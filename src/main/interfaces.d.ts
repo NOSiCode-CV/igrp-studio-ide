@@ -10,52 +10,75 @@ import {
     PageConfig,
     PayloadConfig,
     CodeSnippetsRegistrationConfig,
-    ServiceInfo
-} from './types';  // Ajuste o caminho conforme a localização real dos seus tipos
+    ServiceInfo,
+} from './types'; // Ajuste o caminho conforme a localização real dos seus tipos
 
-import { Dependency } from "@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes";
+import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes';
 import {
     Connection,
     HandlerResponse,
     PageableProjects,
-    ProjectData
-} from "./types";
+    ProjectData,
+} from './types';
 import {
     ComponentRegistrationConfig,
     DockerServiceRegistrationConfig,
     ProjectWorkspace,
-    ServiceWorkspace
-} from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
-import {
-    IWorkspace,
-    DatabaseResponse
-} from 'src/main/types';
-import {
-    WorkspaceService
+    ServiceWorkspace,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { IWorkspace, DatabaseResponse } from 'src/main/types';
+import { WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 export interface IWorkspaceRepository {
     // Workspace Operations
-    createWorkspace(workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>): Promise<HandlerResponse>;
-    updateWorkspace(id: string, updates: Partial<IWorkspace>): Promise<IWorkspace>;
+    createWorkspace(
+        workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>
+    ): Promise<HandlerResponse>;
+    updateWorkspace(
+        id: string,
+        updates: Partial<IWorkspace>
+    ): Promise<IWorkspace>;
     deleteWorkspace(id: string): Promise<void>;
     getWorkspace(id: string): Promise<IWorkspace | undefined>;
     findAllWorkspaces(): Promise<IWorkspace[]>;
     findRecentWorkspaces(limit?: number): Promise<IWorkspace[]>;
-    saveCustomWorkspaceComposeFile(yaml: object, basePath: string): Promise<void>;
+    openWorkspace(workspacePath: string): Promise<HandlerResponse>;
+    saveCustomWorkspaceComposeFile(
+        yaml: object,
+        basePath: string
+    ): Promise<void>;
 
     // Project Operations
-    createProject(workspaceId: string, project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>): Promise<HandlerResponse>;
-    updateProject(projectId: string, updates: Partial<ProjectWorkspace>): Promise<ProjectWorkspace>;
+    createProject(
+        workspaceId: string,
+        project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>
+    ): Promise<HandlerResponse>;
+    updateProject(
+        projectId: string,
+        updates: Partial<ProjectWorkspace>
+    ): Promise<ProjectWorkspace>;
     configureService(config: ProjectWorkspace, basePath: string): Promise<void>;
     deleteProject(projectId: string, basePath: string): Promise<void>;
     getProject(id: string): Promise<ProjectData | undefined>;
     findAllProjects(workspaceId?: string): Promise<ProjectData[]>;
-    getRecentProjects(workspaceId: string, limit?: number): Promise<ProjectData[]>;
+    getRecentProjects(
+        workspaceId: string,
+        limit?: number
+    ): Promise<ProjectData[]>;
+    addProjectToWorkspace(
+        workspaceId: string,
+        project: ProjectData
+    ): Promise<HandlerResponse>;
 
     //Service Operations
-    createService(service: ServiceWorkspace, basePath: string): Promise<HandlerResponse>;
-    updateService(service: ServiceWorkspace, basePath: string): Promise<HandlerResponse>;
+    createService(
+        service: ServiceWorkspace,
+        basePath: string
+    ): Promise<HandlerResponse>;
+    updateService(
+        service: ServiceWorkspace,
+        basePath: string
+    ): Promise<HandlerResponse>;
     deleteService(serviceId: string, basePath: string): Promise<void>;
     findAllServices(workspaceId: string): Promise<WorkspaceService[]>;
 
@@ -64,10 +87,7 @@ export interface IWorkspaceRepository {
     backupData(backupPath: string): Promise<void>;
     restoreData(backupPath: string): Promise<void>;
 
-    onError(callback: (error: {
-        code: string;
-        message: string
-    }) => void);
+    onError(callback: (error: { code: string; message: string }) => void);
 }
 
 export interface IProjectRepository {
@@ -83,9 +103,12 @@ export interface IConnenctionRepository {
     findAll(): Promise<Array<Connection>>;
     findOne(name: string): Promise<Connection>;
 
-    connectToDatabase: (config: Connection) => Promise<DatabaseResponse>,
-    getTables: (connectionName: string) => Promise<DatabaseResponse>,
-    getTableStructure: (connectionName: string, tableName: string) => Promise<DatabaseResponse>,
+    connectToDatabase: (config: Connection) => Promise<DatabaseResponse>;
+    getTables: (connectionName: string) => Promise<DatabaseResponse>;
+    getTableStructure: (
+        connectionName: string,
+        tableName: string
+    ) => Promise<DatabaseResponse>;
 }
 
 export interface BaseEngine {
@@ -109,58 +132,133 @@ export interface BaseEngine {
     getComponents?(): ComponentRegistrationConfig;
     getServices?(): Promise<DockerServiceRegistrationConfig>;
 
-    getDependencies?(): Promise<Dependency[]>
+    getDependencies?(): Promise<Dependency[]>;
 
     getAppMetadata?: (basePath: string) => Promise<PayloadConfig>;
 
     getCodeSnippets?(): CodeSnippetsRegistrationConfig;
 
-    registerComponent?(config: ComponentRegistrationConfig): void
+    registerComponent?(config: ComponentRegistrationConfig): void;
 
     createProcess?: (process: ProcessConfig, basePath: string) => Promise<void>;
-    createProcessStep?: (step: ProcessStepConfig, basePath: string) => Promise<void>;
-
+    createProcessStep?: (
+        step: ProcessStepConfig,
+        basePath: string
+    ) => Promise<void>;
 }
 
-
 export interface IBaseEngine {
-    createProject: (project: ProjectData, basePath: string) => Promise<HandlerResponse>;
+    createProject: (
+        project: ProjectData,
+        basePath: string
+    ) => Promise<HandlerResponse>;
 
-    createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createResponse: (
+        response: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
 
-    createEnum: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createModule: (moduleConfig: ModuleConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createModel: (modelConfig: ModelConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createDto: (dtoConfig: DTOConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createController: (controllerConfig: ControllerConfig, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createEnum: (
+        data: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createModule: (
+        moduleConfig: ModuleConfig,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createModel: (
+        modelConfig: ModelConfig,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createDto: (
+        dtoConfig: DTOConfig,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createController: (
+        controllerConfig: ControllerConfig,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
 
-    createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    duplicate: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createPermission: (
+        data: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    serializeElement: (
+        data: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    delete: (
+        config: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    duplicate: (
+        config: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
 
-    createPage: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createPage: (
+        config: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
     registry: (engineType: string) => Promise<HandlerResponse>;
     getComponent: (engineType: string) => Promise<HandlerResponse>;
     getService: (engineType: string) => Promise<Record<string, Component>>;
     getDependencies: (engineType: string) => Promise<HandlerResponse>;
 
-    getAppMetadata: (engineType: string, basePath: string) => Promise<HandlerResponse>
+    getAppMetadata: (
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
 
     getCodeSnippets(engineType: string): CodeSnippetsRegistrationConfig;
 
-    registerComponent: (engineType: string, config: ComponentRegistrationConfig) => Promise<HandlerResponse>
+    registerComponent: (
+        engineType: string,
+        config: ComponentRegistrationConfig
+    ) => Promise<HandlerResponse>;
 
-    createProcess: (process: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createProcessStep: (step: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createProcess: (
+        process: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createProcessStep: (
+        step: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
 }
 
 export interface IDocker {
     up: (projectPath: string) => Promise<ServiceInfo[]>;
-    down: (projectPath: string, options: { dropVolume?: boolean }) => Promise<void>;
+    down: (
+        projectPath: string,
+        options: { dropVolume?: boolean }
+    ) => Promise<void>;
     status: (projectPath: string) => Promise<ServiceInfo[]>;
-    stop: (projectPath: string, options: { services: string[] }) => Promise<void>;
-    restart: (projectPath: string, options: { services: string[]; timeout?: number }) => Promise<void>;
+    stop: (
+        projectPath: string,
+        options: { services: string[] }
+    ) => Promise<void>;
+    restart: (
+        projectPath: string,
+        options: { services: string[]; timeout?: number }
+    ) => Promise<void>;
     check: () => Promise<boolean>;
-    daemonStatus: () => Promise<{ isRunning: boolean, error?: string, details?: string }>;
+    daemonStatus: () => Promise<{
+        isRunning: boolean;
+        error?: string;
+        details?: string;
+    }>;
 }

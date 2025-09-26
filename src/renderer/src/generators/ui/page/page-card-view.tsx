@@ -1,15 +1,16 @@
 // page-card-view.tsx
-import { Card, CardContent } from '@renderer/components/ui/card';
-import { Button } from '@renderer/components/ui/button';
+import {
+    IGRPBadgePrimitive,
+    IGRPButtonPrimitive,
+    IGRPCardContentPrimitive,
+    IGRPCardPrimitive,
+    IGRPCollapsibleContentPrimitive,
+    IGRPCollapsiblePrimitive,
+    IGRPCollapsibleTriggerPrimitive,
+    IGRPSeparatorPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { ChevronRight, ComponentIcon } from 'lucide-react';
 import { PageDefinition } from './page-manager';
-import { Badge } from '@renderer/components/ui/badge';
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from '@renderer/components/ui/collapsible';
-import { Separator } from '@renderer/components/ui/separator';
 import { useState } from 'react';
 import { cn } from '@renderer/lib/utils';
 import { PageTypeIcon, PageActionMenu } from './page-actions';
@@ -21,8 +22,8 @@ export interface PageCardProps {
     onDelete: (page: any) => void;
     onEdit: (page: any) => void;
     onAddComponents: (page: PageDefinition) => void;
-    openDialogNewPage?: (page: PageDefinition, isSubPage?: boolean  ) => void;
-    onDuplicate?: (page: PageDefinition) => void;   
+    openDialogNewPage?: (page: PageDefinition, isSubPage?: boolean) => void;
+    onDuplicate?: (page: PageDefinition) => void;
     setIsSubPage: (isSubPage: boolean) => void;
 }
 
@@ -45,9 +46,9 @@ export function PageCardView({
         (subPages && subPages.length > 0);
 
     return (
-        <Card className="">
-            <CardContent className="group">
-                <Collapsible
+        <IGRPCardPrimitive className="">
+            <IGRPCardContentPrimitive className="group">
+                <IGRPCollapsiblePrimitive
                     className="flex w-full flex-col gap-2 group/collapsible"
                     open={isOpen}
                     onOpenChange={setIsOpen}
@@ -55,8 +56,8 @@ export function PageCardView({
                     <div className="flex items-center justify-between">
                         <div className="flex items-center">
                             {hasChild && (
-                                <CollapsibleTrigger asChild>
-                                    <Button
+                                <IGRPCollapsibleTriggerPrimitive asChild>
+                                    <IGRPButtonPrimitive
                                         variant="ghost"
                                         size="icon"
                                         className="h-5 w-5 p-0 mr-1"
@@ -68,8 +69,8 @@ export function PageCardView({
                                             )}
                                         />
                                         <span className="sr-only">Toggle</span>
-                                    </Button>
-                                </CollapsibleTrigger>
+                                    </IGRPButtonPrimitive>
+                                </IGRPCollapsibleTriggerPrimitive>
                             )}
                             <div className="flex items-center gap-2 flex-1 min-w-0">
                                 <div className="flex items-center gap-1">
@@ -108,16 +109,16 @@ export function PageCardView({
                         {/** Main page */}
                         <div className="flex items-center justify-end">
                             <div className="flex items-center gap-1 justify-end">
-                                <Badge
+                                <IGRPBadgePrimitive
                                     variant={
                                         page.type === 'page'
-                                            ? 'default'
+                                            ? 'solid'
                                             : 'secondary'
                                     }
                                     className="text-xs h-5"
                                 >
                                     {page.type === 'page' ? 'P' : 'C'}
-                                </Badge>
+                                </IGRPBadgePrimitive>
                                 <PageActionMenu
                                     page={page}
                                     onEdit={() => onEdit(page)}
@@ -130,10 +131,10 @@ export function PageCardView({
                             </div>
                         </div>
                     </div>
-                    <CollapsibleContent className="flex flex-col gap-2">
+                    <IGRPCollapsibleContentPrimitive className="flex flex-col gap-2">
                         {subPages && subPages.length > 0 && (
                             <>
-                                <Separator />
+                                <IGRPSeparatorPrimitive />
 
                                 <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
                                     <ComponentIcon className="h-3 w-3" />
@@ -174,7 +175,7 @@ export function PageCardView({
 
                         {components && components.length > 0 && (
                             <>
-                                <Separator />
+                                <IGRPSeparatorPrimitive />
                                 <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
                                     <ComponentIcon className="h-3 w-3" />
                                     Components
@@ -207,9 +208,9 @@ export function PageCardView({
                                 ))}
                             </div>
                         )}
-                    </CollapsibleContent>
-                </Collapsible>
-            </CardContent>
-        </Card>
+                    </IGRPCollapsibleContentPrimitive>
+                </IGRPCollapsiblePrimitive>
+            </IGRPCardContentPrimitive>
+        </IGRPCardPrimitive>
     );
 }

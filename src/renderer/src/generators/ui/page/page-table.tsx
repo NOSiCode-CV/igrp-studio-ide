@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
-import { Badge } from '@renderer/components/ui/badge';
-import { ChevronDown, ChevronRight, FileText, Component } from 'lucide-react';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@renderer/components/ui/table';
+    IGRPBadgePrimitive,
+    IGRPButtonPrimitive,
+    IGRPTableBodyPrimitive,
+    IGRPTableCellPrimitive,
+    IGRPTableHeaderPrimitive,
+    IGRPTableHeadPrimitive,
+    IGRPTablePrimitive,
+    IGRPTableRowPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { ChevronDown, ChevronRight, FileText, Component } from 'lucide-react';
 import { PageTypeIcon, PageActionMenu } from './page-actions';
 import { PageDefinition } from './page-manager';
 
@@ -58,18 +58,20 @@ export const PageTable = ({
 
     return (
         <div className="rounded-md border">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="w-12"></TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Path</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Subpages/Components</TableHead>
-                        <TableHead>Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
+            <IGRPTablePrimitive>
+                <IGRPTableHeaderPrimitive>
+                    <IGRPTableRowPrimitive>
+                        <IGRPTableHeadPrimitive className="w-12"></IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>Name</IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>Path</IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>Type</IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            Subpages/Components
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>Actions</IGRPTableHeadPrimitive>
+                    </IGRPTableRowPrimitive>
+                </IGRPTableHeaderPrimitive>
+                <IGRPTableBodyPrimitive>
                     {tableData.map((page, index) => {
                         const pageComponents = getPageComponent(page.pageName);
                         const pageSubPages = getSubPages(page.pageName);
@@ -78,13 +80,17 @@ export const PageTable = ({
 
                         return (
                             <React.Fragment key={index}>
-                                <TableRow >
-                                    <TableCell>
+                                <IGRPTableRowPrimitive>
+                                    <IGRPTableCellPrimitive>
                                         {hasChildren && (
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => toggleRowExpansion(page.pageName)}
+                                                onClick={() =>
+                                                    toggleRowExpansion(
+                                                        page.pageName
+                                                    )
+                                                }
                                                 className="h-6 w-6 p-0"
                                             >
                                                 {expanded ? (
@@ -92,53 +98,73 @@ export const PageTable = ({
                                                 ) : (
                                                     <ChevronRight className="h-4 w-4" />
                                                 )}
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         )}
-                                    </TableCell>
-                                    <TableCell>
+                                    </IGRPTableCellPrimitive>
+                                    <IGRPTableCellPrimitive>
                                         <div className="flex items-center gap-2">
                                             <PageTypeIcon
                                                 isOpen={false}
-                                                compCount={components ? components.length : 0}
+                                                compCount={
+                                                    components
+                                                        ? components.length
+                                                        : 0
+                                                }
                                                 page={page}
                                             />
                                             <span>
-                                                {page.description || page.pageName}
+                                                {page.description ||
+                                                    page.pageName}
                                             </span>
                                         </div>
-                                    </TableCell>
-                                    <TableCell>
+                                    </IGRPTableCellPrimitive>
+                                    <IGRPTableCellPrimitive>
                                         <code className="text-xs bg-muted px-1 py-0.5 rounded">
                                             {page.pagePath || '-'}
                                         </code>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge
-                                            variant={page.isPage ? 'default' : 'secondary'}
+                                    </IGRPTableCellPrimitive>
+                                    <IGRPTableCellPrimitive>
+                                        <IGRPBadgePrimitive
+                                            variant={
+                                                page.isPage
+                                                    ? 'default'
+                                                    : 'secondary'
+                                            }
                                             className="text-xs"
                                         >
                                             {page.type}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
+                                        </IGRPBadgePrimitive>
+                                    </IGRPTableCellPrimitive>
+                                    <IGRPTableCellPrimitive>
                                         <div className="flex gap-2">
-                                            {pageComponents.length > 0 || pageSubPages.length > 0 ? (
+                                            {pageComponents.length > 0 ||
+                                            pageSubPages.length > 0 ? (
                                                 <div className="flex flex-col gap-1">
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-xs text-muted-foreground">
                                                             Components:
                                                         </span>
-                                                        <Badge variant="outline" className="text-xs">
-                                                            {pageComponents.length}
-                                                        </Badge>
+                                                        <IGRPBadgePrimitive
+                                                            variant="outline"
+                                                            className="text-xs"
+                                                        >
+                                                            {
+                                                                pageComponents.length
+                                                            }
+                                                        </IGRPBadgePrimitive>
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-xs text-muted-foreground">
                                                             Subpages:
                                                         </span>
-                                                        <Badge variant="outline" className="text-xs">
-                                                            {pageSubPages.length}
-                                                        </Badge>
+                                                        <IGRPBadgePrimitive
+                                                            variant="outline"
+                                                            className="text-xs"
+                                                        >
+                                                            {
+                                                                pageSubPages.length
+                                                            }
+                                                        </IGRPBadgePrimitive>
                                                     </div>
                                                 </div>
                                             ) : (
@@ -147,104 +173,154 @@ export const PageTable = ({
                                                 </span>
                                             )}
                                         </div>
-                                    </TableCell>
-                                    <TableCell>
+                                    </IGRPTableCellPrimitive>
+                                    <IGRPTableCellPrimitive>
                                         <PageActionMenu
                                             page={page}
                                             onEdit={() => void 0}
-                                            onDelete={() => handleDeletePage(page)}
-                                            onAddComponents={() => handleAddComponents(page)}
-                                            openDialogNewPage={openDialogNewPage}
+                                            onDelete={() =>
+                                                handleDeletePage(page)
+                                            }
+                                            onAddComponents={() =>
+                                                handleAddComponents(page)
+                                            }
+                                            openDialogNewPage={
+                                                openDialogNewPage
+                                            }
                                             onDuplicate={handleDuplicate}
                                             setIsSubPage={setIsSubPage}
                                         />
-                                    </TableCell>
-                                </TableRow>
+                                    </IGRPTableCellPrimitive>
+                                </IGRPTableRowPrimitive>
 
                                 {/* Components as table rows */}
-                                {expanded && pageComponents.map((comp, index) => (
-                                    <TableRow key={`comp-${page.id}-${index}`} className="bg-muted/30">
-                                        <TableCell></TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2 pl-6">
-                                                <Component className="h-4 w-4 text-blue-500" />
-                                                <span className="text-sm text-muted-foreground">
-                                                    {comp.description || comp.pageName}
-                                                </span>
-                                                <Badge variant="outline" className="text-xs">
+                                {expanded &&
+                                    pageComponents.map((comp, index) => (
+                                        <IGRPTableRowPrimitive
+                                            key={`comp-${page.id}-${index}`}
+                                            className="bg-muted/30"
+                                        >
+                                            <IGRPTableCellPrimitive></IGRPTableCellPrimitive>
+                                            <IGRPTableCellPrimitive>
+                                                <div className="flex items-center gap-2 pl-6">
+                                                    <Component className="h-4 w-4 text-blue-500" />
+                                                    <span className="text-sm text-muted-foreground">
+                                                        {comp.description ||
+                                                            comp.pageName}
+                                                    </span>
+                                                    <IGRPBadgePrimitive
+                                                        variant="outline"
+                                                        className="text-xs"
+                                                    >
+                                                        component
+                                                    </IGRPBadgePrimitive>
+                                                </div>
+                                            </IGRPTableCellPrimitive>
+                                            <IGRPTableCellPrimitive>
+                                                <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                                                    {comp.pagePath || '-'}
+                                                </code>
+                                            </IGRPTableCellPrimitive>
+                                            <IGRPTableCellPrimitive>
+                                                <IGRPBadgePrimitive
+                                                    variant="outline"
+                                                    className="text-xs"
+                                                >
                                                     component
-                                                </Badge>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                                                {comp.pagePath || '-'}
-                                            </code>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline" className="text-xs">
-                                                component
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell></TableCell>
-                                        <TableCell>
-                                            <PageActionMenu
-                                                page={comp}
-                                                onEdit={() => void 0}
-                                                onDelete={() => handleDeletePage(comp)}
-                                                onAddComponents={() => handleAddComponents(comp)}
-                                                openDialogNewPage={openDialogNewPage}
-                                                onDuplicate={handleDuplicate}
-                                                setIsSubPage={setIsSubPage}
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                                </IGRPBadgePrimitive>
+                                            </IGRPTableCellPrimitive>
+                                            <IGRPTableCellPrimitive></IGRPTableCellPrimitive>
+                                            <IGRPTableCellPrimitive>
+                                                <PageActionMenu
+                                                    page={comp}
+                                                    onEdit={() => void 0}
+                                                    onDelete={() =>
+                                                        handleDeletePage(comp)
+                                                    }
+                                                    onAddComponents={() =>
+                                                        handleAddComponents(
+                                                            comp
+                                                        )
+                                                    }
+                                                    openDialogNewPage={
+                                                        openDialogNewPage
+                                                    }
+                                                    onDuplicate={
+                                                        handleDuplicate
+                                                    }
+                                                    setIsSubPage={setIsSubPage}
+                                                />
+                                            </IGRPTableCellPrimitive>
+                                        </IGRPTableRowPrimitive>
+                                    ))}
 
                                 {/* Subpages as table rows */}
-                                {expanded && pageSubPages.map((subPage, index) => (
-                                    <TableRow key={`subpage-${page.id}-${index}`} className="bg-muted/30">
-                                        <TableCell></TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2 pl-6">
-                                                <FileText className="h-4 w-4 text-green-500" />
-                                                <span className="text-sm text-muted-foreground">
-                                                    {subPage.description || subPage.pageName}
-                                                </span>
-                                                <Badge variant="outline" className="text-xs">
+                                {expanded &&
+                                    pageSubPages.map((subPage, index) => (
+                                        <IGRPTableRowPrimitive
+                                            key={`subpage-${page.id}-${index}`}
+                                            className="bg-muted/30"
+                                        >
+                                            <IGRPTableCellPrimitive></IGRPTableCellPrimitive>
+                                            <IGRPTableCellPrimitive>
+                                                <div className="flex items-center gap-2 pl-6">
+                                                    <FileText className="h-4 w-4 text-green-500" />
+                                                    <span className="text-sm text-muted-foreground">
+                                                        {subPage.description ||
+                                                            subPage.pageName}
+                                                    </span>
+                                                    <IGRPBadgePrimitive
+                                                        variant="outline"
+                                                        className="text-xs"
+                                                    >
+                                                        subpage
+                                                    </IGRPBadgePrimitive>
+                                                </div>
+                                            </IGRPTableCellPrimitive>
+                                            <IGRPTableCellPrimitive>
+                                                <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                                                    {subPage.pagePath || '-'}
+                                                </code>
+                                            </IGRPTableCellPrimitive>
+                                            <IGRPTableCellPrimitive>
+                                                <IGRPBadgePrimitive
+                                                    variant="outline"
+                                                    className="text-xs"
+                                                >
                                                     subpage
-                                                </Badge>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                                                {subPage.pagePath || '-'}
-                                            </code>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline" className="text-xs">
-                                                subpage
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell></TableCell>
-                                        <TableCell>
-                                            <PageActionMenu
-                                                page={subPage}
-                                                onEdit={() => void 0}
-                                                onDelete={() => handleDeletePage(subPage)}
-                                                onAddComponents={() => handleAddComponents(subPage)}
-                                                openDialogNewPage={openDialogNewPage}
-                                                onDuplicate={handleDuplicate}
-                                                setIsSubPage={setIsSubPage}
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                                </IGRPBadgePrimitive>
+                                            </IGRPTableCellPrimitive>
+                                            <IGRPTableCellPrimitive></IGRPTableCellPrimitive>
+                                            <IGRPTableCellPrimitive>
+                                                <PageActionMenu
+                                                    page={subPage}
+                                                    onEdit={() => void 0}
+                                                    onDelete={() =>
+                                                        handleDeletePage(
+                                                            subPage
+                                                        )
+                                                    }
+                                                    onAddComponents={() =>
+                                                        handleAddComponents(
+                                                            subPage
+                                                        )
+                                                    }
+                                                    openDialogNewPage={
+                                                        openDialogNewPage
+                                                    }
+                                                    onDuplicate={
+                                                        handleDuplicate
+                                                    }
+                                                    setIsSubPage={setIsSubPage}
+                                                />
+                                            </IGRPTableCellPrimitive>
+                                        </IGRPTableRowPrimitive>
+                                    ))}
                             </React.Fragment>
                         );
                     })}
-                </TableBody>
-            </Table>
+                </IGRPTableBodyPrimitive>
+            </IGRPTablePrimitive>
         </div>
     );
 };

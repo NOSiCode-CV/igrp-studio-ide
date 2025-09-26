@@ -2,17 +2,17 @@
 
 import React, { useEffect, useState } from 'react';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from '@renderer/components/ui/dialog';
-import { Button } from '@renderer/components/ui/button';
-import { Input } from '@renderer/components/ui/input';
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogDescriptionPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 import MonacoEditor from '@renderer/components/monaco-editor';
-import { DialogDescription } from '@radix-ui/react-dialog';
 import { SerializationConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import useToast from '@renderer/hooks/useToast';
@@ -144,15 +144,17 @@ export default function SerializationConfigModal({
     ];
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent
+        <IGRPDialogPrimitive open={isOpen} onOpenChange={setIsOpen}>
+            <IGRPDialogContentPrimitive
                 className="max-w-[700px]"
                 onClick={(e) => e.stopPropagation()}
             >
-                <DialogHeader>
-                    <DialogTitle>{t('import')}</DialogTitle>
-                    <DialogDescription />
-                </DialogHeader>
+                <IGRPDialogHeaderPrimitive>
+                    <IGRPDialogTitlePrimitive>
+                        {t('import')}
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive />
+                </IGRPDialogHeaderPrimitive>
                 <form
                     onSubmit={(e) => {
                         e.stopPropagation();
@@ -163,7 +165,7 @@ export default function SerializationConfigModal({
                     <div className="grid grid-cols-2 gap-4">
                         <div className="items-center space-y-2">
                             <LabelRequired>{t('name')}</LabelRequired>
-                            <Input
+                            <IGRPInputPrimitive
                                 id="name"
                                 name="name"
                                 value={config.name}
@@ -196,11 +198,13 @@ export default function SerializationConfigModal({
                             fontSize: 14,
                         }}
                     />
-                    <DialogFooter>
-                        <Button type="submit">{t('save')}</Button>
-                    </DialogFooter>
+                    <IGRPDialogFooterPrimitive>
+                        <IGRPButtonPrimitive type="submit">
+                            {t('save')}
+                        </IGRPButtonPrimitive>
+                    </IGRPDialogFooterPrimitive>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

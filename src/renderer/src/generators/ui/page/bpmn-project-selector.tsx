@@ -1,26 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@renderer/components/ui/button';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@renderer/components/ui/select';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
+    IGRPBadgePrimitive,
+    IGRPButtonPrimitive,
+    IGRPSelectContentPrimitive,
+    IGRPSelectItemPrimitive,
+    IGRPSelectPrimitive,
+    IGRPSelectTriggerPrimitive,
+    IGRPSelectValuePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
-import { Badge } from '@renderer/components/ui/badge';
+    IGRPTabsPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+
+import {
+    IGRPCardPrimitive,
+    IGRPCardContentPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { toast } from 'sonner';
 import {
     BPMNProject,
@@ -135,7 +136,7 @@ const ProcessCard = ({
     onSelectProcess: (process: BPMNProjectProcessDefinition) => void;
 }) => {
     return (
-        <Card
+        <IGRPCardPrimitive
             className={`hover:shadow-md transition-all cursor-pointer ${
                 isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
             }`}
@@ -144,14 +145,14 @@ const ProcessCard = ({
                 onSelectProcess(process);
             }}
         >
-            <CardContent>
+            <IGRPCardContentPrimitive>
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
-                        <CardTitle className="text-base font-medium">
+                        <IGRPCardTitlePrimitive className="text-base font-medium">
                             {process.title}
-                        </CardTitle>
+                        </IGRPCardTitlePrimitive>
                         <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
-                            <Calendar  className='w-4 h-4'/>
+                            <Calendar className="w-4 h-4" />
                             {process.deploymentDate && (
                                 <span>
                                     Deployed on{' '}
@@ -162,7 +163,7 @@ const ProcessCard = ({
                             )}
                         </div>
                         <div className="flex items-center space-x-2 mt-1 text-sm text-muted-foreground">
-                            <Trash2 className='w-4 h-4'/>
+                            <Trash2 className="w-4 h-4" />
                             <span>
                                 {process.processArtifacts?.length || 0}{' '}
                                 artifacts
@@ -170,14 +171,14 @@ const ProcessCard = ({
                         </div>
                     </div>
                     <div className="flex flex-col items-end space-y-2">
-                        <Badge variant={'outline'}>
+                        <IGRPBadgePrimitive variant={'outline'}>
                             v{process.version || 'N/A'}
                             {' • Published'}
-                        </Badge>
+                        </IGRPBadgePrimitive>
                     </div>
                 </div>
-            </CardContent>
-        </Card>
+            </IGRPCardContentPrimitive>
+        </IGRPCardPrimitive>
     );
 };
 
@@ -211,8 +212,11 @@ export const BPMNProjectSelector = ({
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const { projects, loading } = useBPMNProjects(refreshTrigger);
-    const { processDefinitions, loading: loadingProcesses, loadProcessDefinitions } =
-        useProcessDefinitions(selectedProject);
+    const {
+        processDefinitions,
+        loading: loadingProcesses,
+        loadProcessDefinitions,
+    } = useProcessDefinitions(selectedProject);
 
     const { showErrorToast, showSuccessToast } = useToast();
     const dispatch: any = useDispatch();
@@ -222,7 +226,7 @@ export const BPMNProjectSelector = ({
         const handleConfigChange = () => {
             // Clear the BPMN service cache to force it to use the new active config
             bpmnService.clearConfig();
-            setRefreshTrigger(prev => prev + 1);
+            setRefreshTrigger((prev) => prev + 1);
         };
 
         // Listen for storage changes (when BPMN configs are updated)
@@ -237,7 +241,10 @@ export const BPMNProjectSelector = ({
         window.addEventListener('storage', handleStorageChange);
 
         return () => {
-            window.removeEventListener('bpmn-config-changed', handleConfigChange);
+            window.removeEventListener(
+                'bpmn-config-changed',
+                handleConfigChange
+            );
             window.removeEventListener('storage', handleStorageChange);
         };
     }, []);
@@ -457,32 +464,36 @@ export const BPMNProjectSelector = ({
             {/* Project Selection */}
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium">Select Project</label>
-                    <Button
+                    <label className="text-sm font-medium">
+                        Select Project
+                    </label>
+                    <IGRPButtonPrimitive
                         variant="outline"
                         size="sm"
                         onClick={() => {
                             bpmnService.clearConfig();
-                            setRefreshTrigger(prev => prev + 1);
+                            setRefreshTrigger((prev) => prev + 1);
                         }}
                         disabled={loading}
                         className="flex items-center gap-2"
                     >
-                        <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                        <RefreshCw
+                            className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
+                        />
                         Refresh
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </div>
-                <Select
+                <IGRPSelectPrimitive
                     onValueChange={handleProjectChange}
                     value={selectedProject?.projectId || ''}
                 >
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Choose a project..." />
-                    </SelectTrigger>
-                    <SelectContent>
+                    <IGRPSelectTriggerPrimitive className="w-full">
+                        <IGRPSelectValuePrimitive placeholder="Choose a project..." />
+                    </IGRPSelectTriggerPrimitive>
+                    <IGRPSelectContentPrimitive>
                         {projects.length > 0 &&
                             projects.map((project) => (
-                                <SelectItem
+                                <IGRPSelectItemPrimitive
                                     key={project.projectId}
                                     value={project.projectId}
                                 >
@@ -490,7 +501,7 @@ export const BPMNProjectSelector = ({
                                         <span className="font-medium">
                                             {project.name}
                                         </span>
-                                        <Badge
+                                        <IGRPBadgePrimitive
                                             variant={
                                                 project.active
                                                     ? 'default'
@@ -498,17 +509,17 @@ export const BPMNProjectSelector = ({
                                             }
                                         >
                                             {project.code}
-                                        </Badge>
+                                        </IGRPBadgePrimitive>
                                         {!project.active && (
-                                            <Badge variant="outline">
+                                            <IGRPBadgePrimitive variant="outline">
                                                 Inactive
-                                            </Badge>
+                                            </IGRPBadgePrimitive>
                                         )}
                                     </div>
-                                </SelectItem>
+                                </IGRPSelectItemPrimitive>
                             ))}
-                    </SelectContent>
-                </Select>
+                    </IGRPSelectContentPrimitive>
+                </IGRPSelectPrimitive>
             </div>
 
             {/* Step 2: Select Process */}
@@ -526,19 +537,21 @@ export const BPMNProjectSelector = ({
                         </div>
                         <div className="flex items-center space-x-2">
                             {loadingProcesses && <IGRPLoadingSpinner />}
-                            <Button
+                            <IGRPButtonPrimitive
                                 variant="ghost"
                                 size="sm"
                                 className="h-8 px-2"
                                 onClick={() =>
                                     selectedProject &&
-                                    loadProcessDefinitions(selectedProject.projectId)
+                                    loadProcessDefinitions(
+                                        selectedProject.projectId
+                                    )
                                 }
                                 title="Refresh processes"
                             >
-                                <RefreshCw className='w-4 h-4'/>
+                                <RefreshCw className="w-4 h-4" />
                                 Refresh
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                     </div>
 
@@ -569,11 +582,11 @@ export const BPMNProjectSelector = ({
                             </div>
                         </div>
                     ) : (
-                        <Card>
-                            <CardContent className="py-8 text-center text-muted-foreground">
+                        <IGRPCardPrimitive>
+                            <IGRPCardContentPrimitive className="py-8 text-center text-muted-foreground">
                                 No process definitions found for this project.
-                            </CardContent>
-                        </Card>
+                            </IGRPCardContentPrimitive>
+                        </IGRPCardPrimitive>
                     )}
                 </div>
             )}
@@ -582,21 +595,21 @@ export const BPMNProjectSelector = ({
             {selectedProcess && (
                 <>
                     <div className="space-y-4">
-                        <Tabs
+                        <IGRPTabsPrimitive
                             value={activeTab}
                             onValueChange={setActiveTab}
                             className="w-full"
                         >
-                            <TabsList className="grid grid-cols-2">
-                                <TabsTrigger value="artifacts">
+                            <IGRPTabsListPrimitive className="grid grid-cols-2">
+                                <IGRPTabsTriggerPrimitive value="artifacts">
                                     Process Artifacts
-                                </TabsTrigger>
-                                <TabsTrigger value="diagram">
+                                </IGRPTabsTriggerPrimitive>
+                                <IGRPTabsTriggerPrimitive value="diagram">
                                     BPMN Diagram
-                                </TabsTrigger>
-                            </TabsList>
+                                </IGRPTabsTriggerPrimitive>
+                            </IGRPTabsListPrimitive>
 
-                            <TabsContent
+                            <IGRPTabsContentPrimitive
                                 value="artifacts"
                                 className="space-y-6"
                             >
@@ -611,14 +624,14 @@ export const BPMNProjectSelector = ({
                                         </p>
                                     </div>
                                     <div className="flex space-x-2">
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             variant="outline"
                                             size="sm"
                                             className="flex items-center space-x-2"
                                         >
                                             <Settings />
                                             Bulk Actions
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </div>
                                 </div>
 
@@ -647,18 +660,18 @@ export const BPMNProjectSelector = ({
                                                     );
 
                                                 return (
-                                                    <Card
+                                                    <IGRPCardPrimitive
                                                         key={index}
                                                         className="hover:shadow-md transition-all cursor-pointer hover:bg-muted/30"
                                                     >
-                                                        <CardHeader>
+                                                        <IGRPCardHeaderPrimitive>
                                                             <div className="flex items-start justify-between">
                                                                 <div className="flex-1">
-                                                                    <CardTitle className="text-base font-medium">
+                                                                    <IGRPCardTitlePrimitive className="text-base font-medium">
                                                                         {
                                                                             artifact.name
                                                                         }
-                                                                    </CardTitle>
+                                                                    </IGRPCardTitlePrimitive>
                                                                     <div className="text-sm text-muted-foreground mt-1">
                                                                         {
                                                                             artifact.taskKey
@@ -666,34 +679,34 @@ export const BPMNProjectSelector = ({
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex flex-col items-end space-y-2">
-                                                                    <Badge
+                                                                    <IGRPBadgePrimitive
                                                                         variant="outline"
                                                                         className="text-xs"
                                                                     >
                                                                         v
                                                                         {selectedProcess.version ||
                                                                             'N/A'}
-                                                                    </Badge>
-                                                                    <Button
+                                                                    </IGRPBadgePrimitive>
+                                                                    <IGRPButtonPrimitive
                                                                         variant="ghost"
                                                                         size="sm"
                                                                         className="h-6 w-6 p-0"
                                                                     >
                                                                         <EllipsisVertical />
-                                                                    </Button>
+                                                                    </IGRPButtonPrimitive>
                                                                 </div>
                                                             </div>
-                                                        </CardHeader>
-                                                        <CardContent className="space-y-2">
+                                                        </IGRPCardHeaderPrimitive>
+                                                        <IGRPCardContentPrimitive className="space-y-2">
                                                             {artifact.subProcessTask && (
-                                                                <Badge
-                                                                    variant="secondary"
+                                                                <IGRPBadgePrimitive
+                                                                    variant="outline"
                                                                     className="text-xs"
                                                                 >
                                                                     {`Sub Process - ${artifact.subProcessName}`}
-                                                                </Badge>
+                                                                </IGRPBadgePrimitive>
                                                             )}
-                                                            <Button
+                                                            <IGRPButtonPrimitive
                                                                 size="sm"
                                                                 className="w-full"
                                                                 variant={
@@ -725,23 +738,26 @@ export const BPMNProjectSelector = ({
                                                                         Step
                                                                     </>
                                                                 )}
-                                                            </Button>
-                                                        </CardContent>
-                                                    </Card>
+                                                            </IGRPButtonPrimitive>
+                                                        </IGRPCardContentPrimitive>
+                                                    </IGRPCardPrimitive>
                                                 );
                                             }
                                         )}
                                     </div>
                                 ) : (
-                                    <Card>
-                                        <CardContent className="py-8 text-center text-muted-foreground">
+                                    <IGRPCardPrimitive>
+                                        <IGRPCardContentPrimitive className="py-8 text-center text-muted-foreground">
                                             No artifacts found for this process.
-                                        </CardContent>
-                                    </Card>
+                                        </IGRPCardContentPrimitive>
+                                    </IGRPCardPrimitive>
                                 )}
-                            </TabsContent>
+                            </IGRPTabsContentPrimitive>
 
-                            <TabsContent value="diagram" className="space-y-4">
+                            <IGRPTabsContentPrimitive
+                                value="diagram"
+                                className="space-y-4"
+                            >
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <h4 className="text-md font-medium">
@@ -761,20 +777,20 @@ export const BPMNProjectSelector = ({
                                         }
                                     />
                                 )}
-                            </TabsContent>
-                        </Tabs>
+                            </IGRPTabsContentPrimitive>
+                        </IGRPTabsPrimitive>
                     </div>
                 </>
             )}
 
             {/* No Projects Message */}
             {!loading && projects.length === 0 && (
-                <Card>
-                    <CardContent className="py-8 text-center text-muted-foreground">
+                <IGRPCardPrimitive>
+                    <IGRPCardContentPrimitive className="py-8 text-center text-muted-foreground">
                         No projects found. Please check your BPMN API
                         configuration.
-                    </CardContent>
-                </Card>
+                    </IGRPCardContentPrimitive>
+                </IGRPCardPrimitive>
             )}
 
             {/* Add Components Name Modal */}

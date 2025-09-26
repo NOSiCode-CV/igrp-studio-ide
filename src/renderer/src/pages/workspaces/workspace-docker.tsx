@@ -1,22 +1,21 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
+    IGRPCard,
+    IGRPCardContent,
+    IGRPCardDescription,
+    IGRPCardFooter,
+    IGRPCardHeader,
+    IGRPCardTitle,
+} from '@igrp/igrp-framework-react-design-system';
 import { Save, Copy, RefreshCw } from 'lucide-react';
 import { IWorkspace } from 'src/main/types';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import { useDocker } from '@renderer/hooks/use-docker';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useTranslation } from 'react-i18next';
-
 
 interface WorkspaceConfigProps {
     workspace: IWorkspace;
@@ -25,7 +24,7 @@ interface WorkspaceConfigProps {
 export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
     const [copied, setCopied] = useState(false);
 
-    const { fileContent, services, loadComposeFile } = useDocker({workspace});
+    const { fileContent, services, loadComposeFile } = useDocker({ workspace });
     const [content, setContent] = useState(fileContent);
 
     const {
@@ -55,29 +54,29 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
 
     return (
         <div className="space-y-4">
-            <Card>
-                <CardHeader className="compact-card-header">
-                    <CardTitle className="text-sm">
-                    {t('dockerComposeConfiguration')}
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                    {t('manageComposeFile')}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="compact-card-content space-y-3">
+            <IGRPCard>
+                <IGRPCardHeader className="compact-card-header">
+                    <IGRPCardTitle className="text-sm">
+                        {t('dockerComposeConfiguration')}
+                    </IGRPCardTitle>
+                    <IGRPCardDescription className="text-xs">
+                        {t('manageComposeFile')}
+                    </IGRPCardDescription>
+                </IGRPCardHeader>
+                <IGRPCardContent className="compact-card-content space-y-3">
                     <div className="border rounded-md overflow-hidden">
                         <div className="bg-muted/30 border-b py-1.5 flex items-center justify-between">
                             <div className="text-xs font-medium px-3">
-                            {t('igrpComposeYml')}
+                                {t('igrpComposeYml')}
                             </div>
-                            <Button
+                            <IGRPButtonPrimitive
                                 size="sm"
                                 variant="ghost"
                                 className="h-6 w-6 p-0"
                                 onClick={() => loadComposeFile(workspace.path)}
                             >
                                 <RefreshCw className="h-3.5 w-3.5" />
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                         {content && (
                             <MonacoEditor
@@ -88,14 +87,14 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                             />
                         )}
                     </div>
-                </CardContent>
-                <CardFooter className="compact-card-footer flex justify-between">
+                </IGRPCardContent>
+                <IGRPCardFooter className="compact-card-footer flex justify-between">
                     <div className="text-xs text-muted-foreground">
                         {services.filter((s) => s.status === 'running').length}{' '}
                         {t('servicesEnabled')}
                     </div>
                     <div className="flex gap-2">
-                        <Button
+                        <IGRPButtonPrimitive
                             size="sm"
                             className="h-7"
                             variant="outline"
@@ -112,8 +111,8 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                                     {t('copy')}
                                 </>
                             )}
-                        </Button>
-                        <Button
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
                             size="sm"
                             className="h-7"
                             variant="outline"
@@ -121,10 +120,10 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
                         >
                             <Save className="h-3.5 w-3.5 mr-1" />
                             {t('save')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </div>
-                </CardFooter>
-            </Card>
+                </IGRPCardFooter>
+            </IGRPCard>
         </div>
     );
 }

@@ -1,10 +1,12 @@
-import { Button } from '@renderer/components/ui/button';
+import {
+    IGRPButtonPrimitive,
+    IGRPInputPrimitive,
+    IGRPLabelPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import useGithubAuth from '@renderer/hooks/use-git-auth';
 import { Github, Gitlab, Plus, Trash2, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ReactNode, useEffect, useState } from 'react';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
 import useToast from '@renderer/hooks/useToast';
 import { nanoid } from '@reduxjs/toolkit';
 import { GitLabProvider } from '@renderer/redux/git/reducer';
@@ -18,7 +20,7 @@ function GitLabConfigForm({
     config: GitLabProvider;
     onSave: (config: GitLabProvider) => void;
     onCancel: () => void;
-}) {
+}): React.ReactNode {
     const { t } = useTranslation();
     const [name, setName] = useState(config.name);
     const [baseUrl, setBaseUrl] = useState(config.baseUrl);
@@ -32,15 +34,15 @@ function GitLabConfigForm({
         setClientSecret(config.clientSecret);
     }, [config]);
 
-    const handleSave = () => {
+    const handleSave = (): void => {
         onSave({ ...config, name, baseUrl, clientId, clientSecret });
     };
 
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <Label>{t('custom_gitlab_name')}</Label>
-                <Input
+                <IGRPLabelPrimitive>{t('custom_gitlab_name')}</IGRPLabelPrimitive>
+                <IGRPInputPrimitive
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -49,8 +51,8 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="space-y-2">
-                <Label>{t('gitlab_base_url')}</Label>
-                <Input
+                <IGRPLabelPrimitive>{t('gitlab_base_url')}</IGRPLabelPrimitive>
+                <IGRPInputPrimitive
                     type="text"
                     value={baseUrl}
                     onChange={(e) => setBaseUrl(e.target.value)}
@@ -59,8 +61,8 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="space-y-2">
-                <Label>{t('client_id')}</Label>
-                <Input
+                <IGRPLabelPrimitive>{t('client_id')}</IGRPLabelPrimitive>
+                <IGRPInputPrimitive
                     type="text"
                     value={clientId}
                     onChange={(e) => setClientId(e.target.value)}
@@ -68,8 +70,8 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="space-y-2">
-                <Label>{t('client_secret')}</Label>
-                <Input
+                <IGRPLabelPrimitive>{t('client_secret')}</IGRPLabelPrimitive>
+                <IGRPInputPrimitive
                     type="password"
                     value={clientSecret}
                     onChange={(e) => setClientSecret(e.target.value)}
@@ -77,10 +79,12 @@ function GitLabConfigForm({
                 />
             </div>
             <div className="flex space-x-2">
-                <Button onClick={handleSave}>{t('save_configuration')}</Button>
-                <Button variant="outline" onClick={onCancel}>
+                <IGRPButtonPrimitive onClick={handleSave}>
+                    {t('save_configuration')}
+                </IGRPButtonPrimitive>
+                <IGRPButtonPrimitive variant="outline" onClick={onCancel}>
                     {t('cancel')}
-                </Button>
+                </IGRPButtonPrimitive>
             </div>
         </div>
     );
@@ -110,10 +114,10 @@ function Account({
     onEdit,
     isDefault,
     isConfigured,
-}: AccountProps) {
+}: AccountProps): React.ReactNode {
     const { t } = useTranslation();
 
-    const handleClick = () => {
+    const handleClick = (): void => {
         if (action) action();
     };
 
@@ -143,36 +147,48 @@ function Account({
 
             <div className="flex items-center space-x-2">
                 {!isActive && connected && (
-                    <Button variant="outline" size="sm" onClick={onActivate}>
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        size="sm"
+                        onClick={onActivate}
+                    >
                         {t('activate')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
 
                 {!isDefault && onEdit && (
-                    <Button variant="outline" size="sm" onClick={onEdit}>
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        size="sm"
+                        onClick={onEdit}
+                    >
                         <Settings size={16} />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
 
                 {!isDefault && onDelete && (
-                    <Button variant="outline" size="sm" onClick={onDelete}>
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        size="sm"
+                        onClick={onDelete}
+                    >
                         <Trash2 size={16} />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
 
-                <Button
+                <IGRPButtonPrimitive
                     variant={connected ? 'outline' : 'default'}
                     onClick={handleClick}
                     disabled={isDefault && !isConfigured}
                 >
                     {connected ? t('disconnect') : t('connect')}
-                </Button>
+                </IGRPButtonPrimitive>
             </div>
         </div>
     );
 }
 
-export function ConnectedAccountsSettings() {
+export function ConnectedAccountsSettings(): React.ReactNode {
     const { t } = useTranslation();
     const {
         getGitlabConfig,
@@ -194,7 +210,7 @@ export function ConnectedAccountsSettings() {
     const [editingProvider, setEditingProvider] =
         useState<GitLabProvider | null>(null);
 
-    const handleGitLabConfigSave = async (config: GitLabProvider) => {
+    const handleGitLabConfigSave = async (config: GitLabProvider): Promise<void> => {
         const response = await saveGitlabConfig(config);
         if (response.success) {
             showSuccessToast(t('configSaved'));
@@ -205,7 +221,7 @@ export function ConnectedAccountsSettings() {
         }
     };
 
-    const handleActivateProvider = (providerId: string) => {
+    const handleActivateProvider = (providerId: string): void => {
         setActiveProvider(providerId);
         showSuccessToast(t('providerActivated'));
     };
@@ -219,14 +235,14 @@ export function ConnectedAccountsSettings() {
         }
     };
 
-    const handleEditProvider = (provider: GitLabProvider) => {
+    const handleEditProvider = (provider: GitLabProvider): void => {
         setEditingProvider(provider);
         setIsGitLabConfigVisible(true);
     };
 
     const isGithubConnected =
         activeProviderId === 'github' && !!activeProvider?.user;
-   /*  const isGitLabConnected =
+    /*  const isGitLabConnected =
         activeProviderId !== 'github' && !!activeProvider?.user;
  */
     useEffect(() => {
@@ -309,7 +325,7 @@ export function ConnectedAccountsSettings() {
 
                 {/* Add GitLab Button */}
                 <div className="pt-2">
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="outline"
                         onClick={() => {
                             setEditingProvider(null);
@@ -318,7 +334,7 @@ export function ConnectedAccountsSettings() {
                     >
                         <Plus size={16} className="mr-2" />
                         {t('add_gitlab')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </div>
             </div>
         </div>

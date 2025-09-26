@@ -1,13 +1,13 @@
-import { StyleComponent } from "../types";
-import { backgroundsStyleToClasses } from "./backgroundsStyleToClasses";
-import { bordersStyleToClasses } from "./bordersStyleToClasses";
-import { effectsToSyleClasses } from "./effectsStyleToClassses";
-import { layoutStyleToClasses } from "./layoutStyleToClasses";
-import { positionStyleToClasses } from "./positionStyleToClasses";
-import { sizeStyleToClasses } from "./sizeStyleToClasses";
-import { spacingToClasses } from "./spacingToClasses";
-import { typographyStyleToClasses } from "./typographyStyleToClasses";
-import { customPropertiesToClasses } from "./customPropertiesToClasses";
+import { StyleComponent } from '../types';
+import { backgroundsStyleToClasses } from './backgroundsStyleToClasses';
+import { bordersStyleToClasses } from './bordersStyleToClasses';
+import { effectsToSyleClasses } from './effectsStyleToClassses';
+import { layoutStyleToClasses } from './layoutStyleToClasses';
+import { positionStyleToClasses } from './positionStyleToClasses';
+import { sizeStyleToClasses } from './sizeStyleToClasses';
+import { spacingToClasses } from './spacingToClasses';
+import { typographyStyleToClasses } from './typographyStyleToClasses';
+import { customPropertiesToClasses } from './customPropertiesToClasses';
 
 export const generateAllClasses = (style: StyleComponent | undefined) => {
     if (!style) return '';

@@ -13,8 +13,8 @@ export interface ModelData {
 }
 
 export interface RelationData {
-    from: string,
-    to: string,
+    from: string;
+    to: string;
     text: string;
     toText: string;
 }

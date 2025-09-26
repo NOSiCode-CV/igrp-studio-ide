@@ -1,4 +1,3 @@
-
 // Example: Spring Engine Changelog
 const springEngineChangelog = {
     title: "What's New in IGRP Spring Engine",

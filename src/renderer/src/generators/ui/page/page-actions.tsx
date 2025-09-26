@@ -1,12 +1,12 @@
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
 import { PageCardProps } from './page-card-view';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import {
+    IGRPButtonPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     Component,
     Edit,
@@ -31,28 +31,35 @@ export const PageActionMenu = ({
     const { t } = useTranslation();
     const { isPage } = page;
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button
+        <IGRPDropdownMenuPrimitive>
+            <IGRPDropdownMenuTriggerPrimitive asChild>
+                <IGRPButtonPrimitive
                     variant="ghost"
                     size="sm"
                     className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
                 >
                     <MoreHorizontal className="h-3 w-3" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onEdit}><Edit/>{t('edit')}</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDuplicate?.(page)}>
+                </IGRPButtonPrimitive>
+            </IGRPDropdownMenuTriggerPrimitive>
+            <IGRPDropdownMenuContentPrimitive align="end">
+                <IGRPDropdownMenuItemPrimitive onClick={onEdit}>
+                    <Edit />
+                    {t('edit')}
+                </IGRPDropdownMenuItemPrimitive>
+                <IGRPDropdownMenuItemPrimitive
+                    onClick={() => onDuplicate?.(page)}
+                >
                     <Copy />
                     {t('duplicate')}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onAddComponents(page)}>
+                </IGRPDropdownMenuItemPrimitive>
+                <IGRPDropdownMenuItemPrimitive
+                    onClick={() => onAddComponents(page)}
+                >
                     <Component />
                     {t('addComponents')}
-                </DropdownMenuItem>
+                </IGRPDropdownMenuItemPrimitive>
                 {isPage && (
-                    <DropdownMenuItem
+                    <IGRPDropdownMenuItemPrimitive
                         onSelect={() => {
                             openDialogNewPage?.(page);
                             setIsSubPage(true);
@@ -60,17 +67,17 @@ export const PageActionMenu = ({
                     >
                         <Component />
                         {t('Create SubPage')}
-                    </DropdownMenuItem>
+                    </IGRPDropdownMenuItemPrimitive>
                 )}
-                <DropdownMenuItem
+                <IGRPDropdownMenuItemPrimitive
                     className="text-destructive"
                     onClick={() => onDelete(page)}
                 >
                     <Trash />
                     <span>{t('delete')}</span>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                </IGRPDropdownMenuItemPrimitive>
+            </IGRPDropdownMenuContentPrimitive>
+        </IGRPDropdownMenuPrimitive>
     );
 };
 

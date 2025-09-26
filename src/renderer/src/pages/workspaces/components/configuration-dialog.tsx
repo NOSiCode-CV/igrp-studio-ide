@@ -1,36 +1,32 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@renderer/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
-import { Textarea } from '@renderer/components/ui/textarea';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@renderer/components/ui/select';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
-import { Badge } from '@renderer/components/ui/badge';
-import { Switch } from '@renderer/components/ui/switch';
+    IGRPBadgePrimitive,
+    IGRPButtonPrimitive,
+    IGRPCheckboxPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPScrollAreaPrimitive,
+    IGRPSelectContentPrimitive,
+    IGRPSelectItemPrimitive,
+    IGRPSelectPrimitive,
+    IGRPSelectTriggerPrimitive,
+    IGRPSelectValuePrimitive,
+    IGRPSwitchPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsPrimitive,
+    IGRPTabsTriggerPrimitive,
+    IGRPTextAreaPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Trash2, X } from 'lucide-react';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
-import { Checkbox } from '@renderer/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
@@ -422,45 +418,49 @@ export function ConfigurationDialog({
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-                <DialogHeader>
-                    <DialogTitle>
+        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
+            <IGRPDialogContentPrimitive className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+                <IGRPDialogHeaderPrimitive>
+                    <IGRPDialogTitlePrimitive>
                         {isNew ? t('addNewService') : t('addNewService')}
-                    </DialogTitle>
-                    <DialogDescription>
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive>
                         {isNew
                             ? t('configureNewDockerService')
                             : t('modifyDockerService')}
-                    </DialogDescription>
-                </DialogHeader>
+                    </IGRPDialogDescriptionPrimitive>
+                </IGRPDialogHeaderPrimitive>
 
-                <Tabs
+                <IGRPTabsPrimitive
                     defaultValue="basic"
                     className="flex-1 overflow-hidden flex flex-col"
                 >
-                    <TabsList className="grid grid-cols-4 mb-4 w-full">
-                        <TabsTrigger value="basic">{t('basic')}</TabsTrigger>
-                        <TabsTrigger value="config">
+                    <IGRPTabsListPrimitive className="grid grid-cols-4 mb-4 w-full">
+                        <IGRPTabsTriggerPrimitive value="basic">
+                            {t('basic')}
+                        </IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="config">
                             {t('configuration')}
-                        </TabsTrigger>
-                        <TabsTrigger value="dependencies">
+                        </IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="dependencies">
                             {t('dependencies')}
-                        </TabsTrigger>
-                        <TabsTrigger value="network">
+                        </IGRPTabsTriggerPrimitive>
+                        <IGRPTabsTriggerPrimitive value="network">
                             {t('network')}
-                        </TabsTrigger>
-                    </TabsList>
+                        </IGRPTabsTriggerPrimitive>
+                    </IGRPTabsListPrimitive>
 
-                    <ScrollArea className="flex-1 pr-4 max-h-[60vh] overflow-auto">
+                    <IGRPScrollAreaPrimitive className="flex-1 pr-4 max-h-[60vh] overflow-auto">
                         <div className="pb-4">
-                            <TabsContent
+                            <IGRPTabsContentPrimitive
                                 value="basic"
                                 className="mt-0 space-y-4 px-1"
                             >
                                 {isNew && (
                                     <div className="space-y-2">
-                                        <Label>{t('templateOptional')}</Label>
+                                        <IGRPLabelPrimitive>
+                                            {t('templateOptional')}
+                                        </IGRPLabelPrimitive>
                                         <IGRPCombobox
                                             value={template}
                                             onChange={(tmpl) =>
@@ -484,10 +484,10 @@ export function ConfigurationDialog({
                                 )}
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">
+                                    <IGRPLabelPrimitive htmlFor="name">
                                         {t('serviceName')}
-                                    </Label>
-                                    <Input
+                                    </IGRPLabelPrimitive>
+                                    <IGRPInputPrimitive
                                         id="name"
                                         value={name}
                                         onChange={(e) =>
@@ -499,10 +499,10 @@ export function ConfigurationDialog({
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="description">
+                                    <IGRPLabelPrimitive htmlFor="description">
                                         {t('description')}
-                                    </Label>
-                                    <Textarea
+                                    </IGRPLabelPrimitive>
+                                    <IGRPTextAreaPrimitive
                                         id="description"
                                         value={description}
                                         onChange={(e) =>
@@ -511,16 +511,16 @@ export function ConfigurationDialog({
                                         placeholder={t(
                                             'describeServicePlaceholder'
                                         )}
-                                        className="h-20 resize-none"
+                                        className="resize-none"
                                     />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="image">
+                                        <IGRPLabelPrimitive htmlFor="image">
                                             {t('dockerImage')}
-                                        </Label>
-                                        <Input
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
                                             id="image"
                                             value={image}
                                             onChange={(e) =>
@@ -532,9 +532,9 @@ export function ConfigurationDialog({
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="type">
+                                        <IGRPLabelPrimitive htmlFor="type">
                                             {t('serviceType')}
-                                        </Label>
+                                        </IGRPLabelPrimitive>
                                         <IGRPCombobox
                                             value={type}
                                             onChange={(type) =>
@@ -545,16 +545,16 @@ export function ConfigurationDialog({
                                         />
                                     </div>
                                 </div>
-                            </TabsContent>
+                            </IGRPTabsContentPrimitive>
 
-                            <TabsContent
+                            <IGRPTabsContentPrimitive
                                 value="config"
                                 className="mt-0 space-y-4"
                             >
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Label>{t('ports')}</Label>
-                                        <Badge
+                                        <IGRPLabelPrimitive>{t('ports')}</IGRPLabelPrimitive>
+                                        <IGRPBadgePrimitive
                                             variant="outline"
                                             className="text-xs"
                                         >
@@ -562,7 +562,7 @@ export function ConfigurationDialog({
                                             {ports.length === 1
                                                 ? 'port'
                                                 : 'ports'}
-                                        </Badge>
+                                        </IGRPBadgePrimitive>
                                     </div>
 
                                     <div className="border rounded-md p-3 space-y-2">
@@ -573,7 +573,7 @@ export function ConfigurationDialog({
                                                         port: any,
                                                         index: number
                                                     ) => (
-                                                        <Badge
+                                                        <IGRPBadgePrimitive
                                                             key={index}
                                                             variant="secondary"
                                                             className="px-2 py-1 flex items-center gap-1"
@@ -581,7 +581,7 @@ export function ConfigurationDialog({
                                                             <span className="font-mono">
                                                                 {port}
                                                             </span>
-                                                            <Button
+                                                            <IGRPButtonPrimitive
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="h-4 w-4 p-0 ml-1"
@@ -592,8 +592,8 @@ export function ConfigurationDialog({
                                                                 }
                                                             >
                                                                 <X className="h-3 w-3" />
-                                                            </Button>
-                                                        </Badge>
+                                                            </IGRPButtonPrimitive>
+                                                        </IGRPBadgePrimitive>
                                                     )
                                                 )}
                                             </div>
@@ -604,7 +604,7 @@ export function ConfigurationDialog({
                                         )}
 
                                         <div className="flex gap-2">
-                                            <Input
+                                            <IGRPInputPrimitive
                                                 value={newPort}
                                                 onChange={(e) =>
                                                     setNewPort(e.target.value)
@@ -612,7 +612,7 @@ export function ConfigurationDialog({
                                                 placeholder="e.g., 5432:5432"
                                                 className="h-8 flex-1"
                                             />
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 type="button"
                                                 size="sm"
                                                 className="h-8"
@@ -620,7 +620,7 @@ export function ConfigurationDialog({
                                                 disabled={!newPort}
                                             >
                                                 {t('add')}
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
                                             {t('portsFormat')}
@@ -630,10 +630,10 @@ export function ConfigurationDialog({
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Label>
+                                        <IGRPLabelPrimitive>
                                             {t('environmentVariables')}
-                                        </Label>
-                                        <Badge
+                                        </IGRPLabelPrimitive>
+                                        <IGRPBadgePrimitive
                                             variant="outline"
                                             className="text-xs"
                                         >
@@ -641,7 +641,7 @@ export function ConfigurationDialog({
                                             {environments.length === 1
                                                 ? t('variable')
                                                 : t('variables')}
-                                        </Badge>
+                                        </IGRPBadgePrimitive>
                                     </div>
 
                                     <div className="border rounded-md p-3 space-y-2">
@@ -661,7 +661,7 @@ export function ConfigurationDialog({
                                                                     {env.value}
                                                                 </div>
                                                             </div>
-                                                            <Button
+                                                            <IGRPButtonPrimitive
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="h-6 w-6"
@@ -672,7 +672,7 @@ export function ConfigurationDialog({
                                                                 }
                                                             >
                                                                 <Trash2 className="h-3 w-3" />
-                                                            </Button>
+                                                            </IGRPButtonPrimitive>
                                                         </div>
                                                     )
                                                 )}
@@ -684,7 +684,7 @@ export function ConfigurationDialog({
                                         )}
 
                                         <div className="grid grid-cols-2 gap-2">
-                                            <Input
+                                            <IGRPInputPrimitive
                                                 value={newEnvName}
                                                 onChange={(e) =>
                                                     setNewEnvName(
@@ -695,7 +695,7 @@ export function ConfigurationDialog({
                                                 className="h-8"
                                             />
                                             <div className="flex gap-2">
-                                                <Input
+                                                <IGRPInputPrimitive
                                                     value={newEnvValue}
                                                     onChange={(e) =>
                                                         setNewEnvValue(
@@ -705,7 +705,7 @@ export function ConfigurationDialog({
                                                     placeholder={t('value')}
                                                     className="h-8 flex-1"
                                                 />
-                                                <Button
+                                                <IGRPButtonPrimitive
                                                     type="button"
                                                     size="sm"
                                                     className="h-8"
@@ -713,7 +713,7 @@ export function ConfigurationDialog({
                                                     disabled={!newEnvName}
                                                 >
                                                     {t('add')}
-                                                </Button>
+                                                </IGRPButtonPrimitive>
                                             </div>
                                         </div>
                                     </div>
@@ -721,8 +721,8 @@ export function ConfigurationDialog({
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Label>{t('volumes')}</Label>
-                                        <Badge
+                                        <IGRPLabelPrimitive>{t('volumes')}</IGRPLabelPrimitive>
+                                        <IGRPBadgePrimitive
                                             variant="outline"
                                             className="text-xs"
                                         >
@@ -730,7 +730,7 @@ export function ConfigurationDialog({
                                             {volumes.length === 1
                                                 ? t('volume')
                                                 : t('volumes')}
-                                        </Badge>
+                                        </IGRPBadgePrimitive>
                                     </div>
 
                                     <div className="border rounded-md p-3 space-y-2">
@@ -738,7 +738,7 @@ export function ConfigurationDialog({
                                             <div className="flex flex-wrap gap-2">
                                                 {volumes.map(
                                                     (volume, index) => (
-                                                        <Badge
+                                                        <IGRPBadgePrimitive
                                                             key={index}
                                                             variant="secondary"
                                                             className="px-2 py-1 flex items-center gap-1"
@@ -746,7 +746,7 @@ export function ConfigurationDialog({
                                                             <span className="font-mono text-xs truncate max-w-[200px]">
                                                                 {volume}
                                                             </span>
-                                                            <Button
+                                                            <IGRPButtonPrimitive
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="h-4 w-4 p-0 ml-1"
@@ -757,8 +757,8 @@ export function ConfigurationDialog({
                                                                 }
                                                             >
                                                                 <X className="h-3 w-3" />
-                                                            </Button>
-                                                        </Badge>
+                                                            </IGRPButtonPrimitive>
+                                                        </IGRPBadgePrimitive>
                                                     )
                                                 )}
                                             </div>
@@ -769,7 +769,7 @@ export function ConfigurationDialog({
                                         )}
 
                                         <div className="flex gap-2">
-                                            <Input
+                                            <IGRPInputPrimitive
                                                 value={newVolume}
                                                 onChange={(e) =>
                                                     setNewVolume(e.target.value)
@@ -777,7 +777,7 @@ export function ConfigurationDialog({
                                                 placeholder="e.g., data:/var/lib/data"
                                                 className="h-8 flex-1"
                                             />
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 type="button"
                                                 size="sm"
                                                 className="h-8"
@@ -785,23 +785,23 @@ export function ConfigurationDialog({
                                                 disabled={!newVolume}
                                             >
                                                 {t('add')}
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
                                             {t('volumesFormat')}
                                         </p>
                                     </div>
                                 </div>
-                            </TabsContent>
+                            </IGRPTabsContentPrimitive>
 
-                            <TabsContent
+                            <IGRPTabsContentPrimitive
                                 value={t('dependencies')}
                                 className="mt-0 space-y-4"
                             >
                                 <div className="space-y-2">
-                                    <Label>
+                                    <IGRPLabelPrimitive>
                                         {t('describeServicePlaceholder')}
-                                    </Label>
+                                    </IGRPLabelPrimitive>
                                     <p className="text-xs text-muted-foreground">
                                         {t('connectedService')}
                                     </p>
@@ -822,7 +822,7 @@ export function ConfigurationDialog({
                                                             key={index}
                                                             className="flex items-center space-x-2"
                                                         >
-                                                            <Checkbox
+                                                            <IGRPCheckboxPrimitive
                                                                 id={`depends-${index}`}
                                                                 checked={dependsOn.includes(
                                                                     s.name
@@ -842,12 +842,12 @@ export function ConfigurationDialog({
                                                                             ?.type
                                                                     )}
                                                                 </div>
-                                                                <Label
+                                                                <IGRPLabelPrimitive
                                                                     htmlFor={`depends-${s.name}`}
                                                                     className="text-sm font-normal cursor-pointer"
                                                                 >
                                                                     {s.name}
-                                                                </Label>
+                                                                </IGRPLabelPrimitive>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -860,7 +860,9 @@ export function ConfigurationDialog({
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>{t('projectDependencies')}</Label>
+                                    <IGRPLabelPrimitive>
+                                        {t('projectDependencies')}
+                                    </IGRPLabelPrimitive>
                                     <p className="text-xs text-muted-foreground">
                                         {t('selectProjects')}
                                     </p>
@@ -878,7 +880,7 @@ export function ConfigurationDialog({
                                                             key={p.id}
                                                             className="flex items-center space-x-2"
                                                         >
-                                                            <Checkbox
+                                                            <IGRPCheckboxPrimitive
                                                                 id={`depends-${p.id}`}
                                                                 checked={dependsOn.includes(
                                                                     p.id
@@ -893,12 +895,12 @@ export function ConfigurationDialog({
                                                                 <ProjectIcon
                                                                     project={p}
                                                                 />
-                                                                <Label
+                                                                <IGRPLabelPrimitive
                                                                     htmlFor={`depends-${p.id}`}
                                                                     className="text-sm font-normal cursor-pointer"
                                                                 >
                                                                     {p.name}
-                                                                </Label>
+                                                                </IGRPLabelPrimitive>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -910,36 +912,36 @@ export function ConfigurationDialog({
                                         )}
                                     </div>
                                 </div>
-                            </TabsContent>
+                            </IGRPTabsContentPrimitive>
 
-                            <TabsContent
+                            <IGRPTabsContentPrimitive
                                 value="network"
                                 className="mt-0 space-y-4"
                             >
                                 <div className="space-y-2">
-                                    <Label>{t('networkType')}</Label>
-                                    <Select
+                                    <IGRPLabelPrimitive>{t('networkType')}</IGRPLabelPrimitive>
+                                    <IGRPSelectPrimitive
                                         value={networkType}
                                         onValueChange={setNetworkType}
                                     >
-                                        <SelectTrigger className="h-8">
-                                            <SelectValue
+                                        <IGRPSelectTriggerPrimitive className="h-8">
+                                            <IGRPSelectValuePrimitive
                                                 placeholder={t(
                                                     'selectNetworkType'
                                                 )}
                                             />
-                                        </SelectTrigger>
-                                        <SelectContent>
+                                        </IGRPSelectTriggerPrimitive>
+                                        <IGRPSelectContentPrimitive>
                                             {networkTypes.map((network) => (
-                                                <SelectItem
+                                                <IGRPSelectItemPrimitive
                                                     key={network.id}
                                                     value={network.id}
                                                 >
                                                     {network.name}
-                                                </SelectItem>
+                                                </IGRPSelectItemPrimitive>
                                             ))}
-                                        </SelectContent>
-                                    </Select>
+                                        </IGRPSelectContentPrimitive>
+                                    </IGRPSelectPrimitive>
                                     <p className="text-xs text-muted-foreground">
                                         {t('networkDescription')}
                                     </p>
@@ -947,24 +949,24 @@ export function ConfigurationDialog({
 
                                 <div className="space-y-2">
                                     <div className="flex items-center space-x-2">
-                                        <Switch
+                                        <IGRPSwitchPrimitive
                                             id="custom-network"
                                             checked={useCustomNetwork}
                                             onCheckedChange={
                                                 setUseCustomNetwork
                                             }
                                         />
-                                        <Label htmlFor="custom-network">
+                                        <IGRPLabelPrimitive htmlFor="custom-network">
                                             {t('useCustomNetwork')}
-                                        </Label>
+                                        </IGRPLabelPrimitive>
                                     </div>
 
                                     {useCustomNetwork && (
                                         <div className="pl-6 space-y-2">
-                                            <Label htmlFor="network-name">
+                                            <IGRPLabelPrimitive htmlFor="network-name">
                                                 {t('networkName')}
-                                            </Label>
-                                            <Input
+                                            </IGRPLabelPrimitive>
+                                            <IGRPInputPrimitive
                                                 id="network-name"
                                                 value={customNetwork}
                                                 onChange={(e) =>
@@ -983,23 +985,26 @@ export function ConfigurationDialog({
                                         </div>
                                     )}
                                 </div>
-                            </TabsContent>
+                            </IGRPTabsContentPrimitive>
                         </div>
-                    </ScrollArea>
-                </Tabs>
+                    </IGRPScrollAreaPrimitive>
+                </IGRPTabsPrimitive>
 
-                <DialogFooter className="pt-2">
-                    <Button variant="outline" onClick={() => setOpen?.(false)}>
+                <IGRPDialogFooterPrimitive className="pt-2">
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        onClick={() => setOpen?.(false)}
+                    >
                         {t('cancel')}
-                    </Button>
-                    <Button
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive
                         onClick={handleSave}
                         disabled={isSubmitting || !name}
                     >
                         {isSubmitting ? t('saving') : t('saveService')}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                    </IGRPButtonPrimitive>
+                </IGRPDialogFooterPrimitive>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

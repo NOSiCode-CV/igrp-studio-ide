@@ -27,10 +27,10 @@ When editing a component, a **lateral sidebar** opens with **three main tabs**:
 
 Bindings allow the creation of component `ts` interface. The following table summarizes their features:
 
-| Component Type | Available Binding | Purpose                                                                        |
-| -------------- | ---------------- | ------------------------------------------------------------------------------ |
-| `form and table` | `Binding Config` | Connects input fields with logic                                               |
-| `table`        | `Binding Filter` | Connects table fields with filters, used when having `client side` filters      |
+| Component Type   | Available Binding | Purpose                                                                    |
+| ---------------- | ----------------- | -------------------------------------------------------------------------- |
+| `form and table` | `Binding Config`  | Connects input fields with logic                                           |
+| `table`          | `Binding Filter`  | Connects table fields with filters, used when having `client side` filters |
 
 > 📌 **Binding** is essential for developers to understand the table or form data input.
 
@@ -158,7 +158,7 @@ Associate conditional logic to components, for example:
 Show a component only if a rule is satisfied:
 
 ```tsx
-state1
+state1;
 ```
 
 ### ⚙️ Example 2: Comparison Logic
@@ -166,7 +166,7 @@ state1
 Show a component only if a rule is satisfied:
 
 ```tsx
-state2 === "value"
+state2 === 'value';
 ```
 
 ### 🧩 Example 3: Multiple State Combination
@@ -174,7 +174,7 @@ state2 === "value"
 Show a component only if a rule is satisfied:
 
 ```tsx
-state1 && state2
+state1 && state2;
 ```
 
 > ✨ Tip: Use the `Custom Code` tab to create a state like
@@ -182,5 +182,5 @@ state1 && state2
 > **_onClick_** event. This way, you can control visibility with:
 
 ```tsx
-() => setShowFilter(!showFilter)
-``` 
+() => setShowFilter(!showFilter);
+```

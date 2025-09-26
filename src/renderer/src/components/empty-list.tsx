@@ -3,8 +3,10 @@
 import type * as React from 'react';
 import { CuboidIcon as Cube, Plus } from 'lucide-react';
 import { cn } from '@renderer/lib/utils';
-import { Button } from '@renderer/components/ui/button';
-import { Separator } from './ui/separator';
+import {
+    IGRPButtonPrimitive,
+    IGRPSeparatorPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 
 interface EmptyListProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -17,7 +19,6 @@ interface EmptyListProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function EmptyList({
-    
     icon = <Cube className="h-12 w-12 text-muted-foreground/60" />,
     title = 'No items created yet',
     description = 'Items let you organize content in your sidebar. Create an item to get started.',
@@ -45,17 +46,21 @@ export function EmptyList({
             </p>
 
             {actionLabel && onAction && (
-                <Button onClick={onAction} variant="outline" size="sm">
+                <IGRPButtonPrimitive
+                    onClick={onAction}
+                    variant="outline"
+                    size="sm"
+                >
                     <Plus className="mr-2 h-4 w-4" />
                     {actionLabel}
-                </Button>
+                </IGRPButtonPrimitive>
             )}
 
             {shortcut && (
                 <>
-                    <Separator orientation="horizontal" />
+                    <IGRPSeparatorPrimitive orientation="horizontal" />
                     <p className="mt-4 text-sm text-muted-foreground">
-                    {t('createShortcut')}{' '}
+                        {t('createShortcut')}{' '}
                         <kbd className="font-semibold">{shortcut}</kbd>
                     </p>
                 </>

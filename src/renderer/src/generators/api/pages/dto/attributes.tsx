@@ -20,7 +20,6 @@ const AttributesCard = ({
     removeRow,
     changeValue,
 }: AttributesCardProps) => {
-
     return (
         <FormList
             errors={errors}

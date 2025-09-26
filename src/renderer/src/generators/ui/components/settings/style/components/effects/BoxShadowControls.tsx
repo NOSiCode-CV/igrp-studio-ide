@@ -25,7 +25,6 @@ export function BoxShadowControls({
     const containerRef = useRef<HTMLDivElement>(null);
     const { t } = useTranslation();
 
-
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (
@@ -128,7 +127,8 @@ export function BoxShadowControls({
             <div className="space-y-2">
                 <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {t('editShadow')}{index + 1}
+                        {t('editShadow')}
+                        {index + 1}
                     </span>
                     <button
                         onClick={() => removeShadow(index)}
@@ -148,14 +148,14 @@ export function BoxShadowControls({
                             className="w-3 h-3 rounded text-blue-500 focus:ring-2 focus:ring-blue-500"
                         />
                         <span className="text-xs text-gray-500">
-                        {t('insideShadow')}
+                            {t('insideShadow')}
                         </span>
                     </label>
                 </div>
                 <div className="grid grid-cols-2 gap-1">
                     <div className="space-y-0.5">
                         <label className="text-xs text-gray-500">
-                        {t('offsetX')}
+                            {t('offsetX')}
                         </label>
                         <input
                             type="number"
@@ -168,7 +168,7 @@ export function BoxShadowControls({
                     </div>
                     <div className="space-y-0.5">
                         <label className="text-xs text-gray-500">
-                        {t('offsetY')}
+                            {t('offsetY')}
                         </label>
                         <input
                             type="number"
@@ -195,7 +195,7 @@ export function BoxShadowControls({
                     </div>
                     <div className="space-y-0.5">
                         <label className="text-xs text-gray-500">
-                        {t('spread')}
+                            {t('spread')}
                         </label>
                         <input
                             type="number"

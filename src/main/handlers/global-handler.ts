@@ -1,10 +1,10 @@
-import { ipcMain } from "electron";
-import { IGRPStudioSettings } from "../helpers/igrp-studio-settings";
-import { DoctorService } from "../services/doctor-service";
-import { ToolCheck, BPMNConfig } from "../types";
-import { EVENTS } from "../constants/events";
+import { ipcMain } from 'electron';
+import { IGRPStudioSettings } from '../helpers/igrp-studio-settings';
+import { DoctorService } from '../services/doctor-service';
+import { ToolCheck, BPMNConfig } from '../types';
+import { EVENTS } from '../constants/events';
 import fs from 'fs';
-import path from "path";
+import path from 'path';
 
 ipcMain.handle('theme:get', async () => {
     return IGRPStudioSettings.getActiveTheme();
@@ -15,54 +15,60 @@ ipcMain.handle('theme:set', async (_event, theme: string) => {
     return true;
 });
 
-
 ipcMain.handle('run-doctor-checks', async (): Promise<ToolCheck[]> => {
-    return DoctorService.run()
+    return DoctorService.run();
 });
 
 // Save project icon file
-ipcMain.handle('save-project-icon', async (_event, { filePath, fileData, assetsPath }) => {
-    try {
-        
-        // Ensure assets directory exists
-        await fs.promises.mkdir(assetsPath, { recursive: true });
-        
-        // Convert ArrayBuffer to Buffer and save file
-        const buffer = Buffer.from(fileData);
-        await fs.promises.writeFile(filePath, buffer);
-        
-        return { success: true };
-    } catch (error) {
-        console.error('Error saving project icon:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+ipcMain.handle(
+    'save-project-icon',
+    async (_event, { filePath, fileData, assetsPath }) => {
+        try {
+            // Ensure assets directory exists
+            await fs.promises.mkdir(assetsPath, { recursive: true });
+
+            // Convert ArrayBuffer to Buffer and save file
+            const buffer = Buffer.from(fileData);
+            await fs.promises.writeFile(filePath, buffer);
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error saving project icon:', error);
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
+            };
+        }
     }
-});
+);
 
 // Get icon file data for secure serving
 ipcMain.handle('get-icon-file', async (_event, iconPath, workspacePath) => {
     try {
-        
         let fullPath: string;
-        
+
         if (iconPath.startsWith('icons/')) {
             // For centralized icons, use the workspace path
             fullPath = path.join(workspacePath, iconPath);
         } else if (iconPath.startsWith('assets/')) {
             // For legacy assets, we need the project path
             // This is more complex and would need the project context
-            return { success: false, error: 'Legacy assets paths not supported in this version' };
+            return {
+                success: false,
+                error: 'Legacy assets paths not supported in this version',
+            };
         } else {
             return { success: false, error: 'Invalid icon path format' };
         }
-        
+
         if (!fs.existsSync(fullPath)) {
             return { success: false, error: 'File not found' };
         }
-        
+
         // Read file and return as base64 for secure serving
         const fileBuffer = fs.readFileSync(fullPath);
         const base64Data = fileBuffer.toString('base64');
-        
+
         // Determine MIME type from file extension
         const ext = path.extname(fullPath).toLowerCase();
         const mimeTypes: { [key: string]: string } = {
@@ -71,19 +77,22 @@ ipcMain.handle('get-icon-file', async (_event, iconPath, workspacePath) => {
             '.jpeg': 'image/jpeg',
             '.gif': 'image/gif',
             '.webp': 'image/webp',
-            '.svg': 'image/svg+xml'
+            '.svg': 'image/svg+xml',
         };
-        
+
         const mimeType = mimeTypes[ext] || 'image/png';
-        
-        return { 
-            success: true, 
+
+        return {
+            success: true,
             data: `data:${mimeType};base64,${base64Data}`,
-            mimeType 
+            mimeType,
         };
     } catch (error) {
         console.error('Error reading icon file:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+        };
     }
 });
 
@@ -114,19 +123,28 @@ ipcMain.handle(EVENTS.BPMN.ADD_CONFIG, async (_event, config: BPMNConfig) => {
         return { success: true };
     } catch (error) {
         console.error('Error adding BPMN config:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+        };
     }
 });
 
-ipcMain.handle(EVENTS.BPMN.UPDATE_CONFIG, async (_event, config: BPMNConfig) => {
-    try {
-        await IGRPStudioSettings.updateBPMNConfig(config);
-        return { success: true };
-    } catch (error) {
-        console.error('Error updating BPMN config:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+ipcMain.handle(
+    EVENTS.BPMN.UPDATE_CONFIG,
+    async (_event, config: BPMNConfig) => {
+        try {
+            await IGRPStudioSettings.updateBPMNConfig(config);
+            return { success: true };
+        } catch (error) {
+            console.error('Error updating BPMN config:', error);
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
+            };
+        }
     }
-});
+);
 
 ipcMain.handle(EVENTS.BPMN.DELETE_CONFIG, async (_event, configId: string) => {
     try {
@@ -134,19 +152,28 @@ ipcMain.handle(EVENTS.BPMN.DELETE_CONFIG, async (_event, configId: string) => {
         return { success: true };
     } catch (error) {
         console.error('Error deleting BPMN config:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+        };
     }
 });
 
-ipcMain.handle(EVENTS.BPMN.SET_ACTIVE_CONFIG, async (_event, configId: string) => {
-    try {
-        await IGRPStudioSettings.setActiveBPMNConfig(configId);
-        return { success: true };
-    } catch (error) {
-        console.error('Error setting active BPMN config:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+ipcMain.handle(
+    EVENTS.BPMN.SET_ACTIVE_CONFIG,
+    async (_event, configId: string) => {
+        try {
+            await IGRPStudioSettings.setActiveBPMNConfig(configId);
+            return { success: true };
+        } catch (error) {
+            console.error('Error setting active BPMN config:', error);
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
+            };
+        }
     }
-});
+);
 
 ipcMain.handle(EVENTS.BPMN.DELETE_ALL_CONFIGS, async () => {
     try {
@@ -154,7 +181,10 @@ ipcMain.handle(EVENTS.BPMN.DELETE_ALL_CONFIGS, async () => {
         return { success: true };
     } catch (error) {
         console.error('Error deleting all BPMN configs:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+        };
     }
 });
 
@@ -177,4 +207,3 @@ ipcMain.handle(EVENTS.LANGUAGE.SET_LANGUAGE, (_event, lang: string) => {
         return 'en'; // fallback to default
     }
 });
-

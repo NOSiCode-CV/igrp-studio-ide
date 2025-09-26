@@ -1,40 +1,39 @@
-import { app, BrowserWindow } from "electron"
-import { autoUpdater } from "electron-updater"
-import log from "electron-log"
+import { app, BrowserWindow } from 'electron';
+import { autoUpdater } from 'electron-updater';
+import log from 'electron-log';
 
 export default class AppUpdater {
-
     private win: BrowserWindow;
 
     constructor(win: BrowserWindow) {
-        log.info("Initializing App Updater...")
+        log.info('Initializing App Updater...');
 
         this.win = win;
 
-        this.configurePlatformSpecifics()
+        this.configurePlatformSpecifics();
 
-        this.initAutoUpdater()
+        this.initAutoUpdater();
     }
 
     sendStatusToWindow(text: string) {
-        log.info(text)
+        log.info(text);
         this.win.webContents.send('message-update', text);
     }
 
     configurePlatformSpecifics() {
         autoUpdater.setFeedURL({
-            provider: "s3",
-            bucket: "igrp-studio",
+            provider: 's3',
+            bucket: 'igrp-studio',
             endpoint: process.env.VITE_ENDPOINT_UPDATE_IGRP_STUDIO,
             path: `${process.platform}/${process.arch}`,
-            channel: "latest"
+            channel: 'latest',
         });
     }
 
     initAutoUpdater() {
-        autoUpdater.logger = log
+        autoUpdater.logger = log;
         //@ts-ignore
-        autoUpdater.logger.transports.file.level = "info"
+        autoUpdater.logger.transports.file.level = 'info';
 
         autoUpdater.forceDevUpdateConfig = true;
 
@@ -48,33 +47,33 @@ export default class AppUpdater {
              return
          } */
 
-        if (app.isPackaged)
-            autoUpdater.checkForUpdatesAndNotify()
+        if (app.isPackaged) autoUpdater.checkForUpdatesAndNotify();
 
-        autoUpdater.on("checking-for-update", () => {
-            this.sendStatusToWindow("🔍 Checking for updates...")
-        })
+        autoUpdater.on('checking-for-update', () => {
+            this.sendStatusToWindow('🔍 Checking for updates...');
+        });
 
-        autoUpdater.on("update-available", () => {
-            this.sendStatusToWindow("🚀 Update available! Downloading...")
-        })
+        autoUpdater.on('update-available', () => {
+            this.sendStatusToWindow('🚀 Update available! Downloading...');
+        });
 
-        autoUpdater.on("update-not-available", () => {
-            this.sendStatusToWindow("✅ No updates found.")
-        })
+        autoUpdater.on('update-not-available', () => {
+            this.sendStatusToWindow('✅ No updates found.');
+        });
 
-        autoUpdater.on("error", (error) => {
-            console.log(error)
-            this.sendStatusToWindow(`❌ Update error`)
-        })
+        autoUpdater.on('error', (error) => {
+            console.log(error);
+            this.sendStatusToWindow(`❌ Update error`);
+        });
 
-        autoUpdater.on("download-progress", (progressObj) => {
-            this.sendStatusToWindow(`📥 Download progress: ${Math.round(progressObj.percent)}%`)
-        })
+        autoUpdater.on('download-progress', (progressObj) => {
+            this.sendStatusToWindow(
+                `📥 Download progress: ${Math.round(progressObj.percent)}%`
+            );
+        });
 
         autoUpdater.on('update-downloaded', () => {
             this.sendStatusToWindow('Update downloaded. Ready to install.');
         });
-
     }
 }

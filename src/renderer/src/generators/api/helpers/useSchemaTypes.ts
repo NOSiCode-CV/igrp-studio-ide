@@ -15,17 +15,20 @@ interface DTOItem {
     name: string;
 }
 
-function useSchemaTypes(selectors: Selector[], dto: DTOItem[], enums: DTOItem[]) {
+function useSchemaTypes(
+    selectors: Selector[],
+    dto: DTOItem[],
+    enums: DTOItem[]
+) {
     const [schemaTypes, setSchemaTypes] = useState<SchemaTypeItem[]>([]);
 
     useEffect(() => {
-
         // Obter os tipos básicos do seletor
         const baseTypes = formatMethods(
             (
                 selectors.find((selector) => 'SCHEMA_TYPES' in selector) as
-                | { SCHEMA_TYPES: string[] }
-                | undefined
+                    | { SCHEMA_TYPES: string[] }
+                    | undefined
             )?.SCHEMA_TYPES || []
         );
 
@@ -40,22 +43,21 @@ function useSchemaTypes(selectors: Selector[], dto: DTOItem[], enums: DTOItem[])
             {
                 value: 'enum',
                 label: 'Enum',
-                items: targetEnums
-            }
+                items: targetEnums,
+            },
         ];
 
         // Atualizar o estado com os tipos completos
         setSchemaTypes(completeSchemaTypes);
 
         // Manter a transformação para "Reference other Object" se necessário
-        setSchemaTypes(prevSchemaTypes =>
-            prevSchemaTypes.map(schemaType =>
+        setSchemaTypes((prevSchemaTypes) =>
+            prevSchemaTypes.map((schemaType) =>
                 schemaType.value === 'Reference other Object'
                     ? { ...schemaType, value: 'dto', items: targetDto }
                     : schemaType
             )
         );
-
     }, [dto, enums, selectors]);
 
     return schemaTypes;

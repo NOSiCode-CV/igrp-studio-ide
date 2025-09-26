@@ -3,16 +3,19 @@
 import { Bug } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '@renderer/components/ui/button';
 import {
-    Drawer,
-    DrawerContent,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from '@renderer/components/ui/drawer';
-import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
-import { ScrollArea } from './ui/scroll-area';
+    IGRPButtonPrimitive,
+    IGRPDrawerContentPrimitive,
+    IGRPDrawerHeaderPrimitive,
+    IGRPDrawerPrimitive,
+    IGRPDrawerTitlePrimitive,
+    IGRPDrawerTriggerPrimitive,
+    IGRPScrollAreaPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+
 import { useEffect, useRef, useState } from 'react';
 import {
     IGRPTabs,
@@ -29,25 +32,31 @@ interface ConsoleMessage {
 export function DebugTerminal() {
     const { t } = useTranslation();
     return (
-        <Drawer modal={false}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <DrawerTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-6 w-6">
+        <IGRPDrawerPrimitive modal={false}>
+            <IGRPTooltipPrimitive>
+                <IGRPTooltipTriggerPrimitive asChild>
+                    <IGRPDrawerTriggerPrimitive asChild>
+                        <IGRPButtonPrimitive
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                        >
                             <Bug className="h-3.5 w-3.5 text-muted-foreground" />
-                        </Button>
-                    </DrawerTrigger>
-                </TooltipTrigger>
-                <TooltipContent>{t('debug')}</TooltipContent>
-            </Tooltip>
-            <DrawerContent
+                        </IGRPButtonPrimitive>
+                    </IGRPDrawerTriggerPrimitive>
+                </IGRPTooltipTriggerPrimitive>
+                <IGRPTooltipContentPrimitive>
+                    {t('debug')}
+                </IGRPTooltipContentPrimitive>
+            </IGRPTooltipPrimitive>
+            <IGRPDrawerContentPrimitive
                 aria-describedby={undefined}
                 className="h-[40vh] z-40 mb-8"
             >
                 <div className="flex h-full flex-col -mt-6">
-                    <DrawerHeader className="p-0">
-                        <DrawerTitle />
-                    </DrawerHeader>
+                    <IGRPDrawerHeaderPrimitive className="p-0">
+                        <IGRPDrawerTitlePrimitive />
+                    </IGRPDrawerHeaderPrimitive>
                     <IGRPTabs
                         defaultValue="debug"
                         className="flex h-full flex-col"
@@ -71,8 +80,8 @@ export function DebugTerminal() {
                         </div>
                     </IGRPTabs>
                 </div>
-            </DrawerContent>
-        </Drawer>
+            </IGRPDrawerContentPrimitive>
+        </IGRPDrawerPrimitive>
     );
 }
 
@@ -109,7 +118,7 @@ function ConsoleTab() {
 
     return (
         <div className="h-full">
-            <ScrollArea className="h-full w-full" ref={scrollRef}>
+            <IGRPScrollAreaPrimitive className="h-full w-full" ref={scrollRef}>
                 <div className="font-mono text-sm p-4  min-h-full">
                     {logs.length > 0 ? (
                         <pre className="text-sm">
@@ -128,7 +137,7 @@ function ConsoleTab() {
                         </div>
                     )}
                 </div>
-            </ScrollArea>
+            </IGRPScrollAreaPrimitive>
         </div>
     );
 }

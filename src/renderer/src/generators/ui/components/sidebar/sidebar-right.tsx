@@ -1,33 +1,33 @@
 import { RotateCcw, Settings, X } from 'lucide-react';
 
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarHeader,
-} from '@renderer/components/ui/sidebar';
-import { Button } from '@renderer/components/ui/button';
+    IGRPButtonPrimitive,
+    IGRPSidebarContentPrimitive,
+    IGRPSidebarHeaderPrimitive,
+    IGRPSidebarPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { useTranslation } from 'react-i18next';
 import RenderPropsConfig from '../settings/properties';
 import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from '@renderer/components/ui/accordion';
+    IGRPAccordionPrimitive,
+    IGRPAccordionContentPrimitive,
+    IGRPAccordionItemPrimitive,
+    IGRPAccordionTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
+    IGRPTabsPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import useStudio from '@renderer/hooks/use-studio';
 import { DataValue, StructuredComponent } from '@renderer/lib/dnd/types';
 import { EmptyList } from '@renderer/components/empty-list';
 import Interactions from '../settings/Interactions';
 import { StyleTab } from '../settings/style';
-import { Label } from '@renderer/components/ui/label';
-import { Input } from '@renderer/components/ui/input';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import useCustomCode from '../../hooks/useCustomCode';
 import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system';
@@ -45,7 +45,8 @@ import { getRequiredDataSchema } from '../../dnd/helpers';
 import { useComponents } from '../../hooks/useComponents';
 import CopyContent from './copy-content';
 
-interface SidebarRightProps extends ComponentProps<typeof Sidebar> {
+interface SidebarRightProps
+    extends ComponentProps<typeof IGRPSidebarPrimitive> {
     comp?: StructuredComponent;
     parentComp?: StructuredComponent;
     path?: string;
@@ -186,7 +187,7 @@ const SidebarRight = ({
                     // If the key doesn't exist in the current data, add it
                     if (!(key in data)) {
                         cleanedData[key] = requiredDataSchema[key];
-                       // hasChanges = true;
+                        // hasChanges = true;
                     }
                 });
 
@@ -199,7 +200,7 @@ const SidebarRight = ({
                         Object.keys(cleanedData[key]).length === 0
                     ) {
                         delete cleanedData[key];
-                       // hasChanges = true;
+                        // hasChanges = true;
                     }
                 });
 
@@ -275,7 +276,9 @@ const SidebarRight = ({
                 const source = // Filter properties based on schema and requirements
                     Object.entries(currentComp?.properties ?? {}).reduce(
                         (acc, [key, value]) => {
-                            const schemaConfig = (data as Record<string, any>)?.[key];
+                            const schemaConfig = (
+                                data as Record<string, any>
+                            )?.[key];
 
                             // Skip if property not in schema
                             if (!schemaConfig) {
@@ -526,7 +529,7 @@ const SidebarRight = ({
     };
 
     return (
-        <Sidebar
+        <IGRPSidebarPrimitive
             collapsible="none"
             className="overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height-two)! h-[calc(100svh-var(--header-height-three))]!"
             {...props}
@@ -536,7 +539,7 @@ const SidebarRight = ({
                 } as React.CSSProperties & { '--sidebar-width': string }
             }
         >
-            <SidebarHeader>
+            <IGRPSidebarHeaderPrimitive>
                 <div className="items-center justify-between flex flex-1">
                     <div className="space-y-1">
                         <h4 className="text-sm font-medium leading-none">
@@ -550,23 +553,26 @@ const SidebarRight = ({
                     <div className="flex items-center gap-2">
                         {!comp && (
                             <>
-                                <Button
+                                <IGRPButtonPrimitive
                                     variant="outline"
                                     size="icon"
                                     onClick={resetTempData}
                                     title="Reset changes"
                                 >
                                     <RotateCcw className="h-4 w-4" />
-                                </Button>
-                                <Button variant={'ghost'} onClick={handleClose}>
+                                </IGRPButtonPrimitive>
+                                <IGRPButtonPrimitive
+                                    variant={'ghost'}
+                                    onClick={handleClose}
+                                >
                                     <X />
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </>
                         )}
                     </div>
                 </div>
-            </SidebarHeader>
-            <SidebarContent>
+            </IGRPSidebarHeaderPrimitive>
+            <IGRPSidebarContentPrimitive>
                 {isLoading ? (
                     <Loader />
                 ) : !tempEditingComponent ? (
@@ -580,39 +586,49 @@ const SidebarRight = ({
                 ) : (
                     <>
                         <div className="space-y-2 p-2">
-                            <Label htmlFor={'tab'}>
+                            <IGRPLabelPrimitive htmlFor={'tab'}>
                                 {`${label || componentName} - ${componentId}`}
-                            </Label>
-                            <Input
+                            </IGRPLabelPrimitive>
+                            <IGRPInputPrimitive
                                 id="tag"
                                 value={tempEditingComponent?.tag}
                                 onChange={udpateTag}
                             />
                         </div>
-                        <Tabs className="flex-1 px-2" defaultValue="props">
-                            <TabsList className="grid w-full grid-cols-4">
-                                <TabsTrigger value="props">Props</TabsTrigger>
-                                <TabsTrigger value="styles">Style</TabsTrigger>
-                                <TabsTrigger value="interactions">
+                        <IGRPTabsPrimitive
+                            className="flex-1 px-2"
+                            defaultValue="props"
+                        >
+                            <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
+                                <IGRPTabsTriggerPrimitive value="props">
+                                    Props
+                                </IGRPTabsTriggerPrimitive>
+                                <IGRPTabsTriggerPrimitive value="styles">
+                                    Style
+                                </IGRPTabsTriggerPrimitive>
+                                <IGRPTabsTriggerPrimitive value="interactions">
                                     Interactions
-                                </TabsTrigger>
-                                <TabsTrigger value="copy-content">
+                                </IGRPTabsTriggerPrimitive>
+                                <IGRPTabsTriggerPrimitive value="copy-content">
                                     Copy
-                                </TabsTrigger>
-                            </TabsList>
+                                </IGRPTabsTriggerPrimitive>
+                            </IGRPTabsListPrimitive>
 
-                            <TabsContent value="props" className="space-y-6">
-                                <Accordion
+                            <IGRPTabsContentPrimitive
+                                value="props"
+                                className="space-y-6"
+                            >
+                                <IGRPAccordionPrimitive
                                     type="single"
                                     collapsible
                                     className="w-full"
                                     defaultValue="item-1"
                                 >
-                                    <AccordionItem value="item-1">
-                                        <AccordionTrigger>
+                                    <IGRPAccordionItemPrimitive value="item-1">
+                                        <IGRPAccordionTriggerPrimitive>
                                             {t('properties')}
-                                        </AccordionTrigger>
-                                        <AccordionContent className="space-y-2">
+                                        </IGRPAccordionTriggerPrimitive>
+                                        <IGRPAccordionContentPrimitive className="space-y-2">
                                             {propsComponent && (
                                                 <RenderPropsConfig
                                                     propsComp={propsComponent}
@@ -653,15 +669,15 @@ const SidebarRight = ({
                                                     }
                                                 />
                                             )}
-                                        </AccordionContent>
-                                    </AccordionItem>
+                                        </IGRPAccordionContentPrimitive>
+                                    </IGRPAccordionItemPrimitive>
                                     {Object.keys(propsComponentChild).length >
                                         0 && (
-                                        <AccordionItem value="item-1">
-                                            <AccordionTrigger>
+                                        <IGRPAccordionItemPrimitive value="item-1">
+                                            <IGRPAccordionTriggerPrimitive>
                                                 {t('Child Properties')}
-                                            </AccordionTrigger>
-                                            <AccordionContent className="space-y-2">
+                                            </IGRPAccordionTriggerPrimitive>
+                                            <IGRPAccordionContentPrimitive className="space-y-2">
                                                 <RenderPropsConfig
                                                     propsComp={
                                                         propsComponentChild
@@ -700,12 +716,15 @@ const SidebarRight = ({
                                                         })
                                                     }
                                                 />
-                                            </AccordionContent>
-                                        </AccordionItem>
+                                            </IGRPAccordionContentPrimitive>
+                                        </IGRPAccordionItemPrimitive>
                                     )}
-                                </Accordion>
-                            </TabsContent>
-                            <TabsContent value="styles" className="space-y-6">
+                                </IGRPAccordionPrimitive>
+                            </IGRPTabsContentPrimitive>
+                            <IGRPTabsContentPrimitive
+                                value="styles"
+                                className="space-y-6"
+                            >
                                 <StyleTab
                                     comp={tempEditingComponent}
                                     path={currentPath}
@@ -713,8 +732,8 @@ const SidebarRight = ({
                                         handleUpdateChildComponent
                                     }
                                 />
-                            </TabsContent>
-                            <TabsContent
+                            </IGRPTabsContentPrimitive>
+                            <IGRPTabsContentPrimitive
                                 value="interactions"
                                 className="space-y-6"
                             >
@@ -726,15 +745,18 @@ const SidebarRight = ({
                                     }
                                     columnsOptions={columnsOptions}
                                 />
-                            </TabsContent>
-                            <TabsContent value="copy-content" className="space-y-6">
+                            </IGRPTabsContentPrimitive>
+                            <IGRPTabsContentPrimitive
+                                value="copy-content"
+                                className="space-y-6"
+                            >
                                 <CopyContent currentComp={currentComp} />
-                            </TabsContent>
-                        </Tabs>
+                            </IGRPTabsContentPrimitive>
+                        </IGRPTabsPrimitive>
                     </>
                 )}
-            </SidebarContent>
-        </Sidebar>
+            </IGRPSidebarContentPrimitive>
+        </IGRPSidebarPrimitive>
     );
 };
 

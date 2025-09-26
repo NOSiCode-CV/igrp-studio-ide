@@ -1,4 +1,47 @@
-import { IGRPAreaChart, IGRPBadge, IGRPButton, IGRPCheckbox, IGRPCombobox, IGRPDataTableFilterDate, IGRPDataTableFilterDropdown, IGRPDataTableFilterFaceted, IGRPDataTableFilterInput, IGRPDataTableFilterMinMax, IGRPDataTableFilterSelect, IGRPDatePicker, IGRPDatePickerRange, IGRPHeadline, IGRPHorizontalBarChart, IGRPIcon, IGRPInputAddOn, IGRPInputColor, IGRPInputFile, IGRPInputNumber, IGRPInputPassword, IGRPInputPhone, IGRPInputSearch, IGRPInputText, IGRPInputTime, IGRPInputUrl, IGRPLabel, IGRPLineChart, IGRPPdfViewer, IGRPPieChart, IGRPRadarChart, IGRPRadialBarChart, IGRPRadioGroup, IGRPSelect, IGRPSeparator, IGRPStatsCard, IGRPStatusBanner, IGRPSwitch, IGRPText, IGRPTextarea, IGRPVerticalBarChart } from '@igrp/igrp-framework-react-design-system';
+import React from 'react';
+import {
+    IGRPAreaChart,
+    IGRPBadge,
+    IGRPButton,
+    IGRPCheckbox,
+    IGRPCombobox,
+    IGRPDataTableFilterDate,
+    IGRPDataTableFilterDropdown,
+    IGRPDataTableFilterFaceted,
+    IGRPDataTableFilterInput,
+    IGRPDataTableFilterMinMax,
+    IGRPDataTableFilterSelect,
+    IGRPDatePicker,
+    IGRPDatePickerRange,
+    IGRPHeadline,
+    IGRPHorizontalBarChart,
+    IGRPIcon,
+    IGRPInputAddOn,
+    IGRPInputColor,
+    IGRPInputFile,
+    IGRPInputNumber,
+    IGRPInputPassword,
+    IGRPInputPhone,
+    IGRPInputSearch,
+    IGRPInputPrimitive,
+    IGRPInputTime,
+    IGRPInputUrl,
+    IGRPLabelPrimitive,
+    IGRPLineChart,
+    IGRPPdfViewer,
+    IGRPPieChart,
+    IGRPRadarChart,
+    IGRPRadialBarChart,
+    IGRPRadioGroup,
+    IGRPSelect,
+    IGRPSeparator,
+    IGRPStatsCard,
+    IGRPStatusBanner,
+    IGRPSwitch,
+    IGRPText,
+    IGRPTextarea,
+    IGRPVerticalBarChart,
+} from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
     FormInput,
@@ -86,7 +129,14 @@ import IGRPStudioContainer from './types/components/Container';
 import IGRPStudioFragment from './types/components/Fragment';
 import IGRPStudioCard from './types/components/Card';
 import IGRPStudioPage from './types/components/MainComponent';
-import { IGRPStudioDialogDescription, IGRPSTudioDialogFooter, IGRPSTudioDialogHeader, IGRPSTudioDialogTitle, IGRPStudioDialogTrigger, IGRPStudioModalDialog } from './types/components/ModalDialog';
+import {
+    IGRPStudioDialogDescription,
+    IGRPSTudioDialogFooter,
+    IGRPSTudioDialogHeader,
+    IGRPSTudioDialogTitle,
+    IGRPStudioDialogTrigger,
+    IGRPStudioModalDialog,
+} from './types/components/ModalDialog';
 import IGRPStudioTable from './types/components/Table';
 import IGRPStudioParagraph from './types/components/Paragraph';
 import IGRPStudioTabs from './types/components/Tabs';
@@ -97,66 +147,65 @@ import IGRPStudioInfoCard from './types/components/InfoCard';
 import IGRPStudioAlert from './types/components/Alert';
 import IGRPStudioTextList from './types/components/TextList';
 
-
 // Component Categories
 export const GROUP_COMPONET: Record<string, string> = {
-    structure: "Structure",
-    containers: "Containers",
-    formElements: "Form Elements",
-    basicElements: "Basic Elements",
-    dataDisplay: "Data Display",
-    layout: "Layout",
-    widget: "Widgets",
-    advanced: "Advanced",
-    typography: "Typography",
-    customComponents: "Custom Components",
-    appComponents: 'Application Components'
+    structure: 'Structure',
+    containers: 'Containers',
+    formElements: 'Form Elements',
+    basicElements: 'Basic Elements',
+    dataDisplay: 'Data Display',
+    layout: 'Layout',
+    widget: 'Widgets',
+    advanced: 'Advanced',
+    typography: 'Typography',
+    customComponents: 'Custom Components',
+    appComponents: 'Application Components',
 } as const;
 
 export const COMPONENT: Record<string, string> = {
     ComponentContent: 'component',
-    PageContent: "page",
-    ProcessContent: "process",
-    ProcessStepContent: "processStep",
-    Columns: "columns",
-    Column: "column",
-    Grid: "grid",
-    Flex: "flex",
-    Section: "section",
+    PageContent: 'page',
+    ProcessContent: 'process',
+    ProcessStepContent: 'processStep',
+    Columns: 'columns',
+    Column: 'column',
+    Grid: 'grid',
+    Flex: 'flex',
+    Section: 'section',
     Container: 'container',
     Form: 'form',
     PageHeader: 'pageHeader',
 
     Link: 'inputUrl',
-    Button: "button",
-    Text: "text",
-    Image: "image",
-    RichTextEditor: "richTextEditor",
-    Table: "table",
-    Chart: "chart",
-    Maps: "maps",
-    Carousel: "carousel",
-    Fingerprint: "fingerprint",
+    Button: 'button',
+    Text: 'text',
+    Image: 'image',
+    RichTextEditor: 'richTextEditor',
+    Table: 'table',
+    Chart: 'chart',
+    Maps: 'maps',
+    Carousel: 'carousel',
+    Fingerprint: 'fingerprint',
     Input: 'input',
     InputText: 'inputText',
-    Date: "datePicker",
+    Date: 'datePicker',
     DatePicker: 'inputDatePicker',
     TimePicker: 'inputTime',
-    Password: "inputPassword",
+    Password: 'inputPassword',
     Textarea: 'inputTextarea',
-    ColorPicker: "inputColor",
-    Select: "select",
-    Combobox: "combobox",
-    AddOn: "inputAddOn",
-    Checkbox: "checkbox",
-    Radio: "radio",
-    Switch: "switch",
-    Number: "inputNumber",
-    Phone: "inputPhone",
-    RangeSlider: "slider",
-    FileUpload: "inputFile",
-    Hidden: "inputHidden",
-    DatePickerRange: "datePickerRange",
+    ColorPicker: 'inputColor',
+    Select: 'select',
+    Combobox: 'combobox',
+    AddOn: 'inputAddOn',
+    Checkbox: 'checkbox',
+    Radio: 'radio',
+    Switch: 'switch',
+    Number: 'inputNumber',
+    Phone: 'inputPhone',
+    RangeSlider: 'slider',
+    FileUpload: 'inputFile',
+    Hidden: 'inputHidden',
+    DatePickerRange: 'datePickerRange',
 
     Dropdown: 'dropdown',
     TableColumn: 'tableColumns',
@@ -194,9 +243,9 @@ export const COMPONENT: Record<string, string> = {
 
     EmbedVideo: 'embedVideo',
 
-    CardContent: "cardContent",
-    CardFooter: "cardFooter",
-    CardHeader: "cardHeader",
+    CardContent: 'cardContent',
+    CardFooter: 'cardFooter',
+    CardHeader: 'cardHeader',
 
     Piechart: 'piechart',
     Chat: 'chat',
@@ -204,19 +253,19 @@ export const COMPONENT: Record<string, string> = {
     Linechart: 'linechart',
     Barchart: 'barchart',
     HorizontalBarchart: 'horizontalBarchart',
-    VerticalBarchart: "verticalBarchart",
-    RadialBarchart: "radialBarchart",
-    Radarchart: "radarchart",
-    StatsCard: "statsCard",
-    Separator: "separator",
+    VerticalBarchart: 'verticalBarchart',
+    RadialBarchart: 'radialBarchart',
+    Radarchart: 'radarchart',
+    StatsCard: 'statsCard',
+    Separator: 'separator',
 
     ModalDialog: 'modalDialog',
-    ModalDialogTitle: "modalDialogTitle",
-    ModalDialogTrigger: "modalDialogTrigger",
+    ModalDialogTitle: 'modalDialogTitle',
+    ModalDialogTrigger: 'modalDialogTrigger',
     ModalDialogHeader: 'modalDialogHeader',
-    ModalDialogDescription: "modalDialogDescription",
-    ModalDialogContent: "modalDialogContent",
-    ModalDialogFooter: "modalDialogFooter",
+    ModalDialogDescription: 'modalDialogDescription',
+    ModalDialogContent: 'modalDialogContent',
+    ModalDialogFooter: 'modalDialogFooter',
 
     AlertDialog: 'alertDialog',
     Aspect: 'aspect',
@@ -229,11 +278,9 @@ export const COMPONENT: Record<string, string> = {
     PdfViewer: 'pdfViewer',
     Alert: 'alert',
     TextList: 'textList',
-    StatusBanner: "statusBanner",
-    Span: "span"
-
+    StatusBanner: 'statusBanner',
+    Span: 'span',
 } as const;
-
 
 // Icon Mapping
 export const ICON_MAP: Record<string, React.ElementType> = {
@@ -347,6 +394,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.TableBadgeCell]: Badge,
 } as const;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.ColorPicker]: IGRPInputColor,
     [COMPONENT.Date]: IGRPDatePicker,
@@ -356,15 +404,15 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Password]: IGRPInputPassword,
     [COMPONENT.TimePicker]: IGRPInputTime,
     [COMPONENT.Phone]: IGRPInputPhone,
-    [COMPONENT.Input]: IGRPInputText,
-    [COMPONENT.InputText]: IGRPInputText,
+    [COMPONENT.Input]: IGRPInputPrimitive,
+    [COMPONENT.InputText]: IGRPInputPrimitive,
     [COMPONENT.Textarea]: IGRPTextarea,
     [COMPONENT.Link]: IGRPInputUrl,
     [COMPONENT.AddOn]: IGRPInputAddOn,
     [COMPONENT.Select]: IGRPSelect,
     [COMPONENT.Combobox]: IGRPCombobox,
     [COMPONENT.Button]: IGRPButton,
-    [COMPONENT.Label]: IGRPLabel,
+    [COMPONENT.Label]: IGRPLabelPrimitive,
     [COMPONENT.Checkbox]: IGRPCheckbox,
     [COMPONENT.Radio]: IGRPRadioGroup,
     [COMPONENT.Icon]: IGRPIcon,
@@ -421,5 +469,5 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.ModalDialogTitle]: IGRPSTudioDialogTitle,
     [COMPONENT.ModalDialogHeader]: IGRPSTudioDialogHeader,
     [COMPONENT.ModalDialogDescription]: IGRPStudioDialogDescription,
-    [COMPONENT.ModalDialogFooter]: IGRPSTudioDialogFooter
+    [COMPONENT.ModalDialogFooter]: IGRPSTudioDialogFooter,
 };

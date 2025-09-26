@@ -11,7 +11,7 @@ execSync('swc src --out-dir dist', { stdio: 'inherit' });
 // Copy CSS files
 console.log('Copying CSS files...');
 if (existsSync('src/index.css')) {
-  copyFileSync('src/index.css', 'dist/index.css');
+    copyFileSync('src/index.css', 'dist/index.css');
 }
 
 // Generate TypeScript declarations
@@ -21,7 +21,7 @@ execSync('tsc --emitDeclarationOnly --outDir dist', { stdio: 'inherit' });
 // Copy type files
 console.log('Copying type files...');
 if (existsSync('types')) {
-  execSync('cp -r types dist/', { stdio: 'inherit' });
+    execSync('cp -r types dist/', { stdio: 'inherit' });
 }
 
-console.log('Build completed successfully!'); 
+console.log('Build completed successfully!');

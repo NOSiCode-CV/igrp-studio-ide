@@ -1,21 +1,8 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, FileText, X, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from '@renderer/components/ui/alert';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@renderer/components/ui/dialog';
 import { cn } from '@renderer/lib/utils';
+import { IGRPAlertDescriptionPrimitive, IGRPAlertPrimitive, IGRPAlertTitlePrimitive, IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive, IGRPDialogTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface ChangelogSection {
     title: string;
@@ -52,28 +39,32 @@ export function VersionAlert({
     // Default changelog content if none provided
     const defaultChangelogContent: ChangelogContent = {
         title: "What's New",
-        version: appVersion || "Latest",
-        date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+        version: appVersion || 'Latest',
+        date: new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        }),
         sections: [
             {
-                title: "🚀 New Features",
+                title: '🚀 New Features',
                 items: [
-                    "Enhanced project structure and organization",
-                    "Improved development experience",
-                    "Better integration with external tools",
-                    "Updated dependencies and frameworks"
-                ]
+                    'Enhanced project structure and organization',
+                    'Improved development experience',
+                    'Better integration with external tools',
+                    'Updated dependencies and frameworks',
+                ],
             },
             {
-                title: "🔧 Improvements",
+                title: '🔧 Improvements',
                 items: [
-                    "Performance optimizations",
-                    "Better error handling",
-                    "Enhanced user interface",
-                    "Improved documentation"
-                ]
-            }
-        ]
+                    'Performance optimizations',
+                    'Better error handling',
+                    'Enhanced user interface',
+                    'Improved documentation',
+                ],
+            },
+        ],
     };
 
     const finalChangelogContent = changelogContent || defaultChangelogContent;
@@ -82,7 +73,9 @@ export function VersionAlert({
         const fetchAppVersion = async () => {
             try {
                 if (window.electron) {
-                    const version = await (window.electron as any).getAppVersion();
+                    const version = await (
+                        window.electron as any
+                    ).getAppVersion();
                     setAppVersion(version);
                 }
             } catch (error) {
@@ -124,7 +117,7 @@ export function VersionAlert({
     }
 
     return (
-        <Alert
+        <IGRPAlertPrimitive
             className={cn(
                 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20',
                 className
@@ -132,65 +125,75 @@ export function VersionAlert({
         >
             <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             <div className="flex-1">
-                <AlertTitle className="text-amber-800 dark:text-amber-200">
+                <IGRPAlertTitlePrimitive className="text-amber-800 dark:text-amber-200">
                     {t('versionOutdated')}
-                </AlertTitle>
-                <AlertDescription className="text-amber-700 dark:text-amber-300">
+                </IGRPAlertTitlePrimitive>
+                <IGRPAlertDescriptionPrimitive className="text-amber-700 dark:text-amber-300">
                     {t('versionOutdatedDescription', {
                         projectVersion,
                         appVersion,
                     })}
-                </AlertDescription>
+                </IGRPAlertDescriptionPrimitive>
             </div>
             <div className="flex items-center gap-2">
-                <Dialog open={showChangelog} onOpenChange={setShowChangelog}>
-                    <DialogTrigger asChild>
-                        <Button
+                <IGRPDialogPrimitive open={showChangelog} onOpenChange={setShowChangelog}>
+                    <IGRPDialogTriggerPrimitive asChild>
+                        <IGRPButtonPrimitive
                             variant="outline"
                             size="sm"
                             className="border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/30"
                         >
                             <FileText className="h-3.5 w-3.5 mr-1" />
                             View Changelog
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2">
+                        </IGRPButtonPrimitive>
+                    </IGRPDialogTriggerPrimitive>
+                    <IGRPDialogContentPrimitive className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <IGRPDialogHeaderPrimitive>
+                            <IGRPDialogTitlePrimitive className="flex items-center gap-2">
                                 <FileText className="h-5 w-5" />
                                 {finalChangelogContent.title}
-                            </DialogTitle>
-                            <DialogDescription>
-                                Version {finalChangelogContent.version} • {finalChangelogContent.date}
-                            </DialogDescription>
-                        </DialogHeader>
+                            </IGRPDialogTitlePrimitive>
+                            <IGRPDialogDescriptionPrimitive>
+                                Version {finalChangelogContent.version} •{' '}
+                                {finalChangelogContent.date}
+                            </IGRPDialogDescriptionPrimitive>
+                        </IGRPDialogHeaderPrimitive>
                         <div className="space-y-6">
-                            {finalChangelogContent.sections.map((section, index) => (
-                                <div key={index} className="space-y-3">
-                                    <h3 className="text-lg font-semibold text-foreground">
-                                        {section.title}
-                                    </h3>
-                                    <ul className="space-y-2">
-                                        {section.items.map((item, itemIndex) => (
-                                            <li key={itemIndex} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                                <span className="text-foreground mt-0.5">•</span>
-                                                <span>{item}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))}
+                            {finalChangelogContent.sections.map(
+                                (section, index) => (
+                                    <div key={index} className="space-y-3">
+                                        <h3 className="text-lg font-semibold text-foreground">
+                                            {section.title}
+                                        </h3>
+                                        <ul className="space-y-2">
+                                            {section.items.map(
+                                                (item, itemIndex) => (
+                                                    <li
+                                                        key={itemIndex}
+                                                        className="flex items-start gap-2 text-sm text-muted-foreground"
+                                                    >
+                                                        <span className="text-foreground mt-0.5">
+                                                            •
+                                                        </span>
+                                                        <span>{item}</span>
+                                                    </li>
+                                                )
+                                            )}
+                                        </ul>
+                                    </div>
+                                )
+                            )}
                         </div>
                         <div className="flex justify-end gap-2 pt-4 border-t">
-                            <Button
+                            <IGRPButtonPrimitive
                                 variant="outline"
                                 onClick={() => setShowChangelog(false)}
                             >
                                 Close
-                            </Button>
-                            <Button
+                            </IGRPButtonPrimitive>
+                            <IGRPButtonPrimitive
                                 onClick={() => {
-                                    const releaseUrl = `https://github.com/NOSiCode-CV/igrp-studio-ide/releases/tag/v0.0.59`;///${appVersion}
+                                    const releaseUrl = `https://github.com/NOSiCode-CV/igrp-studio-ide/releases/tag/v0.0.59`; ///${appVersion}
                                     window.open(releaseUrl, '_blank');
                                     setShowChangelog(false);
                                 }}
@@ -198,21 +201,21 @@ export function VersionAlert({
                             >
                                 <ExternalLink className="h-4 w-4" />
                                 View {appVersion} Release
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
-                    </DialogContent>
-                </Dialog>
+                    </IGRPDialogContentPrimitive>
+                </IGRPDialogPrimitive>
                 {showDismiss && onDismiss && (
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0 text-amber-600 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-900/30"
                         onClick={onDismiss}
                     >
                         <X className="h-3.5 w-3.5" />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
             </div>
-        </Alert>
+        </IGRPAlertPrimitive>
     );
 }

@@ -1,24 +1,31 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@renderer/components/ui/card';
-import { Button } from '@renderer/components/ui/button';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
-import { Switch } from '@renderer/components/ui/switch';
-import { Label } from '@renderer/components/ui/label';
-import { 
-    Settings, 
-    TestTube, 
-    Trash2, 
-    Edit, 
+    IGRPCard,
+    IGRPCardContent,
+    IGRPCardDescription,
+    IGRPCardFooter,
+    IGRPCardHeader,
+    IGRPCardTitle,
+    IGRPSwitchPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuSeparatorPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    Settings,
+    TestTube,
+    Trash2,
+    Edit,
     ExternalLink,
     Clock,
     Calendar,
-    MoreHorizontal
+    MoreHorizontal,
 } from 'lucide-react';
 import { BPMNConfig } from 'src/main/types';
 
@@ -42,9 +49,7 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
     const [isTesting, setIsTesting] = React.useState(false);
     const [isToggling, setIsToggling] = React.useState(false);
 
-    
-
-    const handleTestConnection = async () => {
+    const handleTestConnection = async (): Promise<void> => {
         setIsTesting(true);
         try {
             await onTestConnection(config);
@@ -53,7 +58,7 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
         }
     };
 
-    const handleToggleActive = async () => {
+    const handleToggleActive = async (): Promise<void> => {
         setIsToggling(true);
         try {
             await onToggleActive(config.id, !isActive);
@@ -62,81 +67,113 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
         }
     };
 
-    const formatDate = (dateString: string) => {
+    const formatDate = (dateString: string): string => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
         });
     };
 
     return (
-        <Card className={`transition-all duration-200 hover:shadow-md ${!isActive ? 'opacity-60' : ''}`}>
-            <CardHeader className="pb-3">
+        <IGRPCard
+            className={`transition-all duration-200 hover:shadow-md ${!isActive ? 'opacity-60' : ''}`}
+        >
+            <IGRPCardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                         <Settings className="h-5 w-5 text-muted-foreground" />
-                        <CardTitle className="text-lg">{config.name}</CardTitle>
+                        <IGRPCardTitle className="text-lg">
+                            {config.name}
+                        </IGRPCardTitle>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="flex items-center space-x-2">
-                            <Switch
+                            <IGRPSwitchPrimitive
                                 id={`active-${config.id}`}
                                 checked={isActive}
                                 onCheckedChange={handleToggleActive}
                                 disabled={isToggling}
                             />
-                            <Label htmlFor={`active-${config.id}`} className="text-xs">
+                            <IGRPLabelPrimitive
+                                htmlFor={`active-${config.id}`}
+                                className="text-xs"
+                            >
                                 Active
-                            </Label>
+                            </IGRPLabelPrimitive>
                         </div>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <IGRPDropdownMenuPrimitive>
+                            <IGRPDropdownMenuTriggerPrimitive asChild>
+                                <IGRPButtonPrimitive
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                >
                                     <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="min-w-40">
-                                <DropdownMenuItem onClick={() => onEdit(config)}>
+                                </IGRPButtonPrimitive>
+                            </IGRPDropdownMenuTriggerPrimitive>
+                            <IGRPDropdownMenuContentPrimitive
+                                align="end"
+                                className="min-w-40"
+                            >
+                                <IGRPDropdownMenuItemPrimitive
+                                    onClick={() => onEdit(config)}
+                                >
                                     <Edit className="h-3 w-3 mr-2" /> Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={handleTestConnection} disabled={isTesting}>
-                                    <TestTube className="h-3 w-3 mr-2" /> {isTesting ? 'Testing...' : 'Test'}
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => window.open(config.apiUrl, '_blank')}>
-                                    <ExternalLink className="h-3 w-3 mr-2" /> Open
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
+                                </IGRPDropdownMenuItemPrimitive>
+                                <IGRPDropdownMenuItemPrimitive
+                                    onClick={handleTestConnection}
+                                    disabled={isTesting}
+                                >
+                                    <TestTube className="h-3 w-3 mr-2" />{' '}
+                                    {isTesting ? 'Testing...' : 'Test'}
+                                </IGRPDropdownMenuItemPrimitive>
+                                <IGRPDropdownMenuSeparatorPrimitive />
+                                <IGRPDropdownMenuItemPrimitive
+                                    onClick={() =>
+                                        window.open(config.apiUrl, '_blank')
+                                    }
+                                >
+                                    <ExternalLink className="h-3 w-3 mr-2" />{' '}
+                                    Open
+                                </IGRPDropdownMenuItemPrimitive>
+                                <IGRPDropdownMenuItemPrimitive
                                     onClick={() => onDelete(config.id)}
                                     className="text-destructive focus:text-destructive"
                                 >
                                     <Trash2 className="h-3 w-3 mr-2" /> Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                </IGRPDropdownMenuItemPrimitive>
+                            </IGRPDropdownMenuContentPrimitive>
+                        </IGRPDropdownMenuPrimitive>
                     </div>
                 </div>
                 {config.description && (
-                    <CardDescription className="mt-2">
+                    <IGRPCardDescription className="mt-2">
                         {config.description}
-                    </CardDescription>
+                    </IGRPCardDescription>
                 )}
-            </CardHeader>
+            </IGRPCardHeader>
 
-            <CardContent className="space-y-3">
+            <IGRPCardContent className="space-y-3">
                 <div className="grid grid-cols-1 gap-2 text-sm">
                     <div className="flex items-center justify-between">
-                        <span className="font-medium text-muted-foreground">API URL:</span>
-                        <span className="text-right font-mono text-xs truncate max-w-[200px]" title={config.apiUrl}>
+                        <span className="font-medium text-muted-foreground">
+                            API URL:
+                        </span>
+                        <span
+                            className="text-right font-mono text-xs truncate max-w-[200px]"
+                            title={config.apiUrl}
+                        >
                             {config.apiUrl}
                         </span>
                     </div>
                     {config.basePath && (
                         <div className="flex items-center justify-between">
-                            <span className="font-medium text-muted-foreground">Base Path:</span>
+                            <span className="font-medium text-muted-foreground">
+                                Base Path:
+                            </span>
                             <span className="text-right font-mono text-xs">
                                 {config.basePath}
                             </span>
@@ -144,7 +181,9 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
                     )}
                     {config.token && (
                         <div className="flex items-center justify-between">
-                            <span className="font-medium text-muted-foreground">Token:</span>
+                            <span className="font-medium text-muted-foreground">
+                                Token:
+                            </span>
                             <span className="text-right font-mono text-xs">
                                 {config.token.substring(0, 8)}...
                             </span>
@@ -160,13 +199,15 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
                     {config.lastConnected && (
                         <div className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
-                            <span>Last: {formatDate(config.lastConnected)}</span>
+                            <span>
+                                Last: {formatDate(config.lastConnected)}
+                            </span>
                         </div>
                     )}
                 </div>
-            </CardContent>
+            </IGRPCardContent>
 
-            <CardFooter className="pt-0" />
-        </Card>
+            <IGRPCardFooter className="pt-0" />
+        </IGRPCard>
     );
-}; 
+};

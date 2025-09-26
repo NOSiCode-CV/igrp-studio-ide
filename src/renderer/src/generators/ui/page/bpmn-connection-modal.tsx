@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@renderer/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
-import { Textarea } from '@renderer/components/ui/textarea';
-import { Switch } from '@renderer/components/ui/switch';
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPInputPrimitive,
+    IGRPSwitchPrimitive,
+    IGRPTextAreaPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { toast } from 'sonner';
 import { BPMNConfig } from 'src/main/types';
 import { bpmnService } from '@renderer/services/bpmn-service';
@@ -69,7 +69,7 @@ export const BPMNConfigModal = ({
     // Reset form when modal opens
     useEffect(() => {
         if (isOpen) {
-            setRenderKey(prev => prev + 1);
+            setRenderKey((prev) => prev + 1);
             if (config) {
                 setFormData({
                     name: config.name || '',
@@ -92,9 +92,8 @@ export const BPMNConfigModal = ({
         }
     }, [isOpen, config?.id]);
 
-
     const handleInputChange = (field: keyof BPMNConfig, value: any) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+        setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
     const handleTestConnection = async () => {
@@ -154,12 +153,14 @@ export const BPMNConfigModal = ({
                 await window.igrpStudioSettings.addBPMNConfig(configData);
                 toast.success('API configuration saved successfully');
             }
-            
+
             // If this is the first config or if it's set as active, make it the active config
             if (formData.isActive) {
-                await window.igrpStudioSettings.setActiveBPMNConfig(configData.id);
+                await window.igrpStudioSettings.setActiveBPMNConfig(
+                    configData.id
+                );
             }
-            
+
             onConfirm();
             setRenderKey(0);
             handleClose();
@@ -187,91 +188,125 @@ export const BPMNConfigModal = ({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent key={`${config?.id || 'new'}-${renderKey}`} className="max-w-[500px] w-[95vw] mx-auto">
-                <DialogHeader>
-                    <DialogTitle>
-                        {config ? 'Edit BPMN API Configuration' : 'BPMN API Configuration'}
-                    </DialogTitle>
-                    <DialogDescription>
-                        Configure connection to your BPMN REST API (Camunda, Flowable, etc.)
-                    </DialogDescription>
-                </DialogHeader>
+        <IGRPDialogPrimitive open={isOpen} onOpenChange={handleClose}>
+            <IGRPDialogContentPrimitive
+                key={`${config?.id || 'new'}-${renderKey}`}
+                className="max-w-[500px] w-[95vw] mx-auto"
+            >
+                <IGRPDialogHeaderPrimitive>
+                    <IGRPDialogTitlePrimitive>
+                        {config
+                            ? 'Edit BPMN API Configuration'
+                            : 'BPMN API Configuration'}
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive>
+                        Configure connection to your BPMN REST API (Camunda,
+                        Flowable, etc.)
+                    </IGRPDialogDescriptionPrimitive>
+                </IGRPDialogHeaderPrimitive>
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="name">Configuration Name *</Label>
-                        <Input
+                        <IGRPLabelPrimitive htmlFor="name">
+                            Configuration Name *
+                        </IGRPLabelPrimitive>
+                        <IGRPInputPrimitive
                             id="name"
                             value={formData.name || ''}
-                            onChange={(e) => handleInputChange('name', e.target.value)}
+                            onChange={(e) =>
+                                handleInputChange('name', e.target.value)
+                            }
                             placeholder="My BPMN API"
                         />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="apiUrl">API URL *</Label>
-                        <Input
+                        <IGRPLabelPrimitive htmlFor="apiUrl">API URL *</IGRPLabelPrimitive>
+                        <IGRPInputPrimitive
                             id="apiUrl"
                             value={formData.apiUrl || ''}
-                            onChange={(e) => handleInputChange('apiUrl', e.target.value)}
+                            onChange={(e) =>
+                                handleInputChange('apiUrl', e.target.value)
+                            }
                             placeholder="https://my-bpmn-server.com"
                         />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="basePath">Base Path</Label>
-                        <Input
+                        <IGRPLabelPrimitive htmlFor="basePath">Base Path</IGRPLabelPrimitive>
+                        <IGRPInputPrimitive
                             id="basePath"
                             value={formData.basePath || ''}
-                            onChange={(e) => handleInputChange('basePath', e.target.value)}
+                            onChange={(e) =>
+                                handleInputChange('basePath', e.target.value)
+                            }
                             placeholder="/api/v1"
                         />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="token">Access Token (Optional)</Label>
-                        <Input
+                        <IGRPLabelPrimitive htmlFor="token">
+                            Access Token (Optional)
+                        </IGRPLabelPrimitive>
+                        <IGRPInputPrimitive
                             id="token"
                             type="password"
                             value={formData.token || ''}
-                            onChange={(e) => handleInputChange('token', e.target.value)}
+                            onChange={(e) =>
+                                handleInputChange('token', e.target.value)
+                            }
                             placeholder="Bearer token or API key (optional)"
                         />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="description">Description</Label>
-                        <Textarea
+                        <IGRPLabelPrimitive htmlFor="description">Description</IGRPLabelPrimitive>
+                        <IGRPTextAreaPrimitive
                             id="description"
                             value={formData.description || ''}
-                            onChange={(e) => handleInputChange('description', e.target.value)}
+                            onChange={(e) =>
+                                handleInputChange('description', e.target.value)
+                            }
                             placeholder="Optional description for this API configuration"
                             rows={3}
                         />
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Switch
+                        <IGRPSwitchPrimitive
                             id="isActive"
                             checked={formData.isActive ?? true}
-                            onCheckedChange={(checked) => handleInputChange('isActive', checked)}
+                            onCheckedChange={(checked) =>
+                                handleInputChange('isActive', checked)
+                            }
                         />
-                        <Label htmlFor="isActive">Active Configuration</Label>
+                        <IGRPLabelPrimitive htmlFor="isActive">
+                            Active Configuration
+                        </IGRPLabelPrimitive>
                     </div>
                 </div>
-                <DialogFooter className="flex justify-between">
-                    <Button
+                <IGRPDialogFooterPrimitive className="flex justify-between">
+                    <IGRPButtonPrimitive
                         variant="outline"
                         onClick={handleTestConnection}
                         disabled={isTesting || !formData.apiUrl}
                     >
                         {isTesting ? 'Testing...' : 'Test Connection'}
-                    </Button>
+                    </IGRPButtonPrimitive>
                     <div className="flex gap-2">
-                        <Button variant="outline" onClick={handleClose}>
+                        <IGRPButtonPrimitive
+                            variant="outline"
+                            onClick={handleClose}
+                        >
                             Cancel
-                        </Button>
-                        <Button onClick={handleSave} disabled={isLoading}>
-                            {isLoading ? 'Saving...' : (config ? 'Update' : 'Save')}
-                        </Button>
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
+                            onClick={handleSave}
+                            disabled={isLoading}
+                        >
+                            {isLoading
+                                ? 'Saving...'
+                                : config
+                                  ? 'Update'
+                                  : 'Save'}
+                        </IGRPButtonPrimitive>
                     </div>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                </IGRPDialogFooterPrimitive>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
-}; 
+};

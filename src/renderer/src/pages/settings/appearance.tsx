@@ -1,17 +1,18 @@
 'use client';
 
-import { Button } from '@renderer/components/ui/button';
+import {
+    IGRPButtonPrimitive,
+    IGRPSkeletonPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { baseColors } from './base-color';
 import { useTheme } from 'next-themes';
-import { Skeleton } from '@renderer/components/ui/skeleton';
 import { Check } from 'lucide-react';
 import { ThemeService } from '@renderer/services/ThemeService';
-import { useThemeConfig } from '@renderer/components/ActiveThemeProvider';
-
+import { useThemeConfig } from '@renderer/components/active-theme-provider';
 
 export function AppearanceSettings() {
     const { t } = useTranslation();
@@ -26,7 +27,7 @@ export function AppearanceSettings() {
 
     const { resolvedTheme: mode } = useTheme();
 
-    async function saveTheme(newTheme: string) {
+    async function saveTheme(newTheme: string): Promise<void> {
         await ThemeService.setActiveTheme(newTheme);
     }
 
@@ -37,13 +38,15 @@ export function AppearanceSettings() {
             </div>
             <div className="space-y-6">
                 <div className="flex flex-col gap-2">
-                    <Label className="text-xs"> {t('accentColor')}</Label>
-                    <div className="grid w-full grid-cols-6 gap-3">
+                    <IGRPLabelPrimitive className="text-xs">
+                        {t('accentColor')}
+                    </IGRPLabelPrimitive>    
+                    <div className="grid w-full md:grid-cols-4 grid-cols-6 gap-3">
                         {baseColors.map((theme) => {
                             const isActive = activeTheme === theme.name;
 
                             return mounted ? (
-                                <Button
+                                <IGRPButtonPrimitive
                                     variant="outline"
                                     size="sm"
                                     key={theme.name}
@@ -54,16 +57,17 @@ export function AppearanceSettings() {
                                     className={cn(
                                         'rounded-lg lg:px-2.5 xl:w-[86px]',
                                         isActive &&
-                                        'border-primary/50 ring-[2px] ring-primary/30'
+                                            'border-primary/50 ring-[2px] ring-primary/30'
                                     )}
                                     style={
                                         {
-                                            '--theme-primary': `hsl(${theme?.activeColor[
-                                                mode === 'dark'
-                                                    ? 'dark'
-                                                    : 'light'
-                                            ]
-                                                })`,
+                                            '--theme-primary': `hsl(${
+                                                theme?.activeColor[
+                                                    mode === 'dark'
+                                                        ? 'dark'
+                                                        : 'light'
+                                                ]
+                                            })`,
                                         } as React.CSSProperties
                                     }
                                 >
@@ -73,12 +77,13 @@ export function AppearanceSettings() {
                                         )}
                                         style={
                                             {
-                                                background: `hsl(${theme?.activeColor[
-                                                    mode === 'dark'
-                                                        ? 'dark'
-                                                        : 'light'
-                                                ]
-                                                    })`,
+                                                background: `hsl(${
+                                                    theme?.activeColor[
+                                                        mode === 'dark'
+                                                            ? 'dark'
+                                                            : 'light'
+                                                    ]
+                                                })`,
                                             } as React.CSSProperties
                                         }
                                     >
@@ -88,19 +93,18 @@ export function AppearanceSettings() {
                                     </span>
                                     <span className="hidden md:block">
                                         {theme.label === 'Zinc'
-                                            ? t('default')
+                                            ? 'default'
                                             : theme.label}
                                     </span>
-                                </Button>
+                                </IGRPButtonPrimitive>
                             ) : (
-                                <Skeleton
+                                <IGRPSkeletonPrimitive
                                     className="h-8 w-[32px] xl:w-[86px]"
                                     key={theme.name}
                                 />
                             );
                         })}
                     </div>
-
                 </div>
             </div>
         </div>

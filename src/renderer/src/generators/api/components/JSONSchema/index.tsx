@@ -1,22 +1,24 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Button } from '@renderer/components/ui/button';
 import {
-    Table,
-    TableBody,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@renderer/components/ui/table';
+    IGRPButtonPrimitive,
+    IGRPTooltipContentPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPTablePrimitive,
+    IGRPTableBodyPrimitive,
+    IGRPTableHeadPrimitive,
+    IGRPTableHeaderPrimitive,
+    IGRPTableRowPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Plus } from 'lucide-react';
 import { SchemaFieldRow } from './SchemaFieldRow';
 import { JSONSchema, SchemaField } from '../../types/schema';
 import { JSONSchemaModal } from './JSONSchemaModal';
 import {
-    Tooltip,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
-import { TooltipContent } from '@radix-ui/react-tooltip';
+    IGRPTooltipPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 
 interface JSONSchemaBuilderProps {
@@ -85,7 +87,6 @@ export function JSONSchemaBuilder({
         );
         onSchemaChange?.({ ...schema, properties: orderedProperties });
     }, [schema, fieldOrder, onSchemaChange]);
-
 
     const checkAndUpdateDuplicateNames = (field: SchemaField): SchemaField => {
         const updatedField = { ...field };
@@ -370,19 +371,25 @@ export function JSONSchemaBuilder({
     }, [schema, newFields]);
 
     return (
-        <TooltipProvider>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>{t('name')}</TableHead>
-                        <TableHead>{t('type')}</TableHead>
-                        <TableHead>{t('description')}</TableHead>
-                        <TableHead className="text-right flex flex-1 items-center">
+        <IGRPTooltipProviderPrimitive>
+            <IGRPTablePrimitive>
+                <IGRPTableHeaderPrimitive>
+                    <IGRPTableRowPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('name')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('type')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('description')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive className="text-right flex flex-1 items-center">
                             {fieldOrder.length === 0 &&
                                 Object.entries(newFields).length === 0 && (
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
+                                    <IGRPTooltipPrimitive>
+                                        <IGRPTooltipTriggerPrimitive asChild>
+                                            <IGRPButtonPrimitive
                                                 type="button"
                                                 onClick={() =>
                                                     handleAddNewField()
@@ -395,21 +402,21 @@ export function JSONSchemaBuilder({
                                                 <span className="sr-only">
                                                     {t('addNewField')}
                                                 </span>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
+                                            </IGRPButtonPrimitive>
+                                        </IGRPTooltipTriggerPrimitive>
+                                        <IGRPTooltipContentPrimitive>
                                             {t('addNewField')}
-                                        </TooltipContent>
-                                    </Tooltip>
+                                        </IGRPTooltipContentPrimitive>
+                                    </IGRPTooltipPrimitive>
                                 )}
 
                             <JSONSchemaModal
                                 generateJSONSchema={generateJSONSchema}
                             />
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
+                        </IGRPTableHeadPrimitive>
+                    </IGRPTableRowPrimitive>
+                </IGRPTableHeaderPrimitive>
+                <IGRPTableBodyPrimitive>
                     {fieldOrder.map((id) => (
                         <SchemaFieldRow
                             key={id}
@@ -443,8 +450,8 @@ export function JSONSchemaBuilder({
                             enumTypes={enumTypes}
                         />
                     ))}
-                </TableBody>
-            </Table>
-        </TooltipProvider>
+                </IGRPTableBodyPrimitive>
+            </IGRPTablePrimitive>
+        </IGRPTooltipProviderPrimitive>
     );
 }

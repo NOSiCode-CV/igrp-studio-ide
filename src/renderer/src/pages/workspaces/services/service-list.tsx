@@ -1,14 +1,14 @@
 'use client';
 
-import { Badge } from '@renderer/components/ui/badge';
+import { IGRPBadgePrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@renderer/components/ui/table';
+    IGRPTablePrimitive,
+    IGRPTableBodyPrimitive,
+    IGRPTableCellPrimitive,
+    IGRPTableHeadPrimitive,
+    IGRPTableHeaderPrimitive,
+    IGRPTableRowPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { getServiceColor, getServiceIcon, getStatusColor } from '.';
 import Dependency from '../components/dependency';
 import { ServiceActions } from './service-actions';
@@ -19,31 +19,40 @@ interface ServiceListProps {
     workspaceId?: string;
 }
 
-
-
 export function ServiceList({ services }: ServiceListProps) {
     const { t } = useTranslation();
     return (
-
         <div className="grid w-full [&>div]:border [&>div]:rounded">
-            <Table className="">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>{t('name')}</TableHead>
-                        <TableHead>{t('type')}</TableHead>
-                        <TableHead>{t('ports')}</TableHead>
-                        <TableHead>{t('dependencies')}</TableHead>
-                        <TableHead>{t('status')}</TableHead>
-                        <TableHead className="w-[100px]">{t('actions')}</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
+            <IGRPTablePrimitive className="">
+                <IGRPTableHeaderPrimitive>
+                    <IGRPTableRowPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('name')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('type')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('ports')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('dependencies')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive>
+                            {t('status')}
+                        </IGRPTableHeadPrimitive>
+                        <IGRPTableHeadPrimitive className="w-[100px]">
+                            {t('actions')}
+                        </IGRPTableHeadPrimitive>
+                    </IGRPTableRowPrimitive>
+                </IGRPTableHeaderPrimitive>
+                <IGRPTableBodyPrimitive>
                     {services.map((service, index) => (
-                        <TableRow
+                        <IGRPTableRowPrimitive
                             key={index}
                             className="hover:bg-muted/50 group cursor-pointer"
                         >
-                            <TableCell className="font-medium">
+                            <IGRPTableCellPrimitive className="font-medium">
                                 <div className="flex items-center gap-1.5">
                                     <div
                                         className={`${getServiceColor(service.labels?.type)} rounded-sm p-1 text-white`}
@@ -54,31 +63,31 @@ export function ServiceList({ services }: ServiceListProps) {
                                         {service.name}
                                     </div>
                                 </div>
-                            </TableCell>
-                            <TableCell>
-                                <Badge
+                            </IGRPTableCellPrimitive>
+                            <IGRPTableCellPrimitive>
+                                <IGRPBadgePrimitive
                                     variant="outline"
                                     className={`${getServiceColor(service.labels?.type)} bg-opacity-10  capitalize`}
                                 >
                                     {service.labels?.type}
-                                </Badge>
-                            </TableCell>
-                            <TableCell>
+                                </IGRPBadgePrimitive>
+                            </IGRPTableCellPrimitive>
+                            <IGRPTableCellPrimitive>
                                 <div className="flex flex-wrap gap-1">
                                     {service.ports &&
                                         service.ports.map(
                                             (port: string, i: number) => (
-                                                <Badge
+                                                <IGRPBadgePrimitive
                                                     key={i}
                                                     variant="outline"
                                                 >
                                                     {port}
-                                                </Badge>
+                                                </IGRPBadgePrimitive>
                                             )
                                         )}
                                 </div>
-                            </TableCell>
-                            <TableCell>
+                            </IGRPTableCellPrimitive>
+                            <IGRPTableCellPrimitive>
                                 <div className="flex flex-wrap gap-1">
                                     {service.dependsOn &&
                                     service.dependsOn.length > 0 ? (
@@ -92,25 +101,27 @@ export function ServiceList({ services }: ServiceListProps) {
                                         </span>
                                     )}
                                 </div>
-                            </TableCell>
-                            <TableCell>
-                                <Badge
+                            </IGRPTableCellPrimitive>
+                            <IGRPTableCellPrimitive>
+                                <IGRPBadgePrimitive
                                     variant="outline"
                                     className={`capitalize ${getStatusColor(service.status)}`}
                                 >
                                     {service.status}
-                                </Badge>
-                            </TableCell>
-                            <TableCell onClick={(e) => e.stopPropagation()}>
+                                </IGRPBadgePrimitive>
+                            </IGRPTableCellPrimitive>
+                            <IGRPTableCellPrimitive
+                                onClick={(e) => e.stopPropagation()}
+                            >
                                 <ServiceActions
                                     service={service}
                                     services={services}
                                 />
-                            </TableCell>
-                        </TableRow>
+                            </IGRPTableCellPrimitive>
+                        </IGRPTableRowPrimitive>
                     ))}
-                </TableBody>
-            </Table>
+                </IGRPTableBodyPrimitive>
+            </IGRPTablePrimitive>
         </div>
     );
 }

@@ -7,15 +7,18 @@ import {
 } from '@renderer/redux/thunks';
 
 import Header from './components/header';
-import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar';
-import { AppSidebar } from './components/app-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { useNavdata } from './components/nav-data';
 import { ProjectData } from 'src/main/types';
 import { Footer } from './components/footer';
-import { Toaster } from '@renderer/components/ui/sonner';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
+import {
+    IGRPSidebarInsetPrimitive,
+    IGRPSidebarProviderPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { Toaster } from '@igrp/igrp-framework-react-design-system/dist/components/primitives/sonner';
+import { AppIGRPSidebar } from './components/app-sidebar';
 
 interface LayoutProps {
     children: React.ReactElement<{
@@ -53,7 +56,7 @@ const Layout = (props: LayoutProps) => {
 
     return (
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))] [--header-height-three:calc(--spacing(30))]">
-            <SidebarProvider
+            <IGRPSidebarProviderPrimitive
                 style={
                     {
                         '--sidebar-width': '380px',
@@ -70,23 +73,23 @@ const Layout = (props: LayoutProps) => {
                     <Header config={config} basePath={basePath} />
 
                     <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">
-                        <AppSidebar
+                        <AppIGRPSidebar
                             menuItems={menuItems}
                             config={config}
                             basePath={basePath}
                             header
                         />
-                        <SidebarInset className="flex-1">
+                        <IGRPSidebarInsetPrimitive className="flex-1">
                             {React.cloneElement(props.children, {
                                 basePath,
                                 currentItem,
                                 project: config,
                             })}
-                        </SidebarInset>
+                        </IGRPSidebarInsetPrimitive>
                     </div>
                 </div>
                 <Footer />
-            </SidebarProvider>
+            </IGRPSidebarProviderPrimitive>
         </div>
     );
 };

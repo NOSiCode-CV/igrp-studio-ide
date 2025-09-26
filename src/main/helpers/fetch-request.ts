@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { ipcMain } from 'electron';
 
 type HandlerResponse<T = any> = {
     result?: T;
@@ -24,10 +24,7 @@ async function genericFetchHandler<T>(
         console.error('Erro ao buscar dados:', error);
 
         return {
-            error:
-                error instanceof Error
-                    ? error.message
-                    : 'Erro desconhecido',
+            error: error instanceof Error ? error.message : 'Erro desconhecido',
         };
     }
 }
@@ -35,7 +32,14 @@ async function genericFetchHandler<T>(
 // Implementação para get-versions (agora mais simples)
 ipcMain.handle(
     'get-versions',
-    async (_event, endpoint: string): Promise<HandlerResponse<{ items: Array<{ version: string, maven2?: { version: string } }> }>> => {
+    async (
+        _event,
+        endpoint: string
+    ): Promise<
+        HandlerResponse<{
+            items: Array<{ version: string; maven2?: { version: string } }>;
+        }>
+    > => {
         return genericFetchHandler(endpoint);
     }
 );
@@ -43,7 +47,11 @@ ipcMain.handle(
 // Exemplo de uso para outro endpoint (agora mais direto)
 ipcMain.handle(
     'fetch-data',
-    async (_event, endpoint: string, headers: object): Promise<HandlerResponse> => {
+    async (
+        _event,
+        endpoint: string,
+        headers: object
+    ): Promise<HandlerResponse> => {
         return genericFetchHandler(endpoint, headers);
     }
 );

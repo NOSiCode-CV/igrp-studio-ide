@@ -1,38 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          keyframes: {
-            shake: {
-              '0%, 100%': { transform: 'translateX(0)' },
-              '25%': { transform: 'translateX(-10px)' },
-              '75%': { transform: 'translateX(10px)' }
-            }
-          },
-          animation: {
-            shake: 'shake 0.5s ease-in-out'
-          }
-        }
-      }
-    }
-  </script>
-</head>
-<body class="flex h-screen items-center justify-center bg-[#0d1117] text-[#c9d1d9] font-sans m-0">
-  <div class="text-center p-8 bg-white/5 rounded-xl shadow-lg backdrop-blur-lg border border-white/10">
-    <div class="text-5xl mb-4 text-red-500 animate-shake">❌</div>
-    <h2 class="text-2xl font-semibold text-red-500 m-0">Authentication Failed</h2>
-    <p class="my-4 text-[#8b949e] leading-relaxed">${error}</p>
-    <div class="text-sm text-[#6e7681]">
-      This window will close automatically in 3 seconds...
-    </div>
-  </div>
+    <head>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        keyframes: {
+                            shake: {
+                                '0%, 100%': { transform: 'translateX(0)' },
+                                '25%': { transform: 'translateX(-10px)' },
+                                '75%': { transform: 'translateX(10px)' },
+                            },
+                        },
+                        animation: {
+                            shake: 'shake 0.5s ease-in-out',
+                        },
+                    },
+                },
+            };
+        </script>
+    </head>
+    <body
+        class="flex h-screen items-center justify-center bg-[#0d1117] text-[#c9d1d9] font-sans m-0"
+    >
+        <div
+            class="text-center p-8 bg-white/5 rounded-xl shadow-lg backdrop-blur-lg border border-white/10"
+        >
+            <div class="text-5xl mb-4 text-red-500 animate-shake">❌</div>
+            <h2 class="text-2xl font-semibold text-red-500 m-0">
+                Authentication Failed
+            </h2>
+            <p class="my-4 text-[#8b949e] leading-relaxed">${error}</p>
+            <div class="text-sm text-[#6e7681]">
+                This window will close automatically in 3 seconds...
+            </div>
+        </div>
 
-  <script>
-    setTimeout(() => window.close(), 3000);
-  </script>
-</body>
+        <script>
+            setTimeout(() => window.close(), 3000);
+        </script>
+    </body>
 </html>

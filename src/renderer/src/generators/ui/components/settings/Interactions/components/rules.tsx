@@ -1,13 +1,14 @@
-import { Button } from '@renderer/components/ui/button';
 import {
-    Dialog,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
-import { DialogContent } from '@renderer/components/ui/dialog';
-import { Separator } from '@renderer/components/ui/separator';
-import { SidebarInset } from '@renderer/components/ui/sidebar';
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPScrollAreaPrimitive,
+    IGRPSidebarInsetPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { capitalize } from '@renderer/utils';
 import { Edit, Key } from 'lucide-react';
 import { useRef, useState } from 'react';
@@ -18,7 +19,6 @@ import {
     RuleDefinition,
     State,
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
 
 interface RulesProps {
     rulesProperties: any;
@@ -76,7 +76,7 @@ const Rules = ({ rulesProperties, rules = [], onRulesChange }: RulesProps) => {
             {' '}
             {hasRules && (
                 <>
-                    <Separator />
+                    <IGRPSeparator />
                     <div className="space-y-1.5">
                         <div className="flex items-center gap-1">
                             <Key className="w-5 h-5" />
@@ -97,7 +97,7 @@ const Rules = ({ rulesProperties, rules = [], onRulesChange }: RulesProps) => {
                                             {capitalize(property)}
                                         </h3>
                                         <div className="flex items-center gap-1">
-                                            <Button
+                                            <IGRPButtonPrimitive
                                                 variant={'ghost'}
                                                 size={'icon'}
                                                 onClick={() => {
@@ -119,7 +119,7 @@ const Rules = ({ rulesProperties, rules = [], onRulesChange }: RulesProps) => {
                                                 }}
                                             >
                                                 <Edit className="w-4 h-4" />
-                                            </Button>
+                                            </IGRPButtonPrimitive>
                                         </div>
                                     </div>
                                 )
@@ -160,25 +160,30 @@ const RuleEditor = ({
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="p-0 flex overflow-hidden [--header-height:calc(--spacing(99))] [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw] max-h-[70vh]">
-                <SidebarInset className="p-4 space-y-4 w-2/3">
-                    <DialogHeader>
+        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
+            <IGRPDialogContentPrimitive className="p-0 flex overflow-hidden [--header-height:calc(--spacing(99))] [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw] max-h-[70vh]">
+                <IGRPSidebarInsetPrimitive className="p-4 space-y-4 w-2/3">
+                    <IGRPDialogHeaderPrimitive>
                         <div className="flex flex-1 justify-between">
                             <div className="space-y-2">
-                                <DialogTitle>Rule Editor</DialogTitle>
-                                <DialogDescription>
+                                <IGRPDialogTitlePrimitive>
+                                    Rule Editor
+                                </IGRPDialogTitlePrimitive>
+                                <IGRPDialogDescriptionPrimitive>
                                     Edit the rule for the property
-                                </DialogDescription>
+                                </IGRPDialogDescriptionPrimitive>
                             </div>
                             <div>
                                 {' '}
-                                <Button type="submit" onClick={onSave}>
+                                <IGRPButtonPrimitive
+                                    type="submit"
+                                    onClick={onSave}
+                                >
                                     Save
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </div>
                         </div>
-                    </DialogHeader>
+                    </IGRPDialogHeaderPrimitive>
                     <MonacoEditor
                         content={currentRule}
                         filePath=""
@@ -200,10 +205,10 @@ const RuleEditor = ({
                             {'state1 && state2'}
                         </code>
                     </p>
-                </SidebarInset>
+                </IGRPSidebarInsetPrimitive>
                 <div className="w-1/3 flex gap-4">
-                    <Separator orientation="vertical" />
-                    <ScrollArea>
+                    <IGRPSeparator orientation="vertical" />
+                    <IGRPScrollAreaPrimitive>
                         <div className="flex flex-col gap-4 py-4 pr-4 w-full">
                             <div className="flex flex-col">
                                 <h1 className="text-2xl font-bold mb-1">
@@ -220,10 +225,10 @@ const RuleEditor = ({
                                 }}
                             />
                         </div>
-                    </ScrollArea>
+                    </IGRPScrollAreaPrimitive>
                 </div>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 };
 

@@ -11,7 +11,7 @@ export const FILE_SYSTEM_PATHS = {
     generated: 'src/app/(igrp)/(generated)',
     components: 'src/components',
     pages: 'src/app/(igrp)/(generated)',
-    customComponents: 'src/components'
+    customComponents: 'src/components',
 };
 
 // Default configuration
@@ -20,8 +20,8 @@ export const RENDERER_CONFIG = {
     componentsPath: `${GENERATED_PATH}/components`,
     pagesPath: GENERATED_PATH,
     customComponentsPath: '@/components/',
-    fileSystemPaths: FILE_SYSTEM_PATHS
+    fileSystemPaths: FILE_SYSTEM_PATHS,
 };
 
 // Export default for easy access
-export default RENDERER_CONFIG; 
+export default RENDERER_CONFIG;

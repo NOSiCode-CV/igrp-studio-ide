@@ -14,7 +14,7 @@ export const EVENTS = {
         CREATE_ENUM: 'spring-engine:create-enum',
         CREATE_RESPONSE: 'spring-engine:create-response',
         CREATE_CONTROLLER: 'spring-engine:create-controller',
-        FETCH_SELECTORS: 'spring-engine:fetch-selectors'
+        FETCH_SELECTORS: 'spring-engine:fetch-selectors',
     },
     NEXT: {
         CREATE_PAGE: 'next-engine:create-page',
@@ -26,8 +26,7 @@ export const EVENTS = {
         GET_CODE_SNIPPET: 'engine:get-code-snippet',
         LOAD_METADATA: 'engine:load-metadata',
         REGISTER_COMPONENT: 'engine:register-component',
-        CREATE_PROCESS_STEP: 'engine:create-process-step'
-
+        CREATE_PROCESS_STEP: 'engine:create-process-step',
     },
     REPOSITORY: {
         INITIALIZE: 'repository:initialize',
@@ -39,7 +38,8 @@ export const EVENTS = {
             GET: 'repository:workspace:get',
             FIND_ALL: 'repository:workspace:find-all',
             FIND_RECENT: 'repository:workspace:find-recent',
-            SAVE_CUSTOM_YAML: 'engine:save-custom-ymal'
+            OPEN: 'repository:workspace:open',
+            SAVE_CUSTOM_YAML: 'engine:save-custom-ymal',
         },
         PROJECT: {
             CREATE: 'repository:project:create',
@@ -48,7 +48,8 @@ export const EVENTS = {
             GET: 'repository:project:get',
             FIND_ALL: 'repository:project:find-all',
             FIND_RECENT: 'repository:project:find-recent',
-            CONFIGURE_SERVICE: 'repository:configure-service'
+            CONFIGURE_SERVICE: 'repository:configure-service',
+            ADD_TO_WORKSPACE: 'repository:project:add-to-workspace',
         },
         SERVICE: {
             CREATE: 'repository:service:create',
@@ -58,10 +59,10 @@ export const EVENTS = {
         },
         BACKUP: {
             CREATE: 'repository:backup:create',
-            RESTORE: 'repository:backup:restore'
-        }
+            RESTORE: 'repository:backup:restore',
+        },
     },
-    APPLOGIC:{
+    APPLOGIC: {
         CREATE: 'app-logic:add-environment',
         REATE: 'repository:service:create',
         UPDATE: 'app-logic:update-environment',
@@ -70,8 +71,7 @@ export const EVENTS = {
         FIND_ALL: 'app-logic:get-environments',
         SEARCH: 'app-logic:search-environments',
         CHANGE: 'app-logic:environments-changed',
-        TEST: 'app-logic:test-environment'
-
+        TEST: 'app-logic:test-environment',
     },
     // BPMN 'igrp-studio-settings:get-bpmn-configs
     BPMN: {
@@ -82,7 +82,7 @@ export const EVENTS = {
         DELETE_CONFIG: 'igrp-studio-settings:delete-bpmn-config',
         SET_ACTIVE_CONFIG: 'igrp-studio-settings:set-active-bpmn-config',
         DELETE_ALL_CONFIGS: 'igrp-studio-settings:delete-all-bpmn-configs',
-    },  
+    },
     LANGUAGE: {
         GET_LANGUAGE: 'igrp-studio-settings:get-language',
         SET_LANGUAGE: 'igrp-studio-settings:set-language',
@@ -105,26 +105,25 @@ export const EVENTS = {
         DAEMON_STATUS: 'docker-daemon-status',
     },
     ERROR: 'error',
-    LOG: 'log'
+    LOG: 'log',
 };
-
 
 export const ERROR_CODES = {
     WORKSPACE: {
         CREATE_FAILED: 'workspace:create-failed',
         UPDATE_FAILED: 'workspace:update-failed',
         DELETE_FAILED: 'workspace:delete-failed',
-        NOT_FOUND: 'workspace:not-found'
+        NOT_FOUND: 'workspace:not-found',
     },
     PROJECT: {
         CREATE_FAILED: 'project:create-failed',
         UPDATE_FAILED: 'project:update-failed',
         DELETE_FAILED: 'project:delete-failed',
-        NOT_FOUND: 'project:not-found'
+        NOT_FOUND: 'project:not-found',
     },
     BACKUP: {
         FAILED: 'backup:failed',
-        RESTORE_FAILED: 'backup:restore-failed'
+        RESTORE_FAILED: 'backup:restore-failed',
     },
     ERROR: 'error',
 };

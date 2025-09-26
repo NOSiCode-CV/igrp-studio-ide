@@ -1,7 +1,7 @@
-provider: "s3"
-bucket: "igrp-studio"
-region: "praia"
-path: "/"
-endpoint: "https://storage-api.nosi.cv"
-channel: "latest"
+provider: 's3'
+bucket: 'igrp-studio'
+region: 'praia'
+path: '/'
+endpoint: 'https://storage-api.nosi.cv'
+channel: 'latest'
 updaterCacheDirName: igrp-studio-updater

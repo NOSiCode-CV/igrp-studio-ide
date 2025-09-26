@@ -4,7 +4,9 @@ import { IOpenProject, Handler, ProjectData, FileTree } from '../types';
 import { promisify } from 'util';
 import fs from 'fs';
 
-export async function openDirectory(buttonLabel?: string): Promise<IOpenProject> {
+export async function openDirectory(
+    buttonLabel?: string
+): Promise<IOpenProject> {
     const result = await dialog.showOpenDialog({
         properties: ['openDirectory'],
         buttonLabel: buttonLabel ?? 'Select Destination Folder',
@@ -21,8 +23,9 @@ export async function openDirectory(buttonLabel?: string): Promise<IOpenProject>
     return { canceled: false, folderExists, config, basePath };
 }
 
-export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderExists: boolean; config?: ProjectData }> {
-
+export async function checkAndReadBaseApi(
+    folderPath: string
+): Promise<{ folderExists: boolean; config?: ProjectData }> {
     const readFile = promisify(fs.readFile);
 
     const specificFolder = '.igrpstudio';
@@ -33,7 +36,6 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
     let config: ProjectData | undefined = undefined;
 
     if (folderExists) {
-
         let baseApiPath = join(fullFolderPath, 'baseApi.json');
         if (!fs.existsSync(baseApiPath)) {
             baseApiPath = join(fullFolderPath, 'baseApp.json');
@@ -43,7 +45,7 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
             const data = await readFile(baseApiPath, 'utf8');
             const parsedConfig = JSON.parse(data);
 
-            const { id, type, workspaceId } = parsedConfig
+            const { id, type, workspaceId } = parsedConfig;
 
             if (baseApiPath.endsWith('baseApi.json')) {
                 config = {
@@ -53,8 +55,8 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
                     framework: type,
                     config: { ...parsedConfig },
                     path: folderPath,
-                    workspaceId: workspaceId
-                }
+                    workspaceId: workspaceId,
+                };
             } else if (baseApiPath.endsWith('baseApp.json')) {
                 config = {
                     id,
@@ -63,10 +65,9 @@ export async function checkAndReadBaseApi(folderPath: string): Promise<{ folderE
                     framework: type,
                     config: { ...parsedConfig },
                     path: folderPath,
-                    workspaceId: workspaceId
-                }
+                    workspaceId: workspaceId,
+                };
             }
-
         } catch (error) {
             console.error(`Error reading ${baseApiPath}:`, error);
         }
@@ -101,28 +102,37 @@ export function addNumbers(a: number, b: number) {
 }
 
 export const handleWithCustomErrors = (channel: string, handler: Handler) => {
-    ipcMain.handle(channel, async (event: IpcMainInvokeEvent, ...args: any[]) => {
-        try {
-            return { result: await Promise.resolve(handler(event, ...args)) }
-        } catch (e) {
-            return { error: e }
+    ipcMain.handle(
+        channel,
+        async (event: IpcMainInvokeEvent, ...args: any[]) => {
+            try {
+                return {
+                    result: await Promise.resolve(handler(event, ...args)),
+                };
+            } catch (e) {
+                return { error: e };
+            }
         }
-    })
-}
+    );
+};
 
 // Função para ler o diretório .igrpstudio e retornar a árvore de arquivos
 export const readIgrpStudioDirectory = (basePath: string): FileTree[] => {
-
     try {
-
         // Lê o conteúdo do diretório .igrpstudio
         const files = fs.readdirSync(basePath);
 
-        const IGNORED_PATHS = ['baseApi.json', 'permissions.json', '.DS_store','.gitkeep'];
+        const IGNORED_PATHS = [
+            'baseApi.json',
+            'permissions.json',
+            '.DS_store',
+            '.gitkeep',
+        ];
 
         // Mapeia os arquivos/pastas
         return files
-            .filter((file) => !IGNORED_PATHS.includes(file)).map((file) => {
+            .filter((file) => !IGNORED_PATHS.includes(file))
+            .map((file) => {
                 const filePath = path.join(basePath, file);
                 const stats = fs.statSync(filePath); // Obtém as estatísticas do arquivo/pasta
 
@@ -138,9 +148,10 @@ export const readIgrpStudioDirectory = (basePath: string): FileTree[] => {
                     // Se for um arquivo, lê seu conteúdo
                     let content = null;
                     try {
-                        content = JSON.parse(fs.readFileSync(filePath, 'utf-8')); // Lê o conteúdo como string
-                    }
-                    catch (error) {
+                        content = JSON.parse(
+                            fs.readFileSync(filePath, 'utf-8')
+                        ); // Lê o conteúdo como string
+                    } catch (error) {
                         console.error('Erro ao ler o diretório .json:', error);
                     }
                     return {
@@ -181,7 +192,7 @@ export const readDirectory = (dirPath: string): FileTree[] => {
         console.error('Error reading directory:', error);
         return [];
     }
-}
+};
 
 export async function readProjectFile(filePath: string): Promise<any> {
     try {

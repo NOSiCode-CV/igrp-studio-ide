@@ -9,14 +9,16 @@ import {
     Stethoscope,
 } from 'lucide-react';
 
-import { Button } from '@renderer/components/ui/button';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
-import { Separator } from '@renderer/components/ui/separator';
+    IGRPButtonPrimitive,
+    IGRPTooltipContentPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPTooltipPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { DebugTerminal } from '@renderer/components/debug-terminal';
 import Doctor from '@renderer/components/doctor';
@@ -90,9 +92,9 @@ export function Footer() {
     const simulateError = () => {
         throw new Error('This is a simulated error from the renderer process.');
     };
-    
+
     return (
-        <TooltipProvider>
+        <IGRPTooltipProviderPrimitive>
             <footer className="h-8 border-t bg-card flex items-center px-3 justify-between text-xs fixed bottom-0 left-0 right-0 z-50">
                 <div className="flex items-center space-x-3">
                     <span className="text-muted-foreground whitespace-nowrap flex-none">
@@ -115,28 +117,30 @@ export function Footer() {
                 </div>
 
                 <div className="flex items-center space-x-3">
-                    <Separator orientation="vertical" className="h-4" />
+                    <IGRPSeparator orientation="vertical" className="h-4" />
 
                     <button onClick={simulateError}>Simulate Error</button>
 
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
+                    <IGRPTooltipPrimitive>
+                        <IGRPTooltipTriggerPrimitive asChild>
+                            <IGRPButtonPrimitive
                                 size={'icon'}
                                 variant={'ghost'}
                                 className="h-6 w-6"
                                 onClick={() => setOpen(!open)}
                             >
                                 <Stethoscope className="text-muted-foreground" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">Doctor</TooltipContent>
-                    </Tooltip>
+                            </IGRPButtonPrimitive>
+                        </IGRPTooltipTriggerPrimitive>
+                        <IGRPTooltipContentPrimitive side="top">
+                            Doctor
+                        </IGRPTooltipContentPrimitive>
+                    </IGRPTooltipPrimitive>
 
                     <DebugTerminal />
 
-                    <Tooltip>
-                        <TooltipTrigger asChild>
+                    <IGRPTooltipPrimitive>
+                        <IGRPTooltipTriggerPrimitive asChild>
                             <div className="flex items-center space-x-1">
                                 {isOnline ? (
                                     <Wifi className="h-3.5 w-3.5 text-green-500" />
@@ -147,30 +151,30 @@ export function Footer() {
                                     {isOnline ? 'Online' : 'Offline'}
                                 </span>
                             </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
+                        </IGRPTooltipTriggerPrimitive>
+                        <IGRPTooltipContentPrimitive side="top">
                             <p>{t('networkStatus')}</p>
-                        </TooltipContent>
-                    </Tooltip>
+                        </IGRPTooltipContentPrimitive>
+                    </IGRPTooltipPrimitive>
 
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
+                    <IGRPTooltipPrimitive>
+                        <IGRPTooltipTriggerPrimitive asChild>
+                            <IGRPButtonPrimitive
                                 variant="ghost"
                                 size="icon"
                                 className="h-6 w-6"
                             >
                                 <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
+                            </IGRPButtonPrimitive>
+                        </IGRPTooltipTriggerPrimitive>
+                        <IGRPTooltipContentPrimitive side="top">
                             <p>{t('helpCenter')}</p>
-                        </TooltipContent>
-                    </Tooltip>
+                        </IGRPTooltipContentPrimitive>
+                    </IGRPTooltipPrimitive>
 
                     <Doctor open={open} setOpen={setOpen} />
                 </div>
             </footer>
-        </TooltipProvider>
+        </IGRPTooltipProviderPrimitive>
     );
 }

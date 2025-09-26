@@ -1,19 +1,17 @@
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-} from '@renderer/components/ui/breadcrumb';
-import { Button } from '@renderer/components/ui/button';
-import { Separator } from '@renderer/components/ui/separator';
-import { SidebarTrigger } from '@renderer/components/ui/sidebar';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
+    IGRPBreadcrumbItemPrimitive,
+    IGRPBreadcrumbLinkPrimitive,
+    IGRPBreadcrumbListPrimitive,
+    IGRPBreadcrumbPrimitive,
+    IGRPButtonPrimitive,
+    IGRPSidebarTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+    IGRPTooltipPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { AppWindowMac, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +44,7 @@ const NavigationBar = ({
     };
 
     return (
-        <TooltipProvider>
+        <IGRPTooltipProviderPrimitive>
             <div className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4 z-50">
                 <AlertDialogDelete
                     isOpen={deleteModal}
@@ -56,47 +54,47 @@ const NavigationBar = ({
                     recordId={title}
                 />
 
-                <SidebarTrigger className="-ml-1" />
-                <Separator
+                <IGRPSidebarTriggerPrimitive className="-ml-1" />
+                <IGRPSeparator
                     orientation="vertical"
                     className="mx-2 data-[orientation=vertical]:h-4"
                 />
 
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink
+                <IGRPBreadcrumbPrimitive>
+                    <IGRPBreadcrumbListPrimitive>
+                        <IGRPBreadcrumbItemPrimitive>
+                            <IGRPBreadcrumbLinkPrimitive
                                 onClick={handleBreadcrumbLink}
                                 className="cursor-pointer"
                             >
                                 <span className="font-semibold">{title}</span>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
+                            </IGRPBreadcrumbLinkPrimitive>
+                        </IGRPBreadcrumbItemPrimitive>
+                    </IGRPBreadcrumbListPrimitive>
+                </IGRPBreadcrumbPrimitive>
 
                 <div className="ml-auto flex items-center gap-4">
                     {!isNew && (
                         <>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
+                            <IGRPTooltipPrimitive>
+                                <IGRPTooltipTriggerPrimitive asChild>
+                                    <IGRPButtonPrimitive
                                         type="button"
                                         size="sm"
                                         variant={'secondary'}
                                         onClick={handleSourceCode}
                                     >
                                         <AppWindowMac />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
+                                    </IGRPButtonPrimitive>
+                                </IGRPTooltipTriggerPrimitive>
+                                <IGRPTooltipContentPrimitive>
                                     {t('sourceCode')}
-                                </TooltipContent>
-                            </Tooltip>
+                                </IGRPTooltipContentPrimitive>
+                            </IGRPTooltipPrimitive>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
+                            <IGRPTooltipPrimitive>
+                                <IGRPTooltipTriggerPrimitive asChild>
+                                    <IGRPButtonPrimitive
                                         type="button"
                                         variant="outline"
                                         onClick={(e) => {
@@ -110,23 +108,27 @@ const NavigationBar = ({
                                         <span className="sr-only">
                                             {t('delete')}
                                         </span>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>{t('delete')}</TooltipContent>
-                            </Tooltip>
+                                    </IGRPButtonPrimitive>
+                                </IGRPTooltipTriggerPrimitive>
+                                <IGRPTooltipContentPrimitive>
+                                    {t('delete')}
+                                </IGRPTooltipContentPrimitive>
+                            </IGRPTooltipPrimitive>
                         </>
                     )}
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button color="success" type="submit">
+                    <IGRPTooltipPrimitive>
+                        <IGRPTooltipTriggerPrimitive asChild>
+                            <IGRPButtonPrimitive color="success" type="submit">
                                 {t('save')}
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>{t('save')}</TooltipContent>
-                    </Tooltip>
+                            </IGRPButtonPrimitive>
+                        </IGRPTooltipTriggerPrimitive>
+                        <IGRPTooltipContentPrimitive>
+                            {t('save')}
+                        </IGRPTooltipContentPrimitive>
+                    </IGRPTooltipPrimitive>
                 </div>
             </div>
-        </TooltipProvider>
+        </IGRPTooltipProviderPrimitive>
     );
 };
 

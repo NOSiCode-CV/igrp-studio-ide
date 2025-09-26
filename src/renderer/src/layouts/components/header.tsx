@@ -1,5 +1,5 @@
 import logo from '@renderer/assets/images/igrp-green.svg';
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import {
@@ -14,7 +14,23 @@ import {
 import { SettingsDialog } from '@renderer/pages/settings/settings-dialog';
 import { cn } from '@renderer/lib/utils';
 import { ModeToggle } from '@renderer/components/mode-toogle';
-import { Button } from '@renderer/components/ui/button';
+import {
+    IGRPBreadcrumbItemPrimitive,
+    IGRPBreadcrumbLinkPrimitive,
+    IGRPBreadcrumbListPrimitive,
+    IGRPBreadcrumbPagePrimitive,
+    IGRPBreadcrumbPrimitive,
+    IGRPBreadcrumbSeparatorPrimitive,
+    IGRPButtonPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { BranchSwitcher } from '../../components/git/git-branch-switcher';
 import useToast from '@renderer/hooks/useToast';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,30 +38,10 @@ import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import SyncButton from '@renderer/components/git/git-sync';
 import { RootState } from '@renderer/redux';
 import GitConnectionMenu from '@renderer/components/user-auth';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
-import { useTranslation } from 'react-i18next';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@renderer/components/ui/breadcrumb';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useDocker } from '@renderer/hooks/use-docker';
 import DockerControls from '@renderer/components/docker-controls';
+import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -71,21 +67,21 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const { showErrorToast, showSuccessToast } = useToast();
 
-    const handleMinimize = () => {
+    const handleMinimize = (): void => {
         window.menu.minimizeWindow();
         window.menu.isMaximized;
     };
 
-    const handleMaximize = () => {
+    const handleMaximize = (): void => {
         window.menu.maximizeWindow();
         setIsMaximized(!isMaximized);
     };
 
-    const handleClose = () => {
+    const handleClose = (): void => {
         window.menu.closeWindow();
     };
 
-    const openIDE = async (ideType: string) => {
+    const openIDE = async (ideType: string): Promise<void> => {
         const path = basePath || workspace.path;
         if (!path) return;
         try {
@@ -96,7 +92,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
     };
 
     useEffect(() => {
-        const laodIdes = async () => {
+        const laodIdes = async (): Promise<void> => {
             await window.api.getIDEs().then((data) => {
                 setInstalledIDEs(data);
             });
@@ -105,7 +101,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
     }, []);
 
     useEffect(() => {
-        const checkMaximized = async () => {
+        const checkMaximized = async (): Promise<void> => {
             try {
                 const maximized = await window.menu.isMaximized();
                 setIsMaximized(maximized);
@@ -135,7 +131,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
         icon: React.ReactNode;
         label: string;
         className?: string;
-    }) => (
+    }): JSX.Element => (
         <button
             onClick={onClick}
             className={cn(
@@ -149,22 +145,22 @@ const Header = ({ config, basePath }: HeaderProps) => {
         </button>
     );
 
-    const handleRun = async () => {
+    const handleRun = async (): Promise<void> => {
         await startContainers();
     };
 
-    const handleDowm = async (dropVolume: boolean) => {
+    const handleDowm = async (dropVolume: boolean): Promise<void> => {
         await stopContainers(dropVolume);
     };
 
-    const handleStop = async () => {
+    const handleStop = async (): Promise<void> => {
         await stopService();
     };
 
     const isProjectAtive = config?.name !== undefined && config?.name !== null;
     return (
         <>
-            <TooltipProvider>
+            <IGRPTooltipProviderPrimitive>
                 <header className="fle sticky top-0 z-50 w-full items-center border-b bg-background">
                     <div className="flex h-(--header-height) w-full items-center  px-4 justify-between">
                         <div className="flex items-center space-x-4 home">
@@ -186,36 +182,37 @@ const Header = ({ config, basePath }: HeaderProps) => {
                             </a>
 
                             {isProjectAtive && (
-                                <Breadcrumb className="hidden lg:flex">
-                                    <BreadcrumbList>
-                                        <BreadcrumbItem>
-                                            <BreadcrumbLink href="#/">
+                                <IGRPBreadcrumbPrimitive className="hidden lg:flex">
+                                    <IGRPBreadcrumbListPrimitive>
+                                        <IGRPBreadcrumbItemPrimitive>
+                                            <IGRPBreadcrumbLinkPrimitive href="#/">
                                                 <ArrowLeft className="h-4 w-4" />
-                                            </BreadcrumbLink>
-                                        </BreadcrumbItem>
-                                        <BreadcrumbItem className="md:hidden lg:flex">
-                                            <BreadcrumbPage>
+                                            </IGRPBreadcrumbLinkPrimitive>
+                                        </IGRPBreadcrumbItemPrimitive>
+                                        <IGRPBreadcrumbItemPrimitive className="md:hidden lg:flex">
+                                            <IGRPBreadcrumbPagePrimitive>
                                                 {workspace.name}
-                                            </BreadcrumbPage>
-                                        </BreadcrumbItem>
-                                        <BreadcrumbSeparator />
-                                        <BreadcrumbItem>
-                                            <BreadcrumbPage className="truncate">
+                                            </IGRPBreadcrumbPagePrimitive>
+                                        </IGRPBreadcrumbItemPrimitive>
+                                        <IGRPBreadcrumbSeparatorPrimitive />
+                                        <IGRPBreadcrumbItemPrimitive>
+                                            <IGRPBreadcrumbPagePrimitive className="truncate">
                                                 {config.name}
-                                            </BreadcrumbPage>
-                                        </BreadcrumbItem>
-                                    </BreadcrumbList>
-                                </Breadcrumb>
+                                            </IGRPBreadcrumbPagePrimitive>
+                                        </IGRPBreadcrumbItemPrimitive>
+                                    </IGRPBreadcrumbListPrimitive>
+                                </IGRPBreadcrumbPrimitive>
                             )}
                         </div>
                         <div className="flex items-center space-x-2 ">
-                            <DockerControls
-                                loading={loading}
-                                onRun={handleRun}
-                                onDropAll={handleDowm}
-                                onStopAll={handleStop}
-                                t={t}
-                            />
+                            {!basePath && (
+                                <DockerControls
+                                    loading={loading}
+                                    onRun={handleRun}
+                                    onDropAll={handleDowm}
+                                    onStopAll={handleStop}
+                                />
+                            )}
 
                             {basePath && (
                                 <>
@@ -235,24 +232,29 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                 </>
                             )}
 
-                            <DropdownMenu>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost">
+                            <IGRPDropdownMenuPrimitive>
+                                <IGRPTooltipPrimitive>
+                                    <IGRPTooltipTriggerPrimitive asChild>
+                                        <IGRPDropdownMenuTriggerPrimitive
+                                            asChild
+                                        >
+                                            <IGRPButtonPrimitive variant="ghost">
                                                 <Code />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
+                                            </IGRPButtonPrimitive>
+                                        </IGRPDropdownMenuTriggerPrimitive>
+                                    </IGRPTooltipTriggerPrimitive>
+                                    <IGRPTooltipContentPrimitive>
                                         <p>{t('openOnEditor')}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                                <DropdownMenuContent align="end">
+                                    </IGRPTooltipContentPrimitive>
+                                </IGRPTooltipPrimitive>
+                                <IGRPDropdownMenuContentPrimitive align="end">
                                     {installedIDEs.map(
-                                        ({ key, config }, index) => {
+                                        (
+                                            { key, config },
+                                            index
+                                        ): React.ReactNode => {
                                             return (
-                                                <DropdownMenuItem
+                                                <IGRPDropdownMenuItemPrimitive
                                                     key={index}
                                                     onClick={() => openIDE(key)}
                                                     className="flex items-center"
@@ -263,30 +265,33 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                                         {'  '}
                                                         {config.name}
                                                     </span>
-                                                </DropdownMenuItem>
+                                                </IGRPDropdownMenuItemPrimitive>
                                             );
                                         }
                                     )}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                </IGRPDropdownMenuContentPrimitive>
+                            </IGRPDropdownMenuPrimitive>
 
                             <ModeToggle />
 
                             <SettingsDialog />
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button variant="ghost" size="sm">
+                            <IGRPTooltipPrimitive>
+                                <IGRPTooltipTriggerPrimitive asChild>
+                                    <IGRPButtonPrimitive
+                                        variant="ghost"
+                                        size="sm"
+                                    >
                                         <Bell className="w-5 h-5" />
                                         <span className="sr-only">
                                             {t('notifications')}
                                         </span>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
+                                    </IGRPButtonPrimitive>
+                                </IGRPTooltipTriggerPrimitive>
+                                <IGRPTooltipContentPrimitive>
                                     <p>{t('notifications')}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                                </IGRPTooltipContentPrimitive>
+                            </IGRPTooltipPrimitive>
 
                             <GitConnectionMenu />
 
@@ -323,7 +328,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
                         </div>
                     </div>
                 </header>
-            </TooltipProvider>
+            </IGRPTooltipProviderPrimitive>
         </>
     );
 };

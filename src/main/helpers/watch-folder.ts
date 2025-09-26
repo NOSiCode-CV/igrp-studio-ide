@@ -20,29 +20,38 @@ export class FolderWatcher {
         this.watchers = new Map();
     }
 
-    watchFolder(folderPath: string, callback: (event: WatchEvent) => void): WatchResult {
+    watchFolder(
+        folderPath: string,
+        callback: (event: WatchEvent) => void
+    ): WatchResult {
         if (this.watchers.has(folderPath)) {
             return { error: 'This folder is already being watched' };
         }
 
         try {
-            const watcher = fs.watch(folderPath, { recursive: true }, (eventType, filename) => {
-                if (!filename) return;
+            const watcher = fs.watch(
+                folderPath,
+                { recursive: true },
+                (eventType, filename) => {
+                    if (!filename) return;
 
-                const fullPath = path.join(folderPath, filename);
-              
-                callback({
-                    eventType,
-                    filename,
-                    fullPath,
-                    timestamp: Date.now()
-                });
-            });
+                    const fullPath = path.join(folderPath, filename);
+
+                    callback({
+                        eventType,
+                        filename,
+                        fullPath,
+                        timestamp: Date.now(),
+                    });
+                }
+            );
 
             this.watchers.set(folderPath, watcher);
             return { success: true };
         } catch (error) {
-            return { error: error instanceof Error ? error.message : 'Unknown error' };
+            return {
+                error: error instanceof Error ? error.message : 'Unknown error',
+            };
         }
     }
 
@@ -57,7 +66,7 @@ export class FolderWatcher {
     }
 
     stopAll(): void {
-        this.watchers.forEach(watcher => watcher.close());
+        this.watchers.forEach((watcher) => watcher.close());
         this.watchers.clear();
     }
 }

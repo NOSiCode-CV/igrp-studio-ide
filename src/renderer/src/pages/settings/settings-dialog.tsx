@@ -10,43 +10,43 @@ import {
     Shirt,
 } from 'lucide-react';
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@renderer/components/ui/breadcrumb';
+    IGRPBreadcrumbPrimitive,
+    IGRPBreadcrumbItemPrimitive,
+    IGRPBreadcrumbLinkPrimitive,
+    IGRPBreadcrumbListPrimitive,
+    IGRPBreadcrumbPagePrimitive,
+    IGRPBreadcrumbSeparatorPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@renderer/components/ui/dialog';
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPDialogTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarProvider,
-} from '@renderer/components/ui/sidebar';
+    IGRPSidebarPrimitive,
+    IGRPSidebarContentPrimitive,
+    IGRPSidebarGroupPrimitive,
+    IGRPSidebarGroupContentPrimitive,
+    IGRPSidebarMenuPrimitive,
+    IGRPSidebarMenuButtonPrimitive,
+    IGRPSidebarMenuItemPrimitive,
+    IGRPSidebarProviderPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { AboutSettings } from './about-settings';
 import { LanguageSettings } from './language-settings';
 import { ConnectedAccountsSettings } from './connected-accounts-settings';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
+    IGRPTooltipPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
 import KeyboardShortcuts from './keyboard-shortcuts';
 import { AppearanceSettings } from './appearance';
 
@@ -71,36 +71,43 @@ export function SettingsDialog() {
     const [open, setOpen] = React.useState(false);
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <DialogTrigger asChild>
-                        <Button variant="ghost" size="sm">
+        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
+            <IGRPTooltipPrimitive>
+                <IGRPTooltipTriggerPrimitive asChild>
+                    <IGRPDialogTriggerPrimitive asChild>
+                        <IGRPButtonPrimitive variant="ghost" size="sm">
                             <Settings className="w-5 h-5" />
                             <span className="sr-only">{t('settings')}</span>
-                        </Button>
-                    </DialogTrigger>
-                </TooltipTrigger>
-                <TooltipContent>{t('settings')}</TooltipContent>
-            </Tooltip>
-            <DialogContent className="overflow-hidden p-0 md:max-h-[500px] sm:max-w-[600px] md:max-w-[700px] max-w-4xl">
-                <DialogHeader className="pb-3">
-                    <DialogTitle className="sr-only">
+                        </IGRPButtonPrimitive>
+                    </IGRPDialogTriggerPrimitive>
+                </IGRPTooltipTriggerPrimitive>
+                <IGRPTooltipContentPrimitive>
+                    {t('settings')}
+                </IGRPTooltipContentPrimitive>
+            </IGRPTooltipPrimitive>
+            <IGRPDialogContentPrimitive className="overflow-hidden p-0 md:max-h-[500px] sm:max-w-[600px] md:max-w-[700px] max-w-4xl">
+                <IGRPDialogHeaderPrimitive className="pb-3">
+                    <IGRPDialogTitlePrimitive className="sr-only">
                         {t('settings')}
-                    </DialogTitle>
-                    <DialogDescription className="sr-only">
-                       {t('customizeSettingsHere')}
-                    </DialogDescription>
-                </DialogHeader>
-                <SidebarProvider className="items-start">
-                    <Sidebar collapsible="none" className="hidden md:flex">
-                        <SidebarContent>
-                            <SidebarGroup>
-                                <SidebarGroupContent>
-                                    <SidebarMenu>
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive className="sr-only">
+                        {t('customizeSettingsHere')}
+                    </IGRPDialogDescriptionPrimitive>
+                </IGRPDialogHeaderPrimitive>
+                <IGRPSidebarProviderPrimitive className="items-start">
+                    <IGRPSidebarPrimitive
+                        collapsible="none"
+                        className="hidden md:flex"
+                    >
+                        <IGRPSidebarContentPrimitive>
+                            <IGRPSidebarGroupPrimitive>
+                                <IGRPSidebarGroupContentPrimitive>
+                                    <IGRPSidebarMenuPrimitive>
                                         {data.nav.map((item) => (
-                                            <SidebarMenuItem key={item.name}>
-                                                <SidebarMenuButton
+                                            <IGRPSidebarMenuItemPrimitive
+                                                key={item.name}
+                                            >
+                                                <IGRPSidebarMenuButtonPrimitive
                                                     asChild
                                                     isActive={
                                                         item.name === activeItem
@@ -115,34 +122,34 @@ export function SettingsDialog() {
                                                             {t(item.name)}
                                                         </span>
                                                     </button>
-                                                </SidebarMenuButton>
-                                            </SidebarMenuItem>
+                                                </IGRPSidebarMenuButtonPrimitive>
+                                            </IGRPSidebarMenuItemPrimitive>
                                         ))}
-                                    </SidebarMenu>
-                                </SidebarGroupContent>
-                            </SidebarGroup>
-                        </SidebarContent>
-                    </Sidebar>
+                                    </IGRPSidebarMenuPrimitive>
+                                </IGRPSidebarGroupContentPrimitive>
+                            </IGRPSidebarGroupPrimitive>
+                        </IGRPSidebarContentPrimitive>
+                    </IGRPSidebarPrimitive>
 
                     <main className="flex h-[480px] flex-1 flex-col">
-                        <ScrollArea className='h-full'>
+                        <IGRPScrollAreaPrimitive className="h-full">
                             <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
                                 <div className="flex items-center gap-2 px-4">
-                                    <Breadcrumb>
-                                        <BreadcrumbList>
-                                            <BreadcrumbItem className="hidden md:block">
-                                                <BreadcrumbLink href="#/">
+                                    <IGRPBreadcrumbPrimitive>
+                                        <IGRPBreadcrumbListPrimitive>
+                                            <IGRPBreadcrumbItemPrimitive className="hidden md:block">
+                                                <IGRPBreadcrumbLinkPrimitive href="#/">
                                                     {t('settings')}
-                                                </BreadcrumbLink>
-                                            </BreadcrumbItem>
-                                            <BreadcrumbSeparator className="hidden md:block" />
-                                            <BreadcrumbItem>
-                                                <BreadcrumbPage>
+                                                </IGRPBreadcrumbLinkPrimitive>
+                                            </IGRPBreadcrumbItemPrimitive>
+                                            <IGRPBreadcrumbSeparatorPrimitive className="hidden md:block" />
+                                            <IGRPBreadcrumbItemPrimitive>
+                                                <IGRPBreadcrumbPagePrimitive>
                                                     {t(activeItem)}
-                                                </BreadcrumbPage>
-                                            </BreadcrumbItem>
-                                        </BreadcrumbList>
-                                    </Breadcrumb>
+                                                </IGRPBreadcrumbPagePrimitive>
+                                            </IGRPBreadcrumbItemPrimitive>
+                                        </IGRPBreadcrumbListPrimitive>
+                                    </IGRPBreadcrumbPrimitive>
                                 </div>
                             </header>
 
@@ -163,10 +170,10 @@ export function SettingsDialog() {
                                     </div>
                                 )}
                             </div>
-                        </ScrollArea>
+                        </IGRPScrollAreaPrimitive>
                     </main>
-                </SidebarProvider>
-            </DialogContent>
-        </Dialog>
+                </IGRPSidebarProviderPrimitive>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

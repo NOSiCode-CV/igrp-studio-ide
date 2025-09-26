@@ -7,6 +7,7 @@ A funcionalidade de Duplicação permite aos utilizadores criar cópias exatas d
 ## 🎯 **Intenção e Propósito**
 
 ### Por que Duplicar?
+
 - **Poupança de Tempo**: Em vez de criar páginas/componentes do zero, duplicar os existentes
 - **Consistência**: Manter estrutura e funcionalidade consistentes entre itens semelhantes
 - **Uso de Modelos**: Usar páginas/componentes existentes como modelos para novos
@@ -14,6 +15,7 @@ A funcionalidade de Duplicação permite aos utilizadores criar cópias exatas d
 - **À Prova do Futuro**: Itens duplicados são completamente independentes do original
 
 ### Casos de Uso
+
 - Criar múltiplas páginas semelhantes (ex: perfil de utilizador, perfil de administrador, páginas de configurações)
 - Duplicar componentes com funcionalidades semelhantes (ex: diferentes formulários, cartões, modais)
 - Usar páginas existentes como modelos para novas funcionalidades
@@ -22,23 +24,27 @@ A funcionalidade de Duplicação permite aos utilizadores criar cópias exatas d
 ## 🚀 **Como Usar**
 
 ### Passo 1: Aceder à Opção de Duplicação
+
 1. Navegue para a secção **Páginas** no IGRP Studio
 2. Encontre a página ou componente que deseja duplicar
 3. Clique no **menu de três pontos** (⋮) no item
 4. Selecione **"Duplicar"** no menu suspenso
 
 ### Passo 2: Configurar a Duplicação
+
 1. Um modal abrirá com informações pré-preenchidas
 2. **Descrição**: Adiciona automaticamente o sufixo "Copy" (ex: "Perfil de Utilizador Copy")
 3. **Nome**: Adiciona automaticamente o sufixo "Copy" (ex: "UserProfileCopy")
 4. **Caminho** (apenas Páginas): Adiciona automaticamente o sufixo "-copy" (ex: "user-profile-copy")
 
 ### Passo 3: Personalizar (Opcional)
+
 - **Descrição**: Modifique a descrição para refletir melhor o propósito do novo item
 - **Nome**: Altere o nome para algo mais específico
 - **Caminho**: Atualize o caminho para corresponder à sua estrutura de roteamento
 
 ### Passo 4: Guardar
+
 - Clique em **"Duplicar"** para criar a cópia
 - O novo item aparecerá na sua lista de páginas/componentes
 - Uma mensagem de sucesso confirmará a duplicação
@@ -46,9 +52,11 @@ A funcionalidade de Duplicação permite aos utilizadores criar cópias exatas d
 ## 🔧 **Detalhes Técnicos**
 
 ### O que é Copiado
+
 A funcionalidade de duplicação executa uma **cópia profunda** do item original, preservando:
 
 #### Para Páginas:
+
 - ✅ Todas as propriedades e configurações da página
 - ✅ Tipos, estados e funções
 - ✅ Configurações de força dinâmica
@@ -56,6 +64,7 @@ A funcionalidade de duplicação executa uma **cópia profunda** do item origina
 - ✅ Todas as propriedades e metadados personalizados
 
 #### Para Componentes:
+
 - ✅ Propriedades e configurações do componente
 - ✅ Argumentos e parâmetros
 - ✅ Configurações de ícone
@@ -63,12 +72,14 @@ A funcionalidade de duplicação executa uma **cópia profunda** do item origina
 - ✅ Todas as propriedades e metadados personalizados
 
 ### O que é Modificado
+
 - **ID**: Novo identificador único gerado
 - **Nome**: Adiciona sufixo "Copy"
 - **Descrição**: Adiciona sufixo "Copy"
 - **Caminho**: Adiciona sufixo "-copy" (apenas páginas)
 
 ### Independência
+
 - ✅ Itens duplicados são **completamente independentes** do original
 - ✅ Alterações no original não afetarão a cópia
 - ✅ Alterações na cópia não afetarão o original
@@ -90,6 +101,7 @@ src/renderer/src/generators/ui/page/
 ## 🎨 **Interface do Utilizador**
 
 ### Menu Suspenso
+
 - **Editar**: Modificar o item original
 - **Duplicar**: Criar uma cópia (NOVO)
 - **Adicionar Componentes**: Adicionar componentes ao item
@@ -97,6 +109,7 @@ src/renderer/src/generators/ui/page/
 - **Eliminar**: Remover o item
 
 ### Interface do Modal
+
 - **Título**: Mostra o que está a ser duplicado
 - **Descrição**: Explica o processo de duplicação
 - **Campos do Formulário**: Pré-preenchidos com nomes adequados para cópia
@@ -106,16 +119,19 @@ src/renderer/src/generators/ui/page/
 ## ⚠️ **Notas Importantes**
 
 ### Convenções de Nomenclatura
+
 - Os nomes devem seguir o padrão: `[a-zA-Z0-9]+` (sem espaços ou hífens)
 - Os caminhos devem seguir padrões de roteamento Next.js
 - Nomes duplicados são permitidos (cada item tem um ID único)
 
 ### Limitações
+
 - Não é possível duplicar itens que estão atualmente a ser editados
 - Não é possível duplicar itens com configurações inválidas
 - Podem ocorrer conflitos de caminho se caminhos semelhantes já existirem
 
 ### Melhores Práticas
+
 1. **Usar Nomes Descritivos**: Altere os nomes gerados automaticamente para serem mais específicos
 2. **Rever Caminhos**: Certifique-se de que os caminhos se alinham com a sua estratégia de roteamento
 3. **Testar Após Duplicação**: Verifique se o item duplicado funciona como esperado
@@ -132,6 +148,7 @@ src/renderer/src/generators/ui/page/
 5. **Resultado**: Três páginas semelhantes com estrutura consistente mas propósitos diferentes
 
 ### Benefícios:
+
 - ✅ Experiência de utilizador consistente entre páginas
 - ✅ Tempo de desenvolvimento reduzido
 - ✅ Base de código mantível
@@ -156,6 +173,7 @@ R: Sim! A duplicação incluirá todos os componentes associados e as suas confi
 ## 📈 **Melhorias Futuras**
 
 Possíveis melhorias para a funcionalidade de duplicação:
+
 - Duplicação em massa de múltiplos itens
 - Biblioteca de modelos para padrões comuns de páginas/componentes
 - Sugestões inteligentes de nomenclatura baseadas no contexto do projeto
@@ -166,4 +184,4 @@ Possíveis melhorias para a funcionalidade de duplicação:
 
 **Última Atualização**: Dezembro 2024  
 **Versão**: 1.0  
-**Autor**: Equipa IGRP Studio 
+**Autor**: Equipa IGRP Studio
