@@ -3,6 +3,7 @@ import { COMPONENT_MAP, ICON_MAP } from '../ComponentTypes';
 import { useFakedata } from '../hooks/useFakeData';
 import { generateAllClasses } from '../components/settings/style/utils';
 import { cn } from '@renderer/lib/utils';
+import { JSX } from 'react';
 
 export interface CardComponentProps {
     comp: StructuredComponent;
@@ -17,21 +18,12 @@ const CardComponent = ({
     group,
     hoverClass,
     onDragEnd,
-}: CardComponentProps) => {
+}: CardComponentProps): JSX.Element => {
     const { getFakeComponentData } = useFakedata();
 
     const { componentName, properties, style } = comp;
 
-    const {
-        commonProperties,
-        iconProperties,
-        dataProperties,
-        error,
-        errorMessage,
-        className,
-        content,
-        ...args
-    } = properties || {};
+    const { iconProperties, className, content, ...args } = properties || {};
 
     const componentLabel = content || properties?.label || componentName;
 
@@ -53,7 +45,7 @@ const CardComponent = ({
     return (
         <>
             {Component ? (
-                //@ts-ignore
+                //@ts-ignore - This is a workaround to allow the component to be rendered
                 <Component
                     {...args}
                     {...FAKE_COMPONENT_DATA?.properties}

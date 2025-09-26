@@ -12,12 +12,6 @@ import LoaderComponent from './components/loader';
 
 loader.config({ monaco });
 
-window.addEventListener('error', (event) => {
-    event.preventDefault();
-    console.error('Unhandled Error:', event.error);
-    window.electron.reportError(event.error);
-});
-
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
         <ErrorBoundary>

@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     IGRPAreaChart,
     IGRPBadge,
@@ -393,6 +394,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     [COMPONENT.TableBadgeCell]: Badge,
 } as const;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.ColorPicker]: IGRPInputColor,
     [COMPONENT.Date]: IGRPDatePicker,
