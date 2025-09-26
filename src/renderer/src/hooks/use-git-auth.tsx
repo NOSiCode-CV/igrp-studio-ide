@@ -234,7 +234,9 @@ const useGitAuth = () => {
         }
     };
 
-    const saveGitlabConfig = async (config: GitLabProvider): Promise<{ success: boolean; error?: any }> => {
+    const saveGitlabConfig = async (
+        config: GitLabProvider
+    ): Promise<{ success: boolean; error?: any }> => {
         try {
             await window.electron.ipcRenderer.invoke(
                 'save-gitlab-config',
@@ -293,7 +295,9 @@ const useGitAuth = () => {
         return null;
     };
 
-    const setActiveGitlabConfig = async (providerId: string): Promise<{ success: boolean; error?: any }> => {
+    const setActiveGitlabConfig = async (
+        providerId: string
+    ): Promise<{ success: boolean; error?: any }> => {
         try {
             await window.electron.ipcRenderer.invoke(
                 'set-active-gitlab-config',

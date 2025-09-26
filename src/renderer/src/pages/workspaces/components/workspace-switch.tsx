@@ -40,7 +40,6 @@ export const WorkspaceSwitcher = ({
     onWorkspaceChange: (workspace: IWorkspace) => void;
 }) => {
     const navigate = useNavigate();
-    const [workspaces, setWorkspaces] = useState<IWorkspace[]>([]);
     const [pinnedWorkspaces, setPinnedWorkspaces] = useState<IWorkspace[]>([]);
 
     const { t } = useTranslation();
@@ -55,8 +54,8 @@ export const WorkspaceSwitcher = ({
     );
 
     const {
-        state: { changeStatus },
-        actions: { getWorkspaces, updateWorkspace, openWorkspace },
+        workspaces,
+        actions: { updateWorkspace, openWorkspace },
     } = useWorkspace();
 
     const loadPinnedWorkspace = () => {
@@ -84,14 +83,6 @@ export const WorkspaceSwitcher = ({
         loadPinnedWorkspace();
     }, [searchTerm, defaultWorkspace, workspaces]);
 
-    useEffect(() => {
-        const loadWorkspaces = async () => {
-            await getWorkspaces().then((data) => {
-                setWorkspaces(data);
-            });
-        };
-        loadWorkspaces();
-    }, [changeStatus]);
 
     const togglePinWorkspace = (workspace: IWorkspace, e?: MouseEvent) => {
         if (e) {
@@ -112,7 +103,11 @@ export const WorkspaceSwitcher = ({
             const result = await window.api.openDirectory(t('openWorkspace'));
 
             if (!result.canceled && result.basePath) {
-                await openWorkspace(result.basePath);
+                const newWorkspace = await openWorkspace(result.basePath);
+                if (newWorkspace) {
+                    // Switch to the newly opened workspace
+                    onWorkspaceChange(newWorkspace);
+                }
             }
         } catch (error) {
             console.error('Error opening workspace:', error);
@@ -156,8 +151,8 @@ export const WorkspaceSwitcher = ({
                                             handleChangeWorkspace(workspace)
                                         }
                                         className={cn(
-                                            workspace.slug ===
-                                                selectedWorkspace.slug &&
+                                            workspace.id ===
+                                                selectedWorkspace.id &&
                                                 'text-primary bg-primary/5'
                                         )}
                                     >
@@ -208,8 +203,8 @@ export const WorkspaceSwitcher = ({
                                 <IGRPSidebarMenuButtonPrimitive
                                     asChild
                                     className={cn(
-                                        workspace.slug ===
-                                            selectedWorkspace.slug && 'bg-muted'
+                                        workspace.id ===
+                                            selectedWorkspace.id && 'bg-muted'
                                     )}
                                     onClick={() =>
                                         handleChangeWorkspace(workspace)

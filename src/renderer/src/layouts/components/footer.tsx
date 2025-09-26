@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, JSX } from 'react';
 import {
     Wifi,
     WifiOff,
@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { DebugTerminal } from '@renderer/components/debug-terminal';
 import Doctor from '@renderer/components/doctor';
 
-export function Footer() {
+export function Footer(): JSX.Element {
     const [isOnline, setIsOnline] = useState(true);
     const [appVersion, setAppVersion] = useState('');
     const [newVersion, setNewVersion] = useState<string>('');
@@ -33,7 +33,7 @@ export function Footer() {
 
     // Monitor online status
     useEffect(() => {
-        const handleOnlineStatus = () => {
+        const handleOnlineStatus = (): void => {
             setIsOnline(navigator.onLine);
         };
 

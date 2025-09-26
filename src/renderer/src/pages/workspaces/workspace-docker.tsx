@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPCard,
@@ -21,7 +21,9 @@ interface WorkspaceConfigProps {
     workspace: IWorkspace;
 }
 
-export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
+export function WorkspaceDocker({
+    workspace,
+}: WorkspaceConfigProps): JSX.Element {
     const [copied, setCopied] = useState(false);
 
     const { fileContent, services, loadComposeFile } = useDocker({ workspace });
@@ -33,15 +35,17 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps) {
 
     const { t } = useTranslation();
 
-    const handleCopyYaml = () => {
+    const handleCopyYaml = (): void => {
         if (!content) return;
         navigator.clipboard.writeText(content);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handleSaveService = () => {
-        saveCustomWorkspaceComposeFile(content);
+    const handleSaveService = (): void => {
+        if (content) {
+            saveCustomWorkspaceComposeFile(content);
+        }
     };
 
     useEffect(() => {

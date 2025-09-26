@@ -99,7 +99,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
 
     const handleIconUpload = async (
         event: React.ChangeEvent<HTMLInputElement>
-    ) => {
+    ): Promise<void> => {
         const file = event.target.files?.[0];
         if (!file) return;
 
@@ -129,7 +129,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
         }
     };
 
-    const handleRemoveIcon = () => {
+    const handleRemoveIcon = (): void => {
         formik.setFieldValue('icon', '');
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
@@ -223,6 +223,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                             <LabelRequired>{t('projectName')}</LabelRequired>
                             <IGRPInputPrimitive
                                 id="project-name"
+                                name="name"
                                 value={formik.values.name}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}

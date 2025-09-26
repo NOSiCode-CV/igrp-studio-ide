@@ -114,3 +114,13 @@ ipcMain.handle(EVENTS.DOCKER.DAEMON_STATUS, async () => {
         };
     }
 });
+
+// Test logging functionality
+ipcMain.handle('docker-test-logging', async () => {
+    try {
+        dockerService.testLogging();
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+});

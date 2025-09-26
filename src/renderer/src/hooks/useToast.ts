@@ -7,7 +7,7 @@ const useToast = () => {
         toast.success(message);
     };
 
-    const displayError = (message: string): void => {
+    const displayError = (message: string) => {
         if (message.length > MAX_LENGTH) {
             toast.error(`${message.substring(0, MAX_LENGTH)}[...]`);
         } else {
@@ -15,7 +15,7 @@ const useToast = () => {
         }
     };
 
-    const formatValidationError = (error: any): string | string[] => {
+    const formatValidationError = (error: any): string => {
         // Handle error with params.errors
         if (error?.params?.errors) {
             return formatValidationError(error.params.errors);
@@ -39,7 +39,7 @@ const useToast = () => {
         );
     };
 
-    const showErrorToast = (error: any): void => {
+    const showErrorToast = (error: any) => {
         if (Array.isArray(error) && error.some((e) => e.instancePath)) {
             // Handle validation error array
             const formattedErrors = formatValidationError(error);
@@ -60,7 +60,7 @@ const useToast = () => {
         }
     };
 
-    const showWarningToast = (message: string): void => {
+    const showWarningToast = (message: string) => {
         toast.warning(message);
     };
 

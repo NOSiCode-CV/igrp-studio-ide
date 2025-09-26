@@ -11,8 +11,13 @@ export function useAppLogic(): {
     loading: boolean;
     error: string | null;
     isInitialized: boolean;
-    createEnvironment: (data: Omit<AppLogicEnvironment, 'id' | 'status' | 'createdAt'>) => Promise<AppLogicEnvironment | null>;
-    updateEnvironment: (id: string, updates: Partial<AppLogicEnvironment>) => Promise<boolean>;
+    createEnvironment: (
+        data: Omit<AppLogicEnvironment, 'id' | 'status' | 'createdAt'>
+    ) => Promise<AppLogicEnvironment | null>;
+    updateEnvironment: (
+        id: string,
+        updates: Partial<AppLogicEnvironment>
+    ) => Promise<boolean>;
     deleteEnvironment: (id: string) => Promise<boolean>;
     testEnvironment: (id: string) => Promise<boolean>;
     searchEnvironments: (query: string) => AppLogicEnvironment[];

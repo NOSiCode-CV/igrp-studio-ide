@@ -43,7 +43,9 @@ const makeSelectProperties = (module?: string) =>
     });
 
 // Update the hook to accept `module` as a parameter
-const useStudioAPI = (module?: string): {
+const useStudioAPI = (
+    module?: string
+): {
     basePath: string;
     config: ProjectData;
     models: any[];
@@ -55,6 +57,8 @@ const useStudioAPI = (module?: string): {
     filesThree: FileTree[];
     currentItem: any;
     changeStatus: boolean;
+    findModelsByName: (name: string) => any | undefined;
+    getJsonData: (path: string) => Promise<any | undefined>;
 } => {
     const selectProperties = useMemo(
         () => makeSelectProperties(module),
@@ -83,13 +87,16 @@ const useStudioAPI = (module?: string): {
         return find(models, `${name}.json`);
     };
 
-    const getJsonData = useCallback(async (path: string): Promise<any | undefined> => {
-        try {
-            return await window.api.getJsonContent(path);
-        } catch (error) {
-            console.error('Failed to load JSON content:', error);
-        }
-    }, []);
+    const getJsonData = useCallback(
+        async (path: string): Promise<any | undefined> => {
+            try {
+                return await window.api.getJsonContent(path);
+            } catch (error) {
+                console.error('Failed to load JSON content:', error);
+            }
+        },
+        []
+    );
 
     return {
         basePath,

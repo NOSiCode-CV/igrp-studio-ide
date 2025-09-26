@@ -16,7 +16,9 @@ export const useGit = (): {
     pullChanges: (projectPath: string) => Promise<boolean>;
     pushChanges: (projectPath: string, branch: string) => Promise<boolean>;
     syncChanges: (projectPath: string, branch: string) => Promise<boolean>;
-    getChangesCount: (projectPath: string) => Promise<{ ahead: number; behind: number; modified: number }>;
+    getChangesCount: (
+        projectPath: string
+    ) => Promise<{ ahead: number; behind: number; modified: number }>;
     listCommits: (projectPath: string, branch?: string) => Promise<any>;
     checkLocalProjects: (githubRepos: Repository[]) => Promise<any>;
     setAutoCommit: (prompt: boolean) => Promise<void>;
