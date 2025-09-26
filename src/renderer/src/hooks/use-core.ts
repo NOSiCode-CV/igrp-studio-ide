@@ -1,7 +1,10 @@
 import { useCallback } from 'react';
 import { HandlerResponse } from 'src/main/types';
 
-const useCore = () => {
+const useCore = (): {
+    getVersions: () => Promise<{ label: string; value: string }[]>;
+    fetchData: (endpoint: string, headers: object) => Promise<HandlerResponse>;
+} => {
     const getVersions = useCallback(async () => {
         const { result }: HandlerResponse = await window.api.getVersions(
             import.meta.env.RENDERER_VITE_API_IGRP_VERSIONS

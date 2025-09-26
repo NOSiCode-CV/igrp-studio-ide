@@ -43,7 +43,19 @@ const makeSelectProperties = (module?: string) =>
     });
 
 // Update the hook to accept `module` as a parameter
-const useStudioAPI = (module?: string) => {
+const useStudioAPI = (module?: string): {
+    basePath: string;
+    config: ProjectData;
+    models: any[];
+    dto: any[];
+    modules: any[];
+    responses: any[];
+    enums: any[];
+    permissions: any[];
+    filesThree: FileTree[];
+    currentItem: any;
+    changeStatus: boolean;
+} => {
     const selectProperties = useMemo(
         () => makeSelectProperties(module),
         [module]
@@ -63,15 +75,15 @@ const useStudioAPI = (module?: string) => {
         changeStatus,
     } = useSelector(selectProperties);
 
-    const find = (data: any[], name: string) => {
+    const find = (data: any[], name: string): any | undefined => {
         return data.find((item) => item.name === name);
     };
 
-    const findModelsByName = (name: string) => {
+    const findModelsByName = (name: string): any | undefined => {
         return find(models, `${name}.json`);
     };
 
-    const getJsonData = useCallback(async (path: string) => {
+    const getJsonData = useCallback(async (path: string): Promise<any | undefined> => {
         try {
             return await window.api.getJsonContent(path);
         } catch (error) {

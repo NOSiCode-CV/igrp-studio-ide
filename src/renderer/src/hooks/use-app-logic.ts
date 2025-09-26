@@ -6,7 +6,19 @@ import { AppLogicIPCClient } from '@renderer/pages/applogic/client';
 import { EnvironmentValidator } from '@renderer/pages/applogic/validation';
 import type { AppLogicEnvironment, ConnectionTest } from 'src/main/types';
 
-export function useAppLogic() {
+export function useAppLogic(): {
+    environments: AppLogicEnvironment[];
+    loading: boolean;
+    error: string | null;
+    isInitialized: boolean;
+    createEnvironment: (data: Omit<AppLogicEnvironment, 'id' | 'status' | 'createdAt'>) => Promise<AppLogicEnvironment | null>;
+    updateEnvironment: (id: string, updates: Partial<AppLogicEnvironment>) => Promise<boolean>;
+    deleteEnvironment: (id: string) => Promise<boolean>;
+    testEnvironment: (id: string) => Promise<boolean>;
+    searchEnvironments: (query: string) => AppLogicEnvironment[];
+    exportEnvironments: () => Promise<void>;
+    getEnvironmentHistory: (id: string) => Promise<ConnectionTest[]>;
+} {
     const [environments, setEnvironments] = useState<AppLogicEnvironment[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

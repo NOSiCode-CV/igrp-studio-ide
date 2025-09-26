@@ -56,8 +56,11 @@ export interface IWorkspaceRepository {
     updateProject(
         projectId: string,
         updates: Partial<ProjectWorkspace>
-    ): Promise<ProjectWorkspace>;
-    configureService(config: ProjectWorkspace, basePath: string): Promise<void>;
+    ): Promise<HandlerResponse>;
+    configureService(
+        config: ProjectWorkspace,
+        basePath: string
+    ): Promise<HandlerResponse>;
     deleteProject(projectId: string, basePath: string): Promise<void>;
     getProject(id: string): Promise<ProjectData | undefined>;
     findAllProjects(workspaceId?: string): Promise<ProjectData[]>;
@@ -79,7 +82,10 @@ export interface IWorkspaceRepository {
         service: ServiceWorkspace,
         basePath: string
     ): Promise<HandlerResponse>;
-    deleteService(serviceId: string, basePath: string): Promise<void>;
+    deleteService(
+        serviceId: string,
+        basePath: string
+    ): Promise<HandlerResponse>;
     findAllServices(workspaceId: string): Promise<WorkspaceService[]>;
 
     // Utility Methods

@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 export const useKeyPress = (
     callback: (T?: any) => void,
     keys: KeyboardKey[]
-) => {
+): void => {
     const onKeyDown = (event: KeyboardEvent) => {
         const wasAnyKeyPressed = keys.some((key) => event.key === key);
 

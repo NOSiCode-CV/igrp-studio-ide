@@ -3,11 +3,11 @@ import { toast } from 'sonner';
 const MAX_LENGTH = 300;
 
 const useToast = () => {
-    const showSuccessToast = (message: string) => {
+    const showSuccessToast = (message: string): void => {
         toast.success(message);
     };
 
-    const displayError = (message: string) => {
+    const displayError = (message: string): void => {
         if (message.length > MAX_LENGTH) {
             toast.error(`${message.substring(0, MAX_LENGTH)}[...]`);
         } else {
@@ -15,7 +15,7 @@ const useToast = () => {
         }
     };
 
-    const formatValidationError = (error: any): string => {
+    const formatValidationError = (error: any): string | string[] => {
         // Handle error with params.errors
         if (error?.params?.errors) {
             return formatValidationError(error.params.errors);
@@ -39,7 +39,7 @@ const useToast = () => {
         );
     };
 
-    const showErrorToast = (error: any) => {
+    const showErrorToast = (error: any): void => {
         if (Array.isArray(error) && error.some((e) => e.instancePath)) {
             // Handle validation error array
             const formattedErrors = formatValidationError(error);
@@ -60,7 +60,7 @@ const useToast = () => {
         }
     };
 
-    const showWarningToast = (message: string) => {
+    const showWarningToast = (message: string): void => {
         toast.warning(message);
     };
 

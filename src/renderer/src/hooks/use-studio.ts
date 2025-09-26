@@ -20,14 +20,65 @@ const selectProperties = createSelector(selectState, (studio) => ({
     config: studio.config,
 }));
 
-const useStudio = () => {
+const useStudio = (): {
+    files: FileTree[];
+    basePath: string;
+    config: ProjectData;
+    componentsRegistered: ComponentRegisterConfig[];
+    pageOptions: any[];
+    findComponent: (
+        path: string | undefined,
+        componentName: string
+    ) => Promise<ComponentRegisterConfig | null>;
+    findComponentById: (
+        componentName: string
+    ) => Promise<ComponentRegisterConfig | undefined>;
+    getAcceptedChildren: (
+        path: string | undefined,
+        componentName: string
+    ) => Promise<ComponentRegisterConfig[]>;
+    getPropertiesComponent: (
+        path: string | undefined,
+        componentName: string
+    ) => Promise<Record<string, any>>;
+    getDataComponent: (
+        path: string | undefined,
+        componentName: string
+    ) => Promise<Record<string, any>>;
+    getChildPropertiesComponent: (
+        path: string | undefined,
+        componentName: string
+    ) => Promise<Record<string, any>>;
+    getInteractionsComponent: (
+        path: string | undefined,
+        componentName: string
+    ) => Promise<Record<string, any>>;
+    getRulesComponent: (
+        path: string | undefined,
+        componentName: string
+    ) => Promise<Record<string, any>>;
+    getComponentData: (componentName: string) => Promise<any>;
+    getPageData: (componentName: string) => Promise<any>;
+    fetchComponents: () => FileTree[];
+    loadRegistryComponent: (component: ComponentRegisterConfig) => void;
+} => {
     const { files, basePath, config } = useSelector(selectProperties);
 
     // Use shared context for components
     const { componentsRegistered, loadRegistryComponent } =
         useComponentsContext();
 
-    const [pageOptions, setPageOptions] = useState<any[]>([]);
+    const [pageOptions, setPageOptions] = useState<
+        {
+            value: string;
+            label: string;
+            metadata: {
+                path: string;
+                segments: string[];
+                pageName: string;
+            };
+        }[]
+    >([]);
 
     // Fetch components from the files tree
     const fetchComponents = useCallback(() => {
@@ -153,7 +204,7 @@ const useStudio = () => {
     const getPropertiesComponent = useCallback(
         async (path: string | undefined, componentName: string) => {
             const component = await findComponent(path, componentName);
-            return component ? component.properties : [];
+            return component ? component.properties : {};
         },
         [findComponent]
     );
@@ -162,7 +213,7 @@ const useStudio = () => {
     const getChildPropertiesComponent = useCallback(
         async (path: string | undefined, componentName: string) => {
             const component = await findComponent(path, componentName);
-            return component ? component.childProperties : [];
+            return component ? component.childProperties || {} : {};
         },
         [findComponent]
     );
@@ -171,25 +222,25 @@ const useStudio = () => {
     const getInteractionsComponent = useCallback(
         async (path: string | undefined, componentName: string) => {
             const component = await findComponent(path, componentName);
-            return component ? component.interactions : [];
+            return component ? component.interactions : {};
         },
         [findComponent]
     );
 
-    // Get rukes for a rules
+    // Get rules for a rules
     const getRulesComponent = useCallback(
         async (path: string | undefined, componentName: string) => {
             const component = await findComponent(path, componentName);
-            return component ? component.rules : [];
+            return component ? component.rules : {};
         },
         [findComponent]
     );
 
-    // Get rukes for a data
+    // Get data for a data
     const getDataComponent = useCallback(
         async (path: string | undefined, componentName: string) => {
             const component = await findComponent(path, componentName);
-            return component ? component.data : [];
+            return component ? component.data : {};
         },
         [findComponent]
     );

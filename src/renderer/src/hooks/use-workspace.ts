@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import useToast from '@renderer/hooks/useToast';
-import { HandlerResponse, IWorkspace, ProjectData } from 'src/main/types';
+import {
+    HandlerResponse,
+    IWorkspace,
+    ProjectData,
+    ServiceInfo,
+} from 'src/main/types';
 import { useDispatch } from 'react-redux';
 import {
     setBasePath,
@@ -8,7 +13,7 @@ import {
     setConfig,
     setWorkspace,
 } from '@renderer/redux/thunks';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
@@ -38,26 +43,39 @@ interface openProjectProps {
 
 interface UseWorkspaceReturn {
     workspaces: IWorkspace[];
-    workspace: IWorkspace | null;
+    workspace: IWorkspace;
     loading: boolean;
     actions: {
-        createWorkspace: (workspace: Omit<IWorkspace, 'id' | 'createdAt'>) => Promise<IWorkspace | null>;
-        updateWorkspace: (id: string, updates: Partial<IWorkspace>) => Promise<IWorkspace | null>;
+        createWorkspace: (
+            workspace: Omit<IWorkspace, 'id' | 'createdAt'>
+        ) => Promise<IWorkspace | null>;
+        updateWorkspace: (
+            id: string,
+            updates: Partial<IWorkspace>
+        ) => Promise<IWorkspace | null>;
         deleteWorkspace: (id: string) => Promise<void>;
         switchWorkspace: (upWorkspace: IWorkspace) => Promise<void>;
         refreshWorkspaces: () => Promise<void>;
         validateWorkspaceName: (name: string, slug: string) => string | null;
         getWorkspaces: () => Promise<IWorkspace[]>;
         saveOrOpenProject: (props: openProjectProps) => Promise<void>;
-        findAllProjects: () => Promise<any>;
+        findAllProjects: () => Promise<ProjectData[]>;
         getRecentWorkspaces: () => Promise<IWorkspace[]>;
-        getTemplatesService: () => Promise<any>;
+        getTemplatesService: () => Promise<HandlerResponse>;
         saveCustomWorkspaceComposeFile: (content: string) => Promise<void>;
-        createOrUpdateService: (service: WorkspaceService) => Promise<HandlerResponse>;
+        createOrUpdateService: (
+            service: WorkspaceService
+        ) => Promise<HandlerResponse>;
         removeService: (serviceId: string) => Promise<void>;
-        configureService: (props: { config: any; service: WorkspaceService }) => Promise<HandlerResponse>;
+        configureService: (props: {
+            config: object;
+            service: WorkspaceService;
+        }) => Promise<HandlerResponse>;
         removeProject: (project: ProjectData) => Promise<void>;
-        updateProject: (projectId: string, updates: Partial<ProjectData>) => Promise<any>;
+        updateProject: (
+            projectId: string,
+            updates: Partial<ProjectData>
+        ) => Promise<HandlerResponse>;
         openWorkspace: (workspacePath: string) => Promise<IWorkspace | null>;
     };
     state: {
@@ -85,42 +103,45 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         workspace
     );
 
-    const getWorkspaces = async () => {
+    const getWorkspaces = async (): Promise<IWorkspace[]> => {
         return await window.igrpStudio.workspace.findAllWorkspaces();
     };
 
-    const getRecentWorkspaces = async () => {
+    const getRecentWorkspaces = async (): Promise<IWorkspace[]> => {
         return await window.igrpStudio.workspace.findRecentWorkspaces(3);
     };
 
-    const findAllProjects = async () => {
+    const findAllProjects = async (): Promise<ProjectData[]> => {
         return await window.igrpStudio.workspace.findAllProjects(workspace?.id);
     };
 
-    const findAllServices = async () => {
+    const findAllServices = async (): Promise<ServiceInfo[]> => {
         return await window.igrpStudio.docker.status(workspace.path);
     };
 
-    const getTemplatesService = async () => {
+    const getTemplatesService = async (): Promise<HandlerResponse> => {
         return await window.engine.getService(ENV_TYPES.NEXTJS).then((data) => {
             return data;
         });
     };
 
-    const saveCustomWorkspaceComposeFile = async (content: string) => {
+    const saveCustomWorkspaceComposeFile = async (
+        content: string
+    ): Promise<void> => {
         try {
             const composeYmal = yaml.load(content);
             await window.igrpStudio.workspace.saveCustomWorkspaceComposeFile(
-                composeYmal as Object,
+                composeYmal as object,
                 workspace.path
             );
             showSuccessToast('Update successful');
         } catch (err) {
+            console.error(err);
             showErrorToast('Failed to load workspaces');
         }
     };
 
-    const refreshWorkspaces = async () => {
+    const refreshWorkspaces = async (): Promise<void> => {
         setLoading(true);
         try {
             const data = await getWorkspaces();
@@ -131,6 +152,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
                 dispatch(setWorkspace(null));
             }
         } catch (err) {
+            console.error(err);
             showErrorToast('Failed to load workspaces');
         } finally {
             setLoading(false);
@@ -164,7 +186,9 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         }
     };
 
-    const markWorkspaceAccessed = async (workspaces: IWorkspace[]) => {
+    const markWorkspaceAccessed = async (
+        workspaces: IWorkspace[]
+    ): Promise<void> => {
         if (workspaces.length === 0) {
             return;
         }
@@ -181,7 +205,10 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         updates: Partial<IWorkspace>
     ): Promise<IWorkspace | null> => {
         try {
-            const data = await window.igrpStudio.workspace.updateWorkspace(id, updates);
+            const data = await window.igrpStudio.workspace.updateWorkspace(
+                id,
+                updates
+            );
             if (!data) return null;
             dispatch(setChangeStatus(true));
             return data;
@@ -191,7 +218,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         }
     };
 
-    const deleteWorkspace = async (id: string) => {
+    const deleteWorkspace = async (id: string): Promise<void> => {
         setLoading(true);
         try {
             await window.igrpStudio.workspace.deleteWorkspace(id);
@@ -199,6 +226,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             dispatch(setWorkspace(null));
             showSuccessToast('Workspace removed');
         } catch (err) {
+            console.error(err);
             showErrorToast('Failed to delete workspace');
             throw err;
         } finally {
@@ -206,7 +234,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         }
     };
 
-    const switchWorkspace = async (upWorkspace: IWorkspace) => {
+    const switchWorkspace = async (upWorkspace: IWorkspace): Promise<void> => {
         if (!upWorkspace || currentWorkspace?.id === upWorkspace.id) {
             return;
         }
@@ -216,7 +244,10 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         updateWorkspace(upWorkspace.id, upWorkspace);
     };
 
-    const validateWorkspaceName = (name: string, slug: string) => {
+    const validateWorkspaceName = (
+        name: string,
+        slug: string
+    ): string | null => {
         if (!name.trim()) return 'Name is required';
         if (workspaces.some((w) => w.name === name || w.slug === slug))
             return 'Name already exists';
@@ -227,10 +258,10 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         project,
         openProject,
         onSuccess,
-    }: openProjectProps) => {
+    }: openProjectProps): Promise<void> => {
         try {
             const { id } = project;
-            let response: any = {};
+            let response: HandlerResponse = {};
             setLoading(true);
 
             if (id)
@@ -248,7 +279,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
             if (error) {
                 showErrorToast(error);
-                console.log(error);
+                console.error(error);
                 return;
             }
 
@@ -268,6 +299,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
             navigateToNextPage(navigate, project);
         } catch (err) {
+            console.error(err);
             showErrorToast(err);
         } finally {
             setLoading(false);
@@ -275,9 +307,9 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     };
 
     const navigateToNextPage = async (
-        navigate: any,
+        navigate: NavigateFunction,
         appConfig: ProjectData
-    ) => {
+    ): Promise<void> => {
         const navigationMap = {
             [ENV_TYPES.NEXTJS]: ROUTES.PATH_PAGE_BUILDER_UI,
             [ENV_TYPES.SPRING]: ROUTES.PATH_PAGE_BUILDER_API,
@@ -312,7 +344,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
                 );
 
             if (result?.error) {
-                console.log(result.error);
+                console.error(result.error);
                 showErrorToast(result.error);
             } else
                 showSuccessToast(t('savedSuccessfully', { name: 'Service' }));
@@ -330,10 +362,10 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         config,
         service,
     }: {
-        config: any;
+        config: object;
         service: WorkspaceService;
     }): Promise<HandlerResponse> => {
-        let result: any = {};
+        let result: HandlerResponse = {};
         try {
             const data: ProjectWorkspace = {
                 id: workspace.id,
@@ -350,7 +382,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             );
 
             if (result?.error) {
-                console.log(result.error);
+                console.error(result.error);
                 showErrorToast(result.error);
             } else
                 showSuccessToast(t('savedSuccessfully', { name: 'Service' }));
@@ -364,17 +396,18 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         }
     };
 
-    const removeService = async (serviceId: string) => {
+    const removeService = async (serviceId: string): Promise<void> => {
         try {
             dispatch(setChangeStatus(false));
 
-            const result: any = await window.igrpStudio.workspace.deleteService(
-                serviceId,
-                workspace.path
-            );
+            const result: HandlerResponse =
+                await window.igrpStudio.workspace.deleteService(
+                    serviceId,
+                    workspace.path
+                );
 
             if (result?.error) {
-                console.log(result.error);
+                console.error(result.error);
                 showErrorToast(result.error);
             } else {
                 showSuccessToast(t('deletedSuccess', { name: 'Service' }));
@@ -385,7 +418,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         }
     };
 
-    const removeProject = async (project: ProjectData) => {
+    const removeProject = async (project: ProjectData): Promise<void> => {
         dispatch(setChangeStatus(false));
         try {
             await window.igrpStudio.workspace.deleteProject(
@@ -402,7 +435,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     const updateProject = async (
         projectId: string,
         updates: Partial<ProjectData>
-    ) => {
+    ): Promise<HandlerResponse> => {
         try {
             const result = await window.igrpStudio.workspace.updateProject(
                 projectId,
@@ -416,11 +449,13 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             return result;
         } catch (error: unknown) {
             showErrorToast(error);
-            return null;
+            return { error: error as string };
         }
     };
 
-    const openWorkspace = async (workspacePath: string) => {
+    const openWorkspace = async (
+        workspacePath: string
+    ): Promise<IWorkspace | null> => {
         try {
             // Check if the workspace path exists and contains workspace files
             const result =
@@ -443,6 +478,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
             return result.result;
         } catch (error: unknown) {
+            console.error(error);
             showErrorToast(error);
             return null;
         }

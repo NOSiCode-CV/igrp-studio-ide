@@ -1,4 +1,4 @@
-import React, { JSX, useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import i18n from '@renderer/localization/i18next.config';
 import {
     IGRPCardPrimitive,
@@ -51,7 +51,7 @@ const ErrorScreen = ({ onRetry }: { onRetry: () => void }): JSX.Element => (
     </div>
 );
 
-const AppWithI18n: React.FC = () => {
+const AppWithI18n = (): JSX.Element => {
     const [i18nReady, setI18nReady] = useState(false);
     const [hasError, setHasError] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
