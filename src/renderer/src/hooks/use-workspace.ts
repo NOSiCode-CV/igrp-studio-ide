@@ -36,7 +36,37 @@ interface openProjectProps {
     openProject?: boolean;
 }
 
-export const useWorkspace = () => {
+interface UseWorkspaceReturn {
+    workspaces: IWorkspace[];
+    workspace: IWorkspace | null;
+    loading: boolean;
+    actions: {
+        createWorkspace: (workspace: Omit<IWorkspace, 'id' | 'createdAt'>) => Promise<IWorkspace | null>;
+        updateWorkspace: (id: string, updates: Partial<IWorkspace>) => Promise<IWorkspace | null>;
+        deleteWorkspace: (id: string) => Promise<void>;
+        switchWorkspace: (upWorkspace: IWorkspace) => Promise<void>;
+        refreshWorkspaces: () => Promise<void>;
+        validateWorkspaceName: (name: string, slug: string) => string | null;
+        getWorkspaces: () => Promise<IWorkspace[]>;
+        saveOrOpenProject: (props: openProjectProps) => Promise<void>;
+        findAllProjects: () => Promise<any>;
+        getRecentWorkspaces: () => Promise<IWorkspace[]>;
+        getTemplatesService: () => Promise<any>;
+        saveCustomWorkspaceComposeFile: (content: string) => Promise<void>;
+        createOrUpdateService: (service: WorkspaceService) => Promise<HandlerResponse>;
+        removeService: (serviceId: string) => Promise<void>;
+        configureService: (props: { config: any; service: WorkspaceService }) => Promise<HandlerResponse>;
+        removeProject: (project: ProjectData) => Promise<void>;
+        updateProject: (projectId: string, updates: Partial<ProjectData>) => Promise<any>;
+        openWorkspace: (workspacePath: string) => Promise<IWorkspace | null>;
+    };
+    state: {
+        hasWorkspaces: boolean;
+        changeStatus: boolean;
+    };
+}
+
+export const useWorkspace = (): UseWorkspaceReturn => {
     const { t } = useTranslation();
     const { showSuccessToast, showErrorToast } = useToast();
     const [workspaces, setWorkspaces] = useState<IWorkspace[]>([]);
@@ -149,15 +179,12 @@ export const useWorkspace = () => {
     const updateWorkspace = async (
         id: string,
         updates: Partial<IWorkspace>
-    ) => {
+    ): Promise<IWorkspace | null> => {
         try {
-            await window.igrpStudio.workspace
-                .updateWorkspace(id, updates)
-                .then((data) => {
-                    if (!data) return;
-                    dispatch(setChangeStatus(true));
-                    return data;
-                });
+            const data = await window.igrpStudio.workspace.updateWorkspace(id, updates);
+            if (!data) return null;
+            dispatch(setChangeStatus(true));
+            return data;
         } catch (err) {
             showErrorToast('Failed to update workspace');
             throw err;

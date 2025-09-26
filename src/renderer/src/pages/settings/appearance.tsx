@@ -40,7 +40,7 @@ export function AppearanceSettings() {
                 <div className="flex flex-col gap-2">
                     <IGRPLabelPrimitive className="text-xs">
                         {t('accentColor')}
-                    </IGRPLabelPrimitive>    
+                    </IGRPLabelPrimitive>
                     <div className="grid w-full md:grid-cols-4 grid-cols-6 gap-3">
                         {baseColors.map((theme) => {
                             const isActive = activeTheme === theme.name;

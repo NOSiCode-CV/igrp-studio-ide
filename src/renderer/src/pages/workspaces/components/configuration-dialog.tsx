@@ -553,7 +553,9 @@ export function ConfigurationDialog({
                             >
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <IGRPLabelPrimitive>{t('ports')}</IGRPLabelPrimitive>
+                                        <IGRPLabelPrimitive>
+                                            {t('ports')}
+                                        </IGRPLabelPrimitive>
                                         <IGRPBadgePrimitive
                                             variant="outline"
                                             className="text-xs"
@@ -721,7 +723,9 @@ export function ConfigurationDialog({
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <IGRPLabelPrimitive>{t('volumes')}</IGRPLabelPrimitive>
+                                        <IGRPLabelPrimitive>
+                                            {t('volumes')}
+                                        </IGRPLabelPrimitive>
                                         <IGRPBadgePrimitive
                                             variant="outline"
                                             className="text-xs"
@@ -919,7 +923,9 @@ export function ConfigurationDialog({
                                 className="mt-0 space-y-4"
                             >
                                 <div className="space-y-2">
-                                    <IGRPLabelPrimitive>{t('networkType')}</IGRPLabelPrimitive>
+                                    <IGRPLabelPrimitive>
+                                        {t('networkType')}
+                                    </IGRPLabelPrimitive>
                                     <IGRPSelectPrimitive
                                         value={networkType}
                                         onValueChange={setNetworkType}

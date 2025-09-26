@@ -1,5 +1,5 @@
 import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +8,7 @@ const languages = [
     { value: 'pt', label: 'Português' },
 ];
 
-export function LanguageSettings() {
+export function LanguageSettings(): JSX.Element {
     const { t, i18n } = useTranslation();
     const [currentLanguage, setCurrentLanguage] = useState<string>(
         i18n.language

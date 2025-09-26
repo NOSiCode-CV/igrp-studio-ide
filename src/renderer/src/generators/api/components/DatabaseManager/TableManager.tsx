@@ -203,7 +203,9 @@ export function TableManager({
         <>
             <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive>{t('databaseConnections')}</IGRPLabelPrimitive>
+                    <IGRPLabelPrimitive>
+                        {t('databaseConnections')}
+                    </IGRPLabelPrimitive>
                     <IGRPCombobox
                         value={selectedConnection}
                         onChange={(selected) => {

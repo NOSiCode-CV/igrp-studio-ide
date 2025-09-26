@@ -53,7 +53,9 @@ export function DotNetConfig({
             </div>
 
             <div className="space-y-2">
-                <IGRPLabelPrimitive htmlFor="description">{t('description')}</IGRPLabelPrimitive>
+                <IGRPLabelPrimitive htmlFor="description">
+                    {t('description')}
+                </IGRPLabelPrimitive>
                 <IGRPTextAreaPrimitive
                     id="description"
                     value={data.description}
@@ -93,7 +95,9 @@ export function DotNetConfig({
 
             <div className="grid grid-cols-2">
                 <div className="space-y-3">
-                    <IGRPLabelPrimitive>{t('projectStructureStyle')}</IGRPLabelPrimitive>
+                    <IGRPLabelPrimitive>
+                        {t('projectStructureStyle')}
+                    </IGRPLabelPrimitive>
                     <IGRPRadioGroupPrimitive
                         value={data.projectStructureStyle}
                         onValueChange={(value) =>

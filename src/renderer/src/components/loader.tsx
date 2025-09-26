@@ -95,4 +95,4 @@ export { Loader };
 // Legacy export for backward compatibility
 export const LoadingSpinner: React.FC<Omit<LoaderProps, 'variant'>> = (
     props
-) => <Loader {...props} variant="container" />
+) => <Loader {...props} variant="container" />;

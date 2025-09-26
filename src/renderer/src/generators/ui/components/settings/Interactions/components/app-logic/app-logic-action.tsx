@@ -462,7 +462,9 @@ export function AppLogicAction({
                         <>
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <IGRPLabelPrimitive>Application (Tag)</IGRPLabelPrimitive>
+                                    <IGRPLabelPrimitive>
+                                        Application (Tag)
+                                    </IGRPLabelPrimitive>
                                     <IGRPButtonPrimitive
                                         variant="ghost"
                                         size="sm"
@@ -507,7 +509,9 @@ export function AppLogicAction({
 
                             {selectedApplication && (
                                 <div className="space-y-2">
-                                    <IGRPLabelPrimitive>Endpoint</IGRPLabelPrimitive>
+                                    <IGRPLabelPrimitive>
+                                        Endpoint
+                                    </IGRPLabelPrimitive>
                                     <IGRPSelectPrimitive
                                         value={selectedEndpointId}
                                         onValueChange={handleEndpointSelect}
@@ -570,7 +574,9 @@ export function AppLogicAction({
                             selectedEndpoint.method === 'PUT' ||
                             selectedEndpoint.method === 'PATCH') && (
                             <div className="space-y-2">
-                                <IGRPLabelPrimitive>Request Body (JSON)</IGRPLabelPrimitive>
+                                <IGRPLabelPrimitive>
+                                    Request Body (JSON)
+                                </IGRPLabelPrimitive>
                                 <IGRPTextAreaPrimitive
                                     className="w-full h-32 p-2 border rounded-md font-mono text-sm"
                                     placeholder='{"key": "value"}'

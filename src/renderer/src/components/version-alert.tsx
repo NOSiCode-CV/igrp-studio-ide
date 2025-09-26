@@ -2,7 +2,18 @@ import { useEffect, useState } from 'react';
 import { AlertTriangle, FileText, X, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@renderer/lib/utils';
-import { IGRPAlertDescriptionPrimitive, IGRPAlertPrimitive, IGRPAlertTitlePrimitive, IGRPButtonPrimitive, IGRPDialogContentPrimitive, IGRPDialogDescriptionPrimitive, IGRPDialogHeaderPrimitive, IGRPDialogPrimitive, IGRPDialogTitlePrimitive, IGRPDialogTriggerPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPAlertDescriptionPrimitive,
+    IGRPAlertPrimitive,
+    IGRPAlertTitlePrimitive,
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPDialogTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 interface ChangelogSection {
     title: string;
@@ -136,7 +147,10 @@ export function VersionAlert({
                 </IGRPAlertDescriptionPrimitive>
             </div>
             <div className="flex items-center gap-2">
-                <IGRPDialogPrimitive open={showChangelog} onOpenChange={setShowChangelog}>
+                <IGRPDialogPrimitive
+                    open={showChangelog}
+                    onOpenChange={setShowChangelog}
+                >
                     <IGRPDialogTriggerPrimitive asChild>
                         <IGRPButtonPrimitive
                             variant="outline"

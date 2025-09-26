@@ -152,7 +152,9 @@ const CreateWorkspace = ({
                     </div>
 
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive>{t('workspace.locationLabel')}</IGRPLabelPrimitive>
+                        <IGRPLabelPrimitive>
+                            {t('workspace.locationLabel')}
+                        </IGRPLabelPrimitive>
                         <div className="flex  gap-2">
                             <IGRPInputPrimitive
                                 value={directoryPath}

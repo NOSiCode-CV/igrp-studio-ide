@@ -6,7 +6,7 @@ const Link = ({ children, href, ...props }) => {
     return React.createElement('a', { href, ...props }, children);
 };
 
-// Mock for next/image  
+// Mock for next/image
 const Image = ({ src, alt, ...props }) => {
     return React.createElement('img', { src, alt, ...props });
 };

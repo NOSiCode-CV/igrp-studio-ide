@@ -41,7 +41,9 @@ function GitLabConfigForm({
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('custom_gitlab_name')}</IGRPLabelPrimitive>
+                <IGRPLabelPrimitive>
+                    {t('custom_gitlab_name')}
+                </IGRPLabelPrimitive>
                 <IGRPInputPrimitive
                     type="text"
                     value={name}
@@ -210,7 +212,9 @@ export function ConnectedAccountsSettings(): React.ReactNode {
     const [editingProvider, setEditingProvider] =
         useState<GitLabProvider | null>(null);
 
-    const handleGitLabConfigSave = async (config: GitLabProvider): Promise<void> => {
+    const handleGitLabConfigSave = async (
+        config: GitLabProvider
+    ): Promise<void> => {
         const response = await saveGitlabConfig(config);
         if (response.success) {
             showSuccessToast(t('configSaved'));

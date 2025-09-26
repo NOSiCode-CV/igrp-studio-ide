@@ -102,7 +102,9 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                         key={`${field}`}
                                         className="flex flex-1 items-center gap-4"
                                     >
-                                        <IGRPLabelPrimitive htmlFor={`${field}`}>
+                                        <IGRPLabelPrimitive
+                                            htmlFor={`${field}`}
+                                        >
                                             {toInitCap(field)}
                                         </IGRPLabelPrimitive>
                                         <IGRPSwitch
@@ -125,7 +127,9 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                         key={`${field}`}
                                         className="flex items-center gap-4"
                                     >
-                                        <IGRPLabelPrimitive htmlFor={`${field}`}>
+                                        <IGRPLabelPrimitive
+                                            htmlFor={`${field}`}
+                                        >
                                             {toInitCap(field)}
                                         </IGRPLabelPrimitive>
                                         <IGRPSwitch

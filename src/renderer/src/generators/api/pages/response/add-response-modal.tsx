@@ -73,7 +73,9 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                 >
                     <div className="space-y-4">
                         <div className="flex flex-col gap-3">
-                            <IGRPLabelPrimitive>{t('httpStatusCode')}</IGRPLabelPrimitive>
+                            <IGRPLabelPrimitive>
+                                {t('httpStatusCode')}
+                            </IGRPLabelPrimitive>
                             <IGRPCombobox
                                 options={httpStatusCodes}
                                 value={statusCode}
@@ -85,7 +87,9 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                             />
                         </div>
                         <div className="flex flex-col gap-3">
-                            <IGRPLabelPrimitive className="">{t('name')}</IGRPLabelPrimitive>
+                            <IGRPLabelPrimitive className="">
+                                {t('name')}
+                            </IGRPLabelPrimitive>
                             <IGRPInputPrimitive
                                 type="text"
                                 value={name}

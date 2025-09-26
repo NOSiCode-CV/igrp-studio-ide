@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import Loader from '@renderer/components/loader';
-import {
-    Container,
-    FolderKanban,
-    Network,
-    Settings,
-    Timer,
-} from 'lucide-react';
+import { Container, FolderKanban, Network, Settings } from 'lucide-react';
 import WelcomeHeader from './workspaces/welcome-header';
 import Resources from './workspaces/resources';
 import { WorkspaceDocker } from './workspaces/workspace-docker';
@@ -21,16 +15,21 @@ import {
     IGRPTabsPrimitive,
     IGRPTabsTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
+import WorkspaceDiagram from '@renderer/components/workspace-diagram';
 
-const IDEInitialScreen = () => {
+const IDEInitialScreen = (): React.JSX.Element => {
     const { t } = useTranslation();
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
     const [hasWorkspace, setHasWorkspace] = useState(false);
 
-    const { workspace, loading: workspacesLoading } = useWorkspace();
+    const {
+        workspace,
+        loading: workspacesLoading,
+        state: { changeStatus },
+    } = useWorkspace();
 
     useEffect(() => {
-        const checkWorkspaces = async () => {
+        const checkWorkspaces = async (): Promise<void> => {
             setHasWorkspace(workspace !== null);
 
             setShowWorkspaceDialog(
@@ -41,7 +40,7 @@ const IDEInitialScreen = () => {
         checkWorkspaces();
     }, [workspace, workspacesLoading]);
 
-    const handleCreationSuccess = () => {
+    const handleCreationSuccess = (): void => {
         setShowWorkspaceDialog(false);
         setHasWorkspace(true);
     };
@@ -112,17 +111,12 @@ const IDEInitialScreen = () => {
 
                         <IGRPTabsContentPrimitive
                             value="diagram"
-                            className="mt-0"
+                            className="mt-0 h-[calc(100vh-var(--header-height-two)-8rem)]"
                         >
-                            {
-                                /* <WorkspaceDiagram workspace={workspace} /> */
-                                <EmptyList
-                                    title="Coming soon"
-                                    description="Here you will find soon a diagram of your workspace using React Flow."
-                                    className="py-12"
-                                    icon={<Timer className="h-12 w-12" />}
-                                />
-                            }
+                            <WorkspaceDiagram
+                                workspace={workspace}
+                                changeStatus={changeStatus}
+                            />
                         </IGRPTabsContentPrimitive>
 
                         <IGRPTabsContentPrimitive

@@ -219,7 +219,9 @@ export const BPMNConfigModal = ({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabelPrimitive htmlFor="apiUrl">API URL *</IGRPLabelPrimitive>
+                        <IGRPLabelPrimitive htmlFor="apiUrl">
+                            API URL *
+                        </IGRPLabelPrimitive>
                         <IGRPInputPrimitive
                             id="apiUrl"
                             value={formData.apiUrl || ''}
@@ -230,7 +232,9 @@ export const BPMNConfigModal = ({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabelPrimitive htmlFor="basePath">Base Path</IGRPLabelPrimitive>
+                        <IGRPLabelPrimitive htmlFor="basePath">
+                            Base Path
+                        </IGRPLabelPrimitive>
                         <IGRPInputPrimitive
                             id="basePath"
                             value={formData.basePath || ''}
@@ -255,7 +259,9 @@ export const BPMNConfigModal = ({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabelPrimitive htmlFor="description">Description</IGRPLabelPrimitive>
+                        <IGRPLabelPrimitive htmlFor="description">
+                            Description
+                        </IGRPLabelPrimitive>
                         <IGRPTextAreaPrimitive
                             id="description"
                             value={formData.description || ''}

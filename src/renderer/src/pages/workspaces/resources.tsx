@@ -179,7 +179,7 @@ const Resources = () => {
     } = useWorkspace();
 
     const { services, refreshContainers } = useDocker({
-        workspace,
+        workspace: workspace!,
         changeStatus,
     });
 

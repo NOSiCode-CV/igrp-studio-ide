@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import yaml from 'js-yaml';
 import useToast from '@renderer/hooks/useToast';
 import { DockerComposeConfig, IWorkspace, ServiceInfo } from 'src/main/types';
@@ -22,7 +22,7 @@ export function useDocker({
 
     const { showErrorToast } = useToast();
 
-    const dockerOperations: IDocker = {
+    const dockerOperations: IDocker = useMemo(() => ({
         up: async (projectPath: string) => {
             return window.igrpStudio.docker.up(projectPath);
         },
@@ -52,7 +52,7 @@ export function useDocker({
                 timeout,
             });
         },
-    };
+    }), []);
 
     const checkDocker = useCallback(async () => {
         try {
@@ -186,6 +186,7 @@ export function useDocker({
         services,
         error,
         loading,
+        isDockerRunning,
         getServiceUrl,
         loadComposeFile,
         startContainers: () => handleDockerOperation('up'),

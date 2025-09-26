@@ -26,8 +26,14 @@ export default defineConfig({
             alias: {
                 '@renderer': resolve('src/renderer/src'),
                 path: 'path-browserify',
-                'next/link': resolve(__dirname, 'src/renderer/src/__mocks__/next-link.js'),
-                'next/image': resolve(__dirname, 'src/renderer/src/__mocks__/next-image.js'),
+                'next/link': resolve(
+                    __dirname,
+                    'src/renderer/src/__mocks__/next-link.js'
+                ),
+                'next/image': resolve(
+                    __dirname,
+                    'src/renderer/src/__mocks__/next-image.js'
+                ),
             },
         },
         define: {

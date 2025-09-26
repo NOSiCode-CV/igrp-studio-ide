@@ -192,12 +192,12 @@ export function CloneProjectModal({
                             <div className="grid gap-6 py-6">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2 grid gap-2">
-                                                    <IGRPLabelPrimitive
-                                                        htmlFor="project-url"
-                                                        className="text-muted-foreground"
-                                                    >
-                                                        {t('repositoryUrl')}
-                                                    </IGRPLabelPrimitive>
+                                        <IGRPLabelPrimitive
+                                            htmlFor="project-url"
+                                            className="text-muted-foreground"
+                                        >
+                                            {t('repositoryUrl')}
+                                        </IGRPLabelPrimitive>
                                         <IGRPInputPrimitive
                                             id="project-url"
                                             placeholder={t(

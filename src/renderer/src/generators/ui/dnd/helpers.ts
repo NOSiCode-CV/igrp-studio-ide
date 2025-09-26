@@ -36,7 +36,7 @@ export const getDefaultInteractions = (schema: any) => {
         ) {
             interactions[key] = getDefaultInteractions(schema[key].properties);
         } else if (schema[key].type === 'array' && !schema[key].items?.enum) {
-        /*  else if (schema[key].type === 'object' && schema[key].properties && schema[key].visible) {
+            /*  else if (schema[key].type === 'object' && schema[key].properties && schema[key].visible) {
              interactions[key] = getDefaultInteractions(schema[key].properties);
          } */
             interactions[key] = [];
