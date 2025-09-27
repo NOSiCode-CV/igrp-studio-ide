@@ -59,6 +59,7 @@ import { IGRPStudioSettings } from './helpers/igrp-studio-settings';
 import { folderWatcher } from './helpers/watch-folder';
 
 import { mainBindings } from 'i18next-electron-fs-backend';
+import { SpringEngine } from './engines/SpringEngine';
 
 let mainWindow: BrowserWindow;
 
@@ -212,13 +213,13 @@ app.whenReady().then(async () => {
     const initializeGitHubService = async () => {
         try {
             await GitHubService.initializeServices();
-        } catch {}
+        } catch { }
     };
 
     const initializeGitLabService = async () => {
         try {
             await GitLabService.initializeServices();
-        } catch {}
+        } catch { }
     };
 
     const initializeAllServices = async () => {
@@ -263,17 +264,13 @@ app.whenReady().then(async () => {
 
     new NextjsEngine().registry();
 
+    new SpringEngine().registry();
+
     new WorkspaceRepository().initialize();
 
     new AppUpdater(mainWindow);
 
     await IGRPStudioSettings.initialize();
-
-    setEngineConfiguration({
-        environment: 'production',
-    });
-
-    loadEngineConfiguration();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

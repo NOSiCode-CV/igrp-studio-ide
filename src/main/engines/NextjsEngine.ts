@@ -6,6 +6,7 @@ import {
     initServices,
     loadAppExports,
     loadCodeSnippetsRegistry,
+    loadEngineConfiguration,
     loadRegistry,
     loadServiceRegistry,
     newApp,
@@ -14,6 +15,7 @@ import {
     newProcess,
     newProcessStep,
     registerComponents,
+    setEngineConfiguration,
 } from '@igrp/igrp-studio-nextjs-engine';
 import { BaseEngine } from '../interfaces';
 import {
@@ -37,6 +39,12 @@ export class NextjsEngine implements BaseEngine {
         await initComponents();
         await initServices();
         await initCodeSnippets();
+
+        setEngineConfiguration({
+            environment: 'production',
+        });
+
+        loadEngineConfiguration();
     }
 
     async getServices(): Promise<DockerServiceRegistrationConfig> {

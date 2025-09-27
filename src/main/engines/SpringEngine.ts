@@ -10,6 +10,8 @@ import {
     addModel,
     addController,
     getSpringDependencies,
+    setEngineConfiguration,
+    loadEngineConfiguration,
 } from '@igrp/igrp-studio-springboot-engine';
 import { BaseEngine } from '../interfaces';
 import {
@@ -118,5 +120,13 @@ export class SpringEngine implements BaseEngine {
 
     async serializeElement(data: any, basePath: string): Promise<void> {
         await createElement(data, basePath);
+    }
+
+    async registry(): Promise<void> {
+        setEngineConfiguration({
+            environment: 'production',
+        });
+
+        loadEngineConfiguration();
     }
 }
