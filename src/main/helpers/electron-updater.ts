@@ -15,22 +15,22 @@ export default class AppUpdater {
         this.initAutoUpdater();
     }
 
-    sendStatusToWindow(text: string) {
+    sendStatusToWindow(text: string): void {
         log.info(text);
         this.win.webContents.send('message-update', text);
     }
 
-    configurePlatformSpecifics() {
+    configurePlatformSpecifics(): void {
         autoUpdater.setFeedURL({
             provider: 's3',
             bucket: 'igrp-studio',
-            endpoint: process.env.VITE_ENDPOINT_UPDATE_IGRP_STUDIO,
+            endpoint: 'https://storage-api.nosi.cv',
             path: `${process.platform}/${process.arch}`,
             channel: 'latest',
         });
     }
 
-    initAutoUpdater() {
+    initAutoUpdater(): void {
         autoUpdater.logger = log;
         //@ts-ignore
         autoUpdater.logger.transports.file.level = 'info';
@@ -63,7 +63,7 @@ export default class AppUpdater {
 
         autoUpdater.on('error', (error) => {
             console.log(error);
-            this.sendStatusToWindow(`❌ Update error`);
+            this.sendStatusToWindow(`❌ Update error` + error);
         });
 
         autoUpdater.on('download-progress', (progressObj) => {
