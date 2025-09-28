@@ -215,7 +215,9 @@ function TabConsole(): JSX.Element {
                     size="icon"
                     onClick={async () => {
                         try {
-                            await window.electron.ipcRenderer.invoke('docker-test-logging');
+                            await window.electron.ipcRenderer.invoke(
+                                'docker-test-logging'
+                            );
                         } catch (error) {
                             console.error('Failed to test logging:', error);
                         }

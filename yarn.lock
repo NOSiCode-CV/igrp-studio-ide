@@ -2670,7 +2670,7 @@
     classcat "^5.0.3"
     zustand "^4.4.1"
 
-"@reduxjs/toolkit@1.x.x || 2.x.x", "@reduxjs/toolkit@^2.9.0":
+"@reduxjs/toolkit@^2.9.0":
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/@reduxjs/toolkit/-/toolkit-2.9.0.tgz#d4b12b90c27716a6a507193f8c3b2880729b97d5"
   integrity sha512-fSfQlSRu9Z5yBkvsNhYF2rPS8cGXn/TZVrlwN1948QyZ8xMZ0JvP50S2acZNaf+o63u6aEeMjipFyksjIcWrog==
@@ -5122,7 +5122,7 @@ debug@4.3.4:
   dependencies:
     ms "2.1.2"
 
-decimal.js-light@^2.4.1, decimal.js-light@^2.5.1:
+decimal.js-light@^2.4.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/decimal.js-light/-/decimal.js-light-2.5.1.tgz#134fd32508f19e208f4fb2f8dac0d2626a867934"
   integrity sha512-qIMFpTMZmny+MMIitAB6D7iVPEorVw6YQRWkvarTkT4tBeSLLiHzcwj6q0MmYSFCiVpiqPJTJEYIrpcPzVEIvg==
@@ -5745,11 +5745,6 @@ es-to-primitive@^1.3.0:
     is-date-object "^1.0.5"
     is-symbol "^1.0.4"
 
-es-toolkit@^1.39.3:
-  version "1.39.10"
-  resolved "https://registry.yarnpkg.com/es-toolkit/-/es-toolkit-1.39.10.tgz#513407af73e79f9940e7ec7650f2e6dceeaf1d81"
-  integrity sha512-E0iGnTtbDhkeczB0T+mxmoVlT4YNweEKBLq7oaU4p11mecdsZpNWOglI4895Vh4usbQ+LsJiuLuI2L0Vdmfm2w==
-
 es6-error@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/es6-error/-/es6-error-4.1.1.tgz#9e3af407459deed47e9a91f9b885a84eb05c561d"
@@ -5972,11 +5967,6 @@ eventemitter3@^4.0.1:
   version "4.0.7"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
-
-eventemitter3@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
-  integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
 
 execa@^5.1.1:
   version "5.1.1"
@@ -6875,7 +6865,7 @@ immediate@~3.0.5:
   resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.0.6.tgz#9db1dbd0faf8de6fbe0f5dd5e56bb606280de69b"
   integrity sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==
 
-immer@^10.0.3, immer@^10.1.1:
+immer@^10.0.3:
   version "10.1.3"
   resolved "https://registry.yarnpkg.com/immer/-/immer-10.1.3.tgz#e38a0b97db59949d31d9b381b04c2e441b1c3747"
   integrity sha512-tmjF/k8QDKydUlm3mZU+tjM6zeq9/fFpPqH9SzWmBnVVKsPBg/V66qsMwb3/Bo90cgUN+ghdVBess+hPsxUyRw==
@@ -9324,7 +9314,7 @@ raw-body@^3.0.0:
     iconv-lite "0.7.0"
     unpipe "1.0.0"
 
-react-day-picker@9.10.0, react-day-picker@^9.6.7:
+react-day-picker@^9.6.7:
   version "9.10.0"
   resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-9.10.0.tgz#1470f59ebeaf1a41659d9d65c736efeb72394db0"
   integrity sha512-tedecLSd+fpSN+J08601MaMsf122nxtqZXxB6lwX37qFoLtuPNuRJN8ylxFjLhyJS1kaLfAqL1GUkSLd2BMrpQ==
@@ -9367,7 +9357,7 @@ react-fast-compare@^3.0.1:
   resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-3.2.2.tgz#929a97a532304ce9fee4bcae44234f1ce2c21d49"
   integrity sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==
 
-react-hook-form@^7.55.0, react-hook-form@^7.62.0:
+react-hook-form@^7.55.0:
   version "7.62.0"
   resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.62.0.tgz#2d81e13c2c6b6d636548e440818341ca753218d0"
   integrity sha512-7KWFejc98xqG/F4bAxpL41NB3o1nnvQO1RWZT3TqRZYL8RryQETGfEdVnJN2fy1crCiBLLjkRBVK05j24FxJGA==
@@ -9409,7 +9399,7 @@ react-popper@^2.2.4:
     react-fast-compare "^3.0.1"
     warning "^4.0.2"
 
-"react-redux@8.x.x || 9.x.x", react-redux@^9.2.0:
+react-redux@^9.2.0:
   version "9.2.0"
   resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-9.2.0.tgz#96c3ab23fb9a3af2cb4654be4b51c989e32366f5"
   integrity sha512-ROY9fvHhwOD9ySfrF0wmvu//bKCQ6AeZZq1nJNtbDC+kk5DuSuNX/n6YWYF/SYy7bSba4D4FSz8DJeKY/S/r+g==
@@ -9599,23 +9589,6 @@ recharts@^2.15.2:
     tiny-invariant "^1.3.1"
     victory-vendor "^36.6.8"
 
-recharts@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/recharts/-/recharts-3.2.1.tgz#a4dbf9b089404bd8e2fb74a9aa8a7679e413e2f0"
-  integrity sha512-0JKwHRiFZdmLq/6nmilxEZl3pqb4T+aKkOkOi/ZISRZwfBhVMgInxzlYU9D4KnCH3KINScLy68m/OvMXoYGZUw==
-  dependencies:
-    "@reduxjs/toolkit" "1.x.x || 2.x.x"
-    clsx "^2.1.1"
-    decimal.js-light "^2.5.1"
-    es-toolkit "^1.39.3"
-    eventemitter3 "^5.0.1"
-    immer "^10.1.1"
-    react-redux "8.x.x || 9.x.x"
-    reselect "5.1.1"
-    tiny-invariant "^1.3.3"
-    use-sync-external-store "^1.2.2"
-    victory-vendor "^37.0.2"
-
 rechoir@^0.8.0:
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/rechoir/-/rechoir-0.8.0.tgz#49f866e0d32146142da3ad8f0eff352b3215ff22"
@@ -9684,7 +9657,7 @@ resedit@^1.7.0:
   dependencies:
     pe-library "^0.4.1"
 
-reselect@5.1.1, reselect@^5.1.0:
+reselect@^5.1.0:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/reselect/-/reselect-5.1.1.tgz#c766b1eb5d558291e5e550298adb0becc24bb72e"
   integrity sha512-K/BG6eIky/SBpzfHZv/dd+9JBFiS4SWV7FIujVyJRux6e45+73RaUHXLmIR1f7WOMaQ0U1km6qwklRQxpJJY0w==
@@ -10632,7 +10605,7 @@ tiny-case@^1.0.3:
   resolved "https://registry.yarnpkg.com/tiny-case/-/tiny-case-1.0.3.tgz#d980d66bc72b5d5a9ca86fb7c9ffdb9c898ddd03"
   integrity sha512-Eet/eeMhkO6TX8mnUteS9zgPbUMQa4I6Kkp5ORiBD5476/m+PIRiumP5tmh5ioJpH7k51Kehawy2UDfsnxxY8Q==
 
-tiny-invariant@^1.3.1, tiny-invariant@^1.3.3:
+tiny-invariant@^1.3.1:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-1.3.3.tgz#46680b7a873a0d5d10005995eb90a70d74d60127"
   integrity sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==
@@ -11105,26 +11078,6 @@ victory-vendor@^36.6.8:
   version "36.9.2"
   resolved "https://registry.yarnpkg.com/victory-vendor/-/victory-vendor-36.9.2.tgz#668b02a448fa4ea0f788dbf4228b7e64669ff801"
   integrity sha512-PnpQQMuxlwYdocC8fIJqVXvkeViHYzotI+NJrCuav0ZYFoq912ZHBk3mCeuj+5/VpodOjPe1z0Fk2ihgzlXqjQ==
-  dependencies:
-    "@types/d3-array" "^3.0.3"
-    "@types/d3-ease" "^3.0.0"
-    "@types/d3-interpolate" "^3.0.1"
-    "@types/d3-scale" "^4.0.2"
-    "@types/d3-shape" "^3.1.0"
-    "@types/d3-time" "^3.0.0"
-    "@types/d3-timer" "^3.0.0"
-    d3-array "^3.1.6"
-    d3-ease "^3.0.1"
-    d3-interpolate "^3.0.1"
-    d3-scale "^4.0.2"
-    d3-shape "^3.1.0"
-    d3-time "^3.0.0"
-    d3-timer "^3.0.1"
-
-victory-vendor@^37.0.2:
-  version "37.3.6"
-  resolved "https://registry.yarnpkg.com/victory-vendor/-/victory-vendor-37.3.6.tgz#401ac4b029a0b3d33e0cba8e8a1d765c487254da"
-  integrity sha512-SbPDPdDBYp+5MJHhBCAyI7wKM3d5ivekigc2Dk2s7pgbZ9wIgIBYGVw4zGHBml/qTFbexrofXW6Gu4noGxrOwQ==
   dependencies:
     "@types/d3-array" "^3.0.3"
     "@types/d3-ease" "^3.0.0"

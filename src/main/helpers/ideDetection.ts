@@ -59,7 +59,7 @@ export async function detectInstalledIDEs(): Promise<
                 }
             } catch (error: any) {
                 console.error(`Error detecting ${ideKey} IDE:`, error.message);
-                
+
                 // Send log to renderer process
                 const mainWindow = BrowserWindow.getFocusedWindow();
                 if (mainWindow) {

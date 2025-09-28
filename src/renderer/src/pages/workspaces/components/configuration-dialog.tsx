@@ -372,7 +372,10 @@ export function ConfigurationDialog({
             const serviceName =
                 typeof depend === 'string'
                     ? depend.replace('{{slug}}', workspace.slug)
-                    : (depend as any).service?.replace('{{slug}}', workspace.slug) || '';
+                    : (depend as any).service?.replace(
+                          '{{slug}}',
+                          workspace.slug
+                      ) || '';
             return { service: serviceName };
         });
 

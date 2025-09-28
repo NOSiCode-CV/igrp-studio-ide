@@ -44,9 +44,7 @@ import './helpers/fetch-request';
 import { buildTaskbar } from './helpers/taskbar';
 
 import NextJsManager from './helpers/nextjsManager';
-import {
-    initComponents
-} from '@igrp/igrp-studio-nextjs-engine';
+import { initComponents } from '@igrp/igrp-studio-nextjs-engine';
 import dotenv from 'dotenv';
 import AppUpdater from './helpers/electron-updater';
 import { autoUpdater } from 'electron-updater';

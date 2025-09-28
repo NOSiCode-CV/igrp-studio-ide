@@ -37,7 +37,7 @@ const DockerControls: React.FC<DockerControlsProps> = ({
 
     const handleRun = async () => {
         if (isRunning || loading) return;
-        
+
         setIsRunning(true);
         try {
             await onRun();
@@ -71,9 +71,7 @@ const DockerControls: React.FC<DockerControlsProps> = ({
                         ) : (
                             <>
                                 <Play className="h-3.5 w-3.5 text-igrp" />
-                                <span className="font-medium ">
-                                    {t('run')}
-                                </span>
+                                <span className="font-medium ">{t('run')}</span>
                             </>
                         )}
                     </div>

@@ -24,7 +24,7 @@ export function ServiceList({ services }: ServiceListProps) {
                 <div>{t('status')}</div>
                 <div className="w-[100px]">{t('actions')}</div>
             </div>
-            
+
             {/* Body */}
             <div className="divide-y">
                 {services.map((service, index) => (
@@ -39,9 +39,7 @@ export function ServiceList({ services }: ServiceListProps) {
                                 >
                                     {getServiceIcon(service.labels?.type)}
                                 </div>
-                                <div className="text-xs">
-                                    {service.name}
-                                </div>
+                                <div className="text-xs">{service.name}</div>
                             </div>
                         </div>
                         <div>
@@ -90,9 +88,7 @@ export function ServiceList({ services }: ServiceListProps) {
                                 {service.status}
                             </IGRPBadgePrimitive>
                         </div>
-                        <div
-                            onClick={(e) => e.stopPropagation()}
-                        >
+                        <div onClick={(e) => e.stopPropagation()}>
                             <ServiceActions
                                 service={service}
                                 services={services}

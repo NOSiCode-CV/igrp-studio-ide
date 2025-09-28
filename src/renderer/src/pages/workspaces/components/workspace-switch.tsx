@@ -83,7 +83,6 @@ export const WorkspaceSwitcher = ({
         loadPinnedWorkspace();
     }, [searchTerm, defaultWorkspace, workspaces]);
 
-
     const togglePinWorkspace = (workspace: IWorkspace, e?: MouseEvent) => {
         if (e) {
             e.preventDefault();
@@ -203,8 +202,8 @@ export const WorkspaceSwitcher = ({
                                 <IGRPSidebarMenuButtonPrimitive
                                     asChild
                                     className={cn(
-                                        workspace.id ===
-                                            selectedWorkspace.id && 'bg-muted'
+                                        workspace.id === selectedWorkspace.id &&
+                                            'bg-muted'
                                     )}
                                     onClick={() =>
                                         handleChangeWorkspace(workspace)
