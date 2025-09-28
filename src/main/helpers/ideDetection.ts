@@ -1,6 +1,8 @@
 // utils/ideDetection.ts
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { BrowserWindow } from 'electron';
+import { ERROR_CODES, EVENTS } from '../constants/events';
 
 export interface IDEDetails {
     command: string;
@@ -55,7 +57,18 @@ export async function detectInstalledIDEs(): Promise<
                     await execAsync(ideConfig.detectionCommand);
                     installedIDEs.push({ key: ideKey, config: ideConfig });
                 }
-            } catch {}
+            } catch (error: any) {
+                console.error(`Error detecting ${ideKey} IDE:`, error.message);
+                
+                // Send log to renderer process
+                const mainWindow = BrowserWindow.getFocusedWindow();
+                if (mainWindow) {
+                    mainWindow.webContents.send(EVENTS.LOG, {
+                        code: ERROR_CODES.ERROR,
+                        message: `Error detecting ${ideKey} IDE: ${error.message}`,
+                    });
+                }
+            }
         })
     );
 

@@ -33,6 +33,20 @@ const DockerControls: React.FC<DockerControlsProps> = ({
 }) => {
     const { t } = useTranslation();
     const [dropVolume, setDropVolume] = useState<boolean>(false);
+    const [isRunning, setIsRunning] = useState<boolean>(false);
+
+    const handleRun = async () => {
+        if (isRunning || loading) return;
+        
+        setIsRunning(true);
+        try {
+            await onRun();
+        } catch (error) {
+            console.error('Error running containers:', error);
+        } finally {
+            setIsRunning(false);
+        }
+    };
 
     return (
         <IGRPTooltipProviderPrimitive>
@@ -42,33 +56,26 @@ const DockerControls: React.FC<DockerControlsProps> = ({
                     size="sm"
                     className={`
               relative h-6 text-xs overflow-hidden group
-              ${loading ? 'animate-pulse' : ''}
+              ${loading || isRunning ? 'animate-pulse' : ''}
             `}
-                    disabled={loading}
+                    disabled={loading || isRunning}
+                    onClick={handleRun}
                 >
                     <div
                         className="absolute inset-0 bg-gradient-to-r from-green-400/0 via-green-400/10 to-green-400/0 
                           group-hover:translate-x-full -translate-x-full transition-transform duration-700"
                     />
-                    <div className="flex items-center">
-                        <div
-                            className="flex items-center gap-1.5"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onRun();
-                            }}
-                        >
-                            {loading ? (
-                                <Loader2 className="h-3.5 w-3.5 animate-spin text-igrp" />
-                            ) : (
-                                <>
-                                    <Play className="h-3.5 w-3.5 text-igrp" />
-                                    <span className="font-medium ">
-                                        {t('run')}
-                                    </span>
-                                </>
-                            )}
-                        </div>
+                    <div className="flex items-center gap-1.5">
+                        {loading || isRunning ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-igrp" />
+                        ) : (
+                            <>
+                                <Play className="h-3.5 w-3.5 text-igrp" />
+                                <span className="font-medium ">
+                                    {t('run')}
+                                </span>
+                            </>
+                        )}
                     </div>
                 </IGRPButtonPrimitive>
                 <IGRPSeparatorPrimitive

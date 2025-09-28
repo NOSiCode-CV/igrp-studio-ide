@@ -176,6 +176,8 @@
             "icon": "resources/icons/icon.icns",
             "category": "public.app-category.developer-tools",
             "entitlementsInherit": "build/entitlements.mac.plist",
+            "hardenedRuntime": false,
+            "gatekeeperAssess": false,
             "notarize": false
         },
         "linux": {

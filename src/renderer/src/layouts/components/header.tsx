@@ -26,6 +26,7 @@ import {
     IGRPDropdownMenuItemPrimitive,
     IGRPDropdownMenuPrimitive,
     IGRPDropdownMenuTriggerPrimitive,
+    IGRPIcon,
     IGRPTooltipContentPrimitive,
     IGRPTooltipPrimitive,
     IGRPTooltipProviderPrimitive,
@@ -48,7 +49,7 @@ interface HeaderProps {
     basePath?: string;
 }
 
-const Header = ({ config, basePath }: HeaderProps) => {
+const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
     const { isGitEnabled } = useSelector((state: RootState) => state.git);
@@ -69,12 +70,16 @@ const Header = ({ config, basePath }: HeaderProps) => {
 
     const handleMinimize = (): void => {
         window.menu.minimizeWindow();
-        window.menu.isMaximized;
+        window.menu.isMaximized().then((maximized) => {
+            setIsMaximized(maximized);
+        });
     };
 
     const handleMaximize = (): void => {
         window.menu.maximizeWindow();
-        setIsMaximized(!isMaximized);
+        window.menu.isMaximized().then((maximized) => {
+            setIsMaximized(maximized);
+        });
     };
 
     const handleClose = (): void => {
@@ -106,6 +111,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
                 const maximized = await window.menu.isMaximized();
                 setIsMaximized(maximized);
             } catch (error) {
+                console.error(error);
                 setIsMaximized(false);
             }
         };
@@ -113,7 +119,7 @@ const Header = ({ config, basePath }: HeaderProps) => {
         checkMaximized();
 
         // Optional: Add listeners for window state changes
-        const updateState = () => checkMaximized();
+        const updateState = (): Promise<void> => checkMaximized();
         window.addEventListener('resize', updateState);
 
         return () => {
@@ -259,12 +265,10 @@ const Header = ({ config, basePath }: HeaderProps) => {
                                                     onClick={() => openIDE(key)}
                                                     className="flex items-center"
                                                 >
-                                                    {/*  {getIcon(config.icon)} */}
-                                                    <span className="">
-                                                        {t('openIn')}
-                                                        {'  '}
-                                                        {config.name}
-                                                    </span>
+                                                    <IGRPIcon
+                                                        iconName={config.icon}
+                                                    />
+                                                    {config.name}
                                                 </IGRPDropdownMenuItemPrimitive>
                                             );
                                         }

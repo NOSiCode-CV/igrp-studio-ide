@@ -128,7 +128,9 @@ export function ConfigurationDialog({
 
                 // Convert dependsOn to depends_on array
                 const dependsOn =
-                    serviveData.dependsOn?.map((dep: any) => dep.service) || [];
+                    serviveData.dependsOn?.map((dep: any) =>
+                        typeof dep === 'string' ? dep : dep.service
+                    ) || [];
 
                 // Convert labels array
                 const type =
@@ -170,7 +172,7 @@ export function ConfigurationDialog({
             // Edit mode
             setName(service.name || '');
             setImage(service.image || '');
-            setDescription(service.labels.description || '');
+            setDescription(service.labels?.description || '');
             setType(service.labels?.type || '');
             setPorts(service.ports || []);
             setEnvironments(service.environments || []);
@@ -364,9 +366,14 @@ export function ConfigurationDialog({
             serviceLabels.uuid
         );
 
-        //depondencies
+        //dependencies
         const _dependsOn: Dependency[] = dependsOn.map((depend) => {
-            return { service: depend.replace('{{slug}}', workspace.slug) };
+            // Handle both string and object cases
+            const serviceName =
+                typeof depend === 'string'
+                    ? depend.replace('{{slug}}', workspace.slug)
+                    : (depend as any).service?.replace('{{slug}}', workspace.slug) || '';
+            return { service: serviceName };
         });
 
         const _environments: Environment[] = environments.map(
@@ -419,7 +426,7 @@ export function ConfigurationDialog({
 
     return (
         <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-            <IGRPDialogContentPrimitive className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+            <IGRPDialogContentPrimitive className="sm:max-w-2xl max-h-[70vh] overflow-hidden flex flex-col">
                 <IGRPDialogHeaderPrimitive>
                     <IGRPDialogTitlePrimitive>
                         {isNew ? t('addNewService') : t('addNewService')}
@@ -450,187 +457,176 @@ export function ConfigurationDialog({
                         </IGRPTabsTriggerPrimitive>
                     </IGRPTabsListPrimitive>
 
-                    <IGRPScrollAreaPrimitive className="flex-1 pr-4 max-h-[60vh] overflow-auto">
-                        <div className="pb-4">
-                            <IGRPTabsContentPrimitive
-                                value="basic"
-                                className="mt-0 space-y-4 px-1"
-                            >
-                                {isNew && (
-                                    <div className="space-y-2">
-                                        <IGRPLabelPrimitive>
-                                            {t('templateOptional')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPCombobox
-                                            value={template}
-                                            onChange={(tmpl) =>
-                                                applyTemplate(tmpl as any)
-                                            }
-                                            options={serviceTemplates.map(
-                                                (template) => {
-                                                    return {
-                                                        label: template.label,
-                                                        value: template.name,
-                                                    };
-                                                }
-                                            )}
-                                            placeholder={t('selectTemplate')}
-                                            className="w-1/2"
-                                        />
-                                        <p className="text-xs text-muted-foreground">
-                                            {t('selectTemplate')}
-                                        </p>
-                                    </div>
-                                )}
-
+                    <div className="pb-4">
+                        <IGRPTabsContentPrimitive
+                            value="basic"
+                            className="mt-0 space-y-4 px-1"
+                        >
+                            {isNew && (
                                 <div className="space-y-2">
-                                    <IGRPLabelPrimitive htmlFor="name">
-                                        {t('serviceName')}
+                                    <IGRPLabelPrimitive>
+                                        {t('templateOptional')}
+                                    </IGRPLabelPrimitive>
+                                    <IGRPCombobox
+                                        value={template}
+                                        onChange={(tmpl) =>
+                                            applyTemplate(tmpl as any)
+                                        }
+                                        options={serviceTemplates.map(
+                                            (template) => {
+                                                return {
+                                                    label: template.label,
+                                                    value: template.name,
+                                                };
+                                            }
+                                        )}
+                                        placeholder={t('selectTemplate')}
+                                        className="w-1/2"
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        {t('selectTemplate')}
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="space-y-2">
+                                <IGRPLabelPrimitive htmlFor="name">
+                                    {t('serviceName')}
+                                </IGRPLabelPrimitive>
+                                <IGRPInputPrimitive
+                                    id="name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="e.g., postgres-db"
+                                    className="h-8"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <IGRPLabelPrimitive htmlFor="description">
+                                    {t('description')}
+                                </IGRPLabelPrimitive>
+                                <IGRPTextAreaPrimitive
+                                    id="description"
+                                    value={description}
+                                    onChange={(e) =>
+                                        setDescription(e.target.value)
+                                    }
+                                    placeholder={t(
+                                        'describeServicePlaceholder'
+                                    )}
+                                    className="resize-none"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <IGRPLabelPrimitive htmlFor="image">
+                                        {t('dockerImage')}
                                     </IGRPLabelPrimitive>
                                     <IGRPInputPrimitive
-                                        id="name"
-                                        value={name}
+                                        id="image"
+                                        value={image}
                                         onChange={(e) =>
-                                            setName(e.target.value)
+                                            setImage(e.target.value)
                                         }
-                                        placeholder="e.g., postgres-db"
+                                        placeholder="e.g., postgres:14"
                                         className="h-8"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <IGRPLabelPrimitive htmlFor="description">
-                                        {t('description')}
+                                    <IGRPLabelPrimitive htmlFor="type">
+                                        {t('serviceType')}
                                     </IGRPLabelPrimitive>
-                                    <IGRPTextAreaPrimitive
-                                        id="description"
-                                        value={description}
-                                        onChange={(e) =>
-                                            setDescription(e.target.value)
+                                    <IGRPCombobox
+                                        value={type}
+                                        onChange={(type) =>
+                                            setType(type as string)
                                         }
-                                        placeholder={t(
-                                            'describeServicePlaceholder'
-                                        )}
-                                        className="resize-none"
+                                        options={serviceTypes}
+                                        placeholder={t('selectType')}
                                     />
                                 </div>
+                            </div>
+                        </IGRPTabsContentPrimitive>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <IGRPLabelPrimitive htmlFor="image">
-                                            {t('dockerImage')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
-                                            id="image"
-                                            value={image}
-                                            onChange={(e) =>
-                                                setImage(e.target.value)
-                                            }
-                                            placeholder="e.g., postgres:14"
-                                            className="h-8"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <IGRPLabelPrimitive htmlFor="type">
-                                            {t('serviceType')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPCombobox
-                                            value={type}
-                                            onChange={(type) =>
-                                                setType(type as string)
-                                            }
-                                            options={serviceTypes}
-                                            placeholder={t('selectType')}
-                                        />
-                                    </div>
+                        <IGRPTabsContentPrimitive
+                            value="config"
+                            className="mt-0 space-y-4 flex-1 min-h-0"
+                        >
+                            <IGRPScrollAreaPrimitive className="h-[400px]">
+                                <div className="flex items-center justify-between mb-3">
+                                    <IGRPLabelPrimitive>
+                                        {t('ports')}
+                                    </IGRPLabelPrimitive>
+                                    <IGRPBadgePrimitive
+                                        variant="outline"
+                                        className="text-xs"
+                                    >
+                                        {ports.length}{' '}
+                                        {ports.length === 1 ? 'port' : 'ports'}
+                                    </IGRPBadgePrimitive>
                                 </div>
-                            </IGRPTabsContentPrimitive>
 
-                            <IGRPTabsContentPrimitive
-                                value="config"
-                                className="mt-0 space-y-4"
-                            >
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between">
-                                        <IGRPLabelPrimitive>
-                                            {t('ports')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPBadgePrimitive
-                                            variant="outline"
-                                            className="text-xs"
-                                        >
-                                            {ports.length}{' '}
-                                            {ports.length === 1
-                                                ? 'port'
-                                                : 'ports'}
-                                        </IGRPBadgePrimitive>
-                                    </div>
-
-                                    <div className="border rounded-md p-3 space-y-2">
-                                        {ports.length > 0 ? (
-                                            <div className="flex flex-wrap gap-2">
-                                                {ports.map(
-                                                    (
-                                                        port: any,
-                                                        index: number
-                                                    ) => (
-                                                        <IGRPBadgePrimitive
-                                                            key={index}
-                                                            variant="secondary"
-                                                            className="px-2 py-1 flex items-center gap-1"
+                                <div className="border rounded-md p-3 space-y-2 mb-3">
+                                    {ports.length > 0 ? (
+                                        <div className="flex flex-wrap gap-2">
+                                            {ports.map(
+                                                (port: any, index: number) => (
+                                                    <IGRPBadgePrimitive
+                                                        key={index}
+                                                        variant="secondary"
+                                                        className="px-2 py-1 flex items-center gap-1"
+                                                    >
+                                                        <span className="font-mono">
+                                                            {port}
+                                                        </span>
+                                                        <IGRPButtonPrimitive
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-4 w-4 p-0 ml-1"
+                                                            onClick={() =>
+                                                                removePort(port)
+                                                            }
                                                         >
-                                                            <span className="font-mono">
-                                                                {port}
-                                                            </span>
-                                                            <IGRPButtonPrimitive
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="h-4 w-4 p-0 ml-1"
-                                                                onClick={() =>
-                                                                    removePort(
-                                                                        port
-                                                                    )
-                                                                }
-                                                            >
-                                                                <X className="h-3 w-3" />
-                                                            </IGRPButtonPrimitive>
-                                                        </IGRPBadgePrimitive>
-                                                    )
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <p className="text-xs text-muted-foreground text-center py-2">
-                                                {t('noPortsConfigured')}
-                                            </p>
-                                        )}
-
-                                        <div className="flex gap-2">
-                                            <IGRPInputPrimitive
-                                                value={newPort}
-                                                onChange={(e) =>
-                                                    setNewPort(e.target.value)
-                                                }
-                                                placeholder="e.g., 5432:5432"
-                                                className="h-8 flex-1"
-                                            />
-                                            <IGRPButtonPrimitive
-                                                type="button"
-                                                size="sm"
-                                                className="h-8"
-                                                onClick={addPort}
-                                                disabled={!newPort}
-                                            >
-                                                {t('add')}
-                                            </IGRPButtonPrimitive>
+                                                            <X className="h-3 w-3" />
+                                                        </IGRPButtonPrimitive>
+                                                    </IGRPBadgePrimitive>
+                                                )
+                                            )}
                                         </div>
-                                        <p className="text-xs text-muted-foreground">
-                                            {t('portsFormat')}
+                                    ) : (
+                                        <p className="text-xs text-muted-foreground text-center py-2">
+                                            {t('noPortsConfigured')}
                                         </p>
+                                    )}
+
+                                    <div className="flex gap-2">
+                                        <IGRPInputPrimitive
+                                            value={newPort}
+                                            onChange={(e) =>
+                                                setNewPort(e.target.value)
+                                            }
+                                            placeholder="e.g., 5432:5432"
+                                            className="h-8 flex-1"
+                                        />
+                                        <IGRPButtonPrimitive
+                                            type="button"
+                                            size="sm"
+                                            className="h-8"
+                                            onClick={addPort}
+                                            disabled={!newPort}
+                                        >
+                                            {t('add')}
+                                        </IGRPButtonPrimitive>
                                     </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        {t('portsFormat')}
+                                    </p>
                                 </div>
 
-                                <div className="space-y-2">
+                                <div className="space-y-2 mb-3">
                                     <div className="flex items-center justify-between">
                                         <IGRPLabelPrimitive>
                                             {t('environmentVariables')}
@@ -796,204 +792,194 @@ export function ConfigurationDialog({
                                         </p>
                                     </div>
                                 </div>
-                            </IGRPTabsContentPrimitive>
+                            </IGRPScrollAreaPrimitive>
+                        </IGRPTabsContentPrimitive>
 
-                            <IGRPTabsContentPrimitive
-                                value={t('dependencies')}
-                                className="mt-0 space-y-4"
-                            >
-                                <div className="space-y-2">
-                                    <IGRPLabelPrimitive>
-                                        {t('describeServicePlaceholder')}
-                                    </IGRPLabelPrimitive>
-                                    <p className="text-xs text-muted-foreground">
-                                        {t('connectedService')}
-                                    </p>
+                        <IGRPTabsContentPrimitive
+                            value={t('dependencies')}
+                            className="mt-0 space-y-4"
+                        >
+                            <div className="space-y-2">
+                                <IGRPLabelPrimitive>
+                                    {t('describeServicePlaceholder')}
+                                </IGRPLabelPrimitive>
+                                <p className="text-xs text-muted-foreground">
+                                    {t('connectedService')}
+                                </p>
 
-                                    <div className="border rounded-md p-3 space-y-2">
-                                        {services.length > 0 ? (
-                                            <div className="space-y-2">
-                                                {services
-                                                    .filter(
-                                                        (s) =>
-                                                            s.name !==
-                                                                service?.name &&
-                                                            !s.labels
-                                                                ?.is_project
-                                                    )
-                                                    .map((s, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="flex items-center space-x-2"
-                                                        >
-                                                            <IGRPCheckboxPrimitive
-                                                                id={`depends-${index}`}
-                                                                checked={dependsOn.includes(
+                                <div className="border rounded-md p-3 space-y-2">
+                                    {services.length > 0 ? (
+                                        <div className="space-y-2">
+                                            {services
+                                                .filter(
+                                                    (s) =>
+                                                        s.name !==
+                                                            service?.name &&
+                                                        !s.labels?.is_project
+                                                )
+                                                .map((s, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center space-x-2"
+                                                    >
+                                                        <IGRPCheckboxPrimitive
+                                                            id={`depends-${index}`}
+                                                            checked={dependsOn.includes(
+                                                                s.name
+                                                            )}
+                                                            onCheckedChange={() =>
+                                                                toggleDependency(
                                                                     s.name
+                                                                )
+                                                            }
+                                                        />
+                                                        <div className="flex items-center gap-2">
+                                                            <div
+                                                                className={`rounded-sm p-1 text-white ${getServiceColor(s.labels?.type)}`}
+                                                            >
+                                                                {getServiceIcon(
+                                                                    s.labels
+                                                                        ?.type
                                                                 )}
-                                                                onCheckedChange={() =>
-                                                                    toggleDependency(
-                                                                        s.name
-                                                                    )
-                                                                }
-                                                            />
-                                                            <div className="flex items-center gap-2">
-                                                                <div
-                                                                    className={`rounded-sm p-1 text-white ${getServiceColor(s.labels?.type)}`}
-                                                                >
-                                                                    {getServiceIcon(
-                                                                        s.labels
-                                                                            ?.type
-                                                                    )}
-                                                                </div>
-                                                                <IGRPLabelPrimitive
-                                                                    htmlFor={`depends-${s.name}`}
-                                                                    className="text-sm font-normal cursor-pointer"
-                                                                >
-                                                                    {s.name}
-                                                                </IGRPLabelPrimitive>
                                                             </div>
+                                                            <IGRPLabelPrimitive
+                                                                htmlFor={`depends-${s.name}`}
+                                                                className="text-sm font-normal cursor-pointer"
+                                                            >
+                                                                {s.name}
+                                                            </IGRPLabelPrimitive>
                                                         </div>
-                                                    ))}
-                                            </div>
-                                        ) : (
-                                            <p className="text-xs text-muted-foreground text-center py-2">
-                                                {t('noOtherServices')}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <IGRPLabelPrimitive>
-                                        {t('projectDependencies')}
-                                    </IGRPLabelPrimitive>
-                                    <p className="text-xs text-muted-foreground">
-                                        {t('selectProjects')}
-                                    </p>
-
-                                    <div className="border rounded-md p-3 space-y-2">
-                                        {projects.length > 0 ? (
-                                            <div className="space-y-2">
-                                                {projects
-                                                    .filter(
-                                                        (p) =>
-                                                            p.id !== service?.id
-                                                    )
-                                                    .map((p) => (
-                                                        <div
-                                                            key={p.id}
-                                                            className="flex items-center space-x-2"
-                                                        >
-                                                            <IGRPCheckboxPrimitive
-                                                                id={`depends-${p.id}`}
-                                                                checked={dependsOn.includes(
-                                                                    p.id
-                                                                )}
-                                                                onCheckedChange={() =>
-                                                                    toggleProjectDependency(
-                                                                        p.id
-                                                                    )
-                                                                }
-                                                            />
-                                                            <div className="flex items-center gap-2">
-                                                                <ProjectIcon
-                                                                    project={p}
-                                                                />
-                                                                <IGRPLabelPrimitive
-                                                                    htmlFor={`depends-${p.id}`}
-                                                                    className="text-sm font-normal cursor-pointer"
-                                                                >
-                                                                    {p.name}
-                                                                </IGRPLabelPrimitive>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                        ) : (
-                                            <p className="text-xs text-muted-foreground text-center py-2">
-                                                {t('noOtherProjects')}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            </IGRPTabsContentPrimitive>
-
-                            <IGRPTabsContentPrimitive
-                                value="network"
-                                className="mt-0 space-y-4"
-                            >
-                                <div className="space-y-2">
-                                    <IGRPLabelPrimitive>
-                                        {t('networkType')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPSelectPrimitive
-                                        value={networkType}
-                                        onValueChange={setNetworkType}
-                                    >
-                                        <IGRPSelectTriggerPrimitive className="h-8">
-                                            <IGRPSelectValuePrimitive
-                                                placeholder={t(
-                                                    'selectNetworkType'
-                                                )}
-                                            />
-                                        </IGRPSelectTriggerPrimitive>
-                                        <IGRPSelectContentPrimitive>
-                                            {networkTypes.map((network) => (
-                                                <IGRPSelectItemPrimitive
-                                                    key={network.id}
-                                                    value={network.id}
-                                                >
-                                                    {network.name}
-                                                </IGRPSelectItemPrimitive>
-                                            ))}
-                                        </IGRPSelectContentPrimitive>
-                                    </IGRPSelectPrimitive>
-                                    <p className="text-xs text-muted-foreground">
-                                        {t('networkDescription')}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <div className="flex items-center space-x-2">
-                                        <IGRPSwitchPrimitive
-                                            id="custom-network"
-                                            checked={useCustomNetwork}
-                                            onCheckedChange={
-                                                setUseCustomNetwork
-                                            }
-                                        />
-                                        <IGRPLabelPrimitive htmlFor="custom-network">
-                                            {t('useCustomNetwork')}
-                                        </IGRPLabelPrimitive>
-                                    </div>
-
-                                    {useCustomNetwork && (
-                                        <div className="pl-6 space-y-2">
-                                            <IGRPLabelPrimitive htmlFor="network-name">
-                                                {t('networkName')}
-                                            </IGRPLabelPrimitive>
-                                            <IGRPInputPrimitive
-                                                id="network-name"
-                                                value={customNetwork}
-                                                onChange={(e) =>
-                                                    setCustomNetwork(
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder={t(
-                                                    'exampleNetwork'
-                                                )}
-                                                className="h-8"
-                                            />
-                                            <p className="text-xs text-muted-foreground">
-                                                {t('customNetworkName')}
-                                            </p>
+                                                    </div>
+                                                ))}
                                         </div>
+                                    ) : (
+                                        <p className="text-xs text-muted-foreground text-center py-2">
+                                            {t('noOtherServices')}
+                                        </p>
                                     )}
                                 </div>
-                            </IGRPTabsContentPrimitive>
-                        </div>
-                    </IGRPScrollAreaPrimitive>
+                            </div>
+                            <div className="space-y-2">
+                                <IGRPLabelPrimitive>
+                                    {t('projectDependencies')}
+                                </IGRPLabelPrimitive>
+                                <p className="text-xs text-muted-foreground">
+                                    {t('selectProjects')}
+                                </p>
+
+                                <div className="border rounded-md p-3 space-y-2">
+                                    {projects.length > 0 ? (
+                                        <div className="space-y-2">
+                                            {projects
+                                                .filter(
+                                                    (p) => p.id !== service?.id
+                                                )
+                                                .map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        className="flex items-center space-x-2"
+                                                    >
+                                                        <IGRPCheckboxPrimitive
+                                                            id={`depends-${p.id}`}
+                                                            checked={dependsOn.includes(
+                                                                p.id
+                                                            )}
+                                                            onCheckedChange={() =>
+                                                                toggleProjectDependency(
+                                                                    p.id
+                                                                )
+                                                            }
+                                                        />
+                                                        <div className="flex items-center gap-2">
+                                                            <ProjectIcon
+                                                                project={p}
+                                                            />
+                                                            <IGRPLabelPrimitive
+                                                                htmlFor={`depends-${p.id}`}
+                                                                className="text-sm font-normal cursor-pointer"
+                                                            >
+                                                                {p.name}
+                                                            </IGRPLabelPrimitive>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-xs text-muted-foreground text-center py-2">
+                                            {t('noOtherProjects')}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </IGRPTabsContentPrimitive>
+
+                        <IGRPTabsContentPrimitive
+                            value="network"
+                            className="mt-0 space-y-4"
+                        >
+                            <div className="space-y-2">
+                                <IGRPLabelPrimitive>
+                                    {t('networkType')}
+                                </IGRPLabelPrimitive>
+                                <IGRPSelectPrimitive
+                                    value={networkType}
+                                    onValueChange={setNetworkType}
+                                >
+                                    <IGRPSelectTriggerPrimitive className="h-8">
+                                        <IGRPSelectValuePrimitive
+                                            placeholder={t('selectNetworkType')}
+                                        />
+                                    </IGRPSelectTriggerPrimitive>
+                                    <IGRPSelectContentPrimitive>
+                                        {networkTypes.map((network) => (
+                                            <IGRPSelectItemPrimitive
+                                                key={network.id}
+                                                value={network.id}
+                                            >
+                                                {network.name}
+                                            </IGRPSelectItemPrimitive>
+                                        ))}
+                                    </IGRPSelectContentPrimitive>
+                                </IGRPSelectPrimitive>
+                                <p className="text-xs text-muted-foreground">
+                                    {t('networkDescription')}
+                                </p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <div className="flex items-center space-x-2">
+                                    <IGRPSwitchPrimitive
+                                        id="custom-network"
+                                        checked={useCustomNetwork}
+                                        onCheckedChange={setUseCustomNetwork}
+                                    />
+                                    <IGRPLabelPrimitive htmlFor="custom-network">
+                                        {t('useCustomNetwork')}
+                                    </IGRPLabelPrimitive>
+                                </div>
+
+                                {useCustomNetwork && (
+                                    <div className="pl-6 space-y-2">
+                                        <IGRPLabelPrimitive htmlFor="network-name">
+                                            {t('networkName')}
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
+                                            id="network-name"
+                                            value={customNetwork}
+                                            onChange={(e) =>
+                                                setCustomNetwork(e.target.value)
+                                            }
+                                            placeholder={t('exampleNetwork')}
+                                            className="h-8"
+                                        />
+                                        <p className="text-xs text-muted-foreground">
+                                            {t('customNetworkName')}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </IGRPTabsContentPrimitive>
+                    </div>
                 </IGRPTabsPrimitive>
 
                 <IGRPDialogFooterPrimitive className="pt-2">

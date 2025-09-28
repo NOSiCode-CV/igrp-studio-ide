@@ -31,6 +31,10 @@ import {
     IGRPCardContentPrimitive,
     IGRPCardHeaderPrimitive,
     IGRPCardTitlePrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 
 import {
@@ -45,26 +49,53 @@ import {
     AlertCircle,
     CheckCircle,
     Clock,
-    MoreHorizontal,
+    MoreVertical,
     RefreshCw,
+    ExternalLink,
+    Edit,
+    Trash,
 } from 'lucide-react';
 
 import { ServiceInfo, IWorkspace } from 'src/main/types';
 import { useDocker } from '@renderer/hooks/use-docker';
 import { JSX } from 'react';
 import { cn } from '@renderer/lib/utils';
+import { ConfigurationDialog } from './components/configuration-dialog';
+import useToast from '@renderer/hooks/useToast';
+import { useWorkspace } from '@renderer/hooks/use-workspace';
+import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
+import { useTranslation } from 'react-i18next';
 
 // Custom Node Components
 interface ServiceNodeData {
     service: ServiceInfo;
     onAction: (action: string, serviceName: string) => void;
+    services: ServiceInfo[];
+    onEditService: (service: ServiceInfo) => void;
+    onDeleteService: (service: ServiceInfo) => void;
+    onOpenInBrowser: (service: ServiceInfo) => void;
 }
 
 const ServiceNode: React.FC<{
     data: ServiceNodeData;
     selected: boolean;
 }> = ({ data, selected }) => {
-    const { service, onAction } = data;
+    const {
+        service,
+        onAction,
+        onEditService,
+        onDeleteService,
+        onOpenInBrowser,
+    } = data;
+    const { t } = useTranslation();
+
+    const getServiceUrl = (service: ServiceInfo): string | null => {
+        if (!service.ports || service.ports.length === 0) return null;
+
+        const port = service.ports[0];
+        const portNumber = port.split(':')[0];
+        return `http://localhost:${portNumber}`;
+    };
 
     const getStatusIcon = (): JSX.Element => {
         switch (service.status) {
@@ -142,14 +173,74 @@ const ServiceNode: React.FC<{
                 </div>
                 <div className="flex items-center gap-1">
                     {getStatusIcon()}
-                    <IGRPButtonPrimitive
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0"
-                        onClick={() => onAction('toggle', service.name)}
-                    >
-                        <MoreHorizontal className="h-3 w-3" />
-                    </IGRPButtonPrimitive>
+                    <IGRPDropdownMenuPrimitive>
+                        <IGRPDropdownMenuTriggerPrimitive asChild>
+                            <IGRPButtonPrimitive
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                            >
+                                <MoreVertical className="h-3 w-3" />
+                            </IGRPButtonPrimitive>
+                        </IGRPDropdownMenuTriggerPrimitive>
+                        <IGRPDropdownMenuContentPrimitive
+                            align="end"
+                            className="w-48"
+                        >
+                            {service.status === 'running' ? (
+                                <IGRPDropdownMenuItemPrimitive
+                                    onClick={() => {
+                                        onAction('stop', service.name);
+                                    }}
+                                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                                >
+                                    <Square className="mr-2 h-4 w-4 text-red-600" />
+                                    {t('stopService')}
+                                </IGRPDropdownMenuItemPrimitive>
+                            ) : (
+                                <IGRPDropdownMenuItemPrimitive
+                                    onClick={() => {
+                                        onAction('start', service.name);
+                                    }}
+                                    className="text-green-600 focus:text-green-600 focus:bg-green-50"
+                                >
+                                    <Play className="mr-2 h-4 w-4 text-green-600" />
+                                    {t('startService')}
+                                </IGRPDropdownMenuItemPrimitive>
+                            )}
+
+                            <IGRPDropdownMenuItemPrimitive
+                                className="focus:bg-accent"
+                                onClick={() => {
+                                    onEditService(service);
+                                }}
+                            >
+                                <Edit className="mr-2 h-4 w-4" />
+                                {t('editService')}
+                            </IGRPDropdownMenuItemPrimitive>
+
+                            {getServiceUrl(service) && (
+                                <IGRPDropdownMenuItemPrimitive
+                                    onClick={() => onOpenInBrowser(service)}
+                                >
+                                    <ExternalLink className="mr-2 h-4 w-4" />
+                                    {t('openInBrowser')}
+                                </IGRPDropdownMenuItemPrimitive>
+                            )}
+
+                            {service.labels?.uuid && (
+                                <IGRPDropdownMenuItemPrimitive
+                                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                                    onClick={() => {
+                                        onDeleteService(service);
+                                    }}
+                                >
+                                    <Trash className="mr-2 h-4 w-4 text-red-600" />
+                                    {t('removeService')}
+                                </IGRPDropdownMenuItemPrimitive>
+                            )}
+                        </IGRPDropdownMenuContentPrimitive>
+                    </IGRPDropdownMenuPrimitive>
                 </div>
             </div>
 
@@ -226,11 +317,39 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
         refreshContainers,
         stopService,
         restartService,
+        getServiceUrl,
     } = useDocker({ workspace, changeStatus });
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [selectedNode, setSelectedNode] = useState<string | null>(null);
     const servicesRef = useRef<ServiceInfo[]>(services);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isEditService, setEditService] = useState(false);
+    const [serviceToEdit, setServiceToEdit] = useState<ServiceInfo | null>(
+        null
+    );
+    const [serviceToDelete, setServiceToDelete] = useState<ServiceInfo | null>(
+        null
+    );
+
+    // Refs for handlers to prevent infinite loops
+    const handleServiceActionRef = useRef<
+        (action: string, serviceName: string) => Promise<void>
+    >(async () => {});
+    const handleEditServiceRef = useRef<(service: ServiceInfo) => void>(
+        () => {}
+    );
+    const handleDeleteServiceRef = useRef<(service: ServiceInfo) => void>(
+        () => {}
+    );
+    const handleOpenInBrowserRef = useRef<(service: ServiceInfo) => void>(
+        () => {}
+    );
+    const { showErrorToast } = useToast();
+    const {
+        actions: { removeService },
+    } = useWorkspace();
+    const { t } = useTranslation();
 
     // Memoize fitViewOptions to prevent ReactFlow warnings
     const fitViewOptions = useMemo(
@@ -298,6 +417,51 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
         },
         [startContainers, stopService, restartService, refreshContainers]
     );
+
+    const handleEditService = useCallback((service: ServiceInfo) => {
+        setServiceToEdit(service);
+        setEditService(true);
+    }, []);
+
+    const handleDeleteService = useCallback((service: ServiceInfo) => {
+        setServiceToDelete(service);
+        setIsDialogOpen(true);
+    }, []);
+
+    const handleConfirmDelete = useCallback(async () => {
+        if (!serviceToDelete) return;
+
+        setIsDialogOpen(false);
+        try {
+            await removeService(serviceToDelete.labels.uuid);
+            setServiceToDelete(null);
+        } catch (error: unknown) {
+            showErrorToast(error);
+        }
+    }, [serviceToDelete, removeService, showErrorToast]);
+
+    const handleOpenInBrowser = useCallback(
+        (service: ServiceInfo) => {
+            const url = getServiceUrl(service);
+            if (url) {
+                window.electron.ipcRenderer.send(t('openExternalUrl'), url);
+            }
+        },
+        [getServiceUrl, t]
+    );
+
+    // Update refs when handlers change
+    useEffect(() => {
+        handleServiceActionRef.current = handleServiceAction;
+        handleEditServiceRef.current = handleEditService;
+        handleDeleteServiceRef.current = handleDeleteService;
+        handleOpenInBrowserRef.current = handleOpenInBrowser;
+    }, [
+        handleServiceAction,
+        handleEditService,
+        handleDeleteService,
+        handleOpenInBrowser,
+    ]);
 
     // Create nodes and edges from services
     const createNodesAndEdges = useCallback((): void => {
@@ -390,7 +554,21 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                     id: service.name,
                     type: 'service',
                     position: { x, y },
-                    data: { service, onAction: handleServiceAction },
+                    data: {
+                        service,
+                        onAction: (action: string, serviceName: string) =>
+                            handleServiceActionRef.current?.(
+                                action,
+                                serviceName
+                            ),
+                        services,
+                        onEditService: (service: ServiceInfo) =>
+                            handleEditServiceRef.current?.(service),
+                        onDeleteService: (service: ServiceInfo) =>
+                            handleDeleteServiceRef.current?.(service),
+                        onOpenInBrowser: (service: ServiceInfo) =>
+                            handleOpenInBrowserRef.current?.(service),
+                    },
                     selected: selectedNode === service.name,
                 });
             });
@@ -480,8 +658,7 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
 
         setNodes(newNodes);
         setEdges(newEdges);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [services, selectedNode]);
+    }, [services, selectedNode, setNodes, setEdges]);
 
     useEffect(() => {
         createNodesAndEdges();
@@ -642,6 +819,27 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                     </div>
                 </Panel>
             </ReactFlow>
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialogDelete
+                onConfirm={handleConfirmDelete}
+                onClose={() => setIsDialogOpen(false)}
+                recordId={serviceToDelete?.name || ''}
+                isOpen={isDialogOpen}
+            />
+
+            {/* Edit Service Dialog */}
+            {serviceToEdit && (
+                <ConfigurationDialog
+                    service={serviceToEdit}
+                    services={services}
+                    isNew={false}
+                    open={isEditService}
+                    setOpen={setEditService}
+                >
+                    <span className="sr-only">Edit</span>
+                </ConfigurationDialog>
+            )}
         </div>
     );
 };

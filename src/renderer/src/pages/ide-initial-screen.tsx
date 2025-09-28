@@ -15,7 +15,7 @@ import {
     IGRPTabsPrimitive,
     IGRPTabsTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import WorkspaceDiagram from '@renderer/components/workspace-diagram';
+import WorkspaceDiagram from '@renderer/pages/workspaces/workspace-diagram';
 
 const IDEInitialScreen = (): React.JSX.Element => {
     const { t } = useTranslation();
