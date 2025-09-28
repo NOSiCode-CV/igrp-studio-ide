@@ -45,9 +45,7 @@ import { buildTaskbar } from './helpers/taskbar';
 
 import NextJsManager from './helpers/nextjsManager';
 import {
-    initComponents,
-    loadEngineConfiguration,
-    setEngineConfiguration,
+    initComponents
 } from '@igrp/igrp-studio-nextjs-engine';
 import dotenv from 'dotenv';
 import AppUpdater from './helpers/electron-updater';
@@ -210,19 +208,23 @@ app.whenReady().then(async () => {
     });
 
     await GitStore.initialize();
-    const initializeGitHubService = async () => {
+    const initializeGitHubService = async (): Promise<void> => {
         try {
             await GitHubService.initializeServices();
-        } catch { }
+        } catch (err) {
+            console.error('Failed to initialize GitHub service:', err);
+        }
     };
 
-    const initializeGitLabService = async () => {
+    const initializeGitLabService = async (): Promise<void> => {
         try {
             await GitLabService.initializeServices();
-        } catch { }
+        } catch (err) {
+            console.error('Failed to initialize GitLab service:', err);
+        }
     };
 
-    const initializeAllServices = async () => {
+    const initializeAllServices = async (): Promise<void> => {
         await Promise.allSettled([
             initializeGitHubService(),
             initializeGitLabService(),
@@ -235,7 +237,7 @@ app.whenReady().then(async () => {
         try {
             currentAuthProvider = 'github'; // Add this line
             await githubAuth.setupOAuth(mainWindow, isDev);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('GitHub OAuth failed:', error);
             currentAuthProvider = null; // Add this line
         }
@@ -248,7 +250,7 @@ app.whenReady().then(async () => {
         try {
             currentAuthProvider = 'gitlab'; // Add this line
             await gitlabAuth.setupOAuth(mainWindow, isDev);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('GitLab OAuth failed:', error);
             currentAuthProvider = null; // Add this line
         }
@@ -302,7 +304,7 @@ ipcMain.handle(
     ): Promise<FileTree[] | { error: string }> => {
         try {
             return readDirectory(dirPath);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Error reading directory:', error);
             return {
                 error:
@@ -376,14 +378,14 @@ ipcMain.handle(
 
 ipcMain.handle(
     'igrp-studio:get-json-content',
-    async (_event, filePath: string): Promise<any> => {
+    async (_event, filePath: string): Promise<unknown> => {
         return await getJsonContent(filePath);
     }
 );
 
 ipcMain.handle(
     'igrp-studio:get-file-content',
-    async (_event, filePath: string): Promise<any> => {
+    async (_event, filePath: string): Promise<unknown> => {
         return await getFileContent(filePath);
     }
 );
@@ -399,7 +401,7 @@ ipcMain.handle(
         const ideConfig = IDES[ideType];
         const command = `${ideConfig.command} "${basePath}"`;
 
-        exec(command, (err, _stdout, _stderr) => {
+        exec(command, (err): void => {
             if (err) {
                 console.error(`Error opening ${ideConfig.name}:`, err);
             }
@@ -409,7 +411,7 @@ ipcMain.handle(
 
 ipcMain.handle(
     'igrp-studio:ides',
-    async (_event): Promise<Array<{ key: string; config: IDEDetails }>> => {
+    async (): Promise<Array<{ key: string; config: IDEDetails }>> => {
         return await detectInstalledIDEs();
     }
 );
@@ -439,7 +441,7 @@ ipcMain.on('restore-window', () => {
     mainWindow.unmaximize();
 });
 
-ipcMain.on('start-drag', (_event) => {
+ipcMain.on('start-drag', (): void => {
     mainWindow.on('move', () => {
         const windowBounds = mainWindow.getBounds();
         const displayBounds = screen.getDisplayMatching(windowBounds).bounds;

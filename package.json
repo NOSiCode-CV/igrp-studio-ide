@@ -29,7 +29,6 @@
         "@electron-toolkit/utils": "^4.0.0",
         "@faker-js/faker": "^9.9.0",
         "@gitbeaker/node": "^35.8.1",
-        "@hello-pangea/dnd": "^18.0.1",
         "@hookform/resolvers": "^5.2.2",
         "@igrp/dotnet-engine": "^0.0.1-alpha.12",
         "@igrp/framework-process-studio-bpmn-editor": "0.0.1-beta.9",

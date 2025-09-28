@@ -146,24 +146,8 @@ export class DockerService {
         this.logInfo('Checking Docker daemon status...');
 
         try {
-            // Ensure proper environment for exec with common paths for all platforms
-            const getDefaultPath = () => {
-                if (process.platform === 'win32') {
-                    return 'C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\Git\\bin;C:\\Program Files\\nodejs;C:\\Windows\\System32;C:\\Windows';
-                } else if (process.platform === 'darwin') {
-                    return '/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:/Applications/Docker.app/Contents/Resources/bin';
-                } else {
-                    return '/usr/local/bin:/usr/bin:/bin:/snap/bin';
-                }
-            };
-
             // Try to get Docker info
             const { stdout } = await execAsync('docker info', {
-                env: {
-                    ...process.env,
-                    PATH: process.env.PATH || getDefaultPath(),
-                },
-                shell: true,
                 timeout: 10000, // 10 second timeout
                 maxBuffer: 1024 * 1024, // 1MB buffer
             });
@@ -375,23 +359,7 @@ export class DockerService {
                 this.logProgress(0, 100, 'Building images');
             }
 
-            // Ensure proper environment for exec with common paths for all platforms
-            const getDefaultPath = () => {
-                if (process.platform === 'win32') {
-                    return 'C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\Git\\bin;C:\\Program Files\\nodejs;C:\\Windows\\System32;C:\\Windows';
-                } else if (process.platform === 'darwin') {
-                    return '/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:/Applications/Docker.app/Contents/Resources/bin';
-                } else {
-                    return '/usr/local/bin:/usr/bin:/bin:/snap/bin';
-                }
-            };
-
             const { stdout } = await execAsync(fullCommand, {
-                env: {
-                    ...process.env,
-                    PATH: process.env.PATH || getDefaultPath(),
-                },
-                shell: true,
                 maxBuffer: 1024 * 1024 * 10,
             });
 
