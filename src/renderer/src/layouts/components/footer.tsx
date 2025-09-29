@@ -119,7 +119,9 @@ export function Footer(): JSX.Element {
                 <div className="flex items-center space-x-3">
                     <IGRPSeparator orientation="vertical" className="h-4" />
 
-                    <button onClick={simulateError}>Simulate Error</button>
+                    <button onClick={simulateError} className="hidden">
+                        Simulate Error
+                    </button>
 
                     <IGRPTooltipPrimitive>
                         <IGRPTooltipTriggerPrimitive asChild>
