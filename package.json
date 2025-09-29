@@ -156,7 +156,7 @@
                     "sha256"
                 ],
                 "rfc3161TimeStampServer": "http://timestamp.digicert.com",
-                "publisherName": "NOSi E.P.E <contact@nosi.cv>"
+                "publisherName": "NOSI - Núcleo Operacional Sistema Informação, E.P.E."
             },
             "publish": {
                 "provider": "s3",
@@ -182,7 +182,7 @@
                 "deb"
             ],
             "category": "Development",
-            "maintainer": "NOSi E.P.E <contact@nosi.cv>"
+            "maintainer": "NOSI - Núcleo Operacional Sistema Informação, E.P.E."
         },
         "protocols": [
             {
