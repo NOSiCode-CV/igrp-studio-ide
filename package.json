@@ -1,6 +1,6 @@
 {
     "name": "igrp-studio",
-    "version": "0.1.0-beta.9",
+    "version": "0.1.0-beta.9-1",
     "description": "IGRP Studio for development",
     "main": "out/main/index.js",
     "author": "NOSi E.P.E - Núcleo Operacional Para a Sociedade de Informação",
@@ -156,7 +156,8 @@
                     "sha256"
                 ],
                 "rfc3161TimeStampServer": "http://timestamp.digicert.com",
-                "publisherName": "NOSI - Núcleo Operacional Sistema Informação, E.P.E."
+                "publisherName": "NOSI – Núcleo Operacional Sistema Informação, E.P.E.",
+                "signMethod": "authenticode"
             },
             "publish": {
                 "provider": "s3",
