@@ -149,14 +149,14 @@
         "win": {
             "icon": "resources/icons/icon.ico",
             "target": "nsis",
-            "publisherName": "NOSI – Núcleo Operacional Sistema Informação, E.P.E.",
             "signtoolOptions": {
                 "certificateFile": "certificate.pfx",
                 "certificatePassword": "__CERT_PASS__",
                 "signingHashAlgorithms": [
                     "sha256"
                 ],
-                "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+                "rfc3161TimeStampServer": "http://timestamp.digicert.com",
+                "publisherName": "NOSI – Núcleo Operacional Sistema Informação, E.P.E."
             },
             "publish": {
                 "provider": "s3",
