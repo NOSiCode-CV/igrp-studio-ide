@@ -156,8 +156,7 @@
                     "sha256"
                 ],
                 "rfc3161TimeStampServer": "http://timestamp.digicert.com",
-                "publisherName": "NOSI – Núcleo Operacional Sistema Informação, E.P.E.",
-                "signMethod": "authenticode"
+                "publisherName": "NOSI – Núcleo Operacional Sistema Informação, E.P.E."
             },
             "publish": {
                 "provider": "s3",
