@@ -23,7 +23,6 @@ import {
     IGRPInputPassword,
     IGRPInputPhone,
     IGRPInputSearch,
-    IGRPInputPrimitive,
     IGRPInputTime,
     IGRPInputUrl,
     IGRPLabelPrimitive,
@@ -41,6 +40,7 @@ import {
     IGRPText,
     IGRPTextarea,
     IGRPVerticalBarChart,
+    IGRPInputText,
 } from '@igrp/igrp-framework-react-design-system';
 import {
     Type,
@@ -404,8 +404,8 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Password]: IGRPInputPassword,
     [COMPONENT.TimePicker]: IGRPInputTime,
     [COMPONENT.Phone]: IGRPInputPhone,
-    [COMPONENT.Input]: IGRPInputPrimitive,
-    [COMPONENT.InputText]: IGRPInputPrimitive,
+    [COMPONENT.Input]: IGRPInputText,
+    [COMPONENT.InputText]: IGRPInputText,
     [COMPONENT.Textarea]: IGRPTextarea,
     [COMPONENT.Link]: IGRPInputUrl,
     [COMPONENT.AddOn]: IGRPInputAddOn,

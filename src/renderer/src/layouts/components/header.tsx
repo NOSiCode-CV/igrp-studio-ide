@@ -4,7 +4,6 @@ import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import {
     ArrowLeft,
-    Bell,
     Code,
     Maximize2,
     Minus,
@@ -43,6 +42,7 @@ import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { useDocker } from '@renderer/hooks/use-docker';
 import DockerControls from '@renderer/components/docker-controls';
 import { useTranslation } from 'react-i18next';
+import NotificationsPopover from '@renderer/components/notifications/notifications-popover';
 
 interface HeaderProps {
     config?: ProjectData;
@@ -280,22 +280,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
 
                             <SettingsDialog />
 
-                            <IGRPTooltipPrimitive>
-                                <IGRPTooltipTriggerPrimitive asChild>
-                                    <IGRPButtonPrimitive
-                                        variant="ghost"
-                                        size="sm"
-                                    >
-                                        <Bell className="w-5 h-5" />
-                                        <span className="sr-only">
-                                            {t('notifications')}
-                                        </span>
-                                    </IGRPButtonPrimitive>
-                                </IGRPTooltipTriggerPrimitive>
-                                <IGRPTooltipContentPrimitive>
-                                    <p>{t('notifications')}</p>
-                                </IGRPTooltipContentPrimitive>
-                            </IGRPTooltipPrimitive>
+                            <NotificationsPopover />
 
                             <GitConnectionMenu />
 
