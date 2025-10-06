@@ -1,7 +1,10 @@
-import { BrowserWindow, dialog } from "electron";
-import { app } from "electron/main";
-import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from 'electron-devtools-installer';
-import { is } from "@electron-toolkit/utils";
+import { BrowserWindow, dialog } from 'electron';
+import { app } from 'electron/main';
+import installExtension, {
+    REACT_DEVELOPER_TOOLS,
+    REDUX_DEVTOOLS,
+} from 'electron-devtools-installer';
+import { is } from '@electron-toolkit/utils';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
@@ -10,19 +13,18 @@ export function closeApp(mainWindow: BrowserWindow) {
     mainWindow.on('close', async function (e) {
         if (!allow_quit) {
             e.preventDefault();
-            const choice = await dialog.showMessageBox(mainWindow,
-                {
-                    type: 'question',
-                    buttons: ['Yes', 'No'],
-                    title: 'Confirm',
-                    message: 'Are you sure you want to quit?'
-                });
+            const choice = await dialog.showMessageBox(mainWindow, {
+                type: 'question',
+                buttons: ['Yes', 'No'],
+                title: 'Confirm',
+                message: 'Are you sure you want to quit?',
+            });
             if (choice.response == 0) {
                 allow_quit = true;
                 app.quit();
             }
         }
-    })
+    });
 }
 
 export function installExtensions(mainWindow: BrowserWindow): void {
@@ -32,17 +34,16 @@ export function installExtensions(mainWindow: BrowserWindow): void {
         // Install extensions
         installExtension(REACT_DEVELOPER_TOOLS)
             // eslint-disable-next-line no-console
-            .then(name => console.log(`Added Extension:  ${name}`))
+            .then((name) => console.log(`Added Extension:  ${name}`))
             // eslint-disable-next-line no-console
-            .catch(err => console.log('An error occurred: ', err));
+            .catch((err) => console.log('An error occurred: ', err));
         installExtension(REDUX_DEVTOOLS)
             // eslint-disable-next-line no-console
-            .then(name => console.log(`Added Extension:  ${name}`))
+            .then((name) => console.log(`Added Extension:  ${name}`))
             // eslint-disable-next-line no-console
-            .catch(err => console.log('An error occurred: ', err));
+            .catch((err) => console.log('An error occurred: ', err));
     }
 }
-
 
 export function escapePath(pathString: string): string {
     // Escape spaces and special characters in paths
@@ -57,8 +58,8 @@ export function escapePath(pathString: string): string {
  * @returns Promise<boolean> - True if download was successful
  */
 export async function downloadFile(
-    url: string, 
-    destinationPath: string, 
+    url: string,
+    destinationPath: string,
     onProgress?: (progress: number) => void
 ): Promise<boolean> {
     try {
@@ -78,11 +79,14 @@ export async function downloadFile(
             timeout: 30000, // 30 seconds timeout
         });
 
-        const totalSize = parseInt(response.headers['content-length'] || '0', 10);
+        const totalSize = parseInt(
+            response.headers['content-length'] || '0',
+            10
+        );
         let downloadedSize = 0;
 
         const writer = fs.createWriteStream(destinationPath);
-        
+
         response.data.on('data', (chunk: Buffer) => {
             downloadedSize += chunk.length;
             if (onProgress && totalSize > 0) {
@@ -125,10 +129,14 @@ export async function downloadIgrpNextTemplate(
     destinationPath?: string,
     onProgress?: (progress: number) => void
 ): Promise<boolean> {
-    const templateUrl = 'https://sonatype.nosi.cv/repository/igrp-templates/@igrp/framework-next/0.0.1-alpha.0/igrp-next-template.zip';
-    
+    const templateUrl =
+        'https://sonatype.nosi.cv/repository/igrp-templates/@igrp/framework-next/0.0.1-alpha.0/igrp-next-template.zip';
+
     // Default destination path if not provided
-    const defaultPath = path.join(app.getPath('downloads'), 'igrp-next-template.zip');
+    const defaultPath = path.join(
+        app.getPath('downloads'),
+        'igrp-next-template.zip'
+    );
     const finalPath = destinationPath || defaultPath;
 
     console.log('Downloading IGRP Next template...');

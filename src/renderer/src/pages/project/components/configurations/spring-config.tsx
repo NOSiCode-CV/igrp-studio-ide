@@ -1,7 +1,9 @@
-import { Label } from '@renderer/components/ui/label';
-import { Input } from '@renderer/components/ui/input';
-import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Textarea } from '@renderer/components/ui/textarea';
+import {
+    IGRPCheckboxPrimitive,
+    IGRPLabelPrimitive,
+    IGRPTextAreaPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { SpringConfigData } from 'src/main/types';
 import {
     DatabaseOptions,
@@ -9,10 +11,11 @@ import {
 } from '@renderer/constants/appConstants';
 import { useTranslation } from 'react-i18next';
 import { LabelRequired } from '@renderer/components/label-required';
-import { Separator } from '@renderer/components/ui/separator';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { SelectInput } from '@renderer/generators/api/components/inputs-form';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import DependencySelector from '@renderer/components/dependency-selector';
+import { JSX } from 'react';
 
 interface SpringConfigProps {
     data: SpringConfigData;
@@ -38,10 +41,10 @@ export function SpringConfig({
     data = DEFAULT_SPRING_CONFIG,
     errors,
     onChange,
-}: SpringConfigProps) {
+}: SpringConfigProps): JSX.Element {
     const { t } = useTranslation(); // Hook for translations
 
-    const PackageName = () => {
+    const PackageName = (): React.ReactNode => {
         return (
             <>
                 {data.group && data.artifact && (
@@ -57,10 +60,10 @@ export function SpringConfig({
     };
 
     return (
-        <div className="space-y-6">
+        <div className="rounded-lg border p-4  space-y-6">
             <div className="flex flex-col gap-3">
                 <LabelRequired>{t('projectName')}</LabelRequired>
-                <Input
+                <IGRPInputPrimitive
                     id="name"
                     value={data.name}
                     onChange={(e) =>
@@ -77,8 +80,10 @@ export function SpringConfig({
             </div>
 
             <div className="flex flex-col gap-3">
-                <Label htmlFor="description">{t('description')}</Label>
-                <Textarea
+                <IGRPLabelPrimitive htmlFor="description">
+                    {t('description')}
+                </IGRPLabelPrimitive>
+                <IGRPTextAreaPrimitive
                     id="description"
                     value={data.description}
                     onChange={(e) =>
@@ -91,7 +96,7 @@ export function SpringConfig({
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-3">
                     <LabelRequired>{t('group')}</LabelRequired>
-                    <Input
+                    <IGRPInputPrimitive
                         id="group"
                         value={data.group}
                         onChange={(e) =>
@@ -109,7 +114,7 @@ export function SpringConfig({
 
                 <div className="flex flex-col gap-3">
                     <LabelRequired>{t('artifact')}</LabelRequired>
-                    <Input
+                    <IGRPInputPrimitive
                         id="artifact"
                         value={data.artifact}
                         onChange={(e) =>
@@ -146,7 +151,7 @@ export function SpringConfig({
                 </div>
             </div>
 
-            <Separator orientation="horizontal" />
+            <IGRPSeparator orientation="horizontal" />
 
             <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-3">
@@ -177,7 +182,7 @@ export function SpringConfig({
 
                 <div className="flex flex-col gap-3">
                     <div className="flex items-center space-x-2">
-                        <Checkbox
+                        <IGRPCheckboxPrimitive
                             id="observability"
                             checked={data.enableObservability}
                             onCheckedChange={(checked) =>
@@ -187,12 +192,12 @@ export function SpringConfig({
                                 })
                             }
                         />
-                        <Label htmlFor="observability">
+                        <IGRPLabelPrimitive htmlFor="observability">
                             {t('enableObservability')}
-                        </Label>
+                        </IGRPLabelPrimitive>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Checkbox
+                        <IGRPCheckboxPrimitive
                             id="enableEntityRevision"
                             checked={data.enableEntityRevision}
                             onCheckedChange={(checked) =>
@@ -202,12 +207,12 @@ export function SpringConfig({
                                 })
                             }
                         />
-                        <Label htmlFor="enableEntityRevision">
+                        <IGRPLabelPrimitive htmlFor="enableEntityRevision">
                             {t('enableEntityRevision')}
-                        </Label>
+                        </IGRPLabelPrimitive>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Checkbox
+                        <IGRPCheckboxPrimitive
                             id="enableGraalVm"
                             checked={data.enableGraalVm}
                             onCheckedChange={(checked) =>
@@ -217,14 +222,14 @@ export function SpringConfig({
                                 })
                             }
                         />
-                        <Label htmlFor="enableGraalVm">
+                        <IGRPLabelPrimitive htmlFor="enableGraalVm">
                             {t('enableGraalVm')}
-                        </Label>
+                        </IGRPLabelPrimitive>
                     </div>
                 </div>
             </div>
 
-            <Separator orientation="horizontal" />
+            <IGRPSeparator orientation="horizontal" />
 
             <DependencySelector
                 onSelectedDependencies={(dependencies) =>

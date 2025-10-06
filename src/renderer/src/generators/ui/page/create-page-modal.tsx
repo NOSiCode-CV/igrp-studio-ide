@@ -2,18 +2,18 @@ import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import { PageConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { getId } from '@renderer/utils';
-import { Button } from '@renderer/components/ui/button';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { FocusEvent, useEffect, useState } from 'react';
 import {
     CheckboxInput,
@@ -43,7 +43,7 @@ interface CreatePageModalProps {
     isSubPage?: boolean;
     currentComponent?: PageDefinition;
     onClose: () => void;
-    onConfirm: () => void;
+    onConfirm: (createdPage?: PageDefinition) => void;
 }
 
 export function CreatePageModal({
@@ -53,7 +53,7 @@ export function CreatePageModal({
     onConfirm,
     isSubPage,
     currentComponent,
-}: CreatePageModalProps) {
+}: CreatePageModalProps): React.JSX.Element {
     const { t } = useTranslation();
 
     const { createGitCommit } = useGit();
@@ -64,7 +64,14 @@ export function CreatePageModal({
         useState<PageConfig>(initialValues);
 
     useEffect(() => {
-        const loadCurrentData = async () => {
+        const loadCurrentData = async (): Promise<void> => {
+            // For sub-page creation, don't pre-fill the form with parent data
+            if (isSubPage) {
+                setFormInitialValues(initialValues);
+                return;
+            }
+
+            // For regular page creation, load parent data if available
             if (currentComponent?.path) {
                 try {
                     const currentData = await window.api.getJsonContent(
@@ -92,8 +99,18 @@ export function CreatePageModal({
             }
         };
 
-        loadCurrentData();
-    }, [currentComponent, isOpen]);
+        // Only load data when modal is open
+        if (isOpen) {
+            loadCurrentData();
+        }
+    }, [currentComponent, isOpen, isSubPage]);
+
+    // Reset form when modal closes
+    useEffect(() => {
+        if (!isOpen) {
+            setFormInitialValues(initialValues);
+        }
+    }, [isOpen]);
 
     const handleConfirm = async (pageConfig: PageConfig): Promise<void> => {
         try {
@@ -112,7 +129,7 @@ export function CreatePageModal({
                 }));
 
                 // Add args to pageConfig (we'll need to extend the interface)
-                (pageConfig as any).args = generatedArgs;
+                (pageConfig as unknown as PageConfig).args = generatedArgs;
             }
 
             const { error } = await window.engine.createPage(
@@ -131,7 +148,23 @@ export function CreatePageModal({
             );
             // commit after creating the page
             createGitCommit(basePath, `Add page ${pageConfig.pageName}`);
-            onConfirm?.();
+
+            // Create a PageDefinition object for the newly created page
+            const createdPage: PageDefinition = {
+                id: pageConfig.id,
+                type: pageConfig.type as 'page' | 'component',
+                name: pageConfig.pageName,
+                description: pageConfig.description || '',
+                path: pageConfig.path,
+                pagePath: pageConfig.path,
+                status: 'active',
+                created: new Date().toISOString(),
+                pageName: pageConfig.pageName,
+                isPage: pageConfig.type === 'page',
+                content: pageConfig as any,
+            };
+
+            onConfirm?.(createdPage);
 
             formik.resetForm();
         } catch (error) {
@@ -238,14 +271,14 @@ export function CreatePageModal({
     }, [formik.values.path]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
-                <DialogTitle>
+        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
+            <IGRPDialogContentPrimitive>
+                <IGRPDialogTitlePrimitive>
                     {isSubPage ? t('createSubNewPage') : t('createNewPage')}
-                </DialogTitle>
-                <DialogDescription>
+                </IGRPDialogTitlePrimitive>
+                <IGRPDialogDescriptionPrimitive>
                     {t('comonDialogtDescription', { name: 'Page' })}
-                </DialogDescription>
+                </IGRPDialogDescriptionPrimitive>
                 <form
                     className="needs-validation space-y-4"
                     onSubmit={(e) => {
@@ -325,20 +358,24 @@ export function CreatePageModal({
                             value={formik.values.forceDynamic}
                         />
                     </div>
-                    <DialogFooter className="flex justify-between">
-                        <Button type="button" variant="ghost" onClick={onClose}>
+                    <IGRPDialogFooterPrimitive className="flex justify-between">
+                        <IGRPButtonPrimitive
+                            type="button"
+                            variant="ghost"
+                            onClick={onClose}
+                        >
                             {t('cancel')}
-                        </Button>
-                        <Button
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
                             type="submit"
                             disabled={formik.isSubmitting}
                             color="primary"
                         >
                             {formik.isSubmitting ? t('saving') : t('save')}
-                        </Button>
-                    </DialogFooter>
+                        </IGRPButtonPrimitive>
+                    </IGRPDialogFooterPrimitive>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

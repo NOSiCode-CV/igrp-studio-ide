@@ -82,7 +82,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
     return (
         <>
             <IGRPTabs defaultValue="params">
-                <IGRPTabsList className="w-full">
+                <IGRPTabsList>
                     <IGRPTabsTrigger value="params">
                         {t('params')}
                     </IGRPTabsTrigger>
@@ -172,7 +172,7 @@ export const TabRequest: React.FC<TabRequestProps> = ({
                     />
                 </IGRPTabsContent>
                 <IGRPTabsContent value="headers">
-                    <div className="border rounded-sm py-0">
+                    <div className="border rounded-sm pb-2">
                         {columnsHeaders && (
                             <FormList
                                 formik={formik}

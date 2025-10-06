@@ -5,6 +5,8 @@ import yaml from 'js-yaml';
 import path from 'path';
 import { DockerComposeConfig, ServiceInfo } from '../types';
 import { escapePath } from '../helpers/utils';
+import { BrowserWindow } from 'electron';
+import { EVENTS } from '../constants/events';
 
 const execAsync = promisify(exec);
 
@@ -12,48 +14,190 @@ export class DockerService {
     private composeCache: Record<string, DockerComposeConfig> = {};
 
     /**
+     * Test logging functionality
+     */
+    testLogging(): void {
+        this.logInfo('Testing Docker service logging...');
+        this.logSuccess('Docker service logging is working!');
+        this.logWarn('This is a warning message');
+        this.logDebug('This is a debug message');
+        this.logError('This is an error message (for testing)');
+    }
+
+    /**
+     * Send log message to renderer process
+     */
+    private log(
+        level: 'info' | 'warn' | 'error' | 'debug' | 'success',
+        message: string,
+        progress?: { current: number; total: number; label?: string }
+    ): void {
+        const logMessage = {
+            code: 'docker-service',
+            message,
+            level,
+            timestamp: new Date().toISOString(),
+            progress,
+        };
+
+        // Also log to console for debugging
+        console.log(`[DockerService ${level.toUpperCase()}] ${message}`);
+
+        // Send to all renderer processes
+        const windows = BrowserWindow.getAllWindows();
+        windows.forEach((window) => {
+            if (!window.isDestroyed()) {
+                window.webContents.send(EVENTS.LOG, logMessage);
+            }
+        });
+    }
+
+    /**
+     * Log info message
+     */
+    private logInfo(message: string): void {
+        this.log('info', message);
+    }
+
+    /**
+     * Log warning message
+     */
+    private logWarn(message: string): void {
+        this.log('warn', message);
+    }
+
+    /**
+     * Log error message
+     */
+    private logError(message: string): void {
+        this.log('error', message);
+    }
+
+    /**
+     * Log debug message
+     */
+    private logDebug(message: string): void {
+        this.log('debug', message);
+    }
+
+    /**
+     * Log success message
+     */
+    private logSuccess(message: string): void {
+        this.log('success', message);
+    }
+
+    /**
+     * Log progress update
+     */
+    private logProgress(current: number, total: number, label: string): void {
+        this.log('info', `${label}: ${current}/${total}`, {
+            current,
+            total,
+            label,
+        });
+    }
+
+    /**
+     * Simulate progress for long-running operations
+     */
+    private async simulateProgress<T>(
+        operation: () => Promise<T>,
+        label: string,
+        totalSteps: number = 10
+    ): Promise<T> {
+        let currentStep = 0;
+        const stepInterval = 1000; // 1 second per step
+
+        // Start progress simulation
+        const progressInterval = setInterval(() => {
+            if (currentStep < totalSteps) {
+                currentStep += 1;
+                this.logProgress(currentStep, totalSteps, label);
+            }
+        }, stepInterval);
+
+        try {
+            const result = await operation();
+
+            // Complete progress
+            clearInterval(progressInterval);
+            this.logProgress(totalSteps, totalSteps, `${label} completed`);
+
+            return result;
+        } catch (error) {
+            clearInterval(progressInterval);
+            this.logError(
+                `${label} failed at step ${currentStep}/${totalSteps}`
+            );
+            throw error;
+        }
+    }
+
+    /**
      * Check if Docker daemon is running and accessible
      * @returns Promise<{isRunning: boolean, error?: string, details?: string}>
      */
-    async checkDockerDaemon(): Promise<{ isRunning: boolean, error?: string, details?: string }> {
+    async checkDockerDaemon(): Promise<{
+        isRunning: boolean;
+        error?: string;
+        details?: string;
+    }> {
+        this.logInfo('Checking Docker daemon status...');
+
         try {
             // Try to get Docker info
             const { stdout } = await execAsync('docker info', {
                 timeout: 10000, // 10 second timeout
-                maxBuffer: 1024 * 1024 // 1MB buffer
+                maxBuffer: 1024 * 1024, // 1MB buffer
             });
+
+            this.logSuccess('Docker daemon is running and accessible');
+            this.logDebug(`Docker info: ${stdout.substring(0, 200)}...`);
 
             // If we get here, Docker daemon is running
             return { isRunning: true, details: stdout };
-        } catch (error: any) {
-            const errorMessage = error.stderr || error.stdout || error.message;
+        } catch (error: unknown) {
+            const errorMessage =
+                (error as any).stderr ||
+                (error as any).stdout ||
+                (error as any).message;
+            this.logError(`Docker daemon check failed: ${errorMessage}`);
 
             // Check for specific Docker daemon connection errors
-            if (errorMessage.includes('Cannot connect to the Docker daemon') ||
+            if (
+                errorMessage.includes('Cannot connect to the Docker daemon') ||
                 errorMessage.includes('docker.sock') ||
-                errorMessage.includes('Connection refused')) {
+                errorMessage.includes('Connection refused')
+            ) {
+                this.logError('Docker daemon is not running');
                 return {
                     isRunning: false,
                     error: 'Docker daemon is not running',
-                    details: 'Please start Docker Desktop or the Docker daemon service'
+                    details:
+                        'Please start Docker Desktop or the Docker daemon service',
                 };
             }
 
             // Check for Docker not installed
-            if (errorMessage.includes('command not found') ||
-                errorMessage.includes('docker: not found')) {
+            if (
+                errorMessage.includes('command not found') ||
+                errorMessage.includes('docker: not found')
+            ) {
+                this.logError('Docker is not installed');
                 return {
                     isRunning: false,
                     error: 'Docker is not installed',
-                    details: 'Please install Docker Desktop or Docker Engine'
+                    details: 'Please install Docker Desktop or Docker Engine',
                 };
             }
 
             // Other errors
+            this.logError(`Docker daemon check failed: ${errorMessage}`);
             return {
                 isRunning: false,
                 error: 'Docker daemon check failed',
-                details: errorMessage
+                details: errorMessage,
             };
         }
     }
@@ -63,27 +207,71 @@ export class DockerService {
      * @throws Error if Docker daemon is not running
      */
     private async ensureDockerRunning(): Promise<void> {
+        this.logDebug('Ensuring Docker daemon is running...');
         const check = await this.checkDockerDaemon();
         if (!check.isRunning) {
-            throw new Error(`Docker daemon is not running: ${check.error}. ${check.details}`);
+            this.logError(
+                `Docker daemon is not running: ${check.error}. ${check.details}`
+            );
+            throw new Error(
+                `Docker daemon is not running: ${check.error}. ${check.details}`
+            );
         }
+        this.logDebug('Docker daemon is confirmed to be running');
     }
 
     async loadComposeFile(projectPath: string): Promise<DockerComposeConfig> {
+        this.logInfo(`Loading Docker Compose file from: ${projectPath}`);
         const composePath = path.join(projectPath, 'igrp-compose.yaml');
-        const fileContents = fs.readFileSync(composePath, 'utf8');
-        this.composeCache[projectPath] = yaml.load(fileContents) as DockerComposeConfig;
-        return this.composeCache[projectPath];
+
+        try {
+            const fileContents = fs.readFileSync(composePath, 'utf8');
+            this.logDebug(
+                `Compose file size: ${fileContents.length} characters`
+            );
+
+            this.composeCache[projectPath] = yaml.load(
+                fileContents
+            ) as DockerComposeConfig;
+
+            const serviceCount = Object.keys(
+                this.composeCache[projectPath].services || {}
+            ).length;
+            this.logSuccess(
+                `Successfully loaded compose file with ${serviceCount} services`
+            );
+
+            return this.composeCache[projectPath];
+        } catch (error: unknown) {
+            this.logError(
+                `Failed to load compose file: ${(error as any).message}`
+            );
+            throw error;
+        }
     }
 
     private prepareInitScript(projectPath: string): void {
+        this.logInfo('Preparing initialization scripts...');
         const igrpStudioPath = path.join(projectPath, '.igrpstudio');
 
         try {
             // Find all .sh files recursively
             const shFiles = this.findShFilesRecursively(igrpStudioPath);
+            this.logDebug(`Found ${shFiles.length} shell scripts to prepare`);
 
-            for (const scriptPath of shFiles) {
+            if (shFiles.length === 0) {
+                this.logWarn('No shell scripts found in .igrpstudio directory');
+                return;
+            }
+
+            for (let i = 0; i < shFiles.length; i++) {
+                const scriptPath = shFiles[i];
+                this.logProgress(
+                    i + 1,
+                    shFiles.length,
+                    `Preparing script: ${path.basename(scriptPath)}`
+                );
+
                 // Read and normalize line endings
                 let content = fs.readFileSync(scriptPath, 'utf8');
                 content = content.replace(/\r\n/g, '\n');
@@ -97,9 +285,15 @@ export class DockerService {
                 if (process.platform !== 'win32') {
                     execSync(`chmod +x "${scriptPath}"`);
                 }
+
+                this.logDebug(`Prepared script: ${scriptPath}`);
             }
-        } catch (error) {
-            console.error('Error preparing init scripts:', error);
+
+            this.logSuccess(
+                `Successfully prepared ${shFiles.length} initialization scripts`
+            );
+        } catch (error: unknown) {
+            this.logError(`Error preparing init scripts: ${error}`);
             throw error;
         }
     }
@@ -122,7 +316,15 @@ export class DockerService {
         return shFiles;
     }
 
-    async executeComposeCommand(projectPath: string, command: string, service?: string): Promise<string> {
+    async executeComposeCommand(
+        projectPath: string,
+        command: string,
+        service?: string
+    ): Promise<string> {
+        this.logInfo(
+            `Executing Docker Compose command: ${command}${service ? ` for service: ${service}` : ''}`
+        );
+
         // Check if Docker daemon is running first
         await this.ensureDockerRunning();
 
@@ -130,125 +332,248 @@ export class DockerService {
         const escapedComposeFile = escapePath(composeFile);
         const serviceParam = service || '';
 
-       /*  const envFilePath = path.join(projectPath, '.igrp.env');
-        const escapedEnvFilePath = escapePath(envFilePath); */
+        this.logDebug(`Compose file: ${composeFile}`);
+        this.logDebug(`Service parameter: ${serviceParam || 'all services'}`);
 
         // Prepare the init script first
         this.prepareInitScript(projectPath);
 
-       /*  if (!fs.existsSync(envFilePath)) {
-            throw new Error(`Environment file not found: ${envFilePath}`);
-        } */
+        const fullCommand =
+            `docker compose -f ${escapedComposeFile} ${command} ${serviceParam}`.trim();
+        this.logDebug(`Full command: ${fullCommand}`);
+
+        // Check if this is a pull command for progress tracking
+        const isPullCommand =
+            command.includes('pull') || command.includes('up');
+        const isBuildCommand = command.includes('build');
 
         try {
-            const { stdout } = await execAsync(
-                `docker compose -f ${escapedComposeFile}  ${command} ${serviceParam}`
-                , {
-                    maxBuffer: 1024 * 1024 * 10,
-                });
-            return stdout;
-        } catch (error: any) {
-            // Check if the error is related to Docker daemon connection
-            const errorMessage = error.stderr || error.message;
-            if (errorMessage.includes('Cannot connect to the Docker daemon') ||
-                errorMessage.includes('docker.sock') ||
-                errorMessage.includes('Connection refused')) {
-                throw new Error(`Docker daemon is not running. Please start Docker Desktop or the Docker daemon service.`);
+            this.logInfo('Starting Docker Compose execution...');
+            const startTime = Date.now();
+
+            if (isPullCommand) {
+                this.logInfo('Pulling Docker images...');
+                this.logProgress(0, 100, 'Pulling images');
+            } else if (isBuildCommand) {
+                this.logInfo('Building Docker images...');
+                this.logProgress(0, 100, 'Building images');
             }
+
+            const { stdout } = await execAsync(fullCommand, {
+                maxBuffer: 1024 * 1024 * 10,
+            });
+
+            const duration = Date.now() - startTime;
+
+            if (isPullCommand) {
+                this.logProgress(100, 100, 'Images pulled successfully');
+                this.logSuccess(
+                    `Docker images pulled successfully in ${duration}ms`
+                );
+            } else if (isBuildCommand) {
+                this.logProgress(100, 100, 'Images built successfully');
+                this.logSuccess(
+                    `Docker images built successfully in ${duration}ms`
+                );
+            } else {
+                this.logSuccess(
+                    `Docker Compose command completed successfully in ${duration}ms`
+                );
+            }
+
+            this.logDebug(`Command output length: ${stdout.length} characters`);
+
+            return stdout;
+        } catch (error: unknown) {
+            const duration = Date.now() - (Date.now() - 1000); // Approximate duration
+            const errorMessage =
+                (error as any).stderr || (error as any).message;
+
+            if (isPullCommand) {
+                this.logError(
+                    `Docker pull failed after ${duration}ms: ${errorMessage}`
+                );
+            } else if (isBuildCommand) {
+                this.logError(
+                    `Docker build failed after ${duration}ms: ${errorMessage}`
+                );
+            } else {
+                this.logError(
+                    `Docker Compose command failed after ${duration}ms: ${errorMessage}`
+                );
+            }
+
+            // Check if the error is related to Docker daemon connection
+            if (
+                errorMessage.includes('Cannot connect to the Docker daemon') ||
+                errorMessage.includes('docker.sock') ||
+                errorMessage.includes('Connection refused')
+            ) {
+                this.logError(
+                    'Docker daemon connection lost during command execution'
+                );
+                throw new Error(
+                    `Docker daemon is not running. Please start Docker Desktop or the Docker daemon service.`
+                );
+            }
+
+            this.logError(`Docker compose command failed: ${errorMessage}`);
             throw new Error(`Docker compose command failed: ${errorMessage}`);
         }
     }
 
     async up(projectPath: string): Promise<void> {
+        this.logInfo('Starting Docker Compose services...');
         try {
-            await this.executeComposeCommand(projectPath, `up -d --quiet-pull`);
-            this.status(projectPath);
-        } catch (error: any) {
-            throw new Error(`Failed to start containers: ${error.message}`);
+            // Use progress simulation for the up command which includes pulling
+            await this.simulateProgress(
+                () =>
+                    this.executeComposeCommand(
+                        projectPath,
+                        `up -d --quiet-pull`
+                    ),
+                'Starting services and pulling images',
+                15 // 15 steps for a typical up operation
+            );
+
+            this.logSuccess('Docker Compose services started successfully');
+            this.logInfo('Checking service status...');
+            await this.status(projectPath);
+        } catch (error: unknown) {
+            this.logError(
+                `Failed to start containers: ${(error as any).message}`
+            );
+            throw new Error(
+                `Failed to start containers: ${(error as any).message}`
+            );
         }
     }
 
     async down(projectPath: string, dropVolume: boolean): Promise<void> {
+        this.logInfo(
+            `Stopping Docker Compose services${dropVolume ? ' and removing volumes' : ''}...`
+        );
         try {
-            await this.executeComposeCommand(projectPath, `down --remove-orphans ${dropVolume && '-v'}`);
-        } catch (error: any) {
-            throw new Error(`Failed to stop containers: ${error.message}`);
+            await this.executeComposeCommand(
+                projectPath,
+                `down --remove-orphans ${dropVolume && '-v'}`
+            );
+            this.logSuccess(
+                `Docker Compose services stopped successfully${dropVolume ? ' and volumes removed' : ''}`
+            );
+        } catch (error: unknown) {
+            this.logError(
+                `Failed to stop containers: ${(error as any).message}`
+            );
+            throw new Error(
+                `Failed to stop containers: ${(error as any).message}`
+            );
         }
     }
 
     async status(projectPath: string): Promise<ServiceInfo[]> {
+        this.logInfo('Checking Docker Compose service status...');
         try {
             // Load compose file first to get all services
             const compose = await this.loadComposeFile(projectPath);
             const allServices = compose.services;
             const volumes = compose.volumes;
             const serviceNames = Object.keys(allServices);
+            this.logDebug(
+                `Found ${serviceNames.length} services in compose file: ${serviceNames.join(', ')}`
+            );
 
             try {
                 // Check Docker daemon status first
                 const dockerCheck = await this.checkDockerDaemon();
                 if (!dockerCheck.isRunning) {
+                    this.logWarn(
+                        'Docker daemon not running, returning error status for all services'
+                    );
                     // Return all services as stopped with Docker daemon error
-                    return serviceNames.map(serviceName => {
+                    return serviceNames.map((serviceName) => {
                         const serviceDef = allServices[serviceName];
-                        const { environment, depends_on, env_file, ...rest } = serviceDef;
-                        const processedVolumes = (serviceDef.volumes || []).map(volume => {
-                            if (typeof volume === 'string') {
-                                const [volumeName] = volume.split(':');
-                                const volumeConfig = volumes?.[volumeName];
-                                if (volumeConfig?.driver) {
-                                    return `${volume}:${volumeConfig.driver}`;
+                        const { environment, depends_on, env_file, ...rest } =
+                            serviceDef;
+                        const processedVolumes = (serviceDef.volumes || []).map(
+                            (volume) => {
+                                if (typeof volume === 'string') {
+                                    const [volumeName] = volume.split(':');
+                                    const volumeConfig = volumes?.[volumeName];
+                                    if (volumeConfig?.driver) {
+                                        return `${volume}:${volumeConfig.driver}`;
+                                    }
                                 }
+                                return volume;
                             }
-                            return volume;
-                        });
+                        );
 
                         return {
                             ...rest,
                             name: serviceName,
                             status: 'error',
                             statusMessage: `Docker daemon not running: ${dockerCheck.error}`,
-                            dependsOn: depends_on && !Array.isArray(depends_on) ? [depends_on] : depends_on || [],
-                            environments: this.parseEnvironmentToArray(environment),
-                            env_file: env_file && env_file.map((file: string) => ({ file })),
+                            dependsOn:
+                                depends_on && !Array.isArray(depends_on)
+                                    ? [depends_on]
+                                    : depends_on || [],
+                            environments:
+                                this.parseEnvironmentToArray(environment),
+                            env_file:
+                                env_file &&
+                                env_file.map((file: string) => ({ file })),
                             volumes: processedVolumes,
                         };
                     });
                 }
 
                 // Get running containers
-                const stdout = await this.executeComposeCommand(projectPath, 'ps --format json');
-                const runningContainers = stdout.trim()
+                this.logDebug('Querying running containers...');
+                const stdout = await this.executeComposeCommand(
+                    projectPath,
+                    'ps --format json'
+                );
+                const runningContainers = stdout
+                    .trim()
                     .split('\n')
-                    .filter(line => line.trim())
-                    .map(line => JSON.parse(line));
+                    .filter((line) => line.trim())
+                    .map((line) => JSON.parse(line));
+
+                this.logDebug(
+                    `Found ${runningContainers.length} running containers`
+                );
 
                 // Create a map of running services for quick lookup
                 const runningServicesMap = new Map(
-                    runningContainers.map(container => [container.Service, container])
+                    runningContainers.map((container) => [
+                        container.Service,
+                        container,
+                    ])
                 );
 
                 // Return all services with status info
-                return serviceNames.map(serviceName => {
+                const serviceInfo = serviceNames.map((serviceName) => {
                     const serviceDef = allServices[serviceName];
                     const containerInfo = runningServicesMap.get(serviceName);
 
-                    const { environment, depends_on, env_file, ...rest } = serviceDef
+                    const { environment, depends_on, env_file, ...rest } =
+                        serviceDef;
                     // Process volumes with driver information
-                    const processedVolumes = (serviceDef.volumes || []).map(volume => {
-                        if (typeof volume === 'string') {
-                            // For named volumes (format "volume_name:container_path")
-                            const [volumeName] = volume.split(':');
+                    const processedVolumes = (serviceDef.volumes || []).map(
+                        (volume) => {
+                            if (typeof volume === 'string') {
+                                // For named volumes (format "volume_name:container_path")
+                                const [volumeName] = volume.split(':');
 
-                            // Check if we have driver info for this volume
-                            const volumeConfig = volumes?.[volumeName];
-                            if (volumeConfig?.driver) {
-                                return `${volume}:${volumeConfig.driver}`;
+                                // Check if we have driver info for this volume
+                                const volumeConfig = volumes?.[volumeName];
+                                if (volumeConfig?.driver) {
+                                    return `${volume}:${volumeConfig.driver}`;
+                                }
                             }
+                            return volume;
                         }
-                        return volume;
-                    });
-
+                    );
 
                     if (containerInfo) {
                         // Service is running
@@ -256,15 +581,25 @@ export class DockerService {
                             ...rest,
                             name: serviceName,
                             status: containerInfo.State,
-                            ports: containerInfo.Publishers?.map((p: any) => `${p.PublishedPort}:${p.TargetPort}`) || [],
+                            ports:
+                                containerInfo.Publishers?.map(
+                                    (p: any) =>
+                                        `${p.PublishedPort}:${p.TargetPort}`
+                                ) || [],
                             volumes: processedVolumes,
-                            environments: this.parseEnvironmentToArray(environment),
+                            environments:
+                                this.parseEnvironmentToArray(environment),
                             createdAt: containerInfo.CreatedAt,
                             statusMessage: containerInfo.Status,
-                            dependsOn: depends_on && !Array.isArray(depends_on) ? [depends_on] : depends_on || [],
-                            env_file: env_file && env_file.map((file: string) => {
-                                return { file }
-                            }),
+                            dependsOn:
+                                depends_on && !Array.isArray(depends_on)
+                                    ? [depends_on]
+                                    : depends_on || [],
+                            env_file:
+                                env_file &&
+                                env_file.map((file: string) => {
+                                    return { file };
+                                }),
                         };
                     } else {
                         // Service is not running
@@ -272,38 +607,52 @@ export class DockerService {
                             ...rest,
                             name: serviceName,
                             status: 'stopped',
-                            dependsOn: depends_on && !Array.isArray(depends_on) ? [depends_on] : depends_on || [],
-                            environments: this.parseEnvironmentToArray(environment),
-                            env_file: env_file && env_file.map((file: string) => {
-                                return { file }
-                            }),
+                            dependsOn:
+                                depends_on && !Array.isArray(depends_on)
+                                    ? [depends_on]
+                                    : depends_on || [],
+                            environments:
+                                this.parseEnvironmentToArray(environment),
+                            env_file:
+                                env_file &&
+                                env_file.map((file: string) => {
+                                    return { file };
+                                }),
                             volumes: processedVolumes,
                         };
                     }
                 });
 
+                this.logSuccess(
+                    `Status check completed for ${serviceNames.length} services`
+                );
+                return serviceInfo;
             } catch (parseError) {
-                console.error('Error parsing container info, returning compose services:', parseError);
+                this.logError(`Error parsing container info: ${parseError}`);
                 // Fallback to all services from compose file marked as not running
-                return serviceNames.map(serviceName => {
-                    const serviceDef = allServices[serviceName]
-                    const { environment, depends_on, env_file, ...rest } = serviceDef
-                    return (
-                        {
-                            ...rest,
-                            name: serviceName,
-                            status: 'error',
-                            dependsOn: serviceDef.depends_on && !Array.isArray(serviceDef.depends_on) ? [serviceDef.depends_on] : serviceDef.depends_on || [],
-                            environments: this.parseEnvironmentToArray(serviceDef.environment),
-                            env_file: env_file && env_file.map((file: string) => {
-                                return { file }
+                return serviceNames.map((serviceName) => {
+                    const serviceDef = allServices[serviceName];
+                    const { environment, depends_on, env_file, ...rest } =
+                        serviceDef;
+                    return {
+                        ...rest,
+                        name: serviceName,
+                        status: 'error',
+                        dependsOn:
+                            depends_on && !Array.isArray(depends_on)
+                                ? [depends_on]
+                                : depends_on || [],
+                        environments: this.parseEnvironmentToArray(environment),
+                        env_file:
+                            env_file &&
+                            env_file.map((file: string) => {
+                                return { file };
                             }),
-                        }
-                    )
+                    };
                 });
             }
-        } catch (error: any) {
-            console.error('Error getting status:', error);
+        } catch (error: unknown) {
+            this.logError(`Error getting status: ${(error as any).message}`);
             return [];
         }
     }
@@ -314,13 +663,20 @@ export class DockerService {
      * @param services Array of service names to stop
      */
     async stop(projectPath: string, services: string[]): Promise<void> {
+        this.logInfo(`Stopping services: ${services.join(', ')}`);
         try {
             await this.executeComposeCommand(
                 projectPath,
                 `stop ${services.join(' ')}`
             );
-        } catch (error: any) {
-            throw new Error(`Failed to stop services: ${error.message}`);
+            this.logSuccess(
+                `Successfully stopped services: ${services.join(', ')}`
+            );
+        } catch (error: unknown) {
+            this.logError(`Failed to stop services: ${(error as any).message}`);
+            throw new Error(
+                `Failed to stop services: ${(error as any).message}`
+            );
         }
     }
 
@@ -335,14 +691,25 @@ export class DockerService {
         services: string[],
         timeout?: number
     ): Promise<void> {
+        this.logInfo(
+            `Restarting services: ${services.join(', ')}${timeout ? ` with ${timeout}s timeout` : ''}`
+        );
         try {
             const timeoutFlag = timeout ? `--timeout ${timeout}` : '';
             await this.executeComposeCommand(
                 projectPath,
                 `restart ${timeoutFlag} ${services.join(' ')}`
             );
-        } catch (error: any) {
-            throw new Error(`Failed to restart services: ${error.message}`);
+            this.logSuccess(
+                `Successfully restarted services: ${services.join(', ')}`
+            );
+        } catch (error: unknown) {
+            this.logError(
+                `Failed to restart services: ${(error as any).message}`
+            );
+            throw new Error(
+                `Failed to restart services: ${(error as any).message}`
+            );
         }
     }
 
@@ -358,14 +725,14 @@ export class DockerService {
 
         // Case 2: Array of strings in "KEY=VALUE" format (including ${VARIABLE} syntax)
         if (env.length > 0 && typeof env[0] === 'string') {
-            return (env as string[]).map(item => {
+            return (env as string[]).map((item) => {
                 const [name, ...valueParts] = item.split('=');
                 const value = valueParts.join('='); // Handle values containing '='
 
                 // Preserve the ${VARIABLE} syntax in the value
                 return {
                     key: name.trim(),
-                    value: value.trim()
+                    value: value.trim(),
                 };
             });
         }
@@ -374,11 +741,62 @@ export class DockerService {
     }
 
     async logs(projectPath: string, service?: string): Promise<string> {
-        return this.executeComposeCommand(projectPath, 'logs --no-color', service);
+        this.logInfo(
+            `Retrieving logs${service ? ` for service: ${service}` : ' for all services'}`
+        );
+        try {
+            const logs = await this.executeComposeCommand(
+                projectPath,
+                'logs --no-color',
+                service
+            );
+            this.logSuccess(
+                `Successfully retrieved logs${service ? ` for ${service}` : ''}`
+            );
+            return logs;
+        } catch (error: unknown) {
+            this.logError(`Failed to retrieve logs: ${(error as any).message}`);
+            throw error;
+        }
     }
 
     async build(projectPath: string): Promise<void> {
-        await this.executeComposeCommand(projectPath, 'build');
+        this.logInfo('Building Docker Compose services...');
+        try {
+            // Use progress simulation for build operations
+            await this.simulateProgress(
+                () => this.executeComposeCommand(projectPath, 'build'),
+                'Building Docker images',
+                20 // 20 steps for a typical build operation
+            );
+
+            this.logSuccess('Docker Compose services built successfully');
+        } catch (error: unknown) {
+            this.logError(
+                `Failed to build services: ${(error as any).message}`
+            );
+            throw error;
+        }
+    }
+
+    /**
+     * Pull Docker images with progress tracking
+     */
+    async pull(projectPath: string): Promise<void> {
+        this.logInfo('Pulling Docker images...');
+        try {
+            // Use progress simulation for pull operations
+            await this.simulateProgress(
+                () => this.executeComposeCommand(projectPath, 'pull'),
+                'Pulling Docker images',
+                25 // 25 steps for a typical pull operation
+            );
+
+            this.logSuccess('Docker images pulled successfully');
+        } catch (error: unknown) {
+            this.logError(`Failed to pull images: ${(error as any).message}`);
+            throw error;
+        }
     }
 }
 

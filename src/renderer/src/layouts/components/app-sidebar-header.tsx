@@ -1,5 +1,5 @@
 import React from 'react';
-import { SidebarHeader } from '@renderer/components/ui/sidebar';
+import { IGRPSidebarHeaderPrimitive } from '@igrp/igrp-framework-react-design-system';
 import FormSearch from '../components/app-search';
 import { CreateModuleDialog } from '@renderer/generators/api/components/create-module-dialog';
 import { cn } from '@renderer/lib/utils';
@@ -23,7 +23,7 @@ export const AppSidebarHeader: React.FC<AppSidebarHeaderProps> = ({
 }) => {
     const { t } = useTranslation();
     return (
-        <SidebarHeader className={cn('flex flex-col', className)}>
+        <IGRPSidebarHeaderPrimitive className={cn('flex flex-col', className)}>
             <div className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ml-1 flex flex-1 justify-between items-center">
                 <span className="font-semibold">{description}</span>
                 {basePath && <CreateModuleDialog basePath={basePath} />}
@@ -34,6 +34,6 @@ export const AppSidebarHeader: React.FC<AppSidebarHeaderProps> = ({
                 placeholder={`${t('search')} ${description}`}
                 sidebarState={sidebarState}
             />
-        </SidebarHeader>
+        </IGRPSidebarHeaderPrimitive>
     );
 };

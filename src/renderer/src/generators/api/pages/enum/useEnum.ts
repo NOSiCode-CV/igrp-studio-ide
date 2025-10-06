@@ -12,6 +12,8 @@ import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import { defaultValue, getTablesColumns, initialValues } from './config';
 import useToast from '@renderer/hooks/useToast';
+import { useKeyPress } from '@renderer/hooks/useKeyDown';
+import { KeyboardKey } from '@renderer/constants/shortcut';
 
 export const useEnum = ({ currentItem }: { currentItem: any }) => {
     const dispatch: any = useDispatch();
@@ -23,7 +25,9 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
 
     const [title, setTitle] = useState('');
     const [data, setData] = useState<any>(null);
-    const [tablesColumns, setTableColumns] = useState<{ [value: string]: IColumnsTabelProps[] }>({});
+    const [tablesColumns, setTableColumns] = useState<{
+        [value: string]: IColumnsTabelProps[];
+    }>({});
 
     const validationSchema = Yup.object({
         name: Yup.string()
@@ -74,17 +78,10 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
         }
     }, [data]);
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault();
-                handleSave();
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    // Keyboard shortcut for save (Ctrl/Cmd + S)
+    useKeyPress(() => {
+        handleSave();
+    }, [KeyboardKey.save]);
 
     const handleSave = async (): Promise<void> => {
         try {
@@ -95,12 +92,13 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
                 })
             );
 
-            const attributes = tablesColumns.values
-                ?.filter((attr: any) => attr.name !== 'Name')
-                .map(({ type, name }: { type: string, name: string }) => ({
-                    type: type === 'text' ? 'string' : type,
-                    name,
-                })) || [];
+            const attributes =
+                tablesColumns.values
+                    ?.filter((attr: any) => attr.name !== 'Name')
+                    .map(({ type, name }: { type: string; name: string }) => ({
+                        type: type === 'text' ? 'string' : type,
+                        name,
+                    })) || [];
 
             const values = {
                 ...formik.values,
@@ -119,7 +117,9 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
 
             createGitCommit(basePath, `Add enum ${formik.values.name}`);
             dispatch(onSetChangeStatus(true));
-            showSuccessToast(t('createdSuccess', { name: t('enum'), value: values.name }));
+            showSuccessToast(
+                t('createdSuccess', { name: t('enum'), value: values.name })
+            );
             handleRenameTab(currentItem.id, values.name);
         } catch (error) {
             showErrorToast(error);

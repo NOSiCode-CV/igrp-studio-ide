@@ -1,15 +1,15 @@
 import { Copy, Move, Settings, Trash } from 'lucide-react';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
+    IGRPTooltipPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import StructureDropdown from '../../components/StructureDropdown';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { COMPONENT } from '../../ComponentTypes';
 import { BindingConfigurationModal } from '../../components/binding-configuration-modal';
-import { Badge } from '@renderer/components/ui/badge';
+import { IGRPBadgePrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useEffect, useState } from 'react';
 import { AddComponentPopover } from '../../components/add-components-popover';
 import { useTranslation } from 'react-i18next';
@@ -67,69 +67,69 @@ const CompTools = ({
     }, [isOpen, comp]);
 
     return (
-        <TooltipProvider>
+        <IGRPTooltipProviderPrimitive>
             <div className="flex justify-end shadow-lg align-middle py-0.5 space-x-0.5 z-50">
                 <div className="flex align-middle items-center">
                     <span className="text-xs">{label || componentName}</span>
                 </div>
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
+                <IGRPTooltipPrimitive>
+                    <IGRPTooltipTriggerPrimitive asChild>
                         <button className="container-mover cursor-pointer p-1 hover:bg-white hover:text-black rounded">
                             <Move className="h-4" />
                         </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
+                    </IGRPTooltipTriggerPrimitive>
+                    <IGRPTooltipContentPrimitive>
                         <p>{t('move')}</p>
-                    </TooltipContent>
-                </Tooltip>
+                    </IGRPTooltipContentPrimitive>
+                </IGRPTooltipPrimitive>
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
+                <IGRPTooltipPrimitive>
+                    <IGRPTooltipTriggerPrimitive asChild>
                         <button
                             className="container-clone cursor-pointer p-1 hover:bg-white hover:text-black rounded"
                             onClick={handleClickCloneComp}
                         >
                             <Copy className="h-4" />
                         </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
+                    </IGRPTooltipTriggerPrimitive>
+                    <IGRPTooltipContentPrimitive>
                         <p>{t('clone')}</p>
-                    </TooltipContent>
-                </Tooltip>
+                    </IGRPTooltipContentPrimitive>
+                </IGRPTooltipPrimitive>
 
                 {isGrids && (
                     <StructureDropdown
                         onClickStructure={handleClickStructComp}
                     />
                 )}
-                <Tooltip>
-                    <TooltipTrigger asChild>
+                <IGRPTooltipPrimitive>
+                    <IGRPTooltipTriggerPrimitive asChild>
                         <button
                             className="cursor-pointer p-1 hover:bg-white hover:text-black rounded"
                             onClick={handleClickBtnEdition}
                         >
                             <Settings className="h-4" />
                         </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
+                    </IGRPTooltipTriggerPrimitive>
+                    <IGRPTooltipContentPrimitive>
                         <p>{t('edit')}</p>
-                    </TooltipContent>
-                </Tooltip>
+                    </IGRPTooltipContentPrimitive>
+                </IGRPTooltipPrimitive>
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
+                <IGRPTooltipPrimitive>
+                    <IGRPTooltipTriggerPrimitive asChild>
                         <button
                             className="container-remove cursor-pointer p-1 hover:bg-white hover:text-black rounded"
                             onClick={() => setDeleteModal(true)}
                         >
                             <Trash className="h-4" />
                         </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
+                    </IGRPTooltipTriggerPrimitive>
+                    <IGRPTooltipContentPrimitive>
                         <p>{t('delete')}</p>
-                    </TooltipContent>
-                </Tooltip>
+                    </IGRPTooltipContentPrimitive>
+                </IGRPTooltipPrimitive>
 
                 {components.length > 0 && (
                     <AddComponentPopover components={components} comp={comp} />
@@ -137,10 +137,10 @@ const CompTools = ({
 
                 {allowTypes && (
                     <>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Badge
-                                    variant={'secondary'}
+                        <IGRPTooltipPrimitive>
+                            <IGRPTooltipTriggerPrimitive asChild>
+                                <IGRPBadgePrimitive
+                                    variant={'solid'}
                                     className="rounded-sm cursor-pointer h-6"
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -151,12 +151,12 @@ const CompTools = ({
                                     <span className="text-xs">
                                         Binding Config
                                     </span>
-                                </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
+                                </IGRPBadgePrimitive>
+                            </IGRPTooltipTriggerPrimitive>
+                            <IGRPTooltipContentPrimitive>
                                 <p>Binding Configuration</p>
-                            </TooltipContent>
-                        </Tooltip>
+                            </IGRPTooltipContentPrimitive>
+                        </IGRPTooltipPrimitive>
 
                         {currentComponent && (
                             <BindingConfigurationModal
@@ -177,7 +177,7 @@ const CompTools = ({
                 hasTrigger={false}
                 recordId={componentName}
             />
-        </TooltipProvider>
+        </IGRPTooltipProviderPrimitive>
     );
 };
 

@@ -1,16 +1,18 @@
 import { useMemo, useState } from 'react';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '../ui/tooltip';
 import { icons } from 'lucide-react';
 import { getLabel } from '@renderer/utils';
 import { useDebounce } from 'use-debounce';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { IGRPInputSearch } from '@igrp/igrp-framework-react-design-system';
-import { Button } from '../ui/button';
+import {
+    IGRPInputSearch,
+    IGRPPopoverContentPrimitive,
+    IGRPPopoverPrimitive,
+    IGRPPopoverTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface IconBrowserProps {
     selectedIcon: string;
@@ -42,16 +44,16 @@ const IconBrowserNew = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
     const SelectedIconComp = icons[selectedIcon as keyof typeof icons];
 
     return (
-        <TooltipProvider>
-            <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                    <Button size={'sm'} variant={'outline'}>
+        <IGRPTooltipProviderPrimitive>
+            <IGRPPopoverPrimitive open={open} onOpenChange={setOpen}>
+                <IGRPPopoverTriggerPrimitive asChild>
+                    <IGRPButtonPrimitive size={'sm'} variant={'outline'}>
                         {SelectedIconComp && <SelectedIconComp />}
                         {selectedIcon || 'Select Icon'}
-                    </Button>
-                </PopoverTrigger>
+                    </IGRPButtonPrimitive>
+                </IGRPPopoverTriggerPrimitive>
 
-                <PopoverContent className="w-[435px] z-[60]">
+                <IGRPPopoverContentPrimitive className="w-[435px] z-[60]">
                     <IGRPInputSearch
                         placeholder="Type to search icon ..."
                         value={search}
@@ -68,8 +70,10 @@ const IconBrowserNew = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
                                         key={index}
                                         className="p-2 flex items-center justify-center cursor-pointer hover:bg-gray-100 rounded"
                                     >
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
+                                        <IGRPTooltipPrimitive>
+                                            <IGRPTooltipTriggerPrimitive
+                                                asChild
+                                            >
                                                 <IconComponent
                                                     onClick={() =>
                                                         handleIconClick(
@@ -78,19 +82,19 @@ const IconBrowserNew = ({ selectedIcon, onSelectedIcon }: IconBrowserProps) => {
                                                     }
                                                     className="w-5 h-5"
                                                 />
-                                            </TooltipTrigger>
-                                            <TooltipContent>
+                                            </IGRPTooltipTriggerPrimitive>
+                                            <IGRPTooltipContentPrimitive>
                                                 {getLabel(iconName)}
-                                            </TooltipContent>
-                                        </Tooltip>
+                                            </IGRPTooltipContentPrimitive>
+                                        </IGRPTooltipPrimitive>
                                     </div>
                                 );
                             })}
                         </div>
                     </div>
-                </PopoverContent>
-            </Popover>
-        </TooltipProvider>
+                </IGRPPopoverContentPrimitive>
+            </IGRPPopoverPrimitive>
+        </IGRPTooltipProviderPrimitive>
     );
 };
 

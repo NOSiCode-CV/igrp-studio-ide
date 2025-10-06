@@ -14,7 +14,7 @@ export const EditorLayout = ({ currentItem }: { currentItem: any }) => {
             setData(data);
             setFilePath(currentItem.path);
         } catch (error) {
-            console.error(t("failedLoadJsonContent"), error);
+            console.error(t('failedLoadJsonContent'), error);
         }
     };
 
@@ -25,13 +25,10 @@ export const EditorLayout = ({ currentItem }: { currentItem: any }) => {
     return (
         <div className="flex-1 bg-gray-50">
             {data ? (
-                <MonacoEditor
-                    filePath={filePath}
-                    content={data}
-                />
+                <MonacoEditor filePath={filePath} content={data} />
             ) : (
                 <div className="flex items-center justify-center h-full text-gray-500">
-                   {t('selectFileToEdit')}
+                    {t('selectFileToEdit')}
                 </div>
             )}
         </div>

@@ -9,28 +9,30 @@ import {
     PlusCircle,
     Loader2,
 } from 'lucide-react';
-import { Button } from '@renderer/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogFooter,
-} from '@renderer/components/ui/dialog';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
+    IGRPButtonPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPInputPrimitive,
+    IGRPLabelPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPDialogTriggerPrimitive,
+    IGRPDialogFooterPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { FormikErrors, useFormik } from 'formik';
 import {
-    RadioGroup,
-    RadioGroupItem,
-} from '@renderer/components/ui/radio-group';
+    IGRPRadioGroupPrimitive,
+    IGRPRadioGroupItemPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 import { SpringConfig } from './components/configurations/spring-config';
 import { NextConfig } from './components/configurations/next-config';
 import { DotNetConfig } from './components/configurations/dotnet-config';
 import { StepButton } from './components/step-button';
-import { DialogDescription } from '@radix-ui/react-dialog';
 import {
     backendFrameworks,
     frontendFrameworks,
@@ -41,7 +43,7 @@ import { FrameworkType, ProjectData } from 'src/main/types';
 import { useTranslation } from 'react-i18next';
 import { useProjectValidation } from './validation';
 import { LabelRequired } from '@renderer/components/label-required';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import { IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { FrameworkIcon } from '@renderer/components/framework-icon';
 
@@ -348,7 +350,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         <div className="space-y-4">
             <div className="space-y-2">
                 <LabelRequired>{t('projectName')}</LabelRequired>
-                <Input
+                <IGRPInputPrimitive
                     id="name"
                     name="name"
                     placeholder={t('enterProjectName')}
@@ -369,7 +371,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
             {/* Project Icon Upload with Preview */}
             <div className="space-y-2">
-                <Label>{t('projectIcon')}</Label>
+                <IGRPLabelPrimitive>{t('projectIcon')}</IGRPLabelPrimitive>
                 <input
                     type="file"
                     id="icon-upload"
@@ -399,7 +401,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         {t('recommendedSize')}
                                     </div>
                                 </div>
-                                <Button
+                                <IGRPButtonPrimitive
                                     variant="outline"
                                     size="sm"
                                     type="button"
@@ -410,7 +412,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     }
                                 >
                                     {t('upload')}...
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </>
                         )}
                     </div>
@@ -418,8 +420,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             </div>
 
             <div className="space-y-2">
-                <Label>{t('projectType')}</Label>
-                <RadioGroup
+                <IGRPLabelPrimitive>{t('projectType')}</IGRPLabelPrimitive>
+                <IGRPRadioGroupPrimitive
                     name="type"
                     value={formik.values.type}
                     onValueChange={(value) => handleChangeType(value)}
@@ -432,12 +434,12 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 : ''
                         }`}
                     >
-                        <RadioGroupItem
+                        <IGRPRadioGroupItemPrimitive
                             value="frontend"
                             id="frontend"
                             className="sr-only"
                         />
-                        <Label
+                        <IGRPLabelPrimitive
                             htmlFor="frontend"
                             className="flex items-center gap-2 cursor-pointer"
                         >
@@ -448,7 +450,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     {t('frontendDescription')}
                                 </div>
                             </div>
-                        </Label>
+                        </IGRPLabelPrimitive>
                     </div>
                     <div
                         className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
@@ -457,12 +459,12 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 : ''
                         }`}
                     >
-                        <RadioGroupItem
+                        <IGRPRadioGroupItemPrimitive
                             value="backend"
                             id="backend"
                             className="sr-only"
                         />
-                        <Label
+                        <IGRPLabelPrimitive
                             htmlFor="backend"
                             className="flex items-center gap-2 cursor-pointer"
                         >
@@ -473,9 +475,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     {t('backendDescription')}
                                 </div>
                             </div>
-                        </Label>
+                        </IGRPLabelPrimitive>
                     </div>
-                </RadioGroup>
+                </IGRPRadioGroupPrimitive>
                 {formik.touched.type && formik.errors.type && (
                     <p className="text-xs text-destructive">
                         {formik.errors.type}
@@ -487,8 +489,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
     const renderStep2 = () => (
         <div className="space-y-4">
-            <Label>{t('selectFramework')}</Label>
-            <RadioGroup
+            <IGRPLabelPrimitive>{t('selectFramework')}</IGRPLabelPrimitive>
+            <IGRPRadioGroupPrimitive
                 name="framework"
                 value={formik.values.framework}
                 onValueChange={(value) => handleChangeFramework(value)}
@@ -504,13 +506,13 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     : ''
                             } ${!fw.availableSupport ? 'pointer-events-none opacity-75' : ''}`}
                         >
-                            <RadioGroupItem
+                            <IGRPRadioGroupItemPrimitive
                                 value={fw.id}
                                 id={fw.id}
                                 className="sr-only"
                                 disabled={!fw.availableSupport}
                             />
-                            <Label
+                            <IGRPLabelPrimitive
                                 htmlFor={fw.id}
                                 className="flex items-center gap-4 cursor-pointer"
                             >
@@ -535,11 +537,11 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         </span>
                                     )}
                                 </div>
-                            </Label>
+                            </IGRPLabelPrimitive>
                         </div>
                     );
                 })}
-            </RadioGroup>
+            </IGRPRadioGroupPrimitive>
             {formik.touched.framework && formik.errors.framework && (
                 <p className="text-xs text-destructive">
                     {formik.errors.framework}
@@ -548,11 +550,13 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         </div>
     );
 
-    const renderStep3 = () => (
+    const renderStep3 = (): React.ReactNode => (
         <div className="space-y-4">
             {SelectedComponent ? (
                 <>
-                    <Label>{t('frameworkConfiguration')}</Label>
+                    <IGRPLabelPrimitive>
+                        {t('frameworkConfiguration')}
+                    </IGRPLabelPrimitive>
                     <div className="mt-3">
                         <ProjectConfigForm
                             type={formik.values.framework}
@@ -574,86 +578,90 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         </div>
     );
 
-    const renderStep4 = () => (
-        <div className="space-y-6">
-            <div className="rounded-lg border p-4 space-y-6">
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="name">{t('projectName')}</Label>
-                        <Input
-                            id="name"
-                            name="name"
-                            value={formik.values.name}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                        />
-                        {formik.touched.name && formik.errors.name && (
-                            <p className="text-xs text-destructive">
-                                {formik.errors.name}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="path">{t('projectDirectory')}</Label>
-                        <div className="flex gap-2">
-                            <Input
-                                id="path"
-                                name="path"
-                                value={formik.values.path}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                placeholder={t('enterProjectDirectory')}
-                                readOnly
-                            />
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                type="button"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleOpenDirectory();
-                                }}
-                                disabled
-                            >
-                                <FolderOpen className="h-4 w-4" />
-                            </Button>
-                        </div>
-                        {formik.touched.path && formik.errors.path && (
-                            <p className="text-xs text-destructive">
-                                {formik.errors.path}
-                            </p>
-                        )}
-                    </div>
-
-                    {isFrontend && (
-                        <div className="space-y-2">
-                            <Label>{t('themeColor')}</Label>
-                            <div className="grid grid-cols-12 gap-2 mt-2">
-                                {THEME_COLORS.map((color) => (
-                                    <button
-                                        key={color.value}
-                                        type="button"
-                                        onClick={() =>
-                                            formik.setFieldValue(
-                                                'themeColor',
-                                                color.value
-                                            )
-                                        }
-                                        className={`
-                              w-8 h-8 rounded-full 
-                              ${formik.values.themeColor === color.value ? 'ring-2 ring-offset-2 ring-primary' : ''}
-                            `}
-                                        style={{
-                                            backgroundColor: color.value,
-                                        }}
-                                        title={color.name}
-                                    />
-                                ))}
-                            </div>
-                        </div>
+    const renderStep4 = (): React.ReactNode => (
+        <div className="rounded-lg border p-4 space-y-6">
+            <div className="space-y-4">
+                <div className="space-y-2">
+                    <IGRPLabelPrimitive htmlFor="name">
+                        {t('projectName')}
+                    </IGRPLabelPrimitive>
+                    <IGRPInputPrimitive
+                        id="name"
+                        name="name"
+                        value={formik.values.name}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                    />
+                    {formik.touched.name && formik.errors.name && (
+                        <p className="text-xs text-destructive">
+                            {formik.errors.name}
+                        </p>
                     )}
                 </div>
+
+                <div className="space-y-2">
+                    <IGRPLabelPrimitive htmlFor="path">
+                        {t('projectDirectory')}
+                    </IGRPLabelPrimitive>
+                    <div className="flex gap-2">
+                        <IGRPInputPrimitive
+                            id="path"
+                            name="path"
+                            value={formik.values.path}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            placeholder={t('enterProjectDirectory')}
+                            readOnly
+                        />
+                        <IGRPButtonPrimitive
+                            variant="outline"
+                            size="icon"
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                handleOpenDirectory();
+                            }}
+                            disabled
+                        >
+                            <FolderOpen className="h-4 w-4" />
+                        </IGRPButtonPrimitive>
+                    </div>
+                    {formik.touched.path && formik.errors.path && (
+                        <p className="text-xs text-destructive">
+                            {formik.errors.path}
+                        </p>
+                    )}
+                </div>
+
+                {isFrontend && (
+                    <div className="space-y-2">
+                        <IGRPLabelPrimitive>
+                            {t('themeColor')}
+                        </IGRPLabelPrimitive>
+                        <div className="grid grid-cols-12 gap-2 mt-2">
+                            {THEME_COLORS.map((color) => (
+                                <button
+                                    key={color.value}
+                                    type="button"
+                                    onClick={() =>
+                                        formik.setFieldValue(
+                                            'themeColor',
+                                            color.value
+                                        )
+                                    }
+                                    className={`
+                      w-8 h-8 rounded-full 
+                      ${formik.values.themeColor === color.value ? 'ring-2 ring-offset-2 ring-primary' : ''}
+                    `}
+                                    style={{
+                                        backgroundColor: color.value,
+                                    }}
+                                    title={color.name}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -674,27 +682,31 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     };
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
+        <IGRPDialogPrimitive>
+            <IGRPDialogTriggerPrimitive asChild>
                 {children ? (
                     children
                 ) : (
-                    <Button>
+                    <IGRPButtonPrimitive>
                         <PlusCircle className="w-4 h-4" />
                         {t('createNewProject')}
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
-            </DialogTrigger>
-            <DialogContent
+            </IGRPDialogTriggerPrimitive>
+            <IGRPDialogContentPrimitive
                 className="overflow-hidden max-h-[80svh] sm:max-w-[700px] lg:max-w-[800px] p-0 max-w-4xl"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
-                <DialogHeader className="p-4">
-                    <DialogTitle>{t('newProject')}</DialogTitle>
-                    <DialogDescription />
-                </DialogHeader>
-                <ScrollArea className="max-h-[calc(80svh-80px)]">
+                <IGRPDialogHeaderPrimitive className="p-4">
+                    <IGRPDialogTitlePrimitive>
+                        {t('newProject')}
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive>
+                        {t('newProject')}
+                    </IGRPDialogDescriptionPrimitive>
+                </IGRPDialogHeaderPrimitive>
+                <IGRPScrollAreaPrimitive className="max-h-[calc(80svh-80px)]">
                     <form onSubmit={formik.handleSubmit} className="mx-6 mb-6">
                         <div className="relative mb-6">
                             <div className="absolute top-5 left-0 right-0 h-[2px] bg-muted" />
@@ -714,22 +726,22 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         </div>
                         <div className="py-2">{renderStepContent()}</div>
 
-                        <DialogFooter>
+                        <IGRPDialogFooterPrimitive>
                             <div className="flex w-full justify-between mt-4">
                                 {step > 1 ? (
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         type="button"
                                         variant="outline"
                                         onClick={handleBack}
                                     >
                                         <ArrowLeft className="w-4 h-4 mr-2" />
                                         {t('back')}
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 ) : (
                                     <div />
                                 )}
                                 {step < STEPS.length ? (
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         type="button"
                                         onClick={(e) => {
                                             e.preventDefault();
@@ -739,9 +751,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     >
                                         {t('next')}
                                         <ArrowRight className="w-4 h-4 ml-2" />
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 ) : (
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         type="submit"
                                         disabled={formik.isSubmitting}
                                     >
@@ -749,13 +761,13 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                             <Loader2 className="animate-spin" />
                                         )}
                                         {t('createProject')}
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 )}
                             </div>
-                        </DialogFooter>
+                        </IGRPDialogFooterPrimitive>
                     </form>
-                </ScrollArea>
-            </DialogContent>
-        </Dialog>
+                </IGRPScrollAreaPrimitive>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

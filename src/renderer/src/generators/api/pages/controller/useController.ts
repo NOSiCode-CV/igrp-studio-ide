@@ -6,7 +6,10 @@ import { useGit } from '@renderer/hooks/use-git';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
-import { ControllerAction, ControllerConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import {
+    ControllerAction,
+    ControllerConfig,
+} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { SchemaTypeItem } from 'src/main/types';
 import { IColumnsTabelProps } from '../../types/Interfaces';
@@ -15,12 +18,21 @@ import { useActionValidation } from './validation';
 import { formatMethods } from '../../helpers';
 import useSchemaTypes from '../../helpers/useSchemaTypes';
 import useToast from '@renderer/hooks/useToast';
+import { useKeyPress } from '@renderer/hooks/useKeyDown';
+import { KeyboardKey } from '@renderer/constants/shortcut';
 
-export const useController = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
+export const useController = ({
+    selectors,
+    currentItem,
+}: {
+    selectors: Array<any>;
+    currentItem: any;
+}) => {
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
     const { initializeTabFromCurrentItem, handleRenameTab } = useTabs();
-    const { modules, dto, basePath, enums, responses, getJsonData } = useStudioAPI(currentItem?.module);
+    const { modules, dto, basePath, enums, responses, getJsonData } =
+        useStudioAPI(currentItem?.module);
     const { showErrorToast, showSuccessToast } = useToast();
     const dispatch: any = useDispatch();
 
@@ -37,11 +49,13 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
         description: '',
         path: '',
         module: currentItem?.module,
-    })
+    });
     const [data, setData] = useState<any>(null);
     const [enumTypes, setEnumTypes] = useState<SchemaTypeItem[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [tablesColumns, setTableColumns] = useState<{ [value: string]: IColumnsTabelProps[] }>({});
+    const [tablesColumns, setTableColumns] = useState<{
+        [value: string]: IColumnsTabelProps[];
+    }>({});
 
     const validationSchema = useActionValidation({ t });
     const formik: any = useFormik({
@@ -55,13 +69,34 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
     });
 
     const loadAction = (content: ControllerAction) => {
-        const { actionName, path, method, pathVariables, requestParams, headers, responses, requestBody } = content;
-        formik.setFieldValue('actionName', actionName || initialValues.actionName);
+        const {
+            actionName,
+            path,
+            method,
+            pathVariables,
+            requestParams,
+            headers,
+            responses,
+            requestBody,
+        } = content;
+        formik.setFieldValue(
+            'actionName',
+            actionName || initialValues.actionName
+        );
         formik.setFieldValue('method', method || initialValues.method);
         formik.setFieldValue('path', path || initialValues.path);
-        formik.setFieldValue('requestBody', requestBody || initialValues.requestBody);
-        formik.setFieldValue('pathVariables', pathVariables || initialValues.pathVariables);
-        formik.setFieldValue('requestParams', requestParams || initialValues.requestParams);
+        formik.setFieldValue(
+            'requestBody',
+            requestBody || initialValues.requestBody
+        );
+        formik.setFieldValue(
+            'pathVariables',
+            pathVariables || initialValues.pathVariables
+        );
+        formik.setFieldValue(
+            'requestParams',
+            requestParams || initialValues.requestParams
+        );
         formik.setFieldValue('responses', responses || initialValues.responses);
         formik.setFieldValue('headers', headers || initialValues.headers);
         setOldActionName(actionName);
@@ -77,7 +112,6 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
         const { name, basePath, description, module } = data;
         setTitle(`${name}(${basePath})`);
         setController({ name, description, path: basePath, module });
-
     }, [data]);
 
     useEffect(() => {
@@ -90,7 +124,6 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
             await getJsonData(currentItem.path).then(setData);
         };
         load();
-
     }, [currentItem]);
 
     const getValuesToSubmit = async () => {
@@ -98,9 +131,15 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
         const data = await getJsonData(currentItem?.path);
         const actionName = oldActionName || values.actionName;
 
-        const validPathVariables = values.pathVariables?.filter((item: any) => item.type && item.name);
-        const validRequestParams = values.requestParams?.filter((item: any) => item.type && item.name);
-        const validHeaders = values.headers?.filter((item: any) => item.type && item.header);
+        const validPathVariables = values.pathVariables?.filter(
+            (item: any) => item.type && item.name
+        );
+        const validRequestParams = values.requestParams?.filter(
+            (item: any) => item.type && item.name
+        );
+        const validHeaders = values.headers?.filter(
+            (item: any) => item.type && item.header
+        );
 
         const newAction = {
             ...values,
@@ -118,7 +157,9 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
             dataAction.actionName === actionName ? newAction : dataAction
         );
 
-        const finalActions: ControllerAction[] = isActionExisting ? mergedActions : [...existingActions, newAction];
+        const finalActions: ControllerAction[] = isActionExisting
+            ? mergedActions
+            : [...existingActions, newAction];
 
         const { name, description, path, module } = controller;
 
@@ -133,29 +174,31 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
         } as ControllerConfig;
     };
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault();
-                formik.handleSubmit();
-            }
-        };
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    // Keyboard shortcut for save (Ctrl/Cmd + S)
+    useKeyPress(() => {
+        formik.handleSubmit();
+    }, [KeyboardKey.save]);
 
     const handleSave = async (): Promise<void> => {
         try {
-            if (!controller.name || !controller.module || !controller.description) {
+            if (
+                !controller.name ||
+                !controller.module ||
+                !controller.description
+            ) {
                 setIsModalOpen(true);
                 return;
             }
 
             const values = await getValuesToSubmit();
 
-            const { error } = await window.engine.createController(values, ENV_TYPES.SPRING, basePath);
+            const { error } = await window.engine.createController(
+                values,
+                ENV_TYPES.SPRING,
+                basePath
+            );
 
-            console.log(values, error)
+            console.log(values, error);
 
             if (error) {
                 showErrorToast(error);
@@ -166,10 +209,14 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
 
             createGitCommit(basePath, `Add action ${formik.values.actionName}`);
             dispatch(onSetChangeStatus(true));
-            showSuccessToast(t('createdSuccess', { name: t('controller'), value: values.name }));
+            showSuccessToast(
+                t('createdSuccess', {
+                    name: t('controller'),
+                    value: values.name,
+                })
+            );
 
             handleRenameTab(id, formik.values.actionName);
-
         } catch (error) {
             showErrorToast(error);
         }
@@ -181,15 +228,28 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
             const countActions = values.actions.length;
 
             if (countActions === 1) {
-                const config = { name, type: 'controller', module: currentItem.module };
-                const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath);
+                const config = {
+                    name,
+                    type: 'controller',
+                    module: currentItem.module,
+                };
+                const { error } = await window.engine.delete(
+                    config,
+                    ENV_TYPES.SPRING,
+                    basePath
+                );
                 if (error) return showErrorToast(error);
             } else {
                 const updatedActions = values.actions.filter(
-                    (dataAction: any) => dataAction.actionName !== formik.values.actionName
+                    (dataAction: any) =>
+                        dataAction.actionName !== formik.values.actionName
                 );
                 const updatedValues = { ...values, actions: updatedActions };
-                const { error } = await window.engine.createController(updatedValues, ENV_TYPES.SPRING, basePath);
+                const { error } = await window.engine.createController(
+                    updatedValues,
+                    ENV_TYPES.SPRING,
+                    basePath
+                );
                 if (error) return showErrorToast(error);
             }
 
@@ -202,15 +262,28 @@ export const useController = ({ selectors, currentItem }: { selectors: Array<any
     };
 
     const typesData = formatMethods(
-        (selectors.find((selector: any) => 'MYME_TYPES' in selector) as { MYME_TYPES: string[] } | undefined)?.MYME_TYPES || []
+        (
+            selectors.find((selector: any) => 'MYME_TYPES' in selector) as
+                | { MYME_TYPES: string[] }
+                | undefined
+        )?.MYME_TYPES || []
     );
 
     const collectionType = formatMethods(
-        (selectors.find((selector) => 'COLLECTION_TYPES' in selector) as { COLLECTION_TYPES: string[] } | undefined)?.COLLECTION_TYPES || []
+        (
+            selectors.find((selector) => 'COLLECTION_TYPES' in selector) as
+                | { COLLECTION_TYPES: string[] }
+                | undefined
+        )?.COLLECTION_TYPES || []
     );
 
     useEffect(() => {
-        setEnumTypes(enums.map((enumItem: any) => ({ label: enumItem.name, value: enumItem.name })));
+        setEnumTypes(
+            enums.map((enumItem: any) => ({
+                label: enumItem.name,
+                value: enumItem.name,
+            }))
+        );
     }, [enums]);
 
     const schemaTypes = useSchemaTypes(selectors, dto, enums);

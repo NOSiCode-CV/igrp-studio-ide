@@ -2,16 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
-import { Badge } from '@renderer/components/ui/badge';
+import { IGRPBadgePrimitive } from '@igrp/igrp-framework-react-design-system';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from './ui/command';
+    IGRPCommandPrimitive,
+    IGRPCommandEmptyPrimitive,
+    IGRPCommandGroupPrimitive,
+    IGRPCommandInputPrimitive,
+    IGRPCommandItemPrimitive,
+    IGRPCommandListPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes';
 
@@ -98,57 +98,62 @@ export default function DependencySelector({
             <h2>Further dependencies</h2>
 
             <div className="relative" ref={commandRef}>
-                <Command className="rounded-lg border shadow-md">
-                    <CommandInput
+                <IGRPCommandPrimitive className="rounded-lg border shadow-md">
+                    <IGRPCommandInputPrimitive
                         placeholder="Type to filter, for example starter, devtools, commons, ..."
                         onFocus={() => setOpen(true)}
                         className="h-9"
                     />
                     {open && (
-                        
-                        <CommandList className="max-h-[200px] overflow-auto">
-                            <CommandEmpty>{t('noDependencies')}</CommandEmpty>
-                            <CommandGroup>
-                                {availableForSelection.map((dependency, index) => (
-                                    <CommandItem
-                                        key={index}
-                                        onSelect={() =>
-                                            handleAddDependency(dependency)
-                                        }
-                                        className="flex items-center justify-between p-2 cursor-pointer"
-                                    >
-                                        <div>
-                                            <div className="font-medium">
-                                                {getDependencyFullName(
-                                                    dependency
-                                                )}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                                {dependency.name} (
-                                                {dependency.scope})
-                                            </div>
-                                        </div>
-                                        <button
-                                            className="text-gray-500 hover:text-gray-700"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleAddDependency(dependency);
-                                            }}
+                        <IGRPCommandListPrimitive className="max-h-[200px] overflow-auto">
+                            <IGRPCommandEmptyPrimitive>
+                                {t('noDependencies')}
+                            </IGRPCommandEmptyPrimitive>
+                            <IGRPCommandGroupPrimitive>
+                                {availableForSelection.map(
+                                    (dependency, index) => (
+                                        <IGRPCommandItemPrimitive
+                                            key={index}
+                                            onSelect={() =>
+                                                handleAddDependency(dependency)
+                                            }
+                                            className="flex items-center justify-between p-2 cursor-pointer"
                                         >
-                                            <Plus className="h-4 w-4" />
-                                        </button>
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
-                        </CommandList>
+                                            <div>
+                                                <div className="font-medium">
+                                                    {getDependencyFullName(
+                                                        dependency
+                                                    )}
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    {dependency.name} (
+                                                    {dependency.scope})
+                                                </div>
+                                            </div>
+                                            <button
+                                                className="text-gray-500 hover:text-gray-700"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleAddDependency(
+                                                        dependency
+                                                    );
+                                                }}
+                                            >
+                                                <Plus className="h-4 w-4" />
+                                            </button>
+                                        </IGRPCommandItemPrimitive>
+                                    )
+                                )}
+                            </IGRPCommandGroupPrimitive>
+                        </IGRPCommandListPrimitive>
                     )}
-                </Command>
+                </IGRPCommandPrimitive>
             </div>
             <div className="flex flex-wrap gap-2">
                 {selectedDependencies.map((dependency) => (
-                    <Badge
+                    <IGRPBadgePrimitive
                         key={`${dependency.groupId}:${dependency.artifactId}`}
-                        variant="secondary"
+                        variant="soft"
                         className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md flex items-center gap-2"
                     >
                         {getDependencyFullName(dependency)}
@@ -158,10 +163,10 @@ export default function DependencySelector({
                         >
                             <X className="h-4 w-4" />
                         </button>
-                    </Badge>
+                    </IGRPBadgePrimitive>
                 ))}
                 <p className="text-sm text-gray-500 mt-2">
-                {t('igrpStudioInfo')}
+                    {t('igrpStudioInfo')}
                 </p>
             </div>
         </div>

@@ -44,7 +44,7 @@ import './helpers/fetch-request';
 import { buildTaskbar } from './helpers/taskbar';
 
 import NextJsManager from './helpers/nextjsManager';
-import { initComponents, loadEngineConfiguration, setEngineConfiguration } from '@igrp/igrp-studio-nextjs-engine';
+import { initComponents } from '@igrp/igrp-studio-nextjs-engine';
 import dotenv from 'dotenv';
 import AppUpdater from './helpers/electron-updater';
 import { autoUpdater } from 'electron-updater';
@@ -55,6 +55,7 @@ import { IGRPStudioSettings } from './helpers/igrp-studio-settings';
 import { folderWatcher } from './helpers/watch-folder';
 
 import { mainBindings } from 'i18next-electron-fs-backend';
+import { SpringEngine } from './engines/SpringEngine';
 
 let mainWindow: BrowserWindow;
 
@@ -205,19 +206,23 @@ app.whenReady().then(async () => {
     });
 
     await GitStore.initialize();
-    const initializeGitHubService = async () => {
+    const initializeGitHubService = async (): Promise<void> => {
         try {
             await GitHubService.initializeServices();
-        } catch { }
+        } catch (err) {
+            console.error('Failed to initialize GitHub service:', err);
+        }
     };
 
-    const initializeGitLabService = async () => {
+    const initializeGitLabService = async (): Promise<void> => {
         try {
             await GitLabService.initializeServices();
-        } catch { }
+        } catch (err) {
+            console.error('Failed to initialize GitLab service:', err);
+        }
     };
 
-    const initializeAllServices = async () => {
+    const initializeAllServices = async (): Promise<void> => {
         await Promise.allSettled([
             initializeGitHubService(),
             initializeGitLabService(),
@@ -230,7 +235,7 @@ app.whenReady().then(async () => {
         try {
             currentAuthProvider = 'github'; // Add this line
             await githubAuth.setupOAuth(mainWindow, isDev);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('GitHub OAuth failed:', error);
             currentAuthProvider = null; // Add this line
         }
@@ -243,7 +248,7 @@ app.whenReady().then(async () => {
         try {
             currentAuthProvider = 'gitlab'; // Add this line
             await gitlabAuth.setupOAuth(mainWindow, isDev);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('GitLab OAuth failed:', error);
             currentAuthProvider = null; // Add this line
         }
@@ -259,17 +264,13 @@ app.whenReady().then(async () => {
 
     new NextjsEngine().registry();
 
+    new SpringEngine().registry();
+
     new WorkspaceRepository().initialize();
 
     new AppUpdater(mainWindow);
 
     await IGRPStudioSettings.initialize();
-
-    setEngineConfiguration({
-        environment: "production",
-    });
-
-    loadEngineConfiguration()
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -301,7 +302,7 @@ ipcMain.handle(
     ): Promise<FileTree[] | { error: string }> => {
         try {
             return readDirectory(dirPath);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Error reading directory:', error);
             return {
                 error:
@@ -375,14 +376,14 @@ ipcMain.handle(
 
 ipcMain.handle(
     'igrp-studio:get-json-content',
-    async (_event, filePath: string): Promise<any> => {
+    async (_event, filePath: string): Promise<unknown> => {
         return await getJsonContent(filePath);
     }
 );
 
 ipcMain.handle(
     'igrp-studio:get-file-content',
-    async (_event, filePath: string): Promise<any> => {
+    async (_event, filePath: string): Promise<unknown> => {
         return await getFileContent(filePath);
     }
 );
@@ -398,7 +399,7 @@ ipcMain.handle(
         const ideConfig = IDES[ideType];
         const command = `${ideConfig.command} "${basePath}"`;
 
-        exec(command, (err, _stdout, _stderr) => {
+        exec(command, (err): void => {
             if (err) {
                 console.error(`Error opening ${ideConfig.name}:`, err);
             }
@@ -408,7 +409,7 @@ ipcMain.handle(
 
 ipcMain.handle(
     'igrp-studio:ides',
-    async (_event): Promise<Array<{ key: string; config: IDEDetails }>> => {
+    async (): Promise<Array<{ key: string; config: IDEDetails }>> => {
         return await detectInstalledIDEs();
     }
 );
@@ -438,7 +439,7 @@ ipcMain.on('restore-window', () => {
     mainWindow.unmaximize();
 });
 
-ipcMain.on('start-drag', (_event) => {
+ipcMain.on('start-drag', (): void => {
     mainWindow.on('move', () => {
         const windowBounds = mainWindow.getBounds();
         const displayBounds = screen.getDisplayMatching(windowBounds).bounds;
@@ -495,8 +496,6 @@ app.on('open-url', (event, url) => {
     }
 });
 
-
-
 // NEXTJS
 ipcMain.on('start-nextjs', (_event, basePath) => {
     nextJsManager.setNextJsPath(basePath);
@@ -538,4 +537,3 @@ ipcMain.handle('watch-folder', (_, folderPath: string) => {
         mainWindow?.webContents.send('folder-change', event);
     });
 });
-

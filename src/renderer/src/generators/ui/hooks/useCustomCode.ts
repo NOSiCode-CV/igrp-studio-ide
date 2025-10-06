@@ -1,14 +1,18 @@
-import { State, CustomFunctionConfig, CodeSnippetsRegisterConfig } from "@igrp/igrp-studio-nextjs-engine/dist/interfaces/types";
-import { useDroppedComponents } from "@renderer/generators/ui/dnd/DroppedComponentsContext";
-import useStudio from "@renderer/hooks/use-studio";
-import { EngineService } from "@renderer/services/EngineService";
-import { useMemo, useState, useEffect } from "react";
-import { useComponents } from "./useComponents";
+import {
+    State,
+    CustomFunctionConfig,
+    CodeSnippetsRegisterConfig,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { useDroppedComponents } from '@renderer/generators/ui/dnd/DroppedComponentsContext';
+import useStudio from '@renderer/hooks/use-studio';
+import { EngineService } from '@renderer/services/EngineService';
+import { useMemo, useState, useEffect } from 'react';
+import { useComponents } from './useComponents';
 
 export interface Option {
     label: string;
     value: string;
-    metadata?: any
+    metadata?: any;
 }
 
 const defaultTypes = [
@@ -27,7 +31,7 @@ interface CustomCodeHook {
     states: State[];
     functionOptions: Option[];
     typesOptions: Option[];
-    statesOptions: Option[]
+    statesOptions: Option[];
     snippets: CodeSnippetsRegisterConfig[];
     types: any[];
     customComponents: any[];
@@ -36,9 +40,12 @@ interface CustomCodeHook {
 }
 
 const useCustomCode = (): CustomCodeHook => {
-    const { states: drpoppedStates, functions: droppedFunctions } = useDroppedComponents();
-    const { extractAllStates } = useComponents()
-    const [metadataFunctions, setMetadataFunctions] = useState<CustomFunctionConfig[]>([]);
+    const { states: drpoppedStates, functions: droppedFunctions } =
+        useDroppedComponents();
+    const { extractAllStates } = useComponents();
+    const [metadataFunctions, setMetadataFunctions] = useState<
+        CustomFunctionConfig[]
+    >([]);
     const [metadataStates, setMetadataStates] = useState<State[]>([]);
     const [customComponents, setCustomComponents] = useState<[]>([]);
 
@@ -63,7 +70,7 @@ const useCustomCode = (): CustomCodeHook => {
         return functions.map((fn) => ({
             label: fn.name,
             value: fn.name,
-            metadata: fn
+            metadata: fn,
         }));
     }, [functions]);
 
@@ -71,7 +78,7 @@ const useCustomCode = (): CustomCodeHook => {
         const dynamicTypeOptions = types.map((type) => ({
             label: type.name,
             value: type.name,
-            metadata: type
+            metadata: type,
         }));
 
         return [...defaultTypes, ...dynamicTypeOptions];
@@ -90,13 +97,14 @@ const useCustomCode = (): CustomCodeHook => {
             setIsLoading(true);
             try {
                 // Parallel fetching
-                const [snippetsResponse, metadataResponse, metadataStates] = await Promise.all([
-                    EngineService.getCodeSnippets(),
-                    EngineService.getAppMetadata(basePath),
-                    extractAllStates()
-                ]);
+                const [snippetsResponse, metadataResponse, metadataStates] =
+                    await Promise.all([
+                        EngineService.getCodeSnippets(),
+                        EngineService.getAppMetadata(basePath),
+                        extractAllStates(),
+                    ]);
 
-                const { result } = metadataResponse
+                const { result } = metadataResponse;
 
                 setMetadataStates(metadataStates || []);
 
@@ -104,12 +112,20 @@ const useCustomCode = (): CustomCodeHook => {
                 //TODO review this, when the data is not in the schema, it is not updated
 
                 if (result) {
-                    setMetadataFunctions([...(result.functions || []), ...(result.actions || []), ...(result.hooks || [])]);
-                    setTypes(result.types || [])
-                    setCustomComponents(result.components || [])
+                    setMetadataFunctions([
+                        ...(result.functions || []),
+                        ...(result.actions || []),
+                        ...(result.hooks || []),
+                    ]);
+                    setTypes(result.types || []);
+                    setCustomComponents(result.components || []);
                 }
             } catch (err) {
-                setError(err instanceof Error ? err : new Error('Failed to load resources'));
+                setError(
+                    err instanceof Error
+                        ? err
+                        : new Error('Failed to load resources')
+                );
                 console.error('Error loading data:', err);
             } finally {
                 setIsLoading(false);

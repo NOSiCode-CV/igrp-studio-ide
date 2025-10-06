@@ -1,10 +1,11 @@
-import { Input } from '@renderer/components/ui/input';
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
+    IGRPCardContentPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardPrimitive,
+    IGRPCardTitlePrimitive,
+    IGRPInputPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+
 import NavigationBar from '../../components/navigation-bar';
 import { LabelRequired } from '@renderer/components/label-required';
 import { SelectInput, TextInput } from '../../components/inputs-form';
@@ -50,7 +51,7 @@ export const ResponseLayout = ({
                 showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
-                <Card className="rounded-sm p-6">
+                <IGRPCardPrimitive className="rounded-sm p-6">
                     <div className="flex flex-col gap-4">
                         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                             <SelectInput
@@ -59,11 +60,17 @@ export const ResponseLayout = ({
                                 options={httpStatusCodes}
                                 value={formik.values.statusCode}
                                 onChange={(value) => {
-                                    formik.setFieldValue(t("statusCode"), value);
+                                    formik.setFieldValue(
+                                        t('statusCode'),
+                                        value
+                                    );
                                     handleChangeCode(value as string);
                                 }}
                                 onBlur={(value) => {
-                                    formik.setFieldValue(t("statusCode"), value);
+                                    formik.setFieldValue(
+                                        t('statusCode'),
+                                        value
+                                    );
                                     handleChangeCode(value);
                                 }}
                                 error={formik.errors.statusCode}
@@ -86,7 +93,7 @@ export const ResponseLayout = ({
                                 <LabelRequired>
                                     {t('contentType')}
                                 </LabelRequired>
-                                <Input
+                                <IGRPInputPrimitive
                                     name="contentType"
                                     value={'application/json'}
                                     readOnly
@@ -105,20 +112,22 @@ export const ResponseLayout = ({
                             placeholder={t('description')}
                             className="w-full"
                         />
-                        <Card className="rounded">
-                            <CardHeader>
-                                <CardTitle>{t('dataSchema')}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
+                        <IGRPCardPrimitive>
+                            <IGRPCardHeaderPrimitive>
+                                <IGRPCardTitlePrimitive>
+                                    {t('dataSchema')}
+                                </IGRPCardTitlePrimitive>
+                            </IGRPCardHeaderPrimitive>
+                            <IGRPCardContentPrimitive>
                                 <JSONSchemaBuilder
                                     schemaTypes={schemaTypes}
                                     initialSchema={dataSchema}
                                     onSchemaChange={handleSchemaChange}
                                 />
-                            </CardContent>
-                        </Card>
+                            </IGRPCardContentPrimitive>
+                        </IGRPCardPrimitive>
                     </div>
-                </Card>
+                </IGRPCardPrimitive>
             </div>
         </form>
     );

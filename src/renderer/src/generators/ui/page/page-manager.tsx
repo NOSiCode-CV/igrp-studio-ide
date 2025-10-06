@@ -3,7 +3,15 @@ import { useDispatch } from 'react-redux';
 
 import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import {
+    IGRPButtonPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsPrimitive,
+    IGRPTabsTriggerPrimitive,
+    IGRPToggleGroupItemPrimitive,
+    IGRPToggleGroupPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { LayoutGrid, Plus, TableIcon, Workflow } from 'lucide-react';
 import { PageCardView } from './page-card-view';
 import { CreatePageModal } from './create-page-modal';
@@ -13,23 +21,13 @@ import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { FileTree } from 'src/main/types';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { CreateComponentModal } from './create-component-modal';
-import {
-    IGRPTabs,
-    IGRPTabsContent,
-    IGRPTabsList,
-    IGRPTabsTrigger,
-} from '@renderer/components/tabs';
 import ProjectSettings from '@renderer/pages/project/project-settings';
-import {
-    ToggleGroup,
-    ToggleGroupItem,
-} from '@renderer/components/ui/toggle-group';
 import { EmptyList } from '@renderer/components/empty-list';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { SearchInput, SubHeadline } from '@renderer/components/shared-ui';
@@ -57,7 +55,9 @@ interface PageBuilderContentProps {
     onPageClick?: (pageFile: PageDefinition) => void;
 }
 
-const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
+const PageManager = ({
+    onPageClick,
+}: PageBuilderContentProps): React.JSX.Element => {
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
 
@@ -81,22 +81,24 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
     const [currentComponent, setCurrentComponent] = useState<PageDefinition>();
     const [isSubPage, setIsSubPage] = useState<boolean>(false);
 
-    const handleAddComponents = (page: PageDefinition) => {
+    const handleAddComponents = (page: PageDefinition): void => {
         onPageClick?.(page);
     };
 
-    const handleDeletePage = (page: PageDefinition) => {
+    const handleDeletePage = (page: PageDefinition): void => {
         setDeleteModal(true);
         setCurrentComponent(page);
     };
 
-    const handleDuplicate = (page: PageDefinition) => {
+    const handleDuplicate = (page: PageDefinition): void => {
         setPageToDuplicate(page);
         setShowDuplicateModal(true);
     };
 
-    const confirmDeletion = async () => {
-        if (!currentComponent) return;
+    const confirmDeletion = async (): Promise<void> => {
+        if (!currentComponent) {
+            return;
+        }
         const pageConfig: DeleteConfig = {
             type: currentComponent.type,
             name: currentComponent.pageName,
@@ -108,18 +110,32 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
         setCurrentComponent(undefined);
     };
 
-    const openDialogNewPage = (page?: PageDefinition) => {
+    const openDialogNewPage = (
+        page?: PageDefinition,
+        isSubPage?: boolean
+    ): void => {
         setFormPage(true);
         setCurrentComponent(page);
+        setIsSubPage(isSubPage || false);
     };
 
-    const handleNewPage = () => {
+    const handleNewPage = (createdPage?: PageDefinition): void => {
         setFormPage(false);
-        setCurrentComponent(undefined);
         setFormComponent(false);
         setShowDuplicateModal(false);
         setPageToDuplicate(undefined);
         isLoadingTable(true);
+
+        // If we were creating a sub-page, open the newly created sub-page
+        if (isSubPage && createdPage) {
+            // Open the newly created sub-page
+            onPageClick?.(createdPage);
+            // Keep the current component context for potential future sub-page creation
+        } else {
+            // For regular page creation, reset the context
+            setCurrentComponent(undefined);
+        }
+
         setIsSubPage(false);
     };
 
@@ -158,7 +174,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
         comp.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const getPageComponent = (pageName: string) => {
+    const getPageComponent = (pageName: string): PageDefinition[] => {
         return filteredComponents
             .filter((comp: FileTree) => comp.content.pageName === pageName)
             .map((comp: FileTree) => ({
@@ -170,7 +186,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
             }));
     };
 
-    const getSubPages = (pageName: string) => {
+    const getSubPages = (pageName: string): PageDefinition[] => {
         return filteredPages
             .filter((page: FileTree) => page.content.parentName === pageName)
             .map((page: FileTree) => ({
@@ -182,7 +198,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
             }));
     };
 
-    const handleEdit = (page: PageDefinition) => {
+    const handleEdit = (page: PageDefinition): void => {
         if (page.type === 'page') {
             setFormPage(!showformPage);
         } else {
@@ -240,20 +256,23 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                 changelogContent={nextjsEngineChangelog}
             />
 
-            <IGRPTabs value={activeTab} onValueChange={setActiveTab}>
-                <IGRPTabsList className="w-full">
-                    <IGRPTabsTrigger value="pages">
+            <IGRPTabsPrimitive value={activeTab} onValueChange={setActiveTab}>
+                <IGRPTabsListPrimitive>
+                    <IGRPTabsTriggerPrimitive value="pages">
                         {t('pages')}
-                    </IGRPTabsTrigger>
-                    <IGRPTabsTrigger value="bpmn">
+                    </IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive value="bpmn">
                         <Workflow className="h-4 w-4 mr-2" />
                         BPMN
-                    </IGRPTabsTrigger>
-                    <IGRPTabsTrigger value="settings">
+                    </IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive value="settings">
                         {t('settings')}
-                    </IGRPTabsTrigger>
-                </IGRPTabsList>
-                <IGRPTabsContent value="pages" className="space-y-4 pt-3 group">
+                    </IGRPTabsTriggerPrimitive>
+                </IGRPTabsListPrimitive>
+                <IGRPTabsContentPrimitive
+                    value="pages"
+                    className="space-y-4 pt-3 group"
+                >
                     <>
                         <div className="flex justify-between">
                             <SubHeadline
@@ -272,7 +291,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                                     onChange={(value) => setSearchTerm(value)}
                                     className="lg:w-[250px]"
                                 />
-                                <ToggleGroup
+                                <IGRPToggleGroupPrimitive
                                     type="single"
                                     value={viewMode}
                                     onValueChange={(value) =>
@@ -280,81 +299,90 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                                         setViewMode(value as 'table' | 'card')
                                     }
                                 >
-                                    <ToggleGroupItem
+                                    <IGRPToggleGroupItemPrimitive
                                         value="card"
                                         aria-label="Card view"
                                         className="h-8 w-8"
                                     >
                                         <LayoutGrid className="h-3.5 w-3.5" />
-                                    </ToggleGroupItem>
-                                    <ToggleGroupItem
+                                    </IGRPToggleGroupItemPrimitive>
+                                    <IGRPToggleGroupItemPrimitive
                                         value="table"
                                         aria-label="Table view"
                                         className="h-8 w-8"
                                     >
                                         <TableIcon className="h-3.5 w-3.5" />
-                                    </ToggleGroupItem>
-                                </ToggleGroup>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button size="sm" variant="default">
+                                    </IGRPToggleGroupItemPrimitive>
+                                </IGRPToggleGroupPrimitive>
+                                <IGRPDropdownMenuPrimitive>
+                                    <IGRPDropdownMenuTriggerPrimitive asChild>
+                                        <IGRPButtonPrimitive
+                                            size="sm"
+                                            variant="default"
+                                        >
                                             <Plus className="h-4 w-4" />
                                             {t('add')}
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem
+                                        </IGRPButtonPrimitive>
+                                    </IGRPDropdownMenuTriggerPrimitive>
+                                    <IGRPDropdownMenuContentPrimitive>
+                                        <IGRPDropdownMenuItemPrimitive
                                             onSelect={() => {
-                                                openDialogNewPage();
-                                                setCurrentComponent(undefined);
+                                                openDialogNewPage(
+                                                    undefined,
+                                                    false
+                                                );
                                             }}
                                         >
                                             {t('createNewPage')}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
+                                        </IGRPDropdownMenuItemPrimitive>
+                                        <IGRPDropdownMenuItemPrimitive
                                             onSelect={() => {
                                                 setFormComponent(true);
                                                 setCurrentComponent(undefined);
                                             }}
                                         >
                                             {t('createNewComponent')}
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                        </IGRPDropdownMenuItemPrimitive>
+                                    </IGRPDropdownMenuContentPrimitive>
+                                </IGRPDropdownMenuPrimitive>
                             </div>
                         </div>
 
                         {viewMode === 'card' ? (
                             tableData.length > 0 ? (
                                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start">
-                                    {tableData.map((page) => {
-                                        const components = getPageComponent(
-                                            page.pageName
-                                        );
-                                        const subPages = getSubPages(
-                                            page.pageName
-                                        );
-                                        return (
-                                            <PageCardView
-                                                key={page.name}
-                                                page={page}
-                                                onDelete={(page) =>
-                                                    handleDeletePage(page)
-                                                }
-                                                onAddComponents={
-                                                    handleAddComponents
-                                                }
-                                                onEdit={handleEdit}
-                                                onDuplicate={handleDuplicate}
-                                                components={components}
-                                                subPages={subPages}
-                                                openDialogNewPage={
-                                                    openDialogNewPage
-                                                }
-                                                setIsSubPage={setIsSubPage}
-                                            />
-                                        );
-                                    })}
+                                    {tableData.map(
+                                        (page): React.JSX.Element => {
+                                            const components = getPageComponent(
+                                                page.pageName
+                                            );
+                                            const subPages = getSubPages(
+                                                page.pageName
+                                            );
+                                            return (
+                                                <PageCardView
+                                                    key={page.name}
+                                                    page={page}
+                                                    onDelete={(page) =>
+                                                        handleDeletePage(page)
+                                                    }
+                                                    onAddComponents={
+                                                        handleAddComponents
+                                                    }
+                                                    onEdit={handleEdit}
+                                                    onDuplicate={
+                                                        handleDuplicate
+                                                    }
+                                                    components={components}
+                                                    subPages={subPages}
+                                                    openDialogNewPage={
+                                                        openDialogNewPage
+                                                    }
+                                                    setIsSubPage={setIsSubPage}
+                                                />
+                                            );
+                                        }
+                                    )}
                                 </div>
                             ) : (
                                 <EmptyList
@@ -376,22 +404,28 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                             />
                         )}
                     </>
-                </IGRPTabsContent>
-                <IGRPTabsContent value="bpmn" className="space-y-4 pt-3">
+                </IGRPTabsContentPrimitive>
+                <IGRPTabsContentPrimitive
+                    value="bpmn"
+                    className="space-y-4 pt-3"
+                >
                     <BPMNManager
                         onPageClick={handleAddComponents}
                         bpmnProcesses={bpmnProcesses}
                         basePath={basePath}
                     />
-                </IGRPTabsContent>
-                <IGRPTabsContent value="settings" className="space-y-4">
+                </IGRPTabsContentPrimitive>
+                <IGRPTabsContentPrimitive
+                    value="settings"
+                    className="space-y-4"
+                >
                     <ProjectSettings
                         hasTitle={false}
                         project={project}
                         className="max-w-screen px-0"
                     />
-                </IGRPTabsContent>
-            </IGRPTabs>
+                </IGRPTabsContentPrimitive>
+            </IGRPTabsPrimitive>
             <CreatePageModal
                 basePath={basePath}
                 isOpen={showformPage}

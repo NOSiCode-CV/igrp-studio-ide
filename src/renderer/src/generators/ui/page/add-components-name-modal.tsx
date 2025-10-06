@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-} from '@renderer/components/ui/dialog';
-import { Button } from '@renderer/components/ui/button';
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Plus } from 'lucide-react';
 import {
     SelectInput,
@@ -96,18 +96,18 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
+        <IGRPDialogPrimitive open={open} onOpenChange={onOpenChange}>
+            <IGRPDialogContentPrimitive>
+                <IGRPDialogHeaderPrimitive>
+                    <IGRPDialogTitlePrimitive className="flex items-center gap-2">
                         <Plus className="h-5 w-5" />
                         Configure New Step
-                    </DialogTitle>
-                    <DialogDescription>
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive>
                         Configure the new step name and optionally copy from an
                         existing version.
-                    </DialogDescription>
-                </DialogHeader>
+                    </IGRPDialogDescriptionPrimitive>
+                </IGRPDialogHeaderPrimitive>
 
                 <div className="space-y-6 py-4">
                     <TextInput
@@ -156,20 +156,23 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
                     )}
                 </div>
 
-                <DialogFooter className="gap-2">
-                    <Button variant="outline" onClick={handleCancel}>
+                <IGRPDialogFooterPrimitive className="gap-2">
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        onClick={handleCancel}
+                    >
                         Cancel
-                    </Button>
-                    <Button
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive
                         onClick={handleConfirm}
                         disabled={!description.trim() || !componentName.trim()}
                         className="gap-2"
                     >
                         <Plus className="h-4 w-4" />
                         {previousComponent ? 'Copy Step' : 'Generate Step'}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                    </IGRPButtonPrimitive>
+                </IGRPDialogFooterPrimitive>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 };

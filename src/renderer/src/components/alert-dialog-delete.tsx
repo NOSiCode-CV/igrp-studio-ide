@@ -1,18 +1,18 @@
 import React from 'react';
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from './ui/alert-dialog';
+    IGRPAlertDialogActionPrimitive,
+    IGRPAlertDialogCancelPrimitive,
+    IGRPAlertDialogPrimitive,
+    IGRPAlertDialogTriggerPrimitive,
+    IGRPAlertDialogHeaderPrimitive,
+    IGRPAlertDialogContentPrimitive,
+    IGRPAlertDialogTitlePrimitive,
+    IGRPAlertDialogDescriptionPrimitive,
+    IGRPAlertDialogFooterPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Trash } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from './ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface DeleteModalProps {
     isOpen: boolean;
@@ -31,41 +31,37 @@ const AlertDialogDelete: React.FC<DeleteModalProps> = ({
 }) => {
     const { t } = useTranslation();
     return (
-        <AlertDialog open={isOpen} onOpenChange={onClose}>
+        <IGRPAlertDialogPrimitive open={isOpen} onOpenChange={onClose}>
             {hasTrigger && (
-                <AlertDialogTrigger>
-                    <Button
+                <IGRPAlertDialogTriggerPrimitive>
+                    <IGRPButtonPrimitive
                         variant="outline"
                         size="sm"
                         className="outline  outline-red-500 text-red-500"
                     >
                         <Trash /> {t('delete')}
-                    </Button>
-                </AlertDialogTrigger>
+                    </IGRPButtonPrimitive>
+                </IGRPAlertDialogTriggerPrimitive>
             )}
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>
-                    {t('areYouAbsolutelySure')}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                    {t('confirmRemoveRecord')}{' '}
-                        {recordId ? recordId : ''}?
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => onClose(false)}>
+            <IGRPAlertDialogContentPrimitive>
+                <IGRPAlertDialogHeaderPrimitive>
+                    <IGRPAlertDialogTitlePrimitive>
+                        {t('areYouAbsolutelySure')}
+                    </IGRPAlertDialogTitlePrimitive>
+                    <IGRPAlertDialogDescriptionPrimitive>
+                        {t('confirmRemoveRecord')} {recordId ? recordId : ''}?
+                    </IGRPAlertDialogDescriptionPrimitive>
+                </IGRPAlertDialogHeaderPrimitive>
+                <IGRPAlertDialogFooterPrimitive>
+                    <IGRPAlertDialogCancelPrimitive>
                         {t('cancel')}
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                        onClick={onConfirm}
-                        className="bg-red-500"
-                    >
+                    </IGRPAlertDialogCancelPrimitive>
+                    <IGRPAlertDialogActionPrimitive onClick={onConfirm}>
                         {t('continue')}
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                    </IGRPAlertDialogActionPrimitive>
+                </IGRPAlertDialogFooterPrimitive>
+            </IGRPAlertDialogContentPrimitive>
+        </IGRPAlertDialogPrimitive>
     );
 };
 

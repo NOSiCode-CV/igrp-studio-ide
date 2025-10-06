@@ -2,13 +2,22 @@ import { useState, useEffect } from 'react';
 import MonacoEditor from '@renderer/components/monaco-editor';
 
 const CodeContentJson = ({ components, pagePath }: any) => {
-    const code = components ? JSON.stringify(components, null, 2) : '// No components data available';
+    const code = components
+        ? JSON.stringify(components, null, 2)
+        : '// No components data available';
     return (
         <div className="h-full">
             <div className="p-2 bg-gray-100 border-b">
-                <span className="text-sm text-gray-600">JSON Configuration</span>
+                <span className="text-sm text-gray-600">
+                    JSON Configuration
+                </span>
             </div>
-            <MonacoEditor language="json" content={code} filePath={pagePath} height="calc(100vh - 120px)" />
+            <MonacoEditor
+                language="json"
+                content={code}
+                filePath={pagePath}
+                height="calc(100vh - 120px)"
+            />
         </div>
     );
 };
@@ -22,7 +31,7 @@ const CodeContentTS = ({ pagePath }: { pagePath: string }) => {
             try {
                 setLoading(true);
                 const fileContent = await window.api.readProjectFile(pagePath);
-                
+
                 if (fileContent && fileContent.trim()) {
                     setContent(fileContent);
                 } else {
@@ -71,10 +80,17 @@ const CodeContentTS = ({ pagePath }: { pagePath: string }) => {
     return (
         <div className="h-full">
             <div className="p-2 bg-gray-100 border-b">
-                <span className="text-sm text-gray-600">TypeScript Generated Code</span>
+                <span className="text-sm text-gray-600">
+                    TypeScript Generated Code
+                </span>
                 <span className="text-xs text-gray-400 ml-2">{pagePath}</span>
             </div>
-            <MonacoEditor language="typescript" content={content} filePath={pagePath} height="calc(100vh - 120px)" />
+            <MonacoEditor
+                language="typescript"
+                content={content}
+                filePath={pagePath}
+                height="calc(100vh - 120px)"
+            />
         </div>
     );
 };

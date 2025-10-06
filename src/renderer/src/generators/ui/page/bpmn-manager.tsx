@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
+    IGRPTabsPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { BPMNConfig, BPMNConfigs, FileTree } from 'src/main/types';
@@ -107,7 +107,7 @@ export const BPMNManager = ({
                     title="BPMN Process Manager"
                     description="Connect to BPMN REST API and manage process definitions"
                 />
-                <Button
+                <IGRPButtonPrimitive
                     onClick={() => {
                         setEditingConfig(undefined);
                         setShowConfigModal(true);
@@ -115,26 +115,34 @@ export const BPMNManager = ({
                 >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Configuration
-                </Button>
+                </IGRPButtonPrimitive>
             </div>
 
-            <Tabs defaultValue="projects" className="space-y-4">
-                <TabsList>
-                    <TabsTrigger value="projects">Projects</TabsTrigger>
-                    <TabsTrigger value="configuration">
+            <IGRPTabsPrimitive defaultValue="projects" className="space-y-4">
+                <IGRPTabsListPrimitive>
+                    <IGRPTabsTriggerPrimitive value="projects">
+                        Projects
+                    </IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive value="configuration">
                         API Configuration
-                    </TabsTrigger>
-                </TabsList>
+                    </IGRPTabsTriggerPrimitive>
+                </IGRPTabsListPrimitive>
 
-                <TabsContent value="projects" className="space-y-4">
+                <IGRPTabsContentPrimitive
+                    value="projects"
+                    className="space-y-4"
+                >
                     <BPMNProjectSelector
                         onPageClick={onPageClick}
                         bpmnProcesses={bpmnProcesses}
                         basePath={basePath}
                     />
-                </TabsContent>
+                </IGRPTabsContentPrimitive>
 
-                <TabsContent value="configuration" className="space-y-4">
+                <IGRPTabsContentPrimitive
+                    value="configuration"
+                    className="space-y-4"
+                >
                     {configs.configs.length > 0 ? (
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {configs.configs.map((config) => (
@@ -162,14 +170,20 @@ export const BPMNManager = ({
                                                 );
                                             } else {
                                                 // If deactivating, set no active config
-                                                await window.igrpStudioSettings.setActiveBPMNConfig('');
+                                                await window.igrpStudioSettings.setActiveBPMNConfig(
+                                                    ''
+                                                );
                                             }
                                             // Clear BPMN service cache to force refresh
                                             bpmnService.clearConfig();
                                             // Reload configurations to reflect changes
                                             await loadConfigs();
                                             // Dispatch custom event to notify other components
-                                            window.dispatchEvent(new CustomEvent('bpmn-config-changed'));
+                                            window.dispatchEvent(
+                                                new CustomEvent(
+                                                    'bpmn-config-changed'
+                                                )
+                                            );
                                             toast.success(
                                                 `Configuration ${isActive ? 'activated' : 'deactivated'} successfully`
                                             );
@@ -211,8 +225,8 @@ export const BPMNManager = ({
                             description="Add your BPMN REST API configurations to get started with process management."
                         />
                     )}
-                </TabsContent>
-            </Tabs>
+                </IGRPTabsContentPrimitive>
+            </IGRPTabsPrimitive>
 
             <BPMNConfigModal
                 key={`${editingConfig?.id || 'new'}-${showConfigModal ? 'open' : 'closed'}`}

@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 const MAX_LENGTH = 300;
 
 const useToast = () => {
-    const showSuccessToast = (message: string) => {
+    const showSuccessToast = (message: string): void => {
         toast.success(message);
     };
 
@@ -16,8 +16,7 @@ const useToast = () => {
     };
 
     const formatValidationError = (error: any): string => {
-
-		// Handle error with params.errors
+        // Handle error with params.errors
         if (error?.params?.errors) {
             return formatValidationError(error.params.errors);
         }
@@ -29,16 +28,19 @@ const useToast = () => {
 
         // Handle individual validation error object
         if (error?.instancePath && error?.message) {
-            const path = error.instancePath.replace(/\//g, ' ').trim() || 'root';
+            const path =
+                error.instancePath.replace(/\//g, ' ').trim() || 'root';
             return `${path}: ${error.message}`;
         }
 
         // Fallback to simple error message
-        return error?.message || error?.toString() || 'An unknown error occurred';
+        return (
+            error?.message || error?.toString() || 'An unknown error occurred'
+        );
     };
 
     const showErrorToast = (error: any) => {
-        if (Array.isArray(error) && error.some(e => e.instancePath)) {
+        if (Array.isArray(error) && error.some((e) => e.instancePath)) {
             // Handle validation error array
             const formattedErrors = formatValidationError(error);
             displayError(formattedErrors);
@@ -48,8 +50,11 @@ const useToast = () => {
         } else {
             // Handle regular errors
             const errors = Array.isArray(error) ? error : [error];
-            errors.forEach(err => {
-                const errorMessage = err?.message || err?.toString() || 'An unknown error occurred';
+            errors.forEach((err) => {
+                const errorMessage =
+                    err?.message ||
+                    err?.toString() ||
+                    'An unknown error occurred';
                 displayError(errorMessage);
             });
         }

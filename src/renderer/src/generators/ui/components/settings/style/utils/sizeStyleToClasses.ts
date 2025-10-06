@@ -1,4 +1,4 @@
-import { SizeSytle, SizeValue } from "../types";
+import { SizeSytle, SizeValue } from '../types';
 
 export function sizeStyleToClasses(sizeState: SizeSytle): string {
     const classes: string[] = [];
@@ -49,5 +49,5 @@ export function sizeStyleToClasses(sizeState: SizeSytle): string {
         );
     }
 
-    return classes.filter(c => c).join(' ');
+    return classes.filter((c) => c).join(' ');
 }

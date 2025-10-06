@@ -37,7 +37,6 @@ export function VisibilityControls({
 }: VisibilityControlsProps) {
     const { t } = useTranslation();
     return (
-        
         <div className="space-y-1.5">
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
@@ -55,7 +54,7 @@ export function VisibilityControls({
             <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-0.5">
                     <label className="text-xs text-gray-500 dark:text-gray-400">
-                    {t('opacity')}
+                        {t('opacity')}
                     </label>
                     <div className="flex items-center gap-1">
                         <input
@@ -71,7 +70,7 @@ export function VisibilityControls({
                 </div>
                 <div className="space-y-0.5">
                     <label className="text-xs text-gray-500 dark:text-gray-400">
-                    {t('blendMode')}
+                        {t('blendMode')}
                     </label>
                     <select
                         value={mixBlendMode}

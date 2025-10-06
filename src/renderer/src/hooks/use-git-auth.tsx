@@ -37,10 +37,10 @@ const useGitAuth = () => {
               }
             : gitLabProviders.find((p) => p.id === activeProviderId);
 
-    const loadGithubData = async () => {
+    const loadGithubData = async (): Promise<void> => {
         setIsLoading(true);
 
-        const processGitHubUserInfo = async () => {
+        const processGitHubUserInfo = async (): Promise<void> => {
             try {
                 const userGitHub =
                     await window.electron.ipcRenderer.invoke(
@@ -62,7 +62,7 @@ const useGitAuth = () => {
             }
         };
 
-        const processGitLabUserInfo = async () => {
+        const processGitLabUserInfo = async (): Promise<void> => {
             try {
                 const userGitLab =
                     await window.electron.ipcRenderer.invoke(
@@ -88,7 +88,7 @@ const useGitAuth = () => {
             }
         };
 
-        const processGitHubRepositories = async () => {
+        const processGitHubRepositories = async (): Promise<void> => {
             try {
                 const repoGithub = await window.electron.ipcRenderer.invoke(
                     'github-repositories'
@@ -109,7 +109,7 @@ const useGitAuth = () => {
             }
         };
 
-        const processGitLabRepositories = async () => {
+        const processGitLabRepositories = async (): Promise<void> => {
             try {
                 const repoGitlab = await window.electron.ipcRenderer.invoke(
                     'gitlab-repositories'
@@ -149,7 +149,7 @@ const useGitAuth = () => {
     useEffect(() => {
         window.electron.ipcRenderer.on(
             'github-oauth-success',
-            async (_event: any, data: any) => {
+            async (_event: any, data: any): Promise<void> => {
                 await window.electron.ipcRenderer.invoke(
                     'gitauth-initialize',
                     data.access_token
@@ -161,7 +161,7 @@ const useGitAuth = () => {
 
         window.electron.ipcRenderer.on(
             'gitlab-oauth-success',
-            async (_event: any, data: any) => {
+            async (_event: any, data: any): Promise<void> => {
                 const providerId = data.providerId || activeProviderId;
                 if (providerId && providerId !== 'github') {
                     await window.electron.ipcRenderer.invoke(
@@ -189,12 +189,12 @@ const useGitAuth = () => {
         };
     }, [isInitialized, dispatch, activeProviderId]);
 
-    const handleLoginGithub = () => {
+    const handleLoginGithub = (): void => {
         dispatch(setActiveProvider('github'));
         window.electron.ipcRenderer.send('github-oauth');
     };
 
-    const handleLoginGitLab = (providerId?: string) => {
+    const handleLoginGitLab = (providerId?: string): void => {
         const targetProviderId =
             providerId ||
             activeProviderId ||
@@ -205,7 +205,7 @@ const useGitAuth = () => {
         }
     };
 
-    const handleLogout = async () => {
+    const handleLogout = async (): Promise<void> => {
         await window.electron.ipcRenderer.invoke('logout-github');
         dispatch(setProviderUser({ providerId: 'github', user: null }));
         dispatch(
@@ -214,7 +214,7 @@ const useGitAuth = () => {
         dispatch(setActiveProvider(null));
     };
 
-    const handleLogoutGitLab = async (providerId?: string) => {
+    const handleLogoutGitLab = async (providerId?: string): Promise<void> => {
         const targetProviderId = providerId || activeProviderId;
         if (targetProviderId && targetProviderId !== 'github') {
             await window.electron.ipcRenderer.invoke(
@@ -234,7 +234,9 @@ const useGitAuth = () => {
         }
     };
 
-    const saveGitlabConfig = async (config: GitLabProvider) => {
+    const saveGitlabConfig = async (
+        config: GitLabProvider
+    ): Promise<{ success: boolean; error?: any }> => {
         try {
             await window.electron.ipcRenderer.invoke(
                 'save-gitlab-config',
@@ -257,7 +259,7 @@ const useGitAuth = () => {
         }
     };
 
-    const getGitlabConfig = async () => {
+    const getGitlabConfig = async (): Promise<GitLabProvider[] | null> => {
         try {
             const config =
                 await window.electron.ipcRenderer.invoke('get-gitlab-config');
@@ -293,7 +295,9 @@ const useGitAuth = () => {
         return null;
     };
 
-    const setActiveGitlabConfig = async (providerId: string) => {
+    const setActiveGitlabConfig = async (
+        providerId: string
+    ): Promise<{ success: boolean; error?: any }> => {
         try {
             await window.electron.ipcRenderer.invoke(
                 'set-active-gitlab-config',

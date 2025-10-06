@@ -4,10 +4,12 @@ import { cn } from '@renderer/lib/utils';
 // Icon mapping using reliable CDN sources
 const ICONS = {
     nextjs: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg',
-    springboot: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg',
+    springboot:
+        'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg',
     dotnet: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg',
     vuejs: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg',
-    angular: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg',
+    angular:
+        'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg',
     django: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg',
     go: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg',
 } as const;
@@ -28,7 +30,7 @@ export const FrameworkIcon: React.FC<FrameworkIconProps> = ({
     alt,
 }) => {
     const iconSrc = ICONS[framework];
-    
+
     if (!iconSrc) {
         console.warn(`No icon found for framework: ${framework}`);
         return null;
@@ -67,4 +69,4 @@ export const ProjectIcon: React.FC<ProjectIconProps> = ({
 };
 
 // Export the icon mapping for backward compatibility
-export const projectIcons = ICONS; 
+export const projectIcons = ICONS;

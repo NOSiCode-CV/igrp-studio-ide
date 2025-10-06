@@ -1,8 +1,10 @@
 'use client';
 
-import { Button } from '@renderer/components/ui/button';
-import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Separator } from '@renderer/components/ui/separator';
+import {
+    IGRPButtonPrimitive,
+    IGRPCheckboxPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { CircleArrowUp, Download } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import logo from '@renderer/assets/images/igrp-green.svg';
@@ -76,16 +78,16 @@ export function AboutSettings() {
                         )}
                         <div className="flex items-center gap-2 pt-1">
                             {!newVersion ? (
-                                <Button
+                                <IGRPButtonPrimitive
                                     className="gap-2"
                                     size="sm"
                                     onClick={checkForUpdates}
                                 >
                                     <CircleArrowUp className="h-4 w-4" />
                                     {t('check_update')}
-                                </Button>
+                                </IGRPButtonPrimitive>
                             ) : (
-                                <Button
+                                <IGRPButtonPrimitive
                                     className="gap-2"
                                     size="sm"
                                     onClick={downloadAndInstall}
@@ -95,13 +97,13 @@ export function AboutSettings() {
                                     {isDownloading
                                         ? t('downloading')
                                         : t('downloadInstall')}
-                                </Button>
+                                </IGRPButtonPrimitive>
                             )}
                         </div>
                     </div>
                 </div>
 
-                <Separator />
+                <IGRPSeparator />
 
                 {/* Software Update */}
                 <div className="space-y-4">
@@ -109,7 +111,7 @@ export function AboutSettings() {
                         {t('software_update')}
                     </h3>
                     <div className="flex items-center space-x-2">
-                        <Checkbox id="notifications" />
+                        <IGRPCheckboxPrimitive id="notifications" />
                         <label
                             htmlFor="notifications"
                             className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -119,7 +121,7 @@ export function AboutSettings() {
                     </div>
                 </div>
 
-                <Separator />
+                <IGRPSeparator />
 
                 {/* Other Information */}
                 <div className="space-y-4">
@@ -127,15 +129,15 @@ export function AboutSettings() {
                         {t('other_information')}
                     </h3>
                     <div className="space-y-1">
-                        <Button variant="link" size={'sm'}>
+                        <IGRPButtonPrimitive variant="link" size={'sm'}>
                             {t('get_latest_version')}
-                        </Button>
-                        <Button variant="link" size={'sm'}>
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive variant="link" size={'sm'}>
                             {t('terms_of_service')}
-                        </Button>
-                        <Button variant="link" size={'sm'}>
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive variant="link" size={'sm'}>
                             {t('privacy_policy')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                     </div>
                 </div>
             </div>

@@ -1,13 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Terminal, Code2, Keyboard } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import {
-    SectionProps,
-    Side,
-    SpacingSytle,
-    SpacingType,
-    Unit,
-} from '../types';
+import { SectionProps, Side, SpacingSytle, SpacingType, Unit } from '../types';
 
 const initialState: SpacingSytle = {
     margin: {

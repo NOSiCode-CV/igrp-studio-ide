@@ -1,13 +1,13 @@
 'use client';
 
 import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-} from '@renderer/components/ui/dropdown-menu';
-import { Button } from '@renderer/components/ui/button';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuSeparatorPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import useToast from '@renderer/hooks/useToast';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
@@ -17,13 +17,13 @@ import { useTranslation } from 'react-i18next';
 import { ProjectData, ServiceInfo } from 'src/main/types';
 import { ConfigurationDialog } from '../components/configuration-dialog';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
+import { EditProjectModal } from './edit-project-modal';
 
 interface ProjectDropdownProps {
     project: ProjectData;
     basePath: string;
     services?: ServiceInfo[];
     projects?: ProjectData[];
-    onEdit?: () => void;
     onConvertToSpringBoot?: () => void;
     onConvertToDotNet?: () => void;
 }
@@ -32,11 +32,11 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     project,
     services = [],
     projects = [],
-    onEdit,
     onConvertToSpringBoot,
     onConvertToDotNet,
 }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { showErrorToast } = useToast();
     const { t } = useTranslation();
 
@@ -58,6 +58,10 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
         console.log(t('openExternalLinkFor'), project.name, service);
     };
 
+    const handleEditProject = () => {
+        setIsEditModalOpen(true);
+    };
+
     const findServiceByProjectName = (
         uuid: string
     ): ServiceInfo | undefined => {
@@ -68,33 +72,33 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
 
     return (
         <>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button
+            <IGRPDropdownMenuPrimitive>
+                <IGRPDropdownMenuTriggerPrimitive asChild>
+                    <IGRPButtonPrimitive
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                         <MoreVertical className="h-4 w-4" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="min-w-48">
-                    {onEdit && (
-                        <DropdownMenuItem onClick={onEdit}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            {t('editProject')}
-                        </DropdownMenuItem>
-                    )}
+                    </IGRPButtonPrimitive>
+                </IGRPDropdownMenuTriggerPrimitive>
+                <IGRPDropdownMenuContentPrimitive className="min-w-48">
+                    <IGRPDropdownMenuItemPrimitive onClick={handleEditProject}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        {t('editProject')}
+                    </IGRPDropdownMenuItemPrimitive>
 
                     {service?.status === 'running' && (
-                        <DropdownMenuItem onClick={handleExternalLink}>
+                        <IGRPDropdownMenuItemPrimitive
+                            onClick={handleExternalLink}
+                        >
                             <ExternalLink className="mr-2 h-4 w-4" />
                             {t('openInBrowser')}
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     )}
-                 
+
                     {project.framework === ENV_TYPES.DOTNET && (
-                        <DropdownMenuItem
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={onConvertToSpringBoot}
                             disabled
                         >
@@ -103,17 +107,20 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                             <span className="ml-auto text-xs text-muted-foreground">
                                 {t('comingSoon')}
                             </span>
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     )}
 
                     {project.framework === ENV_TYPES.SPRING && (
-                        <DropdownMenuItem onClick={onConvertToDotNet} disabled>
+                        <IGRPDropdownMenuItemPrimitive
+                            onClick={onConvertToDotNet}
+                            disabled
+                        >
                             <Repeat className="mr-2 h-4 w-4 text-gray-500" />
                             {t('convertToDotNet')}
                             <span className="ml-auto text-xs text-muted-foreground">
                                 {t('comingSoon')}
                             </span>
-                        </DropdownMenuItem>
+                        </IGRPDropdownMenuItemPrimitive>
                     )}
 
                     {service && (
@@ -124,18 +131,18 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                             isNew={false}
                             project={project}
                         >
-                            <DropdownMenuItem
+                            <IGRPDropdownMenuItemPrimitive
                                 onSelect={(e) => e.preventDefault()}
                                 className="focus:bg-accent"
                             >
                                 <Edit className="mr-2 h-4 w-4" />
-                               {t('configureService')}
-                            </DropdownMenuItem>
+                                {t('configureService')}
+                            </IGRPDropdownMenuItemPrimitive>
                         </ConfigurationDialog>
                     )}
-                    <DropdownMenuSeparator />
+                    <IGRPDropdownMenuSeparatorPrimitive />
 
-                    <DropdownMenuItem
+                    <IGRPDropdownMenuItemPrimitive
                         className="text-red-600 focus:text-red-600 focus:bg-red-50"
                         onClick={() => {
                             setIsDialogOpen(true);
@@ -143,15 +150,25 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                     >
                         <Trash className="mr-2 h-4 w-4 text-red-600" />
                         {t('removeProject')}
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                    </IGRPDropdownMenuItemPrimitive>
+                </IGRPDropdownMenuContentPrimitive>
+            </IGRPDropdownMenuPrimitive>
 
             <AlertDialogDelete
                 onConfirm={handleDelete}
                 onClose={() => setIsDialogOpen(false)}
                 recordId={project.name}
                 isOpen={isDialogOpen}
+            />
+
+            <EditProjectModal
+                project={project}
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onSuccess={() => {
+                    // Refresh the projects list or trigger a re-render
+                    window.location.reload();
+                }}
             />
         </>
     );

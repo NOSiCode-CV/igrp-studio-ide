@@ -7,43 +7,52 @@ O recurso Doctor foi aprimorado com uma abordagem categorizada para fornecer uma
 ## Categorias
 
 ### 🌐 Desenvolvimento Frontend
+
 Ferramentas necessárias para desenvolvimento frontend com React, Next.js e tecnologias web modernas.
 
 **Ferramentas incluídas:**
+
 - **Node.js** (Obrigatório) - Runtime JavaScript para desenvolvimento frontend
 - **npm** (Obrigatório) - Gerenciador de pacotes do Node.js
 - **pnpm** (Opcional) - Gerenciador de pacotes rápido e eficiente em espaço
 - **yarn** (Opcional) - Gerenciador de pacotes alternativo para Node.js
 
 ### ⚙️ Desenvolvimento Backend
+
 Ferramentas necessárias para desenvolvimento backend com Java, Spring Boot e .NET.
 
 **Ferramentas incluídas:**
+
 - **Java** (Obrigatório) - Runtime Java para desenvolvimento backend
 - **Maven** (Obrigatório) - Ferramenta de build e gerenciamento de dependências Java
 - **.NET SDK** (Opcional) - Framework de desenvolvimento .NET
 
 ### 🛠️ Infraestrutura de Desenvolvimento
+
 Ferramentas essenciais de desenvolvimento e requisitos de infraestrutura.
 
 **Ferramentas incluídas:**
+
 - **Docker** (Obrigatório) - Plataforma de containerização para desenvolvimento
 - **Git** (Obrigatório) - Sistema de controle de versão
 
 ## Funcionalidades
 
 ### Organização Visual
+
 - **Cards de Categoria**: Cada categoria é exibida em seu próprio card com ícone e descrição
 - **Indicadores de Status**: Indicadores visuais claros mostrando o status de saúde de cada categoria
 - **Badges de Progresso**: Mostra quantas ferramentas obrigatórias estão funcionando em cada categoria
 
 ### Informações Aprimoradas
+
 - **Descrições das Ferramentas**: Cada ferramenta inclui uma descrição explicando sua finalidade
 - **Informações de Versão**: Exibe versões atuais para ferramentas funcionando
 - **Detalhes de Erro**: Mostra mensagens de erro específicas para ferramentas com falha
 - **Links de Download**: Links diretos para baixar ferramentas ausentes
 
 ### Relatórios de Status
+
 - **Status Geral**: Marca de verificação verde quando todos os sistemas estão saudáveis
 - **Status da Categoria**: Status individual para cada categoria de desenvolvimento
 - **Obrigatório vs Opcional**: Distinção clara entre ferramentas obrigatórias e opcionais
@@ -68,8 +77,9 @@ Ferramentas essenciais de desenvolvimento e requisitos de infraestrutura.
 ## Implementação Técnica
 
 A abordagem categorizada usa:
+
 - **Interfaces TypeScript** para segurança de tipos
 - **Filtragem baseada em categoria** para exibição organizada
 - **Cálculo de status** para cada categoria
 - **Design responsivo** para diferentes tamanhos de tela
-- **Recursos de acessibilidade** para melhor experiência do usuário 
+- **Recursos de acessibilidade** para melhor experiência do usuário

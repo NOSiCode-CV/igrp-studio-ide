@@ -2,7 +2,6 @@ import { cn } from '@renderer/lib/utils';
 import Draggable from '@renderer/lib/dnd/Draggable';
 import { CardComponentProps } from '../CardComponent';
 
-
 const IGRPStudioParagraph = ({ comp }: CardComponentProps) => {
     const { id: componentId, properties, componentName } = comp;
     const { content, className } = properties;

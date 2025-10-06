@@ -6,23 +6,42 @@ import { useGit } from '@renderer/hooks/use-git';
 import { useTabs } from '@renderer/components/navigation/TabContext';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
-import { ModelConfig, RelationReference } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+import {
+    ModelConfig,
+    RelationReference,
+} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { IColumnsTabelProps } from '../../types/Interfaces';
-import { defaultValues, getTablesColumns, initialValues, getValuesToSubmit } from './config';
+import {
+    defaultValues,
+    getTablesColumns,
+    initialValues,
+    getValuesToSubmit,
+} from './config';
 import { useModelValidation } from './validation';
 import useToast from '@renderer/hooks/useToast';
+import { useKeyPress } from '@renderer/hooks/useKeyDown';
+import { KeyboardKey } from '@renderer/constants/shortcut';
 
-export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
+export const useModel = ({
+    selectors,
+    currentItem,
+}: {
+    selectors: Array<any>;
+    currentItem: any;
+}) => {
     const { createGitCommit } = useGit();
-    const { initializeTabFromCurrentItem,handleRenameTab } = useTabs();
+    const { initializeTabFromCurrentItem, handleRenameTab } = useTabs();
     const { showErrorToast, showSuccessToast } = useToast();
-    const { models, basePath, config, enums, findModelsByName, getJsonData } = useStudioAPI(currentItem?.module);
+    const { models, basePath, config, enums, findModelsByName, getJsonData } =
+        useStudioAPI(currentItem?.module);
     const { t } = useTranslation();
     const validationSchema = useModelValidation({ t });
     const dispatch: any = useDispatch();
 
-    const [tablesColumns, setTableColumns] = useState<{ [value: string]: IColumnsTabelProps[] }>({});
+    const [tablesColumns, setTableColumns] = useState<{
+        [value: string]: IColumnsTabelProps[];
+    }>({});
     const [data, setData] = useState<any>(null);
     const [enableEntityRevision, setEnableEntityRevision] = useState(false);
 
@@ -46,10 +65,14 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
             .toLowerCase()
             .replace(/\s+/g, '_');
 
-        return nameProcessed.startsWith('t_') ? nameProcessed : `t_${nameProcessed}`;
+        return nameProcessed.startsWith('t_')
+            ? nameProcessed
+            : `t_${nameProcessed}`;
     };
 
-    const handleNameBlur = async (e: FocusEvent<HTMLInputElement>): Promise<void> => {
+    const handleNameBlur = async (
+        e: FocusEvent<HTMLInputElement>
+    ): Promise<void> => {
         formik.handleBlur(e);
         const name = e.target.value;
 
@@ -90,15 +113,25 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
             return;
         }
 
-        const { revision, name, tableName, attributes, crud, primaryKey, uniqueConstraints, indexes } = data;
+        const {
+            revision,
+            name,
+            tableName,
+            attributes,
+            crud,
+            primaryKey,
+            uniqueConstraints,
+            indexes,
+        } = data;
 
-        const primaryKeyAttributes = primaryKey && Array.isArray(primaryKey)
-            ? primaryKey.map((pk) => ({
-                ...defaultValues.attributes,
-                ...pk,
-                primaryKey: true,
-            }))
-            : [];
+        const primaryKeyAttributes =
+            primaryKey && Array.isArray(primaryKey)
+                ? primaryKey.map((pk) => ({
+                      ...defaultValues.attributes,
+                      ...pk,
+                      primaryKey: true,
+                  }))
+                : [];
 
         const attributesTransf = attributes.map(({ ...field }) => ({
             ...field,
@@ -106,29 +139,29 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
         }));
 
         const mergedAttributes = [...attributesTransf, ...primaryKeyAttributes];
-        const constraints = uniqueConstraints?.length > 0 ? uniqueConstraints : [defaultValues.uniqueConstraints];
-        const indexesTable = indexes?.length > 0 ? indexes : [defaultValues.indexes];
+        const constraints =
+            uniqueConstraints?.length > 0
+                ? uniqueConstraints
+                : [defaultValues.uniqueConstraints];
+        const indexesTable =
+            indexes?.length > 0 ? indexes : [defaultValues.indexes];
 
         formik.setFieldValue('revision', revision || false);
         formik.setFieldValue('name', name || '');
         formik.setFieldValue('tableName', tableName || '');
         formik.setFieldValue('crud', crud || false);
-        formik.setFieldValue('attributes', mergedAttributes || [defaultValues.attributes]);
+        formik.setFieldValue(
+            'attributes',
+            mergedAttributes || [defaultValues.attributes]
+        );
         formik.setFieldValue('uniqueConstraints', constraints);
         formik.setFieldValue('indexes', indexesTable);
     }, [data]);
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault();
-                handleSave();
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    // Keyboard shortcut for save (Ctrl/Cmd + S)
+    useKeyPress(() => {
+        handleSave();
+    }, [KeyboardKey.save]);
 
     const handleSave = async (): Promise<void> => {
         try {
@@ -137,8 +170,12 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                 { ...currentData, ...formik.values, id: currentItem.id },
                 currentItem?.module || 'shared'
             );
-            console.log(values)
-            const { error } = await window.engine.createModel(values, ENV_TYPES.SPRING, basePath);
+            console.log(values);
+            const { error } = await window.engine.createModel(
+                values,
+                ENV_TYPES.SPRING,
+                basePath
+            );
 
             if (error) {
                 console.log('error', error);
@@ -148,7 +185,9 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
 
             await createRelationReference(values);
             dispatch(onSetChangeStatus(true));
-            showSuccessToast(t('createdSuccess', { name: t('model'), value: values.name }));
+            showSuccessToast(
+                t('createdSuccess', { name: t('model'), value: values.name })
+            );
             handleRenameTab(currentItem.id, values.name);
         } catch (error) {
             showErrorToast(error);
@@ -163,7 +202,13 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                 const { relation, type, name } = attribute;
                 if (type !== 'relation' || !relation) return;
 
-                const { mappedBy, fetchType, type: relationType, entity, cardinality } = relation;
+                const {
+                    mappedBy,
+                    fetchType,
+                    type: relationType,
+                    entity,
+                    cardinality,
+                } = relation;
                 if (cardinality !== 'twoWay') return;
 
                 const relationReference: RelationReference = {
@@ -179,14 +224,20 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                 if (!schemaRef) return;
 
                 try {
-                    const modelData = await window.api.getJsonContent(schemaRef.path);
-                    const existingRefs = Array.isArray(modelData.relationReference)
+                    const modelData = await window.api.getJsonContent(
+                        schemaRef.path
+                    );
+                    const existingRefs = Array.isArray(
+                        modelData.relationReference
+                    )
                         ? modelData.relationReference
                         : [];
 
-                    const existingIndex = existingRefs.findIndex((existingRef: any) =>
-                        existingRef.fieldName === relationReference.fieldName &&
-                        existingRef.mappedBy === relationReference.mappedBy
+                    const existingIndex = existingRefs.findIndex(
+                        (existingRef: any) =>
+                            existingRef.fieldName ===
+                                relationReference.fieldName &&
+                            existingRef.mappedBy === relationReference.mappedBy
                     );
 
                     let updatedReferences;
@@ -197,14 +248,16 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                             ...relationReference,
                         };
                     } else {
-                        updatedReferences = [...existingRefs, relationReference];
+                        updatedReferences = [
+                            ...existingRefs,
+                            relationReference,
+                        ];
                     }
 
                     const updatedModel = {
                         ...modelData,
                         relationReference: updatedReferences,
                     };
-
 
                     const { error } = await window.engine.createModel(
                         updatedModel,
@@ -213,7 +266,6 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                     );
 
                     if (error) showErrorToast(error);
-
                 } catch (error) {
                     console.error('Failed to fetch JSON content:', error);
                 }
@@ -229,7 +281,11 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
                 module: currentItem.module,
             };
 
-            const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath);
+            const { error } = await window.engine.delete(
+                config,
+                ENV_TYPES.SPRING,
+                basePath
+            );
             if (error) return showErrorToast(error);
 
             dispatch(onSetChangeStatus(true));
@@ -256,6 +312,6 @@ export const useModel = ({ selectors, currentItem }: { selectors: Array<any>; cu
         handleSave,
         deleteModel,
         onClickSourceCode,
-        handleNameBlur
+        handleNameBlur,
     };
 };

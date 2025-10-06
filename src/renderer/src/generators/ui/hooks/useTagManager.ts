@@ -5,19 +5,22 @@ export function useTagManager(componentTree: StructuredComponent | null) {
     const tagSetRef = useRef<Set<string>>(new Set());
 
     // Função recursiva para coletar todos os TAGs
-    const collectAllIds = useCallback((component: StructuredComponent): string[] => {
-        const tags = [component.tag];
-        component.children?.forEach(child => {
-            tags.push(...collectAllIds(child));
-        });
-        return tags;
-    }, []);
+    const collectAllIds = useCallback(
+        (component: StructuredComponent): string[] => {
+            const tags = [component.tag];
+            component.children?.forEach((child) => {
+                tags.push(...collectAllIds(child));
+            });
+            return tags;
+        },
+        []
+    );
 
     // Reconstrói o Set de IDs com base no componente atual
     const rebuild = useCallback(() => {
-        if (!componentTree) return
+        if (!componentTree) return;
         const newSet = new Set<string>();
-        collectAllIds(componentTree).forEach(tag => newSet.add(tag));
+        collectAllIds(componentTree).forEach((tag) => newSet.add(tag));
         tagSetRef.current = newSet;
     }, [componentTree, collectAllIds]);
 

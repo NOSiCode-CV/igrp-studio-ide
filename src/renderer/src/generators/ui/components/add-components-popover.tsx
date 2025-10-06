@@ -1,17 +1,17 @@
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@renderer/components/ui/popover';
+    IGRPPopoverPrimitive,
+    IGRPPopoverContentPrimitive,
+    IGRPPopoverTriggerPrimitive,
+    IGRPBadgePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect } from 'react';
 import { ICON_MAP } from '../ComponentTypes';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
 import { handleDragEnd } from '../dnd/DraggableItemManager';
 import { useTagManager } from '../hooks/useTagManager';
-import { Badge } from '@renderer/components/ui/badge';
 import useStudio from '@renderer/hooks/use-studio';
 import useToast from '@renderer/hooks/useToast';
 
@@ -65,16 +65,16 @@ export const AddComponentPopover = ({
     }, [rebuild]);
 
     return (
-        <Popover>
-            <PopoverTrigger asChild>
-                <Badge
+        <IGRPPopoverPrimitive>
+            <IGRPPopoverTriggerPrimitive asChild>
+                <IGRPBadgePrimitive
                     variant={'secondary'}
                     className="rounded-sm cursor-pointer h-6"
                 >
                     <span className="text-xs">Add Comp</span>
-                </Badge>
-            </PopoverTrigger>
-            <PopoverContent className="w-100 p-3 space-y-3">
+                </IGRPBadgePrimitive>
+            </IGRPPopoverTriggerPrimitive>
+            <IGRPPopoverContentPrimitive className="w-100 p-3 space-y-3">
                 <div className="p-2 border-b">
                     <h3 className="text-lg font-semibold">
                         {t('addComponent')}
@@ -98,7 +98,7 @@ export const AddComponentPopover = ({
                             </button>
                         ))}
                 </div>
-            </PopoverContent>
-        </Popover>
+            </IGRPPopoverContentPrimitive>
+        </IGRPPopoverPrimitive>
     );
 };

@@ -1,24 +1,28 @@
 import React, { useState } from 'react';
 import { Play, Square, Loader2, ChevronDown, Trash2 } from 'lucide-react';
-import { Button } from './ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Separator } from './ui/separator';
-import { Checkbox } from './ui/checkbox';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { TooltipProvider } from '@radix-ui/react-tooltip';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuSeparatorPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPSeparatorPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPCheckboxPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPTooltipPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipTriggerPrimitive,
+    IGRPTooltipProviderPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { useTranslation } from 'react-i18next';
 
 interface DockerControlsProps {
     loading: boolean;
     onRun: () => Promise<void>;
     onStopAll: () => Promise<void>;
     onDropAll: (dropVolume: boolean) => Promise<void>;
-    t: (key: string) => string;
 }
 
 const DockerControls: React.FC<DockerControlsProps> = ({
@@ -26,72 +30,80 @@ const DockerControls: React.FC<DockerControlsProps> = ({
     onRun,
     onStopAll,
     onDropAll,
-    t,
 }) => {
+    const { t } = useTranslation();
     const [dropVolume, setDropVolume] = useState<boolean>(false);
+    const [isRunning, setIsRunning] = useState<boolean>(false);
+
+    const handleRun = async () => {
+        if (isRunning || loading) return;
+
+        setIsRunning(true);
+        try {
+            await onRun();
+        } catch (error) {
+            console.error('Error running containers:', error);
+        } finally {
+            setIsRunning(false);
+        }
+    };
 
     return (
-        <TooltipProvider>
+        <IGRPTooltipProviderPrimitive>
             <div className="flex items-center border rounded-md space-x-1">
-                <Button
+                <IGRPButtonPrimitive
                     variant="ghost"
                     size="sm"
                     className={`
               relative h-6 text-xs overflow-hidden group
-              ${loading ? 'animate-pulse' : ''}
+              ${loading || isRunning ? 'animate-pulse' : ''}
             `}
-                    disabled={loading}
+                    disabled={loading || isRunning}
+                    onClick={handleRun}
                 >
                     <div
                         className="absolute inset-0 bg-gradient-to-r from-green-400/0 via-green-400/10 to-green-400/0 
                           group-hover:translate-x-full -translate-x-full transition-transform duration-700"
                     />
-                    <div className="flex items-center">
-                        <div
-                            className="flex items-center gap-1.5"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onRun();
-                            }}
-                        >
-                            {loading ? (
-                                <Loader2 className="h-3.5 w-3.5 animate-spin text-igrp" />
-                            ) : (
-                                <>
-                                    <Play className="h-3.5 w-3.5 text-igrp" />
-                                    <span className="font-medium ">
-                                        {t('run')}
-                                    </span>
-                                </>
-                            )}
-                        </div>
+                    <div className="flex items-center gap-1.5">
+                        {loading || isRunning ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-igrp" />
+                        ) : (
+                            <>
+                                <Play className="h-3.5 w-3.5 text-igrp" />
+                                <span className="font-medium ">{t('run')}</span>
+                            </>
+                        )}
                     </div>
-                </Button>
-                <Separator
+                </IGRPButtonPrimitive>
+                <IGRPSeparatorPrimitive
                     orientation="vertical"
                     className="data-[orientation=vertical]:h-4"
                 />
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
+                <IGRPDropdownMenuPrimitive>
+                    <IGRPDropdownMenuTriggerPrimitive asChild>
+                        <IGRPButtonPrimitive
                             variant="ghost"
                             size="sm"
                             className="h-6 text-xs"
                         >
                             <ChevronDown className="h-3.5 w-3.5 text-igrp" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem
+                        </IGRPButtonPrimitive>
+                    </IGRPDropdownMenuTriggerPrimitive>
+                    <IGRPDropdownMenuContentPrimitive
+                        align="end"
+                        className="w-48"
+                    >
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={() => onStopAll()}
                             className="group"
                         >
                             <Square className="h-3.5 w-3.5" />
                             <span className="font-medium">{t('stop')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
+                        </IGRPDropdownMenuItemPrimitive>
+                        <IGRPDropdownMenuSeparatorPrimitive />
 
-                        <DropdownMenuItem
+                        <IGRPDropdownMenuItemPrimitive
                             onClick={(e) => {
                                 // Only handle the action if the click wasn't on the checkbox
                                 if (
@@ -117,28 +129,29 @@ const DockerControls: React.FC<DockerControlsProps> = ({
                                     className="checkbox-container"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Checkbox
+                                    <IGRPTooltipPrimitive>
+                                        <IGRPTooltipTriggerPrimitive asChild>
+                                            <IGRPCheckboxPrimitive
+                                                name="drop-volume"
                                                 checked={dropVolume}
                                                 onCheckedChange={(
                                                     checked: boolean
                                                 ) => setDropVolume(checked)}
                                             />
-                                        </TooltipTrigger>
-                                        <TooltipContent>
+                                        </IGRPTooltipTriggerPrimitive>
+                                        <IGRPTooltipContentPrimitive>
                                             <p>
-                                            {t('deleteContainersVolumes')}
+                                                {t('deleteContainersVolumes')}
                                             </p>
-                                        </TooltipContent>
-                                    </Tooltip>
+                                        </IGRPTooltipContentPrimitive>
+                                    </IGRPTooltipPrimitive>
                                 </div>
                             </div>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </IGRPDropdownMenuItemPrimitive>
+                    </IGRPDropdownMenuContentPrimitive>
+                </IGRPDropdownMenuPrimitive>
             </div>
-        </TooltipProvider>
+        </IGRPTooltipProviderPrimitive>
     );
 };
 

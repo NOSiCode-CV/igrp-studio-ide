@@ -1,13 +1,19 @@
 import { ROUTES } from './routeConstants';
-import React, { lazy, Suspense } from 'react';
+import React, { JSX, Suspense } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import MainLayout from '@renderer/layouts/MainLayout';
 import UiStudioLayout from '@renderer/layouts/UiStudioLayout';
 import ApiStudioLayoput from '@renderer/layouts/ApiStudioLayout';
-import { Loader } from 'lucide-react';
+import Loader from '@renderer/components/loader';
+import ProjectSettings from '@renderer/pages/project/project-settings';
+import IDEInitialScreen from '@renderer/pages/ide-initial-screen';
+import AppLogicPage from '@renderer/pages/applogic/app-logic';
+import Connections from '@renderer/pages/connections';
+import GeneratorUI from '@renderer/generators/ui';
+import GeneratorAPI from '@renderer/generators/api';
 
-const IDEInitialScreen = lazy(
+/* const IDEInitialScreen = lazy(
     () => import('@renderer/pages/ide-initial-screen')
 );
 const PageBuilderApi = lazy(() => import('@renderer/generators/api'));
@@ -16,19 +22,19 @@ const ProjectSettings = lazy(
 );
 const Connections = lazy(() => import('@renderer/pages/connections'));
 const PageBuilderUI = lazy(() => import('@renderer/generators/ui'));
-const AppLogicPage = lazy(() => import('@renderer/pages/applogic/app-logic'));
+const AppLogicPage = lazy(() => import('@renderer/pages/applogic/app-logic')); */
 
 const allRoutes = [
     {
         path: ROUTES.PATH_PAGE_BUILDER_UI,
-        component: <PageBuilderUI />,
+        component: <GeneratorUI />,
     },
 ];
 
 const apiRoutes = [
     {
         path: ROUTES.PATH_PAGE_BUILDER_API,
-        component: <PageBuilderApi />,
+        component: <GeneratorAPI />,
     },
     {
         path: '/project-settings',
@@ -51,7 +57,7 @@ const othersRoutes = [
     },
 ];
 
-function AppRoutes() {
+function AppRoutes(): JSX.Element {
     return (
         <React.Fragment>
             <Suspense fallback={<Loader />}>

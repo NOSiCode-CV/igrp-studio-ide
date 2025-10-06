@@ -1,4 +1,4 @@
-import type { EffectsStyle } from "../types";
+import type { EffectsStyle } from '../types';
 
 export function effectsToSyleClasses(effects: EffectsStyle): string {
     const {
@@ -36,7 +36,7 @@ export function effectsToSyleClasses(effects: EffectsStyle): string {
 
     // Box shadows
     if (boxShadows.length > 0) {
-        boxShadows.forEach(shadow => {
+        boxShadows.forEach((shadow) => {
             const shadowStr = `${shadow.inset ? 'inset ' : ''}${shadow.x}px ${shadow.y}px ${shadow.blur}px ${shadow.spread}px ${shadow.color}`;
             classes.push(`shadow-[${shadowStr}]`);
         });
@@ -44,16 +44,14 @@ export function effectsToSyleClasses(effects: EffectsStyle): string {
 
     // Filters
     if (filters.length > 0) {
-        const filterStr = filters
-            .map(f => `${f.type}(${f.value})`)
-            .join(' ');
+        const filterStr = filters.map((f) => `${f.type}(${f.value})`).join(' ');
         classes.push(`filter`, `filter-[${filterStr}]`);
     }
 
     // Backdrop filters
     if (backdropFilters.length > 0) {
         const backdropStr = backdropFilters
-            .map(f => `${f.type}(${f.value})`)
+            .map((f) => `${f.type}(${f.value})`)
             .join(' ');
         classes.push(`backdrop-filter`, `backdrop-filter-[${backdropStr}]`);
     }
@@ -61,14 +59,14 @@ export function effectsToSyleClasses(effects: EffectsStyle): string {
     // Transforms
     if (transforms.length > 0) {
         const transformStr = transforms
-            .map(t => `${t.type}(${t.value})`)
+            .map((t) => `${t.type}(${t.value})`)
             .join(' ');
         classes.push(`transform`, `transform-[${transformStr}]`);
     }
 
     // Transitions
     if (transitions.length > 0) {
-        const props = transitions.map(t => t.property).join(',');
+        const props = transitions.map((t) => t.property).join(',');
         const duration = transitions[0]?.duration || '150ms';
         const timing = transitions[0]?.timing || 'ease-in-out';
         const delay = transitions[0]?.delay || '0ms';

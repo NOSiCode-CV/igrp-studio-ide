@@ -8,20 +8,21 @@ import {
 } from 'lucide-react';
 
 import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-    CommandSeparator,
-} from '@renderer/components/ui/command';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@renderer/components/ui/popover';
-import { Button } from '@renderer/components/ui/button';
+    IGRPButtonPrimitive,
+    IGRPCommandEmptyPrimitive,
+    IGRPCommandGroupPrimitive,
+    IGRPCommandInputPrimitive,
+    IGRPCommandItemPrimitive,
+    IGRPCommandListPrimitive,
+    IGRPCommandPrimitive,
+    IGRPCommandSeparatorPrimitive,
+    IGRPPopoverContentPrimitive,
+    IGRPPopoverPrimitive,
+    IGRPPopoverTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -30,7 +31,6 @@ import {
     setGitEnabled,
 } from '@renderer/redux/git/reducer';
 import { RootState } from '@renderer/redux';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { useTranslation } from 'react-i18next';
 
 export interface Branch {
@@ -95,7 +95,9 @@ export function BranchSwitcher({
             );
             dispatch(setBranches(branchList));
 
-            const activeBranch = branchList.find((branch: any) => branch.isActive);
+            const activeBranch = branchList.find(
+                (branch: any) => branch.isActive
+            );
             if (activeBranch) {
                 dispatch(setActiveBranch(activeBranch.name));
             }
@@ -121,21 +123,21 @@ export function BranchSwitcher({
 
     if (!isGitEnabled) {
         return (
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button
+            <IGRPTooltipPrimitive>
+                <IGRPTooltipTriggerPrimitive asChild>
+                    <IGRPButtonPrimitive
                         variant={'outline'}
                         onClick={handleInitGit}
                         className="h-6 text-xs"
                     >
                         <GitFork className="h-3 w-3" />
                         {t('initGit')}
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent>
+                    </IGRPButtonPrimitive>
+                </IGRPTooltipTriggerPrimitive>
+                <IGRPTooltipContentPrimitive>
                     <p>{t('initializeGit')}</p>
-                </TooltipContent>
-            </Tooltip>
+                </IGRPTooltipContentPrimitive>
+            </IGRPTooltipPrimitive>
         );
     }
 
@@ -178,7 +180,7 @@ export function BranchSwitcher({
 
     if (isLoading) {
         return (
-            <Button
+            <IGRPButtonPrimitive
                 variant="outline"
                 className="w-[250px] justify-between"
                 disabled
@@ -186,14 +188,14 @@ export function BranchSwitcher({
                 <GitBranch className="mr-2 h-4 w-4" />
                 {t('loadingBranches')}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
+            </IGRPButtonPrimitive>
         );
     }
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
+        <IGRPPopoverPrimitive open={open} onOpenChange={setOpen}>
+            <IGRPPopoverTriggerPrimitive asChild>
+                <IGRPButtonPrimitive
                     variant={'outline'}
                     role="combobox"
                     aria-expanded={open}
@@ -202,16 +204,20 @@ export function BranchSwitcher({
                     <GitBranch className="h-3 w-3 " />
                     <span>{activeBranch || t('selectBranch')}</span>
                     <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[300px] p-0">
-                <Command>
-                    <CommandInput placeholder={t('searchBranch')} />
-                    <CommandList>
-                        <CommandEmpty>{t('noBranchFound')}</CommandEmpty>
-                        <CommandGroup heading={t('branches')}>
+                </IGRPButtonPrimitive>
+            </IGRPPopoverTriggerPrimitive>
+            <IGRPPopoverContentPrimitive className="w-[300px] p-0">
+                <IGRPCommandPrimitive>
+                    <IGRPCommandInputPrimitive
+                        placeholder={t('searchBranch')}
+                    />
+                    <IGRPCommandListPrimitive>
+                        <IGRPCommandEmptyPrimitive>
+                            {t('noBranchFound')}
+                        </IGRPCommandEmptyPrimitive>
+                        <IGRPCommandGroupPrimitive heading={t('branches')}>
                             {branches.map((branch) => (
-                                <CommandItem
+                                <IGRPCommandItemPrimitive
                                     key={branch.fullName}
                                     onSelect={() =>
                                         handleBranchSwitch(branch.name)
@@ -249,17 +255,17 @@ export function BranchSwitcher({
                                             )}
                                         </div>
                                     </div>
-                                </CommandItem>
+                                </IGRPCommandItemPrimitive>
                             ))}
-                        </CommandGroup>
-                        <CommandSeparator />
-                        <CommandGroup>
-                            <CommandItem
+                        </IGRPCommandGroupPrimitive>
+                        <IGRPCommandSeparatorPrimitive />
+                        <IGRPCommandGroupPrimitive>
+                            <IGRPCommandItemPrimitive
                                 onSelect={() => setIsCreatingBranch(true)}
                             >
                                 <PlusCircle className="mr-2 h-4 w-4" />
                                 {t('createNewBranch')}
-                            </CommandItem>
+                            </IGRPCommandItemPrimitive>
 
                             {isCreatingBranch && (
                                 <div className="p-2 flex gap-2">
@@ -273,19 +279,19 @@ export function BranchSwitcher({
                                         placeholder={t('branchNamePlaceholder')}
                                         autoFocus
                                     />
-                                    <Button
+                                    <IGRPButtonPrimitive
                                         size="sm"
                                         disabled={!newBranchName.trim()}
                                         onClick={handleCreateBranch}
                                     >
                                         {t('create')}
-                                    </Button>
+                                    </IGRPButtonPrimitive>
                                 </div>
                             )}
-                        </CommandGroup>
-                    </CommandList>
-                </Command>
-            </PopoverContent>
-        </Popover>
+                        </IGRPCommandGroupPrimitive>
+                    </IGRPCommandListPrimitive>
+                </IGRPCommandPrimitive>
+            </IGRPPopoverContentPrimitive>
+        </IGRPPopoverPrimitive>
     );
 }

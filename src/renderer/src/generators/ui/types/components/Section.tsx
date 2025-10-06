@@ -10,7 +10,11 @@ import { COMPONENT } from '../../ComponentTypes';
 import BoxWrapper from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
 
-const IGRPStudioSection = ({ comp, onDragEnd, className }: CardComponentProps) => {
+const IGRPStudioSection = ({
+    comp,
+    onDragEnd,
+    className,
+}: CardComponentProps) => {
     useTranslation();
     const { children: components, id: componentId } = comp || {};
 
