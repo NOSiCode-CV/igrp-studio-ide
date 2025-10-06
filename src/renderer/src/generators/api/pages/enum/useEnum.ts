@@ -12,6 +12,8 @@ import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import { defaultValue, getTablesColumns, initialValues } from './config';
 import useToast from '@renderer/hooks/useToast';
+import { useKeyPress } from '@renderer/hooks/useKeyDown';
+import { KeyboardKey } from '@renderer/constants/shortcut';
 
 export const useEnum = ({ currentItem }: { currentItem: any }) => {
     const dispatch: any = useDispatch();
@@ -76,17 +78,10 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
         }
     }, [data]);
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault();
-                handleSave();
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    // Keyboard shortcut for save (Ctrl/Cmd + S)
+    useKeyPress(() => {
+        handleSave();
+    }, [KeyboardKey.save]);
 
     const handleSave = async (): Promise<void> => {
         try {

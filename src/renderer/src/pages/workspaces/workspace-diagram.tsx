@@ -54,6 +54,7 @@ import {
     ExternalLink,
     Edit,
     Trash,
+    Plus,
 } from 'lucide-react';
 
 import { ServiceInfo, IWorkspace } from 'src/main/types';
@@ -331,6 +332,12 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
     const [serviceToDelete, setServiceToDelete] = useState<ServiceInfo | null>(
         null
     );
+    const [contextMenu, setContextMenu] = useState<{
+        x: number;
+        y: number;
+        visible: boolean;
+    }>({ x: 0, y: 0, visible: false });
+    const [isNewServiceDialogOpen, setIsNewServiceDialogOpen] = useState(false);
 
     // Refs for handlers to prevent infinite loops
     const handleServiceActionRef = useRef<
@@ -672,6 +679,43 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
         await refreshContainers();
     };
 
+    const handleContextMenu = useCallback((event: React.MouseEvent) => {
+        event.preventDefault();
+        setContextMenu({
+            x: event.clientX,
+            y: event.clientY,
+            visible: true,
+        });
+    }, []);
+
+    const handleCloseContextMenu = useCallback(() => {
+        setContextMenu({ x: 0, y: 0, visible: false });
+    }, []);
+
+    const handleCreateService = useCallback(() => {
+        // Open the ConfigurationDialog for creating a new service
+        setIsNewServiceDialogOpen(true);
+        handleCloseContextMenu();
+    }, [handleCloseContextMenu]);
+
+    const handleNewServiceDialogClose = useCallback(async () => {
+        setIsNewServiceDialogOpen(false);
+        // Refresh services after creating a new service
+        await refreshContainers();
+    }, [refreshContainers]);
+
+    // Close context menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (): void => {
+            if (contextMenu.visible) {
+                handleCloseContextMenu();
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [contextMenu.visible, handleCloseContextMenu]);
+
     const runningServices = services.filter(
         (s) => s.status === 'running'
     ).length;
@@ -748,6 +792,7 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onNodeClick={handleNodeClick}
+                onPaneContextMenu={handleContextMenu}
                 nodeTypes={nodeTypes}
                 connectionLineType={ConnectionLineType.SmoothStep}
                 fitView
@@ -820,6 +865,26 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                 </Panel>
             </ReactFlow>
 
+            {/* Context Menu */}
+            {contextMenu.visible && (
+                <div
+                    className="fixed z-50 bg-background border rounded-md shadow-lg p-1 min-w-[160px]"
+                    style={{
+                        left: contextMenu.x,
+                        top: contextMenu.y,
+                    }}
+                    onMouseLeave={handleCloseContextMenu}
+                >
+                    <div
+                        onClick={handleCreateService}
+                        className="flex items-center gap-2 cursor-pointer px-2 py-1 hover:bg-accent rounded-sm"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Create New Service
+                    </div>
+                </div>
+            )}
+
             {/* Delete Confirmation Dialog */}
             <AlertDialogDelete
                 onConfirm={handleConfirmDelete}
@@ -840,6 +905,17 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                     <span className="sr-only">Edit</span>
                 </ConfigurationDialog>
             )}
+
+            {/* New Service Dialog */}
+            <ConfigurationDialog
+                service={undefined}
+                services={services}
+                isNew={true}
+                open={isNewServiceDialogOpen}
+                setOpen={handleNewServiceDialogClose}
+            >
+                <span className="sr-only">Create New Service</span>
+            </ConfigurationDialog>
         </div>
     );
 };

@@ -43,7 +43,7 @@ interface CreatePageModalProps {
     isSubPage?: boolean;
     currentComponent?: PageDefinition;
     onClose: () => void;
-    onConfirm: () => void;
+    onConfirm: (createdPage?: PageDefinition) => void;
 }
 
 export function CreatePageModal({
@@ -53,7 +53,7 @@ export function CreatePageModal({
     onConfirm,
     isSubPage,
     currentComponent,
-}: CreatePageModalProps) {
+}: CreatePageModalProps): React.JSX.Element {
     const { t } = useTranslation();
 
     const { createGitCommit } = useGit();
@@ -64,7 +64,14 @@ export function CreatePageModal({
         useState<PageConfig>(initialValues);
 
     useEffect(() => {
-        const loadCurrentData = async () => {
+        const loadCurrentData = async (): Promise<void> => {
+            // For sub-page creation, don't pre-fill the form with parent data
+            if (isSubPage) {
+                setFormInitialValues(initialValues);
+                return;
+            }
+
+            // For regular page creation, load parent data if available
             if (currentComponent?.path) {
                 try {
                     const currentData = await window.api.getJsonContent(
@@ -92,8 +99,18 @@ export function CreatePageModal({
             }
         };
 
-        loadCurrentData();
-    }, [currentComponent, isOpen]);
+        // Only load data when modal is open
+        if (isOpen) {
+            loadCurrentData();
+        }
+    }, [currentComponent, isOpen, isSubPage]);
+
+    // Reset form when modal closes
+    useEffect(() => {
+        if (!isOpen) {
+            setFormInitialValues(initialValues);
+        }
+    }, [isOpen]);
 
     const handleConfirm = async (pageConfig: PageConfig): Promise<void> => {
         try {
@@ -112,7 +129,7 @@ export function CreatePageModal({
                 }));
 
                 // Add args to pageConfig (we'll need to extend the interface)
-                (pageConfig as any).args = generatedArgs;
+                (pageConfig as unknown as PageConfig).args = generatedArgs;
             }
 
             const { error } = await window.engine.createPage(
@@ -131,7 +148,23 @@ export function CreatePageModal({
             );
             // commit after creating the page
             createGitCommit(basePath, `Add page ${pageConfig.pageName}`);
-            onConfirm?.();
+
+            // Create a PageDefinition object for the newly created page
+            const createdPage: PageDefinition = {
+                id: pageConfig.id,
+                type: pageConfig.type as 'page' | 'component',
+                name: pageConfig.pageName,
+                description: pageConfig.description || '',
+                path: pageConfig.path,
+                pagePath: pageConfig.path,
+                status: 'active',
+                created: new Date().toISOString(),
+                pageName: pageConfig.pageName,
+                isPage: pageConfig.type === 'page',
+                content: pageConfig as any,
+            };
+
+            onConfirm?.(createdPage);
 
             formik.resetForm();
         } catch (error) {

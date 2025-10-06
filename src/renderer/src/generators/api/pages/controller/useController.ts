@@ -18,6 +18,8 @@ import { useActionValidation } from './validation';
 import { formatMethods } from '../../helpers';
 import useSchemaTypes from '../../helpers/useSchemaTypes';
 import useToast from '@renderer/hooks/useToast';
+import { useKeyPress } from '@renderer/hooks/useKeyDown';
+import { KeyboardKey } from '@renderer/constants/shortcut';
 
 export const useController = ({
     selectors,
@@ -172,16 +174,10 @@ export const useController = ({
         } as ControllerConfig;
     };
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault();
-                formik.handleSubmit();
-            }
-        };
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    // Keyboard shortcut for save (Ctrl/Cmd + S)
+    useKeyPress(() => {
+        formik.handleSubmit();
+    }, [KeyboardKey.save]);
 
     const handleSave = async (): Promise<void> => {
         try {
