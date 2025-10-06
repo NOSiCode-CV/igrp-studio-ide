@@ -53,7 +53,7 @@ export function DuplicatePageModal({
     onClose,
     onConfirm,
     pageToDuplicate,
-}: DuplicatePageModalProps) {
+}: DuplicatePageModalProps): React.JSX.Element {
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
     const { showErrorToast, showSuccessToast } = useToast();
