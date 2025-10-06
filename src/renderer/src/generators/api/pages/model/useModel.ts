@@ -20,6 +20,8 @@ import {
 } from './config';
 import { useModelValidation } from './validation';
 import useToast from '@renderer/hooks/useToast';
+import { useKeyPress } from '@renderer/hooks/useKeyDown';
+import { KeyboardKey } from '@renderer/constants/shortcut';
 
 export const useModel = ({
     selectors,
@@ -156,17 +158,10 @@ export const useModel = ({
         formik.setFieldValue('indexes', indexesTable);
     }, [data]);
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault();
-                handleSave();
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    // Keyboard shortcut for save (Ctrl/Cmd + S)
+    useKeyPress(() => {
+        handleSave();
+    }, [KeyboardKey.save]);
 
     const handleSave = async (): Promise<void> => {
         try {

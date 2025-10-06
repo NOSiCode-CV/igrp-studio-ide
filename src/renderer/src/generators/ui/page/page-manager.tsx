@@ -55,7 +55,9 @@ interface PageBuilderContentProps {
     onPageClick?: (pageFile: PageDefinition) => void;
 }
 
-const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
+const PageManager = ({
+    onPageClick,
+}: PageBuilderContentProps): React.JSX.Element => {
     const { t } = useTranslation();
     const dispatch: any = useDispatch();
 
@@ -79,22 +81,24 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
     const [currentComponent, setCurrentComponent] = useState<PageDefinition>();
     const [isSubPage, setIsSubPage] = useState<boolean>(false);
 
-    const handleAddComponents = (page: PageDefinition) => {
+    const handleAddComponents = (page: PageDefinition): void => {
         onPageClick?.(page);
     };
 
-    const handleDeletePage = (page: PageDefinition) => {
+    const handleDeletePage = (page: PageDefinition): void => {
         setDeleteModal(true);
         setCurrentComponent(page);
     };
 
-    const handleDuplicate = (page: PageDefinition) => {
+    const handleDuplicate = (page: PageDefinition): void => {
         setPageToDuplicate(page);
         setShowDuplicateModal(true);
     };
 
-    const confirmDeletion = async () => {
-        if (!currentComponent) return;
+    const confirmDeletion = async (): Promise<void> => {
+        if (!currentComponent) {
+            return;
+        }
         const pageConfig: DeleteConfig = {
             type: currentComponent.type,
             name: currentComponent.pageName,
@@ -106,18 +110,32 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
         setCurrentComponent(undefined);
     };
 
-    const openDialogNewPage = (page?: PageDefinition) => {
+    const openDialogNewPage = (
+        page?: PageDefinition,
+        isSubPage?: boolean
+    ): void => {
         setFormPage(true);
         setCurrentComponent(page);
+        setIsSubPage(isSubPage || false);
     };
 
-    const handleNewPage = () => {
+    const handleNewPage = (createdPage?: PageDefinition): void => {
         setFormPage(false);
-        setCurrentComponent(undefined);
         setFormComponent(false);
         setShowDuplicateModal(false);
         setPageToDuplicate(undefined);
         isLoadingTable(true);
+
+        // If we were creating a sub-page, open the newly created sub-page
+        if (isSubPage && createdPage) {
+            // Open the newly created sub-page
+            onPageClick?.(createdPage);
+            // Keep the current component context for potential future sub-page creation
+        } else {
+            // For regular page creation, reset the context
+            setCurrentComponent(undefined);
+        }
+
         setIsSubPage(false);
     };
 
@@ -156,7 +174,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
         comp.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const getPageComponent = (pageName: string) => {
+    const getPageComponent = (pageName: string): PageDefinition[] => {
         return filteredComponents
             .filter((comp: FileTree) => comp.content.pageName === pageName)
             .map((comp: FileTree) => ({
@@ -168,7 +186,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
             }));
     };
 
-    const getSubPages = (pageName: string) => {
+    const getSubPages = (pageName: string): PageDefinition[] => {
         return filteredPages
             .filter((page: FileTree) => page.content.parentName === pageName)
             .map((page: FileTree) => ({
@@ -180,7 +198,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
             }));
     };
 
-    const handleEdit = (page: PageDefinition) => {
+    const handleEdit = (page: PageDefinition): void => {
         if (page.type === 'page') {
             setFormPage(!showformPage);
         } else {
@@ -309,8 +327,10 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                                     <IGRPDropdownMenuContentPrimitive>
                                         <IGRPDropdownMenuItemPrimitive
                                             onSelect={() => {
-                                                openDialogNewPage();
-                                                setCurrentComponent(undefined);
+                                                openDialogNewPage(
+                                                    undefined,
+                                                    false
+                                                );
                                             }}
                                         >
                                             {t('createNewPage')}
@@ -331,34 +351,38 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps) => {
                         {viewMode === 'card' ? (
                             tableData.length > 0 ? (
                                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start">
-                                    {tableData.map((page) => {
-                                        const components = getPageComponent(
-                                            page.pageName
-                                        );
-                                        const subPages = getSubPages(
-                                            page.pageName
-                                        );
-                                        return (
-                                            <PageCardView
-                                                key={page.name}
-                                                page={page}
-                                                onDelete={(page) =>
-                                                    handleDeletePage(page)
-                                                }
-                                                onAddComponents={
-                                                    handleAddComponents
-                                                }
-                                                onEdit={handleEdit}
-                                                onDuplicate={handleDuplicate}
-                                                components={components}
-                                                subPages={subPages}
-                                                openDialogNewPage={
-                                                    openDialogNewPage
-                                                }
-                                                setIsSubPage={setIsSubPage}
-                                            />
-                                        );
-                                    })}
+                                    {tableData.map(
+                                        (page): React.JSX.Element => {
+                                            const components = getPageComponent(
+                                                page.pageName
+                                            );
+                                            const subPages = getSubPages(
+                                                page.pageName
+                                            );
+                                            return (
+                                                <PageCardView
+                                                    key={page.name}
+                                                    page={page}
+                                                    onDelete={(page) =>
+                                                        handleDeletePage(page)
+                                                    }
+                                                    onAddComponents={
+                                                        handleAddComponents
+                                                    }
+                                                    onEdit={handleEdit}
+                                                    onDuplicate={
+                                                        handleDuplicate
+                                                    }
+                                                    components={components}
+                                                    subPages={subPages}
+                                                    openDialogNewPage={
+                                                        openDialogNewPage
+                                                    }
+                                                    setIsSubPage={setIsSubPage}
+                                                />
+                                            );
+                                        }
+                                    )}
                                 </div>
                             ) : (
                                 <EmptyList

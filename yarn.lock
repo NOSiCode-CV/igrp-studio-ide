@@ -1153,10 +1153,10 @@
     tailwind-merge "^3.3.1"
     zod "^3.25.67"
 
-"@igrp/igrp-framework-react-design-system@0.1.0-beta.16":
-  version "0.1.0-beta.16"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.1.0-beta.16.tgz#c0c9997496e4b04d4e2b434f1df96225de725e76"
-  integrity sha512-Rm8lAWP6lr3OfY+luVHze1q3DxzoLJBPROSXPxc/Jj7SBRasBfoZ0gYiWH0aUuU6woc7ktefSQltrij4eC9gVg==
+"@igrp/igrp-framework-react-design-system@0.1.0-beta.17":
+  version "0.1.0-beta.17"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.1.0-beta.17.tgz#2e5d95d33816ced61096a855df9ec0706cf60559"
+  integrity sha512-IAZzCdaTfDc6wocG05CzYgt9fTzX50sKyYhXEyihu12BPEMU/cLzkpvhgGwRGMVLQScD1A7q8eetL0vLFKrvsg==
   dependencies:
     "@hookform/resolvers" "5.0.1"
     "@radix-ui/react-accordion" "^1.2.11"
@@ -1257,10 +1257,10 @@
     vaul "^1.1.2"
     zod "^3.25.67"
 
-"@igrp/igrp-studio-nextjs-engine@0.1.0-beta.9":
-  version "0.1.0-beta.9"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.1.0-beta.9.tgz#b71a9e79859a688f9ef253944e2baf2c8ebf5e4e"
-  integrity sha512-Sj3bwNtrxdwx0bNuxivH1iy1f94PmOxdALe07ealPBGj+bSJb3ZXP1SM+iaSow8WRyWlT8QHz0QsIs//CeBusQ==
+"@igrp/igrp-studio-nextjs-engine@0.1.0-beta.12":
+  version "0.1.0-beta.12"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.1.0-beta.12.tgz#63f26a12069bb5fcc32c45ab3129811a793979eb"
+  integrity sha512-sb96ocE/b8Gf7IaPmY/mngbBzn94uJ9peG6aWSSC/A7pysCYDONmVja0Ktm8/FOkfUPZrhYvZncRzZdBq8HQtg==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"

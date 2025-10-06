@@ -13,6 +13,8 @@ import { getTablesColumns, initialValues } from './config';
 import { useDtoValidation } from './validation';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import useToast from '@renderer/hooks/useToast';
+import { useKeyPress } from '@renderer/hooks/useKeyDown';
+import { KeyboardKey } from '@renderer/constants/shortcut';
 
 export const useDto = ({
     selectors,
@@ -110,16 +112,10 @@ export const useDto = ({
         setTableColumns(columns);
     }, [selectors, dto, models, data]);
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault();
-                handleSave(formik.values);
-            }
-        };
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    // Keyboard shortcut for save (Ctrl/Cmd + S)
+    useKeyPress(() => {
+        handleSave(formik.values);
+    }, [KeyboardKey.save]);
 
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {

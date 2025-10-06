@@ -30,7 +30,14 @@ import {
 } from '@igrp/igrp-framework-react-design-system';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { SHORTCUTS } from '@renderer/constants/shortcut';
+
+// Helper function to get workspace index from number key
+const getWorkspaceIndexFromKey = (key: string): number | null => {
+    const keyNumber = parseInt(key);
+    return keyNumber >= 1 && keyNumber <= 9 ? keyNumber - 1 : null;
+};
 
 export const WorkspaceSwitcher = ({
     defaultWorkspace,
@@ -38,7 +45,7 @@ export const WorkspaceSwitcher = ({
 }: {
     defaultWorkspace: IWorkspace;
     onWorkspaceChange: (workspace: IWorkspace) => void;
-}) => {
+}): React.JSX.Element => {
     const navigate = useNavigate();
     const [pinnedWorkspaces, setPinnedWorkspaces] = useState<IWorkspace[]>([]);
 
@@ -58,45 +65,24 @@ export const WorkspaceSwitcher = ({
         actions: { updateWorkspace, openWorkspace },
     } = useWorkspace();
 
-    const loadPinnedWorkspace = () => {
+    const loadPinnedWorkspace = useCallback((): void => {
         const pinned: IWorkspace[] = workspaces.filter(
             (workspace) =>
                 workspace.pinned || workspace.name === selectedWorkspace.name
         );
 
         setPinnedWorkspaces(pinned);
-    };
+    }, [workspaces, selectedWorkspace.name]);
 
-    const handleChangeWorkspace = (workspace: IWorkspace) => {
-        onWorkspaceChange(workspace);
-        navigate(ROUTES.HOME);
-    };
+    const handleChangeWorkspace = useCallback(
+        (workspace: IWorkspace): void => {
+            onWorkspaceChange(workspace);
+            navigate(ROUTES.HOME);
+        },
+        [onWorkspaceChange, navigate]
+    );
 
-    useEffect(() => {
-        const result = workspaces.filter((workspace) =>
-            workspace.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredWorkspaces(result);
-
-        setSelectedWorkspace(defaultWorkspace);
-
-        loadPinnedWorkspace();
-    }, [searchTerm, defaultWorkspace, workspaces]);
-
-    const togglePinWorkspace = (workspace: IWorkspace, e?: MouseEvent) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        updateWorkspace(workspace.id, {
-            ...workspace,
-            pinned: !workspace.pinned,
-        });
-
-        loadPinnedWorkspace();
-    };
-
-    const handleOpenWorkspace = async () => {
+    const handleOpenWorkspace = useCallback(async (): Promise<void> => {
         try {
             // Use the Electron dialog to select a directory
             const result = await window.api.openDirectory(t('openWorkspace'));
@@ -111,6 +97,68 @@ export const WorkspaceSwitcher = ({
         } catch (error) {
             console.error('Error opening workspace:', error);
         }
+    }, [openWorkspace, onWorkspaceChange, t]);
+
+    useEffect(() => {
+        const result = workspaces.filter((workspace) =>
+            workspace.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredWorkspaces(result);
+
+        setSelectedWorkspace(defaultWorkspace);
+
+        loadPinnedWorkspace();
+    }, [searchTerm, defaultWorkspace, workspaces, loadPinnedWorkspace]);
+
+    // Keyboard shortcuts handler
+    useEffect(() => {
+        const handleKeyboardShortcuts = (event: KeyboardEvent): void => {
+            // Only handle shortcuts when Cmd/Ctrl is pressed
+            if (!event.metaKey && !event.ctrlKey) return;
+
+            // Handle number keys 1-9 for workspace switching
+            const workspaceIndex = getWorkspaceIndexFromKey(event.key);
+            if (workspaceIndex !== null) {
+                event.preventDefault();
+                if (workspaceIndex < filteredWorkspaces.length) {
+                    handleChangeWorkspace(filteredWorkspaces[workspaceIndex]);
+                }
+                return;
+            }
+
+            // Handle action shortcuts
+            const key = event.key.toLowerCase();
+            switch (key) {
+                case 'o':
+                    event.preventDefault();
+                    handleOpenWorkspace();
+                    break;
+                case 'n':
+                    event.preventDefault();
+                    setShowWorkspaceDialog(true);
+                    break;
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyboardShortcuts);
+        return () =>
+            document.removeEventListener('keydown', handleKeyboardShortcuts);
+    }, [filteredWorkspaces, handleChangeWorkspace, handleOpenWorkspace]);
+
+    const togglePinWorkspace = (
+        workspace: IWorkspace,
+        e?: MouseEvent
+    ): void => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        updateWorkspace(workspace.id, {
+            ...workspace,
+            pinned: !workspace.pinned,
+        });
+
+        loadPinnedWorkspace();
     };
 
     return (
@@ -158,7 +206,11 @@ export const WorkspaceSwitcher = ({
                                         {workspace.name}
 
                                         <IGRPDropdownMenuShortcutPrimitive>
-                                            ⌘{index + 1}
+                                            {index < 9
+                                                ? SHORTCUTS[
+                                                      `SWITCH_WORKSPACE_${index + 1}` as keyof typeof SHORTCUTS
+                                                  ]
+                                                : ''}
                                         </IGRPDropdownMenuShortcutPrimitive>
                                     </IGRPDropdownMenuItemPrimitive>
                                 ))}
@@ -176,6 +228,9 @@ export const WorkspaceSwitcher = ({
                                     <div className="font-medium text-muted-foreground">
                                         {t('openWorkspace')}
                                     </div>
+                                    <IGRPDropdownMenuShortcutPrimitive>
+                                        {SHORTCUTS.OPEN_WORKSPACE}
+                                    </IGRPDropdownMenuShortcutPrimitive>
                                 </IGRPDropdownMenuItemPrimitive>
                                 <IGRPDropdownMenuItemPrimitive
                                     className="gap-2 p-2"
@@ -190,6 +245,9 @@ export const WorkspaceSwitcher = ({
                                     <div className="font-medium text-muted-foreground">
                                         {t('addWorkspace')}
                                     </div>
+                                    <IGRPDropdownMenuShortcutPrimitive>
+                                        {SHORTCUTS.NEW_WORKSPACE}
+                                    </IGRPDropdownMenuShortcutPrimitive>
                                 </IGRPDropdownMenuItemPrimitive>
                             </IGRPDropdownMenuContentPrimitive>
                         </IGRPDropdownMenuPrimitive>
