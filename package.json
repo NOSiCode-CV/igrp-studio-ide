@@ -34,7 +34,7 @@
         "@igrp/dotnet-engine": "^0.0.1-alpha.12",
         "@igrp/framework-process-studio-bpmn-editor": "0.0.1-beta.9",
         "@igrp/igrp-framework-react-design-system": "0.1.0-beta.17",
-        "@igrp/igrp-studio-nextjs-engine": "0.1.0-beta.12",
+        "@igrp/igrp-studio-nextjs-engine": "0.1.0-beta.13",
         "@igrp/igrp-studio-springboot-engine": "0.1.0-beta.3",
         "@monaco-editor/react": "^4.7.0",
         "@octokit/rest": "^22.0.0",
