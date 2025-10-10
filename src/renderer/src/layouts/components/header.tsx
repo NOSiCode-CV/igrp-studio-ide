@@ -2,14 +2,6 @@ import logo from '@renderer/assets/images/igrp-green.svg';
 import { JSX, useEffect, useState } from 'react';
 import { ProjectData } from 'src/main/types';
 import { ROUTES } from '@renderer/routes/routeConstants';
-import {
-    ArrowLeft,
-    Code,
-    Maximize2,
-    Minus,
-    Square,
-    X,
-} from 'lucide-react';
 import { SettingsDialog } from '@renderer/pages/settings/settings-dialog';
 import { cn } from '@renderer/lib/utils';
 import { ModeToggle } from '@renderer/components/mode-toogle';
@@ -43,6 +35,7 @@ import { useDocker } from '@renderer/hooks/use-docker';
 import DockerControls from '@renderer/components/docker-controls';
 import { useTranslation } from 'react-i18next';
 import NotificationsPopover from '@renderer/components/notifications/notifications-popover';
+import { ArrowLeft, Code, Maximize2, Minus, Square, X } from 'lucide-react';
 
 interface HeaderProps {
     config?: ProjectData;

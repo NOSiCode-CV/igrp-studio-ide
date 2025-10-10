@@ -102,7 +102,7 @@ const ImportComponent = ({
                                         variant="soft"
                                         className="px-2 py-1 flex items-center gap-1"
                                     >
-                                        <span className="font-mono">
+                                        <span className="font-mono text-sm">
                                             {imp.namespace}
                                         </span>
                                         <IGRPButtonPrimitive
