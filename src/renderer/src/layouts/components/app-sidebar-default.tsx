@@ -22,6 +22,7 @@ import {
 import { IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import { SearchInput } from '../../components/shared-ui';
+import { JSX } from 'react/jsx-runtime';
 
 export interface SidebarItem {
     name: string; // Title of the navigation item
@@ -156,7 +157,10 @@ const SidebarFooter = React.forwardRef<HTMLDivElement, SidebarFooterProps>(
 
 SidebarFooter.displayName = 'SidebarFooter';
 
-const renderMenu = (menus: SidebarItemProps[], size: 'lg' | 'sm' | null) => {
+const renderMenu = (
+    menus: SidebarItemProps[],
+    size: 'lg' | 'sm' | null
+): JSX.Element => {
     return (
         <>
             {menus.map((item) =>
