@@ -361,7 +361,7 @@ export class WorkspaceRepository {
             updatedAt: new Date().toISOString(),
         };
 
-        this.updateWorkspace(workspaceId, workspace);
+        await this.updateWorkspace(workspaceId, workspace);
     }
 
     async deleteProject(projectId: string, basePath: string): Promise<void> {

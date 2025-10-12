@@ -146,8 +146,9 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         try {
             const data = await getWorkspaces();
             setWorkspaces(data);
+
             if (data.length > 0) {
-                markWorkspaceAccessed(data);
+                await markWorkspaceAccessed(data);
             } else {
                 dispatch(setWorkspace(null));
             }
@@ -197,7 +198,9 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             const bLastAccess = new Date(b.updatedAt || b.createdAt);
             return bLastAccess.getTime() - aLastAccess.getTime();
         })[0];
-        switchWorkspace(workspace);
+        switchWorkspace(workspace).catch((error) => {
+            console.error('Failed to switch workspace in background:', error);
+        });
     };
 
     const updateWorkspace = async (
@@ -241,7 +244,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
         setCurrentWorkspace(upWorkspace);
         dispatch(setWorkspace(upWorkspace));
-        updateWorkspace(upWorkspace.id, upWorkspace);
+        await updateWorkspace(upWorkspace.id, upWorkspace);
     };
 
     const validateWorkspaceName = (
