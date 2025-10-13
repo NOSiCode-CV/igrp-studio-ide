@@ -1,3 +1,5 @@
+// noinspection ES6MissingAwait
+
 'use client';
 
 import {
