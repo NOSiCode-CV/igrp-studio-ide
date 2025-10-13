@@ -39,7 +39,6 @@ export interface SpringConfigData {
     projectStructureStyle: 'technical' | 'domain';
     enableObservability: boolean;
     enableEntityRevision: boolean;
-    projectStructureStyle: string;
     version: string;
     dependencies: Array<any>;
     enableGraalVm: boolean;
@@ -190,7 +189,7 @@ export interface DockerComposeService {
     status: string;
     type?: string;
     labels: Record<string, string>;
-    env_file: string[];
+    env_file: string | string[];
 }
 
 export interface DockerComposeNetwork {
@@ -226,6 +225,8 @@ export interface ServiceInfo {
     id?: string;
     labels: Record<string, string>;
     env_file: { file: string }[];
+    createdAt?: string;
+    statusMessage?: string;
 }
 
 export interface GitProviderConfig {
@@ -377,7 +378,6 @@ export interface BPMNTask {
     due?: string;
     followUp?: string;
     delegationState?: string;
-    description?: string;
     executionId: string;
     owner?: string;
     parentTaskId?: string;

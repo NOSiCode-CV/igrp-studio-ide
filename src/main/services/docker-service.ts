@@ -519,9 +519,7 @@ export class DockerService {
                                     : depends_on || [],
                             environments:
                                 this.parseEnvironmentToArray(environment),
-                            env_file:
-                                env_file &&
-                                env_file.map((file: string) => ({ file })),
+                            env_file: this.parseEnvFileToArray(env_file),
                             volumes: processedVolumes,
                         };
                     });
@@ -595,11 +593,7 @@ export class DockerService {
                                 depends_on && !Array.isArray(depends_on)
                                     ? [depends_on]
                                     : depends_on || [],
-                            env_file:
-                                env_file &&
-                                env_file.map((file: string) => {
-                                    return { file };
-                                }),
+                            env_file: this.parseEnvFileToArray(env_file),
                         };
                     } else {
                         // Service is not running
@@ -613,11 +607,8 @@ export class DockerService {
                                     : depends_on || [],
                             environments:
                                 this.parseEnvironmentToArray(environment),
-                            env_file:
-                                env_file &&
-                                env_file.map((file: string) => {
-                                    return { file };
-                                }),
+
+                            env_file: this.parseEnvFileToArray(env_file),
                             volumes: processedVolumes,
                         };
                     }
@@ -643,11 +634,7 @@ export class DockerService {
                                 ? [depends_on]
                                 : depends_on || [],
                         environments: this.parseEnvironmentToArray(environment),
-                        env_file:
-                            env_file &&
-                            env_file.map((file: string) => {
-                                return { file };
-                            }),
+                        env_file: this.parseEnvFileToArray(env_file),
                     };
                 });
             }
@@ -711,6 +698,19 @@ export class DockerService {
                 `Failed to restart services: ${(error as any).message}`
             );
         }
+    }
+
+    private parseEnvFileToArray(
+        envFile?: string | string[]
+    ): { file: string }[] {
+        // Fallback para um array vazio
+        if (!envFile) {
+            return [];
+        }
+        // Se for uma string, converte para um array
+        const files = Array.isArray(envFile) ? envFile : [envFile];
+        // Mapeia as entradas garantindo o formato correto
+        return files.map((file) => ({ file: file.trim() }));
     }
 
     private parseEnvironmentToArray(
