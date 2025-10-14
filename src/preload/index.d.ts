@@ -1,6 +1,28 @@
 import { electronAPI } from '@electron-toolkit/preload';
-import { Connection, DatabaseResponse, HandlerResponse, IWorkspace, ProjectData, ToolCheck, BPMNConfig } from '../main/types';
-import { ComponentRegistrationConfig, ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import {
+    Connection,
+    DatabaseResponse,
+    HandlerResponse,
+    IWorkspace,
+    ProjectData,
+    ToolCheck,
+    BPMNConfig,
+} from '../main/types';
+import {
+    ComponentRegistrationConfig,
+    ServiceWorkspace,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { WatchEvent } from '../main/helpers/watch-folder';
+
+type ExtendedElectronAPI = typeof electronAPI & {
+    getAppVersion: () => Promise<string>;
+    checkForUpdates: () => Promise<string>;
+    downloadUpdate: () => Promise<void>;
+    installUpdate: () => Promise<void>;
+    watchFolder: (folderPath: string) => Promise<void>;
+    onFolderChange: (callback: (event: WatchEvent) => void) => void;
+    reportError: (error: Error) => void;
+};
 declare const api: {
     reportError: (error: Error) => void;
     fetchSelectors: (module: string, basePath: string) => Promise<any>;
@@ -10,7 +32,10 @@ declare const api: {
     getFileContent: (filePath: string) => Promise<any>;
     readDirectory: (basePath: string) => Promise<any>;
     readProjectFile: (filePath: string) => Promise<any>;
-    openIDE: ({ basePath, ideType }: {
+    openIDE: ({
+        basePath,
+        ideType,
+    }: {
         basePath: string;
         ideType: string;
     }) => Promise<any>;
@@ -37,58 +62,144 @@ declare const api: {
     getIconFile: (iconPath: string, workspacePath: string) => Promise<any>;
 };
 declare const engine: {
-    createProject: (project: ProjectData, basePath: string) => Promise<HandlerResponse>;
-    delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    duplicate: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createResponse: (response: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createDto: (dtoConfig: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createModule: (moduleConfig: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createController: (controllerConfig: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createModel: (modelConfig: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createEnum: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createPage: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createProject: (
+        project: ProjectData,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    delete: (
+        config: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    duplicate: (
+        config: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createResponse: (
+        response: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createDto: (
+        dtoConfig: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createModule: (
+        moduleConfig: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createController: (
+        controllerConfig: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createModel: (
+        modelConfig: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createEnum: (
+        data: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    serializeElement: (
+        data: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createPermission: (
+        data: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createPage: (
+        data: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
     registry: (engineType: string) => Promise<HandlerResponse>;
     getComponent: (engineType: string) => Promise<HandlerResponse>;
-    registerComponent: (engineType: string, config: ComponentRegistrationConfig) => Promise<HandlerResponse>;
+    registerComponent: (
+        engineType: string,
+        config: ComponentRegistrationConfig
+    ) => Promise<HandlerResponse>;
     getService: (engineType: string) => Promise<HandlerResponse>;
     getDependencies: (engineType: string) => Promise<HandlerResponse>;
-    getAppMetadata: (engineType: string, basePath: string) => Promise<HandlerResponse>;
+    getAppMetadata: (
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
     getCodeSnippets: (engineType: string) => Promise<HandlerResponse>;
-    createProcess: (process: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
-    createProcessStep: (step: any, engineType: string, basePath: string) => Promise<HandlerResponse>;
+    createProcess: (
+        process: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
+    createProcessStep: (
+        step: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>;
 };
 declare const repo: {
     workspace: {
         initialize: () => Promise<any>;
         findAllRecentProjects: (limit?: number) => Promise<any>;
-        createProject: (workspaceId: string, project: Omit<ProjectData, "id" | "createdAt" | "workspaceId">) => Promise<any>;
-        updateProject: (projectId: string, updates: Partial<ProjectData>) => Promise<any>;
-        saveCustomWorkspaceComposeFile: (yaml: object, basePath: string) => Promise<any>;
-        configureService: (config: ServiceWorkspace, basePath: string) => Promise<any>;
+        createProject: (
+            workspaceId: string,
+            project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>
+        ) => Promise<any>;
+        updateProject: (
+            projectId: string,
+            updates: Partial<ProjectData>
+        ) => Promise<any>;
+        saveCustomWorkspaceComposeFile: (
+            yaml: object,
+            basePath: string
+        ) => Promise<any>;
+        configureService: (
+            config: ProjectWorkspace,
+            basePath: string
+        ) => Promise<any>;
         deleteProject: (projectId: string, basePath: string) => Promise<any>;
         getProject: (projectId: string) => Promise<any>;
         findAllProjects: (workspaceId?: string) => Promise<any>;
         findAllWorkspaces: () => Promise<any>;
         findRecentWorkspaces: (limit?: number) => Promise<any>;
-        createWorkspace: (workspace: Omit<IWorkspace, "id" | "createdAt">) => Promise<HandlerResponse>;
-        updateWorkspace: (workspaceId: string, updates: Partial<IWorkspace>) => Promise<any>;
+        createWorkspace: (
+            workspace: Omit<IWorkspace, 'id' | 'createdAt'>
+        ) => Promise<HandlerResponse>;
+        updateWorkspace: (
+            workspaceId: string,
+            updates: Partial<IWorkspace>
+        ) => Promise<any>;
         deleteWorkspace: (workspaceId: string) => Promise<any>;
         getWorkspace: (workspaceId: string) => Promise<any>;
         getLastAccessedWorkspace: () => Promise<any>;
         openWorkspace: (workspacePath: string) => Promise<HandlerResponse>;
-        addProjectToWorkspace: (workspaceId: string, project: ProjectData) => Promise<HandlerResponse>;
-        createService: (service: ServiceWorkspace, basePath: string) => Promise<any>;
-        updateService: (service: ServiceWorkspace, basePath: string) => Promise<any>;
+        addProjectToWorkspace: (
+            workspaceId: string,
+            project: ProjectData
+        ) => Promise<HandlerResponse>;
+        createService: (
+            service: ServiceWorkspace,
+            basePath: string
+        ) => Promise<any>;
+        updateService: (
+            service: ServiceWorkspace,
+            basePath: string
+        ) => Promise<any>;
         deleteService: (serviceId: string, basePath: string) => Promise<any>;
         findAllServices: (workspaceId: string) => Promise<any>;
         createBackup: (backupPath?: string) => Promise<any>;
         restoreBackup: (backupPath: string) => Promise<any>;
-        onError: (callback: (error: {
-            code: string;
-            message: string;
-        }) => void) => () => Electron.IpcRenderer;
+        onError: (
+            callback: (error: { code: string; message: string }) => void
+        ) => () => Electron.IpcRenderer;
     };
     connection: {
         findAll: () => Promise<any>;
@@ -96,21 +207,33 @@ declare const repo: {
         delete: (connection: string) => Promise<any>;
         connectToDatabase: (config: Connection) => Promise<DatabaseResponse>;
         getTables: (connectionName: string) => Promise<DatabaseResponse>;
-        getTableStructure: (connectionName: string, tableName: string) => Promise<DatabaseResponse>;
+        getTableStructure: (
+            connectionName: string,
+            tableName: string
+        ) => Promise<DatabaseResponse>;
     };
     docker: {
         up: (projectPath: string) => Promise<any>;
-        down: (projectPath: string, options: {
-            dropVolume?: boolean;
-        }) => Promise<any>;
+        down: (
+            projectPath: string,
+            options: {
+                dropVolume?: boolean;
+            }
+        ) => Promise<any>;
         status: (projectPath: string) => Promise<any>;
-        stop: (projectPath: string, options: {
-            services: string[];
-        }) => Promise<any>;
-        restart: (projectPath: string, options: {
-            services: string[];
-            timeout?: number;
-        }) => Promise<any>;
+        stop: (
+            projectPath: string,
+            options: {
+                services: string[];
+            }
+        ) => Promise<any>;
+        restart: (
+            projectPath: string,
+            options: {
+                services: string[];
+                timeout?: number;
+            }
+        ) => Promise<any>;
         check: () => Promise<any>;
         daemonStatus: () => Promise<any>;
     };
@@ -150,7 +273,7 @@ declare const igrpStudioSettings: {
 };
 declare global {
     interface Window {
-        electron: typeof electronAPI;
+        electron: ExtendedElectronAPI;
         api: typeof api;
         engine: typeof engine;
         igrpStudio: typeof repo;

@@ -261,18 +261,23 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     const renderTableHeader = (): React.ReactNode => {
         return (
             <div
-                className="grid gap-4 p-3 bg-muted/50 border-b text-sm font-medium text-muted-foreground"
-                style={{
+                className="flex flex-1  gap-4 p-3 bg-muted/50 border-b text-sm font-medium text-muted-foreground"
+                /*  style={{
                     gridTemplateColumns:
                         columns.map((col) => col.width || '1fr').join(' ') +
-                        ' 100px',
-                }}
+                        (removeRow ? ' 100px' : ''),
+                }} */
             >
-                {columns.map(({ name, width }, index) => (
+                {columns.map(({ name, width, type }, index) => (
                     <div
                         style={{ width }}
                         key={index}
-                        className="flex items-center"
+                        className={cn(
+                            'flex items-center',
+                            type === 'text' ? 'min-w-40' : '',
+                            type === 'checkbox' ? 'justify-center' : '',
+                            type === 'label' ? 'min-w-30' : ''
+                        )}
                     >
                         {index === 0 ? (
                             <span className="flex items-center">
@@ -286,29 +291,31 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         )}
                     </div>
                 ))}
-                <div className="text-right">
-                    {addRow && (
-                        <IGRPTooltipProviderPrimitive>
-                            <IGRPTooltipPrimitive>
-                                <IGRPTooltipTriggerPrimitive asChild>
-                                    <IGRPButtonPrimitive
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            addRow();
-                                        }}
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-igrp h-6 w-6"
-                                    >
-                                        <Plus size={14} />
-                                        <span className="sr-only">{`New ${btnLabels}`}</span>
-                                    </IGRPButtonPrimitive>
-                                </IGRPTooltipTriggerPrimitive>
-                                <IGRPTooltipContentPrimitive>{`New ${btnLabels}`}</IGRPTooltipContentPrimitive>
-                            </IGRPTooltipPrimitive>
-                        </IGRPTooltipProviderPrimitive>
-                    )}
-                </div>
+                {removeRow && (
+                    <div className="flex justify-end items-center ml-auto">
+                        {addRow && (
+                            <IGRPTooltipProviderPrimitive>
+                                <IGRPTooltipPrimitive>
+                                    <IGRPTooltipTriggerPrimitive asChild>
+                                        <IGRPButtonPrimitive
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                addRow();
+                                            }}
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-primary h-6 w-6"
+                                        >
+                                            <Plus size={14} />
+                                            <span className="sr-only">{`New ${btnLabels}`}</span>
+                                        </IGRPButtonPrimitive>
+                                    </IGRPTooltipTriggerPrimitive>
+                                    <IGRPTooltipContentPrimitive>{`New ${btnLabels}`}</IGRPTooltipContentPrimitive>
+                                </IGRPTooltipPrimitive>
+                            </IGRPTooltipProviderPrimitive>
+                        )}
+                    </div>
+                )}
             </div>
         );
     };
@@ -323,7 +330,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         onChangeValue,
     }: any): React.ReactNode => {
         return (
-            <div className="flex gap-2 align-center">
+            <div className="flex flex-1 gap-2 align-center">
                 {items.map((item: any, itemIndex: number) => {
                     const itemValue = row?.[item.key] || '';
                     const itemOptions = item.options || [];
@@ -358,7 +365,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                             <React.Fragment key={itemIndex}>
                                 <IGRPTooltipPrimitive>
                                     <IGRPTooltipTriggerPrimitive asChild>
-                                        <div className="flex align-center">
+                                        <div className="flex align-center mt-2.5">
                                             <IGRPCheckbox
                                                 name={`${item.key}_${index2}`}
                                                 id={`${item.key}_${index2}`}
@@ -468,7 +475,10 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         // Handle label type
         if (type === 'label') {
             return (
-                <IGRPLabelPrimitive htmlFor={`${key}_${index}`}>
+                <IGRPLabelPrimitive
+                    htmlFor={`${key}_${index}`}
+                    className="w-30 truncate"
+                >
                     {row?.[key] || ''}
                 </IGRPLabelPrimitive>
             );
@@ -512,19 +522,21 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         // Handle checkbox type
         if (type === 'checkbox') {
             return (
-                <IGRPCheckbox
-                    name={`${key}_${index}`}
-                    id={`${key}_${index}`}
-                    onCheckedChange={(checked) =>
-                        onChangeValue({
-                            key,
-                            index,
-                            value: checked,
-                            group,
-                        })
-                    }
-                    checked={row?.[key] || false}
-                />
+                <div className="flex justify-center w-full">
+                    <IGRPCheckbox
+                        name={`${key}_${index}`}
+                        id={`${key}_${index}`}
+                        onCheckedChange={(checked) =>
+                            onChangeValue({
+                                key,
+                                index,
+                                value: checked,
+                                group,
+                            })
+                        }
+                        checked={row?.[key] || false}
+                    />
+                </div>
             );
         }
 
@@ -582,7 +594,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         rowId: string,
         index: number,
         row: any,
-        className: string,
+        _className: string,
         onChangeValue: (props: ChangeFnProps) => void,
         group?: GroupField
     ): React.ReactNode => {
@@ -626,8 +638,16 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                 : [];
                             return (
                                 <React.Fragment key={index2}>
-                                    <div className="flex items-center">
-                                        {index2 === 0 && (
+                                    <div
+                                        className={cn(
+                                            'flex items-center',
+                                            type === 'text' ? 'min-w-40' : '',
+                                            type === 'checkbox'
+                                                ? 'justify-center'
+                                                : ''
+                                        )}
+                                    >
+                                        {/*  {index2 === 0 && (
                                             <button
                                                 className={cn(
                                                     'opacity-0 group-hover/item:opacity-100 cursor-move me-1 p-0',
@@ -636,7 +656,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                             >
                                                 <GripVertical className="h-4 w-4 text-muted-foreground" />
                                             </button>
-                                        )}
+                                        )} */}
                                         {type === 'group' &&
                                         items &&
                                         items?.length > 0
