@@ -26,6 +26,7 @@ import * as Yup from 'yup';
 import { ImportComponent } from './custom-code-imports';
 import useCustomCode from '@renderer/generators/ui/hooks/useCustomCode';
 import { getId } from '@renderer/utils';
+import { JSX } from 'react/jsx-runtime';
 
 interface StateComponentProps {
     open: boolean;
@@ -33,7 +34,11 @@ interface StateComponentProps {
     state?: State;
 }
 
-const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
+const StateComponent = ({
+    open,
+    setOpen,
+    state,
+}: StateComponentProps): JSX.Element => {
     const { addState, updateState } = useDroppedComponents();
     const { t } = useTranslation();
     const { typesOptions } = useCustomCode();
@@ -60,6 +65,7 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
             defaultValue: '',
             imports: [],
             isArray: false,
+            isOptional: false,
         },
         validationSchema: stateValidationSchema,
         onSubmit: (values, actions) => {
@@ -86,7 +92,7 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
         },
     });
 
-    const handleTypeChange = (value: string) => {
+    const handleTypeChange = (value: string): void => {
         formik.setFieldValue('type', value);
         const selectedType = typesOptions.find((type) => type.value === value);
         if (selectedType && selectedType.metadata) {
@@ -154,16 +160,30 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
                         isRequired
                     />
 
-                    <CheckboxInput
-                        label={t('isArray')}
-                        id="isArray"
-                        value={formik.values.isArray}
-                        onChange={(value) =>
-                            formik.setFieldValue('isArray', value)
-                        }
-                        isTouched={formik.touched.isArray}
-                        error={formik.errors.isArray}
-                    />
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center space-x-2">
+                            <CheckboxInput
+                                label={t('isArray')}
+                                id="isArray"
+                                value={formik.values.isArray}
+                                onChange={(value) =>
+                                    formik.setFieldValue('isArray', value)
+                                }
+                                isTouched={formik.touched.isArray}
+                                error={formik.errors.isArray}
+                            />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <CheckboxInput
+                                id={`isOptional`}
+                                value={formik.values.isOptional}
+                                onChange={(value) =>
+                                    formik.setFieldValue('isOptional', value)
+                                }
+                                label="isOptional"
+                            />
+                        </div>
+                    </div>
 
                     <ImportComponent
                         initialImports={formik.values?.imports || []}

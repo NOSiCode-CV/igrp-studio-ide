@@ -63,8 +63,8 @@ export const toolConfig: ToolConfig[] = [
         description: 'Java runtime for backend development',
         versionCheck: {
             minMajor: 23,
-            maxMajor: 23,
-            range: '^23.0.0',
+            maxMajor: 24,
+            range: '^23.0.0 || >=24.0.0',
         },
     },
     /* {

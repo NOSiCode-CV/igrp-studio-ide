@@ -22,6 +22,17 @@ const handleError = (error: unknown): HandlerResponse => ({
     error: (error as Error).message || 'An unknown error occurred',
 });
 
+// Extended Electron API type
+type ExtendedElectronAPI = typeof electronAPI & {
+    getAppVersion: () => Promise<string>;
+    checkForUpdates: () => Promise<string>;
+    downloadUpdate: () => Promise<void>;
+    installUpdate: () => Promise<void>;
+    watchFolder: (folderPath: string) => Promise<void>;
+    onFolderChange: (callback: (event: WatchEvent) => void) => void;
+    reportError: (error: Error) => void;
+};
+
 // Custom APIs for renderer
 const api = {
     reportError: (error: Error) => ipcRenderer.send('report-error', error),
@@ -700,7 +711,21 @@ if (process.contextIsolated) {
         console.error(error);
     }
 } else {
-    window.electron = electronAPI;
+    window.electron = {
+        ...electronAPI,
+        getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+        checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+        downloadUpdate: () => ipcRenderer.invoke('download-update'),
+        installUpdate: () => ipcRenderer.invoke('install-update'),
+        watchFolder: (folderPath: string) =>
+            ipcRenderer.invoke('watch-folder', folderPath),
+        onFolderChange: (callback: (event: WatchEvent) => void) => {
+            ipcRenderer.on('folder-change', (_, data: WatchEvent) =>
+                callback(data)
+            );
+        },
+        reportError: (error: Error) => ipcRenderer.send('report-error', error),
+    };
     window.api = api;
     window.engine = engine;
     window.igrpStudio = repo;
@@ -711,7 +736,7 @@ if (process.contextIsolated) {
 
 declare global {
     interface Window {
-        electron: typeof electronAPI;
+        electron: ExtendedElectronAPI;
         api: typeof api;
         engine: typeof engine;
         igrpStudio: typeof repo;

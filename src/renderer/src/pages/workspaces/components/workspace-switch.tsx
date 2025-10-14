@@ -1,6 +1,12 @@
 'use client';
 
-import { FolderKanban, ListFilter, Pin, Plus, FolderOpen } from 'lucide-react';
+import {
+    FolderKanban,
+    Pin,
+    Plus,
+    FolderOpen,
+    EllipsisVertical,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -172,7 +178,7 @@ export const WorkspaceSwitcher = ({
                                     <IGRPSidebarMenuButtonPrimitive className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground text-primary bg-primary/5">
                                         <FolderKanban className="h-4 w-4 flex-shrink-0" />
                                         <span>{t('workspaces')}</span>
-                                        <ListFilter className="ml-auto h-3 w-3" />
+                                        <EllipsisVertical className="ml-auto h-3 w-3" />
                                     </IGRPSidebarMenuButtonPrimitive>
                                 </IGRPSidebarMenuItemPrimitive>
                             </IGRPDropdownMenuTriggerPrimitive>
