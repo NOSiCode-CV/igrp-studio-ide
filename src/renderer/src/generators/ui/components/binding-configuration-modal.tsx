@@ -13,6 +13,7 @@ import {
     IGRPDialogHeaderPrimitive,
     IGRPDialogPrimitive,
     IGRPDialogTitlePrimitive,
+    IGRPOptionsProps,
     IGRPScrollAreaPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import {
@@ -84,7 +85,9 @@ export const BindingConfigurationModal = ({
     const { showErrorToast } = useToast();
     const { getDataComponent } = useStudio();
 
-    const [fieldsTypeOptions, setFieldsTypeOptions] = useState([]);
+    const [fieldsTypeOptions, setFieldsTypeOptions] = useState<
+        IGRPOptionsProps[]
+    >([]);
     const [selectedType, setSelectedType] = useState<string>('');
     const [typeFilePath, setTypeFilePath] = useState<string>('');
 
@@ -189,7 +192,7 @@ export const BindingConfigurationModal = ({
                 return '[]';
             }
         }
-        return field.defaultValue;
+        return field.defaultValue || '';
     };
 
     const formik = useFormik({
@@ -292,9 +295,11 @@ export const BindingConfigurationModal = ({
     });
 
     const getFields = (): LabeledElementField[] => {
-        const type: any = types.find((c: any) => c.name === selectedType) || {};
+        const type =
+            types.find((c: LabeledElementField) => c.name === selectedType) ||
+            {};
 
-        setTypeFilePath(type.path);
+        setTypeFilePath(type.path || '');
 
         return type && type?.fields && type?.fields ? type.fields : [];
     };
