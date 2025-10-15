@@ -28,6 +28,7 @@ import { capitalize, getId } from '@renderer/utils';
 import { COMPONENT } from '../ComponentTypes';
 import useStudio from '@renderer/hooks/use-studio';
 import { FieldValidation } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import { JSX } from 'react/jsx-runtime';
 
 interface LabeledElementField {
     componentId: string;
@@ -77,7 +78,7 @@ export const BindingConfigurationModal = ({
     comp,
     open,
     setOpen,
-}: BindingProps) => {
+}: BindingProps): JSX.Element => {
     const { t } = useTranslation();
     const { types, typesOptions } = useCustomCode();
     const { showErrorToast } = useToast();
@@ -158,7 +159,7 @@ export const BindingConfigurationModal = ({
         },
     ];
 
-    const validate = () => {
+    const validate = (): boolean => {
         const fieldNames = formik.values.fields.map((f) => f.name);
         if (new Set(fieldNames).size !== fieldNames.length) {
             showErrorToast('Field names must be unique');
@@ -167,7 +168,7 @@ export const BindingConfigurationModal = ({
         return true;
     };
 
-    const getDefaultValue = (field: LabeledElementField) => {
+    const getDefaultValue = (field: LabeledElementField): string => {
         if (
             (field.defaultValue === '' || field.defaultValue === undefined) &&
             field.required
@@ -290,7 +291,7 @@ export const BindingConfigurationModal = ({
         },
     });
 
-    const getFields = () => {
+    const getFields = (): LabeledElementField[] => {
         const type: any = types.find((c: any) => c.name === selectedType) || {};
 
         setTypeFilePath(type.path);
@@ -365,7 +366,7 @@ export const BindingConfigurationModal = ({
         const processComponent = (
             child: StructuredComponent,
             parentIsRepeater = false
-        ) => {
+        ): void => {
             if (!child) return;
 
             // Check if component should be included as a field
@@ -384,7 +385,9 @@ export const BindingConfigurationModal = ({
                     new Map();
 
                 // Temporary process to get nested structure
-                const tempProcess = (nestedChild: StructuredComponent) => {
+                const tempProcess = (
+                    nestedChild: StructuredComponent
+                ): void => {
                     if (!nestedChild) return;
 
                     const nestedShouldInclude =
@@ -467,7 +470,11 @@ export const BindingConfigurationModal = ({
         return { fields, componentMap };
     };
 
-    const handleChange = (element: string, position: number, result: any) => {
+    const handleChange = (
+        element: string,
+        position: number,
+        result: any
+    ): void => {
         if (element === 'newType') {
             const field: any =
                 getFields().find((c: any) => c.name === result) || {};
@@ -516,7 +523,7 @@ export const BindingConfigurationModal = ({
                             </IGRPDialogTitlePrimitive>
                             <IGRPDialogDescriptionPrimitive>
                                 Make changes to your Binding Configuration here.
-                                Click save when you're done.
+                                Click save when you&apos;re done.
                             </IGRPDialogDescriptionPrimitive>
                         </IGRPDialogHeaderPrimitive>
                         <form
