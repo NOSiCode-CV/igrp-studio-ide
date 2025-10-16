@@ -23,8 +23,6 @@ build_packagedev_mac:
         - dpkg --add-architecture arm64
         - apt-get update
         - apt-get install -y wine64
-        - wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_arm64.deb
-        - dpkg -i libssl1.1_1.1.0g-2ubuntu4_arm64.deb
         - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
 
     script:
