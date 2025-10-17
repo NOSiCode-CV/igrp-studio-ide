@@ -1,5 +1,5 @@
 import React from 'react';
-import { BPMNConfigCard } from './bpmn-config-card';
+import { BPMNConfigCard } from './components/bpmn-config-card';
 import { EmptyList } from '../../../components/empty-list';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Plus, Loader2 } from 'lucide-react';

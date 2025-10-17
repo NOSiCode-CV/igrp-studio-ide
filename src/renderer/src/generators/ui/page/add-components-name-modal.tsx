@@ -44,14 +44,15 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
 
     const [description, setDescription] = useState(defaultName);
     const [componentName, setComponentName] = useState(defaultComponentName);
-    const [previousComponent, setPreviousComponent] =
-        useState<ProcessStepConfig | undefined>(undefined);
+    const [previousComponent, setPreviousComponent] = useState<
+        ProcessStepConfig | undefined
+    >(undefined);
     const [availableProcesses, setAvailableProcesses] = useState<
         Array<{ label: string; value: string }>
     >([]);
-    const [selectedProcess, setSelectedProcess] = useState<FileTree | undefined>(
-        undefined
-    );
+    const [selectedProcess, setSelectedProcess] = useState<
+        FileTree | undefined
+    >(undefined);
     const [availableVersions, setAvailableVersions] = useState<
         Array<{ label: string; value: string }>
     >([]);
@@ -60,7 +61,6 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
     >([]);
 
     useEffect(() => {
-        console.log('bpmnProcesses', bpmnProcesses);
         if (bpmnProcesses && bpmnProcesses.length > 0) {
             const processes = bpmnProcesses.map((process) => ({
                 label: process.name,
@@ -71,7 +71,6 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
     }, [bpmnProcesses]);
 
     useEffect(() => {
-        console.log('processFound', processFound);
         if (processFound) {
             setSelectedProcess(processFound);
             const versions = processFound.children?.map((child) => ({
@@ -207,7 +206,9 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
                                         options={availableComponents}
                                         onChange={(value) =>
                                             handleComponentChange(
-                                                value as unknown as ProcessStepConfig | undefined
+                                                value as unknown as
+                                                    | ProcessStepConfig
+                                                    | undefined
                                             )
                                         }
                                         placeholder="Choose a component..."
