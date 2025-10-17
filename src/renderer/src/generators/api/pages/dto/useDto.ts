@@ -13,19 +13,30 @@ import { getTablesColumns, initialValues } from './config';
 import { useDtoValidation } from './validation';
 import { IColumnsTabelProps } from '../../types/Interfaces';
 import useToast from '@renderer/hooks/useToast';
+import { useKeyPress } from '@renderer/hooks/useKeyDown';
+import { KeyboardKey } from '@renderer/constants/shortcut';
 
-
-export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
+export const useDto = ({
+    selectors,
+    currentItem,
+}: {
+    selectors: Array<any>;
+    currentItem: any;
+}) => {
     const { initializeTabFromCurrentItem, handleRenameTab } = useTabs();
     const { createGitCommit } = useGit();
     const { showErrorToast, showSuccessToast } = useToast();
     const dispatch: any = useDispatch();
-    const { models, basePath, dto, enums, getJsonData } = useStudioAPI(currentItem?.module);
+    const { models, basePath, dto, enums, getJsonData } = useStudioAPI(
+        currentItem?.module
+    );
     const { t } = useTranslation();
 
     const [id, setId] = useState<string>('');
     const [data, setData] = useState<any>(null);
-    const [tablesColumns, setTableColumns] = useState<{ [key: string]: IColumnsTabelProps[] }>({});
+    const [tablesColumns, setTableColumns] = useState<{
+        [key: string]: IColumnsTabelProps[];
+    }>({});
 
     const validationSchema = useDtoValidation({ t });
     const formik = useFormik({
@@ -54,12 +65,20 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
         const { attributes, type } = data;
 
         formik.setValues(data);
-        formik.setFieldValue('attributes', attributes || initialValues.attributes);
-        formik.setFieldValue('attributes', attributes || initialValues.attributes);
+        formik.setFieldValue(
+            'attributes',
+            attributes || initialValues.attributes
+        );
+        formik.setFieldValue(
+            'attributes',
+            attributes || initialValues.attributes
+        );
 
         if (type === OPTION_TYPE.MODEL) {
             setId(getId());
-            const baseAttributeFields = initialValues.attributes[0] ? Object.keys(initialValues.attributes[0]) : [];
+            const baseAttributeFields = initialValues.attributes[0]
+                ? Object.keys(initialValues.attributes[0])
+                : [];
             const baseAttributeDefaults = initialValues.attributes[0] || {};
 
             const mergedAttributes = attributes.map((attr: any) => {
@@ -74,7 +93,9 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
 
             formik.setFieldValue(
                 'attributes',
-                mergedAttributes.length ? mergedAttributes : initialValues.attributes
+                mergedAttributes.length
+                    ? mergedAttributes
+                    : initialValues.attributes
             );
         }
     }, [data]);
@@ -87,20 +108,14 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
             enums,
             current: data,
             t,
-        })
+        });
         setTableColumns(columns);
     }, [selectors, dto, models, data]);
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-                event.preventDefault();
-                handleSave(formik.values);
-            }
-        };
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    // Keyboard shortcut for save (Ctrl/Cmd + S)
+    useKeyPress(() => {
+        handleSave(formik.values);
+    }, [KeyboardKey.save]);
 
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {
@@ -125,7 +140,9 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
 
             createGitCommit(basePath, `Add dto ${newValues.name}`);
             dispatch(onSetChangeStatus(true));
-            showSuccessToast(t('createdSuccess', { name: t('dto'), value: newValues.name }));
+            showSuccessToast(
+                t('createdSuccess', { name: t('dto'), value: newValues.name })
+            );
             handleRenameTab(currentItem.id, newValues.name);
         } catch (error) {
             showErrorToast(error);

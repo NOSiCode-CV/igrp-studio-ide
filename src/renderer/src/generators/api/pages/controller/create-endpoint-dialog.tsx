@@ -1,14 +1,14 @@
 import * as Yup from 'yup';
 
-import { Button } from '@renderer/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from '@renderer/components/ui/dialog';
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { ControllerConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { useTranslation } from 'react-i18next';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
@@ -38,7 +38,6 @@ export function CreateEndpointDialog({
     onConfirm,
     onClose,
 }: CreateEndpointDialogProps) {
-    console.log('controller', controller)
     const { t } = useTranslation();
 
     const dispatch: any = useDispatch();
@@ -119,14 +118,16 @@ export function CreateEndpointDialog({
     }, [controller]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{t('createNewEndpoint')}</DialogTitle>
-                    <DialogDescription>
+        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
+            <IGRPDialogContentPrimitive>
+                <IGRPDialogHeaderPrimitive>
+                    <IGRPDialogTitlePrimitive>
+                        {t('createNewEndpoint')}
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive>
                         {t('endpointDescription')}
-                    </DialogDescription>
-                </DialogHeader>
+                    </IGRPDialogDescriptionPrimitive>
+                </IGRPDialogHeaderPrimitive>
                 <form onSubmit={formik.handleSubmit}>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-1 items-center gap-4">
@@ -184,11 +185,13 @@ export function CreateEndpointDialog({
                             </div>
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button type="submit">{t('save')}</Button>
-                    </DialogFooter>
+                    <IGRPDialogFooterPrimitive>
+                        <IGRPButtonPrimitive type="submit">
+                            {t('save')}
+                        </IGRPButtonPrimitive>
+                    </IGRPDialogFooterPrimitive>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

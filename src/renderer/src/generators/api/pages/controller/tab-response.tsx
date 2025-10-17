@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import AddResponseModal from '../response/add-response-modal';
-import { Label } from '@renderer/components/ui/label';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
-import { Input } from '@renderer/components/ui/input';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { httpStatusCodes } from '@renderer/constants/appConstants';
 import { cn } from '@renderer/lib/utils';
 import { JSONSchemaBuilder } from '../../components/JSONSchema';
 import { JSONSchema } from '../../types/schema';
 import { AddResponseMenu } from './add-response-menu';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { ChevronsUpDown, Trash } from 'lucide-react';
 import { LabelRequired } from '@renderer/components/label-required';
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
@@ -264,8 +264,10 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <Label>{t('name')}</Label>
-                                    <Input
+                                    <IGRPLabelPrimitive>
+                                        {t('name')}
+                                    </IGRPLabelPrimitive>
+                                    <IGRPInputPrimitive
                                         name={t('name')}
                                         value={name}
                                         onChange={(e) =>
@@ -325,7 +327,9 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 </div>
 
                                 <div className="flex flex-col gap-2">
-                                    <Label>{t('collectionType')}</Label>
+                                    <IGRPLabelPrimitive>
+                                        {t('collectionType')}
+                                    </IGRPLabelPrimitive>
                                     <IGRPCombobox
                                         options={collectionTypes}
                                         value={collectionType}
@@ -346,7 +350,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
                                 {Object.keys(responses).length > 1 && (
                                     <div className="absolute right-3">
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             type="button"
                                             variant="ghost"
                                             size="sm"
@@ -356,15 +360,17 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                             }
                                         >
                                             <Trash />
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </div>
                                 )}
                             </div>
 
                             {/* Descritpion */}
                             <div className="flex flex-col gap-2">
-                                <Label>{t('description')}</Label>
-                                <Input
+                                <IGRPLabelPrimitive>
+                                    {t('description')}
+                                </IGRPLabelPrimitive>
+                                <IGRPInputPrimitive
                                     type="text"
                                     name="description"
                                     value={description}
@@ -383,9 +389,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                             </div>
                             {typeValue === 'object' && (
                                 <>
-                                    <p className="">
-                                        {t('dataSchema')}
-                                    </p>
+                                    <p className="">{t('dataSchema')}</p>
                                     <div className="border rounded">
                                         <JSONSchemaBuilder
                                             schemaTypes={schemaTypes}

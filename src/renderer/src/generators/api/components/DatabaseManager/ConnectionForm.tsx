@@ -1,14 +1,16 @@
 import { Form, Formik } from 'formik';
-import { Button } from '@renderer/components/ui/button';
-import { Input } from '@renderer/components/ui/input';
-import { Label } from '@renderer/components/ui/label';
+import {
+    IGRPButtonPrimitive,
+    IGRPInputPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
+    IGRPTabsPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import * as Yup from 'yup';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { Connection } from 'src/main/types';
@@ -33,14 +35,14 @@ export function ConnectionForm({
     connection,
     onSubmit,
     onCancel,
-}: ConnectionFormProps) {
+}: ConnectionFormProps): React.ReactNode {
     const { t } = useTranslation();
     const { showErrorToast, showSuccessToast } = useToast();
 
     const handleTestConnection = async (
         e: React.FormEvent<HTMLFormElement>,
         values: any
-    ) => {
+    ): Promise<void> => {
         e.preventDefault();
         const { success, message } =
             await window.igrpStudio.connection.connectToDatabase(values);
@@ -115,29 +117,29 @@ export function ConnectionForm({
                 setFieldValue,
             }) => (
                 <Form className="space-y-4">
-                    <Tabs 
-                        defaultValue="general" 
+                    <IGRPTabsPrimitive
+                        defaultValue="general"
                         className="w-full"
                         onValueChange={(value) => {
                             setFieldValue('connectionType', value);
                         }}
                         value={values.connectionType}
                     >
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="general">
+                        <IGRPTabsListPrimitive className="grid w-full grid-cols-2">
+                            <IGRPTabsTriggerPrimitive value="general">
                                 {t('generalConnection')}
-                            </TabsTrigger>
-                            <TabsTrigger value="ssh">
+                            </IGRPTabsTriggerPrimitive>
+                            <IGRPTabsTriggerPrimitive value="ssh">
                                 {t('sshConnection')}
-                            </TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="general">
+                            </IGRPTabsTriggerPrimitive>
+                        </IGRPTabsListPrimitive>
+                        <IGRPTabsContentPrimitive value="general">
                             <div className="space-y-4 grid md:grid-cols-1">
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">
+                                    <IGRPLabelPrimitive htmlFor="name">
                                         {t('connectionName')}
-                                    </Label>
-                                    <Input
+                                    </IGRPLabelPrimitive>
+                                    <IGRPInputPrimitive
                                         id="name"
                                         name="name"
                                         value={values.name}
@@ -154,9 +156,9 @@ export function ConnectionForm({
                                 </div>
 
                                 <div className="flex flex-col space-y-2">
-                                    <Label htmlFor="databaseType">
+                                    <IGRPLabelPrimitive htmlFor="databaseType">
                                         {t('databaseType')}
-                                    </Label>
+                                    </IGRPLabelPrimitive>
                                     <IGRPCombobox
                                         options={databaseTypes}
                                         value={values.databaseType}
@@ -181,10 +183,10 @@ export function ConnectionForm({
                                 <div className="grid grid-cols-12 gap-2">
                                     <div className="col-span-9">
                                         <div className="space-y-2">
-                                            <Label htmlFor="host">
+                                            <IGRPLabelPrimitive htmlFor="host">
                                                 {t('host')}
-                                            </Label>
-                                            <Input
+                                            </IGRPLabelPrimitive>
+                                            <IGRPInputPrimitive
                                                 id="host"
                                                 name="host"
                                                 value={values.host}
@@ -203,10 +205,10 @@ export function ConnectionForm({
 
                                     <div className="col-span-3">
                                         <div className="space-y-2">
-                                            <Label htmlFor="port">
+                                            <IGRPLabelPrimitive htmlFor="port">
                                                 {t('port')}
-                                            </Label>
-                                            <Input
+                                            </IGRPLabelPrimitive>
+                                            <IGRPInputPrimitive
                                                 id="port"
                                                 name="port"
                                                 type="number"
@@ -226,10 +228,10 @@ export function ConnectionForm({
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div className="space-y-2">
-                                        <Label htmlFor="user">
+                                        <IGRPLabelPrimitive htmlFor="user">
                                             {t('username')}
-                                        </Label>
-                                        <Input
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
                                             id="user"
                                             name="user"
                                             value={values.user}
@@ -245,10 +247,10 @@ export function ConnectionForm({
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="password">
+                                        <IGRPLabelPrimitive htmlFor="password">
                                             {t('password')}
-                                        </Label>
-                                        <Input
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
                                             id="password"
                                             name="password"
                                             type="password"
@@ -266,10 +268,10 @@ export function ConnectionForm({
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="database">
+                                    <IGRPLabelPrimitive htmlFor="database">
                                         {t('databaseName')}
-                                    </Label>
-                                    <Input
+                                    </IGRPLabelPrimitive>
+                                    <IGRPInputPrimitive
                                         id="database"
                                         name="database"
                                         type="database"
@@ -285,18 +287,20 @@ export function ConnectionForm({
                                     )}
                                 </div>
                             </div>
-                        </TabsContent>
-                        <TabsContent value="ssh">
+                        </IGRPTabsContentPrimitive>
+                        <IGRPTabsContentPrimitive value="ssh">
                             <div className="space-y-4">
                                 {/* Database Connection Section */}
                                 <div className="space-y-4">
-                                    <h3 className="text-lg font-medium">{t('databaseConnection')}</h3>
-                                    
+                                    <h3 className="text-lg font-medium">
+                                        {t('databaseConnection')}
+                                    </h3>
+
                                     <div className="space-y-2">
-                                        <Label htmlFor="name">
+                                        <IGRPLabelPrimitive htmlFor="name">
                                             {t('connectionName')}
-                                        </Label>
-                                        <Input
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
                                             id="name"
                                             name="name"
                                             value={values.name}
@@ -313,9 +317,9 @@ export function ConnectionForm({
                                     </div>
 
                                     <div className="flex flex-col space-y-2">
-                                        <Label htmlFor="databaseType">
+                                        <IGRPLabelPrimitive htmlFor="databaseType">
                                             {t('databaseType')}
-                                        </Label>
+                                        </IGRPLabelPrimitive>
                                         <IGRPCombobox
                                             options={databaseTypes}
                                             value={values.databaseType}
@@ -340,10 +344,10 @@ export function ConnectionForm({
                                     <div className="grid grid-cols-12 gap-2">
                                         <div className="col-span-9">
                                             <div className="space-y-2">
-                                                <Label htmlFor="host">
+                                                <IGRPLabelPrimitive htmlFor="host">
                                                     {t('databaseHost')}
-                                                </Label>
-                                                <Input
+                                                </IGRPLabelPrimitive>
+                                                <IGRPInputPrimitive
                                                     id="host"
                                                     name="host"
                                                     value={values.host}
@@ -352,20 +356,21 @@ export function ConnectionForm({
                                                     placeholder="Database IP / Host"
                                                     required
                                                 />
-                                                {errors.host && touched.host && (
-                                                    <div className="text-xs text-destructive">
-                                                        {errors.host}
-                                                    </div>
-                                                )}
+                                                {errors.host &&
+                                                    touched.host && (
+                                                        <div className="text-xs text-destructive">
+                                                            {errors.host}
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
 
                                         <div className="col-span-3">
                                             <div className="space-y-2">
-                                                <Label htmlFor="port">
+                                                <IGRPLabelPrimitive htmlFor="port">
                                                     {t('databasePort')}
-                                                </Label>
-                                                <Input
+                                                </IGRPLabelPrimitive>
+                                                <IGRPInputPrimitive
                                                     id="port"
                                                     name="port"
                                                     type="number"
@@ -375,27 +380,30 @@ export function ConnectionForm({
                                                     placeholder="5432"
                                                     required
                                                 />
-                                                {errors.port && touched.port && (
-                                                    <div className="text-xs text-destructive">
-                                                        {errors.port}
-                                                    </div>
-                                                )}
+                                                {errors.port &&
+                                                    touched.port && (
+                                                        <div className="text-xs text-destructive">
+                                                            {errors.port}
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="space-y-2">
-                                            <Label htmlFor="user">
+                                            <IGRPLabelPrimitive htmlFor="user">
                                                 {t('databaseUsername')}
-                                            </Label>
-                                            <Input
+                                            </IGRPLabelPrimitive>
+                                            <IGRPInputPrimitive
                                                 id="user"
                                                 name="user"
                                                 value={values.user}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
-                                                placeholder={t('databaseUsername')}
+                                                placeholder={t(
+                                                    'databaseUsername'
+                                                )}
                                             />
                                             {errors.user && touched.user && (
                                                 <div className="text-xs text-destructive">
@@ -405,17 +413,19 @@ export function ConnectionForm({
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="password">
+                                            <IGRPLabelPrimitive htmlFor="password">
                                                 {t('databasePassword')}
-                                            </Label>
-                                            <Input
+                                            </IGRPLabelPrimitive>
+                                            <IGRPInputPrimitive
                                                 id="password"
                                                 name="password"
                                                 type="password"
                                                 value={values.password}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
-                                                placeholder={t('databasePassword')}
+                                                placeholder={t(
+                                                    'databasePassword'
+                                                )}
                                             />
                                             {errors.password &&
                                                 touched.password && (
@@ -427,10 +437,10 @@ export function ConnectionForm({
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="database">
+                                        <IGRPLabelPrimitive htmlFor="database">
                                             {t('databaseName')}
-                                        </Label>
-                                        <Input
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
                                             id="database"
                                             name="database"
                                             value={values.database}
@@ -443,15 +453,17 @@ export function ConnectionForm({
 
                                 {/* SSH Connection Section */}
                                 <div className="space-y-4 pt-4 border-t">
-                                    <h3 className="text-lg font-medium">{t('sshConnection')}</h3>
-                                    
+                                    <h3 className="text-lg font-medium">
+                                        {t('sshConnection')}
+                                    </h3>
+
                                     <div className="grid grid-cols-12 gap-2">
                                         <div className="col-span-9">
                                             <div className="space-y-2">
-                                                <Label htmlFor="sshHost">
+                                                <IGRPLabelPrimitive htmlFor="sshHost">
                                                     {t('sshHost')}
-                                                </Label>
-                                                <Input
+                                                </IGRPLabelPrimitive>
+                                                <IGRPInputPrimitive
                                                     id="sshHost"
                                                     name="sshHost"
                                                     value={values.sshHost}
@@ -460,20 +472,21 @@ export function ConnectionForm({
                                                     placeholder="SSH Server IP / Host"
                                                     required
                                                 />
-                                                {errors.sshHost && touched.sshHost && (
-                                                    <div className="text-xs text-destructive">
-                                                        {errors.sshHost}
-                                                    </div>
-                                                )}
+                                                {errors.sshHost &&
+                                                    touched.sshHost && (
+                                                        <div className="text-xs text-destructive">
+                                                            {errors.sshHost}
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
 
                                         <div className="col-span-3">
                                             <div className="space-y-2">
-                                                <Label htmlFor="sshPort">
+                                                <IGRPLabelPrimitive htmlFor="sshPort">
                                                     {t('sshPort')}
-                                                </Label>
-                                                <Input
+                                                </IGRPLabelPrimitive>
+                                                <IGRPInputPrimitive
                                                     id="sshPort"
                                                     name="sshPort"
                                                     type="number"
@@ -483,21 +496,22 @@ export function ConnectionForm({
                                                     placeholder="22"
                                                     required
                                                 />
-                                                {errors.sshPort && touched.sshPort && (
-                                                    <div className="text-xs text-destructive">
-                                                        {errors.sshPort}
-                                                    </div>
-                                                )}
+                                                {errors.sshPort &&
+                                                    touched.sshPort && (
+                                                        <div className="text-xs text-destructive">
+                                                            {errors.sshPort}
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="space-y-2">
-                                            <Label htmlFor="sshUsername">
+                                            <IGRPLabelPrimitive htmlFor="sshUsername">
                                                 {t('sshUsername')}
-                                            </Label>
-                                            <Input
+                                            </IGRPLabelPrimitive>
+                                            <IGRPInputPrimitive
                                                 id="sshUsername"
                                                 name="sshUsername"
                                                 value={values.sshUsername}
@@ -506,18 +520,19 @@ export function ConnectionForm({
                                                 placeholder={t('sshUsername')}
                                                 required
                                             />
-                                            {errors.sshUsername && touched.sshUsername && (
-                                                <div className="text-xs text-destructive">
-                                                    {errors.sshUsername}
-                                                </div>
-                                            )}
+                                            {errors.sshUsername &&
+                                                touched.sshUsername && (
+                                                    <div className="text-xs text-destructive">
+                                                        {errors.sshUsername}
+                                                    </div>
+                                                )}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="sshPassword">
+                                            <IGRPLabelPrimitive htmlFor="sshPassword">
                                                 {t('sshPassword')}
-                                            </Label>
-                                            <Input
+                                            </IGRPLabelPrimitive>
+                                            <IGRPInputPrimitive
                                                 id="sshPassword"
                                                 name="sshPassword"
                                                 type="password"
@@ -537,11 +552,11 @@ export function ConnectionForm({
                                     </div>
                                 </div>
                             </div>
-                        </TabsContent>
-                    </Tabs>
+                        </IGRPTabsContentPrimitive>
+                    </IGRPTabsPrimitive>
 
                     <div className="flex justify-between items-center">
-                        <Button
+                        <IGRPButtonPrimitive
                             variant="link"
                             className="link text-igrp"
                             type="button"
@@ -550,15 +565,18 @@ export function ConnectionForm({
                             }
                         >
                             {t('testConnection')}
-                        </Button>
+                        </IGRPButtonPrimitive>
                         <div className="flex space-x-2 mt-4">
-                            <Button variant="outline" onClick={onCancel}>
+                            <IGRPButtonPrimitive
+                                variant="outline"
+                                onClick={onCancel}
+                            >
                                 {t('cancel')}
-                            </Button>
-                            <Button type="submit">
+                            </IGRPButtonPrimitive>
+                            <IGRPButtonPrimitive type="submit">
                                 {connection.name ? t('Update') : t('Add')}{' '}
                                 Connection
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </div>
                     </div>
                 </Form>

@@ -1,13 +1,13 @@
 import { CodeSnippetsRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import MonacoEditor from '@renderer/components/monaco-editor';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
-import { Label } from '@renderer/components/ui/label';
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 interface SnippetComponentProps {
@@ -25,28 +25,30 @@ const SnnipetComponent = ({
     const importRef = useRef<string>('');
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="overflow-hidden sm:max-w-[800px] lg:max-w-[900px] max-w-[90vw] w-full">
-                <DialogHeader>
-                    <DialogTitle>{snippet?.title}</DialogTitle>
-                    <DialogDescription></DialogDescription>
-                </DialogHeader>
+        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
+            <IGRPDialogContentPrimitive className="overflow-hidden sm:max-w-[800px] lg:max-w-[900px] max-w-[90vw] w-full">
+                <IGRPDialogHeaderPrimitive>
+                    <IGRPDialogTitlePrimitive>
+                        {snippet?.title}
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive></IGRPDialogDescriptionPrimitive>
+                </IGRPDialogHeaderPrimitive>
                 <div className="flex-1 border rounded">
-                    <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                    <IGRPLabelPrimitive className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                         {t('Code Snippet')}
-                    </Label>
+                    </IGRPLabelPrimitive>
                     <MonacoEditor
                         content={snippet?.code || ''}
                         filePath=""
-                        onChange={(newCode) => {
+                        onChange={(newCode: string) => {
                             importRef.current = newCode;
                         }}
                         height="30vh"
                         language="typescript"
                     />
                 </div>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 };
 

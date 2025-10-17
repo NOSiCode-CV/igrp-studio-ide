@@ -10,10 +10,7 @@ import CardComponent, { CardComponentProps } from '../CardComponent';
 const IGRPStudioComponent = ({ comp, onDragEnd }: CardComponentProps) => {
     const { children: components, id: componentId } = comp || {};
 
-    const {
-        setEditingComponent,
-    } = useDroppedComponents();
-
+    const { setEditingComponent } = useDroppedComponents();
 
     const handleDrop = (item: DragEndResult) => {
         onDragEnd(item);

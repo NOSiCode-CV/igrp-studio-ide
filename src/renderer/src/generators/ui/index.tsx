@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { JSX, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@renderer/routes/routeConstants';
 import { TabProvider } from '@renderer/components/navigation/TabContext';
@@ -11,7 +11,7 @@ interface PageBuilderProps {
     basePath?: string;
 }
 
-const Index = ({ basePath }: PageBuilderProps) => {
+const GeneratorUI = ({ basePath }: PageBuilderProps): JSX.Element => {
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -32,4 +32,4 @@ const Index = ({ basePath }: PageBuilderProps) => {
     );
 };
 
-export default Index;
+export default GeneratorUI;

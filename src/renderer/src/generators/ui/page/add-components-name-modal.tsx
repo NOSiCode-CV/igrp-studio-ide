@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-} from '@renderer/components/ui/dialog';
-import { Button } from '@renderer/components/ui/button';
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Plus } from 'lucide-react';
 import {
     SelectInput,
@@ -15,6 +15,7 @@ import {
 } from '@renderer/generators/api/components/inputs-form';
 import { useTranslation } from 'react-i18next';
 import { FileTree } from 'src/main/types';
+import { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface AddComponentsNameModalProps {
     open: boolean;
@@ -22,11 +23,12 @@ interface AddComponentsNameModalProps {
     onConfirm: (
         componentDescription: string,
         componentName: string,
-        previousComponent: any
+        previousComponent?: ProcessStepConfig
     ) => void;
     defaultComponentName: string;
     defaultName?: string;
     processFound: FileTree | undefined;
+    bpmnProcesses: FileTree[];
 }
 
 export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
@@ -36,10 +38,20 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
     defaultComponentName,
     defaultName = '',
     processFound,
+    bpmnProcesses,
 }) => {
+    const { t } = useTranslation();
+
     const [description, setDescription] = useState(defaultName);
     const [componentName, setComponentName] = useState(defaultComponentName);
-    const [previousComponent, setPreviousComponent] = useState(null);
+    const [previousComponent, setPreviousComponent] =
+        useState<ProcessStepConfig | undefined>(undefined);
+    const [availableProcesses, setAvailableProcesses] = useState<
+        Array<{ label: string; value: string }>
+    >([]);
+    const [selectedProcess, setSelectedProcess] = useState<FileTree | undefined>(
+        undefined
+    );
     const [availableVersions, setAvailableVersions] = useState<
         Array<{ label: string; value: string }>
     >([]);
@@ -47,10 +59,21 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
         Array<{ label: string; value: string }>
     >([]);
 
-    const { t } = useTranslation();
+    useEffect(() => {
+        console.log('bpmnProcesses', bpmnProcesses);
+        if (bpmnProcesses && bpmnProcesses.length > 0) {
+            const processes = bpmnProcesses.map((process) => ({
+                label: process.name,
+                value: process.name,
+            }));
+            setAvailableProcesses(processes);
+        }
+    }, [bpmnProcesses]);
 
     useEffect(() => {
+        console.log('processFound', processFound);
         if (processFound) {
+            setSelectedProcess(processFound);
             const versions = processFound.children?.map((child) => ({
                 label: child.name,
                 value: child.name,
@@ -63,25 +86,47 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
         if (open) {
             setDescription(defaultName);
             setComponentName(defaultComponentName);
-            setPreviousComponent(null);
+            setPreviousComponent(undefined);
+            // If no processFound, reset selections
+            if (!processFound) {
+                setSelectedProcess(undefined);
+                setAvailableVersions([]);
+                setAvailableComponents([]);
+            }
         }
-    }, [open, defaultName, defaultComponentName]);
+    }, [open, defaultName, defaultComponentName, processFound]);
 
-    const handleConfirm = () => {
+    const handleConfirm = (): void => {
         if (!description.trim() || !componentName.trim()) return;
 
         onConfirm(description.trim(), componentName.trim(), previousComponent);
         onOpenChange(false);
     };
 
-    const handleCancel = () => {
+    const handleCancel = (): void => {
         onOpenChange(false);
     };
 
     const hasAvailableVersions = availableVersions.length > 0;
+    const hasAvailableProcesses = availableProcesses.length > 0;
 
-    const handleVersionChange = async (version: string) => {
-        const components = processFound?.children
+    const handleProcessChange = (processName: string): void => {
+        const process = bpmnProcesses.find((p) => p.name === processName);
+        if (process) {
+            setSelectedProcess(process);
+            const versions = process.children?.map((child) => ({
+                label: child.name,
+                value: child.name,
+            }));
+            setAvailableVersions(versions || []);
+            // Clear version and component selections
+            setAvailableComponents([]);
+            setPreviousComponent(undefined);
+        }
+    };
+
+    const handleVersionChange = async (version: string): Promise<void> => {
+        const components = selectedProcess?.children
             ?.find((child) => child.name === version)
             ?.children?.map((child) => ({
                 label: child.content.description || child.content.name,
@@ -91,23 +136,25 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
         setAvailableComponents(components || []);
     };
 
-    const handleComponentChange = (component: any) => {
+    const handleComponentChange = (
+        component: ProcessStepConfig | undefined
+    ): void => {
         setPreviousComponent(component);
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
+        <IGRPDialogPrimitive open={open} onOpenChange={onOpenChange}>
+            <IGRPDialogContentPrimitive>
+                <IGRPDialogHeaderPrimitive>
+                    <IGRPDialogTitlePrimitive className="flex items-center gap-2">
                         <Plus className="h-5 w-5" />
                         Configure New Step
-                    </DialogTitle>
-                    <DialogDescription>
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive>
                         Configure the new step name and optionally copy from an
                         existing version.
-                    </DialogDescription>
-                </DialogHeader>
+                    </IGRPDialogDescriptionPrimitive>
+                </IGRPDialogHeaderPrimitive>
 
                 <div className="space-y-6 py-4">
                     <TextInput
@@ -129,47 +176,65 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
                     />
 
                     {/* Copy from Previous Version */}
-                    {hasAvailableVersions && (
+                    {hasAvailableProcesses && (
                         <div className="space-y-4">
                             <p className="text-sm font-medium">
                                 Copy from previous version
                             </p>
                             <SelectInput
-                                id="version-select"
-                                label="Available Versions"
-                                options={availableVersions}
+                                id="process-select"
+                                label="Select Process"
+                                options={availableProcesses}
                                 onChange={(value) =>
-                                    handleVersionChange(value as string)
+                                    handleProcessChange(value as string)
                                 }
-                                placeholder="Choose a version..."
+                                placeholder="Choose a process..."
                             />
-                            <SelectInput
-                                id="component-select"
-                                label="Components"
-                                options={availableComponents}
-                                onChange={(value) =>
-                                    handleComponentChange(value as any)
-                                }
-                                placeholder="Choose a component..."
-                            />
+                            {hasAvailableVersions && (
+                                <>
+                                    <SelectInput
+                                        id="version-select"
+                                        label="Available Versions"
+                                        options={availableVersions}
+                                        onChange={(value) =>
+                                            handleVersionChange(value as string)
+                                        }
+                                        placeholder="Choose a version..."
+                                    />
+                                    <SelectInput
+                                        id="component-select"
+                                        label="Components"
+                                        options={availableComponents}
+                                        onChange={(value) =>
+                                            handleComponentChange(
+                                                value as unknown as ProcessStepConfig | undefined
+                                            )
+                                        }
+                                        placeholder="Choose a component..."
+                                    />
+                                </>
+                            )}
                         </div>
                     )}
                 </div>
 
-                <DialogFooter className="gap-2">
-                    <Button variant="outline" onClick={handleCancel}>
+                <IGRPDialogFooterPrimitive className="gap-2">
+                    <IGRPButtonPrimitive
+                        variant="outline"
+                        onClick={handleCancel}
+                    >
                         Cancel
-                    </Button>
-                    <Button
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive
                         onClick={handleConfirm}
                         disabled={!description.trim() || !componentName.trim()}
                         className="gap-2"
                     >
                         <Plus className="h-4 w-4" />
                         {previousComponent ? 'Copy Step' : 'Generate Step'}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                    </IGRPButtonPrimitive>
+                </IGRPDialogFooterPrimitive>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 };

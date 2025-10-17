@@ -1,16 +1,20 @@
-import { Button } from '@renderer/components/ui/button';
-import { Label } from '@renderer/components/ui/label';
+import {
+    IGRPButtonPrimitive,
+    IGRPCardContentPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardPrimitive,
+    IGRPCardTitlePrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import {
@@ -24,18 +28,12 @@ import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { TextInput } from '@renderer/generators/api/components/inputs-form';
 import { camelCase } from 'lodash-es';
 import { FocusEvent } from 'react';
-import { Separator } from '@renderer/components/ui/separator';
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import {
     FunctionArguments,
     returnTypeOptions,
 } from '../components/sidebar/custom-code/functions-settings';
 import { PageDefinition } from './page-manager';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
 
 const initialValues: ComponentConfig = {
     type: 'component',
@@ -73,20 +71,26 @@ export function CreateComponentModal({
     const { showErrorToast, showSuccessToast } = useToast();
 
     const [arguments_, setArguments] = useState<Arguments[]>([]);
-    const [formInitialValues, setFormInitialValues] = useState<ComponentConfig>(initialValues);
+    const [formInitialValues, setFormInitialValues] =
+        useState<ComponentConfig>(initialValues);
 
     useEffect(() => {
         const loadCurrentData = async () => {
             if (currentComponent?.path) {
                 try {
-                    const currentData = await window.api.getJsonContent(currentComponent.path);
+                    const currentData = await window.api.getJsonContent(
+                        currentComponent.path
+                    );
                     console.log('Current component data loaded:', currentData);
                     setFormInitialValues({
                         ...initialValues,
                         ...currentData,
                     });
                 } catch (error) {
-                    console.warn('Failed to load current component data:', error);
+                    console.warn(
+                        'Failed to load current component data:',
+                        error
+                    );
                     // Fallback to currentComponent.content if API call fails
                     setFormInitialValues({
                         ...initialValues,
@@ -114,7 +118,6 @@ export function CreateComponentModal({
         pageConfig: ComponentConfig
     ): Promise<void> => {
         try {
-
             const { error } = await window.engine.createPage(
                 { ...pageConfig, id: getId() },
                 ENV_TYPES.NEXTJS,
@@ -180,12 +183,14 @@ export function CreateComponentModal({
     }, [arguments_]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="w-full sm:max-w-[800px] lg:max-w-[60vw] max-w-[70vw]">
-                <DialogTitle>{t('createNewComponent')}</DialogTitle>
-                <DialogDescription>
+        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
+            <IGRPDialogContentPrimitive className="w-full sm:max-w-[800px] lg:max-w-[60vw] max-w-[70vw]">
+                <IGRPDialogTitlePrimitive>
+                    {t('createNewComponent')}
+                </IGRPDialogTitlePrimitive>
+                <IGRPDialogDescriptionPrimitive>
                     {t('comonDialogtDescription', { name: 'Component' })}
-                </DialogDescription>
+                </IGRPDialogDescriptionPrimitive>
                 <form
                     className="needs-validation"
                     onSubmit={(e) => {
@@ -216,7 +221,9 @@ export function CreateComponentModal({
                                 placeholder="TodoItem"
                             />
                             <div className="grid grid-cols-1 items-center gap-3">
-                                <Label htmlFor="Associar">{t('pages')}</Label>
+                                <IGRPLabelPrimitive htmlFor="Associar">
+                                    {t('pages')}
+                                </IGRPLabelPrimitive>
                                 <IGRPCombobox
                                     name="pagePath"
                                     className="col-span-3"
@@ -228,13 +235,17 @@ export function CreateComponentModal({
                                         const selected = pageOptions.find(
                                             (opt) => opt.value === selectedValue
                                         );
-                                        
+
                                         // Update all fields at once to avoid double-click issue
                                         formik.setValues({
                                             ...formik.values,
-                                            pagePath: selected?.path || undefined,
-                                            pageName: selected?.value || undefined,
-                                            scope: selectedValue ? 'page' : 'app',
+                                            pagePath:
+                                                selected?.path || undefined,
+                                            pageName:
+                                                selected?.value || undefined,
+                                            scope: selectedValue
+                                                ? 'page'
+                                                : 'app',
                                         });
                                     }}
                                 />
@@ -248,13 +259,13 @@ export function CreateComponentModal({
                                 />
                             </div>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>
+                            <IGRPCardPrimitive>
+                                <IGRPCardHeaderPrimitive>
+                                    <IGRPCardTitlePrimitive>
                                         Generated Component Signature
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
+                                    </IGRPCardTitlePrimitive>
+                                </IGRPCardHeaderPrimitive>
+                                <IGRPCardContentPrimitive>
                                     <pre className="p-4 rounded-lg text-sm overflow-x-auto">
                                         <code>
                                             {`export default function  myComponent(`}
@@ -300,12 +311,12 @@ export function CreateComponentModal({
 }`}
                                         </code>
                                     </pre>
-                                </CardContent>
-                            </Card>
+                                </IGRPCardContentPrimitive>
+                            </IGRPCardPrimitive>
                         </div>
                         <div className="col-span-1 py-4">
                             <div className="flex flex-row space-x-3 w-full h-full">
-                                <Separator orientation="vertical" />
+                                <IGRPSeparator orientation="vertical" />
                                 <div className="w-full flex-1">
                                     <FunctionArguments
                                         value={formik.values?.args || []}
@@ -316,20 +327,24 @@ export function CreateComponentModal({
                             </div>
                         </div>
                     </div>
-                    <DialogFooter className="flex justify-between">
-                        <Button type="button" variant="ghost" onClick={onClose}>
+                    <IGRPDialogFooterPrimitive className="flex justify-between">
+                        <IGRPButtonPrimitive
+                            type="button"
+                            variant="ghost"
+                            onClick={onClose}
+                        >
                             {t('cancel')}
-                        </Button>
-                        <Button
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
                             type="submit"
                             disabled={formik.isSubmitting}
                             color="primary"
                         >
                             {formik.isSubmitting ? t('saving') : t('save')}
-                        </Button>
-                    </DialogFooter>
+                        </IGRPButtonPrimitive>
+                    </IGRPDialogFooterPrimitive>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

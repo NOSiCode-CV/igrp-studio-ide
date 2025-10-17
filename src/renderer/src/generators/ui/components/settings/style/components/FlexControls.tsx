@@ -1,5 +1,4 @@
-
-import { useTranslation } from 'react-i18next'; 
+import { useTranslation } from 'react-i18next';
 interface FlexControlsProps {
     direction: string;
     wrap: string;
@@ -26,7 +25,7 @@ export function FlexControls({
     onGapChange,
 }: FlexControlsProps) {
     const { t } = useTranslation();
-    
+
     return (
         <div className="space-y-2">
             <div className="grid grid-cols-2 gap-1">
@@ -42,7 +41,9 @@ export function FlexControls({
                         <option value="row">{t('row')}</option>
                         <option value="row-reverse">{t('rowReverse')}</option>
                         <option value="column">{t('column')}</option>
-                        <option value="column-reverse">{t('columnReverse')}</option>
+                        <option value="column-reverse">
+                            {t('columnReverse')}
+                        </option>
                     </select>
                 </div>
 
@@ -92,7 +93,9 @@ export function FlexControls({
                         <option value="flex-start">{t('start')}</option>
                         <option value="flex-end">{t('end')}</option>
                         <option value="center">{t('center')}</option>
-                        <option value="space-between">{t('spaceBetween')}</option>
+                        <option value="space-between">
+                            {t('spaceBetween')}
+                        </option>
                         <option value="space-around">{t('spaceAround')}</option>
                         <option value="space-evenly">{t('spaceEvenly')}</option>
                     </select>

@@ -1,26 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@renderer/components/ui/button';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@renderer/components/ui/select';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
+    IGRPBadgePrimitive,
+    IGRPButtonPrimitive,
+    IGRPSelectContentPrimitive,
+    IGRPSelectItemPrimitive,
+    IGRPSelectPrimitive,
+    IGRPSelectTriggerPrimitive,
+    IGRPSelectValuePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
-import { Badge } from '@renderer/components/ui/badge';
+    IGRPTabsPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+
+import {
+    IGRPCardPrimitive,
+    IGRPCardContentPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { toast } from 'sonner';
 import {
     BPMNProject,
@@ -56,10 +57,11 @@ import { nanoid } from '@reduxjs/toolkit';
 import { PageDefinition } from './page-manager';
 import { BPMNDiagramViewer } from '@renderer/components/bpmn-diagram-viewer';
 import { bpmnProcessStepInteractions } from './bpmn-process-step-interactions';
+import { JSX } from 'react/jsx-runtime';
 
 // Types
 interface BPMNProjectSelectorProps {
-    onPageClick?: (pageDefinition: PageDefinition) => void;
+    onPageClick?: (pageDefinition: PageDefinition | FileTree) => void;
     bpmnProcesses: FileTree[];
     basePath: string;
 }
@@ -108,6 +110,7 @@ const useProcessDefinitions = (selectedProject: BPMNProject | null) => {
                 await bpmnService.getProcessDefinitionsByProject(projectId);
             setProcessDefinitions(processes);
         } catch (error) {
+            setProcessDefinitions([]);
             toast.error('Failed to load process definitions');
             console.error('Error loading process definitions:', error);
         } finally {
@@ -133,9 +136,9 @@ const ProcessCard = ({
 }: ProcessCardProps & {
     isSelected: boolean;
     onSelectProcess: (process: BPMNProjectProcessDefinition) => void;
-}) => {
+}): JSX.Element => {
     return (
-        <Card
+        <IGRPCardPrimitive
             className={`hover:shadow-md transition-all cursor-pointer ${
                 isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
             }`}
@@ -144,14 +147,14 @@ const ProcessCard = ({
                 onSelectProcess(process);
             }}
         >
-            <CardContent>
+            <IGRPCardContentPrimitive>
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
-                        <CardTitle className="text-base font-medium">
+                        <IGRPCardTitlePrimitive className="text-base font-medium">
                             {process.title}
-                        </CardTitle>
+                        </IGRPCardTitlePrimitive>
                         <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
-                            <Calendar  className='w-4 h-4'/>
+                            <Calendar className="w-4 h-4" />
                             {process.deploymentDate && (
                                 <span>
                                     Deployed on{' '}
@@ -162,7 +165,7 @@ const ProcessCard = ({
                             )}
                         </div>
                         <div className="flex items-center space-x-2 mt-1 text-sm text-muted-foreground">
-                            <Trash2 className='w-4 h-4'/>
+                            <Trash2 className="w-4 h-4" />
                             <span>
                                 {process.processArtifacts?.length || 0}{' '}
                                 artifacts
@@ -170,14 +173,14 @@ const ProcessCard = ({
                         </div>
                     </div>
                     <div className="flex flex-col items-end space-y-2">
-                        <Badge variant={'outline'}>
+                        <IGRPBadgePrimitive variant={'outline'}>
                             v{process.version || 'N/A'}
                             {' • Published'}
-                        </Badge>
+                        </IGRPBadgePrimitive>
                     </div>
                 </div>
-            </CardContent>
-        </Card>
+            </IGRPCardContentPrimitive>
+        </IGRPCardPrimitive>
     );
 };
 
@@ -186,14 +189,14 @@ export const BPMNProjectSelector = ({
     onPageClick,
     bpmnProcesses,
     basePath,
-}: BPMNProjectSelectorProps) => {
+}: BPMNProjectSelectorProps): JSX.Element => {
     const [selectedProject, setSelectedProject] = useState<BPMNProject | null>(
         null
     );
     const [selectedProcess, setSelectedProcess] =
         useState<BPMNProjectProcessDefinition | null>(null);
     const [processDefinitionDetails, setProcessDefinitionDetails] =
-        useState<any>(null);
+        useState<BPMNProjectProcessDefinition | null>(null);
     const [loadingProcessDetails, setLoadingProcessDetails] = useState(false);
     const [showAddComponentsModal, setShowAddComponentsModal] = useState(false);
     const [pendingComponentData, setPendingComponentData] = useState<
@@ -211,22 +214,25 @@ export const BPMNProjectSelector = ({
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const { projects, loading } = useBPMNProjects(refreshTrigger);
-    const { processDefinitions, loading: loadingProcesses, loadProcessDefinitions } =
-        useProcessDefinitions(selectedProject);
+    const {
+        processDefinitions,
+        loading: loadingProcesses,
+        loadProcessDefinitions,
+    } = useProcessDefinitions(selectedProject);
 
     const { showErrorToast, showSuccessToast } = useToast();
     const dispatch: any = useDispatch();
 
     // Listen for configuration changes and refresh projects
     useEffect(() => {
-        const handleConfigChange = () => {
+        const handleConfigChange = (): void => {
             // Clear the BPMN service cache to force it to use the new active config
             bpmnService.clearConfig();
-            setRefreshTrigger(prev => prev + 1);
+            setRefreshTrigger((prev) => prev + 1);
         };
 
         // Listen for storage changes (when BPMN configs are updated)
-        const handleStorageChange = (e: StorageEvent) => {
+        const handleStorageChange = (e: StorageEvent): void => {
             if (e.key?.includes('bpmn') || e.key?.includes('BPMN')) {
                 handleConfigChange();
             }
@@ -237,14 +243,19 @@ export const BPMNProjectSelector = ({
         window.addEventListener('storage', handleStorageChange);
 
         return () => {
-            window.removeEventListener('bpmn-config-changed', handleConfigChange);
+            window.removeEventListener(
+                'bpmn-config-changed',
+                handleConfigChange
+            );
             window.removeEventListener('storage', handleStorageChange);
         };
     }, []);
 
     // Fetch process definition details when a process is selected
     useEffect(() => {
-        const fetchProcessDefinitionDetails = async () => {
+        setProcessDefinitionDetails(null);
+
+        const fetchProcessDefinitionDetails = async (): Promise<void> => {
             if (selectedProcess?.processDefinitionId) {
                 try {
                     setLoadingProcessDetails(true);
@@ -255,6 +266,7 @@ export const BPMNProjectSelector = ({
                     setProcessDefinitionDetails(details);
                     console.log('Process definition details:', details);
                 } catch (error) {
+                    setProcessDefinitionDetails(null);
                     console.error(
                         'Error fetching process definition details:',
                         error
@@ -273,12 +285,16 @@ export const BPMNProjectSelector = ({
         fetchProcessDefinitionDetails();
     }, [selectedProcess]);
 
-    const handleProjectChange = (projectId: string) => {
+    const handleProjectChange = (projectId: string): void => {
         const project = projects.find((p) => p.projectId === projectId);
         setSelectedProject(project || null);
+        setProcessDefinitionDetails(null);
+        setSelectedProcess(null);
     };
 
-    const findProcess = (processDefinition: BPMNProjectProcessDefinition) => {
+    const findProcess = (
+        processDefinition: BPMNProjectProcessDefinition
+    ): FileTree | undefined => {
         return bpmnProcesses.find(
             (p) =>
                 p.name === processDefinition.processKey &&
@@ -290,7 +306,7 @@ export const BPMNProjectSelector = ({
 
     const findProcessRecursive = (
         processDefinition: BPMNProjectProcessDefinition
-    ) => {
+    ): FileTree | undefined => {
         // Find the process by name
         const process = bpmnProcesses.find(
             (p) => p.name === processDefinition.processKey
@@ -305,7 +321,7 @@ export const BPMNProjectSelector = ({
         while (currentVersion >= 1) {
             const versionName = `v${currentVersion}`;
             const versionFound = process.children.find(
-                (c: any) => c.name === versionName
+                (c: FileTree) => c.name === versionName
             );
 
             if (versionFound) {
@@ -321,32 +337,32 @@ export const BPMNProjectSelector = ({
 
     const findStepProcess = (
         processDefinition: BPMNProjectProcessDefinition,
-        processFound: any,
+        processFound: FileTree,
         processArtifact: BPMNProjectArtifact
-    ) => {
+    ): FileTree | undefined => {
         const processVersionFound = processFound?.children?.find(
-            (c: any) => c.name === `v${processDefinition.version}`
+            (c: FileTree) => c.name === `v${processDefinition.version}`
         );
 
         if (!processVersionFound) return;
 
-        return processVersionFound?.children.find(
-            (c: any) => c.content.taskKey === processArtifact.taskKey
+        return processVersionFound?.children?.find(
+            (c: FileTree) => c.content.taskKey === processArtifact.taskKey
         );
     };
 
     const handleStepProcess = async (
         componentDescription: string,
         componentName: string,
-        previousComponent?: any
-    ) => {
+        previousComponent?: ProcessStepConfig
+    ): Promise<void> => {
         try {
             if (!pendingComponentData) return;
 
             const { processDefinition, processArtifact, processFound } =
                 pendingComponentData;
 
-            const version = `v${processDefinition.version}` || 'v1';
+            const version = `v${processDefinition.version}`;
 
             if (!processFound) {
                 const processConfig: ProcessConfig = {
@@ -414,6 +430,7 @@ export const BPMNProjectSelector = ({
             );
 
             if (error) {
+                console.log('error', error);
                 showErrorToast(error);
             } else {
                 showSuccessToast('Process step created successfully');
@@ -427,12 +444,12 @@ export const BPMNProjectSelector = ({
     const handleModalConfiguration = async (
         processDefinition: BPMNProjectProcessDefinition,
         processArtifact: BPMNProjectArtifact
-    ) => {
+    ): Promise<void> => {
         const processFound = findProcess(processDefinition);
 
         if (!processFound) {
             const processFound = findProcessRecursive(processDefinition);
-            setOldProcessFound(processFound as FileTree);
+            setOldProcessFound(processFound);
         }
 
         // Store the data and open the modal
@@ -444,7 +461,7 @@ export const BPMNProjectSelector = ({
         setShowAddComponentsModal(true);
     };
 
-    const handleConfirmAddComponents = (stepProcessFound: PageDefinition) => {
+    const handleConfirmAddComponents = (stepProcessFound: FileTree): void => {
         onPageClick?.(stepProcessFound);
     };
 
@@ -457,32 +474,36 @@ export const BPMNProjectSelector = ({
             {/* Project Selection */}
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium">Select Project</label>
-                    <Button
+                    <label className="text-sm font-medium">
+                        Select Project
+                    </label>
+                    <IGRPButtonPrimitive
                         variant="outline"
                         size="sm"
                         onClick={() => {
                             bpmnService.clearConfig();
-                            setRefreshTrigger(prev => prev + 1);
+                            setRefreshTrigger((prev) => prev + 1);
                         }}
                         disabled={loading}
                         className="flex items-center gap-2"
                     >
-                        <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                        <RefreshCw
+                            className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
+                        />
                         Refresh
-                    </Button>
+                    </IGRPButtonPrimitive>
                 </div>
-                <Select
+                <IGRPSelectPrimitive
                     onValueChange={handleProjectChange}
                     value={selectedProject?.projectId || ''}
                 >
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Choose a project..." />
-                    </SelectTrigger>
-                    <SelectContent>
+                    <IGRPSelectTriggerPrimitive className="w-full">
+                        <IGRPSelectValuePrimitive placeholder="Choose a project..." />
+                    </IGRPSelectTriggerPrimitive>
+                    <IGRPSelectContentPrimitive>
                         {projects.length > 0 &&
                             projects.map((project) => (
-                                <SelectItem
+                                <IGRPSelectItemPrimitive
                                     key={project.projectId}
                                     value={project.projectId}
                                 >
@@ -490,7 +511,7 @@ export const BPMNProjectSelector = ({
                                         <span className="font-medium">
                                             {project.name}
                                         </span>
-                                        <Badge
+                                        <IGRPBadgePrimitive
                                             variant={
                                                 project.active
                                                     ? 'default'
@@ -498,105 +519,105 @@ export const BPMNProjectSelector = ({
                                             }
                                         >
                                             {project.code}
-                                        </Badge>
+                                        </IGRPBadgePrimitive>
                                         {!project.active && (
-                                            <Badge variant="outline">
+                                            <IGRPBadgePrimitive variant="outline">
                                                 Inactive
-                                            </Badge>
+                                            </IGRPBadgePrimitive>
                                         )}
                                     </div>
-                                </SelectItem>
+                                </IGRPSelectItemPrimitive>
                             ))}
-                    </SelectContent>
-                </Select>
+                    </IGRPSelectContentPrimitive>
+                </IGRPSelectPrimitive>
             </div>
 
             {/* Step 2: Select Process */}
-            {selectedProject && (
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h3 className="text-lg font-semibold">
-                                Select Process
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                                Choose a specific process to view its artifacts,
-                                or load all project artifacts below.
-                            </p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            {loadingProcesses && <IGRPLoadingSpinner />}
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 px-2"
-                                onClick={() =>
-                                    selectedProject &&
-                                    loadProcessDefinitions(selectedProject.projectId)
-                                }
-                                title="Refresh processes"
-                            >
-                                <RefreshCw className='w-4 h-4'/>
-                                Refresh
-                            </Button>
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h3 className="text-lg font-semibold">
+                            Select Process
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                            Choose a specific process to view its artifacts, or
+                            load all project artifacts below.
+                        </p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        {loadingProcesses && <IGRPLoadingSpinner />}
+                        <IGRPButtonPrimitive
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-2"
+                            onClick={() =>
+                                selectedProject &&
+                                loadProcessDefinitions(
+                                    selectedProject.projectId
+                                )
+                            }
+                            title="Refresh processes"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                            Refresh
+                        </IGRPButtonPrimitive>
+                    </div>
+                </div>
+
+                {loadingProcesses ? (
+                    <IGRPLoadingSpinner />
+                ) : processDefinitions.length > 0 ? (
+                    <div className="space-y-4">
+                        {loadingProcessDetails && (
+                            <div className="flex items-center justify-center py-4">
+                                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                                    <IGRPLoadingSpinner />
+                                    <span>Loading process details...</span>
+                                </div>
+                            </div>
+                        )}
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                            {processDefinitions.map((process) => (
+                                <ProcessCard
+                                    key={process.processDefinitionId}
+                                    process={process}
+                                    isSelected={
+                                        selectedProcess?.processDefinitionId ===
+                                        process.processDefinitionId
+                                    }
+                                    onSelectProcess={setSelectedProcess}
+                                />
+                            ))}
                         </div>
                     </div>
-
-                    {loadingProcesses ? (
-                        <IGRPLoadingSpinner />
-                    ) : processDefinitions.length > 0 ? (
-                        <div className="space-y-4">
-                            {loadingProcessDetails && (
-                                <div className="flex items-center justify-center py-4">
-                                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                                        <IGRPLoadingSpinner />
-                                        <span>Loading process details...</span>
-                                    </div>
-                                </div>
-                            )}
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                                {processDefinitions.map((process) => (
-                                    <ProcessCard
-                                        key={process.processDefinitionId}
-                                        process={process}
-                                        isSelected={
-                                            selectedProcess?.processDefinitionId ===
-                                            process.processDefinitionId
-                                        }
-                                        onSelectProcess={setSelectedProcess}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    ) : (
-                        <Card>
-                            <CardContent className="py-8 text-center text-muted-foreground">
-                                No process definitions found for this project.
-                            </CardContent>
-                        </Card>
-                    )}
-                </div>
-            )}
+                ) : (
+                    <IGRPCardPrimitive>
+                        <IGRPCardContentPrimitive className="py-8 text-center text-muted-foreground">
+                            No process definitions found for this project.
+                        </IGRPCardContentPrimitive>
+                    </IGRPCardPrimitive>
+                )}
+            </div>
 
             {/* Step 3: Process Details with Tabs */}
-            {selectedProcess && (
+            {selectedProcess && processDefinitions.length > 0 && (
                 <>
                     <div className="space-y-4">
-                        <Tabs
+                        <IGRPTabsPrimitive
                             value={activeTab}
                             onValueChange={setActiveTab}
                             className="w-full"
                         >
-                            <TabsList className="grid grid-cols-2">
-                                <TabsTrigger value="artifacts">
+                            <IGRPTabsListPrimitive className="grid grid-cols-2">
+                                <IGRPTabsTriggerPrimitive value="artifacts">
                                     Process Artifacts
-                                </TabsTrigger>
-                                <TabsTrigger value="diagram">
+                                </IGRPTabsTriggerPrimitive>
+                                <IGRPTabsTriggerPrimitive value="diagram">
                                     BPMN Diagram
-                                </TabsTrigger>
-                            </TabsList>
+                                </IGRPTabsTriggerPrimitive>
+                            </IGRPTabsListPrimitive>
 
-                            <TabsContent
+                            <IGRPTabsContentPrimitive
                                 value="artifacts"
                                 className="space-y-6"
                             >
@@ -611,14 +632,14 @@ export const BPMNProjectSelector = ({
                                         </p>
                                     </div>
                                     <div className="flex space-x-2">
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             variant="outline"
                                             size="sm"
                                             className="flex items-center space-x-2"
                                         >
                                             <Settings />
                                             Bulk Actions
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </div>
                                 </div>
 
@@ -642,23 +663,23 @@ export const BPMNProjectSelector = ({
                                                 const stepProcessFound =
                                                     findStepProcess(
                                                         selectedProcess,
-                                                        processFound,
+                                                        processFound as FileTree,
                                                         artifact
                                                     );
 
                                                 return (
-                                                    <Card
+                                                    <IGRPCardPrimitive
                                                         key={index}
                                                         className="hover:shadow-md transition-all cursor-pointer hover:bg-muted/30"
                                                     >
-                                                        <CardHeader>
+                                                        <IGRPCardHeaderPrimitive>
                                                             <div className="flex items-start justify-between">
                                                                 <div className="flex-1">
-                                                                    <CardTitle className="text-base font-medium">
+                                                                    <IGRPCardTitlePrimitive className="text-base font-medium">
                                                                         {
                                                                             artifact.name
                                                                         }
-                                                                    </CardTitle>
+                                                                    </IGRPCardTitlePrimitive>
                                                                     <div className="text-sm text-muted-foreground mt-1">
                                                                         {
                                                                             artifact.taskKey
@@ -666,34 +687,34 @@ export const BPMNProjectSelector = ({
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex flex-col items-end space-y-2">
-                                                                    <Badge
+                                                                    <IGRPBadgePrimitive
                                                                         variant="outline"
                                                                         className="text-xs"
                                                                     >
                                                                         v
                                                                         {selectedProcess.version ||
                                                                             'N/A'}
-                                                                    </Badge>
-                                                                    <Button
+                                                                    </IGRPBadgePrimitive>
+                                                                    <IGRPButtonPrimitive
                                                                         variant="ghost"
                                                                         size="sm"
                                                                         className="h-6 w-6 p-0"
                                                                     >
                                                                         <EllipsisVertical />
-                                                                    </Button>
+                                                                    </IGRPButtonPrimitive>
                                                                 </div>
                                                             </div>
-                                                        </CardHeader>
-                                                        <CardContent className="space-y-2">
+                                                        </IGRPCardHeaderPrimitive>
+                                                        <IGRPCardContentPrimitive className="space-y-2">
                                                             {artifact.subProcessTask && (
-                                                                <Badge
-                                                                    variant="secondary"
+                                                                <IGRPBadgePrimitive
+                                                                    variant="outline"
                                                                     className="text-xs"
                                                                 >
                                                                     {`Sub Process - ${artifact.subProcessName}`}
-                                                                </Badge>
+                                                                </IGRPBadgePrimitive>
                                                             )}
-                                                            <Button
+                                                            <IGRPButtonPrimitive
                                                                 size="sm"
                                                                 className="w-full"
                                                                 variant={
@@ -725,23 +746,26 @@ export const BPMNProjectSelector = ({
                                                                         Step
                                                                     </>
                                                                 )}
-                                                            </Button>
-                                                        </CardContent>
-                                                    </Card>
+                                                            </IGRPButtonPrimitive>
+                                                        </IGRPCardContentPrimitive>
+                                                    </IGRPCardPrimitive>
                                                 );
                                             }
                                         )}
                                     </div>
                                 ) : (
-                                    <Card>
-                                        <CardContent className="py-8 text-center text-muted-foreground">
+                                    <IGRPCardPrimitive>
+                                        <IGRPCardContentPrimitive className="py-8 text-center text-muted-foreground">
                                             No artifacts found for this process.
-                                        </CardContent>
-                                    </Card>
+                                        </IGRPCardContentPrimitive>
+                                    </IGRPCardPrimitive>
                                 )}
-                            </TabsContent>
+                            </IGRPTabsContentPrimitive>
 
-                            <TabsContent value="diagram" className="space-y-4">
+                            <IGRPTabsContentPrimitive
+                                value="diagram"
+                                className="space-y-4"
+                            >
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <h4 className="text-md font-medium">
@@ -761,20 +785,20 @@ export const BPMNProjectSelector = ({
                                         }
                                     />
                                 )}
-                            </TabsContent>
-                        </Tabs>
+                            </IGRPTabsContentPrimitive>
+                        </IGRPTabsPrimitive>
                     </div>
                 </>
             )}
 
             {/* No Projects Message */}
             {!loading && projects.length === 0 && (
-                <Card>
-                    <CardContent className="py-8 text-center text-muted-foreground">
+                <IGRPCardPrimitive>
+                    <IGRPCardContentPrimitive className="py-8 text-center text-muted-foreground">
                         No projects found. Please check your BPMN API
                         configuration.
-                    </CardContent>
-                </Card>
+                    </IGRPCardContentPrimitive>
+                </IGRPCardPrimitive>
             )}
 
             {/* Add Components Name Modal */}
@@ -789,6 +813,7 @@ export const BPMNProjectSelector = ({
                 processFound={
                     pendingComponentData?.processFound || oldProcessFound
                 }
+                bpmnProcesses={bpmnProcesses}
             />
         </div>
     );

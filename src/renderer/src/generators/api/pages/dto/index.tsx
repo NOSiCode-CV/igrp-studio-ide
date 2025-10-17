@@ -1,4 +1,9 @@
-import { Card } from '@renderer/components/ui/card';
+import {
+    IGRPCardContentPrimitive,
+    IGRPCardPrimitive,
+    IGRPCheckboxPrimitive,
+    IGRPLabelPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { SelectInput, TextInput } from '../../components/inputs-form';
 import NavigationBar from '../../components/navigation-bar';
 import {
@@ -11,8 +16,6 @@ import { initialValues, TabList, TemplateOptions } from './config';
 import AttributesCard from './attributes';
 import { useTranslation } from 'react-i18next';
 import { useDto } from './useDto';
-import { Checkbox } from '@renderer/components/ui/checkbox';
-import { Label } from '@renderer/components/ui/label';
 
 interface DtoProps {
     selectors: Array<any>;
@@ -86,82 +89,93 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                 title={t('dto')}
             />
             <div className="space-y-4 p-4">
-                <Card className="rounded-sm p-6">
-                    <div className="flex flex-col gap-4">
-                        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-                            <TextInput
-                                label={t('name')}
-                                id="name"
-                                placeholder={t('enterName')}
-                                value={formik.values.name}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                isTouched={formik.touched.name}
-                                error={formik.errors.name}
-                                isRequired
-                            />
-                            <SelectInput
-                                label={t('template')}
-                                id="template"
-                                options={TemplateOptions}
-                                value={formik.values.template}
-                                onChange={(e) => {
-                                    formik.setFieldValue('template', e);
-                                }}
-                                onBlur={formik.handleBlur}
-                                error={formik.errors.template}
-                                isTouched={formik.touched.template}
-                                isRequired
-                            />
-                            <SelectInput
-                                id="extends"
-                                label={'extends'}
-                                value={`${formik.values.extends?.name}-${formik.values.extends?.module}`}
-                                options={
-                                    dtos && dtos.length > 0
-                                        ? dtos.map(
-                                              ({ label, module, value }: { label: string, module: string, value: string }) => ({
-                                                  label: `${label} (${module})`,
-                                                  value: `${value}-${module}`,
-                                              })
-                                          )
-                                        : []
-                                }
-                                onChange={(option: string | boolean) =>
-                                    typeof option === 'string' && handleChangeExtends(option)
-                                }
-                                onBlur={formik.handleBlur}
-                                error={formik.errors.extends}
-                                isTouched={formik.touched.extends}
-                            />
-                            <div className="flex flex-1 space-x-2">
-                                <Label htmlFor="enableCustonValidation">
-                                    {t('enableCustonValidation')}
-                                </Label>
-                                <Checkbox
-                                    id="enableCustonValidation"
-                                    onCheckedChange={(checked: boolean) =>
-                                        formik.setFieldValue(
-                                            'enableCustonValidation',
-                                            checked
-                                        )
-                                    }
-                                    checked={
-                                        formik.values.enableCustonValidation
-                                    }
+                <IGRPCardPrimitive>
+                    <IGRPCardContentPrimitive>
+                        <div className="flex flex-col gap-4">
+                            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                                <TextInput
+                                    label={t('name')}
+                                    id="name"
+                                    placeholder={t('enterName')}
+                                    value={formik.values.name}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    isTouched={formik.touched.name}
+                                    error={formik.errors.name}
+                                    isRequired
                                 />
+                                <SelectInput
+                                    label={t('template')}
+                                    id="template"
+                                    options={TemplateOptions}
+                                    value={formik.values.template}
+                                    onChange={(e) => {
+                                        formik.setFieldValue('template', e);
+                                    }}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.errors.template}
+                                    isTouched={formik.touched.template}
+                                    isRequired
+                                />
+                                <SelectInput
+                                    id="extends"
+                                    label={'extends'}
+                                    value={`${formik.values.extends?.name}-${formik.values.extends?.module}`}
+                                    options={
+                                        dtos && dtos.length > 0
+                                            ? dtos.map(
+                                                  ({
+                                                      label,
+                                                      module,
+                                                      value,
+                                                  }: {
+                                                      label: string;
+                                                      module: string;
+                                                      value: string;
+                                                  }) => ({
+                                                      label: `${label} (${module})`,
+                                                      value: `${value}-${module}`,
+                                                  })
+                                              )
+                                            : []
+                                    }
+                                    onChange={(option: string | boolean) =>
+                                        typeof option === 'string' &&
+                                        handleChangeExtends(option)
+                                    }
+                                    onBlur={formik.handleBlur}
+                                    error={formik.errors.extends}
+                                    isTouched={formik.touched.extends}
+                                />
+                                <div className="flex flex-1 space-x-2">
+                                    <IGRPLabelPrimitive htmlFor="enableCustonValidation">
+                                        {t('enableCustonValidation')}
+                                    </IGRPLabelPrimitive>
+                                    <IGRPCheckboxPrimitive
+                                        id="enableCustonValidation"
+                                        onCheckedChange={(checked: boolean) =>
+                                            formik.setFieldValue(
+                                                'enableCustonValidation',
+                                                checked
+                                            )
+                                        }
+                                        checked={
+                                            formik.values.enableCustonValidation
+                                        }
+                                    />
+                                </div>
                             </div>
+                            {TabList.map(({ value }) => (
+                                <div
+                                    className="border rounded-lg pb-2"
+                                    key={value}
+                                >
+                                    {renderFormList(value)}
+                                </div>
+                            ))}
                         </div>
-                        {TabList.map(({ value }) => (
-                            <div
-                                className="border pt-3 rounded-sm gap-0 p-0"
-                                key={value}
-                            >
-                                {renderFormList(value)}
-                            </div>
-                        ))}
-                    </div>
-                </Card>
+                    </IGRPCardContentPrimitive>
+                </IGRPCardPrimitive>
             </div>
         </form>
     );

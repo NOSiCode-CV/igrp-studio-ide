@@ -1,9 +1,9 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
+    IGRPTooltipPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import React from 'react';
 
@@ -89,9 +89,9 @@ export function RelationTypeSelector({
                     {Object.keys(relationTypeIcons).map(
                         (type, index, array) => (
                             <React.Fragment key={type}>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
+                                <IGRPTooltipPrimitive>
+                                    <IGRPTooltipTriggerPrimitive asChild>
+                                        <IGRPButtonPrimitive
                                             size="icon"
                                             onClick={() => onChange(type)}
                                             className={cn(
@@ -100,13 +100,17 @@ export function RelationTypeSelector({
                                                     'text-muted-foreground bg-secondary/10 border border-secondary shadow-lg'
                                             )}
                                         >
-                                            {relationTypeIcons[type as keyof typeof relationTypeIcons]}
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
+                                            {
+                                                relationTypeIcons[
+                                                    type as keyof typeof relationTypeIcons
+                                                ]
+                                            }
+                                        </IGRPButtonPrimitive>
+                                    </IGRPTooltipTriggerPrimitive>
+                                    <IGRPTooltipContentPrimitive>
                                         <p>{type}</p>
-                                    </TooltipContent>
-                                </Tooltip>
+                                    </IGRPTooltipContentPrimitive>
+                                </IGRPTooltipPrimitive>
                                 {index < array.length - 1 && (
                                     <div className="w-6 h-0.5 bg-primary" />
                                 )}

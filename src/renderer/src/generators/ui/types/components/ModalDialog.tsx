@@ -6,7 +6,7 @@ import Draggable from '@renderer/lib/dnd/Draggable';
 import { cn } from '@renderer/lib/utils';
 import BoxWrapper from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
-import { IGRPButton } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { COMPONENT } from '../../ComponentTypes';
 
 const IGRPStudioModalDialog: React.FC<CardComponentProps> = ({
@@ -238,7 +238,7 @@ const IGRPStudioDialogTrigger: React.FC<CardComponentProps> = ({ comp }) => {
     const { content, ...args } = properties;
     return (
         <div className="py-2">
-            <IGRPButton {...args}>{content}</IGRPButton>
+            <IGRPButtonPrimitive {...args}>{content}</IGRPButtonPrimitive>
         </div>
     );
 };

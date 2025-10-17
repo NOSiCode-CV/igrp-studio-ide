@@ -1,33 +1,28 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { ITabelContainer } from '../generators/api/types/Interfaces';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@renderer/components/ui/table';
-import { Button } from '@renderer/components/ui/button';
-import { Input } from '@renderer/components/ui/input';
+// Table components removed - using div elements instead
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { GripVertical, Plus, Trash } from 'lucide-react';
-import { Checkbox } from '@renderer/components/ui/checkbox';
+import { IGRPCheckbox } from '@igrp/igrp-framework-react-design-system';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import MultipleSelector from '@renderer/components/multiples-selector';
 import { cn } from '@renderer/lib/utils';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@renderer/components/ui/tooltip';
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+    IGRPTooltipPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { DragProvider } from '@renderer/lib/dnd/drag-drop-context';
+import Draggable from '@renderer/lib/dnd/Draggable';
+import Droppable from '@renderer/lib/dnd/Droppable';
 import { PopoverController } from '../generators/api/pages/controller/popover';
 import { PopoverModel } from '../generators/api/pages/model/popover';
 import { PopoverDto } from '../generators/api/pages/dto/popover-dto';
-import { RelationPopover } from '../generators/api/pages/model/relation-popover';
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown';
-import { Label } from './ui/label';
+import { RelationPopover } from '../generators/api/pages/model/relation-popover';
 import { FormValidationPopover } from '../generators/ui/components/form-validation-popover';
 
 // Component registry for popover types
@@ -66,7 +61,7 @@ const POPOVER_PROPS_MAPPING = {
         return {
             index,
             row,
-            changeValue: (element: string, value: any) =>
+            changeValue: (element: string, value: any): void =>
                 onChangeValue({ key: element, index, value, group }),
             options: itemOptions || [],
         };
@@ -76,7 +71,11 @@ const POPOVER_PROPS_MAPPING = {
         return {
             index,
             row,
-            changeValue: (element: string, position: number, value: any) =>
+            changeValue: (
+                element: string,
+                position: number,
+                value: any
+            ): void =>
                 onChangeValue({ key: element, index: position, value, group }),
             options: itemOptions || [],
         };
@@ -86,7 +85,11 @@ const POPOVER_PROPS_MAPPING = {
         return {
             index,
             row,
-            changeValue: (element: string, position: number, value: any) =>
+            changeValue: (
+                element: string,
+                position: number,
+                value: any
+            ): void =>
                 onChangeValue({ key: element, index: position, value, group }),
             collectionTypes: itemOptions || [],
         };
@@ -97,7 +100,11 @@ const POPOVER_PROPS_MAPPING = {
             index,
             field: row,
             fieldType: row.type || 'string',
-            changeValue: (element: string, position: number, value: any) =>
+            changeValue: (
+                element: string,
+                position: number,
+                value: any
+            ): void =>
                 onChangeValue({ key: element, index: position, value, group }),
         };
     },
@@ -105,7 +112,7 @@ const POPOVER_PROPS_MAPPING = {
         const { row, index, onChangeValue, itemOptions, group } = props;
         return {
             field: row,
-            changeValue: (element: string, value: any) => {
+            changeValue: (element: string, value: any): void => {
                 onChangeValue({ key: element, index, value, group });
             },
             options: itemOptions || [],
@@ -124,14 +131,14 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     columns,
     name,
     btnLabels,
-}) => {
+}: ITabelContainer): React.ReactNode => {
     const [formData, setFormData] = useState(data || []);
     const [dynamicOptions, setDynamicOptions] = useState<Record<string, any[]>>(
         {}
     );
 
     // Atualiza o formData quando os dados mudam
-    useEffect(() => {
+    useEffect((): void => {
         setFormData(data);
     }, [data]);
 
@@ -140,7 +147,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         key: string,
         index: number,
         selectedValue: any
-    ) => {
+    ): void => {
         const dependentColumn = columns.find((col) => col.dependsOn === key);
         if (dependentColumn && dependentColumn.getOptions) {
             const updatedOptions = dependentColumn.getOptions(selectedValue);
@@ -170,7 +177,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     };
 
     // Atualiza campos dependentes ao carregar os dados
-    useEffect(() => {
+    useEffect((): void => {
         if (formData && formData.length > 0)
             formData.forEach((row, index) => {
                 columns.forEach((col) => {
@@ -190,7 +197,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         key: string,
         index: number,
         selectedValue: any
-    ) => {
+    ): void => {
         changeValue(key, index, selectedValue);
         const dependentColumn = columns.find((col) => col.dependsOn === key);
         if (dependentColumn && dependentColumn.getOptions) {
@@ -203,7 +210,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     };
 
     // Função de arrastar e soltar
-    const onDragEnd = (result: any) => {
+    const onDragEnd = (result: any): void => {
         const { source, destination } = result;
         if (!destination) return;
         if (
@@ -220,7 +227,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     };
 
     /********************** errors ******************************/
-    const FormErrors = () =>
+    const FormErrors = (): React.ReactNode =>
         Array.isArray(errors) ? (
             <div className="px-3">
                 {errors.map((err, idx) => {
@@ -251,51 +258,65 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         ) : null;
 
     // Renderização do cabeçalho da tabela
-    const renderTableHeader = () => {
+    const renderTableHeader = (): React.ReactNode => {
         return (
-            <>
-                <TableHeader>
-                    <TableRow>
-                        {columns.map(({ name, width }, index) => (
-                            <TableHead style={{ width }} key={index}>
-                                {index === 0 ? (
-                                    <span className="flex items-center">
-                                        <button className="me-1" disabled>
-                                            <GripVertical className="h-4 w-4 text-muted-foreground" />
-                                        </button>
-                                        {name}
-                                    </span>
-                                ) : (
-                                    name
-                                )}
-                            </TableHead>
-                        ))}
-                        <TableHead className="text-right">
-                            {addRow && (
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    addRow();
-                                                }}
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-igrp h-6 w-6"
-                                            >
-                                                <Plus size={14} />
-                                                <span className="sr-only">{`New ${btnLabels}`}</span>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>{`New ${btnLabels}`}</TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            )}
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-            </>
+            <div
+                className="flex flex-1  gap-4 p-3 bg-muted/50 border-b text-sm font-medium text-muted-foreground"
+                /*  style={{
+                    gridTemplateColumns:
+                        columns.map((col) => col.width || '1fr').join(' ') +
+                        (removeRow ? ' 100px' : ''),
+                }} */
+            >
+                {columns.map(({ name, width, type }, index) => (
+                    <div
+                        style={{ width }}
+                        key={index}
+                        className={cn(
+                            'flex items-center',
+                            type === 'text' ? 'min-w-40' : '',
+                            type === 'checkbox' ? 'justify-center' : '',
+                            type === 'label' ? 'min-w-30' : ''
+                        )}
+                    >
+                        {index === 0 ? (
+                            <span className="flex items-center">
+                                <button className="me-1" disabled>
+                                    <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                </button>
+                                {name}
+                            </span>
+                        ) : (
+                            name
+                        )}
+                    </div>
+                ))}
+                {removeRow && (
+                    <div className="flex justify-end items-center ml-auto">
+                        {addRow && (
+                            <IGRPTooltipProviderPrimitive>
+                                <IGRPTooltipPrimitive>
+                                    <IGRPTooltipTriggerPrimitive asChild>
+                                        <IGRPButtonPrimitive
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                addRow();
+                                            }}
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-primary h-6 w-6"
+                                        >
+                                            <Plus size={14} />
+                                            <span className="sr-only">{`New ${btnLabels}`}</span>
+                                        </IGRPButtonPrimitive>
+                                    </IGRPTooltipTriggerPrimitive>
+                                    <IGRPTooltipContentPrimitive>{`New ${btnLabels}`}</IGRPTooltipContentPrimitive>
+                                </IGRPTooltipPrimitive>
+                            </IGRPTooltipProviderPrimitive>
+                        )}
+                    </div>
+                )}
+            </div>
         );
     };
 
@@ -307,9 +328,9 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         index2,
         group,
         onChangeValue,
-    }: any) => {
+    }: any): React.ReactNode => {
         return (
-            <div className="flex gap-2 align-center">
+            <div className="flex flex-1 gap-2 align-center">
                 {items.map((item: any, itemIndex: number) => {
                     const itemValue = row?.[item.key] || '';
                     const itemOptions = item.options || [];
@@ -319,7 +340,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                     // Handle select component
                     if (item.type === 'select') {
                         return (
-                            <div key={itemIndex} className="flex items-center">
+                            <React.Fragment key={itemIndex}>
                                 <IGRPCombobox
                                     placeholder={`Select ${item.name}`}
                                     options={itemOptions || []}
@@ -334,42 +355,39 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                                     }
                                     className="w-auto h-8"
                                 />
-                            </div>
+                            </React.Fragment>
                         );
                     }
 
                     // Handle checkbox component
                     if (item.type === 'checkbox') {
                         return (
-                            <div key={itemIndex} className="flex items-center">
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <div className="flex align-center">
-                                                <Checkbox
-                                                    id={`${item.key}_${index2}`}
-                                                    onCheckedChange={(
-                                                        checked
-                                                    ) => {
-                                                        onChangeValue({
-                                                            key: item.key,
-                                                            index: index,
-                                                            value: checked,
-                                                            group: group,
-                                                        });
-                                                    }}
-                                                    checked={
-                                                        row?.[item.key] || false
-                                                    }
-                                                />
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            {item.name}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            </div>
+                            <React.Fragment key={itemIndex}>
+                                <IGRPTooltipPrimitive>
+                                    <IGRPTooltipTriggerPrimitive asChild>
+                                        <div className="flex align-center mt-2.5">
+                                            <IGRPCheckbox
+                                                name={`${item.key}_${index2}`}
+                                                id={`${item.key}_${index2}`}
+                                                onCheckedChange={(checked) => {
+                                                    onChangeValue({
+                                                        key: item.key,
+                                                        index: index,
+                                                        value: checked,
+                                                        group: group,
+                                                    });
+                                                }}
+                                                checked={
+                                                    row?.[item.key] || false
+                                                }
+                                            />
+                                        </div>
+                                    </IGRPTooltipTriggerPrimitive>
+                                    <IGRPTooltipContentPrimitive>
+                                        {item.name}
+                                    </IGRPTooltipContentPrimitive>
+                                </IGRPTooltipPrimitive>
+                            </React.Fragment>
                         );
                     }
 
@@ -404,9 +422,9 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
                         });
 
                         return (
-                            <div key={itemIndex} className="flex items-center">
+                            <React.Fragment key={itemIndex}>
                                 <PopoverComponent {...(props as any)} />
-                            </div>
+                            </React.Fragment>
                         );
                     }
 
@@ -428,11 +446,11 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         readonly: boolean,
         onChangeValue: (props: ChangeFnProps) => void,
         group?: GroupField
-    ) => {
+    ): React.ReactNode => {
         // Handle input types (text, number)
         if (type === 'text' || type === 'number') {
             return (
-                <Input
+                <IGRPInputPrimitive
                     className={cn(
                         'h-8 text-sm',
                         errors?.[index]?.[key] && touched?.[index]?.[key]
@@ -457,7 +475,12 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         // Handle label type
         if (type === 'label') {
             return (
-                <Label htmlFor={`${key}_${index}`}>{row?.[key] || ''}</Label>
+                <IGRPLabelPrimitive
+                    htmlFor={`${key}_${index}`}
+                    className="w-30 truncate"
+                >
+                    {row?.[key] || ''}
+                </IGRPLabelPrimitive>
             );
         }
 
@@ -499,18 +522,21 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         // Handle checkbox type
         if (type === 'checkbox') {
             return (
-                <Checkbox
-                    id={`${key}_${index}`}
-                    onCheckedChange={(checked) =>
-                        onChangeValue({
-                            key,
-                            index,
-                            value: checked,
-                            group,
-                        })
-                    }
-                    checked={row?.[key] || false}
-                />
+                <div className="flex justify-center w-full">
+                    <IGRPCheckbox
+                        name={`${key}_${index}`}
+                        id={`${key}_${index}`}
+                        onCheckedChange={(checked) =>
+                            onChangeValue({
+                                key,
+                                index,
+                                value: checked,
+                                group,
+                            })
+                        }
+                        checked={row?.[key] || false}
+                    />
+                </div>
             );
         }
 
@@ -568,105 +594,118 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
         rowId: string,
         index: number,
         row: any,
-        className: string,
+        _className: string,
         onChangeValue: (props: ChangeFnProps) => void,
         group?: GroupField
-    ) => {
+    ): React.ReactNode => {
         return (
-            <Draggable key={rowId + '-col'} draggableId={rowId} index={index}>
-                {(provided: any) => (
-                    <TableRow
-                        className={`group/item`}
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                    >
-                        {columns.map(
-                            (
-                                { key, type, options, items, readonly },
-                                index2
-                            ) => {
-                                const selectValue = ['select'].includes(type)
-                                    ? (
-                                          dynamicOptions?.[`${index}-${key}`] ||
-                                          options
-                                      )?.filter(
-                                          (d: any) =>
-                                              row[key] && d.value === row[key]
-                                      )[0]?.value
-                                    : '';
-                                const selectMultiValues = [
-                                    'multiSelect',
-                                ].includes(type)
-                                    ? options
-                                          ?.filter((d: any) =>
-                                              row[key]?.includes(d.value)
-                                          )
-                                          .map((d: any) => d.value)
-                                    : [];
-                                return (
-                                    <TableCell
-                                        key={index2}
-                                        className={cn('py-1!')}
+            <Draggable
+                key={rowId + '-col'}
+                item={{ id: rowId, componentName: 'row', children: [] } as any}
+                index={index}
+                mode="MOVE"
+                dropTargetId={name}
+                dropZone={false}
+                className="p-0"
+            >
+                <div
+                    className={`group/item w-full cursor-move hover:bg-muted/20 border-b border-border/50 last:border-b-0 grid gap-4 px-3 py-1`}
+                    style={{
+                        gridTemplateColumns:
+                            columns.map((col) => col.width || '1fr').join(' ') +
+                            (removeRow ? ' 100px' : ''),
+                    }}
+                >
+                    {columns.map(
+                        ({ key, type, options, items, readonly }, index2) => {
+                            const selectValue = ['select'].includes(type)
+                                ? (
+                                      dynamicOptions?.[`${index}-${key}`] ||
+                                      options
+                                  )?.filter(
+                                      (d: any) =>
+                                          row[key] && d.value === row[key]
+                                  )[0]?.value
+                                : '';
+                            const selectMultiValues = ['multiSelect'].includes(
+                                type
+                            )
+                                ? options
+                                      ?.filter((d: any) =>
+                                          row[key]?.includes(d.value)
+                                      )
+                                      .map((d: any) => d.value)
+                                : [];
+                            return (
+                                <React.Fragment key={index2}>
+                                    <div
+                                        className={cn(
+                                            'flex items-center',
+                                            type === 'text' ? 'min-w-40' : '',
+                                            type === 'checkbox'
+                                                ? 'justify-center'
+                                                : ''
+                                        )}
                                     >
-                                        <div className="flex">
-                                            {index2 === 0 && (
-                                                <button
-                                                    className={cn("opacity-0 group-hover/item:opacity-100 cursor-move me-1 p-0", className)}
-                                                    {...provided.dragHandleProps}
-                                                >
-                                                    <GripVertical className="h-4 w-4 text-muted-foreground" />
-                                                </button>
-                                            )}
-                                            {type === 'group' &&
-                                            items &&
-                                            items?.length > 0
-                                                ? renderGroupedItems({
-                                                      items,
-                                                      row,
-                                                      index,
-                                                      index2,
-                                                      group,
-                                                      onChangeValue,
-                                                  })
-                                                : renderField(
-                                                      row,
-                                                      index,
-                                                      key,
-                                                      type,
-                                                      options,
-                                                      selectValue,
-                                                      selectMultiValues,
-                                                      readonly || false,
-                                                      onChangeValue,
-                                                      group
-                                                  )}
-                                        </div>
-                                    </TableCell>
-                                );
-                            }
-                        )}
-                        {removeRow && (
-                            <TableCell className="py-1!">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={`text-destructive opacity-0 group-hover/item:opacity-100`}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        removeRow(index);
-                                    }}
-                                >
-                                    <Trash />
-                                </Button>
-                            </TableCell>
-                        )}
-                    </TableRow>
-                )}
+                                        {/*  {index2 === 0 && (
+                                            <button
+                                                className={cn(
+                                                    'opacity-0 group-hover/item:opacity-100 cursor-move me-1 p-0',
+                                                    className
+                                                )}
+                                            >
+                                                <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                            </button>
+                                        )} */}
+                                        {type === 'group' &&
+                                        items &&
+                                        items?.length > 0
+                                            ? renderGroupedItems({
+                                                  items,
+                                                  row,
+                                                  index,
+                                                  index2,
+                                                  group,
+                                                  onChangeValue,
+                                              })
+                                            : renderField(
+                                                  row,
+                                                  index,
+                                                  key,
+                                                  type,
+                                                  options,
+                                                  selectValue,
+                                                  selectMultiValues,
+                                                  readonly || false,
+                                                  onChangeValue,
+                                                  group
+                                              )}
+                                    </div>
+                                </React.Fragment>
+                            );
+                        }
+                    )}
+                    {removeRow && (
+                        <React.Fragment key={index}>
+                            <IGRPButtonPrimitive
+                                variant="ghost"
+                                size="icon"
+                                className={`text-destructive opacity-0 group-hover/item:opacity-100`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    removeRow(index);
+                                }}
+                            >
+                                <Trash />
+                            </IGRPButtonPrimitive>
+                        </React.Fragment>
+                    )}
+                </div>
             </Draggable>
         );
     };
 
-    const onChangeValue = (props: ChangeFnProps) => {
+    const onChangeValue = (props: ChangeFnProps): void => {
         const { key, index, value, group } = props;
         //Chick if row is a subitems
         //TODO: Refatorar para usar o findFieldPath para pegar o path do campo
@@ -681,72 +720,73 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
 
     // Renderização do componente completo
     return (
-        <>
+        <IGRPTooltipProviderPrimitive>
             <FormErrors />
-            <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId={`${name}`}>
-                    {(provided: any) => (
-                        <Table
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                        >
-                            {renderTableHeader()}
-                            <TableBody>
-                                {formData.map((row: any, index: number) => {
-                                    const rowId =
-                                        row.id || `row-${name}-${index}`;
-                                    const isDataArray =
-                                        row.fields && row.fields.length > 0;
+            <DragProvider>
+                <Droppable
+                    component={
+                        {
+                            id: name,
+                            componentName: name,
+                            children: formData,
+                        } as any
+                    }
+                    onDrop={onDragEnd}
+                    className="w-full"
+                >
+                    <div className="w-full border rounded-lg overflow-hidden">
+                        {renderTableHeader()}
+                        <div className="divide-y">
+                            {formData.map((row: any, index: number) => {
+                                const rowId = row.id || `row-${name}-${index}`;
+                                const isDataArray =
+                                    row.fields && row.fields.length > 0;
 
-                                    return (
-                                        <React.Fragment key={rowId}>
-                                            {renderTableRow(
-                                                rowId,
-                                                index,
-                                                row,
-                                                '',
-                                                (props: ChangeFnProps) => {
-                                                    onChangeValue(props);
-                                                }
+                                return (
+                                    <React.Fragment key={rowId}>
+                                        {renderTableRow(
+                                            rowId,
+                                            index,
+                                            row,
+                                            '',
+                                            (props: ChangeFnProps): void => {
+                                                onChangeValue(props);
+                                            }
+                                        )}
+                                        {isDataArray &&
+                                            row?.fields.map(
+                                                (col: any, ii: number) =>
+                                                    renderTableRow(
+                                                        `col-${index}-${ii}`,
+                                                        ii,
+                                                        col,
+                                                        'mr-6',
+                                                        (
+                                                            props: ChangeFnProps
+                                                        ): void => {
+                                                            onChangeValue({
+                                                                ...props,
+                                                                group: {
+                                                                    groupName:
+                                                                        'fields',
+                                                                    groupIndex:
+                                                                        index,
+                                                                },
+                                                            });
+                                                        },
+                                                        {
+                                                            groupName: 'fields',
+                                                            groupIndex: index,
+                                                        }
+                                                    )
                                             )}
-                                            {isDataArray &&
-                                                row?.fields.map(
-                                                    (col: any, ii: number) =>
-                                                        renderTableRow(
-                                                            `col-${index}-${ii}`,
-                                                            ii,
-                                                            col,
-                                                            'mr-6',
-                                                            (
-                                                                props: ChangeFnProps
-                                                            ) => {
-                                                                onChangeValue({
-                                                                    ...props,
-                                                                    group: {
-                                                                        groupName:
-                                                                            'fields',
-                                                                        groupIndex:
-                                                                            index,
-                                                                    },
-                                                                });
-                                                            },
-                                                            {
-                                                                groupName:
-                                                                    'fields',
-                                                                groupIndex:
-                                                                    index,
-                                                            }
-                                                        )
-                                                )}
-                                        </React.Fragment>
-                                    );
-                                })}
-                                {provided.placeholder}
-                            </TableBody>
-                        </Table>
-                    )}
+                                    </React.Fragment>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </Droppable>
-            </DragDropContext>
-        </>
+            </DragProvider>
+        </IGRPTooltipProviderPrimitive>
     );
 };

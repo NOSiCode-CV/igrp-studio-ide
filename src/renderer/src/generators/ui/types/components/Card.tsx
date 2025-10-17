@@ -9,10 +9,7 @@ import { generateAllClasses } from '../../components/settings/style/utils';
 import BoxWrapper from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
 
-const IGRPStudioCard: React.FC<CardComponentProps> = ({
-    comp,
-    onDragEnd,
-}) => {
+const IGRPStudioCard: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     const { children: components, componentName: parentComponentName } = comp;
 
     const { setEditingComponent } = useDroppedComponents();
@@ -30,17 +27,14 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({
             className: string,
             childClassName: string
         ) => {
-            const {
-                children: childComponents,
-                id: componentId,
-            } = component;
+            const { children: childComponents, id: componentId } = component;
             const path = parentComponentName;
 
             return (
                 <Droppable
                     component={component}
                     onDrop={onDragEnd}
-                    className={cn( className)}
+                    className={cn(className)}
                 >
                     {childComponents.length > 0 &&
                         childComponents.map((child, index) => {

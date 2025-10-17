@@ -1,29 +1,31 @@
 import { useRef, useEffect, useState } from 'react';
 
 export function usePopover() {
-  const popoverRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState<'top' | 'bottom'>('bottom');
+    const popoverRef = useRef<HTMLDivElement>(null);
+    const [position, setPosition] = useState<'top' | 'bottom'>('bottom');
 
-  useEffect(() => {
-    function updatePosition() {
-      if (!popoverRef.current) return;
+    useEffect(() => {
+        function updatePosition() {
+            if (!popoverRef.current) return;
 
-      const rect = popoverRef.current.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
+            const rect = popoverRef.current.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceAbove = rect.top;
 
-      setPosition(spaceBelow >= 200 || spaceBelow > spaceAbove ? 'bottom' : 'top');
-    }
+            setPosition(
+                spaceBelow >= 200 || spaceBelow > spaceAbove ? 'bottom' : 'top'
+            );
+        }
 
-    updatePosition();
-    window.addEventListener('scroll', updatePosition);
-    window.addEventListener('resize', updatePosition);
+        updatePosition();
+        window.addEventListener('scroll', updatePosition);
+        window.addEventListener('resize', updatePosition);
 
-    return () => {
-      window.removeEventListener('scroll', updatePosition);
-      window.removeEventListener('resize', updatePosition);
-    };
-  }, []);
+        return () => {
+            window.removeEventListener('scroll', updatePosition);
+            window.removeEventListener('resize', updatePosition);
+        };
+    }, []);
 
-  return { popoverRef, position };
+    return { popoverRef, position };
 }

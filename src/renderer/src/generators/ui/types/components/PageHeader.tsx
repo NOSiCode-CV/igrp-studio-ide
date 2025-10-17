@@ -43,7 +43,7 @@ const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
                         dropTargetId={componentId}
                         layout="horizontal"
                         className="p-1"
-                        mode='MOVE'
+                        mode="MOVE"
                     >
                         <BoxField
                             comp={button}

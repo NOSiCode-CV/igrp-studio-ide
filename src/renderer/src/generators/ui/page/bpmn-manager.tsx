@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
+    IGRPTabsPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { BPMNConfig, BPMNConfigs, FileTree } from 'src/main/types';
@@ -19,7 +19,7 @@ import { BPMNConfigCard } from '@renderer/generators/ui/page/bpmn-config-card';
 import { PageDefinition } from './page-manager';
 
 interface BPMNManagerProps {
-    onPageClick?: (pageDefinition: PageDefinition) => void;
+    onPageClick?: (pageDefinition: PageDefinition | FileTree) => void;
     bpmnProcesses: FileTree[];
     basePath: string;
 }
@@ -28,7 +28,7 @@ export const BPMNManager = ({
     onPageClick,
     bpmnProcesses,
     basePath,
-}: BPMNManagerProps) => {
+}: BPMNManagerProps): React.JSX.Element => {
     const [configs, setConfigs] = useState<BPMNConfigs>({
         configs: [],
         activeConfigId: undefined,
@@ -39,7 +39,7 @@ export const BPMNManager = ({
     >();
     const [deleteConfig, setDeleteConfig] = useState<BPMNConfig | null>(null);
 
-    const handleConfigSave = async () => {
+    const handleConfigSave = async (): Promise<void> => {
         setShowConfigModal(false);
         setEditingConfig(undefined);
         // Clear BPMN service cache to force refresh
@@ -50,12 +50,12 @@ export const BPMNManager = ({
         window.dispatchEvent(new CustomEvent('bpmn-config-changed'));
     };
 
-    const handleEditConfig = (currentConfig: BPMNConfig) => {
+    const handleEditConfig = (currentConfig: BPMNConfig): void => {
         setEditingConfig(currentConfig);
         setShowConfigModal(true);
     };
 
-    const handleDeleteConfig = async () => {
+    const handleDeleteConfig = async (): Promise<void> => {
         if (!deleteConfig) return;
 
         try {
@@ -67,31 +67,22 @@ export const BPMNManager = ({
             // Dispatch custom event to notify other components
             window.dispatchEvent(new CustomEvent('bpmn-config-changed'));
             toast.success('API configuration deleted successfully');
-        } catch (error) {
+        } catch (error: unknown) {
+            console.error('Error deleting API configuration:', error);
             toast.error('Failed to delete API configuration');
         } finally {
             setDeleteConfig(null);
         }
     };
 
-    const loadConfigs = async () => {
+    const loadConfigs = async (): Promise<void> => {
         try {
             const configsData =
                 await window.igrpStudioSettings.getBPMNConfigs();
 
             setConfigs(configsData);
-
-            // Set active config
-            /*  if (configsData.activeConfigId) {
-                const active = configsData.configs.find(
-                    (c: BPMNConfig) => c.id === configsData.activeConfigId
-                );
-                setActiveConfig(active || null);
-            } else {
-                console.log('No active config ID found');
-                setActiveConfig(null);
-            } */
-        } catch (error) {
+        } catch (error: unknown) {
+            console.error('Error loading API configurations:', error);
             toast.error('Failed to load API configurations');
         }
     };
@@ -107,7 +98,7 @@ export const BPMNManager = ({
                     title="BPMN Process Manager"
                     description="Connect to BPMN REST API and manage process definitions"
                 />
-                <Button
+                <IGRPButtonPrimitive
                     onClick={() => {
                         setEditingConfig(undefined);
                         setShowConfigModal(true);
@@ -115,26 +106,34 @@ export const BPMNManager = ({
                 >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Configuration
-                </Button>
+                </IGRPButtonPrimitive>
             </div>
 
-            <Tabs defaultValue="projects" className="space-y-4">
-                <TabsList>
-                    <TabsTrigger value="projects">Projects</TabsTrigger>
-                    <TabsTrigger value="configuration">
+            <IGRPTabsPrimitive defaultValue="projects" className="space-y-4">
+                <IGRPTabsListPrimitive>
+                    <IGRPTabsTriggerPrimitive value="projects">
+                        Projects
+                    </IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive value="configuration">
                         API Configuration
-                    </TabsTrigger>
-                </TabsList>
+                    </IGRPTabsTriggerPrimitive>
+                </IGRPTabsListPrimitive>
 
-                <TabsContent value="projects" className="space-y-4">
+                <IGRPTabsContentPrimitive
+                    value="projects"
+                    className="space-y-4"
+                >
                     <BPMNProjectSelector
                         onPageClick={onPageClick}
                         bpmnProcesses={bpmnProcesses}
                         basePath={basePath}
                     />
-                </TabsContent>
+                </IGRPTabsContentPrimitive>
 
-                <TabsContent value="configuration" className="space-y-4">
+                <IGRPTabsContentPrimitive
+                    value="configuration"
+                    className="space-y-4"
+                >
                     {configs.configs.length > 0 ? (
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {configs.configs.map((config) => (
@@ -162,18 +161,28 @@ export const BPMNManager = ({
                                                 );
                                             } else {
                                                 // If deactivating, set no active config
-                                                await window.igrpStudioSettings.setActiveBPMNConfig('');
+                                                await window.igrpStudioSettings.setActiveBPMNConfig(
+                                                    ''
+                                                );
                                             }
                                             // Clear BPMN service cache to force refresh
                                             bpmnService.clearConfig();
                                             // Reload configurations to reflect changes
                                             await loadConfigs();
                                             // Dispatch custom event to notify other components
-                                            window.dispatchEvent(new CustomEvent('bpmn-config-changed'));
+                                            window.dispatchEvent(
+                                                new CustomEvent(
+                                                    'bpmn-config-changed'
+                                                )
+                                            );
                                             toast.success(
                                                 `Configuration ${isActive ? 'activated' : 'deactivated'} successfully`
                                             );
-                                        } catch (error) {
+                                        } catch (error: unknown) {
+                                            console.error(
+                                                'Error updating configuration:',
+                                                error
+                                            );
                                             toast.error(
                                                 'Failed to update configuration'
                                             );
@@ -196,7 +205,11 @@ export const BPMNManager = ({
                                                     `Connection test failed: ${result.message}`
                                                 );
                                             }
-                                        } catch (error) {
+                                        } catch (error: unknown) {
+                                            console.error(
+                                                'Error testing connection:',
+                                                error
+                                            );
                                             toast.error(
                                                 'Connection test failed'
                                             );
@@ -211,8 +224,8 @@ export const BPMNManager = ({
                             description="Add your BPMN REST API configurations to get started with process management."
                         />
                     )}
-                </TabsContent>
-            </Tabs>
+                </IGRPTabsContentPrimitive>
+            </IGRPTabsPrimitive>
 
             <BPMNConfigModal
                 key={`${editingConfig?.id || 'new'}-${showConfigModal ? 'open' : 'closed'}`}

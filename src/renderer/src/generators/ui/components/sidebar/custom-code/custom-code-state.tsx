@@ -1,15 +1,17 @@
 import { State } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { nanoid } from '@reduxjs/toolkit';
-import { Button } from '@renderer/components/ui/button';
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
+    IGRPButtonPrimitive,
+    IGRPDialogClosePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { PATTERNS } from '@renderer/constants/appConstants';
 import {
     CheckboxInput,
@@ -24,6 +26,7 @@ import * as Yup from 'yup';
 import { ImportComponent } from './custom-code-imports';
 import useCustomCode from '@renderer/generators/ui/hooks/useCustomCode';
 import { getId } from '@renderer/utils';
+import { JSX } from 'react/jsx-runtime';
 
 interface StateComponentProps {
     open: boolean;
@@ -31,7 +34,11 @@ interface StateComponentProps {
     state?: State;
 }
 
-const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
+const StateComponent = ({
+    open,
+    setOpen,
+    state,
+}: StateComponentProps): JSX.Element => {
     const { addState, updateState } = useDroppedComponents();
     const { t } = useTranslation();
     const { typesOptions } = useCustomCode();
@@ -58,6 +65,7 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
             defaultValue: '',
             imports: [],
             isArray: false,
+            isOptional: false,
         },
         validationSchema: stateValidationSchema,
         onSubmit: (values, actions) => {
@@ -84,7 +92,7 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
         },
     });
 
-    const handleTypeChange = (value: string) => {
+    const handleTypeChange = (value: string): void => {
         formik.setFieldValue('type', value);
         const selectedType = typesOptions.find((type) => type.value === value);
         if (selectedType && selectedType.metadata) {
@@ -100,10 +108,10 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="overflow-hidden sm:max-w-[800px] lg:max-w-[900px] max-w-[90vw] w-full">
-                <DialogHeader>
-                    <DialogTitle>
+        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
+            <IGRPDialogContentPrimitive className="overflow-hidden sm:max-w-[800px] lg:max-w-[900px] max-w-[90vw] w-full">
+                <IGRPDialogHeaderPrimitive>
+                    <IGRPDialogTitlePrimitive>
                         <div className="flex items-center gap-2 justify-between">
                             <div>
                                 {state ? 'Edit State' : 'Create State'}{' '}
@@ -112,13 +120,13 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
                                 </span>
                             </div>
                         </div>
-                    </DialogTitle>
-                    <DialogDescription>
+                    </IGRPDialogTitlePrimitive>
+                    <IGRPDialogDescriptionPrimitive>
                         {state
                             ? 'Edit your state configuration'
                             : 'Define a new state variable'}
-                    </DialogDescription>
-                </DialogHeader>
+                    </IGRPDialogDescriptionPrimitive>
+                </IGRPDialogHeaderPrimitive>
                 <form onSubmit={formik.handleSubmit} className="space-y-4">
                     <TextInput
                         label={t('Name')}
@@ -152,14 +160,30 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
                         isRequired
                     />
 
-                    <CheckboxInput
-                        label={t('isArray')}
-                        id="isArray"
-                        value={formik.values.isArray}
-                        onChange={(value) => formik.setFieldValue('isArray', value)}
-                        isTouched={formik.touched.isArray}
-                        error={formik.errors.isArray}
-                    />
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center space-x-2">
+                            <CheckboxInput
+                                label={t('isArray')}
+                                id="isArray"
+                                value={formik.values.isArray}
+                                onChange={(value) =>
+                                    formik.setFieldValue('isArray', value)
+                                }
+                                isTouched={formik.touched.isArray}
+                                error={formik.errors.isArray}
+                            />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <CheckboxInput
+                                id={`isOptional`}
+                                value={formik.values.isOptional}
+                                onChange={(value) =>
+                                    formik.setFieldValue('isOptional', value)
+                                }
+                                label="isOptional"
+                            />
+                        </div>
+                    </div>
 
                     <ImportComponent
                         initialImports={formik.values?.imports || []}
@@ -168,18 +192,23 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps) => {
                         }
                     />
 
-                    <DialogFooter className="space-x-2">
-                        <DialogClose>Close</DialogClose>
-                        <Button type="submit" disabled={formik.isSubmitting}>
+                    <IGRPDialogFooterPrimitive className="space-x-2">
+                        <IGRPDialogClosePrimitive>
+                            Close
+                        </IGRPDialogClosePrimitive>
+                        <IGRPButtonPrimitive
+                            type="submit"
+                            disabled={formik.isSubmitting}
+                        >
                             {formik.isSubmitting && (
                                 <Loader2 className="animate-spin" />
                             )}
                             Save changes
-                        </Button>
-                    </DialogFooter>
+                        </IGRPButtonPrimitive>
+                    </IGRPDialogFooterPrimitive>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 };
 

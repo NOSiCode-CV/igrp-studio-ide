@@ -1,4 +1,11 @@
-import { BackgroundStyle, FilterValue, OutlineValue, ShadowValue, TransformValue, TransitionValue } from "./components/effects/types";
+import {
+    BackgroundStyle,
+    FilterValue,
+    OutlineValue,
+    ShadowValue,
+    TransformValue,
+    TransitionValue,
+} from './components/effects/types';
 
 // First, update your types.ts (or wherever you define LayoutStyle)
 export interface FlexProperties {
@@ -23,7 +30,15 @@ export interface BlockProperties {
     // Add block-specific properties here if needed
 }
 
-export type LayoutType = 'block' | 'flex' | 'grid' | 'inline-block' | 'inline-flex' | 'inline-grid' | 'inline' | 'none';
+export type LayoutType =
+    | 'block'
+    | 'flex'
+    | 'grid'
+    | 'inline-block'
+    | 'inline-flex'
+    | 'inline-grid'
+    | 'inline'
+    | 'none';
 
 export interface LayoutStyle {
     type: LayoutType;
@@ -63,7 +78,6 @@ export interface SizeSytle {
     overflowY: string;
     aspectRatioLocked: boolean;
 }
-
 
 //Typography
 export interface TypographyValue {
@@ -110,7 +124,12 @@ export interface PositionValue {
     unit: string;
 }
 
-export type PositionType = 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky';
+export type PositionType =
+    | 'static'
+    | 'relative'
+    | 'absolute'
+    | 'fixed'
+    | 'sticky';
 
 export interface PositionStyle {
     type: PositionType;
@@ -150,8 +169,8 @@ export interface StyleComponent {
     typography?: TypographyStyle;
     borders?: BordersStyle;
     position?: PositionStyle;
-    backgrounds?: BackgroundStyle[]
-    effects?: EffectsStyle
+    backgrounds?: BackgroundStyle[];
+    effects?: EffectsStyle;
     customProperties?: CustomPropertiesStyle;
 }
 

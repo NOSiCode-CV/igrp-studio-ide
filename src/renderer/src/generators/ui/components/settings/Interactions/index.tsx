@@ -41,7 +41,13 @@ const Interactions = ({
                 setRulesProperties(data)
             );
         }
-    }, [getInteractionsComponent, comp, componentName, path, getRulesComponent]);
+    }, [
+        getInteractionsComponent,
+        comp,
+        componentName,
+        path,
+        getRulesComponent,
+    ]);
 
     const handleInteractionsChange = (data: Record<string, Action>) => {
         if (componentId)

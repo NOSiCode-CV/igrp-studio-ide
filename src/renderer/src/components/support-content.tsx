@@ -1,16 +1,14 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
+import { Headset } from 'lucide-react';
 import {
-    Headset,
-} from 'lucide-react';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from './ui/tooltip';
-import { Button } from './ui/button';
+    IGRPTooltipPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipProviderPrimitive,
+    IGRPTooltipTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 export const supportChannels = [
     {
@@ -56,13 +54,15 @@ export default function SupportContent({}: SupportContentProps) {
     };
 
     return (
-        <TooltipProvider>
+        <IGRPTooltipProviderPrimitive>
             <div className="space-y-2 mb-4 rounded-lg p-2 shadow-lg border w-full">
                 <div className="flex items-center gap-2">
                     <span className="h-6 w-6">
                         <Headset />
                     </span>
-                    <h2 className="text-base font-semibold">{t('supportTitle')}</h2>
+                    <h2 className="text-base font-semibold">
+                        {t('supportTitle')}
+                    </h2>
                 </div>
                 <div className="px-1">
                     <p className="text-muted-foreground">
@@ -70,13 +70,15 @@ export default function SupportContent({}: SupportContentProps) {
                     </p>
                     <div className="mt-4 flex justify-center gap-2">
                         {supportChannels.map((channel) => (
-                            <Tooltip key={channel.name}>
-                                <TooltipTrigger asChild>
-                                    <Button
+                            <IGRPTooltipPrimitive key={channel.name}>
+                                <IGRPTooltipTriggerPrimitive asChild>
+                                    <IGRPButtonPrimitive
                                         variant={'ghost'}
                                         size={'icon'}
                                         className={channel.iconClassName}
-                                        aria-label={t('supportContactVia', { channel: channel.name })}
+                                        aria-label={t('supportContactVia', {
+                                            channel: channel.name,
+                                        })}
                                         onClick={() =>
                                             handleClick(channel?.href)
                                         }
@@ -89,16 +91,18 @@ export default function SupportContent({}: SupportContentProps) {
                                             alt={channel.name}
                                             className="h-5 w-5"
                                         />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    {t('supportContactVia', { channel: channel.name })}
-                                </TooltipContent>
-                            </Tooltip>
+                                    </IGRPButtonPrimitive>
+                                </IGRPTooltipTriggerPrimitive>
+                                <IGRPTooltipContentPrimitive>
+                                    {t('supportContactVia', {
+                                        channel: channel.name,
+                                    })}
+                                </IGRPTooltipContentPrimitive>
+                            </IGRPTooltipPrimitive>
                         ))}
                     </div>
                 </div>
             </div>
-        </TooltipProvider>
+        </IGRPTooltipProviderPrimitive>
     );
 }

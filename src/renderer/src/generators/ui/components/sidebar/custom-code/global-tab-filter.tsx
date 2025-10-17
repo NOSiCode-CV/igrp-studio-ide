@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Input } from '@renderer/components/ui/input';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Search, X } from 'lucide-react';
 import { cn } from '@renderer/lib/utils';
 
@@ -15,7 +15,7 @@ interface GlobalTabFilterProps {
 }
 
 export const GlobalTabFilter = ({
-    placeholder = "Search across all tabs...",
+    placeholder = 'Search across all tabs...',
     value,
     onChange,
     onClear,
@@ -28,24 +28,24 @@ export const GlobalTabFilter = ({
     };
 
     return (
-        <div className={cn("space-y-2 border-b pb-3", className)}>
+        <div className={cn('space-y-2 border-b pb-3', className)}>
             <div className="relative">
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
+                <IGRPInputPrimitive
                     placeholder={placeholder}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     className="pl-8 pr-8"
                 />
                 {showClearButton && value && (
-                    <Button
+                    <IGRPButtonPrimitive
                         variant="ghost"
                         size="sm"
                         onClick={handleClear}
                         className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
                     >
                         <X className="h-3 w-3" />
-                    </Button>
+                    </IGRPButtonPrimitive>
                 )}
             </div>
         </div>
@@ -63,4 +63,4 @@ export const useGlobalTabFilter = (initialValue = '') => {
         setFilterValue,
         clearFilter,
     };
-}; 
+};

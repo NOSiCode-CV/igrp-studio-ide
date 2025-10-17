@@ -1,5 +1,5 @@
-import { Label } from '@renderer/components/ui/label';
-import { useState } from 'react';
+import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system';
+import { JSX, useState } from 'react';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
 import { useTranslation } from 'react-i18next';
 
@@ -8,16 +8,14 @@ const languages = [
     { value: 'pt', label: 'Português' },
 ];
 
-export function LanguageSettings() {
+export function LanguageSettings(): JSX.Element {
     const { t, i18n } = useTranslation();
     const [currentLanguage, setCurrentLanguage] = useState<string>(
         i18n.language
     );
-    const [_isPending, setIsPending] = useState<boolean>(false);
 
     // Atualizar o idioma dinamicamente
-    const handleLanguageChange = async (newLang: string) => {
-        setIsPending(true);
+    const handleLanguageChange = async (newLang: string): Promise<void> => {
         try {
             // Atualizar o idioma no i18next
             await i18n.changeLanguage(newLang);
@@ -29,8 +27,6 @@ export function LanguageSettings() {
             setCurrentLanguage(newLang);
         } catch (error) {
             console.error(t('error_change_language'), error);
-        } finally {
-            setIsPending(false);
         }
     };
 
@@ -44,7 +40,9 @@ export function LanguageSettings() {
             </div>
             <div className="space-y-4">
                 <div className="space-y-2 flex flex-col">
-                    <Label htmlFor="language">{t('language_label')}</Label>
+                    <IGRPLabelPrimitive htmlFor="language">
+                        {t('language_label')}
+                    </IGRPLabelPrimitive>
                     <IGRPCombobox
                         value={currentLanguage}
                         options={languages}

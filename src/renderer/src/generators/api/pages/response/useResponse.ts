@@ -25,12 +25,20 @@ const initialValues: ResponseConfig = {
     content: {},
 };
 
-export const useResponse = ({ currentItem, selectors }: { currentItem: any, selectors: Array<any> }) => {
+export const useResponse = ({
+    currentItem,
+    selectors,
+}: {
+    currentItem: any;
+    selectors: Array<any>;
+}) => {
     const dispatch: any = useDispatch();
     const { showErrorToast, showSuccessToast } = useToast();
     const { t } = useTranslation();
     const { initializeTabFromCurrentItem, handleRenameTab } = useTabs();
-    const { basePath, dto, enums, getJsonData } = useStudioAPI(currentItem?.module);
+    const { basePath, dto, enums, getJsonData } = useStudioAPI(
+        currentItem?.module
+    );
 
     const [title, setTitle] = useState('');
     const [dataSchema, setDataSchema] = useState<null | JSONSchema>(null);
@@ -54,7 +62,9 @@ export const useResponse = ({ currentItem, selectors }: { currentItem: any, sele
         const load = async () => {
             if (!currentItem) return;
             try {
-                await getJsonData(currentItem.path).then((data) => setData(data));
+                await getJsonData(currentItem.path).then((data) =>
+                    setData(data)
+                );
             } catch (error) {
                 showErrorToast(t('loadError'));
             }
@@ -109,7 +119,9 @@ export const useResponse = ({ currentItem, selectors }: { currentItem: any, sele
             if (error) return showErrorToast(error);
 
             dispatch(onSetChangeStatus(true));
-            showSuccessToast(t('createdSuccess', { name: t('response'), value: values.name }));
+            showSuccessToast(
+                t('createdSuccess', { name: t('response'), value: values.name })
+            );
             handleRenameTab(currentItem.id, values.name as string);
         } catch (error) {
             showErrorToast(error);
@@ -145,7 +157,11 @@ export const useResponse = ({ currentItem, selectors }: { currentItem: any, sele
         const firstKey = Object.keys(properties)[0];
         const extractedSchema = firstKey ? properties[firstKey] : newSchema;
 
-        if (currentSchema && JSON.stringify(currentSchema.schema) === JSON.stringify(extractedSchema)) {
+        if (
+            currentSchema &&
+            JSON.stringify(currentSchema.schema) ===
+                JSON.stringify(extractedSchema)
+        ) {
             return;
         }
 

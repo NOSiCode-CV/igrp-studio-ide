@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { ProjectData } from 'src/main/types';
 import { LucideIcon, Search } from 'lucide-react';
-import { Input } from './ui/input';
 import * as LucideIcons from 'lucide-react';
 import { FrameworkIcon } from './framework-icon';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface HeadlineProps {
     icon?: LucideIcon; // Optional icon
@@ -23,7 +23,13 @@ interface SearchInputProps {
 }
 
 // Get project type icon
-function ProjectIcon({ project, workspacePath }: { project: ProjectData; workspacePath?: string }) {
+function ProjectIcon({
+    project,
+    workspacePath,
+}: {
+    project: ProjectData;
+    workspacePath?: string;
+}) {
     const [iconUrl, setIconUrl] = React.useState<string | null>(null);
     const [isLoading, setIsLoading] = React.useState(false);
 
@@ -41,20 +47,31 @@ function ProjectIcon({ project, workspacePath }: { project: ProjectData; workspa
             }
 
             // If it's a relative path, load it securely
-            if (project.icon.startsWith('icons/') || project.icon.startsWith('assets/')) {
+            if (
+                project.icon.startsWith('icons/') ||
+                project.icon.startsWith('assets/')
+            ) {
                 if (!workspacePath) {
-                    console.warn('Workspace path not provided for project icon loading');
+                    console.warn(
+                        'Workspace path not provided for project icon loading'
+                    );
                     setIconUrl(null);
                     return;
                 }
-                
+
                 setIsLoading(true);
                 try {
-                    const result = await window.api.getIconFile(project.icon, workspacePath);
+                    const result = await window.api.getIconFile(
+                        project.icon,
+                        workspacePath
+                    );
                     if (result.success) {
                         setIconUrl(result.data);
                     } else {
-                        console.warn('Failed to load project icon:', result.error);
+                        console.warn(
+                            'Failed to load project icon:',
+                            result.error
+                        );
                         setIconUrl(null);
                     }
                 } catch (error) {
@@ -116,7 +133,7 @@ function SearchInput({
             <Search
                 className={`absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground ${iconClassName}`}
             />
-            <Input
+            <IGRPInputPrimitive
                 type="text"
                 placeholder={placeholder}
                 className={`pl-8 h-8 text-xs ${inputClassName}`}
@@ -170,7 +187,6 @@ function SubHeadline({
 }
 
 function getIcon(iconName: string) {
-    console.log(iconName);
     return LucideIcons[iconName as keyof typeof LucideIcons] || undefined;
 }
 

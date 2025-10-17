@@ -239,4 +239,203 @@
 			"!out/**/*.map"
 		]
 	}
+    "name": "igrp-studio",
+    "version": "0.1.0-beta.14",
+    "license": "MIT",
+    "description": "IGRP Studio for development",
+    "main": "out/main/index.js",
+    "author": "NOSi E.P.E - Núcleo Operacional Para a Sociedade de Informação",
+    "homepage": "igrp.cv",
+    "scripts": {
+        "clean": "yarn clean && yarn install",
+        "format": "prettier --write .",
+        "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+        "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+        "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
+        "typecheck": "npm run typecheck:node && npm run typecheck:web",
+        "start": "electron-vite preview ",
+        "dev": "electron-vite dev ",
+        "runnig": "yarn install && yarn dev",
+        "build": "npm run typecheck && electron-vite build ",
+        "postinstall": "electron-builder install-app-deps",
+        "build:unpack": "npm run build && electron-builder --dir",
+        "release:mac": "electron-vite build && electron-builder --mac  --config --publish always",
+        "release:mac:x64": "electron-vite build && electron-builder --mac --x64 --config --publish always",
+        "release:linux": "electron-vite build && electron-builder --linux --config --publish always",
+        "release:win": "electron-vite build && electron-builder --win --config --publish always",
+        "test": "jest"
+    },
+    "dependencies": {
+        "@electron-toolkit/preload": "^3.0.2",
+        "@electron-toolkit/utils": "^4.0.0",
+        "@faker-js/faker": "^9.9.0",
+        "@gitbeaker/node": "^35.8.1",
+        "@hookform/resolvers": "^5.2.2",
+        "@igrp/dotnet-engine": "^0.0.1-alpha.12",
+        "@igrp/framework-process-studio-bpmn-editor": "0.0.1-beta.9",
+        "@igrp/igrp-framework-react-design-system": "0.1.0-beta.25",
+        "@igrp/igrp-studio-nextjs-engine": "0.1.0-beta.20",
+        "@igrp/igrp-studio-springboot-engine": "0.1.0-beta.4",
+        "@monaco-editor/react": "^4.7.0",
+        "@octokit/rest": "^22.0.0",
+        "@radix-ui/react-tabs": "^1.1.13",
+        "@reduxjs/toolkit": "^2.9.0",
+        "@shadcn/ui": "^0.0.4",
+        "@tailwindcss/vite": "^4.1.13",
+        "@types/express": "^5.0.3",
+        "@types/jest": "^30.0.0",
+        "@types/lodash-es": "^4.17.12",
+        "@types/uuid": "^11.0.0",
+        "axios": "^1.12.2",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "cmdk": "^1.1.1",
+        "date-fns": "^4.1.0",
+        "dockerode": "^4.0.8",
+        "dotenv": "^17.2.2",
+        "electron-log": "^5.4.3",
+        "electron-store": "^10.1.0",
+        "electron-updater": "^6.6.2",
+        "embla-carousel-react": "^8.6.0",
+        "eslint-plugin-react-refresh": "^0.4.20",
+        "express": "^5.1.0",
+        "formik": "^2.4.6",
+        "gojs": "^3.0.26",
+        "i18next": "^25.5.2",
+        "i18next-browser-languagedetector": "^8.2.0",
+        "i18next-electron-fs-backend": "^3.0.3",
+        "js-yaml": "^4.1.0",
+        "json-schema-faker": "^0.5.9",
+        "knex": "^3.1.0",
+        "knex-schema-inspector": "^3.1.0",
+        "lodash-es": "^4.17.21",
+        "lucide-react": "^0.544.0",
+        "monaco-editor": "^0.53.0",
+        "mysql2": "^3.15.0",
+        "next-themes": "^0.4.6",
+        "oracledb": "^6.9.0",
+        "path-browserify": "^1.0.1",
+        "pg": "^8.16.3",
+        "process": "^0.11.10",
+        "react-i18next": "^15.7.3",
+        "react-redux": "^9.2.0",
+        "react-resizable-panels": "^3.0.6",
+        "react-router-dom": "^7.9.1",
+        "reactflow": "^11.11.4",
+        "sonner": "^2.0.7",
+        "tailwind-merge": "^3.3.1",
+        "tailwindcss-animate": "^1.0.7",
+        "ts-jest": "^29.4.3",
+        "update-electron-app": "^3.1.1",
+        "use-debounce": "^10.0.6",
+        "uuid": "^13.0.0",
+        "vaul": "^1.1.2",
+        "yup": "^1.7.0",
+        "zod": "^4.1.9"
+    },
+    "devDependencies": {
+        "@electron-toolkit/eslint-config-prettier": "^3.0.0",
+        "@electron-toolkit/eslint-config-ts": "^3.1.0",
+        "@electron-toolkit/tsconfig": "^1.0.1",
+        "@eslint/js": "^9.35.0",
+        "@tailwindcss/postcss": "^4.1.13",
+        "@testing-library/jest-dom": "^6.8.0",
+        "@testing-library/react": "^16.3.0",
+        "@types/github-url-to-object": "^4.0.4",
+        "@types/node": "^24.5.2",
+        "@types/react": "^19.1.13",
+        "@types/react-dom": "^19.1.9",
+        "@typescript-eslint/eslint-plugin": "^8.44.0",
+        "@typescript-eslint/parser": "^8.44.0",
+        "@vitejs/plugin-react": "4.7.0",
+        "electron": "38.1.2",
+        "electron-builder": "^26.0.12",
+        "electron-builder-squirrel-windows": "26.0.12",
+        "electron-devtools-installer": "^4.0.0",
+        "electron-vite": "^4.0.0",
+        "eslint": "^9.35.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-jest": "^29.0.1",
+        "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-react-hooks": "^5.2.0",
+        "jest": "^30.1.3",
+        "jest-environment-jsdom": "^30.1.2",
+        "postcss": "^8.5.6",
+        "prettier": "^3.6.2",
+        "react": "^19.1.1",
+        "react-dom": "^19.1.1",
+        "tailwindcss": "^4.1.13",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.2",
+        "vite": "^7.1.6"
+    },
+    "resolutions": {
+        "@radix-ui/react-dismissable-layer": "^1.1.5"
+    },
+    "optionalDependencies": {
+        "dmg-license": "^1.0.11"
+    },
+    "build": {
+        "productName": "IGRP Studio",
+        "appId": "cv.nosi.igrpstudio.alpha",
+        "artifactName": "IGRP-Studio-${version}-${arch}.${ext}",
+        "publish": {
+            "provider": "s3",
+            "bucket": "igrp-studio",
+            "region": "praia",
+            "endpoint": "https://storage-api.nosi.cv",
+            "channel": "latest",
+            "path": "${platform}/${arch}/"
+        },
+        "win": {
+            "icon": "resources/icons/icon.ico",
+            "target": "nsis",
+            "signtoolOptions": {
+                "certificateFile": "certificate.pfx",
+                "certificatePassword": "__CERT_PASS__",
+                "signingHashAlgorithms": [
+                    "sha256"
+                ],
+                "rfc3161TimeStampServer": "http://timestamp.digicert.com",
+                "publisherName": "NOSI – Núcleo Operacional Sistema Informação, E.P.E."
+            },
+            "publish": {
+                "provider": "s3",
+                "bucket": "igrp-studio",
+                "region": "praia",
+                "endpoint": "https://storage-api.nosi.cv",
+                "channel": "latest",
+                "path": "win32/${arch}/"
+            }
+        },
+        "mac": {
+            "icon": "resources/icons/icon.icns",
+            "category": "public.app-category.developer-tools",
+            "entitlementsInherit": "build/entitlements.mac.plist",
+            "hardenedRuntime": false,
+            "gatekeeperAssess": false,
+            "notarize": false
+        },
+        "linux": {
+            "icon": "resources/icons/icon.png",
+            "target": [
+                "AppImage",
+                "deb"
+            ],
+            "category": "Development",
+            "maintainer": "NOSI - Núcleo Operacional Sistema Informação, E.P.E."
+        },
+        "protocols": [
+            {
+                "name": "IGRP Studio",
+                "schemes": [
+                    "igrp-studio"
+                ]
+            }
+        ],
+        "files": [
+            "out/**/*",
+            "!out/**/*.map"
+        ]
+    }
 }

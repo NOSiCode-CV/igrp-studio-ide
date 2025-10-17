@@ -1,25 +1,22 @@
 import { useEffect, useState } from 'react';
 import DashboardOverview from '../components/dashboard-overview';
 import { useTranslation } from 'react-i18next';
-
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@renderer/components/ui/tabs';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
 import { ProjectConfigForm } from '@renderer/pages/project';
-import { Button } from '@renderer/components/ui/button';
+import {
+    IGRPButtonPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardPrimitive,
+    IGRPCardDescriptionPrimitive,
+    IGRPCardContentPrimitive,
+    IGRPLabelPrimitive,
+    IGRPCardTitlePrimitive,
+    IGRPTabsListPrimitive,
+    IGRPTabsTriggerPrimitive,
+    IGRPTabsContentPrimitive,
+    IGRPTabsPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import useStudioAPI from '@renderer/hooks/use-studio-api';
-import { Label } from '@renderer/components/ui/label';
-import { Input } from '@renderer/components/ui/input';
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     Check,
     Copy,
@@ -92,7 +89,8 @@ const Overview = () => {
             file.children.forEach((child: any) => {
                 const { name, children } = child;
                 if (name in newStats) {
-                    newStats[name as keyof typeof newStats] += children?.length || 0;
+                    newStats[name as keyof typeof newStats] +=
+                        children?.length || 0;
                 }
             });
         });
@@ -112,16 +110,25 @@ const Overview = () => {
 
     return (
         <div className="w-full mx-auto space-y-8 p-6">
-            <Tabs defaultValue="overview" className="compact-tabs">
-                <TabsList className="mb-3">
-                    <TabsTrigger value="overview" className="text-xs">
+            <IGRPTabsPrimitive defaultValue="overview" className="compact-tabs">
+                <IGRPTabsListPrimitive className="mb-3">
+                    <IGRPTabsTriggerPrimitive
+                        value="overview"
+                        className="text-xs"
+                    >
                         {t('overview')}
-                    </TabsTrigger>
-                    <TabsTrigger value="settings" className="text-xs">
+                    </IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive
+                        value="settings"
+                        className="text-xs"
+                    >
                         {t('settings')}
-                    </TabsTrigger>
-                </TabsList>
-                <TabsContent value="overview" className="mt-0 space-y-4">
+                    </IGRPTabsTriggerPrimitive>
+                </IGRPTabsListPrimitive>
+                <IGRPTabsContentPrimitive
+                    value="overview"
+                    className="mt-0 space-y-4"
+                >
                     {project && (
                         <>
                             <div className="space-x-3 flex items-center justify-between">
@@ -140,8 +147,8 @@ const Overview = () => {
                                 </div>
                             </div>
 
-                            <VersionAlert 
-                                projectVersion={config?.version} 
+                            <VersionAlert
+                                projectVersion={config?.version}
                                 className="mb-4"
                                 changelogContent={springEngineChangelog}
                             />
@@ -211,7 +218,7 @@ const Overview = () => {
                                         </div>
                                         <Dependency
                                             dependsOn={
-                                                project?.service?.dependsOn 
+                                                project?.service?.dependsOn
                                             }
                                         />
                                     </div>
@@ -264,31 +271,34 @@ const Overview = () => {
                             <DashboardOverview stats={stats} />
                         </>
                     )}
-                </TabsContent>
-                <TabsContent value="settings" className="mt-0 space-y-4">
-                    <Card>
-                        <CardHeader className="compact-card-header">
-                            <CardTitle className="text-sm">
+                </IGRPTabsContentPrimitive>
+                <IGRPTabsContentPrimitive
+                    value="settings"
+                    className="mt-0 space-y-4"
+                >
+                    <IGRPCardPrimitive>
+                        <IGRPCardHeaderPrimitive className="compact-card-header">
+                            <IGRPCardTitlePrimitive className="text-sm">
                                 {t('projectSettings')}
-                            </CardTitle>
-                            <CardDescription className="text-xs">
+                            </IGRPCardTitlePrimitive>
+                            <IGRPCardDescriptionPrimitive className="text-xs">
                                 {t('configureProjectSettings')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="compact-card-content space-y-3">
+                            </IGRPCardDescriptionPrimitive>
+                        </IGRPCardHeaderPrimitive>
+                        <IGRPCardContentPrimitive className="compact-card-content space-y-3">
                             {projectId && (
                                 <div className="space-y-2">
-                                    <Label htmlFor="project-id">
+                                    <IGRPLabelPrimitive htmlFor="project-id">
                                         {t('projectId')}
-                                    </Label>
+                                    </IGRPLabelPrimitive>
                                     <div className="flex space-x-2">
-                                        <Input
+                                        <IGRPInputPrimitive
                                             id="project-id"
                                             value={projectId}
                                             readOnly
                                             className="h-8 font-mono bg-muted/50 flex-1 rounded-r-none"
                                         />
-                                        <Button
+                                        <IGRPButtonPrimitive
                                             variant="outline"
                                             size="sm"
                                             className="h-8 rounded-l-none border-l-0"
@@ -301,7 +311,7 @@ const Overview = () => {
                                             ) : (
                                                 <Copy className="h-3.5 w-3.5" />
                                             )}
-                                        </Button>
+                                        </IGRPButtonPrimitive>
                                     </div>
                                     <p className="text-[10px] text-muted-foreground mt-1">
                                         {t('projectIdDescription')}
@@ -315,14 +325,14 @@ const Overview = () => {
                                 onChange={setData}
                             />
                             <div className="pt-2">
-                                <Button onClick={handleSave}>
+                                <IGRPButtonPrimitive onClick={handleSave}>
                                     {t('saveSettings')}
-                                </Button>
+                                </IGRPButtonPrimitive>
                             </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-            </Tabs>
+                        </IGRPCardContentPrimitive>
+                    </IGRPCardPrimitive>
+                </IGRPTabsContentPrimitive>
+            </IGRPTabsPrimitive>
         </div>
     );
 };

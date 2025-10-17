@@ -1,22 +1,20 @@
 import { File, Folder, ChevronRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import {
-    SidebarMenu,
-    SidebarMenuSub,
-    SidebarMenuItem,
-    SidebarMenuButton,
-} from '@renderer/components/ui/sidebar';
-import {
-    Collapsible,
-    CollapsibleTrigger,
-    CollapsibleContent,
-} from '@renderer/components/ui/collapsible';
 
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { TabItem, useTabs } from '@renderer/components/navigation/TabContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
+import {
+    IGRPCollapsibleContentPrimitive,
+    IGRPCollapsiblePrimitive,
+    IGRPCollapsibleTriggerPrimitive,
+    IGRPScrollAreaPrimitive,
+    IGRPSidebarMenuButtonPrimitive,
+    IGRPSidebarMenuItemPrimitive,
+    IGRPSidebarMenuPrimitive,
+    IGRPSidebarMenuSubPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 interface FileExplorerSidebarProps {
     basePath: string;
@@ -81,11 +79,11 @@ const NavigatorSidebar: React.FC<FileExplorerSidebarProps> = ({
     const renderTree = (tree: StructuredComponent[]) => {
         const filteredTree = searchTerm ? filterTree(tree, searchTerm) : tree;
         return filteredTree.map((item) => (
-            <SidebarMenuItem key={item.id}>
+            <IGRPSidebarMenuItemPrimitive key={item.id}>
                 {item.children && item.children.length > 0 ? (
-                    <Collapsible defaultOpen={true}>
-                        <CollapsibleTrigger asChild>
-                            <SidebarMenuButton
+                    <IGRPCollapsiblePrimitive defaultOpen={true}>
+                        <IGRPCollapsibleTriggerPrimitive asChild>
+                            <IGRPSidebarMenuButtonPrimitive
                                 className="justify-between"
                                 onClick={() => handleFileSelect(item)}
                             >
@@ -96,30 +94,34 @@ const NavigatorSidebar: React.FC<FileExplorerSidebarProps> = ({
                                         {item.componentName || item.label}
                                     </span>
                                 </div>
-                            </SidebarMenuButton>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                            <SidebarMenuSub>
+                            </IGRPSidebarMenuButtonPrimitive>
+                        </IGRPCollapsibleTriggerPrimitive>
+                        <IGRPCollapsibleContentPrimitive>
+                            <IGRPSidebarMenuSubPrimitive>
                                 {renderTree(item.children)}
-                            </SidebarMenuSub>
-                        </CollapsibleContent>
-                    </Collapsible>
+                            </IGRPSidebarMenuSubPrimitive>
+                        </IGRPCollapsibleContentPrimitive>
+                    </IGRPCollapsiblePrimitive>
                 ) : (
-                    <SidebarMenuButton onClick={() => handleFileSelect(item)}>
+                    <IGRPSidebarMenuButtonPrimitive
+                        onClick={() => handleFileSelect(item)}
+                    >
                         <div className="flex items-center gap-2">
                             <File className="w-4 h-4" />
                             <span>{item.componentName || item.label}</span>
                         </div>
-                    </SidebarMenuButton>
+                    </IGRPSidebarMenuButtonPrimitive>
                 )}
-            </SidebarMenuItem>
+            </IGRPSidebarMenuItemPrimitive>
         ));
     };
 
     return (
-        <ScrollArea className="flex-1 p-2">
-            <SidebarMenu>{renderTree(fileTree)}</SidebarMenu>
-        </ScrollArea>
+        <IGRPScrollAreaPrimitive className="flex-1 p-2">
+            <IGRPSidebarMenuPrimitive>
+                {renderTree(fileTree)}
+            </IGRPSidebarMenuPrimitive>
+        </IGRPScrollAreaPrimitive>
     );
 };
 

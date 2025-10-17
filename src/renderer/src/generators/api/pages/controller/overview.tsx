@@ -1,6 +1,6 @@
 import {
     ColumnDef,
-  IGRPAlertDialog,
+    IGRPAlertDialog,
     IGRPContainer,
     IGRPDataTable,
 } from '@igrp/igrp-framework-react-design-system';
@@ -10,7 +10,7 @@ import {
     IGRPTabsList,
     IGRPTabsTrigger,
 } from '@renderer/components/tabs';
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { getBadgeColor } from '@renderer/utils';
 import { Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -64,10 +64,10 @@ const ControllerOverview = ({ currentItem }: PageBuilderProps) => {
                             title="Você tem absoluta certeza?"
                             description={`Tem certeza de que deseja remover este registro ${endpoint.codigoAcompanhamento}?`}
                         >
-                            <Button variant="ghost" size="sm">
+                            <IGRPButtonPrimitive variant="ghost" size="sm">
                                 <Trash2 className="h-4 w-4 text-red-500" />
                                 <span className="sr-only">Excluir</span>
-                            </Button>
+                            </IGRPButtonPrimitive>
                         </IGRPAlertDialog>
                     </div>
                 );

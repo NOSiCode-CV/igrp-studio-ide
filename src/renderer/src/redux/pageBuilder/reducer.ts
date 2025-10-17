@@ -1,23 +1,23 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ProjectData, FileTree, IWorkspace } from "src/main/types";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ProjectData, FileTree, IWorkspace } from 'src/main/types';
 
 export interface StudioState {
     config: ProjectData | undefined;
     basePath: string;
     filesThree?: FileTree[];
     changeStatus: boolean;
-    currentItem: null,
-    workspace: IWorkspace | null
+    currentItem: null;
+    workspace: IWorkspace | null;
 }
 
 export const initialState: StudioState = {
     config: undefined,
-    basePath: "",
+    basePath: '',
     filesThree: [],
     changeStatus: false,
     currentItem: null,
-    workspace: null
-}
+    workspace: null,
+};
 
 const StudioSlice = createSlice({
     name: 'Studio',
@@ -41,7 +41,7 @@ const StudioSlice = createSlice({
         setWorkspaceAction(state, action: PayloadAction<IWorkspace | null>) {
             state.workspace = action.payload;
         },
-    }
+    },
 });
 
 export const {
@@ -50,7 +50,7 @@ export const {
     setFilesThreeAction,
     setChangeStatusAction,
     setCurrentItemAction,
-    setWorkspaceAction
+    setWorkspaceAction,
 } = StudioSlice.actions;
 
 export default StudioSlice.reducer;

@@ -1,4 +1,4 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { useTranslation } from 'react-i18next';
@@ -65,25 +65,20 @@ const CopyContent = ({ currentComp }: CopyContentProps) => {
         if (!selectedPage || !currentComp || !pageOptions.length) return [];
 
         const page = pageOptions.find(
-            (p: any) => p.content.pageName === selectedPage,
+            (p: any) => p.content.pageName === selectedPage
         );
 
         if (!page) return [];
 
         const componentsMap = extractComponentsFromPage(
             page.components,
-            currentComp.componentName,
+            currentComp.componentName
         );
 
         const allComponents = Array.from(componentsMap.values());
 
         return allComponents.filter((comp) => comp.id !== currentComp.id);
-    }, [
-        selectedPage,
-        currentComp,
-        pageOptions,
-        extractComponentsFromPage,
-    ]);
+    }, [selectedPage, currentComp, pageOptions, extractComponentsFromPage]);
 
     const handlePageChange = (value: string | boolean) => {
         setSelectedPage(value as string);
@@ -111,7 +106,7 @@ const CopyContent = ({ currentComp }: CopyContentProps) => {
                 label: page.content.description,
                 value: page.content.pageName || page.content.name,
             })),
-        [pageOptions],
+        [pageOptions]
     );
 
     const componentSelectOptions = useMemo(
@@ -120,7 +115,7 @@ const CopyContent = ({ currentComp }: CopyContentProps) => {
                 label: `${comp.label || comp.tag} - ${comp.tag}`,
                 value: comp.id,
             })),
-        [availableComponents],
+        [availableComponents]
     );
 
     return (
@@ -143,9 +138,9 @@ const CopyContent = ({ currentComp }: CopyContentProps) => {
                     name="component"
                     label={t('Components')}
                 />
-                <Button className="mt-2" onClick={handleCopyClick}>
+                <IGRPButtonPrimitive className="mt-2" onClick={handleCopyClick}>
                     {t('Copy Properties')}
-                </Button>
+                </IGRPButtonPrimitive>
             </div>
         </div>
     );

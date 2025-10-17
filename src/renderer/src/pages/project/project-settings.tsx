@@ -1,10 +1,10 @@
-import { Button } from '@renderer/components/ui/button';
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@renderer/components/ui/card';
+    IGRPCardPrimitive,
+    IGRPCardContentPrimitive,
+    IGRPCardHeaderPrimitive,
+    IGRPCardTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { ProjectData } from 'src/main/types';
 import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea';
 import { useTranslation } from 'react-i18next';
@@ -42,14 +42,14 @@ function SettingsRow({ label, value, description, onEdit }: SettingsRowProps) {
                 )}
             </div>
             {onEdit && (
-                <Button
+                <IGRPButtonPrimitive
                     variant="outline"
                     size="sm"
                     onClick={onEdit}
                     className="hidden"
                 >
                     {t('edit')}
-                </Button>
+                </IGRPButtonPrimitive>
             )}
         </div>
     );
@@ -78,11 +78,13 @@ export default function ProjectSettings({
                     </h1>
                 )}
 
-                <Card className="border-border/50">
-                    <CardHeader>
-                        <CardTitle>{t('general_info')}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-0 divide-y divide-border/50">
+                <IGRPCardPrimitive className="border-border/50">
+                    <IGRPCardHeaderPrimitive>
+                        <IGRPCardTitlePrimitive>
+                            {t('general_info')}
+                        </IGRPCardTitlePrimitive>
+                    </IGRPCardHeaderPrimitive>
+                    <IGRPCardContentPrimitive className="space-y-0 divide-y divide-border/50">
                         <SettingsRow
                             label="project_name"
                             value={name}
@@ -125,8 +127,8 @@ export default function ProjectSettings({
                                 />
                             );
                         })}
-                    </CardContent>
-                </Card>
+                    </IGRPCardContentPrimitive>
+                </IGRPCardPrimitive>
             </div>
         </ContainerScrollArea>
     );

@@ -1,23 +1,23 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-} from '@renderer/components/ui/dialog';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import { useEffect, useState } from 'react';
 import { FormList } from '@renderer/components/form-list';
 import { handleChangeValueObject } from '@renderer/generators/api/helpers';
 import { FormikProps, useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@renderer/components/ui/button';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogClosePrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext';
-import { DialogClose } from '@radix-ui/react-dialog';
 import { Loader2 } from 'lucide-react';
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
 import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system';
+import { IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 interface BindingFilterType {
     componentId: string;
@@ -178,18 +178,19 @@ export const BindingConfigurationFilterModal = ({
 
     return (
         <>
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max-h-[70vh]">
-                    <ScrollArea className="h-full p-4">
-                        <DialogHeader className="mb-4">
-                            <DialogTitle>
+            <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
+                <IGRPDialogContentPrimitive className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max-h-[70vh]">
+                    <IGRPScrollAreaPrimitive className="h-full p-4">
+                        IGRPScrollAreaPrimitive
+                        <IGRPDialogHeaderPrimitive className="mb-4">
+                            <IGRPDialogTitlePrimitive>
                                 Binding Filter Configuration
-                            </DialogTitle>
-                            <DialogDescription>
+                            </IGRPDialogTitlePrimitive>
+                            <IGRPDialogDescriptionPrimitive>
                                 Make changes to your Binding Configuration here.
                                 Click save when you're done.
-                            </DialogDescription>
-                        </DialogHeader>
+                            </IGRPDialogDescriptionPrimitive>
+                        </IGRPDialogHeaderPrimitive>
                         <form
                             onSubmit={formik.handleSubmit}
                             className="space-y-4"
@@ -206,9 +207,11 @@ export const BindingConfigurationFilterModal = ({
                                 />
                             </div>
 
-                            <DialogFooter className="space-x-2">
-                                <DialogClose>Close</DialogClose>
-                                <Button
+                            <IGRPDialogFooterPrimitive className="space-x-2">
+                                <IGRPDialogClosePrimitive>
+                                    Close
+                                </IGRPDialogClosePrimitive>
+                                <IGRPButtonPrimitive
                                     type="submit"
                                     disabled={formik.isSubmitting}
                                 >
@@ -216,12 +219,12 @@ export const BindingConfigurationFilterModal = ({
                                         <Loader2 className="animate-spin" />
                                     )}
                                     Save changes
-                                </Button>
-                            </DialogFooter>
+                                </IGRPButtonPrimitive>
+                            </IGRPDialogFooterPrimitive>
                         </form>
-                    </ScrollArea>
-                </DialogContent>
-            </Dialog>
+                    </IGRPScrollAreaPrimitive>
+                </IGRPDialogContentPrimitive>
+            </IGRPDialogPrimitive>
         </>
     );
 };

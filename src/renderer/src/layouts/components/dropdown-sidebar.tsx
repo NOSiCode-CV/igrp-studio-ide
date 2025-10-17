@@ -1,13 +1,12 @@
 import React, { useState, Suspense } from 'react';
 import { Plus, Ellipsis } from 'lucide-react';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuTrigger,
-} from '@renderer/components/ui/dropdown-menu';
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuSeparatorPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import { MenuItem } from 'src/main/types';
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete';
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
@@ -18,6 +17,7 @@ import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useGit } from '@renderer/hooks/use-git';
 import { DropdownItem } from './nav-data';
 import { lazy } from 'react';
+import { IGRPDropdownMenuShortcutPrimitive } from '@igrp/igrp-framework-react-design-system';
 
 // Lazy load modal components
 const DatabaseManagerModal = lazy(
@@ -62,9 +62,7 @@ const ModalManager: React.FC<{
     if (!isOpen) return null;
 
     return (
-        <Suspense fallback={<div>Loading...</div>}>
-            {renderModal()}
-        </Suspense>
+        <Suspense fallback={<div>Loading...</div>}>{renderModal()}</Suspense>
     );
 };
 
@@ -159,8 +157,8 @@ export const DropdownSidebarMenuButton: React.FC<
         <></>
     ) : (
         <>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <IGRPDropdownMenuPrimitive>
+                <IGRPDropdownMenuTriggerPrimitive asChild>
                     <div className="text-muted-foreground hover:text-foreground">
                         {isDeleteAction ? (
                             <Ellipsis className="h-4 w-4" />
@@ -168,8 +166,8 @@ export const DropdownSidebarMenuButton: React.FC<
                             <Plus className="h-4 w-4" />
                         )}
                     </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
+                </IGRPDropdownMenuTriggerPrimitive>
+                <IGRPDropdownMenuContentPrimitive
                     side="right"
                     align="start"
                     className="min-w-56"
@@ -181,9 +179,9 @@ export const DropdownSidebarMenuButton: React.FC<
                             return (
                                 <React.Fragment key={idx}>
                                     {menu.actionType === OPTION_TYPE.DELETE && (
-                                        <DropdownMenuSeparator />
+                                        <IGRPDropdownMenuSeparatorPrimitive />
                                     )}
-                                    <DropdownMenuItem
+                                    <IGRPDropdownMenuItemPrimitive
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleDropdownClick({
@@ -203,18 +201,18 @@ export const DropdownSidebarMenuButton: React.FC<
                                         )}
                                         {menu.label}
                                         {isDelete && (
-                                            <DropdownMenuShortcut>
+                                            <IGRPDropdownMenuShortcutPrimitive>
                                                 ⌘+D
-                                            </DropdownMenuShortcut>
+                                            </IGRPDropdownMenuShortcutPrimitive>
                                         )}
-                                    </DropdownMenuItem>
+                                    </IGRPDropdownMenuItemPrimitive>
                                 </React.Fragment>
                             );
                         }
                     )}
-                </DropdownMenuContent>
-            </DropdownMenu>
-            
+                </IGRPDropdownMenuContentPrimitive>
+            </IGRPDropdownMenuPrimitive>
+
             {modalType && (
                 <ModalManager
                     modalType={modalType}

@@ -1,4 +1,4 @@
-import { ScrollArea } from '@renderer/components/ui/scroll-area';
+import { IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { cn } from '@renderer/lib/utils';
 import React from 'react';
 
@@ -13,13 +13,13 @@ export const ContainerScrollArea: React.FC<ContainerScrollAreaProps> = ({
     className,
 }) => {
     return (
-        <ScrollArea
+        <IGRPScrollAreaPrimitive
             className={cn(
                 'h-[calc(100svh-var(--header-height-three))]',
                 className
             )}
         >
             {children}
-        </ScrollArea>
+        </IGRPScrollAreaPrimitive>
     );
 };

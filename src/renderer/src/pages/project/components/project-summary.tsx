@@ -10,44 +10,46 @@ export const ProjectConfigSummary = ({ values }: { values: any }) => {
                     {values.type}
                 </p>
                 <p>
-                    <span className="text-muted-foreground">{t('framework')}</span>
+                    <span className="text-muted-foreground">
+                        {t('framework')}
+                    </span>
                     {values.framework}
                 </p>
                 {values.framework === 'springboot' && values.config && (
                     <>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('database')}
+                                {t('database')}
                             </span>
                             {values.config.database}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('structure')}
+                                {t('structure')}
                             </span>
                             {values.config.structureStyle}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('group')}
+                                {t('group')}
                             </span>
                             {values.config.group}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('artifact')}
+                                {t('artifact')}
                             </span>
                             {values.config.artifact}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('coreVersion')}
+                                {t('coreVersion')}
                             </span>
                             {values.config.coreVersion}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('observability')}
+                                {t('observability')}
                             </span>
                             {values.config.enableObservability
                                 ? t('enabled')
@@ -59,25 +61,25 @@ export const ProjectConfigSummary = ({ values }: { values: any }) => {
                     <>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('typescript')}
+                                {t('typescript')}
                             </span>
                             {values.Config.typescript ? 'Yes' : 'No'}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('tailwindCss')}
+                                {t('tailwindCss')}
                             </span>
                             {values.Config.tailwind ? 'Yes' : 'No'}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('srcDirectory')}
+                                {t('srcDirectory')}
                             </span>
                             {values.Config.srcDirectory ? 'Yes' : 'No'}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('packageManager')}
+                                {t('packageManager')}
                             </span>
                             {values.Config.packageManager}
                         </p>
@@ -87,43 +89,43 @@ export const ProjectConfigSummary = ({ values }: { values: any }) => {
                     <>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('projectName')}
+                                {t('projectName')}
                             </span>
                             {values.Configformik.projectName}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('solutionName')}
+                                {t('solutionName')}
                             </span>
                             {values.Configformik.solutionName}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('framework')}
+                                {t('framework')}
                             </span>
                             {values.Configformik.framework}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('language')}
+                                {t('language')}
                             </span>
                             {values.Configformik.language}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('authentication')}
+                                {t('authentication')}
                             </span>
                             {values.Config.auth ? 'Yes' : 'No'}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('https')}
+                                {t('https')}
                             </span>
                             {values.Config.https ? 'Yes' : 'No'}
                         </p>
                         <p>
                             <span className="text-muted-foreground">
-                            {t('dockerSupport')}
+                                {t('dockerSupport')}
                             </span>
                             {values.Config.dockerSupport ? 'Yes' : 'No'}
                         </p>

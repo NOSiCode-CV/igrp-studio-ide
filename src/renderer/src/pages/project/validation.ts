@@ -1,17 +1,15 @@
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import * as Yup from 'yup';
 
-export function useProjectValidation({ t, step }: { t: any, step: number }  ) {
+export function useProjectValidation({ t, step }: { t: any; step: number }) {
     const validationSchema = Yup.object().shape({
-        name: Yup.string().required(
-            t('fieldRequired', { name: t('projectName') })
-        ).matches(
-            PATTERNS.SPECIAL_CHARACTERS_PROJECT_NAME,
-            t('msgSpecialCharactersRegex')
-        ).max(
-            100,
-            t('maxLengthExceeded', { max: 100 })
-        ),
+        name: Yup.string()
+            .required(t('fieldRequired', { name: t('projectName') }))
+            .matches(
+                PATTERNS.SPECIAL_CHARACTERS_PROJECT_NAME,
+                t('msgSpecialCharactersRegex')
+            )
+            .max(100, t('maxLengthExceeded', { max: 100 })),
         type: Yup.string().oneOf(
             ['frontend', 'backend'],
             t('fieldRequired', { name: t('projectType') })
@@ -26,63 +24,105 @@ export function useProjectValidation({ t, step }: { t: any, step: number }  ) {
             // Only validate the config object when the step is 3
             if (step === 3) {
                 return Yup.object().shape({
-                    name: Yup.string().when('$framework', (framework, schema) => {
-                        return framework && framework[0].includes(ENV_TYPES.SPRING, ENV_TYPES.DOTNET)
-                            ? schema
-                                .required(
-                                    t('thisFieldRequired', { name: t('name') })
+                    name: Yup.string().when(
+                        '$framework',
+                        (framework, schema) => {
+                            return framework &&
+                                framework[0].includes(
+                                    ENV_TYPES.SPRING,
+                                    ENV_TYPES.DOTNET
                                 )
-                                .matches(
-                                    PATTERNS.NO_SPACE_AND_HYPHEN,
-                                    t('msgInfoAccpet')
-                                )
-                                .max(50, t('maxLengthExceeded', { max: 50 }))
-                            : framework && framework[0].includes(ENV_TYPES.NEXTJS)
                                 ? schema
-                                    .required(
-                                        t('thisFieldRequired', { name: t('name') })
-                                    )
-                                    .matches(
-                                        PATTERNS.NAME_APP_VALIDATION,
-                                        t('msgInfoAccpet')
-                                    )
-                                    .max(100, t('maxLengthExceeded', { max: 100 }))
-                                : schema.notRequired();
-                    }),
+                                      .required(
+                                          t('thisFieldRequired', {
+                                              name: t('name'),
+                                          })
+                                      )
+                                      .matches(
+                                          PATTERNS.NO_SPACE_AND_HYPHEN,
+                                          t('msgInfoAccpet')
+                                      )
+                                      .max(
+                                          50,
+                                          t('maxLengthExceeded', { max: 50 })
+                                      )
+                                : framework &&
+                                    framework[0].includes(ENV_TYPES.NEXTJS)
+                                  ? schema
+                                        .required(
+                                            t('thisFieldRequired', {
+                                                name: t('name'),
+                                            })
+                                        )
+                                        .matches(
+                                            PATTERNS.NAME_APP_VALIDATION,
+                                            t('msgInfoAccpet')
+                                        )
+                                        .max(
+                                            100,
+                                            t('maxLengthExceeded', { max: 100 })
+                                        )
+                                  : schema.notRequired();
+                        }
+                    ),
                     // Validation for Spring-specific fields
-                    group: Yup.string().when('$framework', (framework, schema) => {
-                        return framework && framework[0] === ENV_TYPES.SPRING
-                            ? schema
-                                .required(
-                                    t('thisFieldRequired', { name: t('group') })
-                                )
-                                .matches(
-                                    PATTERNS.NO_SPACE_AND_HYPHEN,
-                                    t('msgInfoAccpet')
-                                )
-                                .max(100, t('maxLengthExceeded', { max: 100 }))
-                            : schema.notRequired();
-                    }),
-                    artifact: Yup.string().when('$framework', (framework, schema) => {
-                        return framework && framework[0] === ENV_TYPES.SPRING
-                            ? schema
-                                .required(
-                                    t('thisFieldRequired', { name: t('artifact') })
-                                )
-                                .matches(
-                                    PATTERNS.NO_SPACE_BUT_ALLOW_HYPHEN,
-                                    t('msgNoSpacesAllowed')
-                                )
-                                .max(50, t('maxLengthExceeded', { max: 50 }))
-                            : schema.notRequired();
-                    }),
-                    database: Yup.string().when('$framework', (framework, schema) => {
-                        return framework && framework[0] === ENV_TYPES.SPRING
-                            ? schema.required(
-                                t('thisFieldRequired', { name: t('database') })
-                            )
-                            : schema.notRequired();
-                    })
+                    group: Yup.string().when(
+                        '$framework',
+                        (framework, schema) => {
+                            return framework &&
+                                framework[0] === ENV_TYPES.SPRING
+                                ? schema
+                                      .required(
+                                          t('thisFieldRequired', {
+                                              name: t('group'),
+                                          })
+                                      )
+                                      .matches(
+                                          PATTERNS.NO_SPACE_AND_HYPHEN,
+                                          t('msgInfoAccpet')
+                                      )
+                                      .max(
+                                          100,
+                                          t('maxLengthExceeded', { max: 100 })
+                                      )
+                                : schema.notRequired();
+                        }
+                    ),
+                    artifact: Yup.string().when(
+                        '$framework',
+                        (framework, schema) => {
+                            return framework &&
+                                framework[0] === ENV_TYPES.SPRING
+                                ? schema
+                                      .required(
+                                          t('thisFieldRequired', {
+                                              name: t('artifact'),
+                                          })
+                                      )
+                                      .matches(
+                                          PATTERNS.NO_SPACE_BUT_ALLOW_HYPHEN,
+                                          t('msgNoSpacesAllowed')
+                                      )
+                                      .max(
+                                          50,
+                                          t('maxLengthExceeded', { max: 50 })
+                                      )
+                                : schema.notRequired();
+                        }
+                    ),
+                    database: Yup.string().when(
+                        '$framework',
+                        (framework, schema) => {
+                            return framework &&
+                                framework[0] === ENV_TYPES.SPRING
+                                ? schema.required(
+                                      t('thisFieldRequired', {
+                                          name: t('database'),
+                                      })
+                                  )
+                                : schema.notRequired();
+                        }
+                    ),
                 });
             }
             // Return an empty schema if the step is not 3
@@ -91,5 +131,4 @@ export function useProjectValidation({ t, step }: { t: any, step: number }  ) {
     });
 
     return validationSchema;
-
 }

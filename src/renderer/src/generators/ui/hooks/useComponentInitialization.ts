@@ -6,10 +6,15 @@ import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/dist/in
 interface ComponentInitializationProps {
     content: any;
     menuItems: any[];
-    findComponentById: (componentName: string) => Promise<ComponentRegisterConfig | undefined>;
+    findComponentById: (
+        componentName: string
+    ) => Promise<ComponentRegisterConfig | undefined>;
     generateTag: (base: string) => string;
     setAllComponents: (components: any) => void;
-    findComponent: (path: string | undefined, componentName: string) => Promise<ComponentRegisterConfig | null>;
+    findComponent: (
+        path: string | undefined,
+        componentName: string
+    ) => Promise<ComponentRegisterConfig | null>;
 }
 
 interface UseComponentInitializationReturn {
@@ -21,28 +26,32 @@ export const useComponentInitialization = ({
     findComponentById,
     generateTag,
     setAllComponents,
-    findComponent
+    findComponent,
 }: ComponentInitializationProps): UseComponentInitializationReturn => {
-
     const initializeComponents = useCallback(async () => {
         try {
             const isPage = content.type === 'page';
-            const isBpmnProcess = content.type === 'processStep'
+            const isBpmnProcess = content.type === 'processStep';
 
             const mainComponent = isPage
                 ? COMPONENT.PageContent
                 : isBpmnProcess
-                    ? COMPONENT.ProcessStep
-                    : COMPONENT.ComponentContent;
+                  ? COMPONENT.ProcessStep
+                  : COMPONENT.ComponentContent;
 
-            let pageCompRegister
+            let pageCompRegister;
 
             if (isBpmnProcess) {
-                pageCompRegister = await findComponent('process', COMPONENT.ProcessStep);
+                pageCompRegister = await findComponent(
+                    'process',
+                    COMPONENT.ProcessStep
+                );
             } else {
                 pageCompRegister = await findComponentById(mainComponent);
             }
-            const sectionCompRegister = await findComponentById(COMPONENT.Section);
+            const sectionCompRegister = await findComponentById(
+                COMPONENT.Section
+            );
 
             if (!pageCompRegister && !isBpmnProcess) {
                 console.warn(`Component ${mainComponent} not found`);
@@ -65,7 +74,6 @@ export const useComponentInitialization = ({
                 ...pageContent,
                 tag: generateTag(mainComponent),
             });
-
         } catch (error) {
             console.error('Error initializing components:', error);
         }
@@ -74,4 +82,4 @@ export const useComponentInitialization = ({
     return {
         initializeComponents,
     };
-}; 
+};

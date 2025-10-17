@@ -1,15 +1,15 @@
-import { Button } from '@renderer/components/ui/button';
+import {
+    IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 import useToast from '@renderer/hooks/useToast';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogTitle,
-} from '@renderer/components/ui/dialog';
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants';
 import { useGit } from '@renderer/hooks/use-git';
 import {
@@ -53,8 +53,7 @@ export function DuplicatePageModal({
     onClose,
     onConfirm,
     pageToDuplicate,
-}: DuplicatePageModalProps) {
-  
+}: DuplicatePageModalProps): React.JSX.Element {
     const { t } = useTranslation();
     const { createGitCommit } = useGit();
     const { showErrorToast, showSuccessToast } = useToast();
@@ -73,9 +72,7 @@ export function DuplicatePageModal({
         name: originalContent?.pageName
             ? `${originalContent.pageName}Copy`
             : '',
-        path: originalContent?.path
-            ? `${originalContent.path}-copy`
-            : '',
+        path: originalContent?.path ? `${originalContent.path}-copy` : '',
         pagePath: originalContent?.pagePath || '',
         pageName: originalContent?.pageName
             ? `${originalContent.pageName}Copy`
@@ -115,7 +112,7 @@ export function DuplicatePageModal({
                           pageName: values.name,
                           path: values.path,
                           description: values.description,
-                          id: getId()
+                          id: getId(),
                       } as PageConfig)
                     : ({
                           // Include all other properties from original
@@ -125,7 +122,7 @@ export function DuplicatePageModal({
                           id: getId(),
                       } as ComponentConfig);
 
-                console.log(config)
+                console.log(config);
 
                 const { error } = await window.engine.createPage(
                     config,
@@ -183,21 +180,21 @@ export function DuplicatePageModal({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
-                <DialogTitle>
+        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
+            <IGRPDialogContentPrimitive>
+                <IGRPDialogTitlePrimitive>
                     {t('duplicateItem', {
                         type: isPage ? 'page' : 'component',
                         name:
                             pageToDuplicate?.description ||
                             pageToDuplicate?.pageName,
                     })}
-                </DialogTitle>
-                <DialogDescription>
+                </IGRPDialogTitlePrimitive>
+                <IGRPDialogDescriptionPrimitive>
                     {t('duplicateItemDescription', {
                         type: isPage ? 'page' : 'component',
                     })}
-                </DialogDescription>
+                </IGRPDialogDescriptionPrimitive>
                 <form
                     className="needs-validation space-y-4"
                     onSubmit={(e) => {
@@ -248,11 +245,15 @@ export function DuplicatePageModal({
                             />
                         )}
                     </div>
-                    <DialogFooter className="flex justify-between">
-                        <Button type="button" variant="ghost" onClick={onClose}>
+                    <IGRPDialogFooterPrimitive className="flex justify-between">
+                        <IGRPButtonPrimitive
+                            type="button"
+                            variant="ghost"
+                            onClick={onClose}
+                        >
                             {t('cancel')}
-                        </Button>
-                        <Button
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
                             type="submit"
                             disabled={formik.isSubmitting}
                             color="primary"
@@ -260,10 +261,10 @@ export function DuplicatePageModal({
                             {formik.isSubmitting
                                 ? t('duplicating')
                                 : t('duplicate')}
-                        </Button>
-                    </DialogFooter>
+                        </IGRPButtonPrimitive>
+                    </IGRPDialogFooterPrimitive>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
     );
 }

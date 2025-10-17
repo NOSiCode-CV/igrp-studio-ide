@@ -1,9 +1,14 @@
-import { useCallback } from "react";
-import { HandlerResponse } from "src/main/types";
+import { useCallback } from 'react';
+import { HandlerResponse } from 'src/main/types';
 
-const useCore = () => {
+const useCore = (): {
+    getVersions: () => Promise<{ label: string; value: string }[]>;
+    fetchData: (endpoint: string, headers: object) => Promise<HandlerResponse>;
+} => {
     const getVersions = useCallback(async () => {
-        const { result }: HandlerResponse = await window.api.getVersions(import.meta.env.RENDERER_VITE_API_IGRP_VERSIONS);
+        const { result }: HandlerResponse = await window.api.getVersions(
+            import.meta.env.RENDERER_VITE_API_IGRP_VERSIONS
+        );
 
         return result.items.map((item: any) => {
             return {
@@ -14,14 +19,17 @@ const useCore = () => {
     }, []);
 
     const fetchData = useCallback(async (endpoint: string, headers: object) => {
-        const result : HandlerResponse = await window.api.fetchData(endpoint, headers);
+        const result: HandlerResponse = await window.api.fetchData(
+            endpoint,
+            headers
+        );
 
-        return result
+        return result;
     }, []);
 
     return {
         getVersions,
-        fetchData
+        fetchData,
     };
 };
 
