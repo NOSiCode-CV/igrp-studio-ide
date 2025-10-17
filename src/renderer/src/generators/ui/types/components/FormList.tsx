@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
@@ -8,26 +8,108 @@ import { Plus } from 'lucide-react';
 import { IGRPBadge } from '@igrp/igrp-framework-react-design-system';
 import BoxWrapper from '../tools/BoxWrapper';
 import CardComponent, { CardComponentProps } from '../CardComponent';
+import { useComponents } from '../../hooks/useComponents';
+import useCustomCode from '../../hooks/useCustomCode';
+import { ComputeLabelConfigPopover } from './ComputeLabelConfigPopover';
 
 const IGRPStudioFormList: React.FC<CardComponentProps> = ({
     comp,
     onDragEnd,
 }) => {
+    const [selectedComputeLabel, setSelectedComputeLabel] = useState<
+        string | null
+    >(null);
+    const [selectedComputeLabelFunction, setSelectedComputeLabelFunction] =
+        useState<string | null>(null);
+
     const {
         id: componentId,
         componentName: parentComponentName,
         properties,
     } = comp;
 
-    const { addButtonLabel, badgeValue, label, description } = properties || {};
+    const { addButtonLabel, badgeValue, label, description, computeLabel } =
+        properties || {};
 
-    const { setEditingComponent } = useDroppedComponents();
+    const { setEditingComponent, handleUpdateChildComponent } =
+        useDroppedComponents();
+    const { extractValidFields } = useComponents();
+    const { functionOptions } = useCustomCode();
 
     const handleEdit = useCallback(
         (component: StructuredComponent, path: string) => {
             setEditingComponent({ path, component });
         },
         [setEditingComponent]
+    );
+
+    useEffect(() => {
+        if (computeLabel?.code) {
+            const code = computeLabel.code;
+
+            // Check if it's a field pattern: ${item.fieldName}
+            const fieldMatch = code.match(/^\$\{item\.(.+)\}$/);
+            if (fieldMatch) {
+                setSelectedComputeLabel(fieldMatch[1]);
+                setSelectedComputeLabelFunction(null);
+                return;
+            }
+
+            // Check if it's a function pattern: ${functionName(item ,index)}
+            const functionMatch = code.match(
+                /^\$\{(.+)\(item\s*,\s*index\)\}$/
+            );
+            if (functionMatch) {
+                setSelectedComputeLabelFunction(functionMatch[1]);
+                setSelectedComputeLabel(null);
+                return;
+            }
+
+            // If no pattern matches, set the code as is (fallback)
+            setSelectedComputeLabel(code);
+            setSelectedComputeLabelFunction(null);
+        }
+    }, [computeLabel]);
+
+    // ⚡ Performance: Cache extracted fields with useMemo
+    const { fields } = useMemo(() => {
+        return extractValidFields(comp.children);
+    }, [comp.children, extractValidFields]);
+
+    const handleConfigureField = useCallback(
+        (value: string) => {
+            setSelectedComputeLabel(value);
+            setSelectedComputeLabelFunction(null); // Clear function selection
+
+            const computLabel = `item.${value}`;
+
+            handleUpdateChildComponent(componentId, {
+                properties: {
+                    ...comp.properties,
+                    computeLabel: {
+                        code: '${' + computLabel + '}',
+                    },
+                },
+            });
+        },
+        [comp.properties, componentId, handleUpdateChildComponent]
+    );
+
+    const handleConfigureFunction = useCallback(
+        (value: string) => {
+            setSelectedComputeLabelFunction(value);
+            setSelectedComputeLabel(null); // Clear field selection
+
+            handleUpdateChildComponent(componentId, {
+                properties: {
+                    ...comp.properties,
+                    computeLabel: {
+                        code: '${' + value + '(item ,index)}',
+                    },
+                },
+            });
+        },
+        [comp.properties, componentId, handleUpdateChildComponent]
     );
 
     const renderChildComp = useCallback(
@@ -38,9 +120,23 @@ const IGRPStudioFormList: React.FC<CardComponentProps> = ({
             return (
                 <div className="space-y-1">
                     <div className="flex flex-1 justify-between">
-                        <div>
-                            <p className="text-sm font-medium">{label}</p>
-                            <p className="text-xs">{description}</p>
+                        <div className="flex flex-row items-center gap-2">
+                            <div>
+                                <p className="text-sm font-medium">{label}</p>
+                                <p className="text-xs">{description}</p>
+                            </div>
+
+                            {/* Compute Label Configuration Popover */}
+                            <ComputeLabelConfigPopover
+                                fields={fields}
+                                functionOptions={functionOptions}
+                                selectedComputeLabel={selectedComputeLabel}
+                                selectedComputeLabelFunction={
+                                    selectedComputeLabelFunction
+                                }
+                                onConfigureField={handleConfigureField}
+                                onConfigureFunction={handleConfigureFunction}
+                            />
                         </div>
                         <IGRPBadge
                             variant="outline"
@@ -103,6 +199,12 @@ const IGRPStudioFormList: React.FC<CardComponentProps> = ({
             componentId,
             comp,
             handleEdit,
+            fields,
+            functionOptions,
+            selectedComputeLabel,
+            selectedComputeLabelFunction,
+            handleConfigureField,
+            handleConfigureFunction,
         ]
     );
 

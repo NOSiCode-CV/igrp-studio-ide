@@ -7,11 +7,19 @@ import {
     HelpCircle,
     AlertCircle,
     Stethoscope,
+    Download,
+    RefreshCw,
 } from 'lucide-react';
 
 import {
     IGRPButtonPrimitive,
     IGRPTooltipContentPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPTooltipPrimitive,
@@ -23,11 +31,32 @@ import { useTranslation } from 'react-i18next';
 import { DebugTerminal } from '@renderer/components/debug-terminal';
 import Doctor from '@renderer/components/doctor';
 
+interface UpdateMessage {
+    type:
+        | 'checking'
+        | 'available'
+        | 'not-available'
+        | 'error'
+        | 'progress'
+        | 'downloaded';
+    message: string;
+    version?: string;
+    currentVersion?: string;
+    releaseNotes?: string;
+    releaseDate?: string;
+    progress?: number;
+    error?: string;
+}
+
+// No type extension needed - handled in preload/index.d.ts
+
 export function Footer(): JSX.Element {
     const [isOnline, setIsOnline] = useState(true);
     const [appVersion, setAppVersion] = useState('');
     const [newVersion, setNewVersion] = useState<string>('');
     const [open, setOpen] = useState<boolean>(false);
+    const [updateDialogOpen, setUpdateDialogOpen] = useState<boolean>(false);
+    const [updateInfo, setUpdateInfo] = useState<UpdateMessage | null>(null);
     const [log, setLog] = useState<string>('');
     const { t } = useTranslation();
 
@@ -50,29 +79,60 @@ export function Footer(): JSX.Element {
     }, []);
 
     useEffect(() => {
-        const handleLog = (_event: any, message: string) => {
-            setLog(message);
+        const handleUpdateMessage = (
+            _event: Electron.IpcRendererEvent,
+            data: UpdateMessage
+        ): void => {
+            setUpdateInfo(data);
+            setLog(data.message);
+
+            // Show dialog for available updates, progress, or downloaded updates
+            if (
+                data.type === 'available' ||
+                data.type === 'progress' ||
+                data.type === 'downloaded'
+            ) {
+                if (data.version) {
+                    setNewVersion(data.version);
+                }
+                setUpdateDialogOpen(true);
+            }
+
+            // Auto-close dialog after install prompt
+            if (data.type === 'downloaded') {
+                setTimeout(() => {
+                    setUpdateDialogOpen(false);
+                }, 30000); // Close after 30 seconds if user doesn't act
+            }
         };
 
-        window.electron.ipcRenderer.on('message-update', handleLog);
+        window.electron.ipcRenderer.on('message-update', handleUpdateMessage);
 
         return () => {
-            window.electron.ipcRenderer.on('message-update', handleLog);
+            window.electron.ipcRenderer.removeListener(
+                'message-update',
+                handleUpdateMessage
+            );
         };
     }, []);
 
     useEffect(() => {
         // Fetch app version from Electron
-        window.electron.getAppVersion().then((version: string) => {
-            setAppVersion(version);
-        });
+        window.electron
+            .getAppVersion?.()
+            .then((version: string) => {
+                setAppVersion(version);
+            })
+            .catch((err: Error) =>
+                console.error('Failed to get app version:', err)
+            );
     }, []);
 
     useEffect(() => {
-        const handleCheckUpdate = async () => {
+        const handleCheckUpdate = async (): Promise<void> => {
             try {
                 await window.electron
-                    .checkForUpdates()
+                    .checkForUpdates?.()
                     .then((version: string) => {
                         if (!version) return;
                         setNewVersion(version);
@@ -89,8 +149,46 @@ export function Footer(): JSX.Element {
         if (appVersion) handleCheckUpdate();
     }, [appVersion, t]);
 
-    const simulateError = () => {
+    const simulateError = (): void => {
         throw new Error('This is a simulated error from the renderer process.');
+    };
+
+    const handleInstallUpdate = async (): Promise<void> => {
+        try {
+            await window.electron.installUpdate?.();
+        } catch (error) {
+            console.error('Error installing update:', error);
+        }
+    };
+
+    const formatReleaseNotes = (notes?: string): JSX.Element[] | null => {
+        if (!notes) return null;
+
+        // Basic markdown-to-HTML conversion for simple formatting
+        return notes.split('\n').map((line, i) => {
+            if (line.startsWith('## ')) {
+                return (
+                    <h3 key={i} className="font-semibold mt-3 mb-1">
+                        {line.replace('## ', '')}
+                    </h3>
+                );
+            }
+            if (line.startsWith('- ')) {
+                return (
+                    <li key={i} className="ml-4">
+                        {line.replace('- ', '')}
+                    </li>
+                );
+            }
+            if (line.trim() === '') {
+                return <br key={i} />;
+            }
+            return (
+                <p key={i} className="text-sm">
+                    {line}
+                </p>
+            );
+        });
     };
 
     return (
@@ -177,6 +275,116 @@ export function Footer(): JSX.Element {
                     <Doctor open={open} setOpen={setOpen} />
                 </div>
             </footer>
+
+            {/* Update Dialog with Release Notes */}
+            <IGRPDialogPrimitive
+                open={updateDialogOpen}
+                onOpenChange={setUpdateDialogOpen}
+            >
+                <IGRPDialogContentPrimitive className="max-w-2xl max-h-[80vh]">
+                    <IGRPDialogHeaderPrimitive>
+                        <IGRPDialogTitlePrimitive className="flex items-center gap-2">
+                            {(updateInfo?.type === 'available' ||
+                                updateInfo?.type === 'progress') && (
+                                <>
+                                    <Download className="h-5 w-5 text-blue-500 animate-pulse" />
+                                    Downloading Update...
+                                </>
+                            )}
+                            {updateInfo?.type === 'downloaded' && (
+                                <>
+                                    <RefreshCw className="h-5 w-5 text-green-500" />
+                                    Update Ready to Install
+                                </>
+                            )}
+                        </IGRPDialogTitlePrimitive>
+                        <IGRPDialogDescriptionPrimitive>
+                            {updateInfo?.currentVersion &&
+                                updateInfo?.version && (
+                                    <span className="text-sm">
+                                        Version {updateInfo.currentVersion}{' '}
+                                        &rarr; {updateInfo.version}
+                                    </span>
+                                )}
+                            {updateInfo?.releaseDate && (
+                                <span className="text-xs text-muted-foreground ml-2">
+                                    Released:{' '}
+                                    {new Date(
+                                        updateInfo.releaseDate
+                                    ).toLocaleDateString()}
+                                </span>
+                            )}
+                        </IGRPDialogDescriptionPrimitive>
+                    </IGRPDialogHeaderPrimitive>
+
+                    {/* Release Notes Section */}
+                    {updateInfo?.releaseNotes && (
+                        <div className="mt-4 space-y-2">
+                            <h4 className="font-semibold text-sm">
+                                What&apos;s New:
+                            </h4>
+                            <div className="bg-muted/50 rounded-md p-4 max-h-[400px] overflow-y-auto">
+                                <div className="prose prose-sm dark:prose-invert max-w-none">
+                                    {formatReleaseNotes(
+                                        updateInfo.releaseNotes
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Progress indicator */}
+                    {updateInfo?.type === 'progress' &&
+                        updateInfo.progress !== undefined && (
+                            <div className="mt-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-sm">
+                                        Downloading...
+                                    </span>
+                                    <span className="text-sm font-semibold">
+                                        {updateInfo.progress}%
+                                    </span>
+                                </div>
+                                <div className="w-full bg-secondary rounded-full h-2">
+                                    <div
+                                        className="bg-primary h-2 rounded-full transition-all duration-300"
+                                        style={{
+                                            width: `${updateInfo.progress}%`,
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                    <IGRPDialogFooterPrimitive className="mt-6">
+                        {(updateInfo?.type === 'available' ||
+                            updateInfo?.type === 'progress') && (
+                            <IGRPButtonPrimitive
+                                variant="outline"
+                                onClick={() => setUpdateDialogOpen(false)}
+                            >
+                                Continue in Background
+                            </IGRPButtonPrimitive>
+                        )}
+                        {updateInfo?.type === 'downloaded' && (
+                            <>
+                                <IGRPButtonPrimitive
+                                    variant="outline"
+                                    onClick={() => setUpdateDialogOpen(false)}
+                                >
+                                    Install Later
+                                </IGRPButtonPrimitive>
+                                <IGRPButtonPrimitive
+                                    onClick={handleInstallUpdate}
+                                >
+                                    <RefreshCw className="h-4 w-4 mr-2" />
+                                    Install & Restart
+                                </IGRPButtonPrimitive>
+                            </>
+                        )}
+                    </IGRPDialogFooterPrimitive>
+                </IGRPDialogContentPrimitive>
+            </IGRPDialogPrimitive>
         </IGRPTooltipProviderPrimitive>
     );
 }

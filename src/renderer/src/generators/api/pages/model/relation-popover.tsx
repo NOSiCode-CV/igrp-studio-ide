@@ -128,10 +128,7 @@ export function RelationPopover({
     return (
         <IGRPPopoverPrimitive onOpenChange={setOpen} open={open}>
             <IGRPPopoverTriggerPrimitive asChild>
-                <IGRPButtonPrimitive
-                    variant="link"
-                    className="w-full justify-start"
-                >
+                <IGRPButtonPrimitive variant="link">
                     {field.relation && field.relation.entity
                         ? `${field.relation.type} ${t('with')} ${field.relation.entity}.${field.relation.referencedColumnName}`
                         : t('setRelation')}
