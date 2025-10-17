@@ -18,6 +18,10 @@
 		"build": "npm run typecheck && electron-vite build ",
 		"postinstall": "electron-builder install-app-deps",
 		"build:unpack": "npm run build && electron-builder --dir",
+		"release:mac:universal:signed": "./scripts/sign-and-build.sh --universal",
+		"release:mac:x64:signed": "./scripts/sign-and-build.sh --x64",
+		"release:mac:arm64:signed": "./scripts/sign-and-build.sh --arm64",
+		"release:mac:all:signed": "npm run release:mac:universal:signed && npm run release:mac:x64:signed && npm run release:mac:arm64:signed",
 		"release:mac": "electron-vite build && electron-builder --mac  --config --publish always",
 		"release:mac:x64": "electron-vite build && electron-builder --mac --x64 --config --publish always",
 		"release:linux": "electron-vite build && electron-builder --linux --config --publish always",
@@ -205,8 +209,13 @@
 		"mac": {
 			"icon": "resources/icons/icon.icns",
 			"category": "public.app-category.developer-tools",
+			"identity": "NOSi (QT6DP36974)",
+			"type": "distribution",
+			"hardenedRuntime": true,
+			"gatekeeperAssess": false,
+			"entitlements": "build/entitlements.mac.plist",
 			"entitlementsInherit": "build/entitlements.mac.plist",
-			"notarize": false
+			"notarize": true
 		},
 		"linux": {
 			"icon": "resources/icons/icon.png",
