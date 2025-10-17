@@ -46,6 +46,8 @@ export function VersionAlert({
     const [appVersion, setAppVersion] = useState<string>('');
     const [isOutdated, setIsOutdated] = useState(false);
     const [showChangelog, setShowChangelog] = useState(false);
+    const enabledVersionAlert =
+        import.meta.env.RENDERER_VITE_ENABLE_VERSION_ALERT === 'true' || false;
 
     // Default changelog content if none provided
     const defaultChangelogContent: ChangelogContent = {
@@ -127,10 +129,10 @@ export function VersionAlert({
         return null;
     }
 
-    return (
+    return enabledVersionAlert ? (
         <IGRPAlertPrimitive
             className={cn(
-                'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20',
+                'md:block border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20',
                 className
             )}
         >
@@ -231,5 +233,7 @@ export function VersionAlert({
                 )}
             </div>
         </IGRPAlertPrimitive>
+    ) : (
+        <></>
     );
 }
