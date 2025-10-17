@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDroppedComponents } from '../../dnd/DroppedComponentsContext';
 import { StructuredComponent } from '@renderer/lib/dnd/types';
 import Droppable from '@renderer/lib/dnd/Droppable';
@@ -28,7 +28,8 @@ const IGRPStudioFormList: React.FC<CardComponentProps> = ({
         properties,
     } = comp;
 
-    const { addButtonLabel, badgeValue, label, description } = properties || {};
+    const { addButtonLabel, badgeValue, label, description, computeLabel } =
+        properties || {};
 
     const { setEditingComponent, handleUpdateChildComponent } =
         useDroppedComponents();
@@ -41,6 +42,34 @@ const IGRPStudioFormList: React.FC<CardComponentProps> = ({
         },
         [setEditingComponent]
     );
+
+    useEffect(() => {
+        if (computeLabel?.code) {
+            const code = computeLabel.code;
+
+            // Check if it's a field pattern: ${item.fieldName}
+            const fieldMatch = code.match(/^\$\{item\.(.+)\}$/);
+            if (fieldMatch) {
+                setSelectedComputeLabel(fieldMatch[1]);
+                setSelectedComputeLabelFunction(null);
+                return;
+            }
+
+            // Check if it's a function pattern: ${functionName(item ,index)}
+            const functionMatch = code.match(
+                /^\$\{(.+)\(item\s*,\s*index\)\}$/
+            );
+            if (functionMatch) {
+                setSelectedComputeLabelFunction(functionMatch[1]);
+                setSelectedComputeLabel(null);
+                return;
+            }
+
+            // If no pattern matches, set the code as is (fallback)
+            setSelectedComputeLabel(code);
+            setSelectedComputeLabelFunction(null);
+        }
+    }, [computeLabel]);
 
     // ⚡ Performance: Cache extracted fields with useMemo
     const { fields } = useMemo(() => {

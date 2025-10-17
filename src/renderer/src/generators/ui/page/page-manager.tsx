@@ -52,7 +52,7 @@ export interface PageDefinition {
 }
 
 interface PageBuilderContentProps {
-    onPageClick?: (pageFile: PageDefinition) => void;
+    onPageClick?: (pageFile: PageDefinition | FileTree) => void;
 }
 
 const PageManager = ({
@@ -81,7 +81,7 @@ const PageManager = ({
     const [currentComponent, setCurrentComponent] = useState<PageDefinition>();
     const [isSubPage, setIsSubPage] = useState<boolean>(false);
 
-    const handleAddComponents = (page: PageDefinition): void => {
+    const handleAddComponents = (page: PageDefinition | FileTree): void => {
         onPageClick?.(page);
     };
 

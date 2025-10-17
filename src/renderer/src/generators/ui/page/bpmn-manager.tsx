@@ -19,7 +19,7 @@ import { BPMNConfigCard } from '@renderer/generators/ui/page/bpmn-config-card';
 import { PageDefinition } from './page-manager';
 
 interface BPMNManagerProps {
-    onPageClick?: (pageDefinition: PageDefinition) => void;
+    onPageClick?: (pageDefinition: PageDefinition | FileTree) => void;
     bpmnProcesses: FileTree[];
     basePath: string;
 }
@@ -28,7 +28,7 @@ export const BPMNManager = ({
     onPageClick,
     bpmnProcesses,
     basePath,
-}: BPMNManagerProps) => {
+}: BPMNManagerProps): React.JSX.Element => {
     const [configs, setConfigs] = useState<BPMNConfigs>({
         configs: [],
         activeConfigId: undefined,
@@ -39,7 +39,7 @@ export const BPMNManager = ({
     >();
     const [deleteConfig, setDeleteConfig] = useState<BPMNConfig | null>(null);
 
-    const handleConfigSave = async () => {
+    const handleConfigSave = async (): Promise<void> => {
         setShowConfigModal(false);
         setEditingConfig(undefined);
         // Clear BPMN service cache to force refresh
@@ -50,12 +50,12 @@ export const BPMNManager = ({
         window.dispatchEvent(new CustomEvent('bpmn-config-changed'));
     };
 
-    const handleEditConfig = (currentConfig: BPMNConfig) => {
+    const handleEditConfig = (currentConfig: BPMNConfig): void => {
         setEditingConfig(currentConfig);
         setShowConfigModal(true);
     };
 
-    const handleDeleteConfig = async () => {
+    const handleDeleteConfig = async (): Promise<void> => {
         if (!deleteConfig) return;
 
         try {
@@ -67,31 +67,22 @@ export const BPMNManager = ({
             // Dispatch custom event to notify other components
             window.dispatchEvent(new CustomEvent('bpmn-config-changed'));
             toast.success('API configuration deleted successfully');
-        } catch (error) {
+        } catch (error: unknown) {
+            console.error('Error deleting API configuration:', error);
             toast.error('Failed to delete API configuration');
         } finally {
             setDeleteConfig(null);
         }
     };
 
-    const loadConfigs = async () => {
+    const loadConfigs = async (): Promise<void> => {
         try {
             const configsData =
                 await window.igrpStudioSettings.getBPMNConfigs();
 
             setConfigs(configsData);
-
-            // Set active config
-            /*  if (configsData.activeConfigId) {
-                const active = configsData.configs.find(
-                    (c: BPMNConfig) => c.id === configsData.activeConfigId
-                );
-                setActiveConfig(active || null);
-            } else {
-                console.log('No active config ID found');
-                setActiveConfig(null);
-            } */
-        } catch (error) {
+        } catch (error: unknown) {
+            console.error('Error loading API configurations:', error);
             toast.error('Failed to load API configurations');
         }
     };
@@ -187,7 +178,11 @@ export const BPMNManager = ({
                                             toast.success(
                                                 `Configuration ${isActive ? 'activated' : 'deactivated'} successfully`
                                             );
-                                        } catch (error) {
+                                        } catch (error: unknown) {
+                                            console.error(
+                                                'Error updating configuration:',
+                                                error
+                                            );
                                             toast.error(
                                                 'Failed to update configuration'
                                             );
@@ -210,7 +205,11 @@ export const BPMNManager = ({
                                                     `Connection test failed: ${result.message}`
                                                 );
                                             }
-                                        } catch (error) {
+                                        } catch (error: unknown) {
+                                            console.error(
+                                                'Error testing connection:',
+                                                error
+                                            );
                                             toast.error(
                                                 'Connection test failed'
                                             );
