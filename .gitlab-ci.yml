@@ -5,6 +5,41 @@ stages:
 cache:
     paths:
         - node_modules/
+        
+        
+build_packagedev_mac:
+    image: node
+    stage: build
+    tags: 
+        - arm64
+    only:
+        - tags
+    variables:
+        ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
+        CERTIFICATE_PASSWORD: '${CERTIFICATE_PASSWORD}'
+    before_script:
+        - apt-get update
+        - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
+        - dpkg --add-architecture i386
+        - apt-get update
+        - apt-get install -y wine64 wine32
+        - wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+        - dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+        - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
+
+    script:
+        - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
+        - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
+        - yarn install --frozen-lockfile --ignore-engines
+        - yarn release:mac
+    artifacts:
+        paths:
+            - dist/
+        expire_in: 4 weeks
+    cache:
+        paths:
+            - .cache/electron-builder
+            - node_modules/
 
 build_packagedev:
     image: node
