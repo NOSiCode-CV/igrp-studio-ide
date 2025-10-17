@@ -19,17 +19,35 @@ nsis:
     uninstallDisplayName: ${productName}
     createDesktopShortcut: always
 mac:
-    entitlementsInherit: build/entitlements.mac.plist
-    hardenedRuntime: false
-    gatekeeperAssess: false
-    extendInfo:
-        - NSCameraUsageDescription: Application requests access to the device's camera.
-        - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-        - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-        - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
-    notarize: false
+  extendInfo:
+    - NSCameraUsageDescription: Application requests access to the device's camera.
+    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
+    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
+    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
+  identity: "NOSi (QT6DP36974)"
+  type: distribution
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  notarize: true
+  target:
+    - target: dmg
+      arch:
+        - universal
+        - x64
+        - arm64
 dmg:
-    artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}-${version}-${arch}.${ext}
+  title: ${productName} ${version}
+  icon: resources/icons/icon.icns
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
 linux:
     target:
         - AppImage
