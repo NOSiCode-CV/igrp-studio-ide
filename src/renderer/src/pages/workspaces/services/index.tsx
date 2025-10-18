@@ -18,7 +18,7 @@ const serviceColorMap: Record<string, string> = {
     cache: 'bg-purple-500',
     storage: 'bg-orange-500',
     file: 'bg-red-500',
-    auth: 'bg-green-500',
+    auth: 'bg-red-500',
     'service-discovery': 'bg-indigo-500',
     proxy: 'bg-teal-500',
 };
@@ -82,3 +82,45 @@ export const serviceTypes = [
     { value: 'messaging', label: 'Messaging' },
     { value: 'other', label: 'Other' },
 ];
+
+// Service filtering utilities
+export const filterServicesByCategory = (
+    services: any[],
+    category: string
+): any[] => {
+    if (category === 'all') return services;
+
+    const categoryTypeMap: Record<string, string[]> = {
+        infrastructure: ['proxy', 'service-discovery', 'cache'],
+        database: ['database'],
+        web: ['web', 'api'],
+        storage: ['storage', 'file'],
+        security: ['auth'],
+        monitoring: ['observability', 'messaging'],
+    };
+
+    const types = categoryTypeMap[category] || [];
+    return services.filter((service) => types.includes(service.labels?.type));
+};
+
+export const filterServicesBySearch = (
+    services: any[],
+    searchQuery: string
+): any[] => {
+    if (!searchQuery.trim()) return services;
+
+    const query = searchQuery.toLowerCase();
+    return services.filter(
+        (service) =>
+            service.name?.toLowerCase().includes(query) ||
+            service.labels?.type?.toLowerCase().includes(query) ||
+            service.container_name?.toLowerCase().includes(query)
+    );
+};
+
+export const getServiceCountByCategory = (
+    services: any[],
+    category: string
+): number => {
+    return filterServicesByCategory(services, category).length;
+};
