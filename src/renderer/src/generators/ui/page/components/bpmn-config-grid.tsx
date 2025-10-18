@@ -1,9 +1,9 @@
 import React from 'react';
-import { BPMNConfigCard } from './components/bpmn-config-card';
-import { EmptyList } from '../../../components/empty-list';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { Plus, Loader2 } from 'lucide-react';
 import { BPMNConfig } from 'src/main/types';
+import { EmptyList } from '@renderer/components/empty-list';
+import { BPMNConfigCard } from './bpmn-config-card';
 
 interface BPMNConfigGridProps {
     configs: BPMNConfig[];

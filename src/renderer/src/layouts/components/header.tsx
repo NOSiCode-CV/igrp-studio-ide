@@ -184,7 +184,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                 <IGRPBreadcrumbPrimitive className="hidden lg:flex">
                                     <IGRPBreadcrumbListPrimitive>
                                         <IGRPBreadcrumbItemPrimitive>
-                                            <IGRPBreadcrumbLinkPrimitive href="#/">
+                                            <IGRPBreadcrumbLinkPrimitive href={ROUTES.HOME}>
                                                 <ArrowLeft className="h-4 w-4" />
                                             </IGRPBreadcrumbLinkPrimitive>
                                         </IGRPBreadcrumbItemPrimitive>

@@ -13,17 +13,6 @@ import Connections from '@renderer/pages/connections';
 import GeneratorUI from '@renderer/generators/ui';
 import GeneratorAPI from '@renderer/generators/api';
 
-/* const IDEInitialScreen = lazy(
-    () => import('@renderer/pages/ide-initial-screen')
-);
-const PageBuilderApi = lazy(() => import('@renderer/generators/api'));
-const ProjectSettings = lazy(
-    () => import('@renderer/pages/project/project-settings')
-);
-const Connections = lazy(() => import('@renderer/pages/connections'));
-const PageBuilderUI = lazy(() => import('@renderer/generators/ui'));
-const AppLogicPage = lazy(() => import('@renderer/pages/applogic/app-logic')); */
-
 const allRoutes = [
     {
         path: ROUTES.PATH_PAGE_BUILDER_UI,
@@ -37,7 +26,7 @@ const apiRoutes = [
         component: <GeneratorAPI />,
     },
     {
-        path: '/project-settings',
+        path: ROUTES.PATH_PROJECT_SETTINGS,
         component: <ProjectSettings />,
     },
 ];
@@ -52,7 +41,7 @@ const othersRoutes = [
         component: <AppLogicPage />,
     },
     {
-        path: '/connections',
+        path: ROUTES.PATH_CONNECTIONS,
         component: <Connections />,
     },
 ];

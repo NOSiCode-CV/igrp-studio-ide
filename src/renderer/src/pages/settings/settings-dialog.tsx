@@ -9,6 +9,7 @@ import {
     Settings,
     Shirt,
 } from 'lucide-react';
+import { ROUTES } from '@renderer/routes/routeConstants';
 import {
     IGRPBreadcrumbPrimitive,
     IGRPBreadcrumbItemPrimitive,
@@ -138,7 +139,9 @@ export function SettingsDialog() {
                                     <IGRPBreadcrumbPrimitive>
                                         <IGRPBreadcrumbListPrimitive>
                                             <IGRPBreadcrumbItemPrimitive className="hidden md:block">
-                                                <IGRPBreadcrumbLinkPrimitive href="#/">
+                                                <IGRPBreadcrumbLinkPrimitive
+                                                    href={ROUTES.HOME}
+                                                >
                                                     {t('settings')}
                                                 </IGRPBreadcrumbLinkPrimitive>
                                             </IGRPBreadcrumbItemPrimitive>
