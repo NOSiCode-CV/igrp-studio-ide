@@ -4,6 +4,7 @@ out
 .DS_Store
 *.log*
 
+.env.signing
 .env.local
 /tsconfig.web.tsbuildinfo
 # IDE specific
