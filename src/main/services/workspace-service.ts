@@ -203,20 +203,43 @@ export class WorkspaceRepository {
         workspace: IWorkspace,
         newProject: ProjectData,
         move: boolean
-    ) {
+    ): Promise<void> {
         const { config, id: projectId, framework } = newProject;
 
         const { path: workspacePath, id: workspaceId } = workspace;
+
+        // Check if project already exists in workspace
+        const existingProjects = await this.listProjects(workspaceId);
+        const existingProject = existingProjects.find(
+            (project) => project.config.name === config.name
+        );
+
 
         const workspaceConfig: ProjectWorkspace = {
             config: { ...config, id: projectId, type: framework },
             id: workspaceId,
         };
 
-        //call engine
-        await addProjectToWorkspace(workspaceConfig, workspacePath);
+        if (!existingProject) {
+            //call engine
+            await addProjectToWorkspace(workspaceConfig, workspacePath);
+        } else {
+            console.log(
+                `Project "${config.name}" already exists in workspace. Skipping addition.`
+            );
+        }
 
-        if (move) await this.validateAndMoveProject(newProject, workspacePath);
+        if (move) {
+            const result = await this.validateAndMoveProject(
+                newProject,
+                workspacePath
+            );
+            if (result.nameChanged) {
+                console.log(
+                    `Project name changed from "${result.originalName}" to "${newProject.config.name}" due to existing directory`
+                );
+            }
+        }
     }
 
     async updateProject(
@@ -744,9 +767,9 @@ export class WorkspaceRepository {
     async validateAndMoveProject(
         project: ProjectData,
         workspacePath: string
-    ): Promise<void> {
+    ): Promise<{ nameChanged: boolean; originalName?: string }> {
         // Expected project path pattern: <workspacePath>/projects/<projectName>
-        const expectedPath = path.join(
+        let expectedPath = path.join(
             workspacePath,
             'projects',
             project.config.name
@@ -754,7 +777,7 @@ export class WorkspaceRepository {
 
         // If project is already in correct location, do nothing
         if (project.path === expectedPath) {
-            return;
+            return { nameChanged: false };
         }
 
         // Create projects directory if it doesn't exist
@@ -763,9 +786,24 @@ export class WorkspaceRepository {
             await fs.promises.mkdir(projectsDir, { recursive: true });
         }
 
-        // Check if target directory already exists
+        // If target directory already exists, generate a unique name
+        let nameChanged = false;
+        const originalName = project.config.name;
+
         if (fs.existsSync(expectedPath)) {
-            throw new Error(`Target directory ${expectedPath} already exists`);
+            let counter = 1;
+            const baseName = project.config.name;
+            const basePath = path.join(workspacePath, 'projects');
+
+            do {
+                const newName = `${baseName}-${counter}`;
+                expectedPath = path.join(basePath, newName);
+                counter++;
+            } while (fs.existsSync(expectedPath));
+
+            // Update the project name to match the new directory name
+            project.config.name = path.basename(expectedPath);
+            nameChanged = true;
         }
 
         // Move the project
@@ -782,6 +820,8 @@ export class WorkspaceRepository {
         } catch (error: any) {
             throw new Error(`Failed to move project: ${error.message}`);
         }
+
+        return { nameChanged, originalName };
     }
 
     // Backup Methods

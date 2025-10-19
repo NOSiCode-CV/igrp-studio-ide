@@ -267,6 +267,8 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             let response: HandlerResponse = {};
             setLoading(true);
 
+            console.log('project to save', project);
+
             if (id)
                 response = await window.igrpStudio.workspace.updateProject(
                     id,
@@ -302,7 +304,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
             navigateToNextPage(navigate, project);
         } catch (err) {
-            console.error(err);
+            console.error('Error saving project', err);
             showErrorToast(err);
         } finally {
             setLoading(false);
