@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, JSX } from 'react';
 import {
     IGRPBadgePrimitive,
     IGRPButtonPrimitive,
@@ -7,22 +7,18 @@ import {
     IGRPSelectPrimitive,
     IGRPSelectTriggerPrimitive,
     IGRPSelectValuePrimitive,
-} from '@igrp/igrp-framework-react-design-system';
-
-import {
     IGRPTabsPrimitive,
     IGRPTabsContentPrimitive,
     IGRPTabsListPrimitive,
     IGRPTabsTriggerPrimitive,
-} from '@igrp/igrp-framework-react-design-system';
-
-import {
     IGRPCardPrimitive,
     IGRPCardContentPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardTitlePrimitive,
+    IGRPLoadingSpinner,
+    IGRPSeparator,
 } from '@igrp/igrp-framework-react-design-system';
-import { toast } from 'sonner';
+import { RefreshCw, Settings } from 'lucide-react';
+import { nanoid } from '@reduxjs/toolkit';
+import { useDispatch } from 'react-redux';
 import {
     BPMNProject,
     BPMNProjectProcessDefinition,
@@ -36,153 +32,23 @@ import {
 } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 import { ENV_TYPES } from '@renderer/constants/appConstants';
 import useToast from '@renderer/hooks/useToast';
-import { useDispatch } from 'react-redux';
 import { getFileThree as onGetPages } from '@renderer/redux/thunks';
 import { getId } from '@renderer/utils';
-import {
-    Calendar,
-    Component,
-    EllipsisVertical,
-    RefreshCw,
-    Settings,
-    Trash2,
-    Wrench,
-} from 'lucide-react';
-import { AddComponentsNameModal } from './add-components-name-modal';
-import {
-    IGRPLoadingSpinner,
-    IGRPSeparator,
-} from '@igrp/igrp-framework-react-design-system';
-import { nanoid } from '@reduxjs/toolkit';
 import { PageDefinition } from './page-manager';
 import { BPMNDiagramViewer } from '@renderer/components/bpmn-diagram-viewer';
-import { bpmnProcessStepInteractions } from './bpmn-process-step-interactions';
-import { JSX } from 'react/jsx-runtime';
+import { bpmnProcessStepInteractions } from './utils/bpmn-process-step-interactions';
+import { AddComponentsNameModal } from './add-components-name-modal';
+// Import refactored components and hooks
+import { useBPMNProjects, useProcessDefinitions } from './hooks/useBPMNData';
+import { findProcess, findStepProcess } from './utils/bpmn-helpers';
+import { ProcessCard, ProcessArtifactCard } from './components';
 
 // Types
 interface BPMNProjectSelectorProps {
-    onPageClick?: (pageDefinition: PageDefinition | FileTree) => void;
+    onPageClick?: (pageDefinition: PageDefinition) => void;
     bpmnProcesses: FileTree[];
     basePath: string;
 }
-
-interface ProcessCardProps {
-    process: BPMNProjectProcessDefinition;
-    isSelected: boolean;
-    onSelectProcess: (process: BPMNProjectProcessDefinition) => void;
-}
-
-// Custom Hooks
-const useBPMNProjects = (refreshTrigger?: number) => {
-    const [projects, setProjects] = useState<BPMNProject[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    const loadProjects = async () => {
-        try {
-            setLoading(true);
-            const projectsData = await bpmnService.getProjects();
-            setProjects(projectsData);
-        } catch (error) {
-            toast.error('Failed to load projects');
-            console.error('Error loading projects:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadProjects();
-    }, [refreshTrigger]);
-
-    return { projects, loading, loadProjects };
-};
-
-const useProcessDefinitions = (selectedProject: BPMNProject | null) => {
-    const [processDefinitions, setProcessDefinitions] = useState<
-        BPMNProjectProcessDefinition[]
-    >([]);
-    const [loading, setLoading] = useState(false);
-
-    const loadProcessDefinitions = async (projectId: string) => {
-        try {
-            setLoading(true);
-            const processes =
-                await bpmnService.getProcessDefinitionsByProject(projectId);
-            setProcessDefinitions(processes);
-        } catch (error) {
-            setProcessDefinitions([]);
-            toast.error('Failed to load process definitions');
-            console.error('Error loading process definitions:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        if (selectedProject) {
-            loadProcessDefinitions(selectedProject.projectId);
-        } else {
-            setProcessDefinitions([]);
-        }
-    }, [selectedProject]);
-
-    return { processDefinitions, loading, loadProcessDefinitions };
-};
-
-const ProcessCard = ({
-    process,
-    isSelected,
-    onSelectProcess,
-}: ProcessCardProps & {
-    isSelected: boolean;
-    onSelectProcess: (process: BPMNProjectProcessDefinition) => void;
-}): JSX.Element => {
-    return (
-        <IGRPCardPrimitive
-            className={`hover:shadow-md transition-all cursor-pointer ${
-                isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
-            }`}
-            onClick={() => {
-                console.log('Process clicked:', process.processDefinitionId);
-                onSelectProcess(process);
-            }}
-        >
-            <IGRPCardContentPrimitive>
-                <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                        <IGRPCardTitlePrimitive className="text-base font-medium">
-                            {process.title}
-                        </IGRPCardTitlePrimitive>
-                        <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
-                            <Calendar className="w-4 h-4" />
-                            {process.deploymentDate && (
-                                <span>
-                                    Deployed on{' '}
-                                    {new Date(
-                                        process.deploymentDate || ''
-                                    ).toLocaleDateString()}
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex items-center space-x-2 mt-1 text-sm text-muted-foreground">
-                            <Trash2 className="w-4 h-4" />
-                            <span>
-                                {process.processArtifacts?.length || 0}{' '}
-                                artifacts
-                            </span>
-                        </div>
-                    </div>
-                    <div className="flex flex-col items-end space-y-2">
-                        <IGRPBadgePrimitive variant={'outline'}>
-                            v{process.version || 'N/A'}
-                            {' • Published'}
-                        </IGRPBadgePrimitive>
-                    </div>
-                </div>
-            </IGRPCardContentPrimitive>
-        </IGRPCardPrimitive>
-    );
-};
 
 // Main Component
 export const BPMNProjectSelector = ({
@@ -264,7 +130,6 @@ export const BPMNProjectSelector = ({
                             selectedProcess.processDefinitionId
                         );
                     setProcessDefinitionDetails(details);
-                    console.log('Process definition details:', details);
                 } catch (error) {
                     setProcessDefinitionDetails(null);
                     console.error(
@@ -292,65 +157,6 @@ export const BPMNProjectSelector = ({
         setSelectedProcess(null);
     };
 
-    const findProcess = (
-        processDefinition: BPMNProjectProcessDefinition
-    ): FileTree | undefined => {
-        return bpmnProcesses.find(
-            (p) =>
-                p.name === processDefinition.processKey &&
-                p.children?.some(
-                    (c: any) => c.name === `v${processDefinition.version}`
-                )
-        );
-    };
-
-    const findProcessRecursive = (
-        processDefinition: BPMNProjectProcessDefinition
-    ): FileTree | undefined => {
-        // Find the process by name
-        const process = bpmnProcesses.find(
-            (p) => p.name === processDefinition.processKey
-        );
-        if (!process || !process.children) {
-            return undefined;
-        }
-
-        // Start from the current version and go backwards to find the first available version
-        let currentVersion = processDefinition.version || 1;
-
-        while (currentVersion >= 1) {
-            const versionName = `v${currentVersion}`;
-            const versionFound = process.children.find(
-                (c: FileTree) => c.name === versionName
-            );
-
-            if (versionFound) {
-                return process;
-            }
-
-            currentVersion--;
-        }
-
-        // If no version found, return the process anyway (for first-time creation)
-        return process;
-    };
-
-    const findStepProcess = (
-        processDefinition: BPMNProjectProcessDefinition,
-        processFound: FileTree,
-        processArtifact: BPMNProjectArtifact
-    ): FileTree | undefined => {
-        const processVersionFound = processFound?.children?.find(
-            (c: FileTree) => c.name === `v${processDefinition.version}`
-        );
-
-        if (!processVersionFound) return;
-
-        return processVersionFound?.children?.find(
-            (c: FileTree) => c.content.taskKey === processArtifact.taskKey
-        );
-    };
-
     const handleStepProcess = async (
         componentDescription: string,
         componentName: string,
@@ -359,22 +165,33 @@ export const BPMNProjectSelector = ({
         try {
             if (!pendingComponentData) return;
 
+            // Validate inputs
+            if (!componentName || !componentDescription) {
+                showErrorToast('Component name and description are required');
+                return;
+            }
+
             const { processDefinition, processArtifact, processFound } =
                 pendingComponentData;
 
-            const version = `v${processDefinition.version}`;
+            if (!processArtifact?.taskKey) {
+                showErrorToast('Process artifact task key is missing');
+                return;
+            }
+
+            const version = `v${processDefinition.version || '1'}`;
 
             if (!processFound) {
                 const processConfig: ProcessConfig = {
                     type: 'process',
-                    processKey: processDefinition.processKey,
-                    name: processDefinition.processKey,
+                    processKey: processDefinition.processKey || '',
+                    name: processDefinition.processKey || '',
                     processVersion: version,
-                    description: processDefinition.title,
+                    description: processDefinition.title || '',
                     steps: processDefinition.processArtifacts?.map(
                         (artifact) => ({
-                            id: artifact.taskKey,
-                            name: artifact.name,
+                            id: artifact.taskKey || '',
+                            name: artifact.name || '',
                         })
                     ),
                     id: getId(),
@@ -390,7 +207,7 @@ export const BPMNProjectSelector = ({
             }
 
             const processStep: ProcessStepConfig = {
-                processKey: processDefinition.processKey,
+                processKey: processDefinition.processKey || '',
                 processVersion: version,
                 version: version,
                 name: componentName,
@@ -445,11 +262,11 @@ export const BPMNProjectSelector = ({
         processDefinition: BPMNProjectProcessDefinition,
         processArtifact: BPMNProjectArtifact
     ): Promise<void> => {
-        const processFound = findProcess(processDefinition);
+        const processFound = findProcess(processDefinition, bpmnProcesses);
 
         if (!processFound) {
-            const processFound = findProcessRecursive(processDefinition);
-            setOldProcessFound(processFound);
+            const oldProcess = findProcess(processDefinition, bpmnProcesses);
+            setOldProcessFound(oldProcess);
         }
 
         // Store the data and open the modal
@@ -459,10 +276,6 @@ export const BPMNProjectSelector = ({
             processFound: processFound as FileTree,
         });
         setShowAddComponentsModal(true);
-    };
-
-    const handleConfirmAddComponents = (stepProcessFound: FileTree): void => {
-        onPageClick?.(stepProcessFound);
     };
 
     if (loading) {
@@ -655,10 +468,10 @@ export const BPMNProjectSelector = ({
                                                 artifact: BPMNProjectArtifact,
                                                 index: number
                                             ) => {
-                                                const processFound =
-                                                    findProcess(
-                                                        selectedProcess
-                                                    );
+                                                const processFound = findProcess(
+                                                    selectedProcess,
+                                                    bpmnProcesses
+                                                );
 
                                                 const stepProcessFound =
                                                     findStepProcess(
@@ -668,87 +481,20 @@ export const BPMNProjectSelector = ({
                                                     );
 
                                                 return (
-                                                    <IGRPCardPrimitive
+                                                    <ProcessArtifactCard
                                                         key={index}
-                                                        className="hover:shadow-md transition-all cursor-pointer hover:bg-muted/30"
-                                                    >
-                                                        <IGRPCardHeaderPrimitive>
-                                                            <div className="flex items-start justify-between">
-                                                                <div className="flex-1">
-                                                                    <IGRPCardTitlePrimitive className="text-base font-medium">
-                                                                        {
-                                                                            artifact.name
-                                                                        }
-                                                                    </IGRPCardTitlePrimitive>
-                                                                    <div className="text-sm text-muted-foreground mt-1">
-                                                                        {
-                                                                            artifact.taskKey
-                                                                        }
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex flex-col items-end space-y-2">
-                                                                    <IGRPBadgePrimitive
-                                                                        variant="outline"
-                                                                        className="text-xs"
-                                                                    >
-                                                                        v
-                                                                        {selectedProcess.version ||
-                                                                            'N/A'}
-                                                                    </IGRPBadgePrimitive>
-                                                                    <IGRPButtonPrimitive
-                                                                        variant="ghost"
-                                                                        size="sm"
-                                                                        className="h-6 w-6 p-0"
-                                                                    >
-                                                                        <EllipsisVertical />
-                                                                    </IGRPButtonPrimitive>
-                                                                </div>
-                                                            </div>
-                                                        </IGRPCardHeaderPrimitive>
-                                                        <IGRPCardContentPrimitive className="space-y-2">
-                                                            {artifact.subProcessTask && (
-                                                                <IGRPBadgePrimitive
-                                                                    variant="outline"
-                                                                    className="text-xs"
-                                                                >
-                                                                    {`Sub Process - ${artifact.subProcessName}`}
-                                                                </IGRPBadgePrimitive>
-                                                            )}
-                                                            <IGRPButtonPrimitive
-                                                                size="sm"
-                                                                className="w-full"
-                                                                variant={
-                                                                    stepProcessFound
-                                                                        ? 'outline'
-                                                                        : 'default'
-                                                                }
-                                                                onClick={() => {
-                                                                    stepProcessFound
-                                                                        ? handleConfirmAddComponents(
-                                                                              stepProcessFound
-                                                                          )
-                                                                        : handleModalConfiguration(
-                                                                              selectedProcess,
-                                                                              artifact
-                                                                          );
-                                                                }}
-                                                            >
-                                                                {stepProcessFound ? (
-                                                                    <>
-                                                                        <Component />
-                                                                        Add
-                                                                        Components
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <Wrench />
-                                                                        Generate
-                                                                        Step
-                                                                    </>
-                                                                )}
-                                                            </IGRPButtonPrimitive>
-                                                        </IGRPCardContentPrimitive>
-                                                    </IGRPCardPrimitive>
+                                                        artifact={artifact}
+                                                        selectedProcess={
+                                                            selectedProcess
+                                                        }
+                                                        stepProcessFound={
+                                                            stepProcessFound
+                                                        }
+                                                        onPageClick={onPageClick}
+                                                        onRegenerateStep={
+                                                            handleModalConfiguration
+                                                        }
+                                                    />
                                                 );
                                             }
                                         )}

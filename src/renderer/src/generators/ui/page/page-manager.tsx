@@ -12,7 +12,14 @@ import {
     IGRPToggleGroupItemPrimitive,
     IGRPToggleGroupPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { LayoutGrid, Plus, TableIcon, Workflow } from 'lucide-react';
+import {
+    FileCode,
+    LayoutGrid,
+    Plus,
+    Settings,
+    TableIcon,
+    Workflow,
+} from 'lucide-react';
 import { PageCardView } from './page-card-view';
 import { CreatePageModal } from './create-page-modal';
 import { DuplicatePageModal } from './duplicate-page-modal';
@@ -259,6 +266,7 @@ const PageManager = ({
             <IGRPTabsPrimitive value={activeTab} onValueChange={setActiveTab}>
                 <IGRPTabsListPrimitive>
                     <IGRPTabsTriggerPrimitive value="pages">
+                        <FileCode className="h-4 w-4 mr-2" />
                         {t('pages')}
                     </IGRPTabsTriggerPrimitive>
                     <IGRPTabsTriggerPrimitive value="bpmn">
@@ -266,6 +274,7 @@ const PageManager = ({
                         BPMN
                     </IGRPTabsTriggerPrimitive>
                     <IGRPTabsTriggerPrimitive value="settings">
+                        <Settings className="h-4 w-4 mr-2" />
                         {t('settings')}
                     </IGRPTabsTriggerPrimitive>
                 </IGRPTabsListPrimitive>

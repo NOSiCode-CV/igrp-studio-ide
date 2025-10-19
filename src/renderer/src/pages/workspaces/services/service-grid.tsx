@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { IGRPBadgePrimitive } from '@igrp/igrp-framework-react-design-system';
 import {
     IGRPCardPrimitive,
@@ -10,18 +11,52 @@ import {
 } from '@igrp/igrp-framework-react-design-system';
 import Dependency from '../components/dependency';
 import { ServiceActions } from './service-actions';
-import { getServiceColor, getServiceIcon, getStatusColor } from '.';
+import { ServiceFilter } from './service-filter';
+import { 
+    getServiceColor, 
+    getServiceIcon, 
+    getStatusColor,
+    filterServicesByCategory,
+    filterServicesBySearch
+} from '.';
 import { PortsBadgeList } from '../components/ports-badge-list';
+
 interface ServiceGridProps {
     services: any[];
     workspaceId?: string;
 }
 
 export function ServiceGrid({ services }: ServiceGridProps) {
+    const [activeCategory, setActiveCategory] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredServices = useMemo(() => {
+        let filtered = services;
+        
+        // Apply category filter
+        filtered = filterServicesByCategory(filtered, activeCategory);
+        
+        // Apply search filter
+        filtered = filterServicesBySearch(filtered, searchQuery);
+        
+        return filtered;
+    }, [services, activeCategory, searchQuery]);
+
+    const handleFilterChange = (category: string, query: string) => {
+        setActiveCategory(category);
+        setSearchQuery(query);
+    };
     return (
-        <>
+        <div className="space-y-4">
+            {/* Filter Component */}
+            <ServiceFilter 
+                onFilterChange={handleFilterChange}
+                totalServices={filteredServices.length}
+            />
+            
+            {/* Services Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                {services.map((service, index) => (
+                {filteredServices.map((service, index) => (
                     <IGRPCardPrimitive key={index}>
                         <IGRPCardHeaderPrimitive>
                             <IGRPCardTitlePrimitive>
@@ -50,7 +85,7 @@ export function ServiceGrid({ services }: ServiceGridProps) {
                                         </IGRPBadgePrimitive>
                                         <ServiceActions
                                             service={service}
-                                            services={services}
+                                            services={filteredServices}
                                         />
                                     </div>
                                 </div>
@@ -68,6 +103,6 @@ export function ServiceGrid({ services }: ServiceGridProps) {
                     </IGRPCardPrimitive>
                 ))}
             </div>
-        </>
+        </div>
     );
 }
