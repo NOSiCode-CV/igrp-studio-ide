@@ -28,6 +28,7 @@ import {
 } from '@igrp/igrp-framework-react-design-system';
 import { AppSidebarHeader } from './app-sidebar-header';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@renderer/routes/routeConstants';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
 import FileExplorerIGRPSidebar from '@renderer/components/fileExplorer';
 import { DropdownSidebarMenuButton } from './dropdown-sidebar';
@@ -110,7 +111,7 @@ export function AppIGRPSidebar({
                                     asChild
                                     className="md:h-8 md:p-0 items-center justify-center"
                                 >
-                                    <a href="#/">
+                                    <a href={ROUTES.HOME}>
                                         <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                             <Home className="size-4" />
                                         </div>

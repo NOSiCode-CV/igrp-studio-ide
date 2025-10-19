@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { filterSubItems } from '@renderer/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { MenuItem } from 'src/main/types';
+import { ROUTES } from '@renderer/routes/routeConstants';
 import FileExplorerSidebar from '@renderer/components/fileExplorer';
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits';
 import {
@@ -128,7 +129,7 @@ export function AppSidebar({
                                 asChild
                                 className="md:h-8 md:p-0 items-center justify-center"
                             >
-                                <a href="#/">
+                                <a href={ROUTES.HOME}>
                                     <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                         <Home className="size-4" />
                                     </div>
