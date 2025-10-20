@@ -7,9 +7,7 @@ import {
     Server,
     HardDrive,
     Shield,
-    Compass,
-    Search,
-    X,
+    Compass
 } from 'lucide-react';
 import {
     IGRPBadgePrimitive,
@@ -92,11 +90,6 @@ export function ServiceFilter({
     const handleCategoryClick = (categoryId: string): void => {
         setActiveCategory(categoryId);
         onFilterChange(categoryId, searchQuery);
-    };
-
-    const handleSearchChange = (query: string): void => {
-        setSearchQuery(query);
-        onFilterChange(activeCategory, query);
     };
 
     const clearFilters = (): void => {
