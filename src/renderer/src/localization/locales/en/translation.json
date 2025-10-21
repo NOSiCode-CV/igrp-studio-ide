@@ -618,6 +618,7 @@
     "development": "Development",
     "repository": "Repository",
     "projectSettings": "Project Settings",
+    "branch": "Branch",
     "configureProjectSettings": "Configure project settings and options",
     "projectId": "Project ID",
     "projectIdDescription": "This is the unique identifier for your project.",

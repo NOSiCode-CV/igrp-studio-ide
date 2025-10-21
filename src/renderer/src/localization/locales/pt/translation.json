@@ -614,6 +614,7 @@
     "projectSettings": "Configurações do Projeto",
     "configureProjectSettings": "Configurar as configurações e opções do projeto",
     "projectId": "ID do Projeto",
+    "branch": "Branch",
     "projectIdDescription": "Este é o identificador único para o seu projeto.",
     "saveSettings": "Salvar Configurações",
     "generalConnection": "Conexão Geral",

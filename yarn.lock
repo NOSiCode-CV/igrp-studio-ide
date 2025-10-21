@@ -1206,10 +1206,10 @@
     vaul "^1.1.2"
     zod "^4.1.12"
 
-"@igrp/igrp-studio-nextjs-engine@0.1.0-beta.20":
-  version "0.1.0-beta.20"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.1.0-beta.20.tgz#bf21d92d590f97e059b3d4e41c8357e11a3f7abb"
-  integrity sha512-TzuCUZEXlwcF8g48wjWo9/oIldkc3EtcUh9bxsGgfy5FeKC2ecAVxFw7SXriiI4v4USwP+CfOklPTYwdbLk2iw==
+"@igrp/igrp-studio-nextjs-engine@0.1.0-beta.21":
+  version "0.1.0-beta.21"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.1.0-beta.21.tgz#68f3c22fb840affd0e7d783fb5610eb24f161b2a"
+  integrity sha512-V1mO9lnNQFhKXuJKxeOR0aBOl7sRZBXtoIaXk6NCLcIk8PUfcBEyonA2ETioqa/FGl4Zj+RATRTS3jQjtXXvvw==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"

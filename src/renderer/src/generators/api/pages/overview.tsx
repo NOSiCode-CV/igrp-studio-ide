@@ -234,7 +234,7 @@ const Overview = () => {
                                         {isGitEnabled && (
                                             <div>
                                                 <p className="text-muted-foreground text-xs mb-1">
-                                                    {t('repository')}
+                                                    {t('branch')}
                                                 </p>
                                                 <p className="">
                                                     {activeBranch}

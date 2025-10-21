@@ -25,23 +25,25 @@ export type Endpoint = {
     codigoAcompanhamento: string;
 };
 
-const ControllerOverview = ({ currentItem }: PageBuilderProps) => {
+const ControllerOverview = ({
+    currentItem,
+}: PageBuilderProps): React.ReactNode => {
     const { t } = useTranslation();
 
     const data = currentItem.content.actions;
 
-    const handleDelete = (endpoint: Endpoint) => {
+    const handleDelete = (endpoint: Endpoint): void => {
         console.log(endpoint);
     };
 
     const columns: ColumnDef<any>[] = [
         {
             accessorKey: 'actionName',
-            header: 'Action Name',
+            header: t('actionName'),
         },
         {
             accessorKey: 'method',
-            header: 'Method Type',
+            header: t('methodType'),
             cell: ({ row }) => {
                 const method = row.getValue('method') as string;
                 const color = getBadgeColor(method);
@@ -50,11 +52,11 @@ const ControllerOverview = ({ currentItem }: PageBuilderProps) => {
         },
         {
             accessorKey: 'path',
-            header: 'Path',
+            header: t('path'),
         },
         {
             id: 'actions',
-            header: 'Ações',
+            header: t('actions'),
             cell: ({ row }) => {
                 const endpoint: Endpoint = row.original;
                 return (
@@ -77,23 +79,10 @@ const ControllerOverview = ({ currentItem }: PageBuilderProps) => {
 
     return (
         <div className="space-y-4 p-4">
-            <IGRPTabs defaultValue="endpoints">
-                <IGRPTabsList className="w-full">
-                    <IGRPTabsTrigger value="endpoints">
-                        {' '}
-                        {t('Endpoints')}
-                    </IGRPTabsTrigger>
-                    <IGRPTabsTrigger value="documentation">
-                        {' '}
-                        {t('Documentation')}
-                    </IGRPTabsTrigger>
-                </IGRPTabsList>
-                <IGRPTabsContent value="endpoints">
-                    <IGRPContainer>
-                        <IGRPDataTable columns={columns} data={data} />
-                    </IGRPContainer>
-                </IGRPTabsContent>
-            </IGRPTabs>
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold">{t('Endpoints')}</h1>
+            </div>
+            <IGRPDataTable columns={columns} data={data} />
         </div>
     );
 };

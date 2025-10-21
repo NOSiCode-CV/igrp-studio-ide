@@ -22,6 +22,15 @@ interface StatsCardProps {
     onClick?: () => void;
 }
 
+interface DashboardOverviewProps {
+    stats: {
+        modules: number;
+        controllers: number;
+        models: number;
+        dto: number;
+    };
+}
+
 function StatsCard({
     title,
     value,
@@ -31,7 +40,7 @@ function StatsCard({
     buttonGradient,
     gradient,
     onClick,
-}: StatsCardProps) {
+}: StatsCardProps): React.ReactNode {
     return (
         <IGRPCardPrimitive className="group relative">
             <div
@@ -73,21 +82,14 @@ function StatsCard({
     );
 }
 
-interface DashboardOverviewProps {
-    stats: {
-        modules: number;
-        controllers: number;
-        models: number;
-        dto: number;
-    };
-}
-
-export default function DashboardOverview({ stats }: DashboardOverviewProps) {
+export default function DashboardOverview({
+    stats,
+}: DashboardOverviewProps): React.ReactNode {
     const { t } = useTranslation();
 
     const { newTab } = useTabs();
 
-    const handleClick = (opt: OptionType) => {
+    const handleClick = (opt: OptionType): void => {
         newTab({ type: opt });
     };
 
