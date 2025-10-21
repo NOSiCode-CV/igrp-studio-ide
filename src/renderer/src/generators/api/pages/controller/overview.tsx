@@ -1,15 +1,8 @@
 import {
     ColumnDef,
     IGRPAlertDialog,
-    IGRPContainer,
     IGRPDataTable,
 } from '@igrp/igrp-framework-react-design-system';
-import {
-    IGRPTabs,
-    IGRPTabsContent,
-    IGRPTabsList,
-    IGRPTabsTrigger,
-} from '@renderer/components/tabs';
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { getBadgeColor } from '@renderer/utils';
 import { Trash2 } from 'lucide-react';
