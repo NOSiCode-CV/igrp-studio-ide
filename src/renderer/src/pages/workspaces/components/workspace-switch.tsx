@@ -83,7 +83,7 @@ export const WorkspaceSwitcher = ({
     const handleChangeWorkspace = useCallback(
         (workspace: IWorkspace): void => {
             onWorkspaceChange(workspace);
-            navigate(ROUTES.HOME);
+            navigate(ROUTES.IDE_INITIAL_SCREEN);
         },
         [onWorkspaceChange, navigate]
     );

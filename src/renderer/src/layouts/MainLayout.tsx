@@ -22,7 +22,7 @@ interface LayoutProps {
     children: React.ReactNode;
 }
 
-const MainLayout = (props: LayoutProps) => {
+const MainLayout = (props: LayoutProps): React.ReactElement => {
     const {
         workspace,
         actions: { switchWorkspace },
@@ -36,12 +36,6 @@ const MainLayout = (props: LayoutProps) => {
                 icon: Database,
                 href: '#/connections',
             },
-            /*  {
-                name: 'App Logic',
-                type: 'item' as const,
-                icon: BrainCircuit,
-                href: '#/app-logic',
-            }, */
         ],
         []
     );
