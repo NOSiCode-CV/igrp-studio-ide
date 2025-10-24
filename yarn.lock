@@ -601,9 +601,9 @@
   optionalDependencies:
     global-agent "^3.0.0"
 
-"@electron/node-gyp@git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2":
+"@electron/node-gyp@https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2":
   version "10.2.0-electron.1"
-  resolved "git+https://github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2"
+  resolved "https://github.com/electron/node-gyp#06b29aafb7708acef8b3669835c8a7857ebc92d2"
   dependencies:
     env-paths "^2.2.0"
     exponential-backoff "^3.1.1"
@@ -1148,10 +1148,10 @@
     tailwind-merge "^3.3.1"
     zod "^3.25.67"
 
-"@igrp/igrp-framework-react-design-system@0.1.0-beta.25":
-  version "0.1.0-beta.25"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.1.0-beta.25.tgz#6efb41d490f22452f4d2b10cd624289330d99757"
-  integrity sha512-8uERuo14Xh4ZyN0HZEYfsiq0i+u+g3HdKtUhI+LVPM74jKP8sStesuNwAR90jKIP+o2oQdI0s6BSzvxsPbhuSw==
+"@igrp/igrp-framework-react-design-system@0.1.0-beta.26":
+  version "0.1.0-beta.26"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.1.0-beta.26.tgz#543e1030f0af157fde1f5e61b872d27c904bdb79"
+  integrity sha512-No6suk1nyXmA4IEAl8Wr5c63nZ9vgyu6XPlL036xdVrPUdBz+e/tFHXSdJd5AQ/kIv11jBHw1sMqnRi3qeyuLg==
   dependencies:
     "@hookform/resolvers" "^5.2.2"
     "@origin-space/image-cropper" "^0.1.9"
