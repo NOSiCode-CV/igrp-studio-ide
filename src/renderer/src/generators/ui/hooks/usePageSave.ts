@@ -4,16 +4,18 @@ import { ENV_TYPES } from '@renderer/constants/appConstants';
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
 import useToast from '@renderer/hooks/useToast';
+import { useGit } from '@renderer/hooks/use-git';
+import { ComponentConfig, CustomFunctionConfig, Import, PageConfig, ProcessStepConfig, State, TypeDef } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface PageSaveProps {
     basePath: string;
-    content: any;
+    content: { [key: string]: string }
     id: string;
     components: StructuredLayout;
-    functions: any[];
-    types: any[];
-    states: any[];
-    imports: any[];
+    functions: CustomFunctionConfig[];
+    types: TypeDef[];
+    states: State[];
+    imports: Import[];
     isPage: boolean;
     page: {
         pagePath: string;
@@ -25,8 +27,36 @@ interface PageSaveProps {
 interface SaveError {
     message: string;
     code?: string;
-    details?: any;
+    details?: string;
 }
+
+/**
+ * Generates a descriptive commit message based on the saved content
+ */
+const generateCommitMessage = (
+    content: { [key: string]: string },
+    page: { pagePath: string; pageName: string; name: string },
+    isBpmnProcess: boolean,
+    isPage: boolean
+): string => {
+    const timestamp = Date.now();
+
+    if (isBpmnProcess) {
+        return `feat(process): update ${page.name || 'process step'} - ${timestamp}`;
+    }
+
+    if (isPage) {
+        const pageName = page.pageName || page.name || 'page';
+        const pagePath = page.pagePath ? ` (${page.pagePath})` : '';
+        return `feat(page): update ${pageName}${pagePath} - ${timestamp}`;
+    }
+
+    if (content.scope === 'page') {
+        return `feat(component): update ${content.name} in ${content.pagePath} - ${timestamp}`;
+    }
+
+    return `feat(component): update custom component ${content.name} - ${timestamp}`;
+};
 
 export const usePageSave = ({
     basePath,
@@ -38,9 +68,11 @@ export const usePageSave = ({
     imports,
     isPage,
     page,
-}: PageSaveProps) => {
+}: PageSaveProps): { handleSave: (components: StructuredLayout) => Promise<void> } => {
     const { showErrorToast, showSuccessToast } = useToast();
     const dispatch: any = useDispatch();
+
+    const { createGitCommit } = useGit();
 
     const handleSave = useCallback(
         async (components: StructuredLayout): Promise<void> => {
@@ -63,7 +95,7 @@ export const usePageSave = ({
 
                 console.log('Saving configuration:', config);
 
-                let error;
+                let error: string | undefined;
 
                 if (isBpmnProcess) {
                     const result = await window.engine.createProcessStep(
@@ -89,6 +121,15 @@ export const usePageSave = ({
                     throw saveError;
                 }
 
+                // Generate automatic commit message
+                const commitMessage = generateCommitMessage(
+                    content,
+                    page,
+                    isBpmnProcess,
+                    isPage
+                );
+                createGitCommit(basePath, commitMessage);
+
                 showSuccessToast('Components saved successfully');
                 dispatch(onSetChangeStatus(true));
             } catch (error) {
@@ -113,6 +154,7 @@ export const usePageSave = ({
             showErrorToast,
             dispatch,
             page,
+            createGitCommit,
         ]
     );
 

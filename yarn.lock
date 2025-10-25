@@ -1130,10 +1130,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/framework-process-studio-bpmn-editor@0.0.1-beta.9":
-  version "0.0.1-beta.9"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/framework-process-studio-bpmn-editor/-/framework-process-studio-bpmn-editor-0.0.1-beta.9.tgz#8da605d45f674310460103fc4ca35e6821451026"
-  integrity sha512-Br0ZXSAxvP4IVHXsKTNCBJ0Db4h0GVAW6FLMF6J67jTV5Ps08XTwVCTQQY6D9brOwDfMfIXXD82XMNcZHQABDQ==
+"@igrp/framework-process-studio-bpmn-editor@0.0.1-beta.15":
+  version "0.0.1-beta.15"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/framework-process-studio-bpmn-editor/-/framework-process-studio-bpmn-editor-0.0.1-beta.15.tgz#9754b6ab7ffa7859c192e9f3f5236414b8473d42"
+  integrity sha512-8Ug886Cs2NWjKfrNcZj1Y2k/2Yu2HEIg9QvM8lCojr6kZQlTXdzxk4F5TUPABAETsdP8nP48DgtRzYXLzVyDeg==
   dependencies:
     "@bpmn-io/properties-panel" "^3.30.2"
     "@igrp/igrp-framework-react-design-system" latest
@@ -1148,10 +1148,10 @@
     tailwind-merge "^3.3.1"
     zod "^3.25.67"
 
-"@igrp/igrp-framework-react-design-system@0.1.0-beta.26":
-  version "0.1.0-beta.26"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.1.0-beta.26.tgz#543e1030f0af157fde1f5e61b872d27c904bdb79"
-  integrity sha512-No6suk1nyXmA4IEAl8Wr5c63nZ9vgyu6XPlL036xdVrPUdBz+e/tFHXSdJd5AQ/kIv11jBHw1sMqnRi3qeyuLg==
+"@igrp/igrp-framework-react-design-system@0.1.0-beta.29":
+  version "0.1.0-beta.29"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-framework-react-design-system/-/igrp-framework-react-design-system-0.1.0-beta.29.tgz#66796b7b18d7fe1fea5f8c901f9bddc8129eefff"
+  integrity sha512-tQII5Ay02ycdXVxhqebkzxJRYcG7cMMEbSsOg07Gf42X3n+xMXFlKTmCS6vfuHmji8CAgWdJspbJ36B+HERX2g==
   dependencies:
     "@hookform/resolvers" "^5.2.2"
     "@origin-space/image-cropper" "^0.1.9"
@@ -1188,7 +1188,7 @@
     date-fns "^4.1.0"
     embla-carousel-react "^8.6.0"
     input-otp "^1.4.2"
-    lucide-react "^0.545.0"
+    lucide-react "^0.546.0"
     next-themes "^0.4.6"
     react-day-picker "^9.11.1"
     react-hook-form "^7.65.0"
@@ -1197,7 +1197,7 @@
     recharts "2.15.4"
     sonner "^2.0.7"
     tailwind-merge "^3.3.1"
-    tailwindcss "^4.1.14"
+    tailwindcss "^4.1.15"
     vaul "^1.1.2"
     zod "^4.1.12"
 
@@ -8168,6 +8168,11 @@ lucide-react@^0.545.0:
   resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.545.0.tgz#82affd1b581d358356578dd033e11dd17e6493a0"
   integrity sha512-7r1/yUuflQDSt4f1bpn5ZAocyIxcTyVyBBChSVtBKn5M+392cPmI5YJMWOJKk/HUWGm5wg83chlAZtCcGbEZtw==
 
+lucide-react@^0.546.0:
+  version "0.546.0"
+  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.546.0.tgz#d9fdc232b47fe652e06401b7ee846bf82b4f7de8"
+  integrity sha512-Z94u6fKT43lKeYHiVyvyR8fT7pwCzDu7RyMPpTvh054+xahSgj4HFQ+NmflvzdXsoAjYGdCguGaFKYuvq0ThCQ==
+
 luxon@^3.5.0:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.7.2.tgz#d697e48f478553cca187a0f8436aff468e3ba0ba"
@@ -10474,6 +10479,11 @@ tailwindcss@4.1.15, tailwindcss@^4.1.13, tailwindcss@^4.1.14:
   version "4.1.15"
   resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-4.1.15.tgz#1437ee75ed8f66d8d866da5e25daa38d06ce5cea"
   integrity sha512-k2WLnWkYFkdpRv+Oby3EBXIyQC8/s1HOFMBUViwtAh6Z5uAozeUSMQlIsn/c6Q2iJzqG6aJT3wdPaRNj70iYxQ==
+
+tailwindcss@^4.1.15:
+  version "4.1.16"
+  resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-4.1.16.tgz#c32179f98725eb551e5c1189813a3db437ad5a7f"
+  integrity sha512-pONL5awpaQX4LN5eiv7moSiSPd/DLDzKVRJz8Q9PgzmAdd1R4307GQS2ZpfiN7ZmekdQrfhZZiSE5jkLR4WNaA==
 
 tapable@^2.2.0:
   version "2.3.0"

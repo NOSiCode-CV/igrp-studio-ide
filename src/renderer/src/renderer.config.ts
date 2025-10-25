@@ -9,6 +9,7 @@ export const GENERATED_PATH = '@/app/(igrp)/(generated)/';
 // File system paths (for actual file operations)
 export const FILE_SYSTEM_PATHS = {
     generated: 'src/app/(igrp)/(generated)',
+    processes: 'src/app/(igrp)/(generated)/process',
     components: 'src/components',
     pages: 'src/app/(igrp)/(generated)',
     customComponents: 'src/components',

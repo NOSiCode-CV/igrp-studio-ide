@@ -48,6 +48,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
     ({ basePath, page, activePresentation }, ref) => {
         const { id, content, path: pagePath } = page;
         const isPage = content?.type === 'page';
+        const isProcessStep = content?.type === 'processStep';
 
         // Custom hooks for better separation of concerns
         const {
@@ -152,7 +153,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
         });
 
         useEffect(() => {
-            const getJsonData = async () => {
+            const getJsonData = async (): Promise<void> => {
                 try {
                     if (pagePath === undefined) return;
 
@@ -209,10 +210,14 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                 const cleanPagePath = page.pagePath?.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
                 let tsFilePath: string | null = null;
 
+                console.log('isProcessStep', isProcessStep);
+
                 if (isPage)
                     tsFilePath = cleanPagePath
                         ? `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/${cleanPagePath}/page.tsx`
                         : `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/page.tsx`;
+                else if (isProcessStep)
+                    tsFilePath = `${basePath}/${RENDERER_CONFIG.fileSystemPaths.processes}/[...process]/(${content.processKey})/${content.processVersion}/${content.name.toLowerCase()}.tsx`;
                 else {
                     const withScopePage = content.scope === 'page';
                     if (withScopePage)
@@ -240,6 +245,8 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             pagePath,
             basePath,
             page,
+            content,
+            isPage,
         ]);
 
         return (
@@ -257,5 +264,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
         );
     }
 );
+
+PageBuilder.displayName = 'PageBuilder';
 
 export default PageBuilder;
