@@ -11,7 +11,7 @@ An Electron application with React and TypeScript
 ### Requirements
 
 ```bash
-$ node - ^20.19.0 || >=22.12.0
+$ node -  "^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0". Got "22.12.0"
 ```
 
 ### Install

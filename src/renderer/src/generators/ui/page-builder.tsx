@@ -210,8 +210,6 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                 const cleanPagePath = page.pagePath?.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
                 let tsFilePath: string | null = null;
 
-                console.log('isProcessStep', isProcessStep);
-
                 if (isPage)
                     tsFilePath = cleanPagePath
                         ? `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/${cleanPagePath}/page.tsx`
