@@ -23,7 +23,7 @@ import {
     ModelConfig,
     ModuleConfig,
     ResponseConfig,
-} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
+} from '@igrp/igrp-studio-springboot-engine/interfaces/types';
 import { ProjectData } from '../types';
 import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes';
 import { ensureDirectoryExists } from '../helpers';

@@ -37,7 +37,7 @@ import { getId } from '@renderer/utils';
 import { PageDefinition } from './page-manager';
 import { BPMNDiagramViewer } from '@renderer/components/bpmn-diagram-viewer';
 import { bpmnProcessStepInteractions } from './utils/bpmn-process-step-interactions';
-import { AddComponentsNameModal } from './add-components-name-modal';
+import { AddComponentsNameModal } from './components/add-components-name-modal';
 // Import refactored components and hooks
 import { useBPMNProjects, useProcessDefinitions } from './hooks/useBPMNData';
 import { findProcess, findStepProcess } from './utils/bpmn-helpers';
@@ -203,7 +203,10 @@ export const BPMNProjectSelector = ({
                     basePath
                 );
 
-                if (error) showErrorToast(error);
+                if (error) {
+                    console.log('processConfig error', error);
+                    showErrorToast(error);
+                }
             }
 
             const processStep: ProcessStepConfig = {
@@ -468,10 +471,11 @@ export const BPMNProjectSelector = ({
                                                 artifact: BPMNProjectArtifact,
                                                 index: number
                                             ) => {
-                                                const processFound = findProcess(
-                                                    selectedProcess,
-                                                    bpmnProcesses
-                                                );
+                                                const processFound =
+                                                    findProcess(
+                                                        selectedProcess,
+                                                        bpmnProcesses
+                                                    );
 
                                                 const stepProcessFound =
                                                     findStepProcess(
@@ -490,7 +494,9 @@ export const BPMNProjectSelector = ({
                                                         stepProcessFound={
                                                             stepProcessFound
                                                         }
-                                                        onPageClick={onPageClick}
+                                                        onPageClick={
+                                                            onPageClick
+                                                        }
                                                         onRegenerateStep={
                                                             handleModalConfiguration
                                                         }

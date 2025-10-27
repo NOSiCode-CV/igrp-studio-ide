@@ -127,10 +127,13 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
     const handleVersionChange = async (version: string): Promise<void> => {
         const components = selectedProcess?.children
             ?.find((child) => child.name === version)
-            ?.children?.map((child) => ({
+            ?.children?.filter((child) => child.content.type !== 'process')
+            .map((child) => ({
                 label: child.content.description || child.content.name,
                 value: child.content,
             }));
+
+        console.log('components', components);
 
         setAvailableComponents(components || []);
     };
