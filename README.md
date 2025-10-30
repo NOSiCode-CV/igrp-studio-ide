@@ -2,13 +2,13 @@
 
 An Electron application with React and TypeScript
 
-![](docs/igrp_versions.md)
+![](https://github.com/NOSiCode-CV/IGRP-Framework/blob/master/docs/igrp_versions.md)
 
 ## :books: Versions Guide
 
 # Table comparing all versions of IGRP **(vO | v1 | v2 | v3)**
 
-[View Table](docs/igrp_versions.md)
+[View Table](https://github.com/NOSiCode-CV/IGRP-Framework/blob/master/docs/igrp_versions.md)
 
 ## Recommended IDE Setup
 
