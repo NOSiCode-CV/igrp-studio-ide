@@ -2,6 +2,14 @@
 
 An Electron application with React and TypeScript
 
+![](docs/igrp_versions.md)
+
+## :books: Versions Guide
+
+# Table comparing all versions of IGRP **(vO | v1 | v2 | v3)**
+
+[View Table](docs/igrp_versions.md)
+
 ## Recommended IDE Setup
 
 - [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
