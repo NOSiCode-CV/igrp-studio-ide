@@ -19,7 +19,7 @@ export interface RootState {
     };
 }
 
-const Layout = (props: LayoutProps) => {
+const Layout = (props: LayoutProps): React.JSX.Element => {
     const selectStudioState = (state: RootState) => state.PageBuilder;
     const selectStudioProperties = createSelector(
         selectStudioState,
@@ -42,7 +42,7 @@ const Layout = (props: LayoutProps) => {
             >
                 <div className="h-screen flex flex-col w-full">
                     <IGRPToasterPrimitive
-                        position="top-right"
+                        //position="top-right"
                         richColors
                         closeButton
                         expand

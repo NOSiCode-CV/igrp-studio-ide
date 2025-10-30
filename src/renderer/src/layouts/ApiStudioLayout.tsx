@@ -65,7 +65,7 @@ const Layout = (props: LayoutProps) => {
             >
                 <div className="h-screen flex flex-col w-full">
                     <Toaster
-                        position="top-right"
+                        //position="top-right"
                         richColors
                         closeButton
                         expand

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import FormEngine from '../page-builder';
 import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext';
-import PageManager from '../page/page-manager';
+import PageManager, { PageDefinition } from '../page/page-manager';
 import NavigationBar from './NavigationBar';
 import { cn } from '@renderer/lib/utils';
 import {
@@ -17,16 +17,19 @@ import {
     IGRPSidebarInsetPrimitive,
     IGRPSidebarProviderPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
+import { FileTree } from 'src/main/types';
 
 interface ContentProps {
     basePath: string;
 }
 
 interface FormEngineRef {
-    handleSave: () => void;
+    handleSave: () => Promise<void>;
 }
 
-export default function TabManager({ basePath }: ContentProps) {
+export default function TabManager({
+    basePath,
+}: ContentProps): React.JSX.Element {
     const {
         activeTab,
         tabs,
@@ -45,7 +48,7 @@ export default function TabManager({ basePath }: ContentProps) {
         [key: string]: FormEngineRef | null;
     }>({});
 
-    const handleClickOpenGerador = (page: any) => {
+    const handleClickOpenGerador = (page: PageDefinition | FileTree): void => {
         initializeTabFromCurrentItem({
             ...page,
             label: page.content.description || page.content.pageName,
@@ -53,12 +56,11 @@ export default function TabManager({ basePath }: ContentProps) {
         });
     };
 
-    const handleSave = () => {
-        // Trigger handleSave in FormEngine for the current tab
-        formEngineRefs.current[activeTab]?.handleSave();
+    const handleSave = async (): Promise<void> => {
+        await formEngineRefs.current[activeTab]?.handleSave();
     };
 
-    const handleSwitchClick = (activePresentation: string) => {
+    const handleSwitchClick = (activePresentation: string): void => {
         setAtivePresentation((prevState) => ({
             ...prevState,
             [activeTab]: activePresentation,

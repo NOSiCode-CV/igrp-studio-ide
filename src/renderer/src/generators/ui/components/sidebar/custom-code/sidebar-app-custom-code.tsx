@@ -338,7 +338,7 @@ const FncComponent = ({
             type: Yup.string().required(
                 t('fieldRequired', { name: t('Return type') })
             ),
-            nullable: Yup.boolean(),
+            isNullable: Yup.boolean(),
             isList: Yup.boolean(),
         }),
     });
@@ -352,7 +352,7 @@ const FncComponent = ({
                 code: '',
                 returnValue: {
                     type: 'void',
-                    isNullable: true,
+                    isNullable: false,
                     isList: false,
                 },
                 imports: [],
@@ -472,8 +472,10 @@ const FncComponent = ({
                                     {formik.values.arguments?.map(
                                         (arg, index) => (
                                             <span key={arg.id || index}>
-                                                {arg.name}: {arg.type}
-                                                {arg.isOptional ? '?' : ''}
+                                                {arg.name}
+                                                {arg.isOptional
+                                                    ? '?'
+                                                    : ''}: {arg.type}
                                                 {arg.isList ? '[]' : ''}
                                                 {index <
                                                 (formik.values.arguments

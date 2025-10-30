@@ -45,7 +45,7 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
             <IGRPSidebarProviderPrimitive>
                 <div className="flex flex-col w-full h-screen">
                     <IGRPToasterPrimitive
-                        position="top-right"
+                        //position="top-right"
                         richColors
                         closeButton
                         expand

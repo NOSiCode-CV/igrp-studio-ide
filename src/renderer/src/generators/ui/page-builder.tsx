@@ -37,11 +37,11 @@ interface PageBuilderProps {
     basePath: string;
     page: PageDefinition;
     activePresentation: string;
-    onSave: () => void;
+    onSave: () => Promise<void>;
 }
 
 interface PageBuilderRef {
-    handleSave: () => void;
+    handleSave: () => Promise<void>;
 }
 
 const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
@@ -102,7 +102,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
         useImperativeHandle(
             ref,
             () => ({
-                handleSave: () => handleSave(components),
+                handleSave: async () => await handleSave(components),
             }),
             [handleSave, components]
         );

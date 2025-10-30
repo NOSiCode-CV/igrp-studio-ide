@@ -202,7 +202,7 @@ export const FunctionSettingsSidebar = ({
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <CheckboxInput
-                                            label={t('Nullable')}
+                                            label={t('Is Optional')}
                                             id="returnValue.isNullable"
                                             value={
                                                 formik.values.returnValue
@@ -631,66 +631,6 @@ export const FunctionArguments = ({
                                             </div>
                                         </div>
                                     )}
-
-                                    {/*    {arg.isState && (
-                                        <div className="mt-6 p-4 border rounded-lg bg-white">
-                                            <div className="flex items-center justify-between mb-4">
-                                                <h4 className="font-medium">
-                                                    State Setter Configuration
-                                                </h4>
-                                            </div>
-
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <SelectInput
-                                                        label="Parameter Type"
-                                                        id={`stateParamType-${arg.id}`}
-                                                        onChange={(value) =>
-                                                            updateArgument(
-                                                                arg.id,
-                                                                {
-                                                                    stateParameterType:
-                                                                        value,
-                                                                }
-                                                            )
-                                                        }
-                                                        options={
-                                                            returnTypeOptions
-                                                        }
-                                                    />
-                                                </div>
-
-                                                <div>
-                                                    <TextInput
-                                                        label="Parameter Name"
-                                                        id={`stateParamName-${arg.id}`}
-                                                        value={
-                                                            arg.stateParameterName
-                                                        }
-                                                        onChange={(e) =>
-                                                            updateArgument(
-                                                                arg.id,
-                                                                {
-                                                                    stateParameterName:
-                                                                        e.target
-                                                                            .value,
-                                                                }
-                                                            )
-                                                        }
-                                                        placeholder="Parameter name"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-3 p-3 bg-gray-50 rounded text-sm">
-                                                <strong>Preview:</strong>{' '}
-                                                {arg.name || 'stateSetter'}: (
-                                                {arg.stateParameterType}:{' '}
-                                                {arg.stateParameterName}) =&gt;
-                                                void
-                                            </div>
-                                        </div>
-                                    )} */}
 
                                     <div className="flex flex-1 justify-end">
                                         <IGRPButtonPrimitive
