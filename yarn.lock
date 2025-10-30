@@ -1214,10 +1214,10 @@
     vaul "^1.1.2"
     zod "^4.1.12"
 
-"@igrp/igrp-studio-nextjs-engine@0.1.0-beta.32":
-  version "0.1.0-beta.32"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.1.0-beta.32.tgz#888c91dd58530d870d8de69ade6c0468d76f58e8"
-  integrity sha512-XLwHuBmzgxIMr/UyWgnWtzUabRil1I1UZaLy9ssdAXxaQ6GaiWxcjd17Yluf2SMgY9SYu9GA1uBiQD9Q1wIP/w==
+"@igrp/igrp-studio-nextjs-engine@0.1.0-beta.33":
+  version "0.1.0-beta.33"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.1.0-beta.33.tgz#835d0a1ae517576e82d279ae47c335438c7cd735"
+  integrity sha512-6AjyQe94uiVGkuzGSLLnAu7TL8Qpw1W5mXx6N2s78H3WdlucWp7w9eDgNkroq0J/17q8xoTrSoa0o4RcqNDwPw==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -1240,15 +1240,15 @@
     reactstrap "^9.2.2"
     ts-loader "^9.5.1"
 
-"@igrp/igrp-studio-springboot-engine@0.1.0-beta.6":
-  version "0.1.0-beta.6"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.1.0-beta.6.tgz#cfd0d57f114978b643f4b99bcdba816bf162dbfd"
-  integrity sha512-zeRePwmM/AIb/Hb9Lk5AP+u1OkYWut85UYaN7r2aZhJV+551SJlr6+rq7MYIhCw6D3CxrdmB++Tk2SkLmK7zZg==
+"@igrp/igrp-studio-springboot-engine@0.1.0-beta.7":
+  version "0.1.0-beta.7"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-springboot-engine/-/igrp-studio-springboot-engine-0.1.0-beta.7.tgz#8ae925d1cf72a5f3f4694c1934a5b2902eafc37b"
+  integrity sha512-FgnLe3l38DaDXnkVkQMigxfs1dF+ai+4qcw9zjLsAfOHQG/UEpEoGDDC9+fn7Wvx+HfkzuQsv/KSikPmnNLiqg==
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
     ajv-formats "^3.0.1"
-    axios "^1.12.2"
+    axios "^1.13.0"
     fast-xml-parser "^5.3.0"
     fs-extra "^11.3.2"
     inflection "^3.0.2"
@@ -4116,6 +4116,15 @@ axios@^1.11.0, axios@^1.12.2:
   version "1.12.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.12.2.tgz#6c307390136cf7a2278d09cec63b136dfc6e6da7"
   integrity sha512-vMJzPewAlRyOgxV2dU0Cuz2O8zzzx9VYtbJOaBgXFeLc4IV/Eg50n4LowmehOOR61S8ZMpc2K5Sa7g6A4jfkUw==
+  dependencies:
+    follow-redirects "^1.15.6"
+    form-data "^4.0.4"
+    proxy-from-env "^1.1.0"
+
+axios@^1.13.0:
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.13.1.tgz#45b62dc8fe04e0e92274e08b98e910ba3d7963a7"
+  integrity sha512-hU4EGxxt+j7TQijx1oYdAjw4xuIp1wRQSsbMFwSthCWeBQur1eF+qJ5iQ5sN3Tw8YRzQNKb8jszgBdMDVqwJcw==
   dependencies:
     follow-redirects "^1.15.6"
     form-data "^4.0.4"
