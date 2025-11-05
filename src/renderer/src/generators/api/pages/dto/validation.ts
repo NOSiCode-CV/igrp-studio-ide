@@ -6,7 +6,7 @@ export function useDtoValidation({ t }: { t: any }) {
         name: Yup.string()
             .required('Name is required')
             .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
-            .max(30, t('maxLengthExceeded', { max: 30 })),
+            .max(30, t('maxLengthExceeded', { max: 40 })),
         template: Yup.string().required('Template is required'),
         attributes: Yup.array().of(
             Yup.object().shape({
