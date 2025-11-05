@@ -5,11 +5,16 @@ import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
 import { useDispatch } from 'react-redux';
 import useToast from '@renderer/hooks/useToast';
 import { useGit } from '@renderer/hooks/use-git';
-import { CustomFunctionConfig, Import, State, TypeDef } from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
+import {
+    CustomFunctionConfig,
+    Import,
+    State,
+    TypeDef,
+} from '@igrp/igrp-studio-nextjs-engine/dist/interfaces/types';
 
 interface PageSaveProps {
     basePath: string;
-    content: { [key: string]: string }
+    content: { [key: string]: string };
     id: string;
     components: StructuredLayout;
     functions: CustomFunctionConfig[];
@@ -68,7 +73,9 @@ export const usePageSave = ({
     imports,
     isPage,
     page,
-}: PageSaveProps): { handleSave: (components: StructuredLayout) => Promise<void> } => {
+}: PageSaveProps): {
+    handleSave: (components: StructuredLayout) => Promise<void>;
+} => {
     const { showErrorToast, showSuccessToast } = useToast();
     const dispatch: any = useDispatch();
 

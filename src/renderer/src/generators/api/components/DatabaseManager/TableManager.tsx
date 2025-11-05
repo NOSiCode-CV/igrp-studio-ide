@@ -49,7 +49,7 @@ interface TableManagerProps {
 export function TableManager({
     onSelectedConnection,
     onRowsSubmit,
-}: TableManagerProps) {
+}: TableManagerProps): React.ReactNode {
     const { t } = useTranslation();
     const { showErrorToast } = useToast();
 

@@ -317,7 +317,7 @@ const useNavdata = (filesThree: FileTree[]) => {
     return { menuItems };
 };
 
-const useNavSettings = () => {
+const useNavSettings = (): { menuItems: MenuItem[] } => {
     const menuItems: MenuItem[] = useMemo(
         () => [
             {

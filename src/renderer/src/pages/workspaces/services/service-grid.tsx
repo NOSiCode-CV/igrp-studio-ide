@@ -12,12 +12,12 @@ import {
 import Dependency from '../components/dependency';
 import { ServiceActions } from './service-actions';
 import { ServiceFilter } from './service-filter';
-import { 
-    getServiceColor, 
-    getServiceIcon, 
+import {
+    getServiceColor,
+    getServiceIcon,
     getStatusColor,
     filterServicesByCategory,
-    filterServicesBySearch
+    filterServicesBySearch,
 } from '.';
 import { PortsBadgeList } from '../components/ports-badge-list';
 
@@ -32,13 +32,13 @@ export function ServiceGrid({ services }: ServiceGridProps) {
 
     const filteredServices = useMemo(() => {
         let filtered = services;
-        
+
         // Apply category filter
         filtered = filterServicesByCategory(filtered, activeCategory);
-        
+
         // Apply search filter
         filtered = filterServicesBySearch(filtered, searchQuery);
-        
+
         return filtered;
     }, [services, activeCategory, searchQuery]);
 
@@ -49,11 +49,11 @@ export function ServiceGrid({ services }: ServiceGridProps) {
     return (
         <div className="space-y-4">
             {/* Filter Component */}
-            <ServiceFilter 
+            <ServiceFilter
                 onFilterChange={handleFilterChange}
                 totalServices={filteredServices.length}
             />
-            
+
             {/* Services Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {filteredServices.map((service, index) => (

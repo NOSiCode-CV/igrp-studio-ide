@@ -19,7 +19,7 @@ import { ChevronRight, FileText, GitBranch, Home, Server } from 'lucide-react';
 
 import { cn } from '@renderer/lib/utils';
 import { filterSubItems } from '@renderer/utils';
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProjectData, MenuItem } from 'src/main/types';
 import {
@@ -47,22 +47,35 @@ export function AppIGRPSidebar({
     config,
     basePath,
     header,
-}: AppIGRPSidebarProps) {
+}: AppIGRPSidebarProps): React.ReactNode {
     const { t } = useTranslation();
     const { setOpen } = useIGRPSidebar();
     const { state: sidebarState } = useIGRPSidebar();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeItem, setActiveItem] = useState('');
 
-    const menuApp = filterSubItems(menuItems, searchQuery);
+    const menuApp = useMemo(
+        () => filterSubItems(menuItems, searchQuery),
+        [menuItems, searchQuery]
+    );
     const [activeMenuGroup, setActiveMenuGroup] = useState(t('apis'));
-    const [activeMenu, setActiveMenu] = useState(menuApp || []);
 
-    const handleSearch = (value: string) => {
+    // Derive activeMenu from activeMenuGroup instead of using state
+    const activeMenu = useMemo(() => {
+        if (activeMenuGroup === t('apis')) {
+            return menuApp || [];
+        }
+        return [];
+    }, [activeMenuGroup, menuApp, t]);
+
+    const handleSearch = (value: string): void => {
         setSearchQuery(value);
     };
 
-    const handleSubItemClick = (e: React.MouseEvent, subItem: MenuItem) => {
+    const handleSubItemClick = (
+        e: React.MouseEvent,
+        subItem: MenuItem
+    ): void => {
         e.preventDefault();
         if (subItem.click) {
             subItem.click(subItem);
@@ -70,14 +83,8 @@ export function AppIGRPSidebar({
         setActiveItem(subItem.label);
     };
 
-    useEffect(() => {
-        setActiveMenu(menuApp || []);
-    }, [menuApp]);
-
-    const handleClickMenu = (item: MenuItem) => {
+    const handleClickMenu = (item: MenuItem): void => {
         setActiveMenuGroup(item.label);
-        if (item.id === 'apis') setActiveMenu(menuApp);
-        else setActiveMenu([]);
     };
 
     const menuIcons: MenuItem[] = [
@@ -91,7 +98,7 @@ export function AppIGRPSidebar({
             <IGRPSidebarPrimitive
                 collapsible="icon"
                 className={cn(
-                    'overflow-hidden *:data-[sidebar=sidebar]:flex-row !top-(--header-height) h-[calc(100svh-var(--header-height-two))] group-data-[side=left]:border-r-0',
+                    'overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height)! h-[calc(100svh-var(--header-height-two))] group-data-[side=left]:border-r-0',
                     className
                 )}
             >
@@ -146,7 +153,7 @@ export function AppIGRPSidebar({
                                                     'px-2.5 md:px-2 flex flex-col h-auto rounded-lg truncate',
                                                     item.label ===
                                                         activeMenuGroup
-                                                        ? '!text-primary'
+                                                        ? 'text-primary'
                                                         : ''
                                                 )}
                                             >
@@ -193,11 +200,8 @@ export function AppIGRPSidebar({
                                 ) : activeMenuGroup === 'Git' ? (
                                     <GitCommitsSidebar
                                         basePath={basePath}
-                                        onSelectCommit={(commit) => {
-                                            console.log(
-                                                t('selectedCommit'),
-                                                commit
-                                            );
+                                        onSelectCommit={() => {
+                                            void 0;
                                         }}
                                     />
                                 ) : (
@@ -242,110 +246,113 @@ export function AppIGRPSidebar({
     );
 }
 
-function Three({
-    level,
-    item,
-    handleSubItemClick,
-    activeItem,
-    basePath,
-    activeMenuGroup,
-}: {
-    level: number;
-    item: MenuItem;
-    handleSubItemClick: (e: React.MouseEvent, subItem: MenuItem) => void;
-    activeItem: string;
-    basePath: string;
-    activeMenuGroup?: string;
-}) {
-    const [open, setOpen] = React.useState(level < 1);
+const Three = React.memo(
+    ({
+        level,
+        item,
+        handleSubItemClick,
+        activeItem,
+        basePath,
+        activeMenuGroup,
+    }: {
+        level: number;
+        item: MenuItem;
+        handleSubItemClick: (e: React.MouseEvent, subItem: MenuItem) => void;
+        activeItem: string;
+        basePath: string;
+        activeMenuGroup?: string;
+    }): React.ReactNode => {
+        const [open, setOpen] = React.useState(level < 1);
 
-    const handleOpenChange = (newState: boolean) => {
-        setOpen(newState);
-    };
+        const handleOpenChange = (newState: boolean): void => {
+            setOpen(newState);
+        };
 
-    const navigate = useNavigate();
-    const handleNavigation = (link: string | undefined) => {
-        if (link) navigate(link);
-    };
+        const navigate = useNavigate();
+        const handleNavigation = (link: string | undefined): void => {
+            if (link) navigate(link);
+        };
 
-    const TreeItem = () => {
-        return (
-            <IGRPSidebarMenuButtonPrimitive
-                onClick={(e) => {
-                    e.stopPropagation();
-                    handleNavigation(item.link);
-                    handleSubItemClick(e, item);
-                    handleOpenChange(!open);
-                }}
-                className="data-[active=true]:bg-transparent group/icon justify-between items-center align-middle"
-                isActive={activeItem === item.label}
-            >
-                <div className="flex items-center space-x-2">
-                    {item.subItems && item.subItems.length > 0 && (
-                        <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                    )}
+        const TreeItem = (): React.ReactNode => {
+            return (
+                <IGRPSidebarMenuButtonPrimitive
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleNavigation(item.link);
+                        handleSubItemClick(e, item);
+                        handleOpenChange(!open);
+                    }}
+                    className="data-[active=true]:bg-transparent group/icon justify-between items-center align-middle"
+                    isActive={activeItem === item.label}
+                >
+                    <div className="flex items-center space-x-2">
+                        {item.subItems && item.subItems.length > 0 && (
+                            <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                        )}
 
-                    {item.icon && <item.icon className="h-4 w-4" />}
+                        {item.icon && <item.icon className="h-4 w-4" />}
 
-                    {item.badgeName && (
-                        <span
-                            className={cn(
-                                'text-orange-500',
-                                `${item.badgeColor}`
-                            )}
-                        >
-                            {item.badgeName}
+                        {item.badgeName && (
+                            <span
+                                className={cn(
+                                    'text-orange-500',
+                                    `${item.badgeColor}`
+                                )}
+                            >
+                                {item.badgeName}
+                            </span>
+                        )}
+                        <span>
+                            {item.label}
+                            {item.subItems &&
+                                item.subItems.length > 0 &&
+                                activeMenuGroup === 'APIs' &&
+                                `(${item.subItems.length})`}
                         </span>
-                    )}
-                    <span>
-                        {item.label}
-                        {item.subItems &&
-                            item.subItems.length > 0 &&
-                            activeMenuGroup === 'APIs' &&
-                            `(${item.subItems.length})`}
-                    </span>
-                </div>
+                    </div>
 
-                <div className="opacity-0 flex items-center group-hover/icon:opacity-100">
-                    <DropdownSidebarMenuButton
-                        menuItem={item}
-                        basePath={basePath}
-                    />
-                </div>
-            </IGRPSidebarMenuButtonPrimitive>
+                    <div className="opacity-0 flex items-center group-hover/icon:opacity-100">
+                        <DropdownSidebarMenuButton
+                            menuItem={item}
+                            basePath={basePath}
+                        />
+                    </div>
+                </IGRPSidebarMenuButtonPrimitive>
+            );
+        };
+
+        if (!item.subItems?.length) {
+            return <TreeItem key={item.id} />;
+        }
+
+        return (
+            <IGRPSidebarMenuItemPrimitive>
+                <IGRPCollapsiblePrimitive
+                    className="group/collapsible"
+                    open={open}
+                    onOpenChange={handleOpenChange}
+                >
+                    <IGRPCollapsibleTriggerPrimitive asChild>
+                        <TreeItem key={item.id} />
+                    </IGRPCollapsibleTriggerPrimitive>
+                    <IGRPCollapsibleContentPrimitive>
+                        <IGRPSidebarMenuSubPrimitive className="pr-0! mr-0!">
+                            {item.subItems?.map((subItem, index) => (
+                                <Three
+                                    key={index}
+                                    level={index}
+                                    item={subItem}
+                                    handleSubItemClick={handleSubItemClick}
+                                    activeItem={activeItem}
+                                    basePath={basePath}
+                                    activeMenuGroup={activeMenuGroup}
+                                />
+                            ))}
+                        </IGRPSidebarMenuSubPrimitive>
+                    </IGRPCollapsibleContentPrimitive>
+                </IGRPCollapsiblePrimitive>
+            </IGRPSidebarMenuItemPrimitive>
         );
-    };
-
-    if (!item.subItems?.length) {
-        return <TreeItem />;
     }
-
-    return (
-        <IGRPSidebarMenuItemPrimitive>
-            <IGRPCollapsiblePrimitive
-                className="group/collapsible"
-                open={open}
-                onOpenChange={handleOpenChange}
-            >
-                <IGRPCollapsibleTriggerPrimitive asChild>
-                    <TreeItem />
-                </IGRPCollapsibleTriggerPrimitive>
-                <IGRPCollapsibleContentPrimitive>
-                    <IGRPSidebarMenuSubPrimitive className="pr-0! mr-0!">
-                        {item.subItems?.map((subItem, index) => (
-                            <Three
-                                key={index}
-                                level={index}
-                                item={subItem}
-                                handleSubItemClick={handleSubItemClick}
-                                activeItem={activeItem}
-                                basePath={basePath}
-                                activeMenuGroup={activeMenuGroup}
-                            />
-                        ))}
-                    </IGRPSidebarMenuSubPrimitive>
-                </IGRPCollapsibleContentPrimitive>
-            </IGRPCollapsiblePrimitive>
-        </IGRPSidebarMenuItemPrimitive>
-    );
-}
+);
+Three.displayName = 'Three';

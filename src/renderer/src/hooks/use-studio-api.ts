@@ -1,3 +1,9 @@
+import {
+    DTOConfig,
+    EnumConfig,
+    ModelConfig,
+    ResponseConfig,
+} from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
 import { OPTION_TYPE } from '@renderer/constants/appConstants';
 import {
     extractByType,
@@ -7,7 +13,7 @@ import {
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
-import { FileTree, ProjectData } from 'src/main/types';
+import { FileTree, MenuItem, ProjectData } from 'src/main/types';
 
 interface RootState {
     PageBuilder: {
@@ -48,17 +54,16 @@ const useStudioAPI = (
 ): {
     basePath: string;
     config: ProjectData;
-    models: any[];
-    dto: any[];
-    modules: any[];
-    responses: any[];
-    enums: any[];
-    permissions: any[];
+    models: ModelConfig[];
+    dto: DTOConfig[];
+    modules: { label: string; value: string }[];
+    responses: ResponseConfig[];
+    enums: EnumConfig[];
     filesThree: FileTree[];
-    currentItem: any;
+    currentItem: MenuItem;
     changeStatus: boolean;
-    findModelsByName: (name: string) => any | undefined;
-    getJsonData: (path: string) => Promise<any | undefined>;
+    findModelsByName: (name: string) => ModelConfig | undefined;
+    getJsonData: (path: string) => Promise<string | undefined>;
 } => {
     const selectProperties = useMemo(
         () => makeSelectProperties(module),
@@ -73,22 +78,24 @@ const useStudioAPI = (
         modules,
         responses,
         enums,
-        permissions,
         filesThree,
         currentItem,
         changeStatus,
     } = useSelector(selectProperties);
 
-    const find = (data: any[], name: string): any | undefined => {
+    const find = (
+        data: ModelConfig[],
+        name: string
+    ): ModelConfig | undefined => {
         return data.find((item) => item.name === name);
     };
 
-    const findModelsByName = (name: string): any | undefined => {
+    const findModelsByName = (name: string): ModelConfig | undefined => {
         return find(models, `${name}.json`);
     };
 
     const getJsonData = useCallback(
-        async (path: string): Promise<any | undefined> => {
+        async (path: string): Promise<string | undefined> => {
             try {
                 return await window.api.getJsonContent(path);
             } catch (error) {
@@ -106,7 +113,6 @@ const useStudioAPI = (
         modules,
         responses,
         enums,
-        permissions,
         filesThree,
         currentItem,
         changeStatus,

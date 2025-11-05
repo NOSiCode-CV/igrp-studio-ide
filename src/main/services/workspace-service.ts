@@ -214,7 +214,6 @@ export class WorkspaceRepository {
             (project) => project.config.name === config.name
         );
 
-
         const workspaceConfig: ProjectWorkspace = {
             config: { ...config, id: projectId, type: framework },
             id: workspaceId,

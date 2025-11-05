@@ -85,4 +85,3 @@ export const convertFileTreeToPageDefinition = (
         content: fileTree.content || {},
     } as PageDefinition;
 };
-

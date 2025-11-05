@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import {
-    BPMNProject,
-    BPMNProjectProcessDefinition,
-} from 'src/main/types';
+import { BPMNProject, BPMNProjectProcessDefinition } from 'src/main/types';
 import { bpmnService } from '@renderer/services/bpmn-service';
 
 export const useBPMNProjects = (refreshTrigger?: number) => {
@@ -36,9 +33,7 @@ export const useProcessDefinitions = (selectedProject: BPMNProject | null) => {
     >([]);
     const [loading, setLoading] = useState(false);
 
-    const loadProcessDefinitions = async (
-        projectId: string
-    ): Promise<void> => {
+    const loadProcessDefinitions = async (projectId: string): Promise<void> => {
         try {
             setLoading(true);
             const processes =
@@ -63,4 +58,3 @@ export const useProcessDefinitions = (selectedProject: BPMNProject | null) => {
 
     return { processDefinitions, loading, loadProcessDefinitions };
 };
-

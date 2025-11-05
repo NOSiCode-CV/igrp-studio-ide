@@ -104,7 +104,6 @@ export class NextjsEngine implements BaseEngine {
     }
 
     async createProject(project: ProjectData, basePath: string): Promise<void> {
-
         const { id, config, workspaceId } = project;
 
         const appConfig: AppConfig = {

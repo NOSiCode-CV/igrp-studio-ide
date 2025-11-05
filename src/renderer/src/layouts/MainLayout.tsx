@@ -44,12 +44,6 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))]">
             <IGRPSidebarProviderPrimitive>
                 <div className="flex flex-col w-full h-screen">
-                    <IGRPToasterPrimitive
-                        //position="top-right"
-                        richColors
-                        closeButton
-                        expand
-                    />
                     <Header />
 
                     <div className="flex flex-1 overflow-hidden">

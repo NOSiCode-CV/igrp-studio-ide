@@ -2,10 +2,7 @@ import React from 'react';
 import Header from './components/header';
 import { createSelector } from 'reselect';
 import { useSelector } from 'react-redux';
-import {
-    IGRPSidebarProvider,
-    IGRPToasterPrimitive,
-} from '@igrp/igrp-framework-react-design-system';
+import { IGRPSidebarProvider } from '@igrp/igrp-framework-react-design-system';
 import { Footer } from './components/footer';
 
 interface LayoutProps {
@@ -41,12 +38,6 @@ const Layout = (props: LayoutProps): React.JSX.Element => {
                 }
             >
                 <div className="h-screen flex flex-col w-full">
-                    <IGRPToasterPrimitive
-                        //position="top-right"
-                        richColors
-                        closeButton
-                        expand
-                    />
                     <Header config={config} basePath={basePath} />
 
                     <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">

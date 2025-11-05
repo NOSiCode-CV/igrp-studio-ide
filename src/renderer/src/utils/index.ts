@@ -32,7 +32,7 @@ export function filterItems(navData: any, searchQuery: string) {
         : navData;
 }
 
-export function filterSubItems(navData: any, searchQuery: string) {
+export function filterSubItems(navData: any, searchQuery: string): any {
     if (!searchQuery) return navData;
     return navData
         .map((item: any) => {

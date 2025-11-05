@@ -864,5 +864,17 @@
     "databasePassword": "Senha do Banco de Dados",
     "edit_connection": "Editar Conexão",
     "edit_connection_description": "Modificar os detalhes da sua conexão de banco de dados",
-    "template": "Template"
+    "template": "Template",
+    "editProjectDescription": "Modificar os detalhes do projeto abaixo",
+    "noIcon": "Nenhum Ícone",
+    "uploadIcon": "Carregar Ícone",
+    "removeIcon": "Remover Ícone",
+    "updatedSuccessfully": "{{name}} updated successfully",
+    "invalidFileType": "Selecione um arquivo de imagem válido",
+    "fileTooLarge": "O tamanho do arquivo deve ser menor que 2MB",
+    "openWorkspace": "Open Workspace",
+    "selectWorkspaceDirectory": "Selecionar Diretório do Workspace",
+    "workspaceOpenedSuccessfully": "{{name}} aberto com sucesso",
+    "you_are_running_latest_version": "Você está executando a versão mais recente",
+    "update_check_failed": "Falha ao verificar atualizações"
 }

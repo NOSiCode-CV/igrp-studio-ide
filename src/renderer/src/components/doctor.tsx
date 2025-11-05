@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import {
     IGRPDialogPrimitive,
     IGRPDialogContentPrimitive,
@@ -33,6 +33,12 @@ import {
     IGRPCardTitlePrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system';
+import {
+    IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
+    IGRPTooltipContentPrimitive,
+    IGRPTooltipProviderPrimitive,
+} from '@igrp/igrp-framework-react-design-system';
 
 interface CategorySummary {
     category: 'frontend' | 'backend' | 'development';
@@ -52,7 +58,7 @@ export default function Doctor({
 }: {
     open: boolean;
     setOpen: (prompt: boolean) => void;
-}) {
+}): JSX.Element {
     const [results, setResults] = useState<ToolCheck[] | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -277,9 +283,9 @@ export default function Doctor({
                                                                 <IGRPTableCellPrimitive className="py-3">
                                                                     <div className="flex items-center gap-2">
                                                                         {tool.success ? (
-                                                                            <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                                                                            <CheckCircle className="h-4 w-4 text-green-600" />
                                                                         ) : (
-                                                                            <XCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+                                                                            <XCircle className="h-4 w-4 text-red-600" />
                                                                         )}
                                                                         <span
                                                                             className={
@@ -304,18 +310,22 @@ export default function Doctor({
                                                                             }
                                                                         </code>
                                                                     ) : (
-                                                                        <span
-                                                                            title={
-                                                                                tool.error
-                                                                            }
-                                                                            className="text-red-600 text-xs"
-                                                                        >
-                                                                            {
-                                                                                tool.error?.split(
-                                                                                    '\n'
-                                                                                )[0]
-                                                                            }
-                                                                        </span>
+                                                                        <IGRPTooltipProviderPrimitive>
+                                                                            <IGRPTooltipPrimitive>
+                                                                                <IGRPTooltipTriggerPrimitive
+                                                                                    asChild
+                                                                                >
+                                                                                    Error
+                                                                                </IGRPTooltipTriggerPrimitive>
+                                                                                <IGRPTooltipContentPrimitive className="max-w-md">
+                                                                                    <p className="text-xs whitespace-pre-wrap">
+                                                                                        {
+                                                                                            tool.error
+                                                                                        }
+                                                                                    </p>
+                                                                                </IGRPTooltipContentPrimitive>
+                                                                            </IGRPTooltipPrimitive>
+                                                                        </IGRPTooltipProviderPrimitive>
                                                                     )}
                                                                 </IGRPTableCellPrimitive>
                                                                 <IGRPTableCellPrimitive className="py-3">

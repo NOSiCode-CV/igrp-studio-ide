@@ -158,11 +158,6 @@ export const useModel = ({
         formik.setFieldValue('indexes', indexesTable);
     }, [data]);
 
-    // Keyboard shortcut for save (Ctrl/Cmd + S)
-    useKeyPress(() => {
-        handleSave();
-    }, [KeyboardKey.save]);
-
     const handleSave = async (): Promise<void> => {
         try {
             const currentData = await getJsonData(currentItem.path);
@@ -193,6 +188,11 @@ export const useModel = ({
             showErrorToast(error);
         }
     };
+
+    // Keyboard shortcut for save (Ctrl/Cmd + S)
+    useKeyPress(() => {
+        handleSave();
+    }, [KeyboardKey.save]);
 
     const createRelationReference = async (values: ModelConfig) => {
         const { attributes, name: entityFrom } = values;

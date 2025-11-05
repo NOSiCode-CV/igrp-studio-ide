@@ -48,7 +48,8 @@ export const ProcessCard = ({
                         <div className="flex items-center space-x-2 mt-1 text-sm text-muted-foreground">
                             <Trash2 className="w-4 h-4" />
                             <span>
-                                {process.processArtifacts?.length || 0} artifacts
+                                {process.processArtifacts?.length || 0}{' '}
+                                artifacts
                             </span>
                         </div>
                     </div>
@@ -63,4 +64,3 @@ export const ProcessCard = ({
         </IGRPCardPrimitive>
     );
 };
-

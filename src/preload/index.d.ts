@@ -282,4 +282,4 @@ declare global {
         igrpStudioSettings: typeof igrpStudioSettings;
     }
 }
-export { };
+export {};

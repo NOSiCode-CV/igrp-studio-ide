@@ -68,13 +68,13 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
 
     const { module } = item;
 
-    const handleClickSubmit = async () => {
+    const handleClickSubmit = async (): Promise<void> => {
         if (!basePath) return;
 
         const errorMessages: string[] = [];
         const processedTables = new Set<string>();
 
-        const processTable = async (tableName: string) => {
+        const processTable = async (tableName: string): Promise<void> => {
             if (processedTables.has(tableName)) return;
             processedTables.add(tableName);
 
@@ -172,7 +172,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
 
         // Process all initially selected rows
         for (const tableName of selectedRows) {
-            processTable(tableName);
+            await processTable(tableName);
         }
 
         if (errorMessages.length > 0) {
@@ -180,13 +180,16 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                 showErrorToast(errMsg);
             });
         } else {
-            createGitCommit(basePath, `Import data tables`);
+            // Wait a bit for file system operations to complete
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            await createGitCommit(basePath, `Import data tables`);
             dispatch(onSetChangeStatus(true));
             showSuccessToast(t('schemaCreatedSuccess'));
         }
     };
 
-    const handleClose = () => {
+    const handleClose = (): void => {
         setIsOpen?.(false);
     };
 
@@ -196,25 +199,6 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                 className="sm:max-w-[600px] md:max-w-[900px] max-w-5xl"
                 onClick={(e) => e.stopPropagation()}
             >
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>
-                        {t('importDataTableFromDatabase')}
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        {t('manageDatabaseConnections')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
-                <IGRPTabsPrimitive defaultValue="tables" className="w-full">
-                    <IGRPTabsListPrimitive className="grid w-full grid-cols-2">
-                        <IGRPTabsTriggerPrimitive value="tables">
-                            {t('importDataTables')}
-                        </IGRPTabsTriggerPrimitive>
-                        <IGRPTabsTriggerPrimitive value="connections">
-                            {t('manageConnections')}
-                        </IGRPTabsTriggerPrimitive>
-                    </IGRPTabsListPrimitive>
-                    <IGRPTabsContentPrimitive value="tables"></IGRPTabsContentPrimitive>
-                </IGRPTabsPrimitive>
                 <IGRPDialogHeaderPrimitive>
                     <IGRPDialogTitlePrimitive>
                         {t('importDataTableFromDatabase')}

@@ -5,12 +5,11 @@ stages:
 cache:
     paths:
         - node_modules/
-        
-        
+
 build_packagedev_mac:
     image: node
     stage: build
-    tags: 
+    tags:
         - arm64
     only:
         - tags

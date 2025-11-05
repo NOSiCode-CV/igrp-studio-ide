@@ -7,7 +7,7 @@ import {
     Server,
     HardDrive,
     Shield,
-    Compass
+    Compass,
 } from 'lucide-react';
 import {
     IGRPBadgePrimitive,
@@ -101,7 +101,7 @@ export function ServiceFilter({
     return (
         <div className="space-y-4">
             {/* Search Bar */}
-           {/*  <div className="relative">
+            {/*  <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
                     type="text"

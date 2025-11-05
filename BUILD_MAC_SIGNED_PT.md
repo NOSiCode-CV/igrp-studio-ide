@@ -24,23 +24,23 @@ Guia completo para construir e assinar o IGRP Studio para distribuição em macO
 - **macOS**: 10.15 (Catalina) ou superior recomendado
 - **Xcode Command Line Tools**: Necessário para assinatura de código
 
-  ```bash
-  xcode-select --install
-  ```
+    ```bash
+    xcode-select --install
+    ```
 
 ### Requisitos de Software
 
 - **Node.js**: Versão `^20.19.0` ou `>=22.12.0`
 
-  ```bash
-  node --version
-  ```
+    ```bash
+    node --version
+    ```
 
 - **Yarn**: Gestor de pacotes
 
-  ```bash
-  npm install -g yarn
-  ```
+    ```bash
+    npm install -g yarn
+    ```
 
 ### Requisitos da Apple Developer
 
@@ -72,10 +72,10 @@ Guia completo para construir e assinar o IGRP Studio para distribuição em macO
 1. Abra o **Keychain Access** (Aplicações → Utilitários)
 2. Vá a **Keychain Access** → **Assistente de Certificado** → **Solicitar um Certificado de uma Autoridade de Certificação**
 3. Preencha o formulário:
-   - **Endereço de Email do Utilizador**: O email do seu Apple ID
-   - **Nome Comum**: O seu nome ou nome da empresa
-   - **Endereço de Email da AC**: Deixe vazio
-   - Selecione **"Guardado em disco"**
+    - **Endereço de Email do Utilizador**: O email do seu Apple ID
+    - **Nome Comum**: O seu nome ou nome da empresa
+    - **Endereço de Email da AC**: Deixe vazio
+    - Selecione **"Guardado em disco"**
 4. Guarde o ficheiro Certificate Signing Request (CSR)
 5. Aceda a [Certificados Apple Developer](https://developer.apple.com/account/resources/certificates/list)
 6. Clique em **+** para criar um novo certificado
@@ -93,6 +93,7 @@ security find-identity -v -p codesigning
 ```
 
 Deve ver uma entrada como:
+
 ```
 1) XXXXX "Developer ID Application: Seu Nome (TEAM_ID)"
 ```
@@ -131,6 +132,7 @@ APPLE_APP_SPECIFIC_PASSWORD=xxxx-xxxx-xxxx-xxxx
 ```
 
 **Substitua pelos seus valores reais:**
+
 - `APPLE_ID`: O email da sua conta Apple Developer
 - `APPLE_TEAM_ID`: O seu Team ID de 10 caracteres
 - `APPLE_APP_SPECIFIC_PASSWORD`: A palavra-passe específica da aplicação que gerou
@@ -168,6 +170,7 @@ yarn install
 ```
 
 Saída esperada:
+
 ```
 ✓ Dependências instaladas com sucesso
 ```
@@ -279,7 +282,7 @@ Building with notarization...
 - **x64 ou ARM64**: ~8-12 minutos
 - **Todas as arquiteturas**: ~25-35 minutos
 
-*O tempo de notarização depende dos servidores da Apple e pode variar*
+_O tempo de notarização depende dos servidores da Apple e pode variar_
 
 ---
 
@@ -295,6 +298,7 @@ ls -lh *.dmg
 ```
 
 Deve ver:
+
 - `IGRP-Studio-0.1.0-beta.14-universal.dmg` (Universal)
 - `IGRP-Studio-0.1.0-beta.14-x64.dmg` (Intel)
 - `IGRP-Studio-0.1.0-beta.14-arm64.dmg` (Apple Silicon)
@@ -308,6 +312,7 @@ codesign -dv --verbose=4 dist/mac-universal/IGRP\ Studio.app
 ```
 
 A saída esperada deve incluir:
+
 ```
 Authority=Developer ID Application: NOSi (QT6DP36974)
 Authority=Developer ID Certification Authority
@@ -325,6 +330,7 @@ spctl -a -vvv -t install dist/mac-universal/IGRP\ Studio.app
 ```
 
 Saída esperada:
+
 ```
 dist/mac-universal/IGRP Studio.app: accepted
 source=Notarized Developer ID
@@ -333,19 +339,21 @@ source=Notarized Developer ID
 ### 4. Testar a Aplicação
 
 1. **Montar o DMG**:
-   ```bash
-   open dist/IGRP-Studio-0.1.0-beta.14-universal.dmg
-   ```
+
+    ```bash
+    open dist/IGRP-Studio-0.1.0-beta.14-universal.dmg
+    ```
 
 2. **Copiar para Aplicações** (ou executar diretamente)
 
 3. **Iniciar a aplicação**:
-   - Se devidamente assinada e notarizada, deve abrir sem avisos
-   - O macOS verificará a assinatura no primeiro lançamento
+    - Se devidamente assinada e notarizada, deve abrir sem avisos
+    - O macOS verificará a assinatura no primeiro lançamento
 
 ### 5. Testar Noutro Mac (Recomendado)
 
 Para melhor verificação:
+
 1. Copie o DMG para outro Mac
 2. Tente instalar e executar
 3. Certifique-se de que não aparecem avisos de segurança
@@ -357,6 +365,7 @@ Para melhor verificação:
 ### Problema: "Error: .env.signing file not found"
 
 **Solução**:
+
 - Certifique-se de que `.env.signing` existe na raiz do projeto
 - Verifique o nome do ficheiro (sem erros de digitação)
 - Verifique permissões do ficheiro: `ls -la .env.signing`
@@ -364,37 +373,40 @@ Para melhor verificação:
 ### Problema: "No identity found"
 
 **Solução**:
+
 - Verifique que o certificado está instalado no Keychain:
-  ```bash
-  security find-identity -v -p codesigning
-  ```
+    ```bash
+    security find-identity -v -p codesigning
+    ```
 - Se faltar, reinstale o certificado Developer ID Application
 - Certifique-se de que o certificado é válido (não expirado)
 
 ### Problema: "Notarization failed"
 
 **Soluções**:
+
 1. **Verifique credenciais**:
-   - Verifique que `APPLE_ID` está correto
-   - Verifique que `APPLE_TEAM_ID` corresponde à sua conta
-   - Regenere `APPLE_APP_SPECIFIC_PASSWORD` se necessário
+    - Verifique que `APPLE_ID` está correto
+    - Verifique que `APPLE_TEAM_ID` corresponde à sua conta
+    - Regenere `APPLE_APP_SPECIFIC_PASSWORD` se necessário
 
 2. **Verifique ligação à internet**:
-   - A notarização requer envio para servidores Apple
-   - Verifique configurações de firewall
+    - A notarização requer envio para servidores Apple
+    - Verifique configurações de firewall
 
 3. **Verifique conta Apple Developer**:
-   - Certifique-se de que a subscrição está ativa
-   - Verifique que o email está confirmado
+    - Certifique-se de que a subscrição está ativa
+    - Verifique que o email está confirmado
 
 4. **Veja logs de notarização**:
-   ```bash
-   xcrun notarytool log --apple-id seu@email.com --team-id QT6DP36974 <submission-id>
-   ```
+    ```bash
+    xcrun notarytool log --apple-id seu@email.com --team-id QT6DP36974 <submission-id>
+    ```
 
 ### Problema: "Build falha durante verificação TypeScript"
 
 **Solução**:
+
 ```bash
 # Execute verificação de tipos separadamente para ver erros
 yarn typecheck
@@ -405,6 +417,7 @@ yarn typecheck
 ### Problema: "Permission denied on sign-and-build.sh"
 
 **Solução**:
+
 ```bash
 chmod +x scripts/sign-and-build.sh
 ```
@@ -412,6 +425,7 @@ chmod +x scripts/sign-and-build.sh
 ### Problema: "Certificate is not trusted"
 
 **Solução**:
+
 - Certifique-se de que está a usar certificado **Developer ID Application** (não "Mac Development")
 - Verifique que a cadeia completa de certificados está instalada
 - Verifique no Keychain Access que o certificado aparece como válido
@@ -419,11 +433,12 @@ chmod +x scripts/sign-and-build.sh
 ### Problema: Build tem sucesso mas app não abre noutros Macs
 
 **Soluções**:
+
 1. **Verifique notarização** (passo 3 na secção Verificação)
 2. **Verifique Gatekeeper**:
-   ```bash
-   spctl -a -vvv -t install /caminho/para/app
-   ```
+    ```bash
+    spctl -a -vvv -t install /caminho/para/app
+    ```
 3. **Certifique-se de que o DMG foi criado corretamente** (não apenas o bundle .app)
 
 ---
@@ -445,11 +460,11 @@ chmod +x scripts/sign-and-build.sh
 
 ### Guia de Arquitetura
 
-| Tipo de Mac | Build Recomendado |
-|-------------|-------------------|
-| Mac Intel (2020 e anteriores) | x64 ou Universal |
-| Apple Silicon (M1/M2/M3) | ARM64 ou Universal |
-| Frota mista | Universal |
+| Tipo de Mac                   | Build Recomendado  |
+| ----------------------------- | ------------------ |
+| Mac Intel (2020 e anteriores) | x64 ou Universal   |
+| Apple Silicon (M1/M2/M3)      | ARM64 ou Universal |
+| Frota mista                   | Universal          |
 
 ### Notas de Performance
 
@@ -460,6 +475,7 @@ chmod +x scripts/sign-and-build.sh
 ### Controlo de Versão
 
 O `.gitignore` já deve incluir:
+
 ```
 .env.signing
 dist/
@@ -470,6 +486,7 @@ out/
 ### Publicação
 
 Após build bem-sucedido:
+
 - Ficheiros DMG são automaticamente enviados para S3 (configurado em `package.json`)
 - Endpoint: `https://storage-api.nosi.cv`
 - Caminho: `darwin/universal/` (ou `x64`/`arm64`)
@@ -477,6 +494,7 @@ Após build bem-sucedido:
 ### Limpeza de Build
 
 Para começar de fresco:
+
 ```bash
 # Remover artefactos de build
 rm -rf dist out
@@ -489,14 +507,15 @@ yarn install
 ### Obter Ajuda
 
 Se encontrar problemas:
+
 1. Consulte esta secção de resolução de problemas
 2. Reveja logs de build cuidadosamente
 3. Verifique que todos os pré-requisitos estão cumpridos
 4. Contacte a equipa de desenvolvimento com:
-   - Comando de build usado
-   - Mensagens de erro (sem credenciais)
-   - Versão do macOS
-   - Versão do Node.js
+    - Comando de build usado
+    - Mensagens de erro (sem credenciais)
+    - Versão do macOS
+    - Versão do Node.js
 
 ---
 

@@ -17,11 +17,12 @@ import {
     IGRPTabsTriggerPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { PackageCheck } from 'lucide-react';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system';
 import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
 import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system';
+import { TextInput } from '../../components/inputs-form';
 
 interface PopoverProps {
     children?: ReactNode;
@@ -41,9 +42,13 @@ export function PopoverModel({
 
     const [isPrimary, setIsPrimary] = useState(false);
 
-    useEffect(() => {
-        setIsPrimary(row?.['primaryKey'] === true);
-    }, [row]);
+    const [isSequence, setIsSequence] = useState(false);
+
+    const onChangeGenerationType = (value: string): void => {
+        changeValue('generationType', index, value);
+
+        setIsSequence(value === 'SEQUENCE');
+    };
 
     return (
         <IGRPPopoverPrimitive>
@@ -98,13 +103,17 @@ export function PopoverModel({
                                                     id={`${field}-${index}`}
                                                     onCheckedChange={(
                                                         checked
-                                                    ) =>
+                                                    ) => {
                                                         changeValue(
                                                             field,
                                                             index,
                                                             checked
-                                                        )
-                                                    }
+                                                        );
+                                                        setIsPrimary(
+                                                            field ===
+                                                                'primaryKey'
+                                                        );
+                                                    }}
                                                     checked={
                                                         row?.[field] || false
                                                     }
@@ -146,9 +155,9 @@ export function PopoverModel({
                                     </>
                                 )}
                                 <IGRPSeparatorPrimitive orientation="horizontal" />
-                                <div className="grid grid-cols-2 gap-2">
-                                    <>
-                                        {isPrimary && (
+                                <div className="flex flex-col gap-2">
+                                    {isPrimary && (
+                                        <>
                                             <div className="space-y-2 col-span-2 flex flex-col">
                                                 <IGRPLabelPrimitive>
                                                     {t('generationType')}
@@ -164,53 +173,71 @@ export function PopoverModel({
                                                         ] || 'IDENTITY'
                                                     }
                                                     onChange={(value) =>
-                                                        changeValue(
-                                                            'generationType',
-                                                            index,
-                                                            value
+                                                        onChangeGenerationType(
+                                                            value as string
                                                         )
                                                     }
                                                     className="w-full h-8"
                                                 />
                                             </div>
-                                        )}
-                                        <div className="space-y-2">
-                                            <IGRPLabelPrimitive>
-                                                {t('length')}
-                                            </IGRPLabelPrimitive>
-                                            <IGRPInputPrimitive
-                                                id="length"
-                                                className="h-8"
-                                                value={row?.['length'] || ''}
-                                                onChange={(ev) =>
-                                                    changeValue(
-                                                        'length',
-                                                        index,
-                                                        ev.target.value
-                                                    )
-                                                }
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <IGRPLabelPrimitive>
-                                                {t('defaultValue')}
-                                            </IGRPLabelPrimitive>
-                                            <IGRPInputPrimitive
-                                                id="defaultValue"
-                                                className="h-8"
-                                                value={
-                                                    row?.['defaultValue'] || ''
-                                                }
-                                                onChange={(ev) =>
-                                                    changeValue(
-                                                        'defaultValue',
-                                                        index,
-                                                        ev.target.value
-                                                    )
-                                                }
-                                            />
-                                        </div>
-                                    </>
+
+                                            {isSequence && (
+                                                <TextInput
+                                                    label="Sequence Name"
+                                                    id="sequenceName"
+                                                    className="h-8"
+                                                    value={
+                                                        row?.['sequenceName'] ||
+                                                        ''
+                                                    }
+                                                    onChange={(ev) =>
+                                                        changeValue(
+                                                            'sequenceName',
+                                                            index,
+                                                            ev.target.value
+                                                        )
+                                                    }
+                                                    placeholder="Enter the custom sequence name"
+                                                />
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div className="space-y-2">
+                                        <IGRPLabelPrimitive>
+                                            {t('length')}
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
+                                            id="length"
+                                            className="h-8"
+                                            value={row?.['length'] || ''}
+                                            onChange={(ev) =>
+                                                changeValue(
+                                                    'length',
+                                                    index,
+                                                    ev.target.value
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <IGRPLabelPrimitive>
+                                            {t('defaultValue')}
+                                        </IGRPLabelPrimitive>
+                                        <IGRPInputPrimitive
+                                            id="defaultValue"
+                                            className="h-8"
+                                            value={row?.['defaultValue'] || ''}
+                                            onChange={(ev) =>
+                                                changeValue(
+                                                    'defaultValue',
+                                                    index,
+                                                    ev.target.value
+                                                )
+                                            }
+                                        />
+                                    </div>
                                 </div>
                             </IGRPTabsContentPrimitive>
                         </IGRPTabsPrimitive>

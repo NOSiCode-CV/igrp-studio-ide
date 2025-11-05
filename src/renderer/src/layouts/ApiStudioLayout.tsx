@@ -17,7 +17,6 @@ import {
     IGRPSidebarInsetPrimitive,
     IGRPSidebarProviderPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
-import { Toaster } from '@igrp/igrp-framework-react-design-system/dist/components/primitives/sonner';
 import { AppIGRPSidebar } from './components/app-sidebar';
 
 interface LayoutProps {
@@ -28,7 +27,7 @@ interface LayoutProps {
     }>;
 }
 
-const Layout = (props: LayoutProps) => {
+const Layout = (props: LayoutProps): React.ReactNode => {
     const dispatch: any = useDispatch();
     const navigate = useNavigate();
 
@@ -41,9 +40,15 @@ const Layout = (props: LayoutProps) => {
 
     useEffect(() => {
         if (changeStatus) {
-            dispatch(onGetFolderFiles(basePath));
-            dispatch(onSetChangeStatus(false));
+            // Add a small delay to ensure file system operations complete
+            const timer = setTimeout(() => {
+                dispatch(onGetFolderFiles(basePath));
+                dispatch(onSetChangeStatus(false));
+            }, 100);
+            return () => clearTimeout(timer);
         }
+        return undefined;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [changeStatus, basePath, dispatch]);
 
     const { menuItems } = useNavdata(filesThree);
@@ -64,12 +69,6 @@ const Layout = (props: LayoutProps) => {
                 }
             >
                 <div className="h-screen flex flex-col w-full">
-                    <Toaster
-                        //position="top-right"
-                        richColors
-                        closeButton
-                        expand
-                    />
                     <Header config={config} basePath={basePath} />
 
                     <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">

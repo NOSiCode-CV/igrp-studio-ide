@@ -876,5 +876,7 @@
     "fileTooLarge": "File size must be less than 2MB",
     "openWorkspace": "Open Workspace",
     "selectWorkspaceDirectory": "Select Workspace Directory",
-    "workspaceOpenedSuccessfully": "{{name}} opened successfully"
+    "workspaceOpenedSuccessfully": "{{name}} opened successfully",
+    "you_are_running_latest_version": "You are running the latest version",
+    "update_check_failed": "Failed to check for updates"
 }
