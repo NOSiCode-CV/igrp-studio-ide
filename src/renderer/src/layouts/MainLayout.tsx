@@ -7,7 +7,6 @@ import {
     IGRPScrollAreaPrimitive,
     IGRPSidebarInsetPrimitive,
     IGRPSidebarProviderPrimitive,
-    IGRPToasterPrimitive,
 } from '@igrp/igrp-framework-react-design-system';
 import { useWorkspace } from '@renderer/hooks/use-workspace';
 import { WorkspaceSwitcher } from '../pages/workspaces/components/workspace-switch';

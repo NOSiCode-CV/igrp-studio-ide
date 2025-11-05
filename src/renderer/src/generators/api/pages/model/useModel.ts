@@ -127,10 +127,10 @@ export const useModel = ({
         const primaryKeyAttributes =
             primaryKey && Array.isArray(primaryKey)
                 ? primaryKey.map((pk) => ({
-                      ...defaultValues.attributes,
-                      ...pk,
-                      primaryKey: true,
-                  }))
+                    ...defaultValues.attributes,
+                    ...pk,
+                    primaryKey: true,
+                }))
                 : [];
 
         const attributesTransf = attributes.map(({ ...field }) => ({
@@ -225,7 +225,7 @@ export const useModel = ({
 
                 try {
                     const modelData = await window.api.getJsonContent(
-                        schemaRef.path
+                        schemaRef?.path || ''
                     );
                     const existingRefs = Array.isArray(
                         modelData.relationReference
@@ -236,7 +236,7 @@ export const useModel = ({
                     const existingIndex = existingRefs.findIndex(
                         (existingRef: any) =>
                             existingRef.fieldName ===
-                                relationReference.fieldName &&
+                            relationReference.fieldName &&
                             existingRef.mappedBy === relationReference.mappedBy
                     );
 

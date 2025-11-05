@@ -62,8 +62,8 @@ const useStudioAPI = (
     filesThree: FileTree[];
     currentItem: MenuItem;
     changeStatus: boolean;
-    findModelsByName: (name: string) => ModelConfig | undefined;
-    getJsonData: (path: string) => Promise<string | undefined>;
+    findModelsByName: (name: string) => any;
+    getJsonData: (path: string) => Promise<any>;
 } => {
     const selectProperties = useMemo(
         () => makeSelectProperties(module),
@@ -95,7 +95,7 @@ const useStudioAPI = (
     };
 
     const getJsonData = useCallback(
-        async (path: string): Promise<string | undefined> => {
+        async (path: string): Promise<any | undefined> => {
             try {
                 return await window.api.getJsonContent(path);
             } catch (error) {
