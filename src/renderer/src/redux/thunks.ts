@@ -1,2 +1,2 @@
 // page builders
-export * from './pageBuilder/thunk';
+export * from './pageBuilder/thunk'

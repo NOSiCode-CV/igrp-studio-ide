@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import { IGRPBpmnModeler } from '@igrp/framework-process-studio-bpmn-editor';
+import { IGRPBpmnModeler } from '@igrp/framework-process-studio-bpmn-editor'
 
 const newDiagram = (
-    processKey: string,
-    processName: string
+  processKey: string,
+  processName: string
 ) => `?xml version="1.0" encoding="UTF-8"?>
 <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:activiti="http://activiti.org/bpmn" id="sample-diagram" targetNamespace="http://activiti.org/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
   <bpmn2:process id="${processKey}" name="${processName}" isExecutable="false">
@@ -17,45 +17,43 @@ const newDiagram = (
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</bpmn2:definitions>`;
+</bpmn2:definitions>`
 
 interface BPMNDiagramViewerProps {
-    bpmnContent: string;
+  bpmnContent: string
 }
 
-export const BPMNDiagramViewer: React.FC<BPMNDiagramViewerProps> = ({
-    bpmnContent,
-}) => {
-    const [currentXml, setCurrentXml] = useState('');
+export const BPMNDiagramViewer: React.FC<BPMNDiagramViewerProps> = ({ bpmnContent }) => {
+  const [currentXml, setCurrentXml] = useState('')
 
-    useEffect(() => {
-        if (bpmnContent) {
-            setCurrentXml(bpmnContent);
-        } else {
-            setCurrentXml(newDiagram('test-process', 'Test Process'));
-        }
-    }, [bpmnContent]);
+  useEffect(() => {
+    if (bpmnContent) {
+      setCurrentXml(bpmnContent)
+    } else {
+      setCurrentXml(newDiagram('test-process', 'Test Process'))
+    }
+  }, [bpmnContent])
 
-    const handleXmlChange = (xml: string) => {
-        setCurrentXml(xml);
-        console.log('BPMN XML changed, new length:', xml.length);
-    };
+  const handleXmlChange = (xml: string) => {
+    setCurrentXml(xml)
+    console.log('BPMN XML changed, new length:', xml.length)
+  }
 
-    const handleModelerLoad = (modeler: any) => {
-        console.log('BPMN Modeler loaded successfully');
-        console.log('Modeler instance:', typeof modeler);
-    };
+  const handleModelerLoad = (modeler: any) => {
+    console.log('BPMN Modeler loaded successfully')
+    console.log('Modeler instance:', typeof modeler)
+  }
 
-    return (
-        <IGRPBpmnModeler
-            xml={currentXml}
-            processKey="test-process"
-            processName="Test Process"
-            onChange={handleXmlChange}
-            onLoad={handleModelerLoad}
-            className="h-[78vh]"
-        />
-    );
-};
+  return (
+    <IGRPBpmnModeler
+      xml={currentXml}
+      processKey="test-process"
+      processName="Test Process"
+      onChange={handleXmlChange}
+      onLoad={handleModelerLoad}
+      className="h-[78vh]"
+    />
+  )
+}
 
-export default BPMNDiagramViewer;
+export default BPMNDiagramViewer

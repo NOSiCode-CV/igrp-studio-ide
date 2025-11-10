@@ -1,36 +1,33 @@
-import { useCallback } from 'react';
-import { HandlerResponse } from 'src/main/types';
+import { useCallback } from 'react'
+import { HandlerResponse } from 'src/main/types'
 
 const useCore = (): {
-    getVersions: () => Promise<{ label: string; value: string }[]>;
-    fetchData: (endpoint: string, headers: object) => Promise<HandlerResponse>;
+  getVersions: () => Promise<{ label: string; value: string }[]>
+  fetchData: (endpoint: string, headers: object) => Promise<HandlerResponse>
 } => {
-    const getVersions = useCallback(async () => {
-        const { result }: HandlerResponse = await window.api.getVersions(
-            import.meta.env.RENDERER_VITE_API_IGRP_VERSIONS
-        );
+  const getVersions = useCallback(async () => {
+    const { result }: HandlerResponse = await window.api.getVersions(
+      import.meta.env.RENDERER_VITE_API_IGRP_VERSIONS
+    )
 
-        return result.items.map((item: any) => {
-            return {
-                label: item.version,
-                value: item.version,
-            };
-        });
-    }, []);
+    return result.items.map((item: any) => {
+      return {
+        label: item.version,
+        value: item.version
+      }
+    })
+  }, [])
 
-    const fetchData = useCallback(async (endpoint: string, headers: object) => {
-        const result: HandlerResponse = await window.api.fetchData(
-            endpoint,
-            headers
-        );
+  const fetchData = useCallback(async (endpoint: string, headers: object) => {
+    const result: HandlerResponse = await window.api.fetchData(endpoint, headers)
 
-        return result;
-    }, []);
+    return result
+  }, [])
 
-    return {
-        getVersions,
-        fetchData,
-    };
-};
+  return {
+    getVersions,
+    fetchData
+  }
+}
 
-export default useCore;
+export default useCore

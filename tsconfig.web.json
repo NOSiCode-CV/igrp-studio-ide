@@ -1,7 +1,6 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
   "include": [
-    "vite-env.d.ts",
     "src/renderer/src/env.d.ts",
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.tsx",
@@ -15,7 +14,6 @@
       "@renderer/*": [
         "src/renderer/src/*"
       ]
-    },
-    "types": ["vite/client"]
+    }
   }
 }

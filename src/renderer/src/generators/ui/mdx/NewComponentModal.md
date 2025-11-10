@@ -39,42 +39,42 @@ The NewComponentModal serves as the primary interface for:
 
 ```typescript
 interface NewComponentModalProps {
-    isOpen: boolean;
-    basePath: string;
-    pageOptions: any[];
-    currentComponent?: PageDefinition;
-    onClose: () => void;
-    onConfirm: () => void;
+  isOpen: boolean
+  basePath: string
+  pageOptions: any[]
+  currentComponent?: PageDefinition
+  onClose: () => void
+  onConfirm: () => void
 }
 ```
 
 ### Form Fields
 
 1. **Component Title** (Description)
-    - Required field
-    - Auto-generates component name on blur
-    - Placeholder: "Todo Item"
+   - Required field
+   - Auto-generates component name on blur
+   - Placeholder: "Todo Item"
 
 2. **Component Name**
-    - Required field
-    - Must follow naming conventions (no spaces/hyphens)
-    - Auto-generated from title
+   - Required field
+   - Must follow naming conventions (no spaces/hyphens)
+   - Auto-generated from title
 
 3. **Page Association**
-    - Optional dropdown
-    - Links component to specific pages
-    - Changes scope from 'app' to 'page'
+   - Optional dropdown
+   - Links component to specific pages
+   - Changes scope from 'app' to 'page'
 
 4. **Icon Browser**
-    - Visual icon selection
-    - Searchable icon library
-    - Preview selected icon
+   - Visual icon selection
+   - Searchable icon library
+   - Preview selected icon
 
 5. **Function Arguments**
-    - Complex argument configuration
-    - Support for optional parameters
-    - Type validation
-    - List/array support
+   - Complex argument configuration
+   - Support for optional parameters
+   - Type validation
+   - List/array support
 
 ## 🔧 **Technical Implementation**
 
@@ -88,20 +88,18 @@ interface NewComponentModalProps {
 ### State Management
 
 ```typescript
-const [arguments_, setArguments] = useState<Arguments[]>([]);
+const [arguments_, setArguments] = useState<Arguments[]>([])
 ```
 
 ### Validation Schema
 
 ```typescript
 const validationSchema = Yup.object({
-    description: Yup.string().required(
-        t('thisFieldRequired', { name: t('componentTitle') })
-    ),
-    name: Yup.string()
-        .required(t('thisFieldRequired', { name: t('name') }))
-        .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet')),
-});
+  description: Yup.string().required(t('thisFieldRequired', { name: t('componentTitle') })),
+  name: Yup.string()
+    .required(t('thisFieldRequired', { name: t('name') }))
+    .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet'))
+})
 ```
 
 ## 🎨 **User Interface**
@@ -115,21 +113,21 @@ const validationSchema = Yup.object({
 ### Form Sections
 
 1. **Basic Information**
-    - Component title and name
-    - Page association dropdown
+   - Component title and name
+   - Page association dropdown
 
 2. **Visual Configuration**
-    - Icon browser with search
-    - Icon preview
+   - Icon browser with search
+   - Icon preview
 
 3. **Advanced Configuration**
-    - Function arguments panel
-    - Type selection
-    - Parameter configuration
+   - Function arguments panel
+   - Type selection
+   - Parameter configuration
 
 4. **Preview Section**
-    - Generated component signature
-    - Real-time code preview
+   - Generated component signature
+   - Real-time code preview
 
 ## 🔧 **FunctionArguments Component**
 
@@ -539,11 +537,11 @@ The FunctionArguments component integrates seamlessly with the NewComponentModal
 
 ```typescript
 export default function myComponent(
-    param1: string,
-    param2?: number,
-    callback: (data: any) => void
+  param1: string,
+  param2?: number,
+  callback: (data: any) => void
 ) {
-    // Component implementation
+  // Component implementation
 }
 ```
 
@@ -583,16 +581,16 @@ components/
 
 ```typescript
 const { error } = await window.engine.createPage(
-    { ...pageConfig, id: getId() },
-    ENV_TYPES.NEXTJS,
-    basePath
-);
+  { ...pageConfig, id: getId() },
+  ENV_TYPES.NEXTJS,
+  basePath
+)
 ```
 
 ### Git Integration
 
 ```typescript
-createGitCommit(basePath, t('addComponent', { name: pageConfig.name }));
+createGitCommit(basePath, t('addComponent', { name: pageConfig.name }))
 ```
 
 ### Toast Notifications

@@ -39,42 +39,42 @@ O NewComponentModal serve como interface principal para:
 
 ```typescript
 interface NewComponentModalProps {
-    isOpen: boolean;
-    basePath: string;
-    pageOptions: any[];
-    currentComponent?: PageDefinition;
-    onClose: () => void;
-    onConfirm: () => void;
+  isOpen: boolean
+  basePath: string
+  pageOptions: any[]
+  currentComponent?: PageDefinition
+  onClose: () => void
+  onConfirm: () => void
 }
 ```
 
 ### Campos do Formulário
 
 1. **Título do Componente** (Descrição)
-    - Campo obrigatório
-    - Auto-gera nome do componente no blur
-    - Placeholder: "Todo Item"
+   - Campo obrigatório
+   - Auto-gera nome do componente no blur
+   - Placeholder: "Todo Item"
 
 2. **Nome do Componente**
-    - Campo obrigatório
-    - Deve seguir convenções de nomenclatura (sem espaços/hífens)
-    - Auto-gerado a partir do título
+   - Campo obrigatório
+   - Deve seguir convenções de nomenclatura (sem espaços/hífens)
+   - Auto-gerado a partir do título
 
 3. **Associação de Página**
-    - Dropdown opcional
-    - Liga componente a páginas específicas
-    - Altera escopo de 'app' para 'page'
+   - Dropdown opcional
+   - Liga componente a páginas específicas
+   - Altera escopo de 'app' para 'page'
 
 4. **Navegador de Ícones**
-    - Seleção visual de ícones
-    - Biblioteca de ícones pesquisável
-    - Pré-visualização do ícone selecionado
+   - Seleção visual de ícones
+   - Biblioteca de ícones pesquisável
+   - Pré-visualização do ícone selecionado
 
 5. **Argumentos de Função**
-    - Configuração complexa de argumentos
-    - Suporte para parâmetros opcionais
-    - Validação de tipos
-    - Suporte para listas/arrays
+   - Configuração complexa de argumentos
+   - Suporte para parâmetros opcionais
+   - Validação de tipos
+   - Suporte para listas/arrays
 
 ## 🔧 **Implementação Técnica**
 
@@ -88,20 +88,18 @@ interface NewComponentModalProps {
 ### Gestão de Estado
 
 ```typescript
-const [arguments_, setArguments] = useState<Arguments[]>([]);
+const [arguments_, setArguments] = useState<Arguments[]>([])
 ```
 
 ### Esquema de Validação
 
 ```typescript
 const validationSchema = Yup.object({
-    description: Yup.string().required(
-        t('thisFieldRequired', { name: t('componentTitle') })
-    ),
-    name: Yup.string()
-        .required(t('thisFieldRequired', { name: t('name') }))
-        .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet')),
-});
+  description: Yup.string().required(t('thisFieldRequired', { name: t('componentTitle') })),
+  name: Yup.string()
+    .required(t('thisFieldRequired', { name: t('name') }))
+    .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet'))
+})
 ```
 
 ## 🎨 **Interface do Utilizador**
@@ -115,21 +113,21 @@ const validationSchema = Yup.object({
 ### Secções do Formulário
 
 1. **Informação Básica**
-    - Título e nome do componente
-    - Dropdown de associação de página
+   - Título e nome do componente
+   - Dropdown de associação de página
 
 2. **Configuração Visual**
-    - Navegador de ícones com pesquisa
-    - Pré-visualização de ícone
+   - Navegador de ícones com pesquisa
+   - Pré-visualização de ícone
 
 3. **Configuração Avançada**
-    - Painel de argumentos de função
-    - Seleção de tipos
-    - Configuração de parâmetros
+   - Painel de argumentos de função
+   - Seleção de tipos
+   - Configuração de parâmetros
 
 4. **Secção de Pré-visualização**
-    - Assinatura de componente gerada
-    - Pré-visualização de código em tempo real
+   - Assinatura de componente gerada
+   - Pré-visualização de código em tempo real
 
 ## 🔧 **Componente FunctionArguments**
 
@@ -539,11 +537,11 @@ O componente FunctionArguments integra-se perfeitamente com o NewComponentModal:
 
 ```typescript
 export default function myComponent(
-    param1: string,
-    param2?: number,
-    callback: (data: any) => void
+  param1: string,
+  param2?: number,
+  callback: (data: any) => void
 ) {
-    // Implementação do componente
+  // Implementação do componente
 }
 ```
 
@@ -583,16 +581,16 @@ components/
 
 ```typescript
 const { error } = await window.engine.createPage(
-    { ...pageConfig, id: getId() },
-    ENV_TYPES.NEXTJS,
-    basePath
-);
+  { ...pageConfig, id: getId() },
+  ENV_TYPES.NEXTJS,
+  basePath
+)
 ```
 
 ### Integração com Git
 
 ```typescript
-createGitCommit(basePath, t('addComponent', { name: pageConfig.name }));
+createGitCommit(basePath, t('addComponent', { name: pageConfig.name }))
 ```
 
 ### Notificações Toast

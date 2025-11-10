@@ -1,268 +1,243 @@
-import {
-    forwardRef,
-    useCallback,
-    useEffect,
-    useImperativeHandle,
-    useMemo,
-    useState,
-} from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 
-import { useConfigdata } from './hooks/useConfigData';
-import useToast from '@renderer/hooks/useToast';
-import { CodeContentJson, CodeContentTS } from './components/CodeContent';
+import { useConfigdata } from './hooks/useConfigData'
+import useToast from '@renderer/hooks/useToast'
+import { CodeContentJson, CodeContentTS } from './components/CodeContent'
 
-import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left';
-import { IGRPSidebarInsetPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { DragEndResult } from '@renderer/lib/dnd/types';
-import { useDroppedComponents } from './dnd/DroppedComponentsContext';
-import { APRESENTATION } from '@renderer/constants/appConstants';
-import RENDERER_CONFIG from '@renderer/renderer.config';
-import { ContainerScrollArea } from '../api/components/ContainerScrollArea';
-import { useTagManager } from './hooks/useTagManager';
-import useStudio from '@renderer/hooks/use-studio';
-import useCustomCode from './hooks/useCustomCode';
+import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left'
+import { IGRPSidebarInsetPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { DragEndResult } from '@renderer/lib/dnd/types'
+import { useDroppedComponents } from './dnd/DroppedComponentsContext'
+import { APRESENTATION } from '@renderer/constants/appConstants'
+import RENDERER_CONFIG from '@renderer/renderer.config'
+import { ContainerScrollArea } from '../api/components/ContainerScrollArea'
+import { useTagManager } from './hooks/useTagManager'
+import useStudio from '@renderer/hooks/use-studio'
+import useCustomCode from './hooks/useCustomCode'
 
-import { PageDefinition } from './page/page-manager';
-import IGRPStudioMainComponent from './types/components/MainComponent';
-import SidebarRight from './components/sidebar/sidebar-right';
-import { handleDragEnd } from './dnd/DraggableItemManager';
-import Loader from '@renderer/components/loader';
+import { PageDefinition } from './page/page-manager'
+import IGRPStudioMainComponent from './types/components/MainComponent'
+import SidebarRight from './components/sidebar/sidebar-right'
+import { handleDragEnd } from './dnd/DraggableItemManager'
+import Loader from '@renderer/components/loader'
 
 // Custom hooks for better organization
-import { useComponentRegistration } from './hooks/useComponentRegistration';
-import { useComponentInitialization } from './hooks/useComponentInitialization';
-import { usePageSave } from './hooks/usePageSave';
+import { useComponentRegistration } from './hooks/useComponentRegistration'
+import { useComponentInitialization } from './hooks/useComponentInitialization'
+import { usePageSave } from './hooks/usePageSave'
 
 interface PageBuilderProps {
-    basePath: string;
-    page: PageDefinition;
-    activePresentation: string;
-    onSave: () => Promise<void>;
+  basePath: string
+  page: PageDefinition
+  activePresentation: string
+  onSave: () => Promise<void>
 }
 
 interface PageBuilderRef {
-    handleSave: () => Promise<void>;
+  handleSave: () => Promise<void>
 }
 
 const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
-    ({ basePath, page, activePresentation }, ref) => {
-        const { id, content, path: pagePath } = page;
-        const isPage = content?.type === 'page';
-        const isProcessStep = content?.type === 'processStep';
+  ({ basePath, page, activePresentation }, ref) => {
+    const { id, content, path: pagePath } = page
+    const isPage = content?.type === 'page'
+    const isProcessStep = content?.type === 'processStep'
 
-        // Custom hooks for better separation of concerns
-        const {
-            components,
-            types,
-            functions,
-            states,
-            imports,
-            setAllImports,
-            setAllTypes,
-            setAllFunctions,
-            setAllComponents,
-            setAllStates,
-            setAllArguments,
-            handleAddChildToComponent,
-            handleReorderChildInComponent,
-            removeRow,
-            clearEditingComponent,
-            currentComponent,
-        } = useDroppedComponents();
+    // Custom hooks for better separation of concerns
+    const {
+      components,
+      types,
+      functions,
+      states,
+      imports,
+      setAllImports,
+      setAllTypes,
+      setAllFunctions,
+      setAllComponents,
+      setAllStates,
+      setAllArguments,
+      handleAddChildToComponent,
+      handleReorderChildInComponent,
+      removeRow,
+      clearEditingComponent,
+      currentComponent
+    } = useDroppedComponents()
 
-        const {
-            componentsRegistered,
-            findComponentById,
-            fetchComponents,
-            findComponent,
-        } = useStudio();
+    const { componentsRegistered, findComponentById, fetchComponents, findComponent } = useStudio()
 
-        const { customComponents } = useCustomCode();
-        const { menuItems } = useConfigdata(componentsRegistered);
-        const { rebuild, generateTag } = useTagManager(components);
-        // Temporary: Back to original implementation to identify the issue
-        const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { customComponents } = useCustomCode()
+    const { menuItems } = useConfigdata(componentsRegistered)
+    const { rebuild, generateTag } = useTagManager(components)
+    // Temporary: Back to original implementation to identify the issue
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
-        const { showErrorToast } = useToast();
+    const { showErrorToast } = useToast()
 
-        const { handleSave } = usePageSave({
-            basePath,
-            content,
-            id,
-            components,
-            functions,
-            types,
-            states,
-            imports,
-            isPage,
-            page,
-        });
+    const { handleSave } = usePageSave({
+      basePath,
+      content,
+      id,
+      components,
+      functions,
+      types,
+      states,
+      imports,
+      isPage,
+      page
+    })
 
-        // Expose handleSave to parent via ref
-        useImperativeHandle(
-            ref,
-            () => ({
-                handleSave: async () => await handleSave(components),
-            }),
-            [handleSave, components]
-        );
+    // Expose handleSave to parent via ref
+    useImperativeHandle(
+      ref,
+      () => ({
+        handleSave: async () => await handleSave(components)
+      }),
+      [handleSave, components]
+    )
 
-        // Memoized drag end handler
-        const onDragEnd = useCallback(
-            async (result: DragEndResult) => {
-                const droppedComponentsMethods = {
-                    removeRow,
-                    handleAddChildToComponent,
-                    handleReorderChildInComponent,
-                    generateTag,
-                    findComponent,
-                    showErrorToast,
-                };
+    // Memoized drag end handler
+    const onDragEnd = useCallback(
+      async (result: DragEndResult) => {
+        const droppedComponentsMethods = {
+          removeRow,
+          handleAddChildToComponent,
+          handleReorderChildInComponent,
+          generateTag,
+          findComponent,
+          showErrorToast
+        }
 
-                console.log('Drag end result:', result);
-                await handleDragEnd(result, droppedComponentsMethods);
-            },
-            [
-                removeRow,
-                handleAddChildToComponent,
-                handleReorderChildInComponent,
-                generateTag,
-                showErrorToast,
-                findComponent,
-            ]
-        );
+        console.log('Drag end result:', result)
+        await handleDragEnd(result, droppedComponentsMethods)
+      },
+      [
+        removeRow,
+        handleAddChildToComponent,
+        handleReorderChildInComponent,
+        generateTag,
+        showErrorToast,
+        findComponent
+      ]
+    )
 
-        // Effects for component lifecycle management
-        useEffect(() => {
-            clearEditingComponent();
-        }, [activePresentation]);
+    // Effects for component lifecycle management
+    useEffect(() => {
+      clearEditingComponent()
+    }, [activePresentation])
 
-        useComponentRegistration({
-            customComponents,
-            fetchComponents,
-            page,
-        });
+    useComponentRegistration({
+      customComponents,
+      fetchComponents,
+      page
+    })
 
-        const { initializeComponents } = useComponentInitialization({
-            content,
-            menuItems,
-            findComponentById,
-            generateTag,
-            setAllComponents,
-            findComponent,
-        });
+    const { initializeComponents } = useComponentInitialization({
+      content,
+      menuItems,
+      findComponentById,
+      generateTag,
+      setAllComponents,
+      findComponent
+    })
 
-        useEffect(() => {
-            const getJsonData = async (): Promise<void> => {
-                try {
-                    if (pagePath === undefined) return;
+    useEffect(() => {
+      const getJsonData = async (): Promise<void> => {
+        try {
+          if (pagePath === undefined) return
 
-                    setIsLoading(true);
+          setIsLoading(true)
 
-                    const data = await window.api?.getJsonContent(pagePath);
+          const data = await window.api?.getJsonContent(pagePath)
 
-                    setAllArguments(data.args);
-                    setAllTypes(data.types);
-                    setAllFunctions(data.functions);
-                    setAllStates(data.states);
-                    setAllImports(data.imports);
+          setAllArguments(data.args)
+          setAllTypes(data.types)
+          setAllFunctions(data.functions)
+          setAllStates(data.states)
+          setAllImports(data.imports)
 
-                    if (data.components) setAllComponents(data.components);
-                } catch (error) {
-                    console.error('Failed to load JSON content:', error);
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-            getJsonData();
-        }, [pagePath, page]);
+          if (data.components) setAllComponents(data.components)
+        } catch (error) {
+          console.error('Failed to load JSON content:', error)
+        } finally {
+          setIsLoading(false)
+        }
+      }
+      getJsonData()
+    }, [pagePath, page])
 
-        useEffect(() => {
-            if (componentsRegistered.length > 0 && !components.componentName) {
-                initializeComponents();
-            }
-        }, [componentsRegistered]);
+    useEffect(() => {
+      if (componentsRegistered.length > 0 && !components.componentName) {
+        initializeComponents()
+      }
+    }, [componentsRegistered])
 
-        useEffect(() => {
-            rebuild();
-        }, [components, rebuild]);
+    useEffect(() => {
+      rebuild()
+    }, [components, rebuild])
 
-        // Memoized render content for better performance
-        const renderContent = useMemo(() => {
-            if (activePresentation === APRESENTATION.DESIGN) {
-                return isLoading ? (
-                    <Loader />
-                ) : (
-                    <IGRPStudioMainComponent
-                        component={components ?? []}
-                        onDragEnd={onDragEnd}
-                    />
-                );
-            } else if (activePresentation === APRESENTATION.JSON) {
-                return (
-                    <CodeContentJson
-                        components={components}
-                        pagePath={pagePath}
-                    />
-                );
-            } else if (activePresentation === APRESENTATION.CODE) {
-                // Ensure pagePath is properly formatted and handle spaces
-                const cleanPagePath = page.pagePath?.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
-                let tsFilePath: string | null = null;
+    // Memoized render content for better performance
+    const renderContent = useMemo(() => {
+      if (activePresentation === APRESENTATION.DESIGN) {
+        return isLoading ? (
+          <Loader />
+        ) : (
+          <IGRPStudioMainComponent component={components ?? []} onDragEnd={onDragEnd} />
+        )
+      } else if (activePresentation === APRESENTATION.JSON) {
+        return <CodeContentJson components={components} pagePath={pagePath} />
+      } else if (activePresentation === APRESENTATION.CODE) {
+        // Ensure pagePath is properly formatted and handle spaces
+        const cleanPagePath = page.pagePath?.replace(/^\/+|\/+$/g, '') // Remove leading/trailing slashes
+        let tsFilePath: string | null = null
 
-                if (isPage)
-                    tsFilePath = cleanPagePath
-                        ? `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/${cleanPagePath}/page.tsx`
-                        : `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/page.tsx`;
-                else if (isProcessStep)
-                    tsFilePath = `${basePath}/${RENDERER_CONFIG.fileSystemPaths.processes}/[...process]/(${content.processKey})/${content.processVersion}/${content.name.toLowerCase()}.tsx`;
-                else {
-                    const withScopePage = content.scope === 'page';
-                    if (withScopePage)
-                        tsFilePath = `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/${content.pagePath}/components/${content.name.toLowerCase()}.tsx`;
-                    else
-                        tsFilePath = `${basePath}/${RENDERER_CONFIG.fileSystemPaths.customComponents}/${content.name.toLowerCase()}.tsx`;
-                }
+        if (isPage)
+          tsFilePath = cleanPagePath
+            ? `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/${cleanPagePath}/page.tsx`
+            : `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/page.tsx`
+        else if (isProcessStep)
+          tsFilePath = `${basePath}/${RENDERER_CONFIG.fileSystemPaths.processes}/[...process]/(${content.processKey})/${content.processVersion}/${content.name.toLowerCase()}.tsx`
+        else {
+          const withScopePage = content.scope === 'page'
+          if (withScopePage)
+            tsFilePath = `${basePath}/${RENDERER_CONFIG.fileSystemPaths.generated}/${content.pagePath}/components/${content.name.toLowerCase()}.tsx`
+          else
+            tsFilePath = `${basePath}/${RENDERER_CONFIG.fileSystemPaths.customComponents}/${content.name.toLowerCase()}.tsx`
+        }
 
-                return <CodeContentTS pagePath={tsFilePath ?? ''} />;
-            } else {
-                return isLoading ? (
-                    <Loader />
-                ) : (
-                    <IGRPStudioMainComponent
-                        component={components ?? []}
-                        onDragEnd={onDragEnd}
-                    />
-                );
-            }
-        }, [
-            activePresentation,
-            isLoading,
-            components,
-            onDragEnd,
-            pagePath,
-            basePath,
-            page,
-            content,
-            isPage,
-        ]);
+        return <CodeContentTS pagePath={tsFilePath ?? ''} />
+      } else {
+        return isLoading ? (
+          <Loader />
+        ) : (
+          <IGRPStudioMainComponent component={components ?? []} onDragEnd={onDragEnd} />
+        )
+      }
+    }, [
+      activePresentation,
+      isLoading,
+      components,
+      onDragEnd,
+      pagePath,
+      basePath,
+      page,
+      content,
+      isPage
+    ])
 
-        return (
-            <div className="flex flex-1 overflow-hidden">
-                <AppSidebar data={menuItems} basePath={basePath} />
-                <IGRPSidebarInsetPrimitive>
-                    <div className="flex flex-1 flex-col gap-4 p-2">
-                        <ContainerScrollArea>
-                            {renderContent}
-                        </ContainerScrollArea>
-                    </div>
-                </IGRPSidebarInsetPrimitive>
-                {currentComponent && <SidebarRight />}
-            </div>
-        );
-    }
-);
+    return (
+      <div className="flex flex-1 overflow-hidden">
+        <AppSidebar data={menuItems} basePath={basePath} />
+        <IGRPSidebarInsetPrimitive>
+          <div className="flex flex-1 flex-col gap-4 p-2">
+            <ContainerScrollArea>{renderContent}</ContainerScrollArea>
+          </div>
+        </IGRPSidebarInsetPrimitive>
+        {currentComponent && <SidebarRight />}
+      </div>
+    )
+  }
+)
 
-PageBuilder.displayName = 'PageBuilder';
+PageBuilder.displayName = 'PageBuilder'
 
-export default PageBuilder;
+export default PageBuilder

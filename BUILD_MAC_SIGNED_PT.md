@@ -24,23 +24,23 @@ Guia completo para construir e assinar o IGRP Studio para distribuição em macO
 - **macOS**: 10.15 (Catalina) ou superior recomendado
 - **Xcode Command Line Tools**: Necessário para assinatura de código
 
-    ```bash
-    xcode-select --install
-    ```
+  ```bash
+  xcode-select --install
+  ```
 
 ### Requisitos de Software
 
 - **Node.js**: Versão `^20.19.0` ou `>=22.12.0`
 
-    ```bash
-    node --version
-    ```
+  ```bash
+  node --version
+  ```
 
 - **Yarn**: Gestor de pacotes
 
-    ```bash
-    npm install -g yarn
-    ```
+  ```bash
+  npm install -g yarn
+  ```
 
 ### Requisitos da Apple Developer
 
@@ -72,10 +72,10 @@ Guia completo para construir e assinar o IGRP Studio para distribuição em macO
 1. Abra o **Keychain Access** (Aplicações → Utilitários)
 2. Vá a **Keychain Access** → **Assistente de Certificado** → **Solicitar um Certificado de uma Autoridade de Certificação**
 3. Preencha o formulário:
-    - **Endereço de Email do Utilizador**: O email do seu Apple ID
-    - **Nome Comum**: O seu nome ou nome da empresa
-    - **Endereço de Email da AC**: Deixe vazio
-    - Selecione **"Guardado em disco"**
+   - **Endereço de Email do Utilizador**: O email do seu Apple ID
+   - **Nome Comum**: O seu nome ou nome da empresa
+   - **Endereço de Email da AC**: Deixe vazio
+   - Selecione **"Guardado em disco"**
 4. Guarde o ficheiro Certificate Signing Request (CSR)
 5. Aceda a [Certificados Apple Developer](https://developer.apple.com/account/resources/certificates/list)
 6. Clique em **+** para criar um novo certificado
@@ -340,15 +340,15 @@ source=Notarized Developer ID
 
 1. **Montar o DMG**:
 
-    ```bash
-    open dist/IGRP-Studio-0.1.0-beta.14-universal.dmg
-    ```
+   ```bash
+   open dist/IGRP-Studio-0.1.0-beta.14-universal.dmg
+   ```
 
 2. **Copiar para Aplicações** (ou executar diretamente)
 
 3. **Iniciar a aplicação**:
-    - Se devidamente assinada e notarizada, deve abrir sem avisos
-    - O macOS verificará a assinatura no primeiro lançamento
+   - Se devidamente assinada e notarizada, deve abrir sem avisos
+   - O macOS verificará a assinatura no primeiro lançamento
 
 ### 5. Testar Noutro Mac (Recomendado)
 
@@ -375,9 +375,9 @@ Para melhor verificação:
 **Solução**:
 
 - Verifique que o certificado está instalado no Keychain:
-    ```bash
-    security find-identity -v -p codesigning
-    ```
+  ```bash
+  security find-identity -v -p codesigning
+  ```
 - Se faltar, reinstale o certificado Developer ID Application
 - Certifique-se de que o certificado é válido (não expirado)
 
@@ -386,22 +386,22 @@ Para melhor verificação:
 **Soluções**:
 
 1. **Verifique credenciais**:
-    - Verifique que `APPLE_ID` está correto
-    - Verifique que `APPLE_TEAM_ID` corresponde à sua conta
-    - Regenere `APPLE_APP_SPECIFIC_PASSWORD` se necessário
+   - Verifique que `APPLE_ID` está correto
+   - Verifique que `APPLE_TEAM_ID` corresponde à sua conta
+   - Regenere `APPLE_APP_SPECIFIC_PASSWORD` se necessário
 
 2. **Verifique ligação à internet**:
-    - A notarização requer envio para servidores Apple
-    - Verifique configurações de firewall
+   - A notarização requer envio para servidores Apple
+   - Verifique configurações de firewall
 
 3. **Verifique conta Apple Developer**:
-    - Certifique-se de que a subscrição está ativa
-    - Verifique que o email está confirmado
+   - Certifique-se de que a subscrição está ativa
+   - Verifique que o email está confirmado
 
 4. **Veja logs de notarização**:
-    ```bash
-    xcrun notarytool log --apple-id seu@email.com --team-id QT6DP36974 <submission-id>
-    ```
+   ```bash
+   xcrun notarytool log --apple-id seu@email.com --team-id QT6DP36974 <submission-id>
+   ```
 
 ### Problema: "Build falha durante verificação TypeScript"
 
@@ -436,9 +436,9 @@ chmod +x scripts/sign-and-build.sh
 
 1. **Verifique notarização** (passo 3 na secção Verificação)
 2. **Verifique Gatekeeper**:
-    ```bash
-    spctl -a -vvv -t install /caminho/para/app
-    ```
+   ```bash
+   spctl -a -vvv -t install /caminho/para/app
+   ```
 3. **Certifique-se de que o DMG foi criado corretamente** (não apenas o bundle .app)
 
 ---
@@ -512,10 +512,10 @@ Se encontrar problemas:
 2. Reveja logs de build cuidadosamente
 3. Verifique que todos os pré-requisitos estão cumpridos
 4. Contacte a equipa de desenvolvimento com:
-    - Comando de build usado
-    - Mensagens de erro (sem credenciais)
-    - Versão do macOS
-    - Versão do Node.js
+   - Comando de build usado
+   - Mensagens de erro (sem credenciais)
+   - Versão do macOS
+   - Versão do Node.js
 
 ---
 
