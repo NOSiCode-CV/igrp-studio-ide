@@ -33,8 +33,8 @@ importers:
         specifier: 0.1.0-beta.41
         version: 0.1.0-beta.41(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(next@16.0.1(@babel/core@7.28.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.93.3))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@igrp/igrp-studio-nextjs-engine':
-        specifier: 0.1.0-beta.35
-        version: 0.1.0-beta.35(@types/react@19.2.2)(typescript@5.9.3)(webpack@5.102.1)
+        specifier: 0.1.0-beta.36
+        version: 0.1.0-beta.36(@types/react@19.2.2)(typescript@5.9.3)(webpack@5.102.1)
       '@igrp/igrp-studio-springboot-engine':
         specifier: 0.1.0-beta.8
         version: 0.1.0-beta.8(typescript@5.9.3)(webpack@5.102.1)
@@ -1022,8 +1022,8 @@ packages:
       react: ^19.2.0
       react-dom: ^19.2.0
 
-  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.35':
-    resolution: {integrity: sha512-A8PfpPGUpQd7JfDEf12j90yLDIrLaT+7ESXiPoOUnQSa7CX8jaI7uaiADLEWs/KuKhVXkbwfHrZRhs/dA5U6jQ==}
+  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.36':
+    resolution: {integrity: sha512-w21hB2ioSKoKqjPFpFdMnvsqX/eZJOq3AurDfHlUTS/gjwWzyBTjNFaCODXgofIxxWQPIVpw9YWZFTvnZLyJWg==}
 
   '@igrp/igrp-studio-springboot-engine@0.1.0-beta.8':
     resolution: {integrity: sha512-lgIY+vzVzqR9AZ+PUt92OGBcBRnbMsv/g+NRuQb93DH0wE9VyrAMGI9qefJrib7T6Fe0Vvz9kpZDLZYAhHeiwg==}
@@ -8319,7 +8319,7 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.35(@types/react@19.2.2)(typescript@5.9.3)(webpack@5.102.1)':
+  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.36(@types/react@19.2.2)(typescript@5.9.3)(webpack@5.102.1)':
     dependencies:
       '@prettier/sync': 0.5.5(prettier@3.6.2)
       '@types/adm-zip': 0.5.7
