@@ -93,7 +93,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
         {columns.map((child) => (
           <IGRPTableCellPrimitive key={child.id}>
             {child.componentName === COMPONENT.TableCheckboxCell ? (
-              <IGRPCheckboxPrimitive id={child.id} checked={row[child.id]} />
+              <IGRPCheckboxPrimitive id={child.id} checked={row[child.id] as boolean} />
             ) : child.componentName === COMPONENT.TableableBadgeCell ? (
               <IGRPBadgePrimitive variant="outline">{faker.lorem.words(1)}</IGRPBadgePrimitive>
             ) : child.componentName === COMPONENT.TableActionListCell ? (

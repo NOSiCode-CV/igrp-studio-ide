@@ -9,7 +9,7 @@ export const useFakedata = (): {
   getFakeComponentData: (componentName: string) => StructuredComponent
 } => {
   // Fake data generator for different component types
-  const FAKE_COMPONENT_DATA: Record<string, StructuredComponent> = {
+  const FAKE_COMPONENT_DATA: Record<string, any> = {
     [COMPONENT.Piechart]: {
       componentName: COMPONENT.Piechart,
       properties: {

@@ -306,7 +306,7 @@ export const FunctionArguments = ({
       <IGRPAccordionPrimitive type="single" collapsible className="w-full">
         {arguments_.map((arg, index) => (
           <IGRPAccordionItemPrimitive value={`argName-${index}`} key={arg.id}>
-            <IGRPAccordionTriggerPrimitive>
+            <IGRPAccordionTriggerPrimitive iconName="ChevronDown" showIcon iconPlacement="end">
               <div className="flex justify-between items-center w-full">
                 <div className="flex items-center space-x-2">
                   <span className="font-medium">Argument {index + 1}</span>

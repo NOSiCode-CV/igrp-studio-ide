@@ -522,7 +522,13 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                   defaultValue="item-1"
                 >
                   <IGRPAccordionItemPrimitive value="item-1">
-                    <IGRPAccordionTriggerPrimitive>{t('properties')}</IGRPAccordionTriggerPrimitive>
+                    <IGRPAccordionTriggerPrimitive
+                      iconName="ChevronDown"
+                      showIcon
+                      iconPlacement="end"
+                    >
+                      {t('properties')}
+                    </IGRPAccordionTriggerPrimitive>
                     <IGRPAccordionContentPrimitive className="space-y-2">
                       {propsComponent && (
                         <RenderPropsConfig
@@ -551,7 +557,11 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                   </IGRPAccordionItemPrimitive>
                   {Object.keys(propsComponentChild).length > 0 && (
                     <IGRPAccordionItemPrimitive value="item-1">
-                      <IGRPAccordionTriggerPrimitive>
+                      <IGRPAccordionTriggerPrimitive
+                        iconName="ChevronDown"
+                        showIcon
+                        iconPlacement="end"
+                      >
                         {t('Child Properties')}
                       </IGRPAccordionTriggerPrimitive>
                       <IGRPAccordionContentPrimitive className="space-y-2">

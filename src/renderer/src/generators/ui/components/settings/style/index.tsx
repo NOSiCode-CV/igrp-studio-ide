@@ -166,7 +166,12 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
       <IGRPAccordionPrimitive type="single" collapsible className="w-full">
         {sections.map((section) => (
           <IGRPAccordionItemPrimitive key={section.id} value={section.id}>
-            <IGRPAccordionTriggerPrimitive className="group">
+            <IGRPAccordionTriggerPrimitive
+              className="group"
+              iconName="ChevronDown"
+              showIcon
+              iconPlacement="end"
+            >
               <div className="flex align-middle items-center gap-2">
                 {section.icon}
                 {section.title}
