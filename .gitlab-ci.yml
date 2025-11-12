@@ -28,7 +28,7 @@ build_packagedev_mac:
   script:
     - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
     - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
-    - pnpm install --frozen-lockfile --ignore-engines
+    - pnpm install --frozen-lockfile 
     - pnpm release:mac
   artifacts:
     paths:
@@ -68,7 +68,7 @@ build_packagedev:
   script:
     - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
     - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
-    - pnpm install --frozen-lockfile --ignore-engines
+    - pnpm install --frozen-lockfile 
     - pnpm release:win
     - pnpm release:linux
     #- yarn release:mac
