@@ -2,7 +2,11 @@ import { useIGRPToast } from '@igrp/igrp-framework-react-design-system'
 
 const MAX_LENGTH = 300
 
-const useToast = () => {
+const useToast = (): {
+    showSuccessToast: (message: string) => void
+    showErrorToast: (error: any) => void
+    showWarningToast: (message: string) => void
+} => {
 
     const { igrpToast } = useIGRPToast()
 
@@ -10,7 +14,7 @@ const useToast = () => {
         igrpToast({ type: 'success', content: message })
     }
 
-    const displayError = (message: string) => {
+    const displayError = (message: string): void => {
         if (message.length > MAX_LENGTH) {
             igrpToast({ type: 'error', content: `${message.substring(0, MAX_LENGTH)}[...]` })
         } else {
