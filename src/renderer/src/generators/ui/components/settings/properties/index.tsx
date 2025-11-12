@@ -1,6 +1,6 @@
 import {
   IGRPCombobox,
-  IGRPDatePicker,
+  IGRPDatePickerSingle,
   IGRPOptionsProps,
   IGRPRadioGroup
 } from '@igrp/igrp-framework-react-design-system'
@@ -307,15 +307,17 @@ const RenderPropsConfig = ({
                   id={parentKey ? `${parentKey}.${key}` : key}
                   type="number"
                   name={key}
-                  value={value}
-                  onChange={(e) => onInputChange(fieldPath, (e.target as HTMLInputElement).value)}
+                  value={Number(value)}
+                  onChange={(e) => {
+                    onInputChange(fieldPath, Number((e.target as HTMLInputElement).value))
+                  }}
                 />
               )
             case 'date':
               return (
-                <IGRPDatePicker
+                <IGRPDatePickerSingle
                   name={parentKey ? `${parentKey}.${key}` : key}
-                  date={value}
+                  date={value ? new Date(value) : undefined}
                   onDateChange={(value) => onInputChange(fieldPath, value)}
                   className=""
                   id={parentKey ? `${parentKey}.${key}` : key}
@@ -368,8 +370,6 @@ const FieldActions = ({
 }): React.ReactNode => {
   const [open, setOpen] = useState<boolean>(false)
   const [selected, setSelected] = useState<Data>({})
-  const [inputValue, setInputValue] = useState<string>('')
-
   const state: State = {
     id: '',
     name: `${tag.charAt(0).toLowerCase() + tag.slice(1)}${capitalize(field)}`,
@@ -379,11 +379,7 @@ const FieldActions = ({
   }
 
   const stateSaved = selected.state || selected.value ? selected : dataProperties?.[field]
-
-  // Update input value when stateSaved changes
-  useEffect(() => {
-    setInputValue(stateSaved?.value?.code || '')
-  }, [stateSaved?.value?.code])
+  const inputValue = selected.value?.code ?? dataProperties?.[field]?.value?.code ?? ''
 
   return (
     <>
@@ -424,9 +420,7 @@ const FieldActions = ({
 
                 onSelectState(field, result, undefined)
 
-                setSelected({
-                  state: result
-                })
+                setSelected(result ? { state: result } : {})
               }}
               options={statesOptions}
               className="w-full"
@@ -448,9 +442,7 @@ const FieldActions = ({
                         }
                       : undefined
                     onSelectState(field, undefined, result)
-                    setSelected({
-                      value: result
-                    })
+                    setSelected(result ? { value: result } : {})
                   }}
                   options={argumentsOptions}
                   className="w-full"
@@ -471,7 +463,6 @@ const FieldActions = ({
                 value={inputValue}
                 onChange={(e) => {
                   const newValue = e.target.value
-                  setInputValue(newValue)
                   const result = newValue
                     ? {
                         id: '',
@@ -479,9 +470,7 @@ const FieldActions = ({
                       }
                     : undefined
                   onSelectState(field, undefined, result)
-                  setSelected({
-                    value: result
-                  })
+                  setSelected(result ? { value: result } : {})
                 }}
               />
             </div>

@@ -76,7 +76,7 @@ export const ComputeLabelConfigPopover: React.FC<ComputeLabelConfigPopoverProps>
         <IGRPButtonPrimitive
           variant="outline"
           size="sm"
-          className="gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30 transition-all duration-200"
+          className="gap-2  from-primary-50 to-indigo-50 dark:from-primary-950/20 dark:to-indigo-950/20 border-primary-200 dark:border-primary-800 hover:from-primary-100 hover:to-indigo-100 dark:hover:from-primary-900/30 dark:hover:to-indigo-900/30 transition-all duration-200"
         >
           <Settings className="h-4 w-4" />
           {buttonLabel}
@@ -131,7 +131,7 @@ export const ComputeLabelConfigPopover: React.FC<ComputeLabelConfigPopoverProps>
             />
 
             {/* Function Implementation Example */}
-            <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200  rounded-md space-y-2">
+            <div className="mt-2 p-3 bg-primary-50 dark:bg-primary-950/20 border border-primary-200  rounded-md space-y-2">
               <div>
                 <p className="text-xs font-medium mb-1">How to implement this function:</p>
                 <p className="text-xs text-muted-foreground">
@@ -157,7 +157,7 @@ export const ComputeLabelConfigPopover: React.FC<ComputeLabelConfigPopoverProps>
               <div className="flex items-start gap-1">
                 <p className="text-xs text-muted-foreground">
                   Access item properties using{' '}
-                  <code className="px-1 py-0.5 bg-blue-100 dark:bg-blue-900/30 rounded">
+                  <code className="px-1 py-0.5 bg-primary-100 dark:bg-primary-900/30 rounded">
                     item.fieldName
                   </code>
                 </p>

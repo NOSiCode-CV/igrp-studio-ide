@@ -182,14 +182,14 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
       }
     })
 
-    const loadProps = async () => {
+    const loadProps = async (): Promise<void> => {
       try {
         setIsLoading(true)
         const data = await getPropertiesComponent(currentPath, componentName)
         setPropsComponent(data)
 
         // Função para fazer deep merge de objetos
-        const deepMerge = (target: any, source: any) => {
+        const deepMerge = (target: any, source: any): any => {
           const result = { ...target }
 
           for (const key in source) {
@@ -274,33 +274,6 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
               properties: initialValues
             }) as StructuredComponent
         )
-
-        //TODO review this, when properties key
-        if (data && tempEditingComponent?.data) {
-          // Check if any data keys are referenced in the schema properties
-          /* const cleanedData = { ...tempEditingComponent.data };
-                    let hasChanges = false;
-
-                    Object.keys(tempEditingComponent.data).forEach((key) => {
-                        const isReferencedInProps = isKeyReferencedInProperties(
-                            key,
-                            data || {}
-                        );
-
-                        // Only delete if not referenced in schema properties
-                        if (!isReferencedInProps) {
-                            delete cleanedData[key];
-                            hasChanges = true;
-                        }
-                    });
-
-                    // If we made changes, update the component with cleaned data
-                    if (hasChanges) {
-                        handleUpdateChildComponent(componentId, {
-                            data: cleanedData,
-                        });
-                    }  */
-        }
       } catch (error) {
         console.error('Error loading properties component:', error)
       } finally {
@@ -356,16 +329,23 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
   }, [childformValues, componentId])
 
   // Helper function to set nested values in objects
-  const setNestedValue = useCallback((obj: any, path: string[], val: any): any => {
-    const [first, ...rest] = path
-    if (rest.length === 0) {
-      return { ...obj, [first]: val }
-    }
-    return {
-      ...obj,
-      [first]: setNestedValue(obj[first] || {}, rest, val)
-    }
-  }, [])
+  const setNestedValue = useCallback(
+    (
+      obj: Record<string, any>,
+      path: string[],
+      val: string | boolean | number
+    ): Record<string, string | boolean | number | undefined> => {
+      const [first, ...rest] = path
+      if (rest.length === 0) {
+        return { ...obj, [first]: val }
+      }
+      return {
+        ...obj,
+        [first]: setNestedValue(obj[first] || {}, rest, val)
+      }
+    },
+    []
+  )
 
   // Custom event handlers
   const handleComponentPropertyChange = useCallback(
@@ -400,7 +380,7 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
     clearEditingComponent()
   }, [clearEditingComponent])
 
-  const udpateTag = (e: ChangeEvent<HTMLInputElement>) => {
+  const udpateTag = (e: ChangeEvent<HTMLInputElement>): void => {
     if (!componentId) return
 
     setTempEditingComponent(
@@ -420,7 +400,7 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
     field: string
     state?: State
     value?: DataValue
-  }) => {
+  }): void => {
     if (!componentId) return
 
     const updatedData = { ...tempEditingComponent?.data }
