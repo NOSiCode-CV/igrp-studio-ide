@@ -18,9 +18,9 @@ const CardComponent = ({ comp, group, hoverClass, onDragEnd }: CardComponentProp
 
   const { componentName, properties, style } = comp
 
-  const { iconProperties, className, content, ...args } = properties || {}
+  const { iconProperties, className, content, label, ...args } = properties || {}
 
-  const componentLabel = content || properties?.label || componentName
+  const componentLabel = content || label || properties?.label || componentName
 
   const Icon = ICON_MAP[componentName]
 
@@ -51,7 +51,7 @@ const CardComponent = ({ comp, group, hoverClass, onDragEnd }: CardComponentProp
           hoverClass={hoverClass}
           group={group}
         >
-          {content || FAKE_COMPONENT_DATA?.properties?.content}
+          {content || label || FAKE_COMPONENT_DATA?.properties?.content}
         </Component>
       ) : (
         <div className="rounded-lg shadow-xs border p-4 bg-card">
