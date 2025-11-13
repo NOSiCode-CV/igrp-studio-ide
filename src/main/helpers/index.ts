@@ -95,10 +95,6 @@ export async function getFileContent(filePath: string): Promise<any> {
   }
 }
 
-export function addNumbers(a: number, b: number) {
-  return a + b
-}
-
 export const handleWithCustomErrors = (channel: string, handler: Handler) => {
   ipcMain.handle(channel, async (event: IpcMainInvokeEvent, ...args: any[]) => {
     try {

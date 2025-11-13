@@ -1,0 +1,42 @@
+services:
+  sentry-postgres:
+    image: postgres:17
+    container_name: sentry-postgres
+    environment:
+      POSTGRES_USER: sentry
+      POSTGRES_PASSWORD: sentry
+      POSTGRES_DB: sentry
+    volumes:
+      - sentry_postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  sentry-redis:
+    image: redis:7
+    platform: linux/amd64
+    container_name: sentry-redis
+    restart: always
+
+  sentry:
+    image: getsentry/sentry:24.9.0
+    platform: linux/amd64
+    container_name: sentry
+    depends_on:
+      - sentry-postgres
+      - sentry-redis
+    environment:
+      SENTRY_SECRET_KEY: '31c1b5ced8cd460a7080b6129ac5199e03b1dda505ecf7043d5b58a3db08ffe9'
+      SENTRY_DB_USER: sentry
+      SENTRY_DB_PASSWORD: sentry
+      SENTRY_DB_NAME: sentry
+      SENTRY_REDIS_HOST: sentry-redis
+      SENTRY_POSTGRES_HOST: sentry-postgres
+      SENTRY_SINGLE_ORGANIZATION: 'true'
+    ports:
+      - "9000:9000"
+    restart: always
+    volumes:
+      - sentry_data:/var/lib/sentry/files
+
+volumes:
+  sentry_postgres_data:
+  sentry_data:
