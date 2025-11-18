@@ -168,7 +168,7 @@ const IGRPSTudioDialogFooter: React.FC<CardComponentProps> = ({ comp, onDragEnd 
                   )
                 }
                 group="group/card-dialog-footer"
-                className="top-0 opacity-0 group-hover/card-dialog-footer:opacity-100"
+                className="opacity-0 group-hover/card-dialog-footer:opacity-100"
               >
                 <>
                   <CardComponent comp={child} onDragEnd={onDragEnd} />

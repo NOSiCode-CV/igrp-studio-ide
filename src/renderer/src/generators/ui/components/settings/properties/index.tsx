@@ -100,6 +100,66 @@ const getNestedValue = (obj: any, path: string) => {
 
 const RENDER_IGNORE = ['segments', 'params']
 
+// Componente para inputs que só atualizam no onBlur
+const ControlledInput = ({
+  id,
+  name,
+  type,
+  value,
+  onBlur,
+  fieldPath,
+  onInputChange
+}: {
+  id: string
+  name: string
+  type: 'text' | 'number'
+  value: any
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
+  fieldPath: string
+  onInputChange: (fieldPath: string, value: any) => void
+}): React.ReactNode => {
+  const normalizedValue = type === 'number' ? Number(value) || 0 : value || ''
+  const [localValue, setLocalValue] = useState<string | number>(normalizedValue)
+  const isFocusedRef = React.useRef(false)
+  const previousValueRef = React.useRef(normalizedValue)
+
+  // Só sincroniza o valor externo se não estiver focado e o valor realmente mudou
+  React.useEffect(() => {
+    if (!isFocusedRef.current && previousValueRef.current !== normalizedValue) {
+      setLocalValue(normalizedValue)
+      previousValueRef.current = normalizedValue
+    }
+  }, [normalizedValue])
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>): void => {
+    isFocusedRef.current = false
+    const inputValue = e.target.value
+    const finalValue = type === 'number' ? Number(inputValue) : inputValue
+    onInputChange(fieldPath, finalValue)
+    previousValueRef.current = finalValue
+    onBlur?.(e)
+  }
+
+  const handleFocus = (): void => {
+    isFocusedRef.current = true
+  }
+
+  return (
+    <IGRPInputPrimitive
+      id={id}
+      type={type}
+      name={name}
+      value={localValue}
+      onChange={(e) => {
+        const inputValue = (e.target as HTMLInputElement).value
+        setLocalValue(type === 'number' ? Number(inputValue) || 0 : inputValue)
+      }}
+      onBlur={handleBlur}
+      onFocus={handleFocus}
+    />
+  )
+}
+
 const RenderPropsConfig = ({
   propsComp,
   formValues,
@@ -293,24 +353,24 @@ const RenderPropsConfig = ({
             case 'string':
             case 'any':
               return (
-                <IGRPInputPrimitive
+                <ControlledInput
                   id={parentKey ? `${parentKey}.${key}` : key}
                   type="text"
                   name={key}
                   value={value}
-                  onChange={(e) => onInputChange(fieldPath, (e.target as HTMLInputElement).value)}
+                  fieldPath={fieldPath}
+                  onInputChange={onInputChange}
                 />
               )
             case 'number':
               return (
-                <IGRPInputPrimitive
+                <ControlledInput
                   id={parentKey ? `${parentKey}.${key}` : key}
                   type="number"
                   name={key}
-                  value={Number(value)}
-                  onChange={(e) => {
-                    onInputChange(fieldPath, Number((e.target as HTMLInputElement).value))
-                  }}
+                  value={value}
+                  fieldPath={fieldPath}
+                  onInputChange={onInputChange}
                 />
               )
             case 'date':
@@ -731,12 +791,13 @@ const SlugBindingConfig = ({
         ]}
       />
       {linkType === 'LINK' ? (
-        <IGRPInputPrimitive
+        <ControlledInput
           id={parentKey ? `${parentKey}.${key}` : key}
-          type="email"
+          type="text"
           name={key}
           value={value}
-          onChange={(e) => onInputChange(fieldPath, e.target.value)}
+          fieldPath={fieldPath}
+          onInputChange={onInputChange}
         />
       ) : (
         <PageSelectionConfig
