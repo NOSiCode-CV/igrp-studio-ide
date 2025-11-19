@@ -100,13 +100,13 @@ Users can choose different function types, depending on the engine's options:
 - **Inline Function**: Write the function directly and receive arguments like click return. When clicking the "Function" tab, the system can automatically import dependencies.
 
 ```ts
-(event) => myClickHandler(event);
+;(event) => myClickHandler(event)
 ```
 
 or
 
 ```ts
-myClickHandler;
+myClickHandler
 ```
 
 - **Custom Code**: Custom code that defines specific logic for the event.
@@ -158,7 +158,7 @@ Associate conditional logic to components, for example:
 Show a component only if a rule is satisfied:
 
 ```tsx
-state1;
+state1
 ```
 
 ### ⚙️ Example 2: Comparison Logic
@@ -166,7 +166,7 @@ state1;
 Show a component only if a rule is satisfied:
 
 ```tsx
-state2 === 'value';
+state2 === 'value'
 ```
 
 ### 🧩 Example 3: Multiple State Combination
@@ -174,7 +174,7 @@ state2 === 'value';
 Show a component only if a rule is satisfied:
 
 ```tsx
-state1 && state2;
+state1 && state2
 ```
 
 > ✨ Tip: Use the `Custom Code` tab to create a state like
@@ -182,5 +182,5 @@ state1 && state2;
 > **_onClick_** event. This way, you can control visibility with:
 
 ```tsx
-() => setShowFilter(!showFilter);
+;() => setShowFilter(!showFilter)
 ```

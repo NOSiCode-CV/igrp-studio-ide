@@ -1,7 +1,7 @@
-import SupportContent from '@renderer/components/support-content';
+import SupportContent from '@renderer/components/support-content'
 
 const FooterSidebar = () => {
-    return <SupportContent />;
-};
+  return <SupportContent />
+}
 
-export default FooterSidebar;
+export default FooterSidebar

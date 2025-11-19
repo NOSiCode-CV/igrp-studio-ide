@@ -1,194 +1,168 @@
-import { useEffect, useState } from 'react';
-import { useFormik } from 'formik';
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
-import { useGit } from '@renderer/hooks/use-git';
-import { useTabs } from '@renderer/components/navigation/TabContext';
-import useStudioAPI from '@renderer/hooks/use-studio-api';
-import { getId } from '@renderer/utils';
-import { DTOConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants';
-import { getTablesColumns, initialValues } from './config';
-import { useDtoValidation } from './validation';
-import { IColumnsTabelProps } from '../../types/Interfaces';
-import useToast from '@renderer/hooks/useToast';
-import { useKeyPress } from '@renderer/hooks/useKeyDown';
-import { KeyboardKey } from '@renderer/constants/shortcut';
+import { useEffect, useState } from 'react'
+import { useFormik } from 'formik'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
+import { useGit } from '@renderer/hooks/use-git'
+import { useTabs } from '@renderer/components/navigation/TabContext'
+import useStudioAPI from '@renderer/hooks/use-studio-api'
+import { getId } from '@renderer/utils'
+import { DTOConfig } from '@igrp/igrp-studio-springboot-engine/types'
+import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants'
+import { getTablesColumns, initialValues } from './config'
+import { useDtoValidation } from './validation'
+import { IColumnsTabelProps } from '../../types/Interfaces'
+import useToast from '@renderer/hooks/useToast'
+import { useKeyPress } from '@renderer/hooks/useKeyDown'
+import { KeyboardKey } from '@renderer/constants/shortcut'
 
-export const useDto = ({
-    selectors,
-    currentItem,
-}: {
-    selectors: Array<any>;
-    currentItem: any;
-}) => {
-    const { initializeTabFromCurrentItem, handleRenameTab } = useTabs();
-    const { createGitCommit } = useGit();
-    const { showErrorToast, showSuccessToast } = useToast();
-    const dispatch: any = useDispatch();
-    const { models, basePath, dto, enums, getJsonData } = useStudioAPI(
-        currentItem?.module
-    );
-    const { t } = useTranslation();
+export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
+  const { initializeTabFromCurrentItem, handleRenameTab } = useTabs()
+  const { createGitCommit } = useGit()
+  const { showErrorToast, showSuccessToast } = useToast()
+  const dispatch: any = useDispatch()
+  const { models, basePath, dto, enums, getJsonData } = useStudioAPI(currentItem?.module)
+  const { t } = useTranslation()
 
-    const [id, setId] = useState<string>('');
-    const [data, setData] = useState<any>(null);
-    const [tablesColumns, setTableColumns] = useState<{
-        [key: string]: IColumnsTabelProps[];
-    }>({});
+  const [id, setId] = useState<string>('')
+  const [data, setData] = useState<any>(null)
+  const [tablesColumns, setTableColumns] = useState<{
+    [key: string]: IColumnsTabelProps[]
+  }>({})
 
-    const validationSchema = useDtoValidation({ t });
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues,
-        validationSchema,
-        onSubmit: async (values) => {
-            await handleSave(values);
-        },
-    });
+  const validationSchema = useDtoValidation({ t })
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues,
+    validationSchema,
+    onSubmit: async (values) => {
+      await handleSave(values)
+    }
+  })
 
-    useEffect(() => {
-        const load = async () => {
-            await getJsonData(currentItem.path).then((data) => {
-                setData(data);
-            });
-        };
-        load();
-    }, [currentItem]);
+  useEffect(() => {
+    const load = async () => {
+      await getJsonData(currentItem.path).then((data) => {
+        setData(data)
+      })
+    }
+    load()
+  }, [currentItem])
 
-    useEffect(() => {
-        if (!data) {
-            formik.resetForm();
-            return;
-        }
-        const { attributes, type } = data;
+  useEffect(() => {
+    if (!data) {
+      formik.resetForm()
+      return
+    }
+    const { attributes, type } = data
 
-        formik.setValues(data);
-        formik.setFieldValue(
-            'attributes',
-            attributes || initialValues.attributes
-        );
-        formik.setFieldValue(
-            'attributes',
-            attributes || initialValues.attributes
-        );
+    formik.setValues(data)
+    formik.setFieldValue('attributes', attributes || initialValues.attributes)
+    formik.setFieldValue('attributes', attributes || initialValues.attributes)
 
-        if (type === OPTION_TYPE.MODEL) {
-            setId(getId());
-            const baseAttributeFields = initialValues.attributes[0]
-                ? Object.keys(initialValues.attributes[0])
-                : [];
-            const baseAttributeDefaults = initialValues.attributes[0] || {};
+    if (type === OPTION_TYPE.MODEL) {
+      setId(getId())
+      const baseAttributeFields = initialValues.attributes[0]
+        ? Object.keys(initialValues.attributes[0])
+        : []
+      const baseAttributeDefaults = initialValues.attributes[0] || {}
 
-            const mergedAttributes = attributes.map((attr: any) => {
-                const mergedAttr = { ...baseAttributeDefaults };
-                baseAttributeFields.forEach((field: any) => {
-                    if (attr[field] !== undefined) {
-                        (mergedAttr as any)[field] = attr[field];
-                    }
-                });
-                return mergedAttr;
-            });
+      const mergedAttributes = attributes.map((attr: any) => {
+        const mergedAttr = { ...baseAttributeDefaults }
+        baseAttributeFields.forEach((field: any) => {
+          if (attr[field] !== undefined) {
+            ;(mergedAttr as any)[field] = attr[field]
+          }
+        })
+        return mergedAttr
+      })
 
-            formik.setFieldValue(
-                'attributes',
-                mergedAttributes.length
-                    ? mergedAttributes
-                    : initialValues.attributes
-            );
-        }
-    }, [data]);
+      formik.setFieldValue(
+        'attributes',
+        mergedAttributes.length ? mergedAttributes : initialValues.attributes
+      )
+    }
+  }, [data])
 
-    useEffect(() => {
-        const columns = getTablesColumns({
-            selectors,
-            dto,
-            models,
-            enums,
-            current: data,
-            t,
-        });
-        setTableColumns(columns);
-    }, [selectors, dto, models, data]);
+  useEffect(() => {
+    const columns = getTablesColumns({
+      selectors,
+      dto,
+      models,
+      enums,
+      current: data,
+      t
+    })
+    setTableColumns(columns)
+  }, [selectors, dto, models, data])
 
-    // Keyboard shortcut for save (Ctrl/Cmd + S)
-    useKeyPress(() => {
-        handleSave(formik.values);
-    }, [KeyboardKey.save]);
+  // Keyboard shortcut for save (Ctrl/Cmd + S)
+  useKeyPress(() => {
+    handleSave(formik.values)
+  }, [KeyboardKey.save])
 
-    const handleSave = async (newValues: DTOConfig): Promise<void> => {
-        try {
-            const config = {
-                ...newValues,
-                module: currentItem?.module || 'shared',
-                id: id || currentItem.id,
-            };
+  const handleSave = async (newValues: DTOConfig): Promise<void> => {
+    try {
+      const config = {
+        ...newValues,
+        module: currentItem?.module || 'shared',
+        id: id || currentItem.id
+      }
 
-            const { error } = await window.engine.createDto(
-                config,
-                ENV_TYPES.SPRING,
-                basePath
-            );
-            console.log('config', config);
+      const { error } = await window.engine.createDto(config, ENV_TYPES.SPRING, basePath)
+      console.log('config', config)
 
-            if (error) {
-                console.log('error', error);
-                showErrorToast(error);
-                return;
-            }
+      if (error) {
+        console.log('error', error)
+        showErrorToast(error)
+        return
+      }
 
-            createGitCommit(basePath, `Add dto ${newValues.name}`);
-            dispatch(onSetChangeStatus(true));
-            showSuccessToast(
-                t('createdSuccess', { name: t('dto'), value: newValues.name })
-            );
-            handleRenameTab(currentItem.id, newValues.name);
-        } catch (error) {
-            showErrorToast(error);
-        }
-    };
+      createGitCommit(basePath, `Add dto ${newValues.name}`)
+      dispatch(onSetChangeStatus(true))
+      showSuccessToast(t('createdSuccess', { name: t('dto'), value: newValues.name }))
+      handleRenameTab(currentItem.id, newValues.name)
+    } catch (error) {
+      showErrorToast(error)
+    }
+  }
 
-    const handleDelete = async (): Promise<void> => {
-        try {
-            const config = {
-                name: formik.values.name,
-                type: 'dto',
-                module: currentItem.module,
-            };
+  const handleDelete = async (): Promise<void> => {
+    try {
+      const config = {
+        name: formik.values.name,
+        type: 'dto',
+        module: currentItem.module
+      }
 
-            const { error } = await window.engine.delete(
-                config,
-                ENV_TYPES.SPRING,
-                basePath
-            );
+      const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath)
 
-            if (error) return showErrorToast(error);
+      if (error) return showErrorToast(error)
 
-            createGitCommit(basePath, `Delete dto ${formik.values.name}`);
-            dispatch(onSetChangeStatus(true));
-            showSuccessToast(t('deletedSuccess', { name: t('dto') }));
-        } catch (error) {
-            showErrorToast(error);
-        }
-    };
+      createGitCommit(basePath, `Delete dto ${formik.values.name}`)
+      dispatch(onSetChangeStatus(true))
+      showSuccessToast(t('deletedSuccess', { name: t('dto') }))
+    } catch (error) {
+      showErrorToast(error)
+    }
+  }
 
-    const onClickSourceCode = () => {
-        initializeTabFromCurrentItem({
-            path: `${currentItem.path}`,
-            type: OPTION_TYPE.FILE_THREE,
-            label: `${currentItem.label}.json`,
-        });
-    };
+  const onClickSourceCode = () => {
+    initializeTabFromCurrentItem({
+      path: `${currentItem.path}`,
+      type: OPTION_TYPE.FILE_THREE,
+      label: `${currentItem.label}.json`
+    })
+  }
 
-    return {
-        formik,
-        tablesColumns,
-        data,
-        id,
-        dto,
-        handleSave,
-        handleDelete,
-        onClickSourceCode,
-    };
-};
+  return {
+    formik,
+    tablesColumns,
+    data,
+    id,
+    dto,
+    handleSave,
+    handleDelete,
+    onClickSourceCode
+  }
+}

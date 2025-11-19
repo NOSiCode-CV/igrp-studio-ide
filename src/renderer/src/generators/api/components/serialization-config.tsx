@@ -1,210 +1,197 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
-    IGRPDialogPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogDescriptionPrimitive,
-} from '@igrp/igrp-framework-react-design-system';
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system';
-import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system';
+  IGRPDialogPrimitive,
+  IGRPDialogContentPrimitive,
+  IGRPDialogHeaderPrimitive,
+  IGRPDialogTitlePrimitive,
+  IGRPDialogFooterPrimitive,
+  IGRPDialogDescriptionPrimitive
+} from '@igrp/igrp-framework-react-design-system'
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system'
 
-import MonacoEditor from '@renderer/components/monaco-editor';
-import { SerializationConfig } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/types';
-import { ENV_TYPES } from '@renderer/constants/appConstants';
-import useToast from '@renderer/hooks/useToast';
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { useGit } from '@renderer/hooks/use-git';
-import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks';
-import { LabelRequired } from '@renderer/components/label-required';
-import { SelectInput } from './inputs-form';
+import MonacoEditor from '@renderer/components/monaco-editor'
+import { SerializationConfig } from '@igrp/igrp-studio-springboot-engine/types'
+import { ENV_TYPES } from '@renderer/constants/appConstants'
+import useToast from '@renderer/hooks/useToast'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { useGit } from '@renderer/hooks/use-git'
+import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
+import { LabelRequired } from '@renderer/components/label-required'
+import { SelectInput } from './inputs-form'
 
 interface SerializationConfigModalProps {
-    isOpen?: boolean;
-    setIsOpen?: (open: boolean) => void;
-    item?: any;
-    basePath?: string;
+  isOpen?: boolean
+  setIsOpen?: (open: boolean) => void
+  item?: any
+  basePath?: string
 }
 
 export default function SerializationConfigModal({
-    isOpen = false,
-    setIsOpen,
-    item,
-    basePath,
+  isOpen = false,
+  setIsOpen,
+  item,
+  basePath
 }: SerializationConfigModalProps) {
-    const [config, setConfig] = useState<SerializationConfig>({
-        name: '',
-        type: 'dto',
-        template: 'classic',
-        module: '',
-    });
+  const [config, setConfig] = useState<SerializationConfig>({
+    name: '',
+    type: 'dto',
+    template: 'classic',
+    module: ''
+  })
 
-    const [content, setContent] = useState('');
-    const [contentType, setContenType] = useState('json');
+  const [content, setContent] = useState('')
+  const [contentType, setContenType] = useState('json')
 
-    const { showErrorToast, showSuccessToast } = useToast();
-    const { t } = useTranslation();
-    const dispatch: any = useDispatch();
+  const { showErrorToast, showSuccessToast } = useToast()
+  const { t } = useTranslation()
+  const dispatch: any = useDispatch()
 
-    const { createGitCommit } = useGit();
+  const { createGitCommit } = useGit()
 
-    useEffect(() => {
-        const { module, type } = item;
-        setConfig((prev) => ({
-            ...prev,
-            module,
-            type: type === 'models' ? 'model' : type,
-        }));
-    }, [item]);
+  useEffect(() => {
+    const { module, type } = item
+    setConfig((prev) => ({
+      ...prev,
+      module,
+      type: type === 'models' ? 'model' : type
+    }))
+  }, [item])
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setConfig((prev) => ({ ...prev, [name]: value }));
-    };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setConfig((prev) => ({ ...prev, [name]: value }))
+  }
 
-    const handleSelectChange = (value: string) => {
-        setContenType(value);
-    };
+  const handleSelectChange = (value: string) => {
+    setContenType(value)
+  }
 
-    const handleEditorChange = (value: string | undefined) => {
-        if (value !== undefined) {
-            setContent(value);
-        }
-    };
+  const handleEditorChange = (value: string | undefined) => {
+    if (value !== undefined) {
+      setContent(value)
+    }
+  }
 
-    // Função para limpar espaços extras
-    const cleanSQL = (sql: string): string => {
-        return sql
-            .split('\n') // Quebra em linhas
-            .map((line) => line.trim()) // Aplica trim em cada linha
-            .filter((line) => line !== '') // Remove linhas vazias
-            .join('\n')
-            .replace(/\s+/g, ' ') // Substitui múltiplos espaços e quebras de linha por um único espaço
-            .trim();
-    };
+  // Função para limpar espaços extras
+  const cleanSQL = (sql: string): string => {
+    return sql
+      .split('\n') // Quebra em linhas
+      .map((line) => line.trim()) // Aplica trim em cada linha
+      .filter((line) => line !== '') // Remove linhas vazias
+      .join('\n')
+      .replace(/\s+/g, ' ') // Substitui múltiplos espaços e quebras de linha por um único espaço
+      .trim()
+  }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-        if (!item || !basePath) return;
+    if (!item || !basePath) return
 
-        const values = {
-            ...config,
-            [contentType]: cleanSQL(content),
-        };
+    const values = {
+      ...config,
+      [contentType]: cleanSQL(content)
+    }
 
-        const { error } = await window.engine.serializeElement(
-            values,
-            ENV_TYPES.SPRING,
-            basePath
-        );
+    const { error } = await window.engine.serializeElement(values, ENV_TYPES.SPRING, basePath)
 
-        console.log(values);
+    console.log(values)
 
-        if (error) {
-            showErrorToast(error);
-        } else {
-            showSuccessToast(
-                t('createdSuccess', {
-                    name: t(values.type),
-                    value: values.name,
-                })
-            );
+    if (error) {
+      showErrorToast(error)
+    } else {
+      showSuccessToast(
+        t('createdSuccess', {
+          name: t(values.type),
+          value: values.name
+        })
+      )
 
-            setIsOpen?.(false);
+      setIsOpen?.(false)
 
-            createGitCommit(basePath, `Create ${values.name}`);
+      createGitCommit(basePath, `Create ${values.name}`)
 
-            dispatch(onSetChangeStatus(true));
-        }
-    };
+      dispatch(onSetChangeStatus(true))
+    }
+  }
 
-    const getEditorLanguage = () => {
-        switch (config.type) {
-            case 'dto':
-                return 'json';
-            case 'model':
-                return 'sql';
-            case 'response':
-                return 'xml';
-            default:
-                return 'plaintext';
-        }
-    };
+  const getEditorLanguage = () => {
+    switch (config.type) {
+      case 'dto':
+        return 'json'
+      case 'model':
+        return 'sql'
+      case 'response':
+        return 'xml'
+      default:
+        return 'plaintext'
+    }
+  }
 
-    const options = [
-        { value: 'json', label: t('json') },
-        { value: 'sql', label: t('sql') },
-        { value: 'xml', label: t('xml') },
-        { value: 'ddl', label: t('ddl') },
-    ];
+  const options = [
+    { value: 'json', label: t('json') },
+    { value: 'sql', label: t('sql') },
+    { value: 'xml', label: t('xml') },
+    { value: 'ddl', label: t('ddl') }
+  ]
 
-    return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={setIsOpen}>
-            <IGRPDialogContentPrimitive
-                className="max-w-[700px]"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>
-                        {t('import')}
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive />
-                </IGRPDialogHeaderPrimitive>
-                <form
-                    onSubmit={(e) => {
-                        e.stopPropagation();
-                        handleSubmit(e);
-                    }}
-                    className="space-y-4"
-                >
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="items-center space-y-2">
-                            <LabelRequired>{t('name')}</LabelRequired>
-                            <IGRPInputPrimitive
-                                id="name"
-                                name="name"
-                                value={config.name}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="items-center space-y-2">
-                            <SelectInput
-                                id="contentType"
-                                name="contentType"
-                                label={t('contentType')}
-                                isRequired
-                                onChange={(value) =>
-                                    handleSelectChange(value as string)
-                                }
-                                value={contentType}
-                                options={options}
-                            />
-                        </div>
-                    </div>
-                    <MonacoEditor
-                        height="300px"
-                        language={getEditorLanguage()}
-                        content={content}
-                        onChange={handleEditorChange}
-                        options={{
-                            minimap: { enabled: false },
-                            scrollBeyondLastLine: false,
-                            fontSize: 14,
-                        }}
-                    />
-                    <IGRPDialogFooterPrimitive>
-                        <IGRPButtonPrimitive type="submit">
-                            {t('save')}
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogFooterPrimitive>
-                </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
-    );
+  return (
+    <IGRPDialogPrimitive open={isOpen} onOpenChange={setIsOpen}>
+      <IGRPDialogContentPrimitive className="max-w-[700px]" onClick={(e) => e.stopPropagation()}>
+        <IGRPDialogHeaderPrimitive>
+          <IGRPDialogTitlePrimitive>{t('import')}</IGRPDialogTitlePrimitive>
+          <IGRPDialogDescriptionPrimitive />
+        </IGRPDialogHeaderPrimitive>
+        <form
+          onSubmit={(e) => {
+            e.stopPropagation()
+            handleSubmit(e)
+          }}
+          className="space-y-4"
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <div className="items-center space-y-2">
+              <LabelRequired>{t('name')}</LabelRequired>
+              <IGRPInputPrimitive
+                id="name"
+                name="name"
+                value={config.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="items-center space-y-2">
+              <SelectInput
+                id="contentType"
+                name="contentType"
+                label={t('contentType')}
+                isRequired
+                onChange={(value) => handleSelectChange(value as string)}
+                value={contentType}
+                options={options}
+              />
+            </div>
+          </div>
+          <MonacoEditor
+            height="300px"
+            language={getEditorLanguage()}
+            content={content}
+            onChange={handleEditorChange}
+            options={{
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              fontSize: 14
+            }}
+          />
+          <IGRPDialogFooterPrimitive>
+            <IGRPButtonPrimitive type="submit">{t('save')}</IGRPButtonPrimitive>
+          </IGRPDialogFooterPrimitive>
+        </form>
+      </IGRPDialogContentPrimitive>
+    </IGRPDialogPrimitive>
+  )
 }
