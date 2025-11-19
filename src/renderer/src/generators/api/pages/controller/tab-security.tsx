@@ -34,7 +34,7 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
 
   // Load available permissions from engine
   useEffect(() => {
-    const loadPermissions = async () => {
+    const loadPermissions = async (): Promise<void> => {
       try {
         setLoadingPermissions(true)
         // Try to load permissions from engine
@@ -46,6 +46,7 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
             setAvailablePermissions(result.data)
           }
         }
+        console.log('loadingPermissions', loadingPermissions)
       } catch (error) {
         console.warn('Could not load permissions:', error)
         // Continue with empty array - user can still manually enter permissions
@@ -59,7 +60,7 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
     }
   }, [basePath, module])
 
-  const handlePermissionOperatorChange = (operator: 'AND' | 'OR') => {
+  const handlePermissionOperatorChange = (operator: 'AND' | 'OR'): void => {
     const currentPermission = permission || { items: [], operator: 'OR' }
     formik.setFieldValue('permission', {
       ...currentPermission,
@@ -67,7 +68,7 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
     })
   }
 
-  const handleAddPermission = () => {
+  const handleAddPermission = (): void => {
     if (!permissionInput.trim()) return
 
     const currentPermission = permission || { items: [], operator: 'OR' }
@@ -80,7 +81,7 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
     setPermissionInput('')
   }
 
-  const handleRemovePermission = (permissionToRemove: string) => {
+  const handleRemovePermission = (permissionToRemove: string): void => {
     const currentPermission = permission || { items: [], operator: 'OR' }
     const newItems = (currentPermission.items || []).filter((p) => p !== permissionToRemove)
 
@@ -94,7 +95,7 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
     }
   }
 
-  const handleAddRole = () => {
+  const handleAddRole = (): void => {
     if (!roleInput.trim()) return
 
     const newRoles = [...roles, roleInput.trim()]
@@ -102,12 +103,12 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
     setRoleInput('')
   }
 
-  const handleRemoveRole = (roleToRemove: string) => {
+  const handleRemoveRole = (roleToRemove: string): void => {
     const newRoles = roles.filter((r) => r !== roleToRemove)
     formik.setFieldValue('roles', newRoles.length > 0 ? newRoles : [])
   }
 
-  const handlePermissionSelect = (value: string) => {
+  const handlePermissionSelect = (value: string): void => {
     if (!value) return
 
     const currentPermission = permission || { items: [], operator: 'OR' }
@@ -161,7 +162,7 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
                 <IGRPCombobox
                   options={availablePermissions.filter((p) => !permissionItems.includes(p.value))}
                   value=""
-                  onChange={handlePermissionSelect}
+                  onChange={(value) => handlePermissionSelect(value as string)}
                   placeholder={t('selectPermission') || 'Select a permission...'}
                   className="flex-1"
                 />
