@@ -3,10 +3,7 @@ import { IWorkspace, ProjectData } from '../types'
 import { WorkspaceRepository } from '../services/workspace-service'
 import { ERROR_CODES, EVENTS } from '../constants/events'
 import { handleWithCustomErrors } from '../helpers'
-import {
-  ProjectWorkspace,
-  ServiceWorkspace
-} from '@igrp/igrp-studio-nextjs-engine/types'
+import { ProjectWorkspace, ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/types'
 
 const repo = new WorkspaceRepository()
 

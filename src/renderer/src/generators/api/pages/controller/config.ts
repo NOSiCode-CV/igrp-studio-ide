@@ -40,12 +40,15 @@ export const initialValues = {
       value: '',
       isRequired: true
     }
-  ]
+  ],
+  permission: undefined,
+  roles: []
 }
 
 export const TabList = [
   { label: 'Request', tabId: 'request' },
-  { label: 'Response', tabId: 'response' }
+  { label: 'Response', tabId: 'response' },
+  { label: 'Security', tabId: 'security' }
 ]
 
 export const getTablesColumns = (

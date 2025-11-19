@@ -4,7 +4,9 @@ import { faker } from '@faker-js/faker'
 import { StructuredComponent } from '@renderer/lib/dnd/types'
 
 export const useFakedata = (): {
-  getDataTableFake: (columns: StructuredComponent[]) => { [key: string]: string | number | boolean | undefined }[]
+  getDataTableFake: (
+    columns: StructuredComponent[]
+  ) => { [key: string]: string | number | boolean | undefined }[]
   generateFakeDataForField: (componentType: string) => string | number | boolean | undefined
   getFakeComponentData: (componentName: string) => StructuredComponent
 } => {
@@ -231,7 +233,9 @@ export const useFakedata = (): {
     return FAKE_COMPONENT_DATA[componentName]
   }
 
-  const generateFakeDataForField = (componentType: string): string | number | boolean | undefined => {
+  const generateFakeDataForField = (
+    componentType: string
+  ): string | number | boolean | undefined => {
     switch (componentType.toLowerCase()) {
       case 'text':
       case 'string':

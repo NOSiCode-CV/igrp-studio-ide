@@ -26,10 +26,7 @@ import {
   FileTree
 } from 'src/main/types'
 import { bpmnService } from '@renderer/services/bpmn-service'
-import {
-  ProcessConfig,
-  ProcessStepConfig
-} from '@igrp/igrp-studio-nextjs-engine/types'
+import { ProcessConfig, ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import useToast from '@renderer/hooks/useToast'
 import { getFileThree as onGetPages } from '@renderer/redux/thunks'

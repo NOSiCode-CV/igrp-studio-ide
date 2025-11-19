@@ -5,12 +5,7 @@ import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
 import { useDispatch } from 'react-redux'
 import useToast from '@renderer/hooks/useToast'
 import { useGit } from '@renderer/hooks/use-git'
-import {
-  CustomFunctionConfig,
-  Import,
-  State,
-  TypeDef
-} from '@igrp/igrp-studio-nextjs-engine/types'
+import { CustomFunctionConfig, Import, State, TypeDef } from '@igrp/igrp-studio-nextjs-engine/types'
 
 interface PageSaveProps {
   basePath: string

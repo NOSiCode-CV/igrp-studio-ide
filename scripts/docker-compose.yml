@@ -32,7 +32,7 @@ services:
       SENTRY_POSTGRES_HOST: sentry-postgres
       SENTRY_SINGLE_ORGANIZATION: 'true'
     ports:
-      - "9000:9000"
+      - '9000:9000'
     restart: always
     volumes:
       - sentry_data:/var/lib/sentry/files

@@ -22,13 +22,13 @@ build_packagedev_mac:
     - dpkg --add-architecture arm64
     - apt-get update
     - apt-get install -y wine64
-    - npm install -g pnpm  # Install pnpm
+    - npm install -g pnpm # Install pnpm
     - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
 
   script:
     - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
     - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
-    - pnpm install --frozen-lockfile 
+    - pnpm install --frozen-lockfile
     - pnpm release:mac
   artifacts:
     paths:
@@ -62,13 +62,13 @@ build_packagedev:
     #curl -L --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}"
     #-o certificate.pfx
     #"https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/repository/files/certificate%2Fcertificate.pfx/raw?ref=master"
-    - npm install -g pnpm  # Install pnpm
+    - npm install -g pnpm # Install pnpm
     - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
 
   script:
     - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
     - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
-    - pnpm install --frozen-lockfile 
+    - pnpm install --frozen-lockfile
     - pnpm release:win
     - pnpm release:linux
     #- yarn release:mac

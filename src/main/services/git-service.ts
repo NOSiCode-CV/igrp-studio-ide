@@ -235,7 +235,7 @@ export const GitService = {
     }
   },
 
-  async createCommit(projectPath: string, message: string) {
+  async createCommit(projectPath: string, message: string): Promise<boolean> {
     try {
       await execAsync('git add .', { cwd: projectPath })
       await execAsync(`git commit -m "${message}"`, { cwd: projectPath })
@@ -248,7 +248,8 @@ export const GitService = {
       if (
         errorMessage.includes('nothing to commit') ||
         errorMessage.includes('no changes added to commit') ||
-        errorMessage.includes('nothing added to commit')
+        errorMessage.includes('nothing added to commit') ||
+        errorMessage.includes('not a git repository')
       ) {
         return false
       }
@@ -347,39 +348,35 @@ export const GitService = {
   },
 
   async sync(projectPath: string, branch: string) {
+    const hasRemote = await this.isRemoteConfigured(projectPath)
+    if (!hasRemote) {
+      throw new Error('NO_REMOTE_CONFIGURED')
+    }
+
     try {
-      const hasRemote = await this.isRemoteConfigured(projectPath)
-      if (!hasRemote) {
-        throw new Error('NO_REMOTE_CONFIGURED')
-      }
-
-      try {
-        await execAsync('git push --dry-run origin HEAD', {
-          cwd: projectPath,
-          timeout: 5000
-        })
-      } catch (error: any) {
-        if (error.stderr?.includes('Permission denied') || error.stderr?.includes('403')) {
-          throw new Error('PERMISSION_DENIED')
-        }
-        if (error.stderr?.includes('does not appear to be a git repository')) {
-          throw new Error('NOT_GIT_REPOSITORY')
-        }
-        throw error
-      }
-
-      const remoteBranchExists = await this.isRemoteBranchExists(projectPath, branch)
-      if (!remoteBranchExists) {
-        await this.publishBranch(projectPath, branch)
-      } else {
-        await this.pull(projectPath, branch)
-        await this.push(projectPath, branch)
-      }
-
-      return true
+      await execAsync('git push --dry-run origin HEAD', {
+        cwd: projectPath,
+        timeout: 5000
+      })
     } catch (error: any) {
+      if (error.stderr?.includes('Permission denied') || error.stderr?.includes('403')) {
+        throw new Error('PERMISSION_DENIED')
+      }
+      if (error.stderr?.includes('does not appear to be a git repository')) {
+        throw new Error('NOT_GIT_REPOSITORY')
+      }
       throw error
     }
+
+    const remoteBranchExists = await this.isRemoteBranchExists(projectPath, branch)
+    if (!remoteBranchExists) {
+      await this.publishBranch(projectPath, branch)
+    } else {
+      await this.pull(projectPath, branch)
+      await this.push(projectPath, branch)
+    }
+
+    return true
   },
 
   async addRemote(projectPath: string, remoteUrl: string) {

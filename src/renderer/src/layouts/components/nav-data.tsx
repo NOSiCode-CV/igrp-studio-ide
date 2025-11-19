@@ -118,7 +118,8 @@ const useNavdata = (filesThree: FileTree[]) => {
       subMenus: [menuItemsConfig.newAction, menuItemsConfig.duplicate, menuItemsConfig.delete],
       modelMenus: [menuItemsConfig.convertToDto, menuItemsConfig.duplicate, menuItemsConfig.delete],
       defaultMenus: [menuItemsConfig.duplicate, menuItemsConfig.delete],
-      controllersExtension: [menuItemsConfig.newControllers]
+      controllersExtension: [menuItemsConfig.newControllers],
+      actionMenus: [menuItemsConfig.duplicate, menuItemsConfig.delete]
     }),
     [menuItemsConfig]
   )
@@ -166,6 +167,8 @@ const useNavdata = (filesThree: FileTree[]) => {
           path,
           type: OPTION_TYPE.ACTION,
           click: onClickItem,
+          dropdownclick: onClickItem,
+          dropdownMenus: dropdownConfigs.actionMenus,
           badgeColor: getBadgeColor(action.method),
           badgeName: action.method,
           content: action,
@@ -174,7 +177,7 @@ const useNavdata = (filesThree: FileTree[]) => {
       }
       return []
     },
-    [onClickItem]
+    [onClickItem, dropdownConfigs.actionMenus]
   )
 
   const menuItems = useMemo(() => {
@@ -265,7 +268,16 @@ const useNavdata = (filesThree: FileTree[]) => {
 
         return folderMenuItem
       })
-  }, [filesThree, t, dropdownConfigs, getDropdownMenus, getSubItems, onClickItem])
+  }, [
+    filesThree,
+    t,
+    dropdownConfigs,
+    getDropdownMenus,
+    getDropdownSubMenus,
+    getSubItems,
+    onClickItem,
+    menuItemsConfig
+  ])
 
   return { menuItems }
 }

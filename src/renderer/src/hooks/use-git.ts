@@ -1,5 +1,5 @@
 import useToast from '@renderer/hooks/useToast'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Repository } from 'src/main/types'
 import { useTranslation } from 'react-i18next'
 import { useWorkspace } from './use-workspace'
@@ -32,21 +32,40 @@ export const useGit = (): {
     actions: { findAllProjects }
   } = useWorkspace()
 
-  const getGitErrorType = (error: Error): GitErrorType | null => {
-    const message = error.message.toUpperCase()
-    return (
-      (Object.keys(GIT_ERROR_MESSAGES) as GitErrorType[]).find((type) => message.includes(type)) ||
-      null
-    )
-  }
+  const GIT_ERROR_MESSAGES: Record<GitErrorType, string> = useMemo(
+    () => ({
+      INVALID_REMOTE_URL: t('invalidRemoteUrl'),
+      PERMISSION_DENIED: t('permissionDenied'),
+      NOT_GIT_REPOSITORY: t('notGitRepository'),
+      NO_REMOTE_CONFIGURED: t('noRemoteConfigured'),
+      COMMITS_PENDING: t('commitsPending')
+    }),
+    [t]
+  )
 
-  const GIT_ERROR_MESSAGES: Record<GitErrorType, string> = {
-    INVALID_REMOTE_URL: t('invalidRemoteUrl'),
-    PERMISSION_DENIED: t('permissionDenied'),
-    NOT_GIT_REPOSITORY: t('notGitRepository'),
-    NO_REMOTE_CONFIGURED: t('noRemoteConfigured'),
-    COMMITS_PENDING: t('commitsPending')
-  }
+  const getGitErrorType = useCallback(
+    (error: Error): GitErrorType | null => {
+      const message = error.message.toUpperCase()
+      return (
+        (Object.keys(GIT_ERROR_MESSAGES) as GitErrorType[]).find((type) => message.includes(type)) ||
+        null
+      )
+    },
+    [GIT_ERROR_MESSAGES]
+  )
+
+  const checkIsAutoCommit = useCallback(async () => {
+    try {
+      return await window.electron.ipcRenderer.invoke('is-auto-commit')
+    } catch (error) {
+      if (error instanceof Error) {
+        showErrorToast(error.message || t('gitFailedOperation'))
+      } else {
+        showErrorToast(t('gitFailedOperation'))
+      }
+    }
+    return true
+  }, [showErrorToast, t])
 
   const createGitCommit = useCallback(
     async (projectPath: string, message: string) => {
@@ -55,10 +74,11 @@ export const useGit = (): {
 
         if (!prompt) return true
 
-        await window.electron.ipcRenderer.invoke('create-commit', {
+        const result = await window.electron.ipcRenderer.invoke('create-commit', {
           projectPath,
           message
         })
+        if (!result) return false
         showSuccessToast(t('createCommit'))
         return true
       } catch (error) {
@@ -70,22 +90,25 @@ export const useGit = (): {
         return false
       }
     },
-    [showErrorToast, showSuccessToast]
+    [showErrorToast, showSuccessToast, checkIsAutoCommit, t]
   )
 
-  const listCommits = useCallback(async (projectPath: string, branch?: string) => {
-    try {
-      const commits = await window.electron.ipcRenderer.invoke('list-commits', {
-        projectPath,
-        branch
-      })
+  const listCommits = useCallback(
+    async (projectPath: string, branch?: string) => {
+      try {
+        const commits = await window.electron.ipcRenderer.invoke('list-commits', {
+          projectPath,
+          branch
+        })
 
-      return commits
-    } catch (error) {
-      console.error(t('failedListCommit'), error)
-      throw error
-    }
-  }, [])
+        return commits
+      } catch (error) {
+        console.error(t('failedListCommit'), error)
+        throw error
+      }
+    },
+    [t]
+  )
 
   const pullChanges = useCallback(
     async (projectPath: string) => {
@@ -104,7 +127,7 @@ export const useGit = (): {
         return false
       }
     },
-    [showErrorToast, showSuccessToast]
+    [showErrorToast, showSuccessToast, t]
   )
 
   const pushChanges = useCallback(
@@ -125,7 +148,7 @@ export const useGit = (): {
         return false
       }
     },
-    [showErrorToast, showSuccessToast]
+    [showErrorToast, showSuccessToast, t]
   )
 
   const syncChanges = useCallback(
@@ -152,7 +175,7 @@ export const useGit = (): {
         return false
       }
     },
-    [showErrorToast, showSuccessToast]
+    [showErrorToast, showSuccessToast, getGitErrorType, GIT_ERROR_MESSAGES, t]
   )
 
   const getChangesCount = useCallback(async (projectPath: string) => {
@@ -171,40 +194,33 @@ export const useGit = (): {
     }
   }, [])
 
-  const checkLocalProjects = useCallback(async (githubRepos: Repository[]) => {
-    const localProjects = await findAllProjects()
-    const results = await window.electron.ipcRenderer.invoke('check-git-remotes', {
-      projects: localProjects,
-      githubRepos
-    })
+  const checkLocalProjects = useCallback(
+    async (githubRepos: Repository[]) => {
+      const localProjects = await findAllProjects()
+      const results = await window.electron.ipcRenderer.invoke('check-git-remotes', {
+        projects: localProjects,
+        githubRepos
+      })
 
-    return results
-  }, [])
+      return results
+    },
+    [findAllProjects, t]
+  )
 
-  const setAutoCommit = useCallback(async (prompt: boolean) => {
-    try {
-      await window.electron.ipcRenderer.invoke('set-auto-commit', prompt)
-    } catch (error) {
-      if (error instanceof Error) {
-        showErrorToast(error.message || t('gitFailedOperation'))
-      } else {
-        showErrorToast(t('gitFailedOperation'))
+  const setAutoCommit = useCallback(
+    async (prompt: boolean) => {
+      try {
+        await window.electron.ipcRenderer.invoke('set-auto-commit', prompt)
+      } catch (error) {
+        if (error instanceof Error) {
+          showErrorToast(error.message || t('gitFailedOperation'))
+        } else {
+          showErrorToast(t('gitFailedOperation'))
+        }
       }
-    }
-  }, [])
-
-  const checkIsAutoCommit = useCallback(async () => {
-    try {
-      return await window.electron.ipcRenderer.invoke('is-auto-commit')
-    } catch (error) {
-      if (error instanceof Error) {
-        showErrorToast(error.message || t('gitFailedOperation'))
-      } else {
-        showErrorToast(t('gitFailedOperation'))
-      }
-    }
-    return true
-  }, [])
+    },
+    [showErrorToast, t]
+  )
 
   return {
     createGitCommit,

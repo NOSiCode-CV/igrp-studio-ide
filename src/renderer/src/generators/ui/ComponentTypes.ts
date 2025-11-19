@@ -439,7 +439,6 @@ export const ICON_MAP: Record<string, React.ElementType> = {
   [COMPONENT.Avatar]: CircleUser,
   [COMPONENT.Accordion]: ListCollapse,
   [COMPONENT.CardDetails]: ListCollapse
-
 } as const
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

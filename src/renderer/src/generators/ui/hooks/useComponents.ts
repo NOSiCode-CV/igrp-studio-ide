@@ -1,8 +1,4 @@
-import {
-  Arguments,
-  FieldValidation,
-  State
-} from '@igrp/igrp-studio-nextjs-engine/types'
+import { Arguments, FieldValidation, State } from '@igrp/igrp-studio-nextjs-engine/types'
 import { StructuredComponent } from '@renderer/lib/dnd/types'
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext'
 import { useCallback } from 'react'

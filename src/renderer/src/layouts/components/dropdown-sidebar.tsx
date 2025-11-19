@@ -80,7 +80,7 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
 
   const { createGitCommit } = useGit()
 
-  const handleDropdownClick = (item: any) => {
+  const handleDropdownClick = (item: any): void => {
     setItem(item)
     if (item.actionType === OPTION_TYPE.DELETE) {
       setIsOpenDelete(true)
@@ -95,49 +95,173 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
     }
   }
 
-  const handleDuplicate = async (item: any) => {
+  const handleDuplicate = async (item: any): Promise<void> => {
     if (!item || !basePath) return
 
     try {
-      const config = {
-        name: item.label,
-        type: item.type,
-        module: item.module,
-        content: item.content
-      }
+      // Special handling for actions - need to duplicate within the controller
+      if (item.type === OPTION_TYPE.ACTION) {
+        // Load the controller data
+        const controllerData = await window.api.getJsonContent(item.path)
+        if (!controllerData || !controllerData.actions) {
+          showErrorToast('Failed to load controller data')
+          return
+        }
 
-      const { error } = await window.engine.duplicate(config, ENV_TYPES.SPRING, basePath)
+        // Find the action to duplicate
+        const actionToDuplicate = item.content
+        if (!actionToDuplicate || !actionToDuplicate.actionName) {
+          showErrorToast('Invalid action data')
+          return
+        }
 
-      if (error) {
-        showErrorToast(error)
+        // Create a deep copy of the action
+        const duplicatedAction = JSON.parse(JSON.stringify(actionToDuplicate))
+
+        // Generate a new action name with "Copy" suffix
+        const originalActionName = duplicatedAction.actionName
+        let newActionName = `${originalActionName}Copy`
+        let counter = 1
+
+        // Check if the name already exists and increment counter if needed
+        const existingActions = controllerData.actions || []
+        while (existingActions.some((action: any) => action.actionName === newActionName)) {
+          newActionName = `${originalActionName}Copy${counter}`
+          counter++
+        }
+
+        duplicatedAction.actionName = newActionName
+
+        // Add the duplicated action to the controller
+        const updatedActions = [...existingActions, duplicatedAction]
+        const updatedController = {
+          ...controllerData,
+          actions: updatedActions
+        }
+
+        // Save the controller with the new action
+        const { error } = await window.engine.createController(
+          updatedController,
+          ENV_TYPES.SPRING,
+          basePath
+        )
+
+        if (error) {
+          showErrorToast(error)
+        } else {
+          showSuccessToast(
+            t('duplicatedSuccess', { name: `${t('newAction')} ${originalActionName}` })
+          )
+          createGitCommit(basePath, `Duplicate action ${originalActionName} to ${newActionName}`)
+          dispatch(onSetChangeStatus(true))
+        }
       } else {
-        showSuccessToast(t('duplicatedSuccess', { name: item.label }))
-        createGitCommit(basePath, `Duplicate ${item.label}`)
-        dispatch(onSetChangeStatus(true))
+        // Standard duplication for other types
+        const config = {
+          name: item.label,
+          type: item.type,
+          module: item.module,
+          content: item.content
+        }
+
+        const { error } = await window.engine.duplicate(config, ENV_TYPES.SPRING, basePath)
+
+        if (error) {
+          showErrorToast(error)
+        } else {
+          showSuccessToast(t('duplicatedSuccess', { name: item.label }))
+          createGitCommit(basePath, `Duplicate ${item.label}`)
+          dispatch(onSetChangeStatus(true))
+        }
       }
-    } catch (error) {
-      showErrorToast(t('duplicateError', { name: item.label }))
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showErrorToast(error.message)
+      } else {
+        showErrorToast(t('duplicateError', { name: item.label }))
+      }
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = async (): Promise<void> => {
     if (!item || !basePath) return
 
-    const config = {
-      name: item.label,
-      type: item.type,
-      module: item.module
+    try {
+      // Special handling for actions - need to delete from within the controller
+      if (item.type === OPTION_TYPE.ACTION) {
+        // Load the controller data
+        const controllerData = await window.api.getJsonContent(item.path)
+        if (!controllerData || !controllerData.actions) {
+          showErrorToast('Failed to load controller data')
+          return
+        }
+
+        // Find the action to delete
+        const actionNameToDelete = item.content?.actionName || item.label
+        const countActions = controllerData.actions.length
+
+        if (countActions === 1) {
+          // If it's the last action, delete the entire controller
+          const config = {
+            name: controllerData.name,
+            type: 'controller',
+            module: item.module
+          }
+          const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath)
+          if (error) {
+            showErrorToast(error)
+            return
+          }
+        } else {
+          // Remove the action from the controller
+          const updatedActions = controllerData.actions.filter(
+            (action: any) => action.actionName !== actionNameToDelete
+          )
+          const updatedController = {
+            ...controllerData,
+            actions: updatedActions
+          }
+
+          // Save the controller without the deleted action
+          const { error } = await window.engine.createController(
+            updatedController,
+            ENV_TYPES.SPRING,
+            basePath
+          )
+          if (error) {
+            showErrorToast(error)
+            return
+          }
+        }
+
+        showSuccessToast(t('deletedSuccess', { name: `${t('newAction')} ${actionNameToDelete}` }))
+        createGitCommit(basePath, `Delete action ${actionNameToDelete}`)
+        dispatch(onSetChangeStatus(true))
+      } else {
+        // Standard deletion for other types
+        const config = {
+          name: item.label,
+          type: item.type,
+          module: item.module
+        }
+
+        const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath)
+
+        if (error) {
+          showErrorToast(error)
+        } else {
+          showSuccessToast(t('deletedSuccess', { name: item.label }))
+          createGitCommit(basePath, `Delete ${item.label}`)
+          dispatch(onSetChangeStatus(true))
+        }
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        showErrorToast(error.message)
+      } else {
+        showErrorToast(t('duplicateError', { name: item.label }))
+      }
     }
-
-    const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath)
-
-    if (error) {
-      showErrorToast(error)
-    } else showSuccessToast(t('deletedSuccess', { name: item.label }))
-
-    createGitCommit(basePath, `Delete ${item.label}`)
-
-    dispatch(onSetChangeStatus(true))
   }
 
   const isDeleteAction = (menuItem.dropdownMenus ?? []).some(
