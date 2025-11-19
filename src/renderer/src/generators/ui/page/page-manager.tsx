@@ -237,7 +237,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
   const tableQueryText = searchTerm ? ` matching "${searchTerm}"` : ''
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="p-4 space-y-6">
       <IGRPPageHeader
         variant="h3"
         title={project?.name}
@@ -334,7 +334,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
 
             {viewMode === 'card' ? (
               tableData.length > 0 ? (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 items-start">
                   {tableData.map((page): React.JSX.Element => {
                     const components = getPageComponent(page.pageName)
                     const subPages = getSubPages(page.pageName)

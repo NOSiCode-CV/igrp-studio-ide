@@ -94,7 +94,7 @@ function initializeSentry(metadata?: Record<string, string>): void {
       dsn: sentryDsn,
       environment,
       release: app.getVersion(),
-      enableUnresponsive: true,
+      //enableUnresponsive: true,
       tracesSampleRate: process.env.SENTRY_TRACES_SAMPLE_RATE
         ? Number(process.env.SENTRY_TRACES_SAMPLE_RATE)
         : undefined,
