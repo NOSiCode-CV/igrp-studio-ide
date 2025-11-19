@@ -242,7 +242,18 @@ export const GitService = {
 
       return true
     } catch (error: any) {
-      throw new Error(error.stderr || 'Failed to create commit')
+      const errorMessage = error.stderr || error.message || String(error)
+
+      // Se não houver nada para commitar, retorna false sem lançar erro
+      if (
+        errorMessage.includes('nothing to commit') ||
+        errorMessage.includes('no changes added to commit') ||
+        errorMessage.includes('nothing added to commit')
+      ) {
+        return false
+      }
+
+      throw new Error(errorMessage)
     }
   },
 
