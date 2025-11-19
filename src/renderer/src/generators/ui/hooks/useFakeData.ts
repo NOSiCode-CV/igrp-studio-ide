@@ -4,7 +4,9 @@ import { faker } from '@faker-js/faker'
 import { StructuredComponent } from '@renderer/lib/dnd/types'
 
 export const useFakedata = (): {
-  getDataTableFake: (columns: StructuredComponent[]) => { [key: string]: string | number | boolean | undefined }[]
+  getDataTableFake: (
+    columns: StructuredComponent[]
+  ) => { [key: string]: string | number | boolean | undefined }[]
   generateFakeDataForField: (componentType: string) => string | number | boolean | undefined
   getFakeComponentData: (componentName: string) => StructuredComponent
 } => {
@@ -223,24 +225,17 @@ export const useFakedata = (): {
         source: 'https://www.youtube.com/embed/E3PRQTvUmjs?si=rI9EBb45iUP6fZef',
         title: 'Embed Video'
       }
-    },
-    // Default fallback component
-    Default: {
-      id: 'unknown',
-      componentName: 'UnknownComponent',
-      tag: 'div',
-      interactions: {},
-      children: [],
-      properties: {}
     }
   }
 
   // Helper function to get fake data for a component
   const getFakeComponentData = (componentName: string): StructuredComponent => {
-    return FAKE_COMPONENT_DATA[componentName] || FAKE_COMPONENT_DATA.Default
+    return FAKE_COMPONENT_DATA[componentName]
   }
 
-  const generateFakeDataForField = (componentType: string): string | number | boolean | undefined => {
+  const generateFakeDataForField = (
+    componentType: string
+  ): string | number | boolean | undefined => {
     switch (componentType.toLowerCase()) {
       case 'text':
       case 'string':

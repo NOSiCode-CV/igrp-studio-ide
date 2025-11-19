@@ -6,10 +6,7 @@ import { useGit } from '@renderer/hooks/use-git'
 import { useTabs } from '@renderer/components/navigation/TabContext'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
-import {
-  ControllerAction,
-  ControllerConfig
-} from '@igrp/igrp-studio-springboot-engine/types'
+import { ControllerAction, ControllerConfig } from '@igrp/igrp-studio-springboot-engine/types'
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants'
 import { SchemaTypeItem } from 'src/main/types'
 import { IColumnsTabelProps } from '../../types/Interfaces'
@@ -78,7 +75,9 @@ export const useController = ({
       requestParams,
       headers,
       responses,
-      requestBody
+      requestBody,
+      permission,
+      roles
     } = content
     formik.setFieldValue('actionName', actionName || initialValues.actionName)
     formik.setFieldValue('method', method || initialValues.method)
@@ -88,6 +87,8 @@ export const useController = ({
     formik.setFieldValue('requestParams', requestParams || initialValues.requestParams)
     formik.setFieldValue('responses', responses || initialValues.responses)
     formik.setFieldValue('headers', headers || initialValues.headers)
+    formik.setFieldValue('permission', permission || initialValues.permission)
+    formik.setFieldValue('roles', roles || initialValues.roles)
     setOldActionName(actionName)
   }
 
@@ -128,7 +129,9 @@ export const useController = ({
       ...values,
       pathVariables: validPathVariables,
       requestParams: validRequestParams,
-      headers: validHeaders
+      headers: validHeaders,
+      permission: values.permission,
+      roles: values.roles
     }
 
     const existingActions = data?.actions || []

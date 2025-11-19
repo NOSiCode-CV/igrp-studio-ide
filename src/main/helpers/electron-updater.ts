@@ -69,7 +69,7 @@ export default class AppUpdater {
     autoUpdater.on('checking-for-update', () => {
       this.sendStatusToWindow({
         type: 'checking',
-        message: '🔍 Checking for updates...',
+        message: 'Checking for updates...',
         currentVersion: app.getVersion()
       })
     })
@@ -81,7 +81,7 @@ export default class AppUpdater {
 
       this.sendStatusToWindow({
         type: 'available',
-        message: `🚀 New version ${info.version} available!`,
+        message: `New version ${info.version} available!`,
         version: info.version,
         currentVersion: app.getVersion(),
         releaseNotes,
@@ -98,7 +98,7 @@ export default class AppUpdater {
       this.updateAvailable = false
       this.sendStatusToWindow({
         type: 'not-available',
-        message: '✅ You are running the latest version.',
+        message: 'You are running the latest version.',
         currentVersion: app.getVersion(),
         version: info.version
       })
@@ -108,7 +108,7 @@ export default class AppUpdater {
       console.error('Update error:', error)
       this.sendStatusToWindow({
         type: 'error',
-        message: '❌ Update error occurred',
+        message: 'Update error occurred',
         error: error.message || String(error),
         currentVersion: app.getVersion()
       })
@@ -118,7 +118,7 @@ export default class AppUpdater {
       const progressPercent = Math.round(progressObj.percent)
       this.sendStatusToWindow({
         type: 'progress',
-        message: `📥 Downloading update: ${progressPercent}%`,
+        message: `Downloading update: ${progressPercent}%`,
         progress: progressPercent,
         currentVersion: app.getVersion()
       })
@@ -129,7 +129,7 @@ export default class AppUpdater {
 
       this.sendStatusToWindow({
         type: 'downloaded',
-        message: '✅ Update downloaded. Ready to install.',
+        message: 'Update downloaded. Ready to install.',
         version: info.version,
         currentVersion: app.getVersion(),
         releaseNotes,

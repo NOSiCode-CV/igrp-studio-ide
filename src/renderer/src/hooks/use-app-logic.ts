@@ -81,7 +81,10 @@ export function useAppLogic(): {
       try {
         const validation = EnvironmentValidator.validateEnvironment(data)
         if (!validation.isValid) {
-          igrpToast({ type: 'error', content: `Validation failed: ${validation.errors.join(', ')}` })
+          igrpToast({
+            type: 'error',
+            content: `Validation failed: ${validation.errors.join(', ')}`
+          })
           return null
         }
 
@@ -96,7 +99,10 @@ export function useAppLogic(): {
         } as AppLogicEnvironment
 
         const created = await AppLogicIPCClient.addEnvironment(environment)
-        igrpToast({ type: 'success', content: `Environment "${created.name}" created successfully` })
+        igrpToast({
+          type: 'success',
+          content: `Environment "${created.name}" created successfully`
+        })
         return created
       } catch (err) {
         console.error('Error creating environment:', err)
@@ -146,7 +152,10 @@ export function useAppLogic(): {
         }
 
         await AppLogicIPCClient.deleteEnvironment(id)
-        igrpToast({ type: 'success', content: `Environment "${environment.name}" deleted successfully` })
+        igrpToast({
+          type: 'success',
+          content: `Environment "${environment.name}" deleted successfully`
+        })
         return true
       } catch (err) {
         console.error('Error deleting environment:', err)
@@ -196,7 +205,10 @@ export function useAppLogic(): {
         })
 
         if (result.isValid) {
-          igrpToast({ type: 'success', content: `Environment tested successfully (${result.responseTime}ms)` })
+          igrpToast({
+            type: 'success',
+            content: `Environment tested successfully (${result.responseTime}ms)`
+          })
         } else {
           igrpToast({ type: 'error', content: `Environment test failed: ${result.error}` })
         }

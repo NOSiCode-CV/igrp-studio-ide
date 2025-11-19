@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from 'react'
+import React, { FunctionComponent, useEffect, useState, useRef } from 'react'
 import { ITabelContainer } from '../generators/api/types/Interfaces'
 // Table components removed - using div elements instead
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
@@ -381,6 +381,76 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     )
   }
 
+  // Componente para inputs que preservam a posição do cursor
+  const ControlledInput = React.memo(
+    ({
+      value,
+      type,
+      className,
+      readonly,
+      onChangeValue,
+      fieldKey,
+      index,
+      group
+    }: {
+      value: string | number
+      type: 'text' | 'number'
+      className?: string
+      readonly?: boolean
+      onChangeValue: (props: ChangeFnProps) => void
+      fieldKey: string
+      index: number
+      group?: GroupField
+    }): React.ReactNode => {
+      const [localValue, setLocalValue] = useState<string | number>(value || '')
+      const isFocusedRef = useRef(false)
+      const previousValueRef = useRef(value)
+
+      // Só sincroniza o valor externo se não estiver focado e o valor realmente mudou
+      useEffect(() => {
+        if (!isFocusedRef.current && previousValueRef.current !== value) {
+          setLocalValue(value || '')
+          previousValueRef.current = value
+        }
+      }, [value])
+
+      const handleChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
+        const newValue = ev.target.value
+        setLocalValue(newValue)
+      }
+
+      const handleBlur = (ev: React.FocusEvent<HTMLInputElement>): void => {
+        isFocusedRef.current = false
+        const finalValue = type === 'number' ? Number(ev.target.value) || 0 : ev.target.value
+        onChangeValue({
+          key: fieldKey,
+          index,
+          value: finalValue,
+          group
+        })
+        previousValueRef.current = finalValue
+      }
+
+      const handleFocus = (): void => {
+        isFocusedRef.current = true
+      }
+
+      return (
+        <IGRPInputPrimitive
+          className={className}
+          type={type}
+          value={localValue}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          onFocus={handleFocus}
+          readOnly={readonly}
+        />
+      )
+    }
+  )
+
+  ControlledInput.displayName = 'ControlledInput'
+
   // Optimized field renderer using component registry
   const renderField = (
     row: any,
@@ -397,22 +467,18 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     // Handle input types (text, number)
     if (type === 'text' || type === 'number') {
       return (
-        <IGRPInputPrimitive
+        <ControlledInput
+          value={row?.[key] || ''}
+          type={type}
           className={cn(
             'h-8 text-sm',
             errors?.[index]?.[key] && touched?.[index]?.[key] ? 'border-destructive' : ''
           )}
-          type={type}
-          value={row?.[key] || ''}
-          onChange={(ev) =>
-            onChangeValue({
-              key,
-              index,
-              value: ev.target.value,
-              group
-            })
-          }
-          readOnly={readonly}
+          readonly={readonly}
+          onChangeValue={onChangeValue}
+          fieldKey={key}
+          index={index}
+          group={group}
         />
       )
     }

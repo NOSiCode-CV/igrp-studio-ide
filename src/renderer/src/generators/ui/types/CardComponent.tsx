@@ -18,7 +18,7 @@ const CardComponent = ({ comp, group, hoverClass, onDragEnd }: CardComponentProp
 
   const { componentName, properties, style } = comp
 
-  const { iconProperties, className, content, ...args } = properties || {}
+  const { iconProperties, className, content, label, ...args } = properties || {}
 
   const componentLabel = content || properties?.label || componentName
 
@@ -37,6 +37,8 @@ const CardComponent = ({ comp, group, hoverClass, onDragEnd }: CardComponentProp
       }
     : {}
 
+  console.log('classes', classes, className, componentName)
+
   return (
     <>
       {Component ? (
@@ -50,8 +52,13 @@ const CardComponent = ({ comp, group, hoverClass, onDragEnd }: CardComponentProp
           onDragEnd={onDragEnd}
           hoverClass={hoverClass}
           group={group}
+          label={label}
         >
           {content || FAKE_COMPONENT_DATA?.properties?.content}
+
+          {/*   {componentName === COMPONENT.Label && label && (
+            <div className="text-sm font-medium text-muted-foreground truncate">{label}</div>
+          )} */}
         </Component>
       ) : (
         <div className="rounded-lg shadow-xs border p-4 bg-card">

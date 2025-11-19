@@ -6,10 +6,7 @@ import { useGit } from '@renderer/hooks/use-git'
 import { useTabs } from '@renderer/components/navigation/TabContext'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
-import {
-  ModelConfig,
-  RelationReference
-} from '@igrp/igrp-studio-springboot-engine/types'
+import { ModelConfig, RelationReference } from '@igrp/igrp-studio-springboot-engine/types'
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants'
 import { IColumnsTabelProps } from '../../types/Interfaces'
 import { defaultValues, getTablesColumns, initialValues, getValuesToSubmit } from './config'

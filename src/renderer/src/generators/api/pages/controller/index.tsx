@@ -19,6 +19,7 @@ import NavigationBar from '../../components/navigation-bar'
 import { CreateEndpointDialog } from './create-endpoint-dialog'
 import { TabRequest } from './tab-resquest'
 import { TabResponse } from './tab-response'
+import { TabSecurity } from './tab-security'
 import { useController } from './useController'
 import { TabList } from './config'
 import { httpMethods } from '@renderer/constants/appConstants'
@@ -136,7 +137,7 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
           </IGRPCardContentPrimitive>
         </IGRPCardPrimitive>
         <IGRPTabsPrimitive defaultValue={'request'}>
-          <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
+          <IGRPTabsListPrimitive className="grid w-full grid-cols-3">
             {TabList.map(({ label, tabId }, key) => (
               <IGRPTabsTriggerPrimitive key={key} value={tabId}>
                 {label}
@@ -161,6 +162,9 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
               enumTypes={enumTypes}
               collectionTypes={collectionType}
             />
+          </IGRPTabsContentPrimitive>
+          <IGRPTabsContentPrimitive value={'security'}>
+            <TabSecurity formik={formik} basePath={basePath} module={controller.module} />
           </IGRPTabsContentPrimitive>
         </IGRPTabsPrimitive>
       </div>

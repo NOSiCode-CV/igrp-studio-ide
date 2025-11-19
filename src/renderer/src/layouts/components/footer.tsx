@@ -130,7 +130,15 @@ export function Footer(): JSX.Element {
   }, [appVersion, t])
 
   const simulateError = (): void => {
-    throw new Error('This is a simulated error from the renderer process.')
+    const error = new Error('This is a simulated error from the renderer process.')
+
+    if (window.electron?.reportError) {
+      window.electron.reportError(error)
+      setLog('Simulated error sent to logger')
+    } else {
+      console.error('Electron reportError bridge is not available')
+      throw error
+    }
   }
 
   const handleInstallUpdate = async (): Promise<void> => {
@@ -194,7 +202,7 @@ export function Footer(): JSX.Element {
         <div className="flex items-center space-x-3">
           <IGRPSeparator orientation="vertical" className="h-4" />
 
-          <button onClick={simulateError} className="hidden">
+          <button onClick={simulateError} className="">
             Simulate Error
           </button>
 
