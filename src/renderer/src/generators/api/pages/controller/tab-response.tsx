@@ -220,7 +220,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
               key={statusCode}
               className={cn('space-y-4', activeResponseTab === statusCode ? 'block' : 'hidden')}
             >
-              <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4">
+              <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                   <LabelRequired>{t('httpStatusCode')}</LabelRequired>
                   <IGRPCombobox

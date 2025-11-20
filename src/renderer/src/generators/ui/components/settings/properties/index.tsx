@@ -378,7 +378,9 @@ const RenderPropsConfig = ({
                 <IGRPDatePickerSingle
                   name={parentKey ? `${parentKey}.${key}` : key}
                   date={value ? new Date(value) : undefined}
-                  onDateChange={(value) => onInputChange(fieldPath, value)}
+                  onDateChange={(value) => {
+                    onInputChange(fieldPath, value ? value.toISOString() : value)
+                  }}
                   className=""
                   id={parentKey ? `${parentKey}.${key}` : key}
                 />

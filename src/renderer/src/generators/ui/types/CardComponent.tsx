@@ -37,7 +37,7 @@ const CardComponent = ({ comp, group, hoverClass, onDragEnd }: CardComponentProp
       }
     : {}
 
-  console.log('classes', classes, className, componentName)
+  //console.log('classes', classes, className, componentName)
 
   return (
     <>
