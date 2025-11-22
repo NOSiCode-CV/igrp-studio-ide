@@ -481,7 +481,17 @@ const igrpStudioSettings = {
 
   // Language methods
   getLanguage: () => ipcRenderer.invoke(EVENTS.LANGUAGE.GET_LANGUAGE),
-  setLanguage: (lang: string) => ipcRenderer.invoke(EVENTS.LANGUAGE.SET_LANGUAGE, lang)
+  setLanguage: (lang: string) => ipcRenderer.invoke(EVENTS.LANGUAGE.SET_LANGUAGE, lang),
+
+  // BPMN Project Preference methods
+  setSelectedBPMNProject: (projectId: string) =>
+    ipcRenderer.invoke(EVENTS.BPMN.SET_SELECTED_PROJECT, projectId),
+  getSelectedBPMNProject: () => ipcRenderer.invoke(EVENTS.BPMN.GET_SELECTED_PROJECT),
+
+  // BPMN Process Preference methods
+  setSelectedBPMNProcess: (processDefinitionId: string) =>
+    ipcRenderer.invoke(EVENTS.BPMN.SET_SELECTED_PROCESS, processDefinitionId),
+  getSelectedBPMNProcess: () => ipcRenderer.invoke(EVENTS.BPMN.GET_SELECTED_PROCESS)
 }
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

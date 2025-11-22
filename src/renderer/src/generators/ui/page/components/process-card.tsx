@@ -1,10 +1,11 @@
 import { JSX } from 'react/jsx-runtime'
-import { Calendar, Trash2 } from 'lucide-react'
+import { Calendar, UserCog } from 'lucide-react'
 import {
   IGRPBadgePrimitive,
   IGRPCardPrimitive,
   IGRPCardContentPrimitive,
-  IGRPCardTitlePrimitive
+  IGRPCardTitlePrimitive,
+  IGRPCardDescriptionPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { BPMNProjectProcessDefinition } from 'src/main/types'
 
@@ -34,6 +35,7 @@ export const ProcessCard = ({
             <IGRPCardTitlePrimitive className="text-base font-medium">
               {process.title}
             </IGRPCardTitlePrimitive>
+            <IGRPCardDescriptionPrimitive>{process.processKey}</IGRPCardDescriptionPrimitive>
             <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
               <Calendar className="w-4 h-4" />
               {process.deploymentDate && (
@@ -43,15 +45,12 @@ export const ProcessCard = ({
               )}
             </div>
             <div className="flex items-center space-x-2 mt-1 text-sm text-muted-foreground">
-              <Trash2 className="w-4 h-4" />
+              <UserCog className="w-4 h-4" />
               <span>{process.processArtifacts?.length || 0} artifacts</span>
             </div>
           </div>
           <div className="flex flex-col items-end space-y-2">
-            <IGRPBadgePrimitive variant={'outline'}>
-              v{process.version || 'N/A'}
-              {' • Published'}
-            </IGRPBadgePrimitive>
+            <IGRPBadgePrimitive variant={'outline'}>v{process.version || 'N/A'}</IGRPBadgePrimitive>
           </div>
         </div>
       </IGRPCardContentPrimitive>

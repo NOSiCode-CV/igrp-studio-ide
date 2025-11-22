@@ -198,3 +198,51 @@ ipcMain.handle(EVENTS.LANGUAGE.SET_LANGUAGE, (_event, lang: string) => {
     return 'en' // fallback to default
   }
 })
+
+// BPMN Project Preference IPC Handlers
+ipcMain.handle(EVENTS.BPMN.SET_SELECTED_PROJECT, async (_event, projectId: string) => {
+  try {
+    await IGRPStudioSettings.setSelectedBPMNProject(projectId)
+    return { success: true }
+  } catch (error) {
+    console.error('Error setting selected BPMN project:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
+  }
+})
+
+ipcMain.handle(EVENTS.BPMN.GET_SELECTED_PROJECT, async () => {
+  try {
+    const projectId = await IGRPStudioSettings.getSelectedBPMNProject()
+    return projectId
+  } catch (error) {
+    console.error('Error getting selected BPMN project:', error)
+    return undefined
+  }
+})
+
+// BPMN Process Preference IPC Handlers
+ipcMain.handle(EVENTS.BPMN.SET_SELECTED_PROCESS, async (_event, processDefinitionId: string) => {
+  try {
+    await IGRPStudioSettings.setSelectedBPMNProcess(processDefinitionId)
+    return { success: true }
+  } catch (error) {
+    console.error('Error setting selected BPMN process:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
+  }
+})
+
+ipcMain.handle(EVENTS.BPMN.GET_SELECTED_PROCESS, async () => {
+  try {
+    const processDefinitionId = await IGRPStudioSettings.getSelectedBPMNProcess()
+    return processDefinitionId
+  } catch (error) {
+    console.error('Error getting selected BPMN process:', error)
+    return undefined
+  }
+})

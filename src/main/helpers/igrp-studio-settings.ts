@@ -186,5 +186,27 @@ export const IGRPStudioSettings = {
 
     connections.splice(index, 1)
     storeInstance.set('connections', connections)
+  },
+
+  // BPMN Project Preference Methods
+  async setSelectedBPMNProject(projectId: string): Promise<void> {
+    const storeInstance = await this.getStore()
+    storeInstance.set('selectedBPMNProjectId', projectId)
+  },
+
+  async getSelectedBPMNProject(): Promise<string | undefined> {
+    const storeInstance = await this.getStore()
+    return storeInstance.get('selectedBPMNProjectId', undefined)
+  },
+
+  // BPMN Process Preference Methods
+  async setSelectedBPMNProcess(processDefinitionId: string): Promise<void> {
+    const storeInstance = await this.getStore()
+    storeInstance.set('selectedBPMNProcessDefinitionId', processDefinitionId)
+  },
+
+  async getSelectedBPMNProcess(): Promise<string | undefined> {
+    const storeInstance = await this.getStore()
+    return storeInstance.get('selectedBPMNProcessDefinitionId', undefined)
   }
 }

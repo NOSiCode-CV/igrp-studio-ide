@@ -57,7 +57,6 @@ export const BPMNProjectSelector = ({
   const [selectedProcess, setSelectedProcess] = useState<BPMNProjectProcessDefinition | null>(null)
   const [processDefinitionDetails, setProcessDefinitionDetails] =
     useState<BPMNProjectProcessDefinition | null>(null)
-  const [loadingProcessDetails, setLoadingProcessDetails] = useState(false)
   const [showAddComponentsModal, setShowAddComponentsModal] = useState(false)
   const [pendingComponentData, setPendingComponentData] = useState<
     | {
@@ -106,38 +105,117 @@ export const BPMNProjectSelector = ({
     }
   }, [])
 
-  // Fetch process definition details when a process is selected
+  // Load saved project preference when projects are loaded
   useEffect(() => {
-    setProcessDefinitionDetails(null)
-
-    const fetchProcessDefinitionDetails = async (): Promise<void> => {
-      if (selectedProcess?.processDefinitionId) {
+    const loadSavedProject = async (): Promise<void> => {
+      if (!loading && projects.length > 0) {
         try {
-          setLoadingProcessDetails(true)
-          const details = await bpmnService.getProcessDefinitionDetails(
-            selectedProcess.processDefinitionId
-          )
-          setProcessDefinitionDetails(details)
+          const savedProjectId = await window.igrpStudioSettings.getSelectedBPMNProject()
+          if (savedProjectId) {
+            const project = projects.find((p) => p.projectId === savedProjectId)
+            if (project) {
+              setSelectedProject(project)
+            }
+          }
         } catch (error) {
-          setProcessDefinitionDetails(null)
-          console.error('Error fetching process definition details:', error)
-          showErrorToast('Failed to fetch process definition details')
-        } finally {
-          setLoadingProcessDetails(false)
+          console.error('Error loading saved BPMN project preference:', error)
         }
-      } else {
-        setProcessDefinitionDetails(null)
       }
     }
 
-    fetchProcessDefinitionDetails()
-  }, [selectedProcess])
+    loadSavedProject()
+  }, [projects, loading])
 
-  const handleProjectChange = (projectId: string): void => {
+  // Load saved process preference when process definitions are loaded
+  useEffect(() => {
+    const loadSavedProcess = async (): Promise<void> => {
+      // Only load if we don't already have a selected process
+      if (
+        !loadingProcesses &&
+        processDefinitions.length > 0 &&
+        selectedProject &&
+        !selectedProcess
+      ) {
+        try {
+          const savedProcessDefinitionId = await window.igrpStudioSettings.getSelectedBPMNProcess()
+          if (savedProcessDefinitionId) {
+            const process = processDefinitions.find(
+              (p) => p.processDefinitionId === savedProcessDefinitionId
+            )
+            if (process) {
+              setSelectedProcess(process)
+            }
+          }
+        } catch (error) {
+          console.error('Error loading saved BPMN process preference:', error)
+        }
+      }
+    }
+
+    loadSavedProcess()
+  }, [processDefinitions, loadingProcesses, selectedProject, selectedProcess])
+
+  // Fetch process definition details when a process is selected
+  useEffect(() => {
+    const currentProcessId = selectedProcess?.processDefinitionId
+
+    if (!currentProcessId) {
+      return
+    }
+
+    let isCancelled = false
+
+    const fetchProcessDefinitionDetails = async (): Promise<void> => {
+      try {
+        const details = await bpmnService.getProcessDefinitionDetails(currentProcessId)
+
+        // Only update if the process hasn't changed and effect hasn't been cancelled
+        if (!isCancelled && selectedProcess?.processDefinitionId === currentProcessId) {
+          setProcessDefinitionDetails(details)
+          console.log('Process definition details loaded:', details)
+          console.log('Process artifacts:', details?.processArtifacts)
+        }
+      } catch (error) {
+        // Only update if the process hasn't changed and effect hasn't been cancelled
+        if (!isCancelled && selectedProcess?.processDefinitionId === currentProcessId) {
+          setProcessDefinitionDetails(null)
+          console.error('Error fetching process definition details:', error)
+          showErrorToast('Failed to fetch process definition details')
+        }
+      } 
+    }
+
+    fetchProcessDefinitionDetails()
+
+    return () => {
+      isCancelled = true
+    }
+
+  }, [selectedProcess?.processDefinitionId, showErrorToast])
+
+  const handleProjectChange = async (projectId: string): Promise<void> => {
     const project = projects.find((p) => p.projectId === projectId)
     setSelectedProject(project || null)
     setProcessDefinitionDetails(null)
     setSelectedProcess(null)
+
+    // Save the selected project preference
+    try {
+      await window.igrpStudioSettings.setSelectedBPMNProject(projectId)
+    } catch (error) {
+      console.error('Error saving BPMN project preference:', error)
+    }
+  }
+
+  const handleProcessChange = async (process: BPMNProjectProcessDefinition): Promise<void> => {
+    setSelectedProcess(process)
+
+    // Save the selected process preference
+    try {
+      await window.igrpStudioSettings.setSelectedBPMNProcess(process.processDefinitionId)
+    } catch (error) {
+      console.error('Error saving BPMN process preference:', error)
+    }
   }
 
   const handleStepProcess = async (
@@ -321,7 +399,6 @@ export const BPMNProjectSelector = ({
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            {loadingProcesses && <IGRPLoadingSpinner />}
             <IGRPButtonPrimitive
               variant="ghost"
               size="sm"
@@ -336,24 +413,19 @@ export const BPMNProjectSelector = ({
         </div>
 
         {loadingProcesses ? (
-          <IGRPLoadingSpinner />
+          <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+            <IGRPLoadingSpinner />
+            <span>Loading process details...</span>
+          </div>
         ) : processDefinitions.length > 0 ? (
           <div className="space-y-4">
-            {loadingProcessDetails && (
-              <div className="flex items-center justify-center py-4">
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <IGRPLoadingSpinner />
-                  <span>Loading process details...</span>
-                </div>
-              </div>
-            )}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {processDefinitions.map((process) => (
                 <ProcessCard
                   key={process.processDefinitionId}
                   process={process}
                   isSelected={selectedProcess?.processDefinitionId === process.processDefinitionId}
-                  onSelectProcess={setSelectedProcess}
+                  onSelectProcess={handleProcessChange}
                 />
               ))}
             </div>
@@ -368,7 +440,7 @@ export const BPMNProjectSelector = ({
       </div>
 
       {/* Step 3: Process Details with Tabs */}
-      {selectedProcess && processDefinitions.length > 0 && (
+      {selectedProcess && (
         <>
           <div className="space-y-4">
             <IGRPTabsPrimitive value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -386,16 +458,6 @@ export const BPMNProjectSelector = ({
                     <p className="text-sm text-muted-foreground">
                       Artifacts for process: {selectedProcess.title}
                     </p>
-                  </div>
-                  <div className="flex space-x-2">
-                    <IGRPButtonPrimitive
-                      variant="outline"
-                      size="sm"
-                      className="flex items-center space-x-2"
-                    >
-                      <Settings />
-                      Bulk Actions
-                    </IGRPButtonPrimitive>
                   </div>
                 </div>
 
@@ -478,3 +540,4 @@ export const BPMNProjectSelector = ({
     </div>
   )
 }
+

@@ -81,7 +81,11 @@ export const EVENTS = {
     UPDATE_CONFIG: 'igrp-studio-settings:update-bpmn-config',
     DELETE_CONFIG: 'igrp-studio-settings:delete-bpmn-config',
     SET_ACTIVE_CONFIG: 'igrp-studio-settings:set-active-bpmn-config',
-    DELETE_ALL_CONFIGS: 'igrp-studio-settings:delete-all-bpmn-configs'
+    DELETE_ALL_CONFIGS: 'igrp-studio-settings:delete-all-bpmn-configs',
+    SET_SELECTED_PROJECT: 'igrp-studio-settings:set-selected-bpmn-project',
+    GET_SELECTED_PROJECT: 'igrp-studio-settings:get-selected-bpmn-project',
+    SET_SELECTED_PROCESS: 'igrp-studio-settings:set-selected-bpmn-process',
+    GET_SELECTED_PROCESS: 'igrp-studio-settings:get-selected-bpmn-process'
   },
   LANGUAGE: {
     GET_LANGUAGE: 'igrp-studio-settings:get-language',
