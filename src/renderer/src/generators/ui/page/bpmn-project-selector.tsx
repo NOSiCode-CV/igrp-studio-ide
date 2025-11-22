@@ -1,4 +1,4 @@
-import { useState, useEffect, JSX } from 'react'
+import { useState, useEffect, useRef, JSX } from 'react'
 import {
   IGRPBadgePrimitive,
   IGRPButtonPrimitive,
@@ -16,7 +16,7 @@ import {
   IGRPLoadingSpinner,
   IGRPSeparator
 } from '@igrp/igrp-framework-react-design-system'
-import { RefreshCw, Settings } from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
 import { nanoid } from '@reduxjs/toolkit'
 import { useDispatch } from 'react-redux'
 import {
@@ -57,6 +57,7 @@ export const BPMNProjectSelector = ({
   const [selectedProcess, setSelectedProcess] = useState<BPMNProjectProcessDefinition | null>(null)
   const [processDefinitionDetails, setProcessDefinitionDetails] =
     useState<BPMNProjectProcessDefinition | null>(null)
+  const lastFetchedProcessIdRef = useRef<string | null>(null)
   const [showAddComponentsModal, setShowAddComponentsModal] = useState(false)
   const [pendingComponentData, setPendingComponentData] = useState<
     | {
@@ -160,10 +161,22 @@ export const BPMNProjectSelector = ({
     const currentProcessId = selectedProcess?.processDefinitionId
 
     if (!currentProcessId) {
+      // Clear details when no process is selected
+      lastFetchedProcessIdRef.current = null
+      if (processDefinitionDetails) {
+        // Use setTimeout to avoid synchronous setState warning
+        setTimeout(() => setProcessDefinitionDetails(null), 0)
+      }
+      return
+    }
+
+    // Don't fetch if we already fetched details for this process
+    if (lastFetchedProcessIdRef.current === currentProcessId) {
       return
     }
 
     let isCancelled = false
+    lastFetchedProcessIdRef.current = currentProcessId
 
     const fetchProcessDefinitionDetails = async (): Promise<void> => {
       try {
@@ -172,30 +185,30 @@ export const BPMNProjectSelector = ({
         // Only update if the process hasn't changed and effect hasn't been cancelled
         if (!isCancelled && selectedProcess?.processDefinitionId === currentProcessId) {
           setProcessDefinitionDetails(details)
-          console.log('Process definition details loaded:', details)
-          console.log('Process artifacts:', details?.processArtifacts)
         }
       } catch (error) {
         // Only update if the process hasn't changed and effect hasn't been cancelled
         if (!isCancelled && selectedProcess?.processDefinitionId === currentProcessId) {
+          lastFetchedProcessIdRef.current = null
           setProcessDefinitionDetails(null)
           console.error('Error fetching process definition details:', error)
           showErrorToast('Failed to fetch process definition details')
         }
-      } 
+      }
     }
 
     fetchProcessDefinitionDetails()
 
     return () => {
       isCancelled = true
+      // Don't reset the ref here, only reset on error or when process changes
     }
-
   }, [selectedProcess?.processDefinitionId, showErrorToast])
 
   const handleProjectChange = async (projectId: string): Promise<void> => {
     const project = projects.find((p) => p.projectId === projectId)
     setSelectedProject(project || null)
+    lastFetchedProcessIdRef.current = null
     setProcessDefinitionDetails(null)
     setSelectedProcess(null)
 
