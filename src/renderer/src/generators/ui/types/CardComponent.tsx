@@ -56,9 +56,6 @@ const CardComponent = ({ comp, group, hoverClass, onDragEnd }: CardComponentProp
         >
           {content || FAKE_COMPONENT_DATA?.properties?.content}
 
-          {/*   {componentName === COMPONENT.Label && label && (
-            <div className="text-sm font-medium text-muted-foreground truncate">{label}</div>
-          )} */}
         </Component>
       ) : (
         <div className="rounded-lg shadow-xs border p-4 bg-card">
