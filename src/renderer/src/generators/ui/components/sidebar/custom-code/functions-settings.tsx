@@ -5,7 +5,7 @@ import {
 } from '@igrp/igrp-framework-react-design-system'
 import { Plus, Trash2 } from 'lucide-react'
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
-import { useEffect, useState } from 'react'
+import { JSX, useEffect, useState } from 'react'
 import { Arguments, Import } from '@igrp/igrp-studio-nextjs-engine/types'
 import {
   CheckboxInput,
@@ -34,17 +34,7 @@ import { IGRPCheckboxPrimitive } from '@igrp/igrp-framework-react-design-system'
 import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system'
 import { GlobalTabFilter, useGlobalTabFilter } from './global-tab-filter'
 import { useComponents } from '@renderer/generators/ui/hooks/useComponents'
-
-export const returnTypeOptions = [
-  { value: 'string', label: 'String' },
-  { value: 'number', label: 'Number' },
-  { value: 'boolean', label: 'Boolean' },
-  { value: 'object', label: 'Object' },
-  { value: 'array', label: 'Array' },
-  { value: 'void', label: 'Void' },
-  { value: 'any', label: 'Any' },
-  { value: 'z.infer<any>', label: 'Form ZodType' }
-]
+import { RETURN_TYPE_OPTIONS } from '@renderer/generators/ui/utils/contants'
 
 interface FunctionSettingsSidebarProps extends React.ComponentProps<typeof IGRPSidebarPrimitive> {
   formik?: any
@@ -59,7 +49,7 @@ export const FunctionSettingsSidebar = ({
   componentTag,
   onInsertImport,
   ...props
-}: FunctionSettingsSidebarProps) => {
+}: FunctionSettingsSidebarProps): JSX.Element => {
   const { t } = useTranslation()
   const { states, snippets, functions, types } = useCustomCode()
   const { filterValue, setFilterValue, clearFilter } = useGlobalTabFilter()
@@ -142,7 +132,7 @@ export const FunctionSettingsSidebar = ({
                   onChange={(value) => {
                     formik.setFieldValue('returnValue.type', value)
                   }}
-                  options={returnTypeOptions}
+                  options={RETURN_TYPE_OPTIONS}
                 />
 
                 <div className="flex items-center gap-4">
@@ -174,7 +164,7 @@ export const FunctionSettingsSidebar = ({
               <FunctionArguments
                 value={arguments_}
                 onChange={setArguments}
-                returnTypeOptions={returnTypeOptions}
+                returnTypeOptions={RETURN_TYPE_OPTIONS}
               />
             </IGRPTabsContentPrimitive>
           )}
@@ -227,12 +217,12 @@ export const FunctionArguments = ({
   value: arguments_,
   onChange,
   returnTypeOptions
-}: FunctionArgumentsProps) => {
-  const removeArgument = (id: string) => {
+}: FunctionArgumentsProps): JSX.Element => {
+  const removeArgument = (id: string): void => {
     onChange(arguments_.filter((arg) => arg.id !== id))
   }
 
-  const addArgument = () => {
+  const addArgument = (): void => {
     const newId = (Number.parseInt(arguments_[arguments_.length - 1]?.id || '0') + 1).toString()
     onChange([
       ...arguments_,
@@ -250,11 +240,11 @@ export const FunctionArguments = ({
     ])
   }
 
-  const updateArgument = (id: string, updates: Partial<Arguments>) => {
+  const updateArgument = (id: string, updates: Partial<Arguments>): void => {
     onChange(arguments_.map((arg) => (arg.id === id ? { ...arg, ...updates } : arg)))
   }
 
-  const addFunctionParameter = (argumentId: string) => {
+  const addFunctionParameter = (argumentId: string): void => {
     const newParameter: Arguments = {
       id: Date.now().toString(),
       name: '',
@@ -274,7 +264,7 @@ export const FunctionArguments = ({
     })
   }
 
-  const removeFunctionParameter = (argumentId: string, parameterId: string) => {
+  const removeFunctionParameter = (argumentId: string, parameterId: string): void => {
     const argument = arguments_.find((arg) => arg.id === argumentId)
     if (argument) {
       updateArgument(argumentId, {
@@ -289,7 +279,7 @@ export const FunctionArguments = ({
     argumentId: string,
     parameterId: string,
     updates: Partial<Arguments>
-  ) => {
+  ): void => {
     const argument = arguments_.find((arg) => arg.id === argumentId)
     if (argument) {
       updateArgument(argumentId, {
@@ -483,14 +473,15 @@ export const FunctionArguments = ({
                                 size="sm"
                                 onClick={() => removeFunctionParameter(arg.id, param.id)}
                               >
-                                <Trash2 className="h-4 w-4 text-red-500" />
+                                <Trash2 className="h-4 w-4 text-destructive" />
                               </IGRPButtonPrimitive>
                             </div>
                           ))}
 
                         {arg.functionParameters && arg.functionParameters.length === 0 && (
                           <p className="text-sm text-gray-500 text-center py-4">
-                            No parameters defined. Click "Add Parameter" to add function parameters.
+                            No parameters defined. Click &quot;Add Parameter&quot; to add function
+                            parameters.
                           </p>
                         )}
                       </div>

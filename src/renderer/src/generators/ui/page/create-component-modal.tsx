@@ -26,11 +26,9 @@ import { TextInput } from '@renderer/generators/api/components/inputs-form'
 import { camelCase } from 'lodash-es'
 import { FocusEvent } from 'react'
 import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
-import {
-  FunctionArguments,
-  returnTypeOptions
-} from '../components/sidebar/custom-code/functions-settings'
+import { FunctionArguments } from '../components/sidebar/custom-code/functions-settings'
 import { PageDefinition } from './page-manager'
+import { RETURN_TYPE_OPTIONS } from '../utils/contants'
 
 const initialValues: ComponentConfig = {
   type: 'component',
@@ -60,7 +58,7 @@ export function CreateComponentModal({
   onConfirm,
   pageOptions,
   currentComponent
-}: CreateComponentModalProps) {
+}: CreateComponentModalProps): JSX.Element {
   const { t } = useTranslation()
 
   const { createGitCommit } = useGit()
@@ -282,7 +280,7 @@ export function CreateComponentModal({
                   <FunctionArguments
                     value={formik.values?.args || []}
                     onChange={setArguments}
-                    returnTypeOptions={returnTypeOptions}
+                    returnTypeOptions={RETURN_TYPE_OPTIONS}
                   />
                 </div>
               </div>

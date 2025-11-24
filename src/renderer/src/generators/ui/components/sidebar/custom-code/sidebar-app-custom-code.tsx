@@ -25,7 +25,7 @@ import {
   IGRPDialogTitlePrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import MonacoEditor from '@renderer/components/monaco-editor'
-import { useEffect, useRef, useState } from 'react'
+import { JSX, useEffect, useRef, useState } from 'react'
 import { FormikProps, useFormik } from 'formik'
 import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext'
 import { nanoid } from '@reduxjs/toolkit'
@@ -56,7 +56,7 @@ interface ResourceListProps<T> {
   editModal?: React.ReactNode
 }
 
-const SidebarAppCustomCode = ({ searchTerm }: { searchTerm: string }) => {
+const SidebarAppCustomCode = ({ searchTerm }: { searchTerm: string }): JSX.Element => {
   const { removeFunction, removeState } = useDroppedComponents()
 
   const { snippets, functions, states, isLoading } = useCustomCode()
@@ -168,7 +168,7 @@ const ResourceList = <
   onDelete,
   renderItemName,
   editModal
-}: ResourceListProps<T>) => {
+}: ResourceListProps<T>): JSX.Element => {
   const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -283,7 +283,7 @@ const FncComponent = ({
   funct?: CustomFunctionConfig
   open: boolean
   setOpen: (prompt: boolean) => void
-}) => {
+}): JSX.Element => {
   const { addFunction, updateFunction } = useDroppedComponents()
   const codeRef = useRef<string>('')
   const { t } = useTranslation()
