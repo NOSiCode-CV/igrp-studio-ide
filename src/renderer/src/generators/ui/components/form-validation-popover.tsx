@@ -43,6 +43,7 @@ export function FormValidationPopover({
   const [isBoolean, setIsBoolean] = useState(false)
   const [isDate, setIsDate] = useState(false)
   const [isEmail, setIsEmail] = useState(false)
+  const [isFile, setIsFile] = useState(false)
 
   const handleValidationKeyChange = (key: string, value: string | boolean | number) => {
     const currentValidation = field?.validation || {}
@@ -59,12 +60,14 @@ export function FormValidationPopover({
     setIsBoolean(fieldType === 'boolean')
     setIsDate(['date', 'datetime', 'time'].includes(fieldType))
     setIsEmail(fieldType === 'email')
+    setIsFile(fieldType === 'file')
   }, [fieldType])
 
   const shouldShowValidation = (validation: string) => {
     switch (validation) {
       case 'min':
       case 'max':
+        return isNumber || isFile
       case 'positive':
       case 'negative':
       case 'int':
@@ -86,6 +89,8 @@ export function FormValidationPopover({
       case 'minDate':
       case 'maxDate':
         return isDate
+      case 'mime':
+        return isFile
       case 'required':
       case 'optional':
         return true
@@ -108,6 +113,7 @@ export function FormValidationPopover({
     ]
     const numberValidations = ['min', 'max', 'positive', 'negative', 'int', 'finite']
     const dateValidations = ['minDate', 'maxDate']
+    const fileValidations = ['min', 'max', 'mime']
     const booleanValidations: string[] = []
 
     let validations: string[] = []
@@ -120,6 +126,9 @@ export function FormValidationPopover({
     }
     if (isDate) {
       validations = [...validations, ...dateValidations]
+    }
+    if (isFile) {
+      validations = [...validations, ...fileValidations]
     }
     if (isBoolean) {
       validations = [...validations, ...booleanValidations]
@@ -181,6 +190,15 @@ export function FormValidationPopover({
             onChange={(ev) => handleValidationKeyChange(validation, ev.target.value)}
           />
         )
+      case 'mime':
+        return (
+          <IGRPInputPrimitive
+            className="h-8"
+            value={value || ''}
+            placeholder="image/png"
+            onChange={(ev) => handleValidationKeyChange(validation, ev.target.value)}
+          />
+        )
       default:
         return (
           <IGRPSwitch
@@ -197,7 +215,9 @@ export function FormValidationPopover({
     let schema = 'z.'
 
     // Base type
-    if (isString || isEmail) {
+    if (isFile) {
+      schema += 'file()'
+    } else if (isString || isEmail) {
       schema += 'string()'
     } else if (isNumber) {
       schema += 'number()'
@@ -211,13 +231,21 @@ export function FormValidationPopover({
 
     // Apply validations
     validations.forEach((validation) => {
-      if (field?.[validation]) {
+      const validationValue = field?.validation?.[validation] ?? field?.[validation]
+      if (validationValue !== undefined && validationValue !== null && validationValue !== '') {
         switch (validation) {
           case 'min':
           case 'max':
+            if (isFile) {
+              // For file, min/max are in bytes
+              schema += `.${validation}(${validationValue})`
+            } else {
+              schema += `.${validation}(${validationValue})`
+            }
+            break
           case 'minLength':
           case 'maxLength':
-            schema += `.${validation}(${field[validation]})`
+            schema += `.${validation}(${validationValue})`
             break
           case 'positive':
             schema += '.positive()'
@@ -241,20 +269,23 @@ export function FormValidationPopover({
             schema += '.uuid()'
             break
           case 'regex':
-            schema += `.regex(/${field[validation]}/)`
+            schema += `.regex(/${validationValue}/)`
             break
           case 'startsWith':
-            schema += `.startsWith('${field[validation]}')`
+            schema += `.startsWith('${validationValue}')`
             break
           case 'endsWith':
-            schema += `.endsWith('${field[validation]}')`
+            schema += `.endsWith('${validationValue}')`
             break
           case 'includes':
-            schema += `.includes('${field[validation]}')`
+            schema += `.includes('${validationValue}')`
+            break
+          case 'mime':
+            schema += `.mime("${validationValue}")`
             break
           case 'minDate':
           case 'maxDate':
-            schema += `.${validation === 'minDate' ? 'min' : 'max'}(new Date('${field[validation]}'))`
+            schema += `.${validation === 'minDate' ? 'min' : 'max'}(new Date('${validationValue}'))`
             break
         }
       }
@@ -353,16 +384,25 @@ export function FormValidationPopover({
                     )}
 
                     {getValidationOptions()
-                      .filter((validation) => field?.[validation])
-                      .map((validation) => (
-                        <div key={validation} className="text-xs text-muted-foreground ml-6">
-                          • {toInitCap(t(validation))}
-                          {field[validation] !== true &&
-                            field[validation] !== false &&
-                            `: ${field[validation]}`}
-                        </div>
-                      ))}
-                    {getValidationOptions().filter((validation) => field?.[validation]).length ===
+                      .filter((validation) => {
+                        const value = field?.validation?.[validation] ?? field?.[validation]
+                        return value !== undefined && value !== null && value !== ''
+                      })
+                      .map((validation) => {
+                        const value = field?.validation?.[validation] ?? field?.[validation]
+                        return (
+                          <div key={validation} className="text-xs text-muted-foreground ml-6">
+                            • {toInitCap(t(validation))}
+                            {value !== true &&
+                              value !== false &&
+                              `: ${value}`}
+                          </div>
+                        )
+                      })}
+                    {getValidationOptions().filter((validation) => {
+                      const value = field?.validation?.[validation] ?? field?.[validation]
+                      return value !== undefined && value !== null && value !== ''
+                    }).length ===
                       0 &&
                       !field?.validation?.key && (
                         <div className="text-xs text-muted-foreground ml-6">
