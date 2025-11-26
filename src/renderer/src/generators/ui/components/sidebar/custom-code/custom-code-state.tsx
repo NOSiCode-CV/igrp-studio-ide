@@ -62,7 +62,8 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps): JSX.Elem
     onSubmit: (values, actions) => {
       try {
         const stateData = {
-          ...values
+          ...values,
+          defaultValue: values.defaultValue?.toString()
         }
 
         if (stateData.id === '') {

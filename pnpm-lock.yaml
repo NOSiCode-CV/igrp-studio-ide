@@ -33,8 +33,8 @@ importers:
         specifier: 0.1.0-beta.56-1
         version: 0.1.0-beta.56-1(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@igrp/igrp-studio-nextjs-engine':
-        specifier: 0.1.0-beta.43
-        version: 0.1.0-beta.43(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)
+        specifier: 0.1.0-beta.44
+        version: 0.1.0-beta.44(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)
       '@igrp/igrp-studio-springboot-engine':
         specifier: 0.1.0-beta.11
         version: 0.1.0-beta.11(typescript@5.9.3)(webpack@5.103.0)
@@ -138,8 +138,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       lucide-react:
-        specifier: ^0.554.0
-        version: 0.554.0(react@19.2.0)
+        specifier: ^0.555.0
+        version: 0.555.0(react@19.2.0)
       monaco-editor:
         specifier: ^0.55.1
         version: 0.55.1
@@ -1039,8 +1039,8 @@ packages:
       react: ^19.2.0
       react-dom: ^19.2.0
 
-  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.43':
-    resolution: {integrity: sha512-smV+h2B5YfO7AVUaGxB4K1J7W1d/Y2JUtZVqpMGexSE7bSdsYUT0PN8yqJ+soQV1sOZRWz8q4lMq+5d97llOUw==}
+  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.44':
+    resolution: {integrity: sha512-1EoTiAmP/aKsYLP/j7xJ1B/TDMGf7TdcKgiMLFUcvtoyzAsW7sNEDlPk8ktbeT4WvfCX+VNqvPm/mSt1bI6Yjg==}
 
   '@igrp/igrp-studio-springboot-engine@0.1.0-beta.11':
     resolution: {integrity: sha512-SknRprhs1W/3v/M4DgJiTSEZ0o1SjDzTwQ3gSBkOx2TyqLmF92N0OhjtFYsF2M2PzL9Wv3V/PW13Kc8/hTaNJw==}
@@ -5793,6 +5793,11 @@ packages:
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  lucide-react@0.555.0:
+    resolution: {integrity: sha512-D8FvHUGbxWBRQM90NZeIyhAvkFfsh3u9ekrMvJ30Z6gnpBHS6HC6ldLg7tL45hwiIz/u66eKDtdA23gwwGsAHA==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   luxon@3.7.2:
     resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
     engines: {node: '>=12'}
@@ -8772,7 +8777,7 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.43(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)':
+  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.44(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)':
     dependencies:
       '@prettier/sync': 0.5.5(prettier@3.6.2)
       '@types/adm-zip': 0.5.7
@@ -14347,6 +14352,10 @@ snapshots:
       react: 19.2.0
 
   lucide-react@0.554.0(react@19.2.0):
+    dependencies:
+      react: 19.2.0
+
+  lucide-react@0.555.0(react@19.2.0):
     dependencies:
       react: 19.2.0
 
