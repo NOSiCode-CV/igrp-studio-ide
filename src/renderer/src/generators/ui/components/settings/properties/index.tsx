@@ -82,7 +82,7 @@ interface PageSelectionConfigProps {
   onNavigationParamsChange?: (params: Segment[]) => void
 }
 
-const toMap = (items: any) => {
+const toMap = (items: any): { value: string; label: string }[] => {
   return (
     items &&
     items.map((value: string) => ({
@@ -92,7 +92,7 @@ const toMap = (items: any) => {
   )
 }
 
-const getNestedValue = (obj: any, path: string) => {
+const getNestedValue = (obj: any, path: string): any => {
   return path
     .split('.')
     .reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj)
@@ -113,7 +113,7 @@ const ControlledInput = ({
   id: string
   name: string
   type: 'text' | 'number'
-  value: any
+  value: string | number
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
   fieldPath: string
   onInputChange: (fieldPath: string, value: any) => void

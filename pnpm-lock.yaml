@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@electron-toolkit/preload':
         specifier: ^3.0.2
-        version: 3.0.2(electron@39.2.3)
+        version: 3.0.2(electron@39.2.4)
       '@electron-toolkit/utils':
         specifier: ^4.0.0
-        version: 4.0.0(electron@39.2.3)
+        version: 4.0.0(electron@39.2.4)
       '@faker-js/faker':
         specifier: ^10.1.0
         version: 10.1.0
@@ -28,16 +28,16 @@ importers:
         version: 0.0.1-alpha.12(typescript@5.9.3)(webpack@5.103.0)
       '@igrp/framework-process-studio-bpmn-editor':
         specifier: 0.0.1-beta.16
-        version: 0.0.1-beta.16(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(diagram-js@15.4.0)(next-auth@4.24.13(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(zeebe-bpmn-moddle@1.11.0)
+        version: 0.0.1-beta.16(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(diagram-js@15.4.0)(next-auth@4.24.13(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(zeebe-bpmn-moddle@1.11.0)
       '@igrp/igrp-framework-react-design-system':
         specifier: 0.1.0-beta.56-1
-        version: 0.1.0-beta.56-1(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 0.1.0-beta.56-1(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@igrp/igrp-studio-nextjs-engine':
-        specifier: 0.1.0-beta.44
-        version: 0.1.0-beta.44(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)
+        specifier: 0.1.0-beta.45
+        version: 0.1.0-beta.45(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)
       '@igrp/igrp-studio-springboot-engine':
-        specifier: 0.1.0-beta.11
-        version: 0.1.0-beta.11(typescript@5.9.3)(webpack@5.103.0)
+        specifier: 0.1.0-beta.12
+        version: 0.1.0-beta.12(typescript@5.9.3)(webpack@5.103.0)
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -55,7 +55,7 @@ importers:
         version: 7.3.0
       '@tailwindcss/vite':
         specifier: ^4.1.17
-        version: 4.1.17(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.1)(terser@5.44.1))
+        version: 4.1.17(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1))
       '@types/express':
         specifier: ^5.0.5
         version: 5.0.5
@@ -212,7 +212,7 @@ importers:
     devDependencies:
       '@electron-toolkit/eslint-config-prettier':
         specifier: ^3.0.0
-        version: 3.0.0(@types/eslint@9.6.1)(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2)
+        version: 3.0.0(@types/eslint@9.6.1)(eslint@9.39.1(jiti@2.6.1))(prettier@3.7.1)
       '@electron-toolkit/eslint-config-ts':
         specifier: ^3.1.0
         version: 3.1.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
@@ -248,10 +248,10 @@ importers:
         version: 8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       '@vitejs/plugin-react':
         specifier: ^5.1.1
-        version: 5.1.1(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.1)(terser@5.44.1))
+        version: 5.1.1(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1))
       electron:
-        specifier: 39.2.3
-        version: 39.2.3
+        specifier: 39.2.4
+        version: 39.2.4
       electron-builder:
         specifier: ^26.0.12
         version: 26.0.12(electron-builder-squirrel-windows@26.0.12)
@@ -263,7 +263,7 @@ importers:
         version: 4.0.0
       electron-vite:
         specifier: ^4.0.1
-        version: 4.0.1(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.1)(terser@5.44.1))
+        version: 4.0.1(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1))
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
@@ -289,8 +289,8 @@ importers:
         specifier: ^8.5.6
         version: 8.5.6
       prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
+        specifier: ^3.7.1
+        version: 3.7.1
       react:
         specifier: ^19.2.0
         version: 19.2.0
@@ -308,7 +308,7 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^7.2.4
-        version: 7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.1)(terser@5.44.1)
+        version: 7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1)
     optionalDependencies:
       dmg-license:
         specifier: ^1.0.11
@@ -1031,19 +1031,19 @@ packages:
       react: ^19.2.0
       react-dom: ^19.2.0
 
-  '@igrp/igrp-framework-react-design-system@0.1.0-beta.66':
-    resolution: {integrity: sha512-51uNJ+DnEysFbCQerZS1QBtcDAjjGZnhXDMBguGNTCx0yaPr5nKySN1HXFGvu9csiG8Nwn3wnhNCU9pNVRPQCQ==}
+  '@igrp/igrp-framework-react-design-system@0.1.0-beta.67':
+    resolution: {integrity: sha512-8fc9MuxeHFKGYNGHUKSaljFpP5RIpKQKaoFq7Od4huZRLgHTX9xO509PrZpIq2u+CLZwii2kmJCdoN5QrudjEg==}
     engines: {node: '>=20.x.x'}
     peerDependencies:
       next: ^15.5.6
       react: ^19.2.0
       react-dom: ^19.2.0
 
-  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.44':
-    resolution: {integrity: sha512-1EoTiAmP/aKsYLP/j7xJ1B/TDMGf7TdcKgiMLFUcvtoyzAsW7sNEDlPk8ktbeT4WvfCX+VNqvPm/mSt1bI6Yjg==}
+  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.45':
+    resolution: {integrity: sha512-tTUQ85LfFHFfzUSs2C0n/Zrozjl48mlt1Yq4W97CMNWbAsRh5VgHWut3unukhJr2uvd1J788HaBOq3NMWyc68Q==}
 
-  '@igrp/igrp-studio-springboot-engine@0.1.0-beta.11':
-    resolution: {integrity: sha512-SknRprhs1W/3v/M4DgJiTSEZ0o1SjDzTwQ3gSBkOx2TyqLmF92N0OhjtFYsF2M2PzL9Wv3V/PW13Kc8/hTaNJw==}
+  '@igrp/igrp-studio-springboot-engine@0.1.0-beta.12':
+    resolution: {integrity: sha512-d4ZKSnOH2tzajkM8xQQfxSrli6dxV25ery+17tlTvUtgdiFS75A8s01EWpKjf0KAiFQrAVfXpr0EptIBSCmQ8A==}
 
   '@img/colour@1.0.0':
     resolution: {integrity: sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw==}
@@ -4378,8 +4378,8 @@ packages:
     resolution: {integrity: sha512-bO3y10YikuUwUuDUQRM4KfwNkKhnpVO7IPdbsrejwN9/AABJzzTQ4GeHwyzNSrVO+tEH3/Np255a3sVZpZDjvg==}
     engines: {node: '>=8.0.0'}
 
-  electron@39.2.3:
-    resolution: {integrity: sha512-j7k7/bj3cNA29ty54FzEMRUoqirE+RBQPhPFP+XDuM93a1l2WcDPiYumxKWz+iKcXxBJLFdMIAlvtLTB/RfCkg==}
+  electron@39.2.4:
+    resolution: {integrity: sha512-KxPtwpFceQKSxRtUY39piHLYhJMMyHfOhc70e6zRnKGrbRdK6hzEqssth8IGjlKOdkeT4KCvIEngnNraYk39+g==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -6407,8 +6407,8 @@ packages:
     resolution: {integrity: sha512-GbK2cP9nraSSUF9N2XwUwqfzlAFlMNYYl+ShE/V+H8a9uNl/oUqB1w2EL54Jh0OlyRSd8RfWYJ3coVS4TROP2w==}
     engines: {node: '>=6.0.0'}
 
-  prettier@3.6.2:
-    resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
+  prettier@3.7.1:
+    resolution: {integrity: sha512-RWKXE4qB3u5Z6yz7omJkjWwmTfLdcbv44jUVHC5NpfXwFGzvpQM798FGv/6WNK879tc+Cn0AAyherCl1KjbyZQ==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -6844,6 +6844,11 @@ packages:
 
   sass@1.94.1:
     resolution: {integrity: sha512-/YVm5FRQaRlr3oNh2LLFYne1PdPlRZGyKnHh1sLleOqLcohTR4eUUvBjBIqkl1fEXd1MGOHgzJGJh+LgTtV4KQ==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
+
+  sass@1.94.2:
+    resolution: {integrity: sha512-N+7WK20/wOr7CzA2snJcUSSNTCzeCGUTFY3OgeQP3mZ1aj9NMQ0mSTXwlrnd89j33zzQJGqIN52GIOmYrfq46A==}
     engines: {node: '>=14.0.0'}
     hasBin: true
 
@@ -8200,12 +8205,12 @@ snapshots:
       ajv: 6.12.6
       ajv-keywords: 3.5.2(ajv@6.12.6)
 
-  '@electron-toolkit/eslint-config-prettier@3.0.0(@types/eslint@9.6.1)(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2)':
+  '@electron-toolkit/eslint-config-prettier@3.0.0(@types/eslint@9.6.1)(eslint@9.39.1(jiti@2.6.1))(prettier@3.7.1)':
     dependencies:
       eslint: 9.39.1(jiti@2.6.1)
       eslint-config-prettier: 10.1.8(eslint@9.39.1(jiti@2.6.1))
-      eslint-plugin-prettier: 5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2)
-      prettier: 3.6.2
+      eslint-plugin-prettier: 5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(prettier@3.7.1)
+      prettier: 3.7.1
     transitivePeerDependencies:
       - '@types/eslint'
 
@@ -8220,17 +8225,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@electron-toolkit/preload@3.0.2(electron@39.2.3)':
+  '@electron-toolkit/preload@3.0.2(electron@39.2.4)':
     dependencies:
-      electron: 39.2.3
+      electron: 39.2.4
 
   '@electron-toolkit/tsconfig@2.0.0(@types/node@24.10.1)':
     dependencies:
       '@types/node': 24.10.1
 
-  '@electron-toolkit/utils@4.0.0(electron@39.2.3)':
+  '@electron-toolkit/utils@4.0.0(electron@39.2.4)':
     dependencies:
-      electron: 39.2.3
+      electron: 39.2.4
 
   '@electron/asar@3.2.18':
     dependencies:
@@ -8641,10 +8646,10 @@ snapshots:
       - typescript
       - webpack
 
-  '@igrp/framework-process-studio-bpmn-editor@0.0.1-beta.16(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(diagram-js@15.4.0)(next-auth@4.24.13(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(zeebe-bpmn-moddle@1.11.0)':
+  '@igrp/framework-process-studio-bpmn-editor@0.0.1-beta.16(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(diagram-js@15.4.0)(next-auth@4.24.13(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(zeebe-bpmn-moddle@1.11.0)':
     dependencies:
       '@bpmn-io/properties-panel': 3.34.0
-      '@igrp/igrp-framework-react-design-system': 0.1.0-beta.66(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@igrp/igrp-framework-react-design-system': 0.1.0-beta.67(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       bpmn-js: 18.9.0
       bpmn-js-properties-panel: 5.42.3(@bpmn-io/properties-panel@3.34.0)(bpmn-js@18.9.0)(camunda-bpmn-js-behaviors@1.11.2(bpmn-js@18.9.0)(camunda-bpmn-moddle@7.0.1)(zeebe-bpmn-moddle@1.11.0))(diagram-js@15.4.0)
       bpmn-js-token-simulation: 0.38.1
@@ -8653,8 +8658,8 @@ snapshots:
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       lucide-react: 0.518.0(react@19.2.0)
-      next: 16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1)
-      next-auth: 4.24.13(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      next: 16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2)
+      next-auth: 4.24.13(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
       tailwind-merge: 3.4.0
@@ -8665,7 +8670,7 @@ snapshots:
       - diagram-js
       - zeebe-bpmn-moddle
 
-  '@igrp/igrp-framework-react-design-system@0.1.0-beta.56-1(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+  '@igrp/igrp-framework-react-design-system@0.1.0-beta.56-1(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       '@hookform/resolvers': 5.2.2(react-hook-form@7.66.1(react@19.2.0))
       '@origin-space/image-cropper': 0.1.9(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -8703,7 +8708,7 @@ snapshots:
       embla-carousel-react: 8.6.0(react@19.2.0)
       input-otp: 1.4.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       lucide-react: 0.554.0(react@19.2.0)
-      next: 16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1)
+      next: 16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2)
       next-themes: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react: 19.2.0
       react-day-picker: 9.11.1(react@19.2.0)
@@ -8721,7 +8726,7 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  '@igrp/igrp-framework-react-design-system@0.1.0-beta.66(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+  '@igrp/igrp-framework-react-design-system@0.1.0-beta.67(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       '@hookform/resolvers': 5.2.2(react-hook-form@7.66.1(react@19.2.0))
       '@origin-space/image-cropper': 0.1.9(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -8759,7 +8764,7 @@ snapshots:
       embla-carousel-react: 8.6.0(react@19.2.0)
       input-otp: 1.4.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       lucide-react: 0.554.0(react@19.2.0)
-      next: 16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1)
+      next: 16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2)
       next-themes: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react: 19.2.0
       react-day-picker: 9.11.1(react@19.2.0)
@@ -8777,9 +8782,9 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.44(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)':
+  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.45(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)':
     dependencies:
-      '@prettier/sync': 0.5.5(prettier@3.6.2)
+      '@prettier/sync': 0.5.5(prettier@3.7.1)
       '@types/adm-zip': 0.5.7
       '@types/js-yaml': 4.0.9
       adm-zip: 0.5.16
@@ -8793,7 +8798,7 @@ snapshots:
       js-yaml: 4.1.1
       jszip: 3.10.1
       original-fs: 1.2.0
-      prettier: 3.6.2
+      prettier: 3.7.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-select: 5.10.2(@types/react@19.2.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -8806,7 +8811,7 @@ snapshots:
       - typescript
       - webpack
 
-  '@igrp/igrp-studio-springboot-engine@0.1.0-beta.11(typescript@5.9.3)(webpack@5.103.0)':
+  '@igrp/igrp-studio-springboot-engine@0.1.0-beta.12(typescript@5.9.3)(webpack@5.103.0)':
     dependencies:
       ajv: 8.17.1
       ajv-errors: 3.0.0(ajv@8.17.1)
@@ -8816,7 +8821,7 @@ snapshots:
       fs-extra: 11.3.2
       inflection: 3.0.2
       pluralize: 8.0.0
-      sass: 1.94.1
+      sass: 1.94.2
       source-map-loader: 5.0.0(webpack@5.103.0)
       ts-loader: 9.5.4(typescript@5.9.3)(webpack@5.103.0)
     transitivePeerDependencies:
@@ -9667,10 +9672,10 @@ snapshots:
 
   '@popperjs/core@2.11.8': {}
 
-  '@prettier/sync@0.5.5(prettier@3.6.2)':
+  '@prettier/sync@0.5.5(prettier@3.7.1)':
     dependencies:
       make-synchronized: 0.4.2
-      prettier: 3.6.2
+      prettier: 3.7.1
 
   '@prisma/instrumentation@6.15.0(@opentelemetry/api@1.9.0)':
     dependencies:
@@ -10729,12 +10734,12 @@ snapshots:
       postcss: 8.5.6
       tailwindcss: 4.1.17
 
-  '@tailwindcss/vite@4.1.17(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.1)(terser@5.44.1))':
+  '@tailwindcss/vite@4.1.17(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1))':
     dependencies:
       '@tailwindcss/node': 4.1.17
       '@tailwindcss/oxide': 4.1.17
       tailwindcss: 4.1.17
-      vite: 7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.1)(terser@5.44.1)
+      vite: 7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1)
 
   '@tanstack/react-table@8.21.3(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
@@ -11378,7 +11383,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@vitejs/plugin-react@5.1.1(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.1)(terser@5.44.1))':
+  '@vitejs/plugin-react@5.1.1(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1))':
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
@@ -11386,7 +11391,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.47
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.1)(terser@5.44.1)
+      vite: 7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -12558,7 +12563,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron-vite@4.0.1(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.1)(terser@5.44.1)):
+  electron-vite@4.0.1(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1)):
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-arrow-functions': 7.27.1(@babel/core@7.28.5)
@@ -12566,7 +12571,7 @@ snapshots:
       esbuild: 0.25.12
       magic-string: 0.30.21
       picocolors: 1.1.1
-      vite: 7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.1)(terser@5.44.1)
+      vite: 7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -12582,7 +12587,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@39.2.3:
+  electron@39.2.4:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 22.19.1
@@ -12794,10 +12799,10 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-plugin-prettier@5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2):
+  eslint-plugin-prettier@5.5.4(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(prettier@3.7.1):
     dependencies:
       eslint: 9.39.1(jiti@2.6.1)
-      prettier: 3.6.2
+      prettier: 3.7.1
       prettier-linter-helpers: 1.0.0
       synckit: 0.11.11
     optionalDependencies:
@@ -14583,13 +14588,13 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  next-auth@4.24.13(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1))(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+  next-auth@4.24.13(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2))(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
       '@babel/runtime': 7.28.4
       '@panva/hkdf': 1.2.1
       cookie: 0.7.2
       jose: 4.15.9
-      next: 16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1)
+      next: 16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2)
       oauth: 0.9.15
       openid-client: 5.7.1
       preact: 10.27.2
@@ -14603,7 +14608,7 @@ snapshots:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
 
-  next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.1):
+  next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.94.2):
     dependencies:
       '@next/env': 16.0.3
       '@swc/helpers': 0.5.15
@@ -14622,7 +14627,7 @@ snapshots:
       '@next/swc-win32-arm64-msvc': 16.0.3
       '@next/swc-win32-x64-msvc': 16.0.3
       '@opentelemetry/api': 1.9.0
-      sass: 1.94.1
+      sass: 1.94.2
       sharp: 0.34.5
     transitivePeerDependencies:
       - '@babel/core'
@@ -14931,7 +14936,7 @@ snapshots:
     dependencies:
       fast-diff: 1.3.0
 
-  prettier@3.6.2: {}
+  prettier@3.7.1: {}
 
   pretty-format@27.5.1:
     dependencies:
@@ -15446,6 +15451,14 @@ snapshots:
       truncate-utf8-bytes: 1.0.2
 
   sass@1.94.1:
+    dependencies:
+      chokidar: 4.0.3
+      immutable: 5.1.4
+      source-map-js: 1.2.1
+    optionalDependencies:
+      '@parcel/watcher': 2.5.1
+
+  sass@1.94.2:
     dependencies:
       chokidar: 4.0.3
       immutable: 5.1.4
@@ -16264,7 +16277,7 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.1)(terser@5.44.1):
+  vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.3)
@@ -16277,7 +16290,7 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.6.1
       lightningcss: 1.30.2
-      sass: 1.94.1
+      sass: 1.94.2
       terser: 5.44.1
 
   void-elements@3.1.0: {}
