@@ -241,6 +241,16 @@ export const BPMNProjectSelector = ({
     }
   }
 
+  /*
+   *
+   * This function is used to create a new process step
+   * It is used to create a new process step from a BPMN process
+   *
+   * @param componentDescription - The description of the component
+   * @param componentName - The name of the component
+   * @param previousComponent - The previous component
+   * @returns void
+   */
   const handleStepProcess = async (
     componentDescription: string,
     componentName: string,
@@ -527,6 +537,13 @@ export const BPMNProjectSelector = ({
                   const lastVersion = sortedVersions[0]
                   const artifactCount = lastVersion?.children?.length || 0
 
+                  // Find the process config file in the last version
+                  const processConfigFile = lastVersion?.children?.find(
+                    (child) => !child.isDirectory && child.content?.type === 'process'
+                  )
+                  const processDescription =
+                    processConfigFile?.content?.description || 'No description available'
+
                   return (
                     <IGRPCardPrimitive
                       key={`${process.path}-${index}`}
@@ -535,11 +552,11 @@ export const BPMNProjectSelector = ({
                           ? 'ring-2 ring-primary'
                           : 'hover:bg-muted/30'
                       }`}
-                      onClick={() =>
+                      onClick={() => {
                         setSelectedLocalProcess(
                           selectedLocalProcess?.path === process.path ? null : process
                         )
-                      }
+                      }}
                     >
                       <IGRPCardContentPrimitive>
                         <div className="flex items-start justify-between">
@@ -548,7 +565,7 @@ export const BPMNProjectSelector = ({
                               {process.name}
                             </IGRPCardTitlePrimitive>
                             <IGRPCardDescriptionPrimitive>
-                              {process.path.split('/').slice(-2).join('/')}
+                              {processDescription}
                             </IGRPCardDescriptionPrimitive>
                             <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
                               <UserCog className="w-4 h-4" />
