@@ -111,7 +111,7 @@ const IGRPStudioAccordion: React.FC<CardComponentProps> = ({
 
   return (
     <IGRPAccordionPrimitive
-      defaultValue={components[0].id}
+      defaultValue={components[0]?.id || ''}
       className="w-full"
       type="single"
       collapsible

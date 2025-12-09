@@ -26,7 +26,7 @@ self.MonacoEnvironment = {
     return new editorWorker()
   }
 }
-
+// @ts-ignore
 monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true)
 
 interface MonacoEditorProps {

@@ -188,6 +188,10 @@ declare const igrpStudioSettings: {
   deleteAllBPMNConfigs: () => Promise<any>
   getLanguage: () => Promise<any>
   setLanguage: (lang: string) => Promise<any>
+  setSelectedBPMNProject: (projectId: string) => Promise<any>
+  getSelectedBPMNProject: () => Promise<string | undefined>
+  setSelectedBPMNProcess: (processDefinitionId: string) => Promise<any>
+  getSelectedBPMNProcess: () => Promise<string | undefined>
 }
 declare global {
   interface Window {

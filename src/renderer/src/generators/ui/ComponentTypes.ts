@@ -11,7 +11,6 @@ import {
   IGRPDataTableFilterInput,
   IGRPDataTableFilterMinMax,
   IGRPDataTableFilterSelect,
-  IGRPDatePicker,
   IGRPDatePickerRange,
   IGRPHeadline,
   IGRPHorizontalBarChart,
@@ -25,7 +24,6 @@ import {
   IGRPInputSearch,
   IGRPInputTime,
   IGRPInputUrl,
-  IGRPLabelPrimitive,
   IGRPLineChart,
   IGRPPdfViewer,
   IGRPPieChart,
@@ -52,7 +50,8 @@ import {
   IGRPCalendarRangeTime,
   IGRPDatePickerSingle,
   IGRPDatePickerMultiple,
-  IGRPDatePickerInputSingle
+  IGRPDatePickerInputSingle,
+  IGRPLabel
 } from '@igrp/igrp-framework-react-design-system'
 import {
   FormInput,
@@ -444,8 +443,8 @@ export const ICON_MAP: Record<string, React.ElementType> = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const COMPONENT_MAP: Record<string, any> = {
   [COMPONENT.ColorPicker]: IGRPInputColor,
-  [COMPONENT.Date]: IGRPDatePicker,
-  [COMPONENT.DatePicker]: IGRPDatePicker,
+  [COMPONENT.Date]: IGRPDatePickerSingle,
+  [COMPONENT.DatePicker]: IGRPDatePickerSingle,
   [COMPONENT.FileUpload]: IGRPInputFile,
   [COMPONENT.Number]: IGRPInputNumber,
   [COMPONENT.Password]: IGRPInputPassword,
@@ -459,7 +458,7 @@ export const COMPONENT_MAP: Record<string, any> = {
   [COMPONENT.Select]: IGRPSelect,
   [COMPONENT.Combobox]: IGRPCombobox,
   [COMPONENT.Button]: IGRPButton,
-  [COMPONENT.Label]: IGRPLabelPrimitive,
+  [COMPONENT.Label]: IGRPLabel,
   [COMPONENT.Checkbox]: IGRPCheckbox,
   [COMPONENT.Radio]: IGRPRadioGroup,
   [COMPONENT.Icon]: IGRPIcon,

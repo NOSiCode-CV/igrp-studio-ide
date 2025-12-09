@@ -15,6 +15,7 @@ import {
   IGRPSidebarProviderPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { FileTree } from 'src/main/types'
+import { convertFileTreeToPageDefinition } from '../page/utils/bpmn-helpers'
 
 interface ContentProps {
   basePath: string
@@ -38,10 +39,15 @@ export default function TabManager({ basePath }: ContentProps): React.JSX.Elemen
   }>({})
 
   const handleClickOpenGerador = (page: PageDefinition | FileTree): void => {
+    // Check if it's a FileTree without proper content
+    const pageDefinition = 'content' in page && page.content ? 
+      page as PageDefinition : 
+      convertFileTreeToPageDefinition(page as FileTree)
+    
     initializeTabFromCurrentItem({
-      ...page,
-      label: page.content.description || page.content.pageName,
-      id: page.content.id
+      ...pageDefinition,
+      label: pageDefinition.content?.description || pageDefinition.content?.pageName || pageDefinition.name,
+      id: pageDefinition.content?.id || pageDefinition.id
     })
   }
 

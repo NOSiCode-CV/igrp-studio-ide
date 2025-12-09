@@ -5,7 +5,7 @@ import {
   State
 } from '@igrp/igrp-studio-nextjs-engine/types'
 import { EmptyList } from '@renderer/components/empty-list'
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { IGRPBadgePrimitive, IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
 import {
   IGRPTooltipPrimitive,
   IGRPTooltipContentPrimitive,
@@ -205,7 +205,7 @@ const TabSnipptes = ({ snippets, componentTag, editorRef, globalFilter }: TabSni
     )
   }, [snippets, globalFilter])
 
-  const handleInsertSnippet = (snippet: any) => {
+  const handleInsertSnippet = (snippet: any): void => {
     if (editorRef && editorRef.current) {
       editorRef.current.insertTextAtCursor(snippet.code.replace('{{tag}}', componentTag))
     }
@@ -215,7 +215,7 @@ const TabSnipptes = ({ snippets, componentTag, editorRef, globalFilter }: TabSni
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Info className="w-4 h-4" />
-        <span>Click "Insert Code" to add the code snippet to your editor</span>
+        <span>Click &quot;Insert Code&quot; to add the code snippet to your editor</span>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -228,10 +228,12 @@ const TabSnipptes = ({ snippets, componentTag, editorRef, globalFilter }: TabSni
               <div className="flex justify-between items-start w-full">
                 <div className="flex flex-col flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-sm truncate">{snippet.title}</span>
-                    <IGRPBadge variant="outline" className="text-xs">
-                      {snippet.type}
-                    </IGRPBadge>
+                    <span className="font-medium text-sm truncate ">{snippet.title}</span>
+                    {snippet.type && (
+                      <IGRPBadgePrimitive variant="outline" className="text-xs">
+                        {snippet.type}
+                      </IGRPBadgePrimitive>
+                    )}
                   </div>
 
                   {snippet.description && (
