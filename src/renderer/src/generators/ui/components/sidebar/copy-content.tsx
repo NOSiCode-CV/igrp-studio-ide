@@ -212,7 +212,7 @@ const CopyContent = ({ currentComp }: CopyContentProps): JSX.Element => {
     handleUpdateChildComponent(currentComp.id, {
       ...currentComp,
       properties: selectedPageComponent.properties,
-      children: [...(currentComp.children || []), ...childrenToCopy]
+      children: [...childrenToCopy] ///[...(currentComp.children || []), ...childrenToCopy]
     })
   }
 
