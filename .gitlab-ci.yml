@@ -34,6 +34,8 @@ build_packagedev_mac:
 
 build_packagedev:
   image: node
+  tags:
+    - nosi-runner
   stage: build
   only:
     - tags
@@ -73,6 +75,8 @@ build_packagedev:
 
 release:
   stage: release
+  tags:
+    - nosi-runner
   only:
     - tags
   image: curlimages/curl:latest
