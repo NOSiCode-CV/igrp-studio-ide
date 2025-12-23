@@ -2,8 +2,9 @@ import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import {
   convertComponentsToJSONSchema,
-  convertCompToInteractinsJSONSchema
-} from '@renderer/utils/convertComponentsToJSONSchema'
+  convertCompToInteractinsJSONSchema,
+  convertCompToRulesJSONSchema
+} from '@renderer/utils/register-schema'
 import { capitalize, getLabel } from '@renderer/utils'
 import { FileTree, HandlerResponse } from 'src/main/types'
 import RENDERER_CONFIG from '@renderer/renderer.config'
@@ -56,7 +57,7 @@ export const EngineService = {
       dataMapping: {},
       style: component.style,
       styleMapping: {},
-      rules: component.rules,
+      rules: convertCompToRulesJSONSchema(),
       rulesMapping: {},
       childProperties: {},
       childPropertiesMapping: {},
@@ -100,7 +101,7 @@ export const EngineService = {
         dataMapping: {},
         style: component.style,
         styleMapping: {},
-        rules: component.rules,
+        rules: convertCompToRulesJSONSchema(),
         rulesMapping: {},
         childProperties: {},
         childPropertiesMapping: {},

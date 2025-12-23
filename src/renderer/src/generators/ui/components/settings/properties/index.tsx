@@ -93,9 +93,12 @@ const toMap = (items: any): { value: string; label: string }[] => {
 }
 
 const getNestedValue = (obj: any, path: string): any => {
-  return path
-    .split('.')
-    .reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj)
+  return (
+    path
+      .split('.')
+      .reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj) ||
+    undefined
+  )
 }
 
 const RENDER_IGNORE = ['segments', 'params']
