@@ -1,6 +1,6 @@
 import { StructuredComponent } from '@renderer/lib/dnd/types'
 import { AddComponentPopover } from '../../components/add-components-popover'
-import { Settings } from 'lucide-react'
+import { Settings, Trash } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { BindingConfigurationFilterModal } from '../../components/binding-config-filter-modal'
 import { useEffect, useState } from 'react'
@@ -13,6 +13,8 @@ import {
 import { cn } from '@renderer/lib/utils'
 import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import useStudio from '@renderer/hooks/use-studio'
+import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
+import { useDroppedComponents } from '../../dnd/DroppedComponentsContext'
 
 interface RowOptionsProps {
   comp: StructuredComponent
@@ -21,6 +23,7 @@ interface RowOptionsProps {
   onEdit: () => void
   group?: string
   className?: string
+  index?: number
 }
 
 const TableTool = ({
@@ -29,13 +32,17 @@ const TableTool = ({
   tableColumns = [],
   onEdit,
   group,
-  className
-}: RowOptionsProps) => {
+  className,
+  index = 0
+}: RowOptionsProps): React.JSX.Element => {
   const { t } = useTranslation()
+
+  const { id, componentName } = comp
+
+  const [deleteModal, setDeleteModal] = useState<boolean>(false)
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const { componentName } = comp
   const { componentName: parentComponentName } = parentComp || {}
 
   const [currentComponent, setCurrentComponent] = useState<StructuredComponent | null>(null)
@@ -44,11 +51,17 @@ const TableTool = ({
 
   const { getAcceptedChildren } = useStudio()
 
+  const { handleRemoveChildFromComponent } = useDroppedComponents()
+
   useEffect(() => {
     getAcceptedChildren(parentComponentName, componentName).then((data) => {
       setComponents(data)
     })
   }, [parentComponentName, componentName, getAcceptedChildren])
+
+  const onClickDeleteField = (): void => {
+    handleRemoveChildFromComponent({ droppableId: id, index })
+  }
 
   return (
     <div className={cn('table-tools relative', group)}>
@@ -74,6 +87,21 @@ const TableTool = ({
             </IGRPTooltipTriggerPrimitive>
             <IGRPTooltipContentPrimitive>
               <p>{t('edit')}</p>
+            </IGRPTooltipContentPrimitive>
+          </IGRPTooltipPrimitive>
+
+          <IGRPTooltipPrimitive>
+            <IGRPTooltipTriggerPrimitive asChild>
+              <button
+                className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
+                title="Delete"
+                onClick={() => setDeleteModal(true)}
+              >
+                <Trash className="h-3.5" />
+              </button>
+            </IGRPTooltipTriggerPrimitive>
+            <IGRPTooltipContentPrimitive>
+              <p>{t('delete')}</p>
             </IGRPTooltipContentPrimitive>
           </IGRPTooltipPrimitive>
 
@@ -112,6 +140,14 @@ const TableTool = ({
               </>
             )}
           </div>
+
+          <AlertDialogDelete
+            isOpen={deleteModal}
+            onClose={() => setDeleteModal(false)}
+            onConfirm={onClickDeleteField}
+            hasTrigger={false}
+            recordId={componentName}
+          />
         </div>
       </div>
     </div>

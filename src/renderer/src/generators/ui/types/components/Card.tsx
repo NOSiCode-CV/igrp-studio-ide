@@ -80,6 +80,7 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
               onEdit={() => handleEdit(child, parentComponentName)}
               group="group/card-comp"
               className="-top-4 popacity-0 group-hover/card-comp:opacity-100"
+              index={index}
             />
             {renderChildComp(child, cn(`${classes}, ${className}`), childClassName)}
           </div>

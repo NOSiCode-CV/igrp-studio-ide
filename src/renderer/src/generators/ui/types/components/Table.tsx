@@ -168,6 +168,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
               tableColumns={tableColumns[0].children}
               group="group/table-filter"
               className="opacity-0 group-hover/table-filter:opacity-100"
+              index={index}
             />
             <Droppable
               key={index}
@@ -193,6 +194,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
               onEdit={() => handleEdit(tableComp, componentName)}
               group="group/table-column"
               className="opacity-0 group-hover/table-column:opacity-100"
+              index={index}
             />
             <Droppable
               key={index}

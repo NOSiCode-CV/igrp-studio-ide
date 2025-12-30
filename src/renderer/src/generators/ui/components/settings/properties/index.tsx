@@ -237,11 +237,29 @@ const RenderPropsConfig = ({
       )
     } else if (key === 'options') {
       return (
-        <DynamicKeyValueForm
-          onAdd={(opt) => {
-            onInputChange(fieldPath, opt)
-          }}
-        />
+        <>
+          <div className=" group space-y-2">
+            <IGRPLabelPrimitive htmlFor={key} className="flex justify-between ">
+              <span>{xMetaLabel}</span>
+              <FieldActions
+                field={key}
+                statesOptions={statesOptions}
+                argumentsOptions={argumentsOptions}
+                value={value}
+                tag={tag}
+                type={type}
+                onSelectState={onSelectState}
+                dataProperties={dataProperties}
+              />
+            </IGRPLabelPrimitive>
+
+            <DynamicKeyValueForm
+              onAdd={(opt) => {
+                onInputChange(fieldPath, opt)
+              }}
+            />
+          </div>
+        </>
       )
     } else if (xUiWidget === 'uri') {
       return (
