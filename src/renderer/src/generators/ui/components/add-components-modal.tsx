@@ -135,12 +135,12 @@ export const AddComponentModal = ({ path, comp, parentComp, open, setOpen }: Add
   return (
     <>
       <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-        <IGRPDialogContentPrimitive className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] !max-w-[80vw] !h-[80vh]">
+        <IGRPDialogContentPrimitive className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] max-w-[80vw]! h-[80vh]!">
           <IGRPSidebarInsetPrimitive>
             <IGRPDialogHeaderPrimitive className="p-4">
               <div className="flex justify-between">
                 <div>
-                  <IGRPDialogTitlePrimitive>{t('manageComp')}</IGRPDialogTitlePrimitive>
+                  <IGRPDialogTitlePrimitive>{t('manageComponents')}</IGRPDialogTitlePrimitive>
                   <IGRPDialogDescriptionPrimitive>
                     {t('config')} - {componentName}
                   </IGRPDialogDescriptionPrimitive>
