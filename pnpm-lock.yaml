@@ -33,8 +33,8 @@ importers:
         specifier: 0.1.0-beta.87
         version: 0.1.0-beta.87(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.96.0))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@igrp/igrp-studio-nextjs-engine':
-        specifier: 0.1.0-beta.58
-        version: 0.1.0-beta.58(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)
+        specifier: 0.1.0-beta.60
+        version: 0.1.0-beta.60(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)
       '@igrp/igrp-studio-springboot-engine':
         specifier: 0.1.0-beta.16
         version: 0.1.0-beta.16(typescript@5.9.3)(webpack@5.103.0)
@@ -1187,16 +1187,16 @@ packages:
       react: ^19.2.1
       react-dom: ^19.2.1
 
-  '@igrp/igrp-framework-react-design-system@0.1.0-beta.87.3':
-    resolution: {integrity: sha512-fnBG5xw49rmkinUFHMIyqWNhySIgUGJzqUt/J21NNZYAg+Ha1uXZ2K+K7Mtg8hu7wvRBpFyHFPVMvS7IaqIOOw==}
+  '@igrp/igrp-framework-react-design-system@0.1.0-beta.87.14':
+    resolution: {integrity: sha512-XKxzomNguhSxDzVi1Qq5uwtsQylb+JJ5qobGY+psQ//3FSfSD65cm6Xluj+SaEaBkxMkAIkeyPqb+m9YpywTaQ==}
     engines: {node: '>=20.x.x'}
     peerDependencies:
       next: ^15.5.7
       react: ^19.2.1
       react-dom: ^19.2.1
 
-  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.58':
-    resolution: {integrity: sha512-M1eXYUgf7gfbHQmlzkBjpvbeTeN5Sq6BIbgdTSwkcp6ygNJeajniHkWzVrXulQs0DASePRDzKIGM73GyCRddgw==}
+  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.60':
+    resolution: {integrity: sha512-8gxQdmXSA7TDTQcVZFL5/sPtSq8e37ZbX3K7xxJL73O+4UsgcsPmSdxsr4NU7SMag+B/ifoKbdqFN7DHR6idJQ==}
 
   '@igrp/igrp-studio-springboot-engine@0.1.0-beta.16':
     resolution: {integrity: sha512-98GurqVoB1IWFUT84raqp0kqeP7Szx/zwHwyJpV8YsDpHwYAm5LOwQVHqxFv33tjFFoNcZ5Q6t1cxShMnFUOQA==}
@@ -8752,7 +8752,7 @@ snapshots:
   '@igrp/framework-process-studio-bpmn-editor@0.0.1-beta.16(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(diagram-js@15.4.0)(next-auth@4.24.13(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.96.0))(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.96.0))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zeebe-bpmn-moddle@1.11.0)':
     dependencies:
       '@bpmn-io/properties-panel': 3.34.0
-      '@igrp/igrp-framework-react-design-system': 0.1.0-beta.87.3(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.96.0))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@igrp/igrp-framework-react-design-system': 0.1.0-beta.87.14(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.96.0))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       bpmn-js: 18.9.1
       bpmn-js-properties-panel: 5.44.0(@bpmn-io/properties-panel@3.34.0)(bpmn-js@18.9.1)(camunda-bpmn-js-behaviors@1.12.0(bpmn-js@18.9.1)(camunda-bpmn-moddle@7.0.1)(zeebe-bpmn-moddle@1.11.0))(diagram-js@15.4.0)
       bpmn-js-token-simulation: 0.38.2
@@ -8829,7 +8829,7 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  '@igrp/igrp-framework-react-design-system@0.1.0-beta.87.3(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.96.0))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+  '@igrp/igrp-framework-react-design-system@0.1.0-beta.87.14(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(sass@1.96.0))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:
       '@hookform/resolvers': 5.2.2(react-hook-form@7.68.0(react@19.2.3))
       '@origin-space/image-cropper': 0.1.9(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -8885,7 +8885,7 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.58(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)':
+  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.60(@types/react@19.2.7)(typescript@5.9.3)(webpack@5.103.0)':
     dependencies:
       '@prettier/sync': 0.5.5(prettier@3.7.4)
       '@types/adm-zip': 0.5.7
