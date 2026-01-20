@@ -26,10 +26,13 @@ import { IGRPSidebarInsetPrimitive } from '@igrp/igrp-framework-react-design-sys
 import { useTagManager } from '../hooks/useTagManager'
 import * as LucideIcons from 'lucide-react'
 import SidebarRight from './sidebar/sidebar-right'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@renderer/lib/utils'
 import Draggable from '@renderer/lib/dnd/Draggable'
 import Droppable from '@renderer/lib/dnd/Droppable'
 import useToast from '@renderer/hooks/useToast'
+
+
 
 interface AddComponentProps {
   path: string
@@ -41,6 +44,7 @@ interface AddComponentProps {
 
 export const AddComponentModal = ({ path, comp, parentComp, open, setOpen }: AddComponentProps) => {
   const { componentName, id, children } = comp
+  const { t } = useTranslation()
 
   const [currentComponent, setCurrentComponent] = useState<StructuredComponent>(comp)
 
@@ -131,18 +135,18 @@ export const AddComponentModal = ({ path, comp, parentComp, open, setOpen }: Add
   return (
     <>
       <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-        <IGRPDialogContentPrimitive className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] !max-w-[80vw] !h-[80vh]">
+        <IGRPDialogContentPrimitive className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] max-w-[80vw]! h-[80vh]!">
           <IGRPSidebarInsetPrimitive>
             <IGRPDialogHeaderPrimitive className="p-4">
               <div className="flex justify-between">
                 <div>
-                  <IGRPDialogTitlePrimitive>Add Component</IGRPDialogTitlePrimitive>
+                  <IGRPDialogTitlePrimitive>{t('manageComponents')}</IGRPDialogTitlePrimitive>
                   <IGRPDialogDescriptionPrimitive>
-                    Select a component to add to your {componentName}
+                    {t('config')} - {componentName}
                   </IGRPDialogDescriptionPrimitive>
                 </div>
                 <div className="justify-end">
-                  {renderAddComponents(components, id, handleAddComponent)}
+                  {renderAddComponents(components, id, handleAddComponent, t)}
                 </div>
               </div>
             </IGRPDialogHeaderPrimitive>
@@ -214,14 +218,15 @@ export const AddComponentModal = ({ path, comp, parentComp, open, setOpen }: Add
 const renderAddComponents = (
   components: ComponentRegisterConfig[],
   droppableId: string,
-  handleAddComponent: (comp: ComponentRegisterConfig, droppableId: string) => void
+  handleAddComponent: (comp: ComponentRegisterConfig, droppableId: string) => void,
+  t: any
 ) => {
   return (
     <IGRPDropdownMenuPrimitive>
       <IGRPDropdownMenuTriggerPrimitive asChild>
         <IGRPButtonPrimitive variant="outline" size={'sm'}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Component
+          {t('addComponent')}
         </IGRPButtonPrimitive>
       </IGRPDropdownMenuTriggerPrimitive>
       <IGRPDropdownMenuContentPrimitive align="end">
@@ -326,6 +331,7 @@ const RenderCreatedComponents = ({
     >
       {components.map((component, index) => {
         const { properties, label, id } = component
+        const { t } = useTranslation()
         return (
           <React.Fragment key={index}>
             <div className="grid grid-cols-[1fr_auto] px-3 py-1 mb-0 border-b last:border-b-0 hover:bg-muted/50">
@@ -371,7 +377,7 @@ const RenderCreatedComponents = ({
                   <span className="sr-only">Delete</span>
                 </IGRPButtonPrimitive>
                 {canAcceptChildren(component) &&
-                  renderAddComponents(getAcceptedChildren(component), id, handleAddComponent)}
+                  renderAddComponents(getAcceptedChildren(component), id, handleAddComponent,t)}
               </div>
             </div>
             {component.children && component.children.length > 0 && (
@@ -407,13 +413,14 @@ const ComponentTable = ({
   handleAddComponent: (item: any, droppableId: string) => void
   handleRemoveChildFromComponent: (destination: Destination) => void
 }) => {
+  const { t } = useTranslation()
   return (
     <div className="border rounded-lg overflow-hidden">
       {/* Table Header */}
       <div className="bg-muted/50 border-b">
         <div className="grid grid-cols-[1fr_auto] gap-4 p-3 mx-6">
-          <div className="font-medium text-sm">Label</div>
-          <div className="font-medium text-sm">Actions</div>
+          <div className="font-medium text-sm">{t('label')}</div>
+          <div className="font-medium text-sm">{t('actions')}</div>
         </div>
       </div>
       {/* Table Body */}
