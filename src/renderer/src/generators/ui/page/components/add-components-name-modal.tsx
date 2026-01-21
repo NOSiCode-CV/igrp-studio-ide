@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useRef, startTransition } from 'react'
 import {
   IGRPButtonPrimitive,
   IGRPDialogContentPrimitive,
@@ -44,9 +44,15 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
   const [previousComponent, setPreviousComponent] = useState<ProcessStepConfig | undefined>(
     undefined
   )
-  const [availableProcesses, setAvailableProcesses] = useState<
-    Array<{ label: string; value: string }>
-  >([])
+  const availableProcesses = useMemo(() => {
+    if (bpmnProcesses && bpmnProcesses.length > 0) {
+      return bpmnProcesses.map((process) => ({
+        label: `${process.name} - ${process.children?.[0]?.children?.find((child) => child.name === `${process.name}.json`)?.content.description}`,
+        value: process.name
+      }))
+    }
+    return []
+  }, [bpmnProcesses])
   const [selectedProcess, setSelectedProcess] = useState<FileTree | undefined>(undefined)
   const [availableVersions, setAvailableVersions] = useState<
     Array<{ label: string; value: string }>
@@ -54,40 +60,23 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
   const [availableComponents, setAvailableComponents] = useState<
     Array<{ label: string; value: string }>
   >([])
-
+  const prevOpenRef = useRef(open)
   useEffect(() => {
-    if (bpmnProcesses && bpmnProcesses.length > 0) {
-      const processes = bpmnProcesses.map((process) => ({
-        label: process.name,
-        value: process.name
-      }))
-      setAvailableProcesses(processes)
+    if (open && !prevOpenRef.current) {
+      // Modal just opened, reset form state
+      startTransition(() => {
+        setDescription(defaultName)
+        setComponentName(defaultComponentName)
+        setPreviousComponent(undefined)
+        // If no processFound, reset selections
+        if (!processFound) {
+          setSelectedProcess(undefined)
+          setAvailableVersions([])
+          setAvailableComponents([])
+        }
+      })
     }
-  }, [bpmnProcesses])
-
-  useEffect(() => {
-    if (processFound) {
-      setSelectedProcess(processFound)
-      const versions = processFound.children?.map((child) => ({
-        label: child.name,
-        value: child.name
-      }))
-      setAvailableVersions(versions || [])
-    }
-  }, [processFound])
-
-  useEffect(() => {
-    if (open) {
-      setDescription(defaultName)
-      setComponentName(defaultComponentName)
-      setPreviousComponent(undefined)
-      // If no processFound, reset selections
-      if (!processFound) {
-        setSelectedProcess(undefined)
-        setAvailableVersions([])
-        setAvailableComponents([])
-      }
-    }
+    prevOpenRef.current = open
   }, [open, defaultName, defaultComponentName, processFound])
 
   const handleConfirm = (): void => {
