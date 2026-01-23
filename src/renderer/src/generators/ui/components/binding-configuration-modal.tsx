@@ -102,34 +102,34 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
     { key: 'name', name: t('name'), type: 'text', readonly: !newBinding },
     ...(!newBinding
       ? [
-          {
-            key: 'newType',
-            name: t('type'),
-            type: 'select',
-            options: fieldsTypeOptions
-          }
-        ]
+        {
+          key: 'newType',
+          name: t('type'),
+          type: 'select',
+          options: fieldsTypeOptions
+        }
+      ]
       : []),
 
     ...(newBinding
       ? [
-          {
-            key: 'type',
-            name: t('dataType'),
-            type: 'typeSelectorDropdown',
-            options: FIELD_TYPES
-          },
-          {
-            key: 'required',
-            name: 'Required?',
-            type: 'checkbox'
-          },
-          {
-            key: 'isList',
-            name: 'IsList?',
-            type: 'checkbox'
-          }
-        ]
+        {
+          key: 'type',
+          name: t('dataType'),
+          type: 'typeSelectorDropdown',
+          options: FIELD_TYPES
+        },
+        {
+          key: 'required',
+          name: 'Required?',
+          type: 'checkbox'
+        },
+        {
+          key: 'isList',
+          name: 'IsList?',
+          type: 'checkbox'
+        }
+      ]
       : []),
     { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
     {
@@ -226,11 +226,10 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             type:
               (data && 'defaultValues' in data && data.defaultValues?.properties?.type?.default) ??
               'any',
-            name: `${
-              values.name ??
+            name: `${values.name ??
               (data && 'defaultValues' in data && data.defaultValues?.properties?.name?.default) ??
               ''
-            }Data`,
+              }Data`,
             defaultValue: `init${capitalize(values.name)}`,
             imports:
               (data &&
@@ -284,41 +283,6 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
 
     setFieldsTypeOptions(fieldsTypes)
   }, [selectedType])
-
-  useEffect(() => {
-    // Auto-add fields from children if not already in the list
-    if (comp.children?.length) {
-      const currentFields: any[] = formik.values.fields || []
-
-      const { fields, componentMap: updatedMap } = extractValidFields(comp.children)
-
-      const updatedFields = updateFieldsWithSubFields(fields, currentFields)
-
-      formik.setFieldValue('fields', [...updatedFields])
-
-      setComponentMap(updatedMap)
-    }
-  }, [components, comp.children])
-
-  const updateFieldsWithSubFields = (
-    originalFields: LabeledElementField[],
-    currentFields: LabeledElementField[]
-  ): LabeledElementField[] => {
-    return originalFields.map((field) => {
-      const currentField = currentFields.find((f) => f.componentId === field.componentId)
-
-      const mergedField: LabeledElementField = {
-        ...field,
-        ...currentField
-      }
-
-      if (field.fields && currentField?.fields) {
-        mergedField.fields = updateFieldsWithSubFields(field.fields, currentField.fields)
-      }
-
-      return mergedField
-    })
-  }
 
   const extractValidFields = (
     components: StructuredComponent[]
@@ -416,6 +380,42 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
 
     return { fields, componentMap }
   }
+
+  const updateFieldsWithSubFields = (
+    originalFields: LabeledElementField[],
+    currentFields: LabeledElementField[]
+  ): LabeledElementField[] => {
+    return originalFields.map((field) => {
+      const currentField = currentFields.find((f) => f.componentId === field.componentId)
+
+      const mergedField: LabeledElementField = {
+        ...field,
+        ...currentField
+      }
+
+      if (field.fields && currentField?.fields) {
+        mergedField.fields = updateFieldsWithSubFields(field.fields, currentField.fields)
+      }
+
+      return mergedField
+    })
+  }
+
+  useEffect(() => {
+    // Auto-add fields from children if not already in the list
+    if (comp.children?.length) {
+      const currentFields: any[] = formik.values.fields || []
+
+      const { fields, componentMap: updatedMap } = extractValidFields(comp.children)
+
+      const updatedFields = updateFieldsWithSubFields(fields, currentFields)
+
+      formik.setFieldValue('fields', [...updatedFields])
+
+      setComponentMap(updatedMap)
+    }
+  }, [components, comp.children])
+
 
   const handleChange = (element: string, position: number, result: any): void => {
     if (element === 'newType') {

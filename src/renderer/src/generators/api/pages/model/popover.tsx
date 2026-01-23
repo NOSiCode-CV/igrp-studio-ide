@@ -75,7 +75,7 @@ export function PopoverModel({ index, row, options, changeValue }: PopoverProps)
                   {['unique', 'nullable', 'primaryKey'].map((field) => (
                     <div key={`${field}-${index}`} className="flex flex-1 items-center gap-4">
                       <IGRPLabelPrimitive htmlFor={`${field}-${index}`}>
-                        {t(field)}
+                        {t(field === 'nullable' ? 'required' : field)}
                       </IGRPLabelPrimitive>
                       <IGRPSwitchPrimitive
                         id={`${field}-${index}`}

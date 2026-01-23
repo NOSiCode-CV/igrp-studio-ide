@@ -146,11 +146,11 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                   setIsOpen(true)
                 }}
               >
-                <span className="text-xs">Add Comp</span>
+                <span className="text-xs">Manage Comp</span>
               </IGRPBadgePrimitive>
             </IGRPTooltipTriggerPrimitive>
             <IGRPTooltipContentPrimitive>
-              <p>Add Comp</p>
+              <p>Manage Comp</p>
             </IGRPTooltipContentPrimitive>
           </IGRPTooltipPrimitive>
         )}

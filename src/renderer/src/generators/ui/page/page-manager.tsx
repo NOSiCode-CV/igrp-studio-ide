@@ -237,7 +237,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
   const tableQueryText = searchTerm ? ` matching "${searchTerm}"` : ''
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="px-8 py-4 space-y-6">
       <IGRPPageHeader
         variant="h3"
         title={project?.name}
