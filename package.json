@@ -37,7 +37,7 @@
     "@igrp/framework-process-studio-bpmn-editor": "0.0.1-beta.16",
     "@igrp/igrp-framework-react-design-system": "0.1.0-beta.88",
     "@igrp/igrp-studio-nextjs-engine": "0.1.0-beta.61",
-    "@igrp/igrp-studio-springboot-engine": "0.1.0-beta.16",
+    "@igrp/igrp-studio-springboot-engine": "0.1.0-beta.17",
     "@monaco-editor/react": "^4.7.0",
     "@octokit/rest": "^22.0.1",
     "@radix-ui/react-tabs": "^1.1.13",
