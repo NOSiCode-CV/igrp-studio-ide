@@ -264,6 +264,8 @@ const RenderCreatedComponents = ({
   handleRemoveChildFromComponent?: (destination: Destination) => void
   onOrderComponent: (result: DragEndResult) => void
 }) => {
+  const { t } = useTranslation()
+
   const handleEditComponent = (component: StructuredComponent, parentComponent?: string) => {
     onEdit(component, parentComponent)
   }
@@ -331,7 +333,7 @@ const RenderCreatedComponents = ({
     >
       {components.map((component, index) => {
         const { properties, label, id } = component
-        const { t } = useTranslation()
+
         return (
           <React.Fragment key={index}>
             <div className="grid grid-cols-[1fr_auto] px-3 py-1 mb-0 border-b last:border-b-0 hover:bg-muted/50">
@@ -377,7 +379,7 @@ const RenderCreatedComponents = ({
                   <span className="sr-only">Delete</span>
                 </IGRPButtonPrimitive>
                 {canAcceptChildren(component) &&
-                  renderAddComponents(getAcceptedChildren(component), id, handleAddComponent,t)}
+                  renderAddComponents(getAcceptedChildren(component), id, handleAddComponent, t)}
               </div>
             </div>
             {component.children && component.children.length > 0 && (
