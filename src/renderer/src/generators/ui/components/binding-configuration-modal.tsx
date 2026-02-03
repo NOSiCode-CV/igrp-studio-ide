@@ -1,5 +1,5 @@
 import { StructuredComponent } from '@renderer/lib/dnd/types'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FormList } from '@renderer/components/form-list'
 import { handleChangeValueObject } from '@renderer/generators/api/helpers'
 import { useFormik } from 'formik'
@@ -78,11 +78,21 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
   const { showErrorToast } = useToast()
   const { getDataComponent } = useStudio()
 
-  const [fieldsTypeOptions, setFieldsTypeOptions] = useState<IGRPOptionsProps[]>([])
   const [selectedType, setSelectedType] = useState<string>('')
-  const [typeFilePath, setTypeFilePath] = useState<string>('')
 
-  const [componentMap, setComponentMap] = useState<Map<string, StructuredComponent>>(new Map())
+  const selectedTypeData = useMemo(
+    () => types.find((c: LabeledElementField) => c.name === selectedType),
+    [types, selectedType]
+  )
+  const typeFilePath = selectedTypeData?.path ?? ''
+  const fieldsTypeOptions = useMemo<IGRPOptionsProps[]>(
+    () =>
+      (selectedTypeData?.fields ?? []).map((field: LabeledElementField) => ({
+        label: `${field.name} (${field.type})`,
+        value: field.name
+      })),
+    [selectedTypeData]
+  )
 
   const { createOrUpdateType, getTypeByComponentId, handleUpdateChildComponent, components } =
     useDroppedComponents()
@@ -266,23 +276,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
     }
   })
 
-  const getFields = (): LabeledElementField[] => {
-    const type = types.find((c: LabeledElementField) => c.name === selectedType) || {}
-
-    setTypeFilePath(type.path || '')
-
-    return type && type?.fields && type?.fields ? type.fields : []
-  }
-
-  useEffect(() => {
-    const type = getFields()
-    const fieldsTypes = type.map((field: LabeledElementField) => ({
-      label: `${field.name} (${field.type})`,
-      value: field.name
-    }))
-
-    setFieldsTypeOptions(fieldsTypes)
-  }, [selectedType])
+  const getFields = (): LabeledElementField[] => selectedTypeData?.fields ?? []
 
   const extractValidFields = (
     components: StructuredComponent[]
@@ -401,18 +395,20 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
     })
   }
 
+  const componentMap = comp.children?.length
+    ? extractValidFields(comp.children).componentMap
+    : new Map<string, StructuredComponent>()
+
   useEffect(() => {
     // Auto-add fields from children if not already in the list
     if (comp.children?.length) {
       const currentFields: any[] = formik.values.fields || []
 
-      const { fields, componentMap: updatedMap } = extractValidFields(comp.children)
+      const { fields } = extractValidFields(comp.children)
 
       const updatedFields = updateFieldsWithSubFields(fields, currentFields)
 
       formik.setFieldValue('fields', [...updatedFields])
-
-      setComponentMap(updatedMap)
     }
   }, [components, comp.children])
 
@@ -495,7 +491,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                 />
               )}
 
-              <div className="border rounded-sm">
+              {columns.length > 0 && <div className="border rounded-sm">
                 <FormList
                   columns={columns}
                   formik={formik}
@@ -505,7 +501,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                   }}
                   name={'fields'}
                 />
-              </div>
+              </div>}
 
               <IGRPDialogFooterPrimitive className="space-x-2">
                 <IGRPDialogClosePrimitive>Close</IGRPDialogClosePrimitive>
