@@ -111,21 +111,10 @@ const CopyContent = ({ currentComp }: CopyContentProps): JSX.Element => {
         (child: FileTree) => child.isDirectory && /^v\d+$/.test(child.name)
       )
 
-      if (versionFolders.length === 0) return
-
-      // Sort versions descending to get latest first
-      const sortedVersions = versionFolders.sort((a: FileTree, b: FileTree) => {
-        const versionA = parseInt(a.name.slice(1), 10)
-        const versionB = parseInt(b.name.slice(1), 10)
-        return versionB - versionA
-      })
-
-      // Get the latest version folder
-      const latestVersion = sortedVersions[0]
-      if (!latestVersion.children || !Array.isArray(latestVersion.children)) return
+      if (versionFolders.length > 0) return
 
       // Extract activity files (files starting with "Activity_" and ending with ".json")
-      latestVersion.children.forEach((file: FileTree) => {
+      process.children.forEach((file: FileTree) => {
         if (!file.isDirectory && file.content.type === 'processStep') {
           // Convert activity content to StructuredComponent format
           const activityContent = file.content as ActivityContent
