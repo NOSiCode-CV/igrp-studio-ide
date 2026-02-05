@@ -13,6 +13,7 @@ import { SelectInput, TextInput } from '@renderer/generators/api/components/inpu
 import { useTranslation } from 'react-i18next'
 import { FileTree } from 'src/main/types'
 import { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import { isVersionFolderName } from '../utils/form-key-utils'
 
 interface GenerateNewStepFormProps {
   open: boolean
@@ -45,14 +46,21 @@ export const GenerateNewStepForm: React.FC<GenerateNewStepFormProps> = ({
     undefined
   )
   const availableProcesses = useMemo(() => {
-    if (bpmnProcesses && bpmnProcesses.length > 0) {
-      return bpmnProcesses.map((process) => ({
-        label: `${process.name} - ${process.children?.[0]?.children?.find((child) => child.name === `${process.name}.json`)?.content.description}`,
-        value: process.name
-      }))
-    }
-    return []
+    if (!bpmnProcesses?.length) return []
+    return bpmnProcesses
+      .map((process) => {
+        const versionFolder = process.children?.find(
+          (child) => child.isDirectory && isVersionFolderName(child.name)
+        )
+        if (versionFolder) return null
+        return {
+          label: `${process.name} - ${process.children?.find((child) => child.name === `${process.name}.json`)?.content?.description ?? '—'}`,
+          value: process.name
+        }
+      })
+      .filter((item): item is { label: string; value: string } => item !== null)
   }, [bpmnProcesses])
+
   const [selectedProcess, setSelectedProcess] = useState<FileTree | undefined>(undefined)
   const [availableVersions, setAvailableVersions] = useState<
     Array<{ label: string; value: string }>
