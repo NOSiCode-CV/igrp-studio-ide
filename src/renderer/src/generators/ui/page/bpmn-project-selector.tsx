@@ -36,7 +36,7 @@ import { getId } from '@renderer/utils'
 import { PageDefinition } from './page-manager'
 import { BPMNDiagramViewer } from '@renderer/components/bpmn-diagram-viewer'
 import { bpmnProcessStepInteractions } from './utils/bpmn-process-step-interactions'
-import { AddComponentsNameModal } from './components/add-components-name-modal'
+import { GenerateNewStepForm } from './components/generate-new-step-form'
 // Import refactored components and hooks
 import { useBPMNProjects, useProcessDefinitions } from './hooks/useBPMNData'
 import { findProcess, findStepProcess } from './utils/bpmn-helpers'
@@ -44,7 +44,11 @@ import { ProcessCard, ProcessArtifactCard } from './components'
 import { BpmnLocalView } from './components/bpmn-local-view'
 import { SearchInput } from '@renderer/components/shared-ui'
 import { EmptyList } from '@renderer/components/empty-list'
-import { getKeyFromFormKey, getNormalizeClassNameFromFormKey } from './utils/form-key-utils'
+import {
+  getKeyFromFormKey,
+  getNormalizeClassNameFromFormKey,
+  getVersionFromFormKey
+} from './utils/form-key-utils'
 import { CopyLegacyVersionModal } from './components/copy-legacy-version'
 
 // Types
@@ -273,19 +277,16 @@ export const BPMNProjectSelector = ({
         return
       }
 
-      const version = `v${processDefinition.version || '1'}`
-
       if (!processFound) {
         const processConfig: ProcessConfig = {
           type: 'process',
           processKey: processDefinition.processKey || '',
           name: processDefinition.processKey || '',
-          processVersion: version,
+          processVersion: processDefinition.version?.toString() || '',
           description: processDefinition.title || '',
           steps: processDefinition.processArtifacts?.map((artifact) => {
             const key = getKeyFromFormKey(artifact.formKey)
             const name = getNormalizeClassNameFromFormKey(artifact.formKey)
-
 
             return {
               id: getId(),
@@ -309,14 +310,14 @@ export const BPMNProjectSelector = ({
       }
 
       const key = getKeyFromFormKey(processArtifact.formKey)
-      const name = getNormalizeClassNameFromFormKey(processArtifact.formKey)
+      const version = getVersionFromFormKey(processArtifact.formKey)
 
       const processStep: ProcessStepConfig = {
         key: key,
         processKey: processDefinition.processKey || '',
-        processVersion: version,
-        version: version,
-        name: name || componentName,
+        processVersion: processDefinition.version?.toString() || '',
+        version: version || '1',
+        name: componentName,
         type: 'processStep',
         description: componentDescription,
         id: getId(),
@@ -346,6 +347,8 @@ export const BPMNProjectSelector = ({
           }
       }
 
+      console.log('basePath', basePath)
+
       const { error } = await window.engine.createProcessStep(
         processStep,
         ENV_TYPES.NEXTJS,
@@ -374,13 +377,20 @@ export const BPMNProjectSelector = ({
       const oldProcess = findProcess(processDefinition, bpmnProcesses)
       setOldProcessFound(oldProcess)
     }
+    const newProcessArtifact = {
+      ...processArtifact,
+      name: getNormalizeClassNameFromFormKey(processArtifact.formKey),
+      description: processArtifact.name
+    }
 
+    console.log(newProcessArtifact)
     // Store the data and open the modal
     setPendingComponentData({
       processDefinition,
-      processArtifact,
+      processArtifact: newProcessArtifact,
       processFound: processFound as FileTree
     })
+
     setShowAddComponentsModal(true)
   }
 
@@ -610,7 +620,6 @@ export const BPMNProjectSelector = ({
                         const processFound = findProcess(selectedProcess, bpmnProcesses)
 
                         const stepProcessFound = findStepProcess(
-                          selectedProcess,
                           processFound as FileTree,
                           artifact
                         )
@@ -676,12 +685,12 @@ export const BPMNProjectSelector = ({
       )}
 
       {/* Add Components Name Modal */}
-      <AddComponentsNameModal
+      <GenerateNewStepForm
         open={showAddComponentsModal}
         onOpenChange={setShowAddComponentsModal}
         onConfirm={handleStepProcess}
-        defaultComponentName={pendingComponentData?.processArtifact?.taskKey || ''}
-        defaultName={pendingComponentData?.processArtifact?.name || ''}
+        defaultComponentName={pendingComponentData?.processArtifact?.name || ''}
+        defaultComponentDescription={pendingComponentData?.processArtifact?.description || ''}
         processFound={pendingComponentData?.processFound || oldProcessFound}
         bpmnProcesses={bpmnProcesses}
       />
@@ -690,8 +699,6 @@ export const BPMNProjectSelector = ({
         open={showCopyLegacyVersionModal}
         onOpenChange={setShowCopyLegacyVersionModal}
         onConfirm={handleStepProcess}
-        defaultComponentName={pendingComponentData?.processArtifact?.taskKey || ''}
-        defaultName={pendingComponentData?.processArtifact?.name || ''}
         processFound={pendingComponentData?.processFound || oldProcessFound}
         bpmnProcesses={bpmnProcesses}
       />

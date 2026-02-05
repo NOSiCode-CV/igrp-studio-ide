@@ -19,7 +19,7 @@ import {
 import { FileTree } from 'src/main/types'
 import { PageDefinition } from '../page-manager'
 import { convertFileTreeToPageDefinition } from '../utils/bpmn-helpers'
-import { AddComponentsNameModal } from './add-components-name-modal'
+import { GenerateNewStepForm } from './generate-new-step-form'
 import { SearchInput } from '@renderer/components/shared-ui'
 import { EmptyList } from '@renderer/components/empty-list'
 import { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
@@ -40,12 +40,12 @@ export interface BpmnLocalViewProps {
   showAddComponentsModal: boolean
   onShowAddComponentsModalChange: (open: boolean) => void
   pendingComponentData:
-    | {
-        processDefinition: BPMNProjectProcessDefinition
-        processArtifact: BPMNProjectArtifact
-        processFound: FileTree
-      }
-    | undefined
+  | {
+    processDefinition: BPMNProjectProcessDefinition
+    processArtifact: BPMNProjectArtifact
+    processFound: FileTree
+  }
+  | undefined
   oldProcessFound: FileTree | undefined
   onConfirmStepProcess: (
     componentDescription: string,
@@ -219,11 +219,10 @@ export const BpmnLocalView = ({
                 return (
                   <IGRPCardPrimitive
                     key={`${process.path}-${index}`}
-                    className={`hover:shadow-md transition-all cursor-pointer ${
-                      selectedLocalProcess?.path === process.path
-                        ? 'ring-2 ring-primary'
-                        : 'hover:bg-muted/30'
-                    }`}
+                    className={`hover:shadow-md transition-all cursor-pointer ${selectedLocalProcess?.path === process.path
+                      ? 'ring-2 ring-primary'
+                      : 'hover:bg-muted/30'
+                      }`}
                     onClick={() => {
                       onSelectedLocalProcessChange(
                         selectedLocalProcess?.path === process.path ? null : process
@@ -368,7 +367,7 @@ export const BpmnLocalView = ({
           )
         })()}
 
-      <AddComponentsNameModal
+      <GenerateNewStepForm
         open={showAddComponentsModal}
         onOpenChange={onShowAddComponentsModalChange}
         onConfirm={onConfirmStepProcess}

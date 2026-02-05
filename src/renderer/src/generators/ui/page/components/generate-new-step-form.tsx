@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 import { FileTree } from 'src/main/types'
 import { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 
-interface AddComponentsNameModalProps {
+interface GenerateNewStepFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: (
@@ -23,23 +23,23 @@ interface AddComponentsNameModalProps {
     previousComponent?: ProcessStepConfig
   ) => void
   defaultComponentName: string
-  defaultName?: string
+  defaultComponentDescription?: string
   processFound: FileTree | undefined
   bpmnProcesses: FileTree[]
 }
 
-export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
+export const GenerateNewStepForm: React.FC<GenerateNewStepFormProps> = ({
   open,
   onOpenChange,
   onConfirm,
   defaultComponentName,
-  defaultName = '',
+  defaultComponentDescription = '',
   processFound,
   bpmnProcesses
 }) => {
   const { t } = useTranslation()
 
-  const [description, setDescription] = useState(defaultName)
+  const [description, setDescription] = useState(defaultComponentDescription)
   const [componentName, setComponentName] = useState(defaultComponentName)
   const [previousComponent, setPreviousComponent] = useState<ProcessStepConfig | undefined>(
     undefined
@@ -65,7 +65,7 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
     if (open && !prevOpenRef.current) {
       // Modal just opened, reset form state
       startTransition(() => {
-        setDescription(defaultName)
+        setDescription(defaultComponentDescription)
         setComponentName(defaultComponentName)
         setPreviousComponent(undefined)
         // If no processFound, reset selections
@@ -77,7 +77,7 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
       })
     }
     prevOpenRef.current = open
-  }, [open, defaultName, defaultComponentName, processFound])
+  }, [open, defaultComponentDescription, defaultComponentName, processFound])
 
   const handleConfirm = (): void => {
     if (!description.trim() || !componentName.trim()) return
@@ -140,19 +140,19 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
         <div className="space-y-6 py-4">
           <TextInput
             id="description"
-            label={t('Step Name')}
+            label={t('Component Description')}
             onChange={(e) => setDescription(e.target.value)}
             value={description || ''}
-            placeholder="Enter step name..."
+            placeholder="Enter component description..."
             isRequired
           />
           <TextInput
             id="name"
-            label={t('Step Key')}
+            label={t('Component Name')}
             className="col-span-3"
             onChange={(e) => setComponentName(e.target.value)}
             value={componentName || ''}
-            placeholder="Step key"
+            placeholder="Enter component name..."
             isRequired
           />
 

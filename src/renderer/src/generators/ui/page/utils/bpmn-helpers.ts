@@ -7,8 +7,7 @@ export const findProcess = (
 ): FileTree | undefined => {
   return bpmnProcesses.find(
     (p) =>
-      p.name === processDefinition.processKey &&
-      p.children?.some((c: FileTree) => c.name === `v${processDefinition.version}`)
+      p.name === processDefinition.processKey
   )
 }
 
@@ -41,18 +40,11 @@ export const findProcessRecursive = (
 }
 
 export const findStepProcess = (
-  processDefinition: BPMNProjectProcessDefinition,
   processFound: FileTree,
   processArtifact: BPMNProjectArtifact
 ): FileTree | undefined => {
-  const processVersionFound = processFound?.children?.find(
-    (c: FileTree) => c.name === `v${processDefinition.version}`
-  )
-
-  if (!processVersionFound) return
-
-  return processVersionFound?.children?.find(
-    (c: FileTree) => c.content.taskKey === processArtifact.taskKey
+  return processFound?.children?.find(
+    (c: FileTree) => c.content?.taskKey === processArtifact?.taskKey
   )
 }
 

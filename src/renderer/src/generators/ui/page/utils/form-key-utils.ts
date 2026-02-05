@@ -75,3 +75,13 @@ export function getNormalizeClassNameFromFormKey(formKey: string | undefined | n
   const normalized = getNameFromFormKey(formKey)
   return normalized.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase()).replace(/\s+/g, '')
 }
+
+export function getVersionFromFormKey(formKey: string | undefined | null): string {
+  if (formKey == null || formKey === '') return ''
+  const normalized = getNormalizedFormKey(formKey)
+  return normalized.split('@')[1]
+}
+
+/** Matches version folder names: v1, v2, v10, etc. */
+export const isVersionFolderName = (name: string | undefined): boolean =>
+  Boolean(name && /^v\d+$/.test(name))

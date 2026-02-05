@@ -54,7 +54,7 @@ export const ProcessArtifactCard = ({
               <IGRPBadgePrimitive variant="outline" className="text-xs">
                 v{selectedProcess.version || 'N/A'}
               </IGRPBadgePrimitive>
-              {formKeyType === 'unknown' && (<IGRPBadgePrimitive variant="outline" className="text-xs">
+              {formKeyType === 'unknown' && (<IGRPBadgePrimitive variant="destructive" className="text-xs">
                 <AlertTriangle className="h-4 w-4" />
                 Unknown Form Key
               </IGRPBadgePrimitive>)}
@@ -64,7 +64,7 @@ export const ProcessArtifactCard = ({
             <IGRPCardDescriptionPrimitive>
               <div className="flex items-center space-x-2 justify-between">
                 <span>Form Key: {formKey}</span>
-                <IGRPBadgePrimitive variant="outline" className="text-xs">
+                <IGRPBadgePrimitive variant="default" className="text-xs">
                   {formKeyType}
                 </IGRPBadgePrimitive>
               </div>
