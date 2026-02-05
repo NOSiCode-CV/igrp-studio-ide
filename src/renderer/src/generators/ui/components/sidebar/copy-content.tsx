@@ -120,8 +120,6 @@ const CopyContent = ({ currentComp }: CopyContentProps): JSX.Element => {
           const activityContent = file.content as ActivityContent
           const rootComponent = activityContent.components
 
-          console.log(activityContent)
-
           processStepOptions.push({
             ...file.content,
             pagePath: file.path,
