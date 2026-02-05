@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 import { FileTree } from 'src/main/types'
 import { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 
-interface AddComponentsNameModalProps {
+interface CopyLegacyVersionModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: (
@@ -28,7 +28,7 @@ interface AddComponentsNameModalProps {
   bpmnProcesses: FileTree[]
 }
 
-export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
+export const CopyLegacyVersionModal: React.FC<CopyLegacyVersionModalProps> = ({
   open,
   onOpenChange,
   onConfirm,
@@ -116,6 +116,8 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
         label: child.content.description || child.content.name,
         value: child.content
       }))
+
+    console.log('components', components)
 
     setAvailableComponents(components || [])
   }
