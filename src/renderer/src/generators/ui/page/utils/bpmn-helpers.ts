@@ -1,15 +1,21 @@
 import { BPMNProjectProcessDefinition, BPMNProjectArtifact, FileTree } from 'src/main/types'
 import { PageDefinition } from '../page-manager'
 
+/** Matches version folder names: v1, v2, v9, etc. */
+const VERSION_FOLDER_PATTERN = /^v\d+$/
+
+/**
+ * Returns items whose name is NOT a version folder (v + number).
+ * Use to get files/siblings and exclude v1, v2, v9, etc.
+ */
+export const getNonVersionFolderItems = <T extends { name?: string }>(items: T[] | undefined): T[] =>
+  (items ?? []).filter((item) => !VERSION_FOLDER_PATTERN.test(item.name ?? ''))
+
 export const findProcess = (
   processDefinition: BPMNProjectProcessDefinition,
   bpmnProcesses: FileTree[]
-): FileTree | undefined => {
-  return bpmnProcesses.find(
-    (p) =>
-      p.name === processDefinition.processKey
-  )
-}
+): FileTree | undefined =>
+  bpmnProcesses.find((p) => p.name === processDefinition.processKey)
 
 export const findProcessRecursive = (
   processDefinition: BPMNProjectProcessDefinition,

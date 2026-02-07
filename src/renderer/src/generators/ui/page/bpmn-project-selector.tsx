@@ -277,6 +277,8 @@ export const BPMNProjectSelector = ({
         return
       }
 
+      console.log('processFound', processFound)
+
       if (!processFound) {
         const processConfig: ProcessConfig = {
           type: 'process',
@@ -347,8 +349,6 @@ export const BPMNProjectSelector = ({
           }
       }
 
-      console.log('basePath', basePath)
-
       const { error } = await window.engine.createProcessStep(
         processStep,
         ENV_TYPES.NEXTJS,
@@ -356,7 +356,7 @@ export const BPMNProjectSelector = ({
       )
 
       if (error) {
-        console.log('error', error)
+        console.log('error', error, processStep)
         showErrorToast(error)
       } else {
         showSuccessToast('Process step created successfully')
@@ -383,7 +383,6 @@ export const BPMNProjectSelector = ({
       description: processArtifact.name
     }
 
-    console.log(newProcessArtifact)
     // Store the data and open the modal
     setPendingComponentData({
       processDefinition,
