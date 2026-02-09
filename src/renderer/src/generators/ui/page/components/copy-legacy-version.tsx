@@ -8,7 +8,7 @@ import {
   IGRPDialogPrimitive,
   IGRPDialogTitlePrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import { Plus } from 'lucide-react'
+import { Copy, Plus } from 'lucide-react'
 import { SelectInput } from '@renderer/generators/api/components/inputs-form'
 import { FileTree } from 'src/main/types'
 import { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
@@ -94,10 +94,13 @@ export const CopyLegacyVersionModal: React.FC<CopyLegacyVersionModalProps> = ({
     const process = bpmnProcesses.find((p) => p.name === processName)
     if (process) {
       setSelectedProcess(process)
-      const versions = process.children?.map((child) => ({
-        label: child.name,
-        value: child.name
-      }))
+      const versions = process.children?.
+        filter((child) => child.isDirectory && isVersionFolderName(child.name))
+        .map((child) => ({
+          label: child.name,
+          value: child.name
+        }))
+
       setAvailableVersions(versions || [])
       // Clear version and component selections
       setAvailableComponents([])
@@ -114,8 +117,6 @@ export const CopyLegacyVersionModal: React.FC<CopyLegacyVersionModalProps> = ({
         value: child.content
       }))
 
-    console.log('components', components)
-
     setAvailableComponents(components || [])
   }
 
@@ -128,11 +129,11 @@ export const CopyLegacyVersionModal: React.FC<CopyLegacyVersionModalProps> = ({
       <IGRPDialogContentPrimitive>
         <IGRPDialogHeaderPrimitive>
           <IGRPDialogTitlePrimitive className="flex items-center gap-2">
-            <Plus className="h-5 w-5" />
-            Configure New Step
+            <Copy className="h-5 w-5" />
+            Copy Legacy Version
           </IGRPDialogTitlePrimitive>
           <IGRPDialogDescriptionPrimitive>
-            Configure the new step name and optionally copy from an existing version.
+            Copy a legacy version of a process.
           </IGRPDialogDescriptionPrimitive>
         </IGRPDialogHeaderPrimitive>
 
@@ -140,7 +141,6 @@ export const CopyLegacyVersionModal: React.FC<CopyLegacyVersionModalProps> = ({
           {/* Copy from Previous Version */}
           {hasAvailableProcesses && (
             <div className="space-y-4">
-              <p className="text-sm font-medium">Copy from previous version</p>
               <SelectInput
                 id="process-select"
                 label="Select Process"
