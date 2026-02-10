@@ -616,11 +616,10 @@ export const BPMNProjectSelector = ({
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {processDefinitionDetails.processArtifacts.map(
                       (artifact: BPMNProjectArtifact, index: number) => {
-                        const processFound = findProcess(selectedProcess, bpmnProcesses)
-
                         const stepProcessFound = findStepProcess(
-                          processFound as FileTree,
-                          artifact
+                          bpmnProcesses,
+                          artifact,
+                          selectedProcess
                         )
 
                         return (

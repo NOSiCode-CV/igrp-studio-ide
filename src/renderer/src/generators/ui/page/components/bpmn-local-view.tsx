@@ -372,7 +372,7 @@ export const BpmnLocalView = ({
         onOpenChange={onShowAddComponentsModalChange}
         onConfirm={onConfirmStepProcess}
         defaultComponentName={pendingComponentData?.processArtifact?.taskKey || ''}
-        defaultName={pendingComponentData?.processArtifact?.name || ''}
+        defaultComponentDescription={pendingComponentData?.processArtifact?.name || ''}
         processFound={pendingComponentData?.processFound || oldProcessFound}
         bpmnProcesses={bpmnProcesses}
       />
