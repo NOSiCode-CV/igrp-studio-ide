@@ -13,20 +13,20 @@ export interface PageHeaderProps {
   isDisabled?: boolean
 }
 
-const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
+const IGRPStudioPageHeader: React.FC<PageHeaderProps> = ({ comp, onDragEnd }: PageHeaderProps) => {
   const { id: componentId, children: buttonComponents, componentName, label, properties } = comp
   const { title } = properties
 
   const { setEditingComponent } = useDroppedComponents()
 
-  const handleEditClick = (component: StructuredComponent) => {
+  const handleEditClick = (component: StructuredComponent): void => {
     setEditingComponent({
       path: '',
       component
     })
   }
 
-  const renderButtons = () => {
+  const renderButtons = (): React.ReactNode => {
     return buttonComponents.map((button: StructuredComponent, index: number) => {
       return (
         <Draggable
@@ -52,7 +52,11 @@ const IGRPStudioPageHeader = ({ comp, onDragEnd }: PageHeaderProps) => {
   }
 
   return (
-    <IGRPPageHeader {...properties} title={title || label || componentName}>
+    <IGRPPageHeader
+      title={title || label || componentName}
+      {...properties}
+      showBackButton={false}
+    >
       <Droppable
         component={comp}
         onDrop={onDragEnd}

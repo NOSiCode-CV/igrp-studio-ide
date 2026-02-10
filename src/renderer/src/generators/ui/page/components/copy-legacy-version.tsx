@@ -8,13 +8,15 @@ import {
   IGRPDialogPrimitive,
   IGRPDialogTitlePrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import { Plus } from 'lucide-react'
-import { SelectInput, TextInput } from '@renderer/generators/api/components/inputs-form'
-import { useTranslation } from 'react-i18next'
+import { Copy, Plus } from 'lucide-react'
+import { SelectInput } from '@renderer/generators/api/components/inputs-form'
 import { FileTree } from 'src/main/types'
 import { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import { isVersionFolderName } from '../utils/form-key-utils'
 
-interface AddComponentsNameModalProps {
+
+
+interface CopyLegacyVersionModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: (
@@ -22,37 +24,36 @@ interface AddComponentsNameModalProps {
     componentName: string,
     previousComponent?: ProcessStepConfig
   ) => void
-  defaultComponentName: string
-  defaultName?: string
   processFound: FileTree | undefined
   bpmnProcesses: FileTree[]
 }
 
-export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
+export const CopyLegacyVersionModal: React.FC<CopyLegacyVersionModalProps> = ({
   open,
   onOpenChange,
   onConfirm,
-  defaultComponentName,
-  defaultName = '',
   processFound,
   bpmnProcesses
 }) => {
-  const { t } = useTranslation()
-
-  const [description, setDescription] = useState(defaultName)
-  const [componentName, setComponentName] = useState(defaultComponentName)
   const [previousComponent, setPreviousComponent] = useState<ProcessStepConfig | undefined>(
     undefined
   )
   const availableProcesses = useMemo(() => {
-    if (bpmnProcesses && bpmnProcesses.length > 0) {
-      return bpmnProcesses.map((process) => ({
-        label: `${process.name} - ${process.children?.[0]?.children?.find((child) => child.name === `${process.name}.json`)?.content.description}`,
-        value: process.name
-      }))
-    }
-    return []
+    if (!bpmnProcesses?.length) return []
+    return bpmnProcesses
+      .map((process) => {
+        const versionFolder = process.children?.find(
+          (child) => child.isDirectory && isVersionFolderName(child.name)
+        )
+        if (!versionFolder) return null
+        return {
+          label: `${process.name} - ${versionFolder.children?.find((child) => child.name === `${process.name}.json`)?.content?.description ?? '—'}`,
+          value: process.name
+        }
+      })
+      .filter((item): item is { label: string; value: string } => item !== null)
   }, [bpmnProcesses])
+
   const [selectedProcess, setSelectedProcess] = useState<FileTree | undefined>(undefined)
   const [availableVersions, setAvailableVersions] = useState<
     Array<{ label: string; value: string }>
@@ -65,8 +66,6 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
     if (open && !prevOpenRef.current) {
       // Modal just opened, reset form state
       startTransition(() => {
-        setDescription(defaultName)
-        setComponentName(defaultComponentName)
         setPreviousComponent(undefined)
         // If no processFound, reset selections
         if (!processFound) {
@@ -77,12 +76,10 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
       })
     }
     prevOpenRef.current = open
-  }, [open, defaultName, defaultComponentName, processFound])
+  }, [open, processFound])
 
   const handleConfirm = (): void => {
-    if (!description.trim() || !componentName.trim()) return
-
-    onConfirm(description.trim(), componentName.trim(), previousComponent)
+    onConfirm(previousComponent?.description || '', previousComponent?.name || '', previousComponent)
     onOpenChange(false)
   }
 
@@ -97,10 +94,13 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
     const process = bpmnProcesses.find((p) => p.name === processName)
     if (process) {
       setSelectedProcess(process)
-      const versions = process.children?.map((child) => ({
-        label: child.name,
-        value: child.name
-      }))
+      const versions = process.children?.
+        filter((child) => child.isDirectory && isVersionFolderName(child.name))
+        .map((child) => ({
+          label: child.name,
+          value: child.name
+        }))
+
       setAvailableVersions(versions || [])
       // Clear version and component selections
       setAvailableComponents([])
@@ -117,8 +117,6 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
         value: child.content
       }))
 
-    console.log('components', components)
-
     setAvailableComponents(components || [])
   }
 
@@ -131,37 +129,18 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
       <IGRPDialogContentPrimitive>
         <IGRPDialogHeaderPrimitive>
           <IGRPDialogTitlePrimitive className="flex items-center gap-2">
-            <Plus className="h-5 w-5" />
-            Configure New Step
+            <Copy className="h-5 w-5" />
+            Copy Legacy Version
           </IGRPDialogTitlePrimitive>
           <IGRPDialogDescriptionPrimitive>
-            Configure the new step name and optionally copy from an existing version.
+            Copy a legacy version of a process.
           </IGRPDialogDescriptionPrimitive>
         </IGRPDialogHeaderPrimitive>
 
         <div className="space-y-6 py-4">
-          <TextInput
-            id="description"
-            label={t('Step Name')}
-            onChange={(e) => setDescription(e.target.value)}
-            value={description || ''}
-            placeholder="Enter step name..."
-            isRequired
-          />
-          <TextInput
-            id="name"
-            label={t('Step Key')}
-            className="col-span-3"
-            onChange={(e) => setComponentName(e.target.value)}
-            value={componentName || ''}
-            placeholder="Step key"
-            isRequired
-          />
-
           {/* Copy from Previous Version */}
           {hasAvailableProcesses && (
             <div className="space-y-4">
-              <p className="text-sm font-medium">Copy from previous version</p>
               <SelectInput
                 id="process-select"
                 label="Select Process"
@@ -199,11 +178,10 @@ export const AddComponentsNameModal: React.FC<AddComponentsNameModalProps> = ({
           </IGRPButtonPrimitive>
           <IGRPButtonPrimitive
             onClick={handleConfirm}
-            disabled={!description.trim() || !componentName.trim()}
             className="gap-2"
           >
             <Plus className="h-4 w-4" />
-            {previousComponent ? 'Copy Step' : 'Generate Step'}
+            {'Copy Step'}
           </IGRPButtonPrimitive>
         </IGRPDialogFooterPrimitive>
       </IGRPDialogContentPrimitive>
