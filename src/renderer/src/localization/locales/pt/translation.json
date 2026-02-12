@@ -894,5 +894,6 @@
   "selectWorkspaceDirectory": "Selecionar Diretório do Workspace",
   "workspaceOpenedSuccessfully": "{{name}} aberto com sucesso",
   "you_are_running_latest_version": "Você está executando a versão mais recente",
-  "update_check_failed": "Falha ao verificar atualizações"
+  "update_check_failed": "Falha ao verificar atualizações",
+  "readOnly": "Somente Leitura"
 }

@@ -105,19 +105,19 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                   options={
                     dtos && dtos.length > 0
                       ? dtos.map(
-                          ({
-                            label,
-                            module,
-                            value
-                          }: {
-                            label: string
-                            module: string
-                            value: string
-                          }) => ({
-                            label: `${label} (${module})`,
-                            value: `${value}-${module}`
-                          })
-                        )
+                        ({
+                          label,
+                          module,
+                          value
+                        }: {
+                          label: string
+                          module: string
+                          value: string
+                        }) => ({
+                          label: `${label} (${module})`,
+                          value: `${value}-${module}`
+                        })
+                      )
                       : []
                   }
                   onChange={(option: string | boolean) =>
@@ -137,6 +137,16 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                       formik.setFieldValue('enableCustonValidation', checked)
                     }
                     checked={formik.values.enableCustonValidation}
+                  />
+                  <IGRPLabelPrimitive htmlFor="enableCustonValidation">
+                    {t('readOnly')}
+                  </IGRPLabelPrimitive>
+                  <IGRPCheckboxPrimitive
+                    id="readOnly"
+                    onCheckedChange={(checked: boolean) =>
+                      formik.setFieldValue('readOnly', checked)
+                    }
+                    checked={formik.values.readOnly}
                   />
                 </div>
               </div>

@@ -896,5 +896,6 @@
   "selectWorkspaceDirectory": "Select Workspace Directory",
   "workspaceOpenedSuccessfully": "{{name}} opened successfully",
   "you_are_running_latest_version": "You are running the latest version",
-  "update_check_failed": "Failed to check for updates"
+  "update_check_failed": "Failed to check for updates",
+  "readOnly": "Read Only"
 }
