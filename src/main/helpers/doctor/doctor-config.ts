@@ -57,7 +57,7 @@ export const toolConfig: ToolConfig[] = [
   {
     name: 'Java',
     command: 'java',
-    link: 'https://adoptium.net/',
+    link: 'https://www.oracle.com/in/java/technologies/downloads/',
     required: true,
     category: 'backend',
     description: 'Java runtime for backend development',
@@ -67,23 +67,6 @@ export const toolConfig: ToolConfig[] = [
       range: '^23.0.0 || >=24.0.0'
     }
   },
-  /* {
-    name: 'Maven',
-    command: 'mvn',
-    link: 'https://maven.apache.org/download.cgi',
-    required: true,
-    category: 'backend',
-    description: 'Java build and dependency management tool',
-  },
-  {
-    name: '.NET SDK',
-    command: 'dotnet',
-    link: 'https://dotnet.microsoft.com/download',
-    required: false,
-    category: 'backend',
-    description: '.NET development framework',
-  }, */
-
   // Development Infrastructure Tools
   {
     name: 'Docker',

@@ -67,6 +67,7 @@ export default function Doctor({
       setLoading(true)
       setResults(null)
       window.api.runDoctorChecks().then((res: ToolCheck[]) => {
+        console.log('doctor results', res)
         setResults(res)
         setLoading(false)
       })
@@ -255,15 +256,18 @@ export default function Doctor({
                                 </div>
                               </IGRPTableCellPrimitive>
                               <IGRPTableCellPrimitive className="py-3 text-xs">
-                                {tool.success ? (
+                                {tool.success && (
                                   <code className="bg-muted px-1 py-0.5 rounded text-xs">
                                     {tool.version}
                                   </code>
-                                ) : (
+                                )}
+                                {!tool.success && tool.error && (
                                   <IGRPTooltipProviderPrimitive>
                                     <IGRPTooltipPrimitive>
                                       <IGRPTooltipTriggerPrimitive asChild>
-                                        Error
+                                        <span className="cursor-help text-red-600 underline decoration-dotted">
+                                          Error
+                                        </span>
                                       </IGRPTooltipTriggerPrimitive>
                                       <IGRPTooltipContentPrimitive className="max-w-md">
                                         <p className="text-xs whitespace-pre-wrap">{tool.error}</p>
@@ -271,6 +275,7 @@ export default function Doctor({
                                     </IGRPTooltipPrimitive>
                                   </IGRPTooltipProviderPrimitive>
                                 )}
+
                               </IGRPTableCellPrimitive>
                               <IGRPTableCellPrimitive className="py-3">
                                 {!tool.success && tool.link && (
