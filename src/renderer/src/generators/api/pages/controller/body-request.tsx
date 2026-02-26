@@ -34,6 +34,15 @@ const defaultValue = {
   isRequired: true
 }
 
+const deafutlFormData = [
+  {
+    type: 'string',
+    name: '',
+    value: '',
+    isRequired: true
+  }
+]
+
 export const BodyRequest: React.FC<BodyRequestProps> = ({
   formik,
   contentTypes,
@@ -181,11 +190,11 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
   } | null => {
     return localSchema
       ? {
-          type: 'object',
-          properties: {
-            [localSchema?.name || 'data']: localSchema
-          }
+        type: 'object',
+        properties: {
+          [localSchema?.name || 'data']: localSchema
         }
+      }
       : null
   }
 
@@ -249,7 +258,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
           <div className="border rounded">
             <FormList
               columns={columnsBody}
-              data={data}
+              data={data.length > 0 ? data : deafutlFormData}
               formik={formik}
               changeValue={(element, position, value) => {
                 onChangeBody(element, position, value)

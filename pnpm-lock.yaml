@@ -30,11 +30,11 @@ importers:
         specifier: 0.0.1-beta.16
         version: 0.0.1-beta.16(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(diagram-js@15.7.0)(next-auth@4.24.13(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zeebe-bpmn-moddle@1.12.0)
       '@igrp/igrp-framework-react-design-system':
-        specifier: 0.1.0-beta.92
-        version: 0.1.0-beta.92(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 0.1.0-beta.102
+        version: 0.1.0-beta.102(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@igrp/igrp-studio-nextjs-engine':
-        specifier: 0.1.0-beta.72
-        version: 0.1.0-beta.72(@types/react@19.2.13)(typescript@5.9.3)(webpack@5.104.1)
+        specifier: 0.1.0-beta.73
+        version: 0.1.0-beta.73(@types/react@19.2.13)(typescript@5.9.3)(webpack@5.104.1)
       '@igrp/igrp-studio-springboot-engine':
         specifier: 0.1.0-beta.19
         version: 0.1.0-beta.19(typescript@5.9.3)(webpack@5.104.1)
@@ -1163,24 +1163,16 @@ packages:
       react: 19.1.1
       react-dom: 19.1.1
 
-  '@igrp/igrp-framework-react-design-system@0.1.0-beta.101':
-    resolution: {integrity: sha512-Ieo579JKgYlwXAGyMxF3L4G+7GxW7VmcPMB5CjdkpcnkqgtYUOnbAhNEt8lQtWsLnq6zbt8TkX8xFOAjw+360w==}
+  '@igrp/igrp-framework-react-design-system@0.1.0-beta.102':
+    resolution: {integrity: sha512-AesnOEGiqMyubc3KlkMSfBexi68miNwEW5AwdDQhKFB4VjsQebFej1oSm5xCJFk0cHoWpYsEqg7TsaXcWA2c3A==}
     engines: {node: '>=20.x.x'}
     peerDependencies:
       next: ^15.5.12
       react: ^19.2.4
       react-dom: ^19.2.4
 
-  '@igrp/igrp-framework-react-design-system@0.1.0-beta.92':
-    resolution: {integrity: sha512-GV8boxGq4b6F6h6f5te0CkbH6ySlhKbzmZkNXic+OW2nd0umn0J3To7zQXxQxZJ5B4bGh5GnQafmr2Z8IDtzsQ==}
-    engines: {node: '>=20.x.x'}
-    peerDependencies:
-      next: ^15.5.9
-      react: ^19.2.3
-      react-dom: ^19.2.3
-
-  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.72':
-    resolution: {integrity: sha512-2OUXNKuTQ6OWlskiU63OesetjJ4+3MDRhdbYydWeX1CudD9oMc/ez4+h2iu85Tc/DMF74hGZ0HtsvpAPSh9gOw==}
+  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.73':
+    resolution: {integrity: sha512-O91DPxPOkZ9KUcnAGxHjT34r1auFfvDG0LikRBOkssVAMDNp9y5bliGAhe85O+8hahdABztLwz0P+sIbbBQWJQ==}
 
   '@igrp/igrp-studio-springboot-engine@0.1.0-beta.19':
     resolution: {integrity: sha512-AiIr0o8EbW+buz+Vk4i8zrQ9ZezLt6tazMTrM58im3E0Z/aCMVUYFxCghocvVJ8QgmKt9tGIaYV4CUDwjt0a9g==}
@@ -8666,7 +8658,7 @@ snapshots:
   '@igrp/framework-process-studio-bpmn-editor@0.0.1-beta.16(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(diagram-js@15.7.0)(next-auth@4.24.13(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zeebe-bpmn-moddle@1.12.0)':
     dependencies:
       '@bpmn-io/properties-panel': 3.36.0
-      '@igrp/igrp-framework-react-design-system': 0.1.0-beta.101(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@igrp/igrp-framework-react-design-system': 0.1.0-beta.102(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       bpmn-js: 18.10.1
       bpmn-js-properties-panel: 5.48.0(@bpmn-io/properties-panel@3.36.0)(bpmn-js@18.10.1)(camunda-bpmn-js-behaviors@1.12.1(bpmn-js@18.10.1)(camunda-bpmn-moddle@7.0.1)(zeebe-bpmn-moddle@1.12.0))(diagram-js@15.7.0)
       bpmn-js-token-simulation: 0.38.2
@@ -8687,7 +8679,7 @@ snapshots:
       - diagram-js
       - zeebe-bpmn-moddle
 
-  '@igrp/igrp-framework-react-design-system@0.1.0-beta.101(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@igrp/igrp-framework-react-design-system@0.1.0-beta.102(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@hookform/resolvers': 5.2.2(react-hook-form@7.71.1(react@19.2.4))
       '@origin-space/image-cropper': 0.1.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -8743,63 +8735,7 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  '@igrp/igrp-framework-react-design-system@0.1.0-beta.92(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
-    dependencies:
-      '@hookform/resolvers': 5.2.2(react-hook-form@7.71.1(react@19.2.4))
-      '@origin-space/image-cropper': 0.1.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-accordion': 1.2.12(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-alert-dialog': 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-aspect-ratio': 1.1.8(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-avatar': 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-checkbox': 1.3.3(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-collapsible': 1.1.12(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-context-menu': 2.2.16(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-dialog': 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-dropdown-menu': 2.1.16(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-hover-card': 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-label': 2.1.8(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-menubar': 1.1.16(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-navigation-menu': 1.2.14(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-popover': 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-progress': 1.1.8(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-radio-group': 1.3.8(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-scroll-area': 1.2.10(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-select': 2.2.6(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-separator': 1.1.8(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-slider': 1.3.6(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-slot': 1.2.4(@types/react@19.2.13)(react@19.2.4)
-      '@radix-ui/react-switch': 1.2.6(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-tabs': 1.1.13(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-toggle': 1.1.10(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-toggle-group': 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@radix-ui/react-tooltip': 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@tanstack/react-table': 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      class-variance-authority: 0.7.1
-      clsx: 2.1.1
-      cmdk: 1.1.1(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      date-fns: 4.1.0
-      embla-carousel-react: 8.6.0(react@19.2.4)
-      input-otp: 1.4.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      lucide-react: 0.563.0(react@19.2.4)
-      next: 16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3)
-      next-themes: 0.4.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react: 19.2.4
-      react-day-picker: 9.13.0(react@19.2.4)
-      react-dom: 19.2.4(react@19.2.4)
-      react-hook-form: 7.71.1(react@19.2.4)
-      react-phone-number-input: 3.4.14(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react-resizable-panels: 3.0.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      recharts: 2.15.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      sonner: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      tailwind-merge: 3.4.0
-      tailwindcss: 4.1.18
-      vaul: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      zod: 4.3.6
-    transitivePeerDependencies:
-      - '@types/react'
-      - '@types/react-dom'
-
-  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.72(@types/react@19.2.13)(typescript@5.9.3)(webpack@5.104.1)':
+  '@igrp/igrp-studio-nextjs-engine@0.1.0-beta.73(@types/react@19.2.13)(typescript@5.9.3)(webpack@5.104.1)':
     dependencies:
       '@prettier/sync': 0.5.5(prettier@3.8.1)
       '@types/adm-zip': 0.5.7
