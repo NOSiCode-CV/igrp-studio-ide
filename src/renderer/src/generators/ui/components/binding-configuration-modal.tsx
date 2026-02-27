@@ -38,6 +38,7 @@ interface LabeledElementField {
   label: string
   fields?: LabeledElementField[]
   isList?: boolean
+  nullable?: boolean
 }
 
 const defaultFieldType: LabeledElementField = {
@@ -47,7 +48,8 @@ const defaultFieldType: LabeledElementField = {
   required: false,
   defaultValue: undefined,
   label: '',
-  isList: false
+  isList: false,
+  nullable: false
 }
 
 const FIELD_TYPES: SchemaTypeItem[] = [
@@ -132,6 +134,11 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
         {
           key: 'required',
           name: 'Required?',
+          type: 'checkbox'
+        },
+        {
+          key: 'nullable',
+          name: 'Nullable?',
           type: 'checkbox'
         },
         {

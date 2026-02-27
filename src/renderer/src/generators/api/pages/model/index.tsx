@@ -37,11 +37,11 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps): React.
 
   const { t } = useTranslation()
 
+
   const renderFormList = (value: string): React.ReactNode => {
     const columns = tablesColumns?.[value]
     const errors = formik?.errors?.[value]
     const touched = formik?.touched?.[value]
-
     if (!columns || !formik?.values?.[value]) return null
 
     return (

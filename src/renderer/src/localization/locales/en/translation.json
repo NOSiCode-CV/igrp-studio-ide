@@ -815,6 +815,9 @@
   "addNewRowBottom": "Add New Row Bottom",
   "addNewRowTop": "Add New Row Top",
   "forceDynamic": "Force Dynamic",
+  "useClient": "Use Client",
+  "useClientInfo": "When enabled, this page will use the React \"use client\" directive so components can use client-side features (state, effects, event handlers).",
+  "useClientHelperText": "Enable for pages that need interactivity, forms, or browser APIs. Leave disabled for static or server-rendered content.",
   "pageTitle": "Page Title",
   "searchRepositories": "Search Repositories",
   "componentAssociation": "You can associate this component with one of the pages available in this combobox. The associated page will be included in the same path as the current page, inside the 'components' folder.",
@@ -896,5 +899,6 @@
   "selectWorkspaceDirectory": "Select Workspace Directory",
   "workspaceOpenedSuccessfully": "{{name}} opened successfully",
   "you_are_running_latest_version": "You are running the latest version",
-  "update_check_failed": "Failed to check for updates"
+  "update_check_failed": "Failed to check for updates",
+  "readOnly": "Read Only"
 }

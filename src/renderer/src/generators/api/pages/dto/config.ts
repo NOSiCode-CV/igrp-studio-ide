@@ -9,6 +9,7 @@ export const initialValues: DTOConfig = {
   name: '',
   template: 'classic',
   enableCustonValidation: false,
+  readOnly: false,
   extends: {
     name: '',
     module: ''
@@ -60,8 +61,8 @@ export const getTablesColumns = ({
   const collectionTypes = formatMethods(
     (
       selectors.find((selector: any) => 'COLLECTION_TYPES' in selector) as
-        | { COLLECTION_TYPES: string[] }
-        | undefined
+      | { COLLECTION_TYPES: string[] }
+      | undefined
     )?.COLLECTION_TYPES || [],
     true
   )
@@ -69,10 +70,10 @@ export const getTablesColumns = ({
   const dataTypes =
     (
       selectors.find((selector: any) => 'ATTRIBUTE_TYPES' in selector) as
-        | {
-            ATTRIBUTE_TYPES: string[]
-          }
-        | undefined
+      | {
+        ATTRIBUTE_TYPES: string[]
+      }
+      | undefined
     )?.ATTRIBUTE_TYPES || []
 
   const dtos = getOptionsByObject(dto, module, currentDto)

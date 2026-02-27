@@ -31,7 +31,8 @@ const initialValues: PageConfig = {
   states: [],
   functions: [],
   parentName: undefined,
-  args: []
+  args: [],
+  useClient: true
 } as any
 
 interface CreatePageModalProps {
@@ -122,8 +123,8 @@ export function CreatePageModal({
           isState: false
         }))
 
-        // Add args to pageConfig (we'll need to extend the interface)
-        ;(pageConfig as unknown as PageConfig).args = generatedArgs
+          // Add args to pageConfig (we'll need to extend the interface)
+          ; (pageConfig as unknown as PageConfig).args = generatedArgs
       }
 
       const { error } = await window.engine.createPage(
@@ -185,10 +186,10 @@ export function CreatePageModal({
     onSubmit: async (values, actions) => {
       const newValues = isSubPage
         ? {
-            ...values,
-            path: `${currentComponent?.content?.path}/${values.path}`,
-            parentName: currentComponent?.content?.pageName
-          }
+          ...values,
+          path: `${currentComponent?.content?.path}/${values.path}`,
+          parentName: currentComponent?.content?.pageName
+        }
         : values
 
       newValues.id = newValues.id || getId()
@@ -253,7 +254,7 @@ export function CreatePageModal({
     <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
       <IGRPDialogContentPrimitive>
         <IGRPDialogTitlePrimitive>
-          {isSubPage ? t('createSubNewPage') : t('createNewPage')}
+          {isSubPage ? t('createSubNewPage') : formInitialValues.id ? `Edit ${formInitialValues.pageName}` : t('createNewPage')}
         </IGRPDialogTitlePrimitive>
         <IGRPDialogDescriptionPrimitive>
           {t('comonDialogtDescription', { name: 'Page' })}
@@ -323,12 +324,22 @@ export function CreatePageModal({
               </div>
             )}
 
-            <CheckboxInput
-              id="forceDynamic"
-              label={t('forceDynamic')}
-              onChange={formik.handleChange}
-              value={formik.values.forceDynamic}
-            />
+            <div className="flex justify-start gap-2">
+              <CheckboxInput
+                id="forceDynamic"
+                label={t('forceDynamic')}
+                onChange={formik.handleChange}
+                value={formik.values.forceDynamic}
+              />
+
+              <CheckboxInput
+                id="useClient"
+                label={t('useClient')}
+                onChange={formik.handleChange}
+                value={formik.values.useClient}
+                info={t('useClientInfo')}
+              />
+            </div>
           </div>
           <IGRPDialogFooterPrimitive className="flex justify-between">
             <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
