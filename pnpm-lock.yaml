@@ -101,6 +101,9 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      form-data:
+        specifier: ^4.0.5
+        version: 4.0.5
       formik:
         specifier: ^2.4.9
         version: 2.4.9(@types/react@19.2.13)(react@19.2.4)
