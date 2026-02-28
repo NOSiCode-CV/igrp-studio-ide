@@ -5,7 +5,6 @@ import installExtension, {
   REDUX_DEVTOOLS
 } from 'electron-devtools-installer'
 import { is } from '@electron-toolkit/utils'
-import axios from 'axios'
 import fs from 'fs'
 import path from 'path'
 let allow_quit = false
@@ -72,70 +71,65 @@ export async function downloadFile(
       fs.mkdirSync(dir, { recursive: true })
     }
 
-    const response = await axios({
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 30_000) // 30 seconds
+
+    const response = await fetch(url, {
       method: 'GET',
-      url: url,
-      responseType: 'stream',
-      timeout: 30000 // 30 seconds timeout
+      signal: controller.signal
     })
 
-    const totalSize = parseInt(response.headers['content-length'] || '0', 10)
+    clearTimeout(timeoutId)
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const contentLength = response.headers.get('content-length')
+    const totalSize = contentLength ? parseInt(contentLength, 10) : 0
     let downloadedSize = 0
+
+    const reader = response.body?.getReader()
+    if (!reader) {
+      throw new Error('No response body')
+    }
 
     const writer = fs.createWriteStream(destinationPath)
 
-    response.data.on('data', (chunk: Buffer) => {
-      downloadedSize += chunk.length
-      if (onProgress && totalSize > 0) {
-        const progress = (downloadedSize / totalSize) * 100
-        onProgress(progress)
-      }
-    })
-
     return new Promise((resolve, reject) => {
+      const pump = async (): Promise<void> => {
+        try {
+          const { done, value } = await reader.read()
+          if (done) {
+            writer.end()
+            return
+          }
+          downloadedSize += value.length
+          if (onProgress && totalSize > 0) {
+            onProgress((downloadedSize / totalSize) * 100)
+          }
+          writer.write(Buffer.from(value))
+          return pump()
+        } catch (err) {
+          writer.destroy()
+          reject(err)
+        }
+      }
+
       writer.on('finish', () => {
         console.log(`Download completed: ${destinationPath}`)
         resolve(true)
       })
 
       writer.on('error', (error) => {
-        console.error('Error writing file:', error)
+        reader.cancel().catch(() => {})
         reject(error)
       })
 
-      response.data.on('error', (error) => {
-        console.error('Error downloading file:', error)
-        reject(error)
-      })
-
-      response.data.pipe(writer)
+      pump().catch(reject)
     })
   } catch (error) {
     console.error('Download failed:', error)
     return false
   }
-}
-
-/**
- * Downloads the IGRP Next template from Sonatype repository
- * @param destinationPath - The local path where the template should be saved
- * @param onProgress - Optional callback for download progress
- * @returns Promise<boolean> - True if download was successful
- */
-export async function downloadIgrpNextTemplate(
-  destinationPath?: string,
-  onProgress?: (progress: number) => void
-): Promise<boolean> {
-  const templateUrl =
-    'https://sonatype.nosi.cv/repository/igrp-templates/@igrp/framework-next/0.0.1-alpha.0/igrp-next-template.zip'
-
-  // Default destination path if not provided
-  const defaultPath = path.join(app.getPath('downloads'), 'igrp-next-template.zip')
-  const finalPath = destinationPath || defaultPath
-
-  console.log('Downloading IGRP Next template...')
-  console.log(`URL: ${templateUrl}`)
-  console.log(`Destination: ${finalPath}`)
-
-  return await downloadFile(templateUrl, finalPath, onProgress)
 }
