@@ -9,7 +9,7 @@ import { ThemeService } from './services/ThemeService'
 
 import '@igrp/framework-process-studio-bpmn-editor/dist/src/styles.css'
 
-import '@igrp/igrp-framework-react-design-system/styles'
+import '@igrp/igrp-framework-react-design-system/dist/styles.css'
 import { IGRPToasterPrimitive } from '@igrp/igrp-framework-react-design-system'
 
 // Configure Redux store
