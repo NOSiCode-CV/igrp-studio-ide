@@ -142,7 +142,7 @@
       "bucket": "igrp-studio",
       "region": "praia",
       "endpoint": "https://storage-api.nosi.cv",
-      "channel": "latest",
+      "channel": "${env.PUBLISH_CHANNEL}",
       "path": "${platform}/${arch}/"
     },
     "win": {
@@ -162,7 +162,7 @@
         "bucket": "igrp-studio",
         "region": "praia",
         "endpoint": "https://storage-api.nosi.cv",
-        "channel": "latest",
+        "channel": "${env.PUBLISH_CHANNEL}",
         "path": "win32/${arch}/"
       }
     },
