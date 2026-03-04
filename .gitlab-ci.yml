@@ -2,40 +2,40 @@ stages:
   - build
   - release
 
-build_packagedev_mac:
-  image: node
-  stage: build
-  tags:
-    - arm64
-  only:
-    - tags
-  variables:
-    #ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
-    CERTIFICATE_PASSWORD: '${CERTIFICATE_PASSWORD}'
-  before_script:
-    - apt-get update
-    - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
-    - dpkg --add-architecture arm64
-    - apt-get update
-    - apt-get install -y wine64
-    - npm install -g pnpm # Install pnpm
-    - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
+#build_packagedev_mac:
+#  image: node
+#  stage: build
+#  tags:
+#    - arm64
+#  only:
+#    - tags
+#  variables:
+#    #ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
+#    CERTIFICATE_PASSWORD: '${CERTIFICATE_PASSWORD}'
+#  before_script:
+#    - apt-get update
+#    - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
+#    - dpkg --add-architecture arm64
+#    - apt-get update
+#    - apt-get install -y wine64
+#    - npm install -g pnpm # Install pnpm
+#    - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
 
-  script:
-    - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
-    - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
-    - pnpm install --frozen-lockfile
-    - pnpm release:mac
-  artifacts:
-    paths:
-      - dist/
-    expire_in: 4 weeks
+#  script:
+#    - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
+#    - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
+#    - pnpm install --frozen-lockfile
+#    - pnpm release:mac
+#  artifacts:
+#    paths:
+#      - dist/
+#    expire_in: 4 weeks
 
 
 build_packagedev:
   image: node
   tags:
-    - nosi-runner
+    - guine-runner
   stage: build
   only:
     - tags
@@ -76,7 +76,7 @@ build_packagedev:
 release:
   stage: release
   tags:
-    - nosi-runner
+    - guine-runner
   only:
     - tags
   image: curlimages/curl:latest
