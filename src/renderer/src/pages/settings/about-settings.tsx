@@ -4,13 +4,6 @@
 
 import {
   IGRPButtonPrimitive,
-  IGRPCheckboxPrimitive,
-  IGRPDialogPrimitive,
-  IGRPDialogContentPrimitive,
-  IGRPDialogHeaderPrimitive,
-  IGRPDialogTitlePrimitive,
-  IGRPDialogDescriptionPrimitive,
-  IGRPDialogFooterPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import { CircleArrowUp, Download, RefreshCw, Loader2 } from 'lucide-react'
@@ -18,6 +11,7 @@ import { useEffect, useState, JSX } from 'react'
 import logo from '@renderer/assets/images/igrp-green.svg'
 import { useTranslation } from 'react-i18next'
 import useToast from '@renderer/hooks/useToast'
+import { SHOW_UPDATE_MODAL_EVENT } from '@renderer/components/update-banner'
 
 interface UpdateMessage {
   type: 'checking' | 'available' | 'not-available' | 'error' | 'progress' | 'downloaded'
@@ -35,7 +29,6 @@ export function AboutSettings(): JSX.Element {
   const { showWarningToast, showSuccessToast } = useToast()
   const [appVersion, setAppVersion] = useState('')
   const [updateInfo, setUpdateInfo] = useState<UpdateMessage | null>(null)
-  const [updateDialogOpen, setUpdateDialogOpen] = useState(false)
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
 
   const checkForUpdates = async (): Promise<void> => {
@@ -43,50 +36,20 @@ export function AboutSettings(): JSX.Element {
     try {
       const newVersion = await window.electron.checkForUpdates?.()
       if (!newVersion || newVersion === appVersion) {
-        showSuccessToast(`${t('you_are_running_latest_version')}`)
+        showSuccessToast(t('you_are_running_latest_version'))
+      } else {
+        showSuccessToast(t('found_new_version') + ' ' + newVersion)
+        window.dispatchEvent(new CustomEvent(SHOW_UPDATE_MODAL_EVENT))
       }
     } catch {
-      showWarningToast(`${t('update_check_failed')}`)
+      showWarningToast(t('update_check_failed'))
     } finally {
       setIsCheckingUpdate(false)
     }
   }
 
-  const handleInstallUpdate = async (): Promise<void> => {
-    try {
-      await window.electron.installUpdate?.()
-    } catch (err) {
-      console.error('Error installing update:', err)
-    }
-  }
-
-  const formatReleaseNotes = (notes?: string): JSX.Element[] | null => {
-    if (!notes) return null
-
-    return notes.split('\n').map((line, i) => {
-      if (line.startsWith('## ')) {
-        return (
-          <h3 key={i} className="font-semibold mt-3 mb-1">
-            {line.replace('## ', '')}
-          </h3>
-        )
-      }
-      if (line.startsWith('- ')) {
-        return (
-          <li key={i} className="ml-4">
-            {line.replace('- ', '')}
-          </li>
-        )
-      }
-      if (line.trim() === '') {
-        return <br key={i} />
-      }
-      return (
-        <p key={i} className="text-sm">
-          {line}
-        </p>
-      )
-    })
+  const openUpdateModal = (): void => {
+    window.dispatchEvent(new CustomEvent(SHOW_UPDATE_MODAL_EVENT))
   }
 
   useEffect(() => {
@@ -102,12 +65,17 @@ export function AboutSettings(): JSX.Element {
       setUpdateInfo(data)
 
       if (data.type === 'available' || data.type === 'progress' || data.type === 'downloaded') {
-        setUpdateDialogOpen(true)
         setIsCheckingUpdate(false)
+        window.dispatchEvent(new CustomEvent(SHOW_UPDATE_MODAL_EVENT))
       }
 
       if (data.type === 'not-available') {
         setIsCheckingUpdate(false)
+      }
+
+      if (data.type === 'error') {
+        setIsCheckingUpdate(false)
+        showWarningToast(data.error || data.message || t('update_check_failed'))
       }
     }
 
@@ -145,6 +113,21 @@ export function AboutSettings(): JSX.Element {
                 {updateInfo.type === 'downloaded' && (
                   <p className="text-xs text-green-600">✓ {t('ready_to_install')}</p>
                 )}
+                <IGRPButtonPrimitive
+                  className="gap-2 mt-1"
+                  size="sm"
+                  variant="outline"
+                  onClick={openUpdateModal}
+                >
+                  {updateInfo.type === 'downloaded' ? (
+                    <RefreshCw className="h-4 w-4" />
+                  ) : (
+                    <Download className="h-4 w-4" />
+                  )}
+                  {updateInfo.type === 'downloaded'
+                    ? t('install_restart')
+                    : t('view_progress')}
+                </IGRPButtonPrimitive>
               </div>
             ) : (
               <p className="text-muted-foreground">
@@ -154,22 +137,7 @@ export function AboutSettings(): JSX.Element {
               </p>
             )}
             <div className="flex items-center gap-2 pt-1">
-              {updateInfo?.type === 'downloaded' ? (
-                <IGRPButtonPrimitive className="gap-2" size="sm" onClick={handleInstallUpdate}>
-                  <RefreshCw className="h-4 w-4" />
-                  {t('install_restart')}
-                </IGRPButtonPrimitive>
-              ) : updateInfo?.type === 'progress' || updateInfo?.type === 'available' ? (
-                <IGRPButtonPrimitive
-                  className="gap-2"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setUpdateDialogOpen(true)}
-                >
-                  <Download className="h-4 w-4 animate-pulse" />
-                  {t('view_progress')}
-                </IGRPButtonPrimitive>
-              ) : (
+              {(!updateInfo?.version || updateInfo.version === appVersion) && (
                 <IGRPButtonPrimitive
                   className="gap-2"
                   size="sm"
@@ -191,7 +159,7 @@ export function AboutSettings(): JSX.Element {
         <IGRPSeparator />
 
         {/* Software Update */}
-        <div className="space-y-4">
+        {/*  <div className="space-y-4">
           <h3 className="text-sm font-medium">{t('software_update')}</h3>
           <div className="flex items-center space-x-2">
             <IGRPCheckboxPrimitive id="notifications" />
@@ -202,9 +170,9 @@ export function AboutSettings(): JSX.Element {
               {t('remind_me')}
             </label>
           </div>
-        </div>
+        </div> */}
 
-        <IGRPSeparator />
+        {/*  <IGRPSeparator /> */}
 
         {/* Other Information */}
         <div className="space-y-4">
@@ -214,7 +182,7 @@ export function AboutSettings(): JSX.Element {
               variant="link"
               size={'sm'}
               onClick={() =>
-                window.electron.ipcRenderer.send('open-external-url', 'https://igrp.cv/en')
+                window.electron.ipcRenderer.send('open-external-url', 'https://docs3.igrp.cv/instalacao/download-exe')
               }
             >
               {t('get_latest_version')}
@@ -240,89 +208,6 @@ export function AboutSettings(): JSX.Element {
           </div>
         </div>
       </div>
-
-      {/* Update Dialog with Release Notes */}
-      <IGRPDialogPrimitive open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
-        <IGRPDialogContentPrimitive className="max-w-2xl max-h-[80vh]">
-          <IGRPDialogHeaderPrimitive>
-            <IGRPDialogTitlePrimitive className="flex items-center gap-2">
-              {(updateInfo?.type === 'available' || updateInfo?.type === 'progress') && (
-                <>
-                  <Download className="h-5 w-5 text-blue-500 animate-pulse" />
-                  {t('downloading_update')}
-                </>
-              )}
-              {updateInfo?.type === 'downloaded' && (
-                <>
-                  <RefreshCw className="h-5 w-5 text-green-500" />
-                  {t('update_ready')}
-                </>
-              )}
-            </IGRPDialogTitlePrimitive>
-            <IGRPDialogDescriptionPrimitive>
-              {updateInfo?.currentVersion && updateInfo?.version && (
-                <span className="text-sm">
-                  {t('version')} {updateInfo.currentVersion} &rarr; {updateInfo.version}
-                </span>
-              )}
-              {updateInfo?.releaseDate && (
-                <span className="text-xs text-muted-foreground ml-2">
-                  {t('released')}: {new Date(updateInfo.releaseDate).toLocaleDateString()}
-                </span>
-              )}
-            </IGRPDialogDescriptionPrimitive>
-          </IGRPDialogHeaderPrimitive>
-
-          {/* Release Notes Section */}
-          {updateInfo?.releaseNotes && (
-            <div className="mt-4 space-y-2">
-              <h4 className="font-semibold text-sm">{t('whats_new')}</h4>
-              <div className="bg-muted/50 rounded-md p-4 max-h-[400px] overflow-y-auto">
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                  {formatReleaseNotes(updateInfo.releaseNotes)}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Progress indicator */}
-          {updateInfo?.type === 'progress' && updateInfo.progress !== undefined && (
-            <div className="mt-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm">{t('downloading')}</span>
-                <span className="text-sm font-semibold">{updateInfo.progress}%</span>
-              </div>
-              <div className="w-full bg-secondary rounded-full h-2">
-                <div
-                  className="bg-primary h-2 rounded-full transition-all duration-300"
-                  style={{
-                    width: `${updateInfo.progress}%`
-                  }}
-                />
-              </div>
-            </div>
-          )}
-
-          <IGRPDialogFooterPrimitive className="mt-6">
-            {(updateInfo?.type === 'available' || updateInfo?.type === 'progress') && (
-              <IGRPButtonPrimitive variant="outline" onClick={() => setUpdateDialogOpen(false)}>
-                {t('continue_background')}
-              </IGRPButtonPrimitive>
-            )}
-            {updateInfo?.type === 'downloaded' && (
-              <>
-                <IGRPButtonPrimitive variant="outline" onClick={() => setUpdateDialogOpen(false)}>
-                  {t('install_later')}
-                </IGRPButtonPrimitive>
-                <IGRPButtonPrimitive onClick={handleInstallUpdate}>
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  {t('install_restart')}
-                </IGRPButtonPrimitive>
-              </>
-            )}
-          </IGRPDialogFooterPrimitive>
-        </IGRPDialogContentPrimitive>
-      </IGRPDialogPrimitive>
     </div>
   )
 }
