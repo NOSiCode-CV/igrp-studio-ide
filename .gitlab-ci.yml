@@ -33,7 +33,7 @@ stages:
 
 
 build_packagedev:
-  image: node
+  image: node:25.5.0
   tags:
     - guine-runner
   stage: build
