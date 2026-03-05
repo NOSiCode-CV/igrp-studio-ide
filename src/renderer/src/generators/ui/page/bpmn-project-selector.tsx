@@ -277,8 +277,6 @@ export const BPMNProjectSelector = ({
         return
       }
 
-      console.log('processFound', processFound)
-
       if (!processFound) {
         const processConfig: ProcessConfig = {
           type: 'process',
