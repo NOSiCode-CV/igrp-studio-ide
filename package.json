@@ -200,7 +200,6 @@
       "out/**/*",
       "!out/**/*.map",
       "node_modules/**/*",
-      ".pnpm/**/*"
     ],
     "asar": true
   },
