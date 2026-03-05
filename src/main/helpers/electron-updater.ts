@@ -89,9 +89,9 @@ export default class AppUpdater {
       })
 
       // Auto-download the update
-      autoUpdater.downloadUpdate().catch((err) => {
+     /*  autoUpdater.downloadUpdate().catch((err) => {
         log.error('Auto-download failed:', err)
-      })
+      }) */
     })
 
     autoUpdater.on('update-not-available', (info: UpdateInfo) => {

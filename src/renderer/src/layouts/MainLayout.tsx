@@ -3,6 +3,7 @@ import Header from './components/header'
 import { Database } from 'lucide-react'
 import FooterSidebar from './components/footer-sidebar'
 import { Footer } from './components/footer'
+import { UpdateModalBottomLeft } from '@renderer/components/update-banner'
 import {
   IGRPScrollAreaPrimitive,
   IGRPSidebarInsetPrimitive,
@@ -66,6 +67,7 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
             </IGRPSidebarInsetPrimitive>
           </div>
           <Footer />
+          <UpdateModalBottomLeft />
         </div>
       </IGRPSidebarProviderPrimitive>
     </div>
