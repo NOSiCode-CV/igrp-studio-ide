@@ -57,7 +57,7 @@ build_packagedev:
     #curl -L --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}"
     #-o certificate.pfx
     #"https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/repository/files/certificate%2Fcertificate.pfx/raw?ref=master"
-    - npm install -g pnpm # Install pnpm
+    - npm install -g pnpm@10.29.0  # Install pnpm
     - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
 
   script:
