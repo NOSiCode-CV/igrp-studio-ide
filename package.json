@@ -195,8 +195,13 @@
       }
     ],
     "files": [
+      "package.json",
       "out/**/*",
       "!out/**/*.map"
+    ],
+    "asarUnpack": [
+      "**/*.node",
+      "resources/**"
     ]
   },
   "pnpm": {
