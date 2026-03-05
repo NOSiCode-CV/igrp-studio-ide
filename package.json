@@ -205,6 +205,6 @@
     "asar": true
   },
   "pnpm": {
-    "packageManager": "pnpm@10.5.2"
+    "packageManager": "pnpm@10.29.0"
   }
 }
