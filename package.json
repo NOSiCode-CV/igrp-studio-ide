@@ -205,18 +205,6 @@
     "asar": true
   },
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "@carbon/icons",
-      "@parcel/watcher",
-      "cpu-features",
-      "electron",
-      "electron-winstaller",
-      "esbuild",
-      "oracledb",
-      "protobufjs",
-      "sharp",
-      "ssh2",
-      "unrs-resolver"
-    ]
+    "packageManager": "pnpm@10.5.2"
   }
 }
