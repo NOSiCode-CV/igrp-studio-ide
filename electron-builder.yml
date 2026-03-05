@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: cv.nosi.igrpstudio.beta
 productName: igrp-studio
 directories:
   buildResources: build
@@ -9,9 +9,9 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-asarUnpack:
-  - '**/*.node'
-  - resources/**
+# Desativar asar para as dependências (node_modules com symlinks do pnpm) e .node
+# ficarem no disco, como nas versões que funcionavam
+asar: false
 win:
   executableName: igrp-studio
 nsis:

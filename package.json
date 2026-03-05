@@ -197,12 +197,11 @@
     "files": [
       "package.json",
       "out/**/*",
-      "!out/**/*.map"
+      "!out/**/*.map",
+      "node_modules/**/*",
+      ".pnpm/**/*"
     ],
-    "asarUnpack": [
-      "**/*.node",
-      "resources/**"
-    ]
+    "asar": false
   },
   "pnpm": {
     "onlyBuiltDependencies": [
