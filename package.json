@@ -25,7 +25,8 @@
     "release:mac:x64:signed": "./scripts/sign-and-build.sh --x64",
     "release:mac:arm64:signed": "./scripts/sign-and-build.sh --arm64",
     "release:mac:all:signed": "npm run release:mac:universal:signed && npm run release:mac:x64:signed && npm run release:mac:arm64:signed",
-    "test": "jest"
+    "test": "jest",
+    "setup": "pnpm install && pnpm dev"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
@@ -201,7 +202,7 @@
       "node_modules/**/*",
       ".pnpm/**/*"
     ],
-    "asar": false
+    "asar": true
   },
   "pnpm": {
     "onlyBuiltDependencies": [
