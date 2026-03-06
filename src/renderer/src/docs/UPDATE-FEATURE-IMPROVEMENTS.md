@@ -68,6 +68,21 @@ Documento de sugestões de melhoria, evolução futura e boas práticas para o f
 - **Objetivo**: Utilizadores em beta receberem pre-releases; stable só releases estáveis.
 - **Como**: `electron-updater` (ex.: `allowPrerelease` + channel no feed). Manter `channel: 'latest'` ou adicionar selector na UI (Definições) para “Beta” vs “Stable” e guardar preferência (electron-store); main process usa esse valor em `setFeedURL` ou nas opções do updater.
 
+#### Análise e plano de implementação (todo list)
+
+| # | Tarefa | Descrição / ficheiros |
+|---|--------|------------------------|
+| 1 | **Persistência do canal no main** | Em `src/main/helpers/igrp-studio-settings.ts`: adicionar ao `defaults` a chave `updateChannel: 'stable'`; criar métodos `getUpdateChannel(): 'stable' \| 'beta'` e `setUpdateChannel(channel: 'stable' \| 'beta')`. O store já existe (`electron-store`, nome `igrp-studio-settings`). |
+| 2 | **Updater usar canal persistido** | Em `src/main/helpers/electron-updater.ts`: (a) Garantir que `IGRPStudioSettings.initialize()` foi chamado antes de instanciar `AppUpdater` (ver `src/main/index.ts`). (b) Em `configurePlatformSpecifics()`, ler o canal com `IGRPStudioSettings.getUpdateChannel()` e chamar `setFeedURL({ ... existing, channel: channel === 'beta' ? 'beta' : 'latest' })`. (c) Definir `autoUpdater.allowPrerelease = (channel === 'beta')` para que no canal beta sejam consideradas versões prerelease (ex.: `0.1.0-beta.10`). |
+| 3 | **Reconfigurar feed ao mudar canal** | Em `electron-updater.ts`: expor método público `reconfigureChannel()` que lê de novo `getUpdateChannel()`, chama `setFeedURL` e `autoUpdater.allowPrerelease = (channel === 'beta')`. No `index.ts`, registar handler IPC `update:reconfigure-channel` que chama esse método (e opcionalmente `checkForUpdates()`). Assim, ao mudar nas Definições, o novo canal aplica-se de imediato. |
+| 4 | **IPC e preload** | Em `src/main/index.ts`: `ipcMain.handle('update:get-channel', ...)` que retorna `IGRPStudioSettings.getUpdateChannel()`; `ipcMain.handle('update:set-channel', async (_, channel) => { IGRPStudioSettings.setUpdateChannel(channel); ... })`. No preload (ex.: `src/preload/index.ts` ou onde estiver a API de updates), expor `getUpdateChannel()` e `setUpdateChannel(channel)` via `invoke`. |
+| 5 | **UI nas Definições** | Em Definições, na secção **About** (ou nova secção “Atualizações”): adicionar controlo “Canal de atualizações” com duas opções: **Stable** (só releases estáveis) e **Beta** (inclui pre-releases). Ao mudar: chamar `setUpdateChannel` via IPC e depois `update:reconfigure-channel` para aplicar; mostrar toast opcional “O canal foi alterado. O próximo check de atualizações usará o canal selecionado.” |
+| 6 | **i18n** | Em `src/renderer/src/localization/locales/{en,pt}/translation.json`: adicionar chaves como `updateChannel`, `updateChannelStable`, `updateChannelBeta`, `updateChannelDescription` (texto curto explicativo). |
+| 7 | **Estrutura S3 e build** | Confirmar que o S3/CI publica em caminhos por canal (ex.: `platform/arch/latest/` e `platform/arch/beta/`). No `package.json` do electron-builder já existe `"channel": "beta"` no publish; para releases estáveis usar `"channel": "latest"` na publicação. Documentar na secção 5 (Checklist) ou num README de releases a convenção de pastas/canais. |
+| 8 | **Tipos no renderer (opcional)** | Se existir um tipo partilhado para o canal, definir `type UpdateChannel = 'stable' | 'beta'` num ficheiro de tipos (ex.: `src/renderer/src/types/update.ts` ou no preload) e usar nas chamadas IPC. |
+
+**Ordem sugerida**: 1 → 2 → 4 → 5 → 6 → 3 → 7 → 8 (3 pode ser feito após 5 para que a mudança na UI aplique o canal imediatamente).
+
 ### 3.3 Assinatura e integridade
 
 - **Problema**: Confiar apenas em HTTPS e no signing do OS; se o S3 for comprometido, um atacante pode servir binários maliciosos.
