@@ -32,22 +32,22 @@ export const toolConfig: ToolConfig[] = [
     name: 'npm',
     command: 'npm',
     link: 'https://nodejs.org/en/download',
-    required: true,
-    category: 'frontend',
-    description: 'Node.js package manager'
-  },
-  {
-    name: 'pnpm',
-    command: 'pnpm',
-    link: 'https://pnpm.io/installation',
     required: false,
     category: 'frontend',
-    description: 'Fast, disk space efficient package manager'
+    description: 'Node.js package manager (bundled with Node)'
   },
   {
     name: 'yarn',
     command: 'yarn',
     link: 'https://classic.yarnpkg.com/en/docs/install',
+    required: true,
+    category: 'frontend',
+    description: 'Node.js package manager (project default)'
+  },
+  {
+    name: 'pnpm',
+    command: 'pnpm',
+    link: 'https://pnpm.io/installation',
     required: false,
     category: 'frontend',
     description: 'Alternative package manager for Node.js'

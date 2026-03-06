@@ -332,13 +332,13 @@ export function CreatePageModal({
                 value={formik.values.forceDynamic}
               />
 
-             {/*  <CheckboxInput
+              <CheckboxInput
                 id="useClient"
                 label={t('useClient')}
                 onChange={formik.handleChange}
                 value={formik.values.useClient}
                 info={t('useClientInfo')}
-              /> */}
+              />
             </div>
           </div>
           <IGRPDialogFooterPrimitive className="flex justify-between">

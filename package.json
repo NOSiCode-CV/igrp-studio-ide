@@ -26,7 +26,7 @@
     "release:mac:arm64:signed": "./scripts/sign-and-build.sh --arm64",
     "release:mac:all:signed": "npm run release:mac:universal:signed && npm run release:mac:x64:signed && npm run release:mac:arm64:signed",
     "test": "jest",
-    "setup": "pnpm install && pnpm dev"
+    "setup": "yarn install && yarn dev"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
@@ -202,8 +202,5 @@
       "node_modules/**/*"
     ],
     "asar": true
-  },
-  "pnpm": {
-    "packageManager": "pnpm@10.29.0"
   }
 }
