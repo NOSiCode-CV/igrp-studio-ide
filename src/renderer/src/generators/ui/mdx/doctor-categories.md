@@ -13,9 +13,9 @@ Tools required for frontend development with React, Next.js, and modern web tech
 **Tools included:**
 
 - **Node.js** (Required) - JavaScript runtime for frontend development
-- **npm** (Required) - Node.js package manager
-- **pnpm** (Optional) - Fast, disk space efficient package manager
-- **yarn** (Optional) - Alternative package manager for Node.js
+- **yarn** (Required) - Node.js package manager (project default)
+- **npm** (Optional) - Node.js package manager (bundled with Node)
+- **pnpm** (Optional) - Alternative package manager for Node.js
 
 ### ⚙️ Backend Development
 
