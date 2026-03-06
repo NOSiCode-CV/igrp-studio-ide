@@ -27,7 +27,8 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src'),
         path: 'path-browserify',
         'next/link': resolve(__dirname, 'src/renderer/src/__mocks__/next-link.js'),
-        'next/image': resolve(__dirname, 'src/renderer/src/__mocks__/next-image.js')
+        'next/image': resolve(__dirname, 'src/renderer/src/__mocks__/next-image.js'),
+        'next/navigation': resolve(__dirname, 'src/renderer/src/__mocks__/next-navigation.js')
       }
     },
     define: {
