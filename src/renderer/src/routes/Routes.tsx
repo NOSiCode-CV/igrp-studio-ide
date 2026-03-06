@@ -4,7 +4,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import MainLayout from '@renderer/layouts/MainLayout'
 import UiStudioLayout from '@renderer/layouts/UiStudioLayout'
-import ApiStudioLayoput from '@renderer/layouts/ApiStudioLayout'
+import ApiStudioLayout from '@renderer/layouts/ApiStudioLayout'
 import Loader from '@renderer/components/loader'
 import ProjectSettings from '@renderer/pages/project/project-settings'
 import IDEInitialScreen from '@renderer/pages/ide-initial-screen'
@@ -37,6 +37,10 @@ const othersRoutes = [
     component: <IDEInitialScreen />
   },
   {
+    path: ROUTES.HOME,
+    component: <IDEInitialScreen />
+  },
+  {
     path: ROUTES.PATH_IDE_APP_LOGIC,
     component: <AppLogicPage />
   },
@@ -47,12 +51,13 @@ const othersRoutes = [
 ]
 
 function AppRoutes(): JSX.Element {
+
   return (
     <React.Fragment>
       <Suspense fallback={<Loader />}>
         <HashRouter>
           <Routes>
-            <Route path="/" element={<Navigate to={ROUTES.PAHT_IDE_INITIAL_SCREEN} />} />
+            <Route path="/" element={<Navigate to={ROUTES.PAHT_IDE_INITIAL_SCREEN} replace />} />
             {allRoutes.map((route, idx) => (
               <Route
                 path={route.path}
@@ -63,7 +68,7 @@ function AppRoutes(): JSX.Element {
             {apiRoutes.map((route, idx) => (
               <Route
                 path={route.path}
-                element={<ApiStudioLayoput>{route.component}</ApiStudioLayoput>}
+                element={<ApiStudioLayout>{route.component}</ApiStudioLayout>}
                 key={idx}
               />
             ))}
@@ -74,6 +79,8 @@ function AppRoutes(): JSX.Element {
                 key={idx}
               />
             ))}
+            {/* Catch-all route to redirect invalid routes to initial screen */}
+            <Route path="*" element={<Navigate to={ROUTES.PAHT_IDE_INITIAL_SCREEN} replace />} />
           </Routes>
         </HashRouter>
       </Suspense>

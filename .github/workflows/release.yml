@@ -23,7 +23,7 @@ jobs:
           node-version: 16
 
       - name: Install Dependencies
-        run: npm install
+        run: yarn install --frozen-lockfile
 
       - name: build-linux
         if: matrix.os == 'ubuntu-latest'

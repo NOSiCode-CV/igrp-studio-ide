@@ -86,6 +86,52 @@ export function convertCompToInteractinsJSONSchema(props: Prop[]) {
   return properties
 }
 
+
+/*{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "type": {
+                "type": "string",
+                "enum": [
+                    "visibility"
+                ],
+                "required": true,
+                "default": "visibility"
+            },
+            "condition": {
+                "type": "string",
+                "required": true,
+                "default": "true"
+            }
+        }
+    }
+}
+    */
+
+export function convertCompToRulesJSONSchema() {
+  return {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        type: {
+          type: 'string',
+          enum: ['visibility'],
+          required: true,
+          default: 'visibility'
+        },
+        condition: {
+          type: 'string',
+          required: true,
+          default: 'true'
+        }
+      }
+    }
+  }
+}
+
 // Optional helper to normalize types
 function mapToJSONSchemaType(type: string): string {
   switch (type.toLowerCase()) {

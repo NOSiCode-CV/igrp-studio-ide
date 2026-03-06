@@ -1,4 +1,4 @@
-import { Gitlab } from '@gitbeaker/node'
+import { Gitlab } from '@gitbeaker/rest'
 import { GitStore } from './git-store'
 import { BrowserWindow } from 'electron'
 import { GitProviderConfig } from '../types'

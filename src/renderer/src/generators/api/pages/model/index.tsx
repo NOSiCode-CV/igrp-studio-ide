@@ -24,7 +24,7 @@ interface ModelProps {
   onCloseTab: () => void
 }
 
-const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
+const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps): React.ReactNode => {
   const {
     formik,
     data,
@@ -37,11 +37,11 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
 
   const { t } = useTranslation()
 
+
   const renderFormList = (value: string): React.ReactNode => {
     const columns = tablesColumns?.[value]
     const errors = formik?.errors?.[value]
     const touched = formik?.touched?.[value]
-
     if (!columns || !formik?.values?.[value]) return null
 
     return (
@@ -102,7 +102,7 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps) => {
                   isRequired
                 />
               </div>
-              <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-4">
+              <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-2 gap-4 mb-4">
                 <div className="flex items-center space-x-2">
                   <IGRPCheckboxPrimitive
                     id="audit"

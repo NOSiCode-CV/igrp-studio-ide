@@ -22,9 +22,8 @@ export const ProcessCard = ({
 }: ProcessCardProps): JSX.Element => {
   return (
     <IGRPCardPrimitive
-      className={`hover:shadow-md transition-all cursor-pointer ${
-        isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
-      }`}
+      className={`hover:shadow-md transition-all cursor-pointer ${isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
+        }`}
       onClick={() => {
         onSelectProcess(process)
       }}
@@ -40,7 +39,7 @@ export const ProcessCard = ({
               <Calendar className="w-4 h-4" />
               {process.deploymentDate && (
                 <span>
-                  Deployed on {new Date(process.deploymentDate || '').toLocaleDateString()}
+                  {`Deployed on ${process.deploymentDate ? process.deploymentDate : 'N/A'}`}
                 </span>
               )}
             </div>

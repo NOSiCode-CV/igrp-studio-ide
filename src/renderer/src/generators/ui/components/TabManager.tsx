@@ -40,13 +40,17 @@ export default function TabManager({ basePath }: ContentProps): React.JSX.Elemen
 
   const handleClickOpenGerador = (page: PageDefinition | FileTree): void => {
     // Check if it's a FileTree without proper content
-    const pageDefinition = 'content' in page && page.content ? 
-      page as PageDefinition : 
-      convertFileTreeToPageDefinition(page as FileTree)
-    
+    const pageDefinition =
+      'content' in page && page.content
+        ? (page as PageDefinition)
+        : convertFileTreeToPageDefinition(page as FileTree)
+
     initializeTabFromCurrentItem({
       ...pageDefinition,
-      label: pageDefinition.content?.description || pageDefinition.content?.pageName || pageDefinition.name,
+      label:
+        pageDefinition.content?.description ||
+        pageDefinition.content?.pageName ||
+        pageDefinition.name,
       id: pageDefinition.content?.id || pageDefinition.id
     })
   }
@@ -87,9 +91,7 @@ export default function TabManager({ basePath }: ContentProps): React.JSX.Elemen
           {tab.id === TAB_DEFAULT ? (
             <IGRPSidebarInsetPrimitive>
               <ContainerScrollArea>
-                <div className="flex flex-1 flex-col gap-4 p-4">
-                  <PageManager onPageClick={handleClickOpenGerador} />
-                </div>
+                <PageManager onPageClick={handleClickOpenGerador} />
               </ContainerScrollArea>
             </IGRPSidebarInsetPrimitive>
           ) : (

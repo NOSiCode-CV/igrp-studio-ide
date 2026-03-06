@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: cv.nosi.igrpstudio.beta
 productName: igrp-studio
 directories:
   buildResources: build
@@ -7,10 +7,10 @@ files:
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
-  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - '!{.env,.env.*,.npmrc,yarn.lock}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-asarUnpack:
-  - resources/**
+# Desativar asar para as dependências e binários .node ficarem no disco
+asar: false
 win:
   executableName: igrp-studio
 nsis:

@@ -120,11 +120,6 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
       ]
     )
 
-    // Effects for component lifecycle management
-    useEffect(() => {
-      clearEditingComponent()
-    }, [activePresentation])
-
     useComponentRegistration({
       customComponents,
       fetchComponents,
@@ -139,6 +134,11 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
       setAllComponents,
       findComponent
     })
+
+    // Effects for component lifecycle management
+    useEffect(() => {
+      clearEditingComponent()
+    }, [activePresentation])
 
     useEffect(() => {
       const getJsonData = async (): Promise<void> => {

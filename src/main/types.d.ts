@@ -425,6 +425,8 @@ export interface BPMNProjectArtifact {
   subProcessTask: boolean
   subProcessId: string
   subProcessName: string
+  formKey: string
+  description: string
 }
 
 export interface BPMNProjectProcessDefinition {

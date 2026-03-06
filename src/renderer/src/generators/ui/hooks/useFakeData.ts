@@ -225,6 +225,13 @@ export const useFakedata = (): {
         source: 'https://www.youtube.com/embed/E3PRQTvUmjs?si=rI9EBb45iUP6fZef',
         title: 'Embed Video'
       }
+    },
+    [COMPONENT.Badge]: {
+      properties: {
+        content: faker.lorem.words(1),
+        variant: 'outline',
+        color: 'primary'
+      }
     }
   }
 

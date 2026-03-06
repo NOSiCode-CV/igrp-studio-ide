@@ -15,7 +15,7 @@ import {
 import { IGRPBadge } from '@igrp/igrp-framework-react-design-system'
 import { getId } from '@renderer/utils'
 import { FunctionSquare, Type, Info, Code, Zap } from 'lucide-react'
-import { useMemo } from 'react'
+import { JSX, useMemo } from 'react'
 
 interface TabStatesProps {
   states: State[]
@@ -303,7 +303,6 @@ const TabsFunctions = ({
   onInsertImport,
   globalFilter
 }: TabFunctionsProps) => {
-  console.log('functions', functions)
   const filteredFunctions = useMemo(() => {
     let filtered = currentFunction
       ? functions.filter((funct) => funct.id !== currentFunction.id)
@@ -320,7 +319,7 @@ const TabsFunctions = ({
     return filtered
   }, [functions, currentFunction, globalFilter])
 
-  const handleInsertFunction = (funct: ComponentCustomFunctionConfig) => {
+  const handleInsertFunction = (funct: ComponentCustomFunctionConfig): void => {
     if (editorRef && editorRef.current) {
       let code = funct.code
       if ((funct.id || !code) && funct.name) {
@@ -353,7 +352,7 @@ const TabsFunctions = ({
     }
   }
 
-  const renderParameters = (params: any[]) => {
+  const renderParameters = (params: any[]): JSX.Element | null => {
     if (!params || params.length === 0) return null
 
     return (
@@ -394,7 +393,7 @@ const TabsFunctions = ({
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Info className="w-4 h-4" />
-        <span>Click "Insert Code" to add the function call to your editor</span>
+        <span>Click &quot;Insert Code&quot; to add the function call to your editor</span>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -472,7 +471,7 @@ const TabTypes = ({ types, editorRef, globalFilter, onInsertImport }: TabTypesPr
     )
   }, [types, globalFilter])
 
-  const handleInsertType = (type: any) => {
+  const handleInsertType = (type: any): void => {
     if (editorRef && editorRef.current) {
       editorRef.current.insertTextAtCursor(type.name)
 
@@ -488,7 +487,7 @@ const TabTypes = ({ types, editorRef, globalFilter, onInsertImport }: TabTypesPr
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Info className="w-4 h-4" />
-        <span>Click "Insert Type" to add the type name and import statement to your editor</span>
+        <span>Click &quot;Insert Type&quot; to add the type name and import statement to your editor</span>
       </div>
 
       <div className="flex flex-col gap-3">

@@ -224,11 +224,6 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
     return (
       <div
         className="flex flex-1  gap-4 p-3 bg-muted/50 border-b text-sm font-medium text-muted-foreground"
-        /*  style={{
-                    gridTemplateColumns:
-                        columns.map((col) => col.width || '1fr').join(' ') +
-                        (removeRow ? ' 100px' : ''),
-                }} */
       >
         {columns.map(({ name, width, type }, index) => (
           <div

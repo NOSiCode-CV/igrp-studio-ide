@@ -3,8 +3,12 @@ import {
   IGRPCombobox,
   IGRPInputPrimitive,
   IGRPLabelPrimitive,
-  IGRPSwitchPrimitive
+  IGRPSwitchPrimitive,
+  IGRPTooltipContentPrimitive,
+  IGRPTooltipPrimitive,
+  IGRPTooltipTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
+import { Info } from 'lucide-react'
 
 import { LabelRequired } from '@renderer/components/label-required'
 import { cn } from '@renderer/lib/utils'
@@ -37,6 +41,8 @@ export interface CheckboxProps extends InputProps {
   value?: boolean
   onChange: (value: boolean) => void
   onBlur?: (value: string) => void
+  /** Optional text shown in a tooltip next to the label to explain the checkbox purpose. */
+  info?: string
 }
 
 // Helper Component: TextInput
@@ -118,15 +124,30 @@ export const CheckboxInput = ({
   isRequired = false,
   onChange,
   isTouched = false,
-  error
+  error,
+  info,
 }: CheckboxProps): React.ReactNode => (
-  <div className="flex flex-1 gap-2">
-    <IGRPCheckboxPrimitive name={id} checked={value} onCheckedChange={onChange} />
-    {isRequired ? (
-      <LabelRequired>{label}</LabelRequired>
-    ) : (
-      <IGRPLabelPrimitive htmlFor={id}>{label}</IGRPLabelPrimitive>
-    )}
+  <div className="flex flex-1 flex-col gap-2">
+    <div className="flex flex-1 items-center gap-2">
+      <IGRPCheckboxPrimitive name={id} checked={value} onCheckedChange={onChange} />
+      {isRequired ? (
+        <LabelRequired>{label}</LabelRequired>
+      ) : (
+        <IGRPLabelPrimitive htmlFor={id}>{label}</IGRPLabelPrimitive>
+      )}
+      {info != null && info !== '' && (
+        <IGRPTooltipPrimitive>
+          <IGRPTooltipTriggerPrimitive asChild>
+            <span className="inline-flex cursor-help text-muted-foreground hover:text-foreground" tabIndex={0}>
+              <Info className="h-4 w-4" aria-hidden />
+            </span>
+          </IGRPTooltipTriggerPrimitive>
+          <IGRPTooltipContentPrimitive>
+            <p className="max-w-xs text-sm">{info}</p>
+          </IGRPTooltipContentPrimitive>
+        </IGRPTooltipPrimitive>
+      )}
+    </div>
     {error && isTouched && <p className="text-xs text-destructive">{error}</p>}
   </div>
 )

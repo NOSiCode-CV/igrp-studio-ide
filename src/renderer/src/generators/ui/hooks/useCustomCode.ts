@@ -125,7 +125,7 @@ const useCustomCode = (): CustomCodeHook => {
     }
     fetchData()
 
-    const handleFolderChange = () => fetchData()
+    const handleFolderChange = (): Promise<void> => fetchData()
     window.electron.ipcRenderer.on('folder-change', handleFolderChange)
 
     return () => {

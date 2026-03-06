@@ -56,23 +56,6 @@ const IDEInitialScreen = (): React.JSX.Element => {
       {!workspace ? (
         <div className="p-3 space-y-4 border-dashed rounded-lg">
           <EmptyList title={t('workspaceNotFound')} description={t('workspaceNotExist')} />
-          {/*    <div className="flex gap-3">
-                        <IGRPButtonPrimitive
-                            onClick={handleOpenWorkspace}
-                            variant="outline"
-                            className="flex items-center gap-2"
-                        >
-                            <FolderOpen className="h-4 w-4" />
-                            {t('openWorkspace')}
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive
-                            onClick={() => setShowWorkspaceDialog(true)}
-                            className="flex items-center gap-2"
-                        >
-                            <FolderKanban className="h-4 w-4" />
-                            {t('addWorkspace')}
-                        </IGRPButtonPrimitive>
-                    </div> */}
         </div>
       ) : (
         <>

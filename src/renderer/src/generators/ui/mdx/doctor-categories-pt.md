@@ -13,9 +13,9 @@ Ferramentas necessárias para desenvolvimento frontend com React, Next.js e tecn
 **Ferramentas incluídas:**
 
 - **Node.js** (Obrigatório) - Runtime JavaScript para desenvolvimento frontend
-- **npm** (Obrigatório) - Gerenciador de pacotes do Node.js
-- **pnpm** (Opcional) - Gerenciador de pacotes rápido e eficiente em espaço
-- **yarn** (Opcional) - Gerenciador de pacotes alternativo para Node.js
+- **yarn** (Obrigatório) - Gerenciador de pacotes do Node.js (padrão do projeto)
+- **npm** (Opcional) - Gerenciador de pacotes do Node.js (incluído com Node)
+- **pnpm** (Opcional) - Gerenciador de pacotes alternativo para Node.js
 
 ### ⚙️ Desenvolvimento Backend
 

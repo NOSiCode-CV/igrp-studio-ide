@@ -55,13 +55,13 @@ interface SettingsProps {
   statesOptions: Option[]
   columnsOptions: IGRPOptionsProps[]
   dataProperties:
-    | {
-        [key: string]: {
-          state?: State
-          value?: DataValue
-        }
-      }
-    | undefined
+  | {
+    [key: string]: {
+      state?: State
+      value?: DataValue
+    }
+  }
+  | undefined
   tag: string
   onInputChange: (fieldPath: string, value: any) => void
   onSelectState: (field: string, state?: State, value?: DataValue) => void
@@ -93,9 +93,12 @@ const toMap = (items: any): { value: string; label: string }[] => {
 }
 
 const getNestedValue = (obj: any, path: string): any => {
-  return path
-    .split('.')
-    .reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj)
+  return (
+    path
+      .split('.')
+      .reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj) ||
+    undefined
+  )
 }
 
 const RENDER_IGNORE = ['segments', 'params']
@@ -210,7 +213,7 @@ const RenderPropsConfig = ({
       )
     } else if (key === 'iconName' || xUiWidget === 'icon') {
       return (
-        <div className=" group space-y-2">
+        <div className="group space-y-2">
           <IGRPLabelPrimitive htmlFor={key} className="flex justify-between ">
             <span>{xMetaLabel}</span>
             <FieldActions
@@ -232,13 +235,78 @@ const RenderPropsConfig = ({
           />
         </div>
       )
+    } else if (xUiWidget === 'chips') {
+      return (
+        <div className="group space-y-2">
+          <IGRPLabelPrimitive htmlFor={key} className="flex justify-between ">
+            <span>{xMetaLabel}</span>
+            <FieldActions
+              field={key}
+              statesOptions={statesOptions}
+              argumentsOptions={argumentsOptions}
+              value={value}
+              tag={tag}
+              type={type}
+              onSelectState={onSelectState}
+              dataProperties={dataProperties}
+            />
+          </IGRPLabelPrimitive>
+
+          <IGRPInputPrimitive
+            value={value}
+            onChange={(e) => {
+              const inputValue = e.target.value.trim();
+              // If input is empty, set empty array
+              if (!inputValue) {
+                onInputChange(fieldPath, []);
+                return;
+              }
+              // Split by comma, filter out empty strings, convert to numbers, and filter valid integers
+              const value = inputValue
+                .split(',')
+                .map((v) => v.trim())
+                .filter((v) => v !== '')
+                .map(Number)
+                .filter(Number.isInteger);
+              onInputChange(fieldPath, value);
+            }}
+            placeholder={'Enter pagination size (e.g., 10,20,50)'}
+            className="flex-1"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                onInputChange(fieldPath, (e.target as HTMLInputElement).value)
+              }
+            }}
+          />
+
+        </div>
+      )
     } else if (key === 'options') {
       return (
-        <DynamicKeyValueForm
-          onAdd={(opt) => {
-            onInputChange(fieldPath, opt)
-          }}
-        />
+        <>
+          <div className=" group space-y-2">
+            <IGRPLabelPrimitive htmlFor={key} className="flex justify-between ">
+              <span>{xMetaLabel}</span>
+              <FieldActions
+                field={key}
+                statesOptions={statesOptions}
+                argumentsOptions={argumentsOptions}
+                value={value}
+                tag={tag}
+                type={type}
+                onSelectState={onSelectState}
+                dataProperties={dataProperties}
+              />
+            </IGRPLabelPrimitive>
+
+            <DynamicKeyValueForm
+              onAdd={(opt) => {
+                onInputChange(fieldPath, opt)
+              }}
+            />
+          </div>
+        </>
       )
     } else if (xUiWidget === 'uri') {
       return (
@@ -471,13 +539,13 @@ const FieldActions = ({
               onChange={(selectedState) => {
                 const result = selectedState
                   ? {
-                      id: '',
-                      name: selectedState as string,
-                      type: '',
-                      imports: [],
-                      defaultValue: undefined,
-                      generate: false
-                    }
+                    id: '',
+                    name: selectedState as string,
+                    type: '',
+                    imports: [],
+                    defaultValue: undefined,
+                    generate: false
+                  }
                   : undefined
 
                 onSelectState(field, result, undefined)
@@ -499,9 +567,9 @@ const FieldActions = ({
                   onChange={(selectedArgs) => {
                     const result = selectedArgs
                       ? {
-                          id: '',
-                          code: selectedArgs as string
-                        }
+                        id: '',
+                        code: selectedArgs as string
+                      }
                       : undefined
                     onSelectState(field, undefined, result)
                     setSelected(result ? { value: result } : {})
@@ -527,9 +595,9 @@ const FieldActions = ({
                   const newValue = e.target.value
                   const result = newValue
                     ? {
-                        id: '',
-                        code: newValue
-                      }
+                      id: '',
+                      code: newValue
+                    }
                     : undefined
                   onSelectState(field, undefined, result)
                   setSelected(result ? { value: result } : {})
@@ -649,9 +717,9 @@ export const PageSelectionConfig = ({
   }[] => {
     return navigationParams && navigationParams.length > 0
       ? navigationParams.map((param) => ({
-          paramName: param.name,
-          paramValue: param.tag || ''
-        }))
+        paramName: param.name,
+        paramValue: param.tag || ''
+      }))
       : []
   }
 

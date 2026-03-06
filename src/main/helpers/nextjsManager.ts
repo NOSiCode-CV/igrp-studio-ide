@@ -40,16 +40,16 @@ class NextJsManager {
       return
     }
 
+    const yarnLockPath = path.join(this.nextAppPath, 'yarn.lock')
     const pnpmLockPath = path.join(this.nextAppPath, 'pnpm-lock.yaml')
     const npmLockPath = path.join(this.nextAppPath, 'package-lock.json')
-    const yarnLockPath = path.join(this.nextAppPath, 'yarn.lock')
 
-    let installCommand = 'npm install' // Default to npm
+    let installCommand = 'yarn install' // Default to yarn (project package manager)
 
-    if (fs.existsSync(pnpmLockPath)) {
-      installCommand = 'pnpm install'
-    } else if (fs.existsSync(yarnLockPath)) {
+    if (fs.existsSync(yarnLockPath)) {
       installCommand = 'yarn install'
+    } else if (fs.existsSync(pnpmLockPath)) {
+      installCommand = 'pnpm install'
     } else if (fs.existsSync(npmLockPath)) {
       installCommand = 'npm install'
     }
