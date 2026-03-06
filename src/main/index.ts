@@ -38,7 +38,7 @@ import { buildTaskbar } from './helpers/taskbar'
 import NextJsManager from './helpers/nextjsManager'
 import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
 import dotenv from 'dotenv'
-import AppUpdater from './helpers/electron-updater'
+import AppUpdater, { applyUpdateChannelConfig } from './helpers/electron-updater'
 import { autoUpdater } from 'electron-updater'
 import { detectInstalledIDEs, IDEDetails, IDES } from './helpers/ideDetection'
 import { NextjsEngine } from './engines/NextjsEngine'
@@ -249,9 +249,8 @@ app.whenReady().then(async () => {
 
   new WorkspaceRepository().initialize()
 
-  new AppUpdater(mainWindow)
-
   await IGRPStudioSettings.initialize()
+  new AppUpdater(mainWindow)
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -474,6 +473,21 @@ ipcMain.handle('check-for-updates', async () => {
     console.error('Update check failed:', error)
     return null
   }
+})
+
+// 📌 Update channel (beta / stable)
+ipcMain.handle('update:get-channel', () => {
+  return IGRPStudioSettings.getUpdateChannel()
+})
+
+ipcMain.handle('update:set-channel', async (_event, channel: 'stable' | 'beta') => {
+  if (channel !== 'stable' && channel !== 'beta') return
+  IGRPStudioSettings.setUpdateChannel(channel)
+  applyUpdateChannelConfig()
+})
+
+ipcMain.handle('update:reconfigure-channel', () => {
+  applyUpdateChannelConfig()
 })
 
 // 📌 IPC para iniciar o download manualmente

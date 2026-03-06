@@ -14,11 +14,16 @@ import {
 } from '@igrp/igrp-studio-nextjs-engine/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
 
+type UpdateChannel = 'stable' | 'beta'
+
 type ExtendedElectronAPI = typeof electronAPI & {
   getAppVersion: () => Promise<string>
   checkForUpdates: () => Promise<string>
   downloadUpdate: () => Promise<void>
   installUpdate: () => Promise<void>
+  getUpdateChannel: () => Promise<UpdateChannel>
+  setUpdateChannel: (channel: UpdateChannel) => Promise<void>
+  reconfigureUpdateChannel: () => Promise<void>
   watchFolder: (folderPath: string) => Promise<void>
   onFolderChange: (callback: (event: WatchEvent) => void) => void
   reportError: (error: Error) => void

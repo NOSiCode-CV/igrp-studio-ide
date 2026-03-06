@@ -2,6 +2,25 @@ import { app, BrowserWindow } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import type { UpdateInfo } from 'electron-updater'
+import { IGRPStudioSettings } from './igrp-studio-settings'
+
+/**
+ * Applies update channel (stable/beta) from IGRPStudioSettings to autoUpdater.
+ * Call this on startup (from AppUpdater) and when user changes channel in Settings.
+ */
+export function applyUpdateChannelConfig(): void {
+  const channel = IGRPStudioSettings.getUpdateChannel()
+  const feedChannel = channel === 'beta' ? 'beta' : 'latest'
+  autoUpdater.setFeedURL({
+    provider: 's3',
+    bucket: 'igrp-studio',
+    endpoint: 'https://storage-api.nosi.cv',
+    path: `${process.platform}/${process.arch}`,
+    channel: feedChannel
+  })
+  autoUpdater.allowPrerelease = channel === 'beta'
+  log.info('Update channel configured', { channel: feedChannel, allowPrerelease: channel === 'beta' })
+}
 
 export interface UpdateMessage {
   type: 'checking' | 'available' | 'not-available' | 'error' | 'progress' | 'downloaded'
@@ -38,13 +57,7 @@ export default class AppUpdater {
   }
 
   configurePlatformSpecifics(): void {
-    autoUpdater.setFeedURL({
-      provider: 's3',
-      bucket: 'igrp-studio',
-      endpoint: 'https://storage-api.nosi.cv',
-      path: `${process.platform}/${process.arch}`,
-      channel: 'latest'
-    })
+    applyUpdateChannelConfig()
   }
 
   initAutoUpdater(): void {

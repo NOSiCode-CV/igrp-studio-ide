@@ -12,7 +12,8 @@ export const IGRPStudioSettings = {
         activeTheme: 'default',
         bpmnConfigs: { configs: [], activeConfigId: undefined },
         language: 'en',
-        connections: []
+        connections: [],
+        updateChannel: 'stable'
       }
     })
   },
@@ -47,6 +48,15 @@ export const IGRPStudioSettings = {
 
   resetLanguage() {
     store?.set('language', 'en')
+  },
+
+  // Update channel (stable | beta) for auto-updates
+  getUpdateChannel(): 'stable' | 'beta' {
+    return store?.get('updateChannel', 'stable')
+  },
+
+  setUpdateChannel(channel: 'stable' | 'beta') {
+    store?.set('updateChannel', channel)
   },
 
   // BPMN Configuration Methods
