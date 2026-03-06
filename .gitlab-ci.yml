@@ -2,8 +2,13 @@ stages:
   - build
   - release
 
+cache:
+  paths:
+    - node_modules/
+
 build_packagedev_mac:
-  when: never  # desativado; reativar removendo esta linha
+  rules:
+    - when: never  # Mac build disabled
   image: node
   stage: build
   tags:
@@ -11,7 +16,7 @@ build_packagedev_mac:
   only:
     - tags
   variables:
-    #ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
+    ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
     CERTIFICATE_PASSWORD: '${CERTIFICATE_PASSWORD}'
   before_script:
     - apt-get update
@@ -19,29 +24,29 @@ build_packagedev_mac:
     - dpkg --add-architecture arm64
     - apt-get update
     - apt-get install -y wine64
-    - command -v yarn >/dev/null 2>&1 || npm install -g yarn
     - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
 
   script:
     - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
     - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
-    - yarn install --frozen-lockfile
+    - yarn install --frozen-lockfile --ignore-engines
     - yarn release:mac
   artifacts:
     paths:
       - dist/
     expire_in: 4 weeks
-
+  cache:
+    paths:
+      - .cache/electron-builder
+      - node_modules/
 
 build_packagedev:
   image: node
-  tags:
-    - nosi-runner
   stage: build
   only:
     - tags
   variables:
-    #ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
+    ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
     # Make sure the variable is available in the script environment
     CERTIFICATE_PASSWORD: '${CERTIFICATE_PASSWORD}'
   before_script:
@@ -58,25 +63,27 @@ build_packagedev:
     #curl -L --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}"
     #-o certificate.pfx
     #"https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/repository/files/certificate%2Fcertificate.pfx/raw?ref=master"
-    - command -v yarn >/dev/null 2>&1 || npm install -g yarn
+
     - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
 
   script:
     - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
     - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
-    - yarn install --frozen-lockfile
+    - yarn install --frozen-lockfile --ignore-engines
     - yarn release:win
     - yarn release:linux
+    #- yarn release:mac
   artifacts:
     paths:
       - dist/
     expire_in: 4 weeks
-
+  cache:
+    paths:
+      - .cache/electron-builder
+      - node_modules/
 
 release:
   stage: release
-  tags:
-    - nosi-runner
   only:
     - tags
   image: curlimages/curl:latest
