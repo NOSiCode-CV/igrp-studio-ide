@@ -38,14 +38,13 @@ build_packagedev_mac:
       - .cache/electron-builder
       - node_modules/
 
-build_packagedev:
+build_packagedev_windows:
   image: node
   stage: build
   only:
     - tags
   variables:
     ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
-    # Make sure the variable is available in the script environment
     CERTIFICATE_PASSWORD: '${CERTIFICATE_PASSWORD}'
   before_script:
     - apt-get update
@@ -69,8 +68,31 @@ build_packagedev:
     - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
     - yarn install --frozen-lockfile --ignore-engines
     - yarn release:win
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 4 weeks
+  cache:
+    paths:
+      - .cache/electron-builder
+      - node_modules/
+
+build_packagedev_linux:
+  image: node
+  stage: build
+  only:
+    - tags
+  variables:
+    ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
+    CERTIFICATE_PASSWORD: '${CERTIFICATE_PASSWORD}'
+  before_script:
+    - apt-get update
+    - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
+  script:
+    - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
+    - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
+    - yarn install --frozen-lockfile --ignore-engines
     - yarn release:linux
-    #- yarn release:mac
   artifacts:
     paths:
       - dist/
@@ -125,4 +147,5 @@ release:
            "https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/releases"
 
   needs:
-    - build_packagedev
+    - build_packagedev_windows
+    - build_packagedev_linux
