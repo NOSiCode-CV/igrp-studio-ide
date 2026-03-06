@@ -17,7 +17,7 @@ import { getId } from '@renderer/utils'
 import { FocusEvent } from 'react'
 import { TextInput } from '@renderer/generators/api/components/inputs-form'
 import { camelCase } from 'lodash-es'
-import { PageDefinition } from './page-manager'
+import { PageDefinition } from '@renderer/generators/ui/page/page-manager'
 
 interface DuplicatePageModalProps {
   isOpen: boolean

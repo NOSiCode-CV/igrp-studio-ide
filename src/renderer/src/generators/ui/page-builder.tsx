@@ -50,17 +50,20 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
       functions,
       states,
       imports,
+      componentArguments,
       setAllImports,
       setAllTypes,
       setAllFunctions,
       setAllComponents,
       setAllStates,
       setAllArguments,
+      setAllRestData,
       handleAddChildToComponent,
       handleReorderChildInComponent,
       removeRow,
       clearEditingComponent,
-      currentComponent
+      currentComponent,
+      restData
     } = useDroppedComponents()
 
     const { componentsRegistered, findComponentById, fetchComponents, findComponent } = useStudio()
@@ -75,13 +78,16 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
 
     const { handleSave } = usePageSave({
       basePath,
-      content,
-      id,
-      components,
-      functions,
-      types,
-      states,
-      imports,
+      restData: {
+        ...restData,           // tudo o que já está em restData no context
+        args: componentArguments,
+        id,
+        components,
+        functions,
+        types,
+        states,
+        imports
+      },
       isPage,
       page
     })
@@ -90,7 +96,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
     useImperativeHandle(
       ref,
       () => ({
-        handleSave: async () => await handleSave(components)
+        handleSave: async () => await handleSave()
       }),
       [handleSave, components]
     )
@@ -148,14 +154,16 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
           setIsLoading(true)
 
           const data = await window.api?.getJsonContent(pagePath)
+          const { components, args, types, functions, states, imports, ...rest } = data
 
-          setAllArguments(data.args)
-          setAllTypes(data.types)
-          setAllFunctions(data.functions)
-          setAllStates(data.states)
-          setAllImports(data.imports)
+          setAllArguments(args)
+          setAllTypes(types)
+          setAllFunctions(functions)
+          setAllStates(states)
+          setAllImports(imports)
+          setAllRestData(rest)
 
-          if (data.components) setAllComponents(data.components)
+          if (components) setAllComponents(components)
         } catch (error) {
           console.error('Failed to load JSON content:', error)
         } finally {

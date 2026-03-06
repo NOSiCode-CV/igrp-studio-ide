@@ -1,4 +1,4 @@
-import { PageCardProps } from './page-card-view'
+import { PageCardProps } from '@renderer/generators/ui/page/page-card-view'
 import { useTranslation } from 'react-i18next'
 import {
   IGRPButtonPrimitive,
@@ -17,7 +17,7 @@ import {
   Trash,
   Copy
 } from 'lucide-react'
-import { PageDefinition } from './page-manager'
+import { PageDefinition } from '@renderer/generators/ui/page/page-manager'
 
 export const PageActionMenu = ({
   page,

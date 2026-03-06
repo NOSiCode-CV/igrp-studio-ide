@@ -57,6 +57,7 @@ export interface DataValue {
 }
 
 export interface StructuredComponent {
+  useClient?: boolean
   deprecated?: boolean
   id: string
   componentName: string
@@ -178,4 +179,8 @@ export interface DroppedComponentsContextType {
   //
   setAllArguments: (args: Arguments[]) => void
   componentArguments: Arguments[]
+
+  //informacoes adicionais
+  restData: any
+  setAllRestData: (restData: any) => void
 }

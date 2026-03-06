@@ -37,6 +37,7 @@ import Loader from '@renderer/components/loader'
 import { getRequiredDataSchema } from '../../dnd/helpers'
 import { useComponents } from '../../hooks/useComponents'
 import CopyContent from './copy-content'
+import { CheckboxInput } from '@renderer/generators/api/components/inputs-form'
 
 interface SidebarRightProps extends ComponentProps<typeof IGRPSidebarPrimitive> {
   comp?: StructuredComponent
@@ -45,13 +46,17 @@ interface SidebarRightProps extends ComponentProps<typeof IGRPSidebarPrimitive> 
 }
 
 const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) => {
+
   const { t } = useTranslation()
   const { getPropertiesComponent, getDataComponent, getChildPropertiesComponent, pageOptions } =
     useStudio()
   const {
     currentComponent: editingComponentParams,
     handleUpdateChildComponent,
-    clearEditingComponent
+    clearEditingComponent,
+    components,
+    setAllRestData,
+    restData,
   } = useDroppedComponents()
 
   const { statesOptions } = useCustomCode()
@@ -63,6 +68,11 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
     () => comp || editingComponentParams?.component,
     [comp, editingComponentParams]
   )
+
+  const isRootComponent = useMemo(() => {
+    return currentComp?.componentName === 'page' || currentComp?.componentName === 'component' ||
+      currentComp?.componentName === 'processStep'
+  }, [currentComp])
 
   const currentPath = path || editingComponentParams?.path || ''
 
@@ -392,6 +402,11 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
     )
   }
 
+  const udpateTypeRenderComponent = (useClient: boolean): void => {
+    if (!componentId) return
+    setAllRestData({ ...restData, useClient })
+  }
+
   const udpateDataProperties = ({
     field,
     state,
@@ -443,7 +458,6 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
         <div className="items-center justify-between flex flex-1">
           <div className="space-y-1">
             <h4 className="text-sm font-medium leading-none">{t('settings')}</h4>
-
             {componentName && <p className="text-sm text-muted-foreground"></p>}
           </div>
           <div className="flex items-center gap-2">
@@ -453,7 +467,7 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                   variant="outline"
                   size="icon"
                   onClick={resetTempData}
-                  title="Reset changes"
+                  title={t('resetChanges')}
                 >
                   <RotateCcw className="h-4 w-4" />
                 </IGRPButtonPrimitive>
@@ -466,132 +480,142 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
         </div>
       </IGRPSidebarHeaderPrimitive>
       <IGRPSidebarContentPrimitive>
-        {isLoading ? (
-          <Loader />
-        ) : !tempEditingComponent ? (
-          <div className="p-4">
+        <div className="space-y-4 p-2 px-3">
+          {isLoading ? (
+            <Loader />
+          ) : !tempEditingComponent ? (
+
             <EmptyList
               icon={<Settings />}
-              title="Settings Components"
-              description="Select a component on the table to start edit"
+              title={t('settingsComponents')}
+              description={t('selectComponentToEdit')}
             />
-          </div>
-        ) : (
-          <>
-            <div className="space-y-2 p-2">
-              <IGRPLabelPrimitive htmlFor={'tab'}>
-                {`${label || componentName} - ${componentId}`}
-              </IGRPLabelPrimitive>
-              <IGRPInputPrimitive id="tag" value={tempEditingComponent?.tag} onChange={udpateTag} />
-            </div>
-            <IGRPTabsPrimitive className="flex-1 px-2" defaultValue="props">
-              <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
-                <IGRPTabsTriggerPrimitive value="props">Props</IGRPTabsTriggerPrimitive>
-                <IGRPTabsTriggerPrimitive value="styles">Style</IGRPTabsTriggerPrimitive>
-                <IGRPTabsTriggerPrimitive value="interactions">
-                  Interactions
-                </IGRPTabsTriggerPrimitive>
-                <IGRPTabsTriggerPrimitive value="copy-content">Copy</IGRPTabsTriggerPrimitive>
-              </IGRPTabsListPrimitive>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <IGRPLabelPrimitive htmlFor={'tab'}>
+                  {`${label || componentName} - ${componentId}`}
+                </IGRPLabelPrimitive>
+                <IGRPInputPrimitive id="tag" value={tempEditingComponent?.tag} onChange={udpateTag} />
+              </div>
+              {isRootComponent && (
+                <CheckboxInput
+                  id="useClient"
+                  label={t('useClient')}
+                  onChange={(value: boolean) => udpateTypeRenderComponent(value)}
+                  value={restData?.useClient ?? true}
+                  info={t('useClientInfo')}
+                />
+              )}
+              <IGRPTabsPrimitive className="flex-1" defaultValue="props">
+                <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
+                  <IGRPTabsTriggerPrimitive value="props">{t('props')}</IGRPTabsTriggerPrimitive>
+                  <IGRPTabsTriggerPrimitive value="styles">{t('style')}</IGRPTabsTriggerPrimitive>
+                  <IGRPTabsTriggerPrimitive value="interactions">
+                    {t('interactions')}
+                  </IGRPTabsTriggerPrimitive>
+                  <IGRPTabsTriggerPrimitive value="copy-content">{t('copy')}</IGRPTabsTriggerPrimitive>
+                </IGRPTabsListPrimitive>
 
-              <IGRPTabsContentPrimitive value="props" className="space-y-6">
-                <IGRPAccordionPrimitive
-                  type="single"
-                  collapsible
-                  className="w-full"
-                  defaultValue="item-1"
-                >
-                  <IGRPAccordionItemPrimitive value="item-1">
-                    <IGRPAccordionTriggerPrimitive
-                      iconName="ChevronDown"
-                      showIcon
-                      iconPlacement="end"
-                    >
-                      {t('properties')}
-                    </IGRPAccordionTriggerPrimitive>
-                    <IGRPAccordionContentPrimitive className="space-y-2">
-                      {propsComponent && (
-                        <RenderPropsConfig
-                          propsComp={propsComponent}
-                          formValues={tempEditingComponent?.properties}
-                          pageOptions={pageOptions}
-                          dataProperties={tempEditingComponent.data}
-                          statesOptions={statesOptions}
-                          columnsOptions={columnsOptions}
-                          tag={tempEditingComponent?.tag || ''}
-                          onInputChange={handleComponentPropertyChange}
-                          onSelectState={(
-                            field: string,
-                            state: State | undefined,
-                            value: DataValue | undefined
-                          ) =>
-                            udpateDataProperties({
-                              field,
-                              state,
-                              value
-                            })
-                          }
-                        />
-                      )}
-                    </IGRPAccordionContentPrimitive>
-                  </IGRPAccordionItemPrimitive>
-                  {Object.keys(propsComponentChild).length > 0 && (
+                <IGRPTabsContentPrimitive value="props" className="space-y-6">
+                  <IGRPAccordionPrimitive
+                    type="single"
+                    collapsible
+                    className="w-full"
+                    defaultValue="item-1"
+                  >
                     <IGRPAccordionItemPrimitive value="item-1">
                       <IGRPAccordionTriggerPrimitive
                         iconName="ChevronDown"
                         showIcon
                         iconPlacement="end"
                       >
-                        {t('Child Properties')}
+                        {t('properties')}
                       </IGRPAccordionTriggerPrimitive>
                       <IGRPAccordionContentPrimitive className="space-y-2">
-                        <RenderPropsConfig
-                          propsComp={propsComponentChild}
-                          formValues={childformValues}
-                          pageOptions={pageOptions}
-                          dataProperties={tempEditingComponent.data}
-                          statesOptions={statesOptions}
-                          columnsOptions={columnsOptions}
-                          tag={tempEditingComponent?.tag || ''}
-                          onInputChange={handleChildPropertyChange}
-                          onSelectState={(
-                            field: string,
-                            state: State | undefined,
-                            value: DataValue | undefined
-                          ) =>
-                            udpateDataProperties({
-                              field,
-                              state,
-                              value
-                            })
-                          }
-                        />
+                        {propsComponent && (
+                          <RenderPropsConfig
+                            propsComp={propsComponent}
+                            formValues={tempEditingComponent?.properties}
+                            pageOptions={pageOptions}
+                            dataProperties={tempEditingComponent.data}
+                            statesOptions={statesOptions}
+                            columnsOptions={columnsOptions}
+                            tag={tempEditingComponent?.tag || ''}
+                            onInputChange={handleComponentPropertyChange}
+                            onSelectState={(
+                              field: string,
+                              state: State | undefined,
+                              value: DataValue | undefined
+                            ) =>
+                              udpateDataProperties({
+                                field,
+                                state,
+                                value
+                              })
+                            }
+                          />
+                        )}
                       </IGRPAccordionContentPrimitive>
                     </IGRPAccordionItemPrimitive>
-                  )}
-                </IGRPAccordionPrimitive>
-              </IGRPTabsContentPrimitive>
-              <IGRPTabsContentPrimitive value="styles" className="space-y-6">
-                <StyleTab
-                  comp={tempEditingComponent}
-                  path={currentPath}
-                  onInteranctionsChange={handleUpdateChildComponent}
-                />
-              </IGRPTabsContentPrimitive>
-              <IGRPTabsContentPrimitive value="interactions" className="space-y-6">
-                <Interactions
-                  comp={tempEditingComponent}
-                  path={currentPath}
-                  onInteranctionsChange={handleUpdateChildComponent}
-                  columnsOptions={columnsOptions}
-                />
-              </IGRPTabsContentPrimitive>
-              <IGRPTabsContentPrimitive value="copy-content" className="space-y-6">
-                <CopyContent currentComp={currentComp} />
-              </IGRPTabsContentPrimitive>
-            </IGRPTabsPrimitive>
-          </>
-        )}
+                    {Object.keys(propsComponentChild).length > 0 && (
+                      <IGRPAccordionItemPrimitive value="item-2">
+                        <IGRPAccordionTriggerPrimitive
+                          iconName="ChevronDown"
+                          showIcon
+                          iconPlacement="end"
+                        >
+                          {t('childProperties')}
+                        </IGRPAccordionTriggerPrimitive>
+                        <IGRPAccordionContentPrimitive className="space-y-2">
+                          <RenderPropsConfig
+                            propsComp={propsComponentChild}
+                            formValues={childformValues}
+                            pageOptions={pageOptions}
+                            dataProperties={tempEditingComponent.data}
+                            statesOptions={statesOptions}
+                            columnsOptions={columnsOptions}
+                            tag={tempEditingComponent?.tag || ''}
+                            onInputChange={handleChildPropertyChange}
+                            onSelectState={(
+                              field: string,
+                              state: State | undefined,
+                              value: DataValue | undefined
+                            ) =>
+                              udpateDataProperties({
+                                field,
+                                state,
+                                value
+                              })
+                            }
+                          />
+                        </IGRPAccordionContentPrimitive>
+                      </IGRPAccordionItemPrimitive>
+                    )}
+                  </IGRPAccordionPrimitive>
+                </IGRPTabsContentPrimitive>
+                <IGRPTabsContentPrimitive value="styles" className="space-y-6">
+                  <StyleTab
+                    comp={tempEditingComponent}
+                    path={currentPath}
+                    onInteranctionsChange={handleUpdateChildComponent}
+                  />
+                </IGRPTabsContentPrimitive>
+                <IGRPTabsContentPrimitive value="interactions" className="space-y-6">
+                  <Interactions
+                    comp={tempEditingComponent}
+                    path={currentPath}
+                    onInteranctionsChange={handleUpdateChildComponent}
+                    columnsOptions={columnsOptions}
+                  />
+                </IGRPTabsContentPrimitive>
+                <IGRPTabsContentPrimitive value="copy-content" className="space-y-6">
+                  <CopyContent currentComp={currentComp} />
+                </IGRPTabsContentPrimitive>
+              </IGRPTabsPrimitive>
+            </>
+          )}
+        </div>
       </IGRPSidebarContentPrimitive>
     </IGRPSidebarPrimitive>
   )

@@ -13,7 +13,7 @@ import { ChevronRight, ComponentIcon } from 'lucide-react'
 import { PageDefinition } from './page-manager'
 import { useState } from 'react'
 import { cn } from '@renderer/lib/utils'
-import { PageTypeIcon, PageActionMenu } from './page-actions'
+import { PageTypeIcon, PageActionMenu } from '@renderer/generators/ui/page/components/page-actions'
 
 export interface PageCardProps {
   page: PageDefinition

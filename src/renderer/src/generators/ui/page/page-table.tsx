@@ -10,7 +10,7 @@ import {
   IGRPTableRowPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { ChevronDown, ChevronRight, FileText, Component } from 'lucide-react'
-import { PageTypeIcon, PageActionMenu } from './page-actions'
+import { PageTypeIcon, PageActionMenu } from '@renderer/generators/ui/page/components/page-actions'
 import { PageDefinition } from './page-manager'
 
 interface PageTableProps {

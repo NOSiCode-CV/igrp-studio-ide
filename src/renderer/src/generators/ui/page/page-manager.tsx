@@ -14,8 +14,6 @@ import {
 } from '@igrp/igrp-framework-react-design-system'
 import { FileCode, LayoutGrid, Plus, Settings, TableIcon, Workflow } from 'lucide-react'
 import { PageCardView } from './page-card-view'
-import { CreatePageModal } from './create-page-modal'
-import { DuplicatePageModal } from './duplicate-page-modal'
 import { PageTable } from './page-table'
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
 import { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/types'
@@ -26,7 +24,9 @@ import {
   IGRPDropdownMenuItemPrimitive,
   IGRPDropdownMenuTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import { CreateComponentModal } from './create-component-modal'
+import { CreatePageModal } from '@renderer/generators/ui/page/components/create-page-modal'
+import { DuplicatePageModal } from '@renderer/generators/ui/page/components/duplicate-page-modal'
+import { CreateComponentModal } from '@renderer/generators/ui/page/components/create-component-modal'
 import ProjectSettings from '@renderer/pages/project/project-settings'
 import { EmptyList } from '@renderer/components/empty-list'
 import { ENV_TYPES } from '@renderer/constants/appConstants'

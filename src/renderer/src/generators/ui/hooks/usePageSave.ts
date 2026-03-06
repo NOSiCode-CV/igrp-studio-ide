@@ -9,7 +9,7 @@ import { CustomFunctionConfig, Import, State, TypeDef } from '@igrp/igrp-studio-
 
 interface PageSaveProps {
   basePath: string
-  content: { [key: string]: string }
+  restData: any
   id: string
   components: StructuredLayout
   functions: CustomFunctionConfig[]
@@ -34,7 +34,7 @@ interface SaveError {
  * Generates a descriptive commit message based on the saved content
  */
 const generateCommitMessage = (
-  content: { [key: string]: string },
+  restData: any,
   page: { pagePath: string; pageName: string; name: string },
   isBpmnProcess: boolean,
   isPage: boolean
@@ -51,25 +51,20 @@ const generateCommitMessage = (
     return `feat(page): update ${pageName}${pagePath} - ${timestamp}`
   }
 
-  if (content.scope === 'page') {
-    return `feat(component): update ${content.name} in ${content.pagePath} - ${timestamp}`
+  if (restData.scope === 'page') {
+    return `feat(component): update ${restData.name} in ${restData.pagePath} - ${timestamp}`
   }
 
-  return `feat(component): update custom component ${content.name} - ${timestamp}`
+  return `feat(component): update custom component ${restData.name} - ${timestamp}`
 }
 
 export const usePageSave = ({
   basePath,
-  content,
-  id,
-  functions,
-  types,
-  states,
-  imports,
+  restData,
   isPage,
-  page
+  page,
 }: PageSaveProps): {
-  handleSave: (components: StructuredLayout) => Promise<void>
+  handleSave: () => Promise<void>
 } => {
   const { showErrorToast, showSuccessToast } = useToast()
   const dispatch: any = useDispatch()
@@ -77,33 +72,23 @@ export const usePageSave = ({
   const { createGitCommit } = useGit()
 
   const handleSave = useCallback(
-    async (components: StructuredLayout): Promise<void> => {
+    async (): Promise<void> => {
       try {
         if (!basePath) {
           throw new Error('Base path is required')
         }
 
-        const isBpmnProcess = content.type === 'processStep'
+        const isBpmnProcess = restData.type === 'processStep'
 
-        const config = {
-          ...content,
-          id,
-          components,
-          functions,
-          types,
-          states,
-          imports
-        }
-
-        console.log('Saving configuration:', config)
+        console.log('Saving configuration:', restData)
 
         let error: string | undefined
 
         if (isBpmnProcess) {
-          const result = await window.engine.createProcessStep(config, ENV_TYPES.NEXTJS, basePath)
+          const result = await window.engine.createProcessStep(restData, ENV_TYPES.NEXTJS, basePath)
           error = result.error
         } else {
-          const result = await window.engine.createPage(config, ENV_TYPES.NEXTJS, basePath)
+          const result = await window.engine.createPage(restData, ENV_TYPES.NEXTJS, basePath)
           error = result.error
         }
 
@@ -116,7 +101,7 @@ export const usePageSave = ({
         }
 
         // Generate automatic commit message
-        const commitMessage = generateCommitMessage(content, page, isBpmnProcess, isPage)
+        const commitMessage = generateCommitMessage(restData, page, isBpmnProcess, isPage)
         createGitCommit(basePath, commitMessage)
 
         showSuccessToast('Components saved successfully')
@@ -129,17 +114,10 @@ export const usePageSave = ({
     },
     [
       basePath,
-      content,
-      id,
-      functions,
-      types,
-      states,
-      imports,
+      restData,
       isPage,
-      showSuccessToast,
-      showErrorToast,
-      dispatch,
       page,
+      restData,
       createGitCommit
     ]
   )

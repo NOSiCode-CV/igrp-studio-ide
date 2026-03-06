@@ -26,9 +26,9 @@ import { TextInput } from '@renderer/generators/api/components/inputs-form'
 import { camelCase } from 'lodash-es'
 import { FocusEvent } from 'react'
 import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
-import { FunctionArguments } from '../components/sidebar/custom-code/functions-settings'
-import { PageDefinition } from './page-manager'
-import { RETURN_TYPE_OPTIONS } from '../utils/contants'
+import { FunctionArguments } from '@renderer/generators/ui/components/sidebar/custom-code/functions-settings'
+import { RETURN_TYPE_OPTIONS } from '@renderer/generators/ui/utils/contants'
+import { PageDefinition } from '@renderer/generators/ui/page/page-manager'
 
 const initialValues: ComponentConfig = {
   type: 'component',

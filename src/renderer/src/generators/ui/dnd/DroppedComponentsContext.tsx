@@ -43,6 +43,9 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({ c
 
   const [currentComponent, setCurrentComponent] = useState<EditingComponentParams | null>(null)
 
+  //informacoes adicionais
+  const [restData, setRestData] = useState<any>({})
+
   const setAllComponents = (components: StructuredLayout) => {
     setComponents(components)
   }
@@ -384,6 +387,10 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({ c
     setComponentArguments(Array.isArray(args) ? args : [])
   }
 
+  const setAllRestData = (restData: any) => {
+    setRestData(restData)
+  }
+
   return (
     <DroppedComponentsContext.Provider
       value={{
@@ -426,7 +433,9 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({ c
         imports,
 
         setAllArguments,
-        componentArguments
+        componentArguments,
+        setAllRestData,
+        restData,  
       }}
     >
       {children}
