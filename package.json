@@ -1,6 +1,6 @@
 {
   "name": "igrp-studio",
-  "version": "0.2.0-alpha.4",
+  "version": "0.2.0-beta.10.1",
   "license": "MIT",
   "description": "IGRP Studio for development",
   "main": "out/main/index.js",
