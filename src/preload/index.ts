@@ -22,12 +22,18 @@ const handleError = (error: unknown): HandlerResponse => ({
   error: (error as Error).message || 'An unknown error occurred'
 })
 
+// Update channel type for auto-updates (stable | beta)
+export type UpdateChannel = 'stable' | 'beta'
+
 // Extended Electron API type
 type ExtendedElectronAPI = typeof electronAPI & {
   getAppVersion: () => Promise<string>
   checkForUpdates: () => Promise<string>
   downloadUpdate: () => Promise<void>
   installUpdate: () => Promise<void>
+  getUpdateChannel: () => Promise<UpdateChannel>
+  setUpdateChannel: (channel: UpdateChannel) => Promise<void>
+  reconfigureUpdateChannel: () => Promise<void>
   watchFolder: (folderPath: string) => Promise<void>
   onFolderChange: (callback: (event: WatchEvent) => void) => void
   reportError: (error: Error) => void
@@ -504,6 +510,9 @@ if (process.contextIsolated) {
       checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
       downloadUpdate: () => ipcRenderer.invoke('download-update'),
       installUpdate: () => ipcRenderer.invoke('install-update'),
+      getUpdateChannel: () => ipcRenderer.invoke('update:get-channel'),
+      setUpdateChannel: (channel: UpdateChannel) => ipcRenderer.invoke('update:set-channel', channel),
+      reconfigureUpdateChannel: () => ipcRenderer.invoke('update:reconfigure-channel'),
       watchFolder: (folderPath: string) => ipcRenderer.invoke('watch-folder', folderPath),
       onFolderChange: (callback: (event: WatchEvent) => void) => {
         ipcRenderer.on('folder-change', (_, data: WatchEvent) => callback(data))
@@ -526,6 +535,9 @@ if (process.contextIsolated) {
     checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
     downloadUpdate: () => ipcRenderer.invoke('download-update'),
     installUpdate: () => ipcRenderer.invoke('install-update'),
+    getUpdateChannel: () => ipcRenderer.invoke('update:get-channel'),
+    setUpdateChannel: (channel: UpdateChannel) => ipcRenderer.invoke('update:set-channel', channel),
+    reconfigureUpdateChannel: () => ipcRenderer.invoke('update:reconfigure-channel'),
     watchFolder: (folderPath: string) => ipcRenderer.invoke('watch-folder', folderPath),
     onFolderChange: (callback: (event: WatchEvent) => void) => {
       ipcRenderer.on('folder-change', (_, data: WatchEvent) => callback(data))

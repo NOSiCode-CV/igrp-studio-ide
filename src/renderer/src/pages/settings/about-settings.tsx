@@ -4,6 +4,8 @@
 
 import {
   IGRPButtonPrimitive,
+  IGRPLabelPrimitive,
+  IGRPCombobox
 } from '@igrp/igrp-framework-react-design-system'
 import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import { CircleArrowUp, Download, RefreshCw, Loader2 } from 'lucide-react'
@@ -12,6 +14,8 @@ import logo from '@renderer/assets/images/igrp-green.svg'
 import { useTranslation } from 'react-i18next'
 import useToast from '@renderer/hooks/useToast'
 import { SHOW_UPDATE_MODAL_EVENT } from '@renderer/components/update-banner'
+
+type UpdateChannel = 'stable' | 'beta'
 
 interface UpdateMessage {
   type: 'checking' | 'available' | 'not-available' | 'error' | 'progress' | 'downloaded'
@@ -30,6 +34,7 @@ export function AboutSettings(): JSX.Element {
   const [appVersion, setAppVersion] = useState('')
   const [updateInfo, setUpdateInfo] = useState<UpdateMessage | null>(null)
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
+  const [updateChannel, setUpdateChannel] = useState<UpdateChannel>('stable')
 
   const checkForUpdates = async (): Promise<void> => {
     setIsCheckingUpdate(true)
@@ -59,6 +64,34 @@ export function AboutSettings(): JSX.Element {
       })
     }
   }, [])
+
+  useEffect(() => {
+    const electron = window.electron as Window['electron'] & {
+      getUpdateChannel?: () => Promise<UpdateChannel>
+      setUpdateChannel?: (c: UpdateChannel) => Promise<void>
+      reconfigureUpdateChannel?: () => Promise<void>
+    }
+    electron?.getUpdateChannel?.().then((channel: UpdateChannel) => {
+      setUpdateChannel(channel)
+    })
+  }, [])
+
+  const handleUpdateChannelChange = async (channel: string): Promise<void> => {
+    const value = channel as UpdateChannel
+    if (value !== 'stable' && value !== 'beta') return
+    const electron = window.electron as Window['electron'] & {
+      setUpdateChannel?: (c: UpdateChannel) => Promise<void>
+      reconfigureUpdateChannel?: () => Promise<void>
+    }
+    try {
+      await electron?.setUpdateChannel?.(value)
+      await electron?.reconfigureUpdateChannel?.()
+      setUpdateChannel(value)
+      showSuccessToast(t('update_channel_changed'))
+    } catch {
+      showWarningToast(t('update_check_failed'))
+    }
+  }
 
   useEffect(() => {
     const handleUpdateMessage = (_event: Electron.IpcRendererEvent, data: UpdateMessage): void => {
@@ -153,6 +186,26 @@ export function AboutSettings(): JSX.Element {
                 </IGRPButtonPrimitive>
               )}
             </div>
+          </div>
+        </div>
+
+        <IGRPSeparator />
+
+        {/* Update channel (beta / stable) */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium">{t('updateChannel')}</h3>
+          <p className="text-xs text-muted-foreground">{t('updateChannelDescription')}</p>
+          <div className="space-y-2 flex flex-col">
+            <IGRPLabelPrimitive htmlFor="update-channel">{t('updateChannel')}</IGRPLabelPrimitive>
+            <IGRPCombobox
+              id="update-channel"
+              value={updateChannel}
+              options={[
+                { value: 'stable', label: t('updateChannelStable') },
+                { value: 'beta', label: t('updateChannelBeta') }
+              ]}
+              onChange={(value) => handleUpdateChannelChange(value as string)}
+            />
           </div>
         </div>
 
