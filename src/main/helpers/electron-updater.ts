@@ -4,6 +4,13 @@ import log from 'electron-log'
 import type { UpdateInfo } from 'electron-updater'
 import { IGRPStudioSettings } from './igrp-studio-settings'
 
+/** Base URL for fetching release notes when the update feed does not include them (e.g. S3 latest.yml). */
+const RELEASE_NOTES_BASE_URL = 'https://storage-api.nosi.cv/igrp-studio/release-notes'
+
+/** GitHub repo for fetching release notes (e.g. https://github.com/NOSiCode-CV/igrp-studio-ide/releases). */
+const GITHUB_RELEASE_NOTES_REPO = 'NOSiCode-CV/igrp-studio-ide'
+const GITHUB_API_RELEASES = `https://api.github.com/repos/${GITHUB_RELEASE_NOTES_REPO}/releases`
+
 /**
  * Applies update channel (stable/beta) from IGRPStudioSettings to autoUpdater.
  * Call this on startup (from AppUpdater) and when user changes channel in Settings.
@@ -87,9 +94,12 @@ export default class AppUpdater {
       })
     })
 
-    autoUpdater.on('update-available', (info: UpdateInfo) => {
+    autoUpdater.on('update-available', async (info: UpdateInfo) => {
       this.updateAvailable = true
-      const releaseNotes = this.extractReleaseNotes(info)
+      let releaseNotes = this.extractReleaseNotes(info)
+      if (!releaseNotes?.trim() && info.version) {
+        releaseNotes = await this.fetchReleaseNotesForVersion(info.version)
+      }
       const releaseDate = info.releaseDate || ''
 
       this.sendStatusToWindow({
@@ -97,14 +107,9 @@ export default class AppUpdater {
         message: `New version ${info.version} available!`,
         version: info.version,
         currentVersion: app.getVersion(),
-        releaseNotes,
+        releaseNotes: releaseNotes || '',
         releaseDate
       })
-
-      // Auto-download the update
-     /*  autoUpdater.downloadUpdate().catch((err) => {
-        log.error('Auto-download failed:', err)
-      }) */
     })
 
     autoUpdater.on('update-not-available', (info: UpdateInfo) => {
@@ -137,18 +142,90 @@ export default class AppUpdater {
       })
     })
 
-    autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
-      const releaseNotes = this.extractReleaseNotes(info)
+    autoUpdater.on('update-downloaded', async (info: UpdateInfo) => {
+      let releaseNotes = this.extractReleaseNotes(info)
+      if (!releaseNotes?.trim() && info.version) {
+        releaseNotes = await this.fetchReleaseNotesForVersion(info.version)
+      }
 
       this.sendStatusToWindow({
         type: 'downloaded',
         message: 'Update downloaded. Ready to install.',
         version: info.version,
         currentVersion: app.getVersion(),
-        releaseNotes,
+        releaseNotes: releaseNotes || '',
         releaseDate: info.releaseDate || ''
       })
     })
+  }
+
+  /**
+   * Fetch release notes when the update feed does not include them.
+   * Tries: 1) GitHub Releases API (tag v{version} or {version}), 2) S3 release-notes/{version}.txt|.md
+   */
+  private async fetchReleaseNotesForVersion(version: string): Promise<string> {
+    const sanitized = version.replace(/[^a-zA-Z0-9.-]/g, '')
+    if (!sanitized) return ''
+
+    const fromGitHub = await this.fetchReleaseNotesFromGitHub(sanitized)
+    if (fromGitHub) return fromGitHub
+
+    const fromS3 = await this.fetchReleaseNotesFromS3(sanitized)
+    if (fromS3) return fromS3
+
+    return ''
+  }
+
+  /**
+   * Fetch release notes from GitHub Releases API.
+   * Tries tag "v{version}" then "{version}" (e.g. https://github.com/NOSiCode-CV/igrp-studio-ide/releases/tag/v0.2.0-beta.10.2).
+   */
+  private async fetchReleaseNotesFromGitHub(version: string): Promise<string> {
+    const tagsToTry = [version.startsWith('v') ? version : `v${version}`, version]
+    for (const tag of tagsToTry) {
+      try {
+        const res = await fetch(`${GITHUB_API_RELEASES}/tags/${encodeURIComponent(tag)}`, {
+          method: 'GET',
+          headers: { Accept: 'application/vnd.github.v3+json' }
+        })
+        if (res.ok) {
+          const data = (await res.json()) as { body?: string | null }
+          const body = data?.body?.trim()
+          if (body) {
+            log.info('Release notes fetched from GitHub', { version, tag })
+            return body
+          }
+        }
+      } catch (err) {
+        log.debug('GitHub release notes fetch failed', { tag, err: (err as Error).message })
+      }
+    }
+    return ''
+  }
+
+  /**
+   * Fetch release notes from S3 (release-notes/{version}.txt or .md).
+   */
+  private async fetchReleaseNotesFromS3(version: string): Promise<string> {
+    const urls = [
+      `${RELEASE_NOTES_BASE_URL}/${version}.txt`,
+      `${RELEASE_NOTES_BASE_URL}/${version}.md`
+    ]
+    for (const url of urls) {
+      try {
+        const res = await fetch(url, { method: 'GET' })
+        if (res.ok) {
+          const text = await res.text()
+          if (text?.trim()) {
+            log.info('Release notes fetched from S3', { version, url })
+            return text.trim()
+          }
+        }
+      } catch (err) {
+        log.debug('S3 release notes fetch failed', { url, err: (err as Error).message })
+      }
+    }
+    return ''
   }
 
   /**
