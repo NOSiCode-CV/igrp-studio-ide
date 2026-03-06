@@ -57,7 +57,6 @@ export function getFormKeyType(formKey: string | undefined | null): FormKeyType 
   return 'unknown'
 }
 
-
 //Todo extract projectKey from formKey and return it: want this default.1 from ui:shared:default@1
 export function getKeyFromFormKey(formKey: string | undefined | null): string {
   if (formKey == null || formKey === '') return ''
@@ -73,7 +72,10 @@ export function getNameFromFormKey(formKey: string | undefined | null): string {
 
 export function getNormalizeClassNameFromFormKey(formKey: string | undefined | null): string {
   const normalized = getNameFromFormKey(formKey)
-  return normalized.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase()).replace(/\s+/g, '')
+  return normalized
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+    .replace(/\s+/g, '')
 }
 
 export function getVersionFromFormKey(formKey: string | undefined | null): string {

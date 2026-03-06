@@ -16,12 +16,12 @@ body {
     --spacing: 0.222222rem;
   }
 
-  [data-slot='card'] {
+  [data-slot="card"] {
     --spacing: 0.16rem;
   }
 
-  [data-slot='select-trigger'],
-  [data-slot='toggle-group-item'] {
+  [data-slot="select-trigger"],
+  [data-slot="toggle-group-item"] {
     --spacing: 0.222222rem;
   }
 }

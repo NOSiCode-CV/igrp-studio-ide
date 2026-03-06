@@ -125,7 +125,7 @@ export const CheckboxInput = ({
   onChange,
   isTouched = false,
   error,
-  info,
+  info
 }: CheckboxProps): React.ReactNode => (
   <div className="flex flex-1 flex-col gap-2">
     <div className="flex flex-1 items-center gap-2">
@@ -138,7 +138,10 @@ export const CheckboxInput = ({
       {info != null && info !== '' && (
         <IGRPTooltipPrimitive>
           <IGRPTooltipTriggerPrimitive asChild>
-            <span className="inline-flex cursor-help text-muted-foreground hover:text-foreground" tabIndex={0}>
+            <span
+              className="inline-flex cursor-help text-muted-foreground hover:text-foreground"
+              tabIndex={0}
+            >
               <Info className="h-4 w-4" aria-hidden />
             </span>
           </IGRPTooltipTriggerPrimitive>

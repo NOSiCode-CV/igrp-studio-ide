@@ -86,7 +86,6 @@ export function convertCompToInteractinsJSONSchema(props: Prop[]) {
   return properties
 }
 
-
 /*{
     "type": "array",
     "items": {

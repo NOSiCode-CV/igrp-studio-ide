@@ -3,7 +3,6 @@ import { toolConfig } from './doctor-config'
 import { ToolCheck } from '../../types'
 
 export function checkCommand(command: string): Promise<{ version?: string; error?: string }> {
-  console.log('checking command', command)
   return new Promise((resolve) => {
     exec(`${command} --version`, (error, stdout, stderr) => {
       if (error) {

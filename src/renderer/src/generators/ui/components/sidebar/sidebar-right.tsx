@@ -46,7 +46,6 @@ interface SidebarRightProps extends ComponentProps<typeof IGRPSidebarPrimitive> 
 }
 
 const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) => {
-
   const { t } = useTranslation()
   const { getPropertiesComponent, getDataComponent, getChildPropertiesComponent, pageOptions } =
     useStudio()
@@ -54,9 +53,8 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
     currentComponent: editingComponentParams,
     handleUpdateChildComponent,
     clearEditingComponent,
-    components,
     setAllRestData,
-    restData,
+    restData
   } = useDroppedComponents()
 
   const { statesOptions } = useCustomCode()
@@ -70,8 +68,11 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
   )
 
   const isRootComponent = useMemo(() => {
-    return currentComp?.componentName === 'page' || currentComp?.componentName === 'component' ||
+    return (
+      currentComp?.componentName === 'page' ||
+      currentComp?.componentName === 'component' ||
       currentComp?.componentName === 'processStep'
+    )
   }, [currentComp])
 
   const currentPath = path || editingComponentParams?.path || ''
@@ -484,7 +485,6 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
           {isLoading ? (
             <Loader />
           ) : !tempEditingComponent ? (
-
             <EmptyList
               icon={<Settings />}
               title={t('settingsComponents')}
@@ -496,7 +496,11 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                 <IGRPLabelPrimitive htmlFor={'tab'}>
                   {`${label || componentName} - ${componentId}`}
                 </IGRPLabelPrimitive>
-                <IGRPInputPrimitive id="tag" value={tempEditingComponent?.tag} onChange={udpateTag} />
+                <IGRPInputPrimitive
+                  id="tag"
+                  value={tempEditingComponent?.tag}
+                  onChange={udpateTag}
+                />
               </div>
               {isRootComponent && (
                 <CheckboxInput
@@ -514,7 +518,9 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                   <IGRPTabsTriggerPrimitive value="interactions">
                     {t('interactions')}
                   </IGRPTabsTriggerPrimitive>
-                  <IGRPTabsTriggerPrimitive value="copy-content">{t('copy')}</IGRPTabsTriggerPrimitive>
+                  <IGRPTabsTriggerPrimitive value="copy-content">
+                    {t('copy')}
+                  </IGRPTabsTriggerPrimitive>
                 </IGRPTabsListPrimitive>
 
                 <IGRPTabsContentPrimitive value="props" className="space-y-6">

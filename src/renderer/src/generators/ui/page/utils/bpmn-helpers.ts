@@ -9,8 +9,9 @@ const VERSION_FOLDER_PATTERN = /^v\d+$/
  * Returns items whose name is NOT a version folder (v + number).
  * Use to get files/siblings and exclude v1, v2, v9, etc.
  */
-export const getNonVersionFolderItems = <T extends { name?: string }>(items: T[] | undefined): T[] =>
-  (items ?? []).filter((item) => !VERSION_FOLDER_PATTERN.test(item.name ?? ''))
+export const getNonVersionFolderItems = <T extends { name?: string }>(
+  items: T[] | undefined
+): T[] => (items ?? []).filter((item) => !VERSION_FOLDER_PATTERN.test(item.name ?? ''))
 
 /**
  * Returns the process config file from children (name does not match v + number).
@@ -25,7 +26,6 @@ export const findProcess = (
   processDefinition: BPMNProjectProcessDefinition,
   bpmnProcesses: FileTree[]
 ): FileTree | undefined => {
-
   const process = bpmnProcesses.find((p) => p.name === processDefinition.processKey)
 
   const versionFolders = (process?.children ?? []).filter(
@@ -72,7 +72,6 @@ export const findStepProcess = (
   processArtifact: BPMNProjectArtifact,
   processDefinition: BPMNProjectProcessDefinition
 ): FileTree | undefined => {
-
   const key = getKeyFromFormKey(processArtifact.formKey)
 
   const process = bpmnProcesses.find((p) => p.name === processDefinition.processKey)
@@ -82,8 +81,6 @@ export const findStepProcess = (
   )
 
   return versionFolders && versionFolders.length > 0 ? versionFolders[0] : undefined
-
-
 }
 
 export const convertFileTreeToPageDefinition = (fileTree: FileTree): PageDefinition => {

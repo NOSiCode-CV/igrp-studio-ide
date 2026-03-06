@@ -173,7 +173,7 @@ export const GenerateNewStepForm: React.FC<GenerateNewStepFormProps> = ({
                 placeholder="Choose a process..."
               />
 
-              {availableComponents.length > 0 &&
+              {availableComponents.length > 0 && (
                 <SelectInput
                   id="component-select"
                   label="Components"
@@ -182,10 +182,10 @@ export const GenerateNewStepForm: React.FC<GenerateNewStepFormProps> = ({
                     handleComponentChange(value as unknown as ProcessStepConfig | undefined)
                   }
                   placeholder="Choose a component..."
-                />}
+                />
+              )}
             </div>
           )}
-
         </div>
 
         <IGRPDialogFooterPrimitive className="gap-2">

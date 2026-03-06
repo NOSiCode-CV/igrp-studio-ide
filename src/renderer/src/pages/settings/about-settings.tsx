@@ -157,9 +157,7 @@ export function AboutSettings(): JSX.Element {
                   ) : (
                     <Download className="h-4 w-4" />
                   )}
-                  {updateInfo.type === 'downloaded'
-                    ? t('install_restart')
-                    : t('view_progress')}
+                  {updateInfo.type === 'downloaded' ? t('install_restart') : t('view_progress')}
                 </IGRPButtonPrimitive>
               </div>
             ) : (
@@ -235,7 +233,10 @@ export function AboutSettings(): JSX.Element {
               variant="link"
               size={'sm'}
               onClick={() =>
-                window.electron.ipcRenderer.send('open-external-url', 'https://docs3.igrp.cv/instalacao/download-exe')
+                window.electron.ipcRenderer.send(
+                  'open-external-url',
+                  'https://docs3.igrp.cv/instalacao/download-exe'
+                )
               }
             >
               {t('get_latest_version')}

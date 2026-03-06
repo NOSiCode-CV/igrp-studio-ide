@@ -14,8 +14,6 @@ import { FileTree } from 'src/main/types'
 import { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { isVersionFolderName } from '../utils/form-key-utils'
 
-
-
 interface CopyLegacyVersionModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -79,7 +77,11 @@ export const CopyLegacyVersionModal: React.FC<CopyLegacyVersionModalProps> = ({
   }, [open, processFound])
 
   const handleConfirm = (): void => {
-    onConfirm(previousComponent?.description || '', previousComponent?.name || '', previousComponent)
+    onConfirm(
+      previousComponent?.description || '',
+      previousComponent?.name || '',
+      previousComponent
+    )
     onOpenChange(false)
   }
 
@@ -94,8 +96,8 @@ export const CopyLegacyVersionModal: React.FC<CopyLegacyVersionModalProps> = ({
     const process = bpmnProcesses.find((p) => p.name === processName)
     if (process) {
       setSelectedProcess(process)
-      const versions = process.children?.
-        filter((child) => child.isDirectory && isVersionFolderName(child.name))
+      const versions = process.children
+        ?.filter((child) => child.isDirectory && isVersionFolderName(child.name))
         .map((child) => ({
           label: child.name,
           value: child.name
@@ -176,10 +178,7 @@ export const CopyLegacyVersionModal: React.FC<CopyLegacyVersionModalProps> = ({
           <IGRPButtonPrimitive variant="outline" onClick={handleCancel}>
             Cancel
           </IGRPButtonPrimitive>
-          <IGRPButtonPrimitive
-            onClick={handleConfirm}
-            className="gap-2"
-          >
+          <IGRPButtonPrimitive onClick={handleConfirm} className="gap-2">
             <Plus className="h-4 w-4" />
             {'Copy Step'}
           </IGRPButtonPrimitive>

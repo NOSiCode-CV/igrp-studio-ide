@@ -73,10 +73,10 @@ export const BPMNProjectSelector = ({
   const [showCopyLegacyVersionModal, setShowCopyLegacyVersionModal] = useState(false)
   const [pendingComponentData, setPendingComponentData] = useState<
     | {
-      processDefinition: BPMNProjectProcessDefinition
-      processArtifact: BPMNProjectArtifact
-      processFound: FileTree
-    }
+        processDefinition: BPMNProjectProcessDefinition
+        processArtifact: BPMNProjectArtifact
+        processFound: FileTree
+      }
     | undefined
   >(undefined)
   const [oldProcessFound, setOldProcessFound] = useState<FileTree | undefined>(undefined)
@@ -333,18 +333,18 @@ export const BPMNProjectSelector = ({
         components: previousComponent
           ? previousComponent.components
           : {
-            id: `processstep_${componentName}`,
-            componentName: 'processStep',
-            label: 'Process Step',
-            properties: {
-              variables: [],
-              commonProperties: {}
-            },
-            children: [],
-            tag: `processStep_${nanoid()}`,
-            data: {},
-            interactions: bpmnProcessStepInteractions
-          }
+              id: `processstep_${componentName}`,
+              componentName: 'processStep',
+              label: 'Process Step',
+              properties: {
+                variables: [],
+                commonProperties: {}
+              },
+              children: [],
+              tag: `processStep_${nanoid()}`,
+              data: {},
+              interactions: bpmnProcessStepInteractions
+            }
       }
 
       const { error } = await window.engine.createProcessStep(
@@ -609,8 +609,8 @@ export const BPMNProjectSelector = ({
                 <IGRPSeparator />
 
                 {processDefinitionDetails &&
-                  processDefinitionDetails.processArtifacts &&
-                  processDefinitionDetails.processArtifacts.length > 0 ? (
+                processDefinitionDetails.processArtifacts &&
+                processDefinitionDetails.processArtifacts.length > 0 ? (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {processDefinitionDetails.processArtifacts.map(
                       (artifact: BPMNProjectArtifact, index: number) => {

@@ -33,7 +33,6 @@ export const EngineService = {
     currentPage: string
     loadRegistryComponent: () => void
   }): Promise<void> {
-
     const components: ComponentRegisterConfig[] = customComponents.map((component: any) => ({
       name: component.name,
       label: getLabel(component.name),

@@ -487,7 +487,9 @@ const TabTypes = ({ types, editorRef, globalFilter, onInsertImport }: TabTypesPr
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Info className="w-4 h-4" />
-        <span>Click &quot;Insert Type&quot; to add the type name and import statement to your editor</span>
+        <span>
+          Click &quot;Insert Type&quot; to add the type name and import statement to your editor
+        </span>
       </div>
 
       <div className="flex flex-col gap-3">

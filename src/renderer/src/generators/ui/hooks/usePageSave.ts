@@ -9,13 +9,16 @@ import { CustomFunctionConfig, Import, State, TypeDef } from '@igrp/igrp-studio-
 
 interface PageSaveProps {
   basePath: string
-  restData: any
-  id: string
-  components: StructuredLayout
-  functions: CustomFunctionConfig[]
-  types: TypeDef[]
-  states: State[]
-  imports: Import[]
+  /** Payload for save: id, components, functions, types, states, imports, args, etc. */
+  restData: {
+    id?: string
+    components?: StructuredLayout
+    functions?: CustomFunctionConfig[]
+    types?: TypeDef[]
+    states?: State[]
+    imports?: Import[]
+    [key: string]: unknown
+  }
   isPage: boolean
   page: {
     pagePath: string
@@ -62,7 +65,7 @@ export const usePageSave = ({
   basePath,
   restData,
   isPage,
-  page,
+  page
 }: PageSaveProps): {
   handleSave: () => Promise<void>
 } => {
@@ -71,56 +74,46 @@ export const usePageSave = ({
 
   const { createGitCommit } = useGit()
 
-  const handleSave = useCallback(
-    async (): Promise<void> => {
-      try {
-        if (!basePath) {
-          throw new Error('Base path is required')
-        }
-
-        const isBpmnProcess = restData.type === 'processStep'
-
-        console.log('Saving configuration:', restData)
-
-        let error: string | undefined
-
-        if (isBpmnProcess) {
-          const result = await window.engine.createProcessStep(restData, ENV_TYPES.NEXTJS, basePath)
-          error = result.error
-        } else {
-          const result = await window.engine.createPage(restData, ENV_TYPES.NEXTJS, basePath)
-          error = result.error
-        }
-
-        if (error) {
-          const saveError: SaveError = {
-            message: error,
-            code: 'SAVE_ERROR'
-          }
-          throw saveError
-        }
-
-        // Generate automatic commit message
-        const commitMessage = generateCommitMessage(restData, page, isBpmnProcess, isPage)
-        createGitCommit(basePath, commitMessage)
-
-        showSuccessToast('Components saved successfully')
-        dispatch(onSetChangeStatus(true))
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-        showErrorToast(errorMessage)
-        console.error('Save error:', error)
+  const handleSave = useCallback(async (): Promise<void> => {
+    try {
+      if (!basePath) {
+        throw new Error('Base path is required')
       }
-    },
-    [
-      basePath,
-      restData,
-      isPage,
-      page,
-      restData,
-      createGitCommit
-    ]
-  )
+
+      const isBpmnProcess = restData.type === 'processStep'
+
+      console.log('Saving configuration:', restData)
+
+      let error: string | undefined
+
+      if (isBpmnProcess) {
+        const result = await window.engine.createProcessStep(restData, ENV_TYPES.NEXTJS, basePath)
+        error = result.error
+      } else {
+        const result = await window.engine.createPage(restData, ENV_TYPES.NEXTJS, basePath)
+        error = result.error
+      }
+
+      if (error) {
+        const saveError: SaveError = {
+          message: error,
+          code: 'SAVE_ERROR'
+        }
+        throw saveError
+      }
+
+      // Generate automatic commit message
+      const commitMessage = generateCommitMessage(restData, page, isBpmnProcess, isPage)
+      createGitCommit(basePath, commitMessage)
+
+      showSuccessToast('Components saved successfully')
+      dispatch(onSetChangeStatus(true))
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      showErrorToast(errorMessage)
+      console.error('Save error:', error)
+    }
+  }, [basePath, restData, isPage, page, restData, createGitCommit])
 
   return {
     handleSave

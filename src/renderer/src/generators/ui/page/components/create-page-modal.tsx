@@ -17,7 +17,7 @@ import {
 import { FocusEvent, useEffect, useState } from 'react'
 import { CheckboxInput, TextInput } from '@renderer/generators/api/components/inputs-form'
 import { camelCase } from 'lodash-es'
-import { PageDefinition } from './page-manager'
+import { PageDefinition } from '../page-manager'
 import { getDynamicSegments } from '@renderer/generators/ui/components/settings/properties/route-parser'
 
 const initialValues: PageConfig = {
@@ -123,8 +123,8 @@ export function CreatePageModal({
           isState: false
         }))
 
-          // Add args to pageConfig (we'll need to extend the interface)
-          ; (pageConfig as unknown as PageConfig).args = generatedArgs
+        // Add args to pageConfig (we'll need to extend the interface)
+        ;(pageConfig as unknown as PageConfig).args = generatedArgs
       }
 
       const { error } = await window.engine.createPage(
@@ -186,10 +186,10 @@ export function CreatePageModal({
     onSubmit: async (values, actions) => {
       const newValues = isSubPage
         ? {
-          ...values,
-          path: `${currentComponent?.content?.path}/${values.path}`,
-          parentName: currentComponent?.content?.pageName
-        }
+            ...values,
+            path: `${currentComponent?.content?.path}/${values.path}`,
+            parentName: currentComponent?.content?.pageName
+          }
         : values
 
       newValues.id = newValues.id || getId()
@@ -254,7 +254,11 @@ export function CreatePageModal({
     <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
       <IGRPDialogContentPrimitive>
         <IGRPDialogTitlePrimitive>
-          {isSubPage ? t('createSubNewPage') : formInitialValues.id ? `Edit ${formInitialValues.pageName}` : t('createNewPage')}
+          {isSubPage
+            ? t('createSubNewPage')
+            : formInitialValues.id
+              ? `Edit ${formInitialValues.pageName}`
+              : t('createNewPage')}
         </IGRPDialogTitlePrimitive>
         <IGRPDialogDescriptionPrimitive>
           {t('comonDialogtDescription', { name: 'Page' })}

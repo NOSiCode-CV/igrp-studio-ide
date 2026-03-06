@@ -275,7 +275,6 @@ export default function Doctor({
                                     </IGRPTooltipPrimitive>
                                   </IGRPTooltipProviderPrimitive>
                                 )}
-
                               </IGRPTableCellPrimitive>
                               <IGRPTableCellPrimitive className="py-3">
                                 {!tool.success && tool.link && (

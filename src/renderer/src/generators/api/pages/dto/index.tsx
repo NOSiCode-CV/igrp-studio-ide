@@ -105,19 +105,19 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                   options={
                     dtos && dtos.length > 0
                       ? dtos.map(
-                        ({
-                          label,
-                          module,
-                          value
-                        }: {
-                          label: string
-                          module: string
-                          value: string
-                        }) => ({
-                          label: `${label} (${module})`,
-                          value: `${value}-${module}`
-                        })
-                      )
+                          ({
+                            label,
+                            module,
+                            value
+                          }: {
+                            label: string
+                            module: string
+                            value: string
+                          }) => ({
+                            label: `${label} (${module})`,
+                            value: `${value}-${module}`
+                          })
+                        )
                       : []
                   }
                   onChange={(option: string | boolean) =>

@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import './themes.css';
+@import "tailwindcss";
+@import "./themes.css";
 
 @plugin "tailwindcss-animate";
 /*
@@ -174,7 +174,7 @@
   }
 
   button:not(:disabled),
-  [role='button']:not(:disabled) {
+  [role="button"]:not(:disabled) {
     cursor: pointer;
   }
 }

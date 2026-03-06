@@ -393,17 +393,14 @@ export function FormValidationPopover({
                         return (
                           <div key={validation} className="text-xs text-muted-foreground ml-6">
                             • {toInitCap(t(validation))}
-                            {value !== true &&
-                              value !== false &&
-                              `: ${value}`}
+                            {value !== true && value !== false && `: ${value}`}
                           </div>
                         )
                       })}
                     {getValidationOptions().filter((validation) => {
                       const value = field?.validation?.[validation] ?? field?.[validation]
                       return value !== undefined && value !== null && value !== ''
-                    }).length ===
-                      0 &&
+                    }).length === 0 &&
                       !field?.validation?.key && (
                         <div className="text-xs text-muted-foreground ml-6">
                           {t('noValidationsSet')}

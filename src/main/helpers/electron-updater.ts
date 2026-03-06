@@ -26,7 +26,10 @@ export function applyUpdateChannelConfig(): void {
     channel: feedChannel
   })
   autoUpdater.allowPrerelease = channel === 'beta'
-  log.info('Update channel configured', { channel: feedChannel, allowPrerelease: channel === 'beta' })
+  log.info('Update channel configured', {
+    channel: feedChannel,
+    allowPrerelease: channel === 'beta'
+  })
 }
 
 export interface UpdateMessage {

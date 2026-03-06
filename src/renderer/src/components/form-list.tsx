@@ -222,9 +222,7 @@ export const FormList: FunctionComponent<ITabelContainer> = ({
   // Renderização do cabeçalho da tabela
   const renderTableHeader = (): React.ReactNode => {
     return (
-      <div
-        className="flex flex-1  gap-4 p-3 bg-muted/50 border-b text-sm font-medium text-muted-foreground"
-      >
+      <div className="flex flex-1  gap-4 p-3 bg-muted/50 border-b text-sm font-medium text-muted-foreground">
         {columns.map(({ name, width, type }, index) => (
           <div
             style={{ width }}

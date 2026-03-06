@@ -52,11 +52,7 @@ const IGRPStudioPageHeader: React.FC<PageHeaderProps> = ({ comp, onDragEnd }: Pa
   }
 
   return (
-    <IGRPPageHeader
-      title={title || label || componentName}
-      {...properties}
-      showBackButton={false}
-    >
+    <IGRPPageHeader title={title || label || componentName} {...properties} showBackButton={false}>
       <Droppable
         component={comp}
         onDrop={onDragEnd}

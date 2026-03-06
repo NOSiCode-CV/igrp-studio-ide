@@ -1,13 +1,7 @@
 'use client'
 
 import { useState, useEffect, JSX } from 'react'
-import {
-  Wifi,
-  WifiOff,
-  HelpCircle,
-  AlertCircle,
-  Stethoscope
-} from 'lucide-react'
+import { Wifi, WifiOff, HelpCircle, AlertCircle, Stethoscope } from 'lucide-react'
 
 import {
   IGRPButtonPrimitive,
@@ -107,7 +101,7 @@ export function Footer(): JSX.Element {
     if (appVersion) handleCheckUpdate()
   }, [appVersion, t])
 
- /*  const simulateError = (): void => {
+  /*  const simulateError = (): void => {
     const error = new Error('This is a simulated error from the renderer process.')
 
     if (window.electron?.reportError) {
@@ -129,16 +123,25 @@ export function Footer(): JSX.Element {
 
           <span className="text-muted-foreground">
             {lastUpdateType === 'error' ? (
-              <span className="flex items-center space-x-1 text-destructive" title={updateError || log}>
+              <span
+                className="flex items-center space-x-1 text-destructive"
+                title={updateError || log}
+              >
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span className="truncate max-w-[calc(100vw-500px)]">{updateError || log}</span>
               </span>
-            ) : lastUpdateType === 'available' || lastUpdateType === 'progress' || lastUpdateType === 'downloaded' ? (
+            ) : lastUpdateType === 'available' ||
+              lastUpdateType === 'progress' ||
+              lastUpdateType === 'downloaded' ? (
               <button
                 type="button"
                 onClick={() => window.dispatchEvent(new CustomEvent(SHOW_UPDATE_MODAL_EVENT))}
                 className="flex items-center space-x-1 text-amber-600 hover:text-amber-700 hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 rounded"
-                title={newVersion ? `${t('new_update_available')} (${newVersion})` : t('new_update_available')}
+                title={
+                  newVersion
+                    ? `${t('new_update_available')} (${newVersion})`
+                    : t('new_update_available')
+                }
               >
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span className="truncate max-w-[calc(100vw-500px)]">{log}</span>
@@ -156,7 +159,7 @@ export function Footer(): JSX.Element {
         <div className="flex items-center space-x-3">
           <IGRPSeparator orientation="vertical" className="h-4" />
 
-         {/*  <button onClick={simulateError} className="">
+          {/*  <button onClick={simulateError} className="">
             Simulate Error
           </button> */}
 

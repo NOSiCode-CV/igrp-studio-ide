@@ -21,12 +21,12 @@ export const toolConfig: ToolConfig[] = [
     link: 'https://nodejs.org/en/download',
     required: true,
     category: 'frontend',
-    description: 'JavaScript runtime for frontend development',
-    versionCheck: {
+    description: 'JavaScript runtime for frontend development'
+    /* versionCheck: {
       minMajor: 20,
       maxMajor: 22,
       range: '^20.19.0 || >=22.12.0'
-    }
+    } */
   },
   {
     name: 'npm',

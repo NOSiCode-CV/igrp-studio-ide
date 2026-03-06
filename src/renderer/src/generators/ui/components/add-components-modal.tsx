@@ -32,8 +32,6 @@ import Draggable from '@renderer/lib/dnd/Draggable'
 import Droppable from '@renderer/lib/dnd/Droppable'
 import useToast from '@renderer/hooks/useToast'
 
-
-
 interface AddComponentProps {
   path: string
   comp: StructuredComponent

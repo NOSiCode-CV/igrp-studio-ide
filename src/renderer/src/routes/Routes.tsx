@@ -51,7 +51,6 @@ const othersRoutes = [
 ]
 
 function AppRoutes(): JSX.Element {
-
   return (
     <React.Fragment>
       <Suspense fallback={<Loader />}>

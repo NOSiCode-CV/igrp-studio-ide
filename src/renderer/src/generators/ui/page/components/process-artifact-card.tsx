@@ -24,7 +24,10 @@ interface ProcessArtifactCardProps {
   stepProcessFound: FileTree | undefined
   onPageClick?: (pageDefinition: PageDefinition) => void
   onRegenerateStep: (process: BPMNProjectProcessDefinition, artifact: BPMNProjectArtifact) => void
-  onCopyFromLegacyVersion: (process: BPMNProjectProcessDefinition, artifact: BPMNProjectArtifact) => void
+  onCopyFromLegacyVersion: (
+    process: BPMNProjectProcessDefinition,
+    artifact: BPMNProjectArtifact
+  ) => void
 }
 
 export const ProcessArtifactCard = ({
@@ -54,10 +57,12 @@ export const ProcessArtifactCard = ({
               <IGRPBadgePrimitive variant="outline" className="text-xs">
                 v{selectedProcess.version || 'N/A'}
               </IGRPBadgePrimitive>
-              {formKeyType === 'unknown' && (<IGRPBadgePrimitive variant="destructive" className="text-xs">
-                <AlertTriangle className="h-4 w-4" />
-                Unknown Form Key
-              </IGRPBadgePrimitive>)}
+              {formKeyType === 'unknown' && (
+                <IGRPBadgePrimitive variant="destructive" className="text-xs">
+                  <AlertTriangle className="h-4 w-4" />
+                  Unknown Form Key
+                </IGRPBadgePrimitive>
+              )}
             </div>
           </div>
           {formKeyType === 'shared' && (
@@ -74,7 +79,6 @@ export const ProcessArtifactCard = ({
       </IGRPCardPrimitive>
     )
   }
-
 
   return (
     <IGRPCardPrimitive className="hover:shadow-md transition-all cursor-pointer hover:bg-muted/30">
@@ -97,7 +101,8 @@ export const ProcessArtifactCard = ({
                 </IGRPButtonPrimitive>
               </IGRPDropdownMenuTriggerPrimitive>
               <IGRPDropdownMenuContentPrimitive align="end" className="w-56">
-                <IGRPDropdownMenuItemPrimitive disabled={!stepProcessFound}
+                <IGRPDropdownMenuItemPrimitive
+                  disabled={!stepProcessFound}
                   onClick={() => onRegenerateStep(selectedProcess, artifact)}
                 >
                   <RotateCw className="mr-2 h-4 w-4" />

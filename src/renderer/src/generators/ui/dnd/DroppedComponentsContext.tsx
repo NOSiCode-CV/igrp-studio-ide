@@ -435,7 +435,7 @@ export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({ c
         setAllArguments,
         componentArguments,
         setAllRestData,
-        restData,  
+        restData
       }}
     >
       {children}

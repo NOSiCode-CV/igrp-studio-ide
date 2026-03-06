@@ -190,11 +190,11 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
   } | null => {
     return localSchema
       ? {
-        type: 'object',
-        properties: {
-          [localSchema?.name || 'data']: localSchema
+          type: 'object',
+          properties: {
+            [localSchema?.name || 'data']: localSchema
+          }
         }
-      }
       : null
   }
 

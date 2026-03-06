@@ -114,39 +114,39 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
     { key: 'name', name: t('name'), type: 'text', readonly: !newBinding },
     ...(!newBinding
       ? [
-        {
-          key: 'newType',
-          name: t('type'),
-          type: 'select',
-          options: fieldsTypeOptions
-        }
-      ]
+          {
+            key: 'newType',
+            name: t('type'),
+            type: 'select',
+            options: fieldsTypeOptions
+          }
+        ]
       : []),
 
     ...(newBinding
       ? [
-        {
-          key: 'type',
-          name: t('dataType'),
-          type: 'typeSelectorDropdown',
-          options: FIELD_TYPES
-        },
-        {
-          key: 'required',
-          name: 'Required?',
-          type: 'checkbox'
-        },
-        {
-          key: 'nullable',
-          name: 'Nullable?',
-          type: 'checkbox'
-        },
-        {
-          key: 'isList',
-          name: 'IsList?',
-          type: 'checkbox'
-        }
-      ]
+          {
+            key: 'type',
+            name: t('dataType'),
+            type: 'typeSelectorDropdown',
+            options: FIELD_TYPES
+          },
+          {
+            key: 'required',
+            name: 'Required?',
+            type: 'checkbox'
+          },
+          {
+            key: 'nullable',
+            name: 'Nullable?',
+            type: 'checkbox'
+          },
+          {
+            key: 'isList',
+            name: 'IsList?',
+            type: 'checkbox'
+          }
+        ]
       : []),
     { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
     {
@@ -243,10 +243,11 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             type:
               (data && 'defaultValues' in data && data.defaultValues?.properties?.type?.default) ??
               'any',
-            name: `${values.name ??
+            name: `${
+              values.name ??
               (data && 'defaultValues' in data && data.defaultValues?.properties?.name?.default) ??
               ''
-              }Data`,
+            }Data`,
             defaultValue: `init${capitalize(values.name)}`,
             imports:
               (data &&
@@ -419,7 +420,6 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
     }
   }, [components, comp.children])
 
-
   const handleChange = (element: string, position: number, result: any): void => {
     if (element === 'newType') {
       const field: any = getFields().find((c: any) => c.name === result) || {}
@@ -498,17 +498,19 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                 />
               )}
 
-              {columns.length > 0 && <div className="border rounded-sm">
-                <FormList
-                  columns={columns}
-                  formik={formik}
-                  data={formik.values.fields}
-                  changeValue={(element, position, result) => {
-                    handleChange(element, position, result)
-                  }}
-                  name={'fields'}
-                />
-              </div>}
+              {columns.length > 0 && (
+                <div className="border rounded-sm">
+                  <FormList
+                    columns={columns}
+                    formik={formik}
+                    data={formik.values.fields}
+                    changeValue={(element, position, result) => {
+                      handleChange(element, position, result)
+                    }}
+                    name={'fields'}
+                  />
+                </div>
+              )}
 
               <IGRPDialogFooterPrimitive className="space-x-2">
                 <IGRPDialogClosePrimitive>Close</IGRPDialogClosePrimitive>

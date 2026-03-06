@@ -123,12 +123,13 @@ export function UpdateModalBottomLeft(): JSX.Element | null {
 
   const hasUpdate =
     updateInfo &&
-    (updateInfo.type === 'available' || updateInfo.type === 'progress' || updateInfo.type === 'downloaded') &&
+    (updateInfo.type === 'available' ||
+      updateInfo.type === 'progress' ||
+      updateInfo.type === 'downloaded') &&
     updateInfo.version
 
   const show =
-    hasUpdate &&
-    (userRequestedOpen || (dismissedVersion !== updateInfo.version && !isDismissed()))
+    hasUpdate && (userRequestedOpen || (dismissedVersion !== updateInfo.version && !isDismissed()))
 
   if (!show) return null
 
@@ -147,9 +148,7 @@ export function UpdateModalBottomLeft(): JSX.Element | null {
             <Package className="h-4 w-4 text-primary" aria-hidden />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-foreground">
-              {t('new_update_available')}
-            </p>
+            <p className="text-sm font-medium text-foreground">{t('new_update_available')}</p>
             {updateInfo.version && (
               <p className="text-xs text-muted-foreground mt-0.5 truncate">
                 {isDownloaded

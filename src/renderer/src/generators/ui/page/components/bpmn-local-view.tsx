@@ -40,12 +40,12 @@ export interface BpmnLocalViewProps {
   showAddComponentsModal: boolean
   onShowAddComponentsModalChange: (open: boolean) => void
   pendingComponentData:
-  | {
-    processDefinition: BPMNProjectProcessDefinition
-    processArtifact: BPMNProjectArtifact
-    processFound: FileTree
-  }
-  | undefined
+    | {
+        processDefinition: BPMNProjectProcessDefinition
+        processArtifact: BPMNProjectArtifact
+        processFound: FileTree
+      }
+    | undefined
   oldProcessFound: FileTree | undefined
   onConfirmStepProcess: (
     componentDescription: string,
@@ -219,10 +219,11 @@ export const BpmnLocalView = ({
                 return (
                   <IGRPCardPrimitive
                     key={`${process.path}-${index}`}
-                    className={`hover:shadow-md transition-all cursor-pointer ${selectedLocalProcess?.path === process.path
-                      ? 'ring-2 ring-primary'
-                      : 'hover:bg-muted/30'
-                      }`}
+                    className={`hover:shadow-md transition-all cursor-pointer ${
+                      selectedLocalProcess?.path === process.path
+                        ? 'ring-2 ring-primary'
+                        : 'hover:bg-muted/30'
+                    }`}
                     onClick={() => {
                       onSelectedLocalProcessChange(
                         selectedLocalProcess?.path === process.path ? null : process

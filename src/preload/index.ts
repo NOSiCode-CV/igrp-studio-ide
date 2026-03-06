@@ -511,7 +511,8 @@ if (process.contextIsolated) {
       downloadUpdate: () => ipcRenderer.invoke('download-update'),
       installUpdate: () => ipcRenderer.invoke('install-update'),
       getUpdateChannel: () => ipcRenderer.invoke('update:get-channel'),
-      setUpdateChannel: (channel: UpdateChannel) => ipcRenderer.invoke('update:set-channel', channel),
+      setUpdateChannel: (channel: UpdateChannel) =>
+        ipcRenderer.invoke('update:set-channel', channel),
       reconfigureUpdateChannel: () => ipcRenderer.invoke('update:reconfigure-channel'),
       watchFolder: (folderPath: string) => ipcRenderer.invoke('watch-folder', folderPath),
       onFolderChange: (callback: (event: WatchEvent) => void) => {

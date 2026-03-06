@@ -79,7 +79,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
     const { handleSave } = usePageSave({
       basePath,
       restData: {
-        ...restData,           // tudo o que já está em restData no context
+        ...restData, // tudo o que já está em restData no context
         args: componentArguments,
         id,
         components,

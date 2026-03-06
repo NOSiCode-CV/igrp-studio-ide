@@ -47,8 +47,9 @@ export const useGit = (): {
     (error: Error): GitErrorType | null => {
       const message = error.message.toUpperCase()
       return (
-        (Object.keys(GIT_ERROR_MESSAGES) as GitErrorType[]).find((type) => message.includes(type)) ||
-        null
+        (Object.keys(GIT_ERROR_MESSAGES) as GitErrorType[]).find((type) =>
+          message.includes(type)
+        ) || null
       )
     },
     [GIT_ERROR_MESSAGES]
