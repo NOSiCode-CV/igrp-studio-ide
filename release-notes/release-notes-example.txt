@@ -1,0 +1,14 @@
+What's new
+----------
+
+Update channel (Beta / Stable)
+Choose how you receive updates:
+• Stable – Only stable releases. Recommended for production.
+• Beta – Includes pre-releases for early access to new features.
+Go to Settings → About → Update channel to change.
+
+Release notes in the update dialog
+When a new version is available, the update dialog can now show release notes from GitHub Releases or our update server.
+
+Improvements and fixes
+• General stability and performance improvements.
