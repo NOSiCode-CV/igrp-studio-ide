@@ -1,14 +1,14 @@
-import { CustomPropertiesStyle } from '../types'
+import type { CustomPropertiesStyle } from '../types'
 
 export const customPropertiesToClasses = (customProperties: CustomPropertiesStyle): string => {
-  if (!customProperties.properties || customProperties.properties.length === 0) {
-    return ''
-  }
+    if (!customProperties.properties || customProperties.properties.length === 0) {
+        return ''
+    }
 
-  const cssProperties = customProperties.properties
-    .filter((prop) => prop.name && prop.value)
-    .map((prop) => `--${prop.name}: ${prop.value}`)
-    .join('; ')
+    const cssProperties = customProperties.properties
+        .filter((prop) => prop.name && prop.value)
+        .map((prop) => `--${prop.name}: ${prop.value}`)
+        .join('; ')
 
-  return cssProperties ? `[style*="${cssProperties}"]` : ''
+    return cssProperties ? `[style*="${cssProperties}"]` : ''
 }
