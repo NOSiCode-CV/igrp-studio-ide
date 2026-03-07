@@ -37,7 +37,7 @@
         "@igrp/dotnet-engine": "^0.0.1-alpha.12",
         "@igrp/framework-process-studio-bpmn-editor": "0.0.1-beta.16",
         "@igrp/igrp-framework-react-design-system": "0.1.0-beta.103",
-        "@igrp/igrp-studio-nextjs-engine": "0.1.0-beta.74",
+        "@igrp/igrp-studio-nextjs-engine": "0.1.0-beta.75",
         "@igrp/igrp-studio-springboot-engine": "0.1.0-beta.20",
         "@monaco-editor/react": "^4.7.0",
         "@octokit/rest": "^22.0.1",
@@ -96,7 +96,7 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.2.6",
+        "@biomejs/biome": "2.4.6",
         "@electron-toolkit/tsconfig": "^2.0.0",
         "@tailwindcss/postcss": "^4.2.1",
         "@testing-library/jest-dom": "^6.9.1",
