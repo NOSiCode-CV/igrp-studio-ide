@@ -27,6 +27,7 @@ import {
     type ComponentProps,
     useCallback,
     useEffect,
+    useId,
     useMemo,
     useState
 } from 'react'
@@ -455,6 +456,9 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
         )
     }
 
+    const idTag = useId()
+    const idUseClient = useId()
+
     return (
         <IGRPSidebarPrimitive
             collapsible="none"
@@ -508,14 +512,14 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                                     {`${label || componentName} - ${componentId}`}
                                 </IGRPLabelPrimitive>
                                 <IGRPInputPrimitive
-                                    id="tag"
+                                    id={idTag}
                                     value={tempEditingComponent?.tag}
                                     onChange={udpateTag}
                                 />
                             </div>
                             {isRootComponent && (
                                 <CheckboxInput
-                                    id="useClient"
+                                    id={idUseClient}
                                     label={t('useClient')}
                                     onChange={(value: boolean) => udpateTypeRenderComponent(value)}
                                     value={restData?.useClient ?? true}

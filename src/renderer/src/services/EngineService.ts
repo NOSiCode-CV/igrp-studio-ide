@@ -28,12 +28,11 @@ export const EngineService = {
         currentPage,
         loadRegistryComponent
     }: {
-        customComponents: any
+        customComponents: ComponentDef[]
         appComponents: FileTree[]
         currentPage: string
         loadRegistryComponent: () => void
     }): Promise<void> {
-        console.log('customComponents', customComponents)
 
         const components: ComponentRegisterConfig[] = customComponents.map(
             (component: ComponentDef) => ({
@@ -71,7 +70,8 @@ export const EngineService = {
                 renderer: 'custom',
                 templatePath: '',
                 defaultChildren: [],
-                allowChildren: component.allowChildren ?? false
+                allowChildren: component.allowChildren ?? false,
+                metadata: {}
             })
         )
 
@@ -118,7 +118,8 @@ export const EngineService = {
                 renderer: 'custom',
                 templatePath: '',
                 metadata: component.content,
-                defaultChildren: []
+                defaultChildren: [],
+                
             }))
 
         const componentsToRegister = [...components, ..._components]

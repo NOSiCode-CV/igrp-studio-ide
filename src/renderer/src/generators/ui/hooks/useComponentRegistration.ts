@@ -2,10 +2,12 @@ import { EngineService } from '@renderer/services/EngineService'
 import { useEffect } from 'react'
 import { useComponentsContext } from '../contexts/ComponentsContext'
 import type { PageDefinition } from '../page/page-manager'
+import { ComponentDef } from '@igrp/igrp-studio-nextjs-engine/types'
+import { FileTree } from 'src/main/types'
 
 interface ComponentRegistrationProps {
-    customComponents: any[]
-    fetchComponents: () => any[]
+    customComponents: ComponentDef[]
+    fetchComponents: () => FileTree[]
     page: PageDefinition
 }
 
@@ -22,7 +24,7 @@ export const useComponentRegistration = ({
     const { loadRegistryComponent } = useComponentsContext()
 
     const registerComponents = (): void => {
-        const appComponents = fetchComponents()
+        const appComponents: FileTree[] = fetchComponents()
 
         EngineService.registerComponent({
             customComponents,

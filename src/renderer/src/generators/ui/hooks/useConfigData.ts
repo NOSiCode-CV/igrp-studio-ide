@@ -47,7 +47,8 @@ const useConfigdata = (components: ComponentRegisterConfig[]) => {
                     defaultChildren: component.defaultChildren,
                     allowTypes: component.allowTypes,
                     data: component.data,
-                    deprecated: component.deprecated
+                    deprecated: component.deprecated,
+                    allowChildren: component.allowChildren
                 }))
         }))
     }, [components])
