@@ -13,11 +13,11 @@ import LoaderComponent from './components/loader'
 loader.config({ monaco })
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <React.Suspense fallback={<LoaderComponent />}>
-        <AppWithI18n />
-      </React.Suspense>
-    </ErrorBoundary>
-  </React.StrictMode>
+    <React.StrictMode>
+        <ErrorBoundary>
+            <React.Suspense fallback={<LoaderComponent />}>
+                <AppWithI18n />
+            </React.Suspense>
+        </ErrorBoundary>
+    </React.StrictMode>
 )

@@ -1,20 +1,20 @@
+import type { FileTree, IWorkspace, ProjectData } from 'src/main/types'
 import {
-  setConfigAction,
-  setBasePathAction,
-  setChangeStatusAction,
-  setCurrentItemAction,
-  setFilesThreeAction,
-  setWorkspaceAction
+    setBasePathAction,
+    setChangeStatusAction,
+    setConfigAction,
+    setCurrentItemAction,
+    setFilesThreeAction,
+    setWorkspaceAction
 } from './reducer'
-import { FileTree, IWorkspace, ProjectData } from 'src/main/types'
 /**
  * set BasePath
  * @param {*} param0
  */
 export const setBasePath = (basePath: string) => async (dispatch: any) => {
-  try {
-    dispatch(setBasePathAction(basePath))
-  } catch (error) {}
+    try {
+        dispatch(setBasePathAction(basePath))
+    } catch (error) {}
 }
 
 /**
@@ -22,9 +22,9 @@ export const setBasePath = (basePath: string) => async (dispatch: any) => {
  * @param {*} param0
  */
 export const setConfig = (appConfig: ProjectData) => async (dispatch: any) => {
-  try {
-    dispatch(setConfigAction(appConfig))
-  } catch (error) {}
+    try {
+        dispatch(setConfigAction(appConfig))
+    } catch (error) {}
 }
 
 /**
@@ -32,9 +32,9 @@ export const setConfig = (appConfig: ProjectData) => async (dispatch: any) => {
  * @param {*} param0
  */
 export const setChangeStatus = (status: boolean) => async (dispatch: any) => {
-  try {
-    dispatch(setChangeStatusAction(status))
-  } catch (error) {}
+    try {
+        dispatch(setChangeStatusAction(status))
+    } catch (error) {}
 }
 
 /**
@@ -42,9 +42,9 @@ export const setChangeStatus = (status: boolean) => async (dispatch: any) => {
  * @param {*} param0
  */
 export const setCurrentItem = (item: any) => async (dispatch: any) => {
-  try {
-    dispatch(setCurrentItemAction(item))
-  } catch (error) {}
+    try {
+        dispatch(setCurrentItemAction(item))
+    } catch (error) {}
 }
 
 /**
@@ -52,9 +52,9 @@ export const setCurrentItem = (item: any) => async (dispatch: any) => {
  * @param {*} param0
  */
 export const setWorkspace = (workspace: IWorkspace | null) => async (dispatch: any) => {
-  try {
-    dispatch(setWorkspaceAction(workspace))
-  } catch (error) {}
+    try {
+        dispatch(setWorkspaceAction(workspace))
+    } catch (error) {}
 }
 
 /* /**
@@ -63,10 +63,10 @@ export const setWorkspace = (workspace: IWorkspace | null) => async (dispatch: a
  */
 
 export const getFileThree = (basePath: string) => async (dispatch: any) => {
-  try {
-    let filesThree: FileTree[] = await window.api.fetchFiles(`${basePath}/.igrpstudio`)
-    dispatch(setFilesThreeAction(filesThree))
-  } catch (error) {
-    console.error('error:', error)
-  }
+    try {
+        const filesThree: FileTree[] = await window.api.fetchFiles(`${basePath}/.igrpstudio`)
+        dispatch(setFilesThreeAction(filesThree))
+    } catch (error) {
+        console.error('error:', error)
+    }
 }

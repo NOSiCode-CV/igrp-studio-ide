@@ -1,80 +1,80 @@
+import type { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system'
+import type { RuleDefinition } from '@igrp/igrp-studio-nextjs-engine/types'
 import { EmptyList } from '@renderer/components/empty-list'
 import useStudio from '@renderer/hooks/use-studio'
-import { StructuredComponent } from '@renderer/lib/dnd/types'
+import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { MousePointer } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Action, TriggerControls } from './components/trigger-controls'
 import Rules from './components/rules'
-import { RuleDefinition } from '@igrp/igrp-studio-nextjs-engine/types'
-import { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system'
+import { type Action, TriggerControls } from './components/trigger-controls'
 
 interface InteractionProps {
-  comp: StructuredComponent
-  path: string
-  onInteranctionsChange: (componentId: string, updates: Partial<StructuredComponent>) => void
-  columnsOptions?: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[]
+    comp: StructuredComponent
+    path: string
+    onInteranctionsChange: (componentId: string, updates: Partial<StructuredComponent>) => void
+    columnsOptions?: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[]
 }
 
 const Interactions = ({
-  comp,
-  path,
-  onInteranctionsChange,
-  columnsOptions = []
+    comp,
+    path,
+    onInteranctionsChange,
+    columnsOptions = []
 }: InteractionProps) => {
-  const { getInteractionsComponent, getRulesComponent } = useStudio()
+    const { getInteractionsComponent, getRulesComponent } = useStudio()
 
-  const [interactionsType, setInteractionsType] = useState({})
+    const [interactionsType, setInteractionsType] = useState({})
 
-  const [rulesProperties, setRulesProperties] = useState({})
+    const [rulesProperties, setRulesProperties] = useState({})
 
-  const { componentName, interactions, id: componentId, tag, rules } = comp
+    const { componentName, interactions, id: componentId, tag, rules } = comp
 
-  useEffect(() => {
-    if (componentName) {
-      getInteractionsComponent(path, componentName).then((data) => setInteractionsType(data))
-      getRulesComponent(path, componentName).then((data) => setRulesProperties(data))
+    useEffect(() => {
+        if (componentName) {
+            getInteractionsComponent(path, componentName).then((data) => setInteractionsType(data))
+            getRulesComponent(path, componentName).then((data) => setRulesProperties(data))
+        }
+    }, [getInteractionsComponent, comp, componentName, path, getRulesComponent])
+
+    const handleInteractionsChange = (data: Record<string, Action>) => {
+        if (componentId)
+            onInteranctionsChange(componentId, {
+                interactions: { ...data }
+            })
     }
-  }, [getInteractionsComponent, comp, componentName, path, getRulesComponent])
 
-  const handleInteractionsChange = (data: Record<string, Action>) => {
-    if (componentId)
-      onInteranctionsChange(componentId, {
-        interactions: { ...data }
-      })
-  }
+    const handleRulesChange = (data: RuleDefinition[]) => {
+        if (componentId)
+            onInteranctionsChange(componentId, {
+                rules: data
+            })
+    }
 
-  const handleRulesChange = (data: RuleDefinition[]) => {
-    if (componentId)
-      onInteranctionsChange(componentId, {
-        rules: data
-      })
-  }
-
-  return (
-    <div className="p-3 space-y-2">
-      <TriggerControls
-        interactions={interactions}
-        onInteractionsChange={handleInteractionsChange}
-        interactionsType={interactionsType}
-        componentTag={tag}
-        columnsOptions={columnsOptions}
-      />
-      {Object.keys(interactions || {}).length === 0 && (
-        <EmptyList
-          title="Element Trigger"
-          description="Select an element on the canvas, then click + above to animate the selected element when a user interacts with it (such as on hover or click)."
-          className="py-12"
-          icon={<MousePointer />}
-        />
-      )}
-      <Rules
-        rulesProperties={rulesProperties}
-        rules={rules}
-        componentTag={tag}
-        onRulesChange={handleRulesChange}
-      />
-    </div>
-  )
+    return (
+        <div className="p-3 space-y-2">
+            <TriggerControls
+                interactions={interactions}
+                onInteractionsChange={handleInteractionsChange}
+                interactionsType={interactionsType}
+                componentTag={tag}
+                columnsOptions={columnsOptions}
+            />
+            {Object.keys(interactions || {}).length === 0 && (
+                <EmptyList
+                    title="Element Trigger"
+                    description="Select an element on the canvas, then click + above to animate the selected element when a user interacts with it (such as on hover or click)."
+                    className="py-12"
+                    icon={<MousePointer />}
+                />
+            )}
+            <Rules
+                rulesProperties={rulesProperties}
+                rules={rules}
+                componentTag={tag}
+                onRulesChange={handleRulesChange}
+            />
+        </div>
+    )
 }
 
 export default Interactions

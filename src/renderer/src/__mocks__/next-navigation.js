@@ -3,34 +3,34 @@ const noop = () => {}
 const empty = () => ({})
 
 export function useRouter() {
-  return {
-    back: noop,
-    forward: noop,
-    refresh: noop,
-    push: noop,
-    replace: noop,
-    prefetch: noop
-  }
+    return {
+        back: noop,
+        forward: noop,
+        refresh: noop,
+        push: noop,
+        replace: noop,
+        prefetch: noop
+    }
 }
 
 export function usePathname() {
-  return typeof window !== 'undefined' ? window.location.pathname : '/'
+    return typeof window !== 'undefined' ? window.location.pathname : '/'
 }
 
 export function useSearchParams() {
-  return typeof window !== 'undefined'
-    ? new URLSearchParams(window.location.search)
-    : new URLSearchParams()
+    return typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search)
+        : new URLSearchParams()
 }
 
 export function useParams() {
-  return {}
+    return {}
 }
 
 export function notFound() {
-  noop()
+    noop()
 }
 
 export function redirect() {
-  noop()
+    noop()
 }

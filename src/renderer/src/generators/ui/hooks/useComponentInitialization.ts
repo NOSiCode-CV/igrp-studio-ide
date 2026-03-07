@@ -1,74 +1,74 @@
+import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { useCallback } from 'react'
 import { COMPONENT } from '../ComponentTypes'
 import { newStructuredComponent } from '../dnd/helpers'
-import { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 
 interface ComponentInitializationProps {
-  content: any
-  menuItems: any[]
-  findComponentById: (componentName: string) => Promise<ComponentRegisterConfig | undefined>
-  generateTag: (base: string) => string
-  setAllComponents: (components: any) => void
-  findComponent: (
-    path: string | undefined,
-    componentName: string
-  ) => Promise<ComponentRegisterConfig | null>
+    content: any
+    menuItems: any[]
+    findComponentById: (componentName: string) => Promise<ComponentRegisterConfig | undefined>
+    generateTag: (base: string) => string
+    setAllComponents: (components: any) => void
+    findComponent: (
+        path: string | undefined,
+        componentName: string
+    ) => Promise<ComponentRegisterConfig | null>
 }
 
 interface UseComponentInitializationReturn {
-  initializeComponents: () => Promise<void>
+    initializeComponents: () => Promise<void>
 }
 
 export const useComponentInitialization = ({
-  content,
-  findComponentById,
-  generateTag,
-  setAllComponents,
-  findComponent
+    content,
+    findComponentById,
+    generateTag,
+    setAllComponents,
+    findComponent
 }: ComponentInitializationProps): UseComponentInitializationReturn => {
-  const initializeComponents = useCallback(async () => {
-    try {
-      const isPage = content.type === 'page'
-      const isBpmnProcess = content.type === 'processStep'
+    const initializeComponents = useCallback(async () => {
+        try {
+            const isPage = content.type === 'page'
+            const isBpmnProcess = content.type === 'processStep'
 
-      const mainComponent = isPage
-        ? COMPONENT.PageContent
-        : isBpmnProcess
-          ? COMPONENT.ProcessStep
-          : COMPONENT.ComponentContent
+            const mainComponent = isPage
+                ? COMPONENT.PageContent
+                : isBpmnProcess
+                  ? COMPONENT.ProcessStep
+                  : COMPONENT.ComponentContent
 
-      let pageCompRegister
+            let pageCompRegister
 
-      if (isBpmnProcess) {
-        pageCompRegister = await findComponent('process', COMPONENT.ProcessStep)
-      } else {
-        pageCompRegister = await findComponentById(mainComponent)
-      }
-      const sectionCompRegister = await findComponentById(COMPONENT.Section)
+            if (isBpmnProcess) {
+                pageCompRegister = await findComponent('process', COMPONENT.ProcessStep)
+            } else {
+                pageCompRegister = await findComponentById(mainComponent)
+            }
+            const sectionCompRegister = await findComponentById(COMPONENT.Section)
 
-      if (!pageCompRegister && !isBpmnProcess) {
-        console.warn(`Component ${mainComponent} not found`)
-        return
-      }
+            if (!pageCompRegister && !isBpmnProcess) {
+                console.warn(`Component ${mainComponent} not found`)
+                return
+            }
 
-      const section = newStructuredComponent(COMPONENT.Section, [], sectionCompRegister)
+            const section = newStructuredComponent(COMPONENT.Section, [], sectionCompRegister)
 
-      const pageContent = newStructuredComponent(
-        mainComponent,
-        [{ ...section, tag: generateTag(COMPONENT.Section) }],
-        pageCompRegister
-      )
+            const pageContent = newStructuredComponent(
+                mainComponent,
+                [{ ...section, tag: generateTag(COMPONENT.Section) }],
+                pageCompRegister
+            )
 
-      setAllComponents({
-        ...pageContent,
-        tag: generateTag(mainComponent)
-      })
-    } catch (error) {
-      console.error('Error initializing components:', error)
+            setAllComponents({
+                ...pageContent,
+                tag: generateTag(mainComponent)
+            })
+        } catch (error) {
+            console.error('Error initializing components:', error)
+        }
+    }, [])
+
+    return {
+        initializeComponents
     }
-  }, [])
-
-  return {
-    initializeComponents
-  }
 }

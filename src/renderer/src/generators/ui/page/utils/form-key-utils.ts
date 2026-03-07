@@ -20,16 +20,16 @@ export const DEFAULT_FORM_KEY = '' as const
  * Returns true if formKey matches the shared format: ui:shared:<page>@<version>
  */
 export function isSharedFormKey(formKey: string | undefined | null): boolean {
-  if (formKey == null || formKey === '') return false
-  return SHARED_FORM_KEY_REGEX.test(formKey)
+    if (formKey == null || formKey === '') return false
+    return SHARED_FORM_KEY_REGEX.test(formKey)
 }
 
 /**
  * Returns true if formKey matches the schema-driven form format: ui:form:<formId>@<version>
  */
 export function isFormFormKey(formKey: string | undefined | null): boolean {
-  if (formKey == null || formKey === '') return false
-  return FORM_FORM_KEY_REGEX.test(formKey)
+    if (formKey == null || formKey === '') return false
+    return FORM_FORM_KEY_REGEX.test(formKey)
 }
 
 /**
@@ -37,8 +37,8 @@ export function isFormFormKey(formKey: string | undefined | null): boolean {
  * Otherwise returns the given formKey as-is (caller can validate with isSharedFormKey / isFormFormKey).
  */
 export function getNormalizedFormKey(formKey: string | undefined | null): string {
-  const trimmed = typeof formKey === 'string' ? formKey.trim() : ''
-  return trimmed === '' ? DEFAULT_FORM_KEY : trimmed
+    const trimmed = typeof formKey === 'string' ? formKey.trim() : ''
+    return trimmed === '' ? DEFAULT_FORM_KEY : trimmed
 }
 
 /**
@@ -51,39 +51,39 @@ export type FormKeyType = 'shared' | 'form' | 'unknown'
  * Uses normalized formKey (missing → ui:shared:default@1).
  */
 export function getFormKeyType(formKey: string | undefined | null): FormKeyType {
-  const normalized = getNormalizedFormKey(formKey)
-  if (isSharedFormKey(normalized)) return 'shared'
-  if (isFormFormKey(normalized)) return 'form'
-  return 'unknown'
+    const normalized = getNormalizedFormKey(formKey)
+    if (isSharedFormKey(normalized)) return 'shared'
+    if (isFormFormKey(normalized)) return 'form'
+    return 'unknown'
 }
 
 //Todo extract projectKey from formKey and return it: want this default.1 from ui:shared:default@1
 export function getKeyFromFormKey(formKey: string | undefined | null): string {
-  if (formKey == null || formKey === '') return ''
-  const normalized = getNormalizedFormKey(formKey)
-  return normalized.split('@')[0].split(':')[2] + '.v' + normalized.split('@')[1]
+    if (formKey == null || formKey === '') return ''
+    const normalized = getNormalizedFormKey(formKey)
+    return normalized.split('@')[0].split(':')[2] + '.v' + normalized.split('@')[1]
 }
 
 export function getNameFromFormKey(formKey: string | undefined | null): string {
-  if (formKey == null || formKey === '') return ''
-  const normalized = getNormalizedFormKey(formKey)
-  return normalized.split('@')[0].split(':')[2]
+    if (formKey == null || formKey === '') return ''
+    const normalized = getNormalizedFormKey(formKey)
+    return normalized.split('@')[0].split(':')[2]
 }
 
 export function getNormalizeClassNameFromFormKey(formKey: string | undefined | null): string {
-  const normalized = getNameFromFormKey(formKey)
-  return normalized
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase())
-    .replace(/\s+/g, '')
+    const normalized = getNameFromFormKey(formKey)
+    return normalized
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+        .replace(/\s+/g, '')
 }
 
 export function getVersionFromFormKey(formKey: string | undefined | null): string {
-  if (formKey == null || formKey === '') return ''
-  const normalized = getNormalizedFormKey(formKey)
-  return normalized.split('@')[1]
+    if (formKey == null || formKey === '') return ''
+    const normalized = getNormalizedFormKey(formKey)
+    return normalized.split('@')[1]
 }
 
 /** Matches version folder names: v1, v2, v10, etc. */
 export const isVersionFolderName = (name: string | undefined): boolean =>
-  Boolean(name && /^v\d+$/.test(name))
+    Boolean(name && /^v\d+$/.test(name))
