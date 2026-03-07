@@ -1,28 +1,34 @@
-import { app, BrowserWindow, dialog, ipcMain, IpcMainInvokeEvent, screen, shell } from 'electron'
-import path, { join } from 'path'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
-import { closeApp, installExtensions } from './helpers/utils'
-import fs from 'fs'
-import { FileTree, IOpenProject } from './types'
-import { initializeLogger, sendErrorReport } from './helpers/logger'
-
-import {
-  checkAndReadBaseApi,
-  getFileContent,
-  getJsonContent,
-  openDirectory,
-  readDirectory,
-  readIgrpStudioDirectory,
-  readProjectFile
-} from './helpers'
-
 import { exec } from 'child_process'
+import {
+    app,
+    BrowserWindow,
+    dialog,
+    type IpcMainInvokeEvent,
+    ipcMain,
+    screen,
+    shell
+} from 'electron'
+import fs from 'fs'
+import path, { join } from 'path'
+import icon from '../../resources/icon.png?asset'
+import {
+    checkAndReadBaseApi,
+    getFileContent,
+    getJsonContent,
+    openDirectory,
+    readDirectory,
+    readIgrpStudioDirectory,
+    readProjectFile
+} from './helpers'
 import { githubAuth } from './helpers/git-auth/github-auth'
-import { GitLabService } from './services/gitlab-service'
 import { gitlabAuth } from './helpers/git-auth/gitlab-auth'
+import { initializeLogger, sendErrorReport } from './helpers/logger'
+import { closeApp, installExtensions } from './helpers/utils'
 import { GitStore } from './services/git-store'
 import { GitHubService } from './services/github-service'
+import { GitLabService } from './services/gitlab-service'
+import type { FileTree, IOpenProject } from './types'
 
 import './handlers/api-handler'
 import './handlers/db-handler'
@@ -33,21 +39,19 @@ import './handlers/docker-handler'
 import './handlers/global-handler'
 import './helpers/fetch-request'
 
-import { buildTaskbar } from './helpers/taskbar'
-
-import NextJsManager from './helpers/nextjsManager'
 import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
 import dotenv from 'dotenv'
-import AppUpdater, { applyUpdateChannelConfig } from './helpers/electron-updater'
 import { autoUpdater } from 'electron-updater'
-import { detectInstalledIDEs, IDEDetails, IDES } from './helpers/ideDetection'
-import { NextjsEngine } from './engines/NextjsEngine'
-import { WorkspaceRepository } from './services/workspace-service'
-import { IGRPStudioSettings } from './helpers/igrp-studio-settings'
-import { folderWatcher } from './helpers/watch-folder'
-
 import { mainBindings } from 'i18next-electron-fs-backend'
+import { NextjsEngine } from './engines/NextjsEngine'
 import { SpringEngine } from './engines/SpringEngine'
+import AppUpdater, { applyUpdateChannelConfig } from './helpers/electron-updater'
+import { detectInstalledIDEs, type IDEDetails, IDES } from './helpers/ideDetection'
+import { IGRPStudioSettings } from './helpers/igrp-studio-settings'
+import NextJsManager from './helpers/nextjsManager'
+import { buildTaskbar } from './helpers/taskbar'
+import { folderWatcher } from './helpers/watch-folder'
+import { WorkspaceRepository } from './services/workspace-service'
 
 let mainWindow: BrowserWindow
 
@@ -57,452 +61,455 @@ let currentAuthProvider: 'github' | 'gitlab' | null = null
 dotenv.config()
 
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error)
-  sendErrorReport(error)
+    console.error('Uncaught Exception:', error)
+    sendErrorReport(error)
 })
 
 function createWindow(): void {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 1160,
-    height: 650,
-    minWidth: 960,
-    minHeight: 620,
-    show: false,
-    autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
-    },
-    titleBarStyle: 'hidden',
-    icon: path.join(__dirname, 'resources/icons', 'icon.icns') // Set icon for the window
-  })
+    // Create the browser window.
+    mainWindow = new BrowserWindow({
+        width: 1160,
+        height: 650,
+        minWidth: 960,
+        minHeight: 620,
+        show: false,
+        autoHideMenuBar: true,
+        ...(process.platform === 'linux' ? { icon } : {}),
+        webPreferences: {
+            preload: join(__dirname, '../preload/index.js'),
+            sandbox: false
+        },
+        titleBarStyle: 'hidden',
+        icon: path.join(__dirname, 'resources/icons', 'icon.icns') // Set icon for the window
+    })
 
-  nextJsManager = new NextJsManager(mainWindow)
+    nextJsManager = new NextJsManager(mainWindow)
 
-  mainWindow.maximize()
+    mainWindow.maximize()
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
+    mainWindow.on('ready-to-show', () => {
+        mainWindow.show()
+    })
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
+    mainWindow.webContents.setWindowOpenHandler((details) => {
+        shell.openExternal(details.url)
+        return { action: 'deny' }
+    })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  const startUrl =
-    is.dev && process.env['ELECTRON_RENDERER_URL']
-      ? process.env['ELECTRON_RENDERER_URL']
-      : `file://${join(__dirname, '../renderer/index.html')}#/ide-initial-screen`
+    // HMR for renderer base on electron-vite cli.
+    // Load the remote URL for development or the local html file for production.
+    const startUrl =
+        is.dev && process.env['ELECTRON_RENDERER_URL']
+            ? process.env['ELECTRON_RENDERER_URL']
+            : `file://${join(__dirname, '../renderer/index.html')}#/ide-initial-screen`
 
-  mainWindow.loadURL(startUrl)
+    mainWindow.loadURL(startUrl)
 
-  mainBindings(ipcMain, mainWindow, fs) // <- configures the backend
+    mainBindings(ipcMain, mainWindow, fs) // <- configures the backend
 
-  closeApp(mainWindow)
+    closeApp(mainWindow)
 
-  installExtensions(mainWindow)
+    installExtensions(mainWindow)
 
-  initializeLogger({
-    endpoint: 'localhost:4317'
-  })
+    initializeLogger({
+        endpoint: 'localhost:4317'
+    })
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+    // Set app user model id for windows
+    electronApp.setAppUserModelId('com.electron')
 
-  if (process.defaultApp) {
-    if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]])
-    }
-  } else {
-    app.setAsDefaultProtocolClient('igrp-studio')
-  }
-
-  if (process.platform === 'win32') {
-    app.setAsDefaultProtocolClient('igrp-studio')
-
-    const gotTheLock = app.requestSingleInstanceLock()
-
-    if (!gotTheLock) {
-      app.quit()
+    if (process.defaultApp) {
+        if (process.argv.length >= 2) {
+            app.setAsDefaultProtocolClient('igrp-studio', process.execPath, [process.argv[1]])
+        }
     } else {
-      app.on('second-instance', (_event, argv) => {
-        const url = argv[argv.length - 1]
+        app.setAsDefaultProtocolClient('igrp-studio')
+    }
 
-        if (url.startsWith('igrp-studio://') && mainWindow) {
-          if (mainWindow.isMinimized()) mainWindow.restore()
-          mainWindow.focus()
+    if (process.platform === 'win32') {
+        app.setAsDefaultProtocolClient('igrp-studio')
 
-          if (url.includes('oauth/callback')) {
-            if (currentAuthProvider === 'github') {
-              githubAuth.handleProtocolCallback(url, mainWindow)
-            } else if (currentAuthProvider === 'gitlab') {
-              gitlabAuth.handleProtocolCallback(url, mainWindow)
-            } else {
-              if (url.includes('github')) {
-                githubAuth.handleProtocolCallback(url, mainWindow)
-              } else if (url.includes('gitlab')) {
-                gitlabAuth.handleProtocolCallback(url, mainWindow)
-              }
+        const gotTheLock = app.requestSingleInstanceLock()
+
+        if (!gotTheLock) {
+            app.quit()
+        } else {
+            app.on('second-instance', (_event, argv) => {
+                const url = argv[argv.length - 1]
+
+                if (url.startsWith('igrp-studio://') && mainWindow) {
+                    if (mainWindow.isMinimized()) mainWindow.restore()
+                    mainWindow.focus()
+
+                    if (url.includes('oauth/callback')) {
+                        if (currentAuthProvider === 'github') {
+                            githubAuth.handleProtocolCallback(url, mainWindow)
+                        } else if (currentAuthProvider === 'gitlab') {
+                            gitlabAuth.handleProtocolCallback(url, mainWindow)
+                        } else {
+                            if (url.includes('github')) {
+                                githubAuth.handleProtocolCallback(url, mainWindow)
+                            } else if (url.includes('gitlab')) {
+                                gitlabAuth.handleProtocolCallback(url, mainWindow)
+                            }
+                        }
+                    }
+                }
+            })
+
+            if (process.argv.length > 1) {
+                const url = process.argv[process.argv.length - 1]
+                if (url.startsWith('igrp-studio://')) {
+                    if (url.includes('github')) {
+                        githubAuth.handleProtocolCallback(url, mainWindow)
+                    } else if (url.includes('gitlab')) {
+                        gitlabAuth.handleProtocolCallback(url, mainWindow)
+                    }
+                }
             }
-          }
         }
-      })
 
-      if (process.argv.length > 1) {
-        const url = process.argv[process.argv.length - 1]
-        if (url.startsWith('igrp-studio://')) {
-          if (url.includes('github')) {
-            githubAuth.handleProtocolCallback(url, mainWindow)
-          } else if (url.includes('gitlab')) {
-            gitlabAuth.handleProtocolCallback(url, mainWindow)
-          }
+        buildTaskbar()
+
+        initComponents()
+    }
+
+    // Default open or close DevTools by F12 in development
+    // and ignore CommandOrControl + R in production.
+    // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
+    app.on('browser-window-created', (_, window) => {
+        optimizer.watchWindowShortcuts(window)
+    })
+
+    // IPC test
+    ipcMain.on('ping', () => console.log('pong'))
+
+    ipcMain.on('report-error', (_, error: Error) => {
+        sendErrorReport(error)
+    })
+
+    await GitStore.initialize()
+    const initializeGitHubService = async (): Promise<void> => {
+        try {
+            await GitHubService.initializeServices()
+        } catch (err) {
+            console.error('Failed to initialize GitHub service:', err)
         }
-      }
     }
 
-    buildTaskbar()
-
-    initComponents()
-  }
-
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
-
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
-  ipcMain.on('report-error', (_, error: Error) => {
-    sendErrorReport(error)
-  })
-
-  await GitStore.initialize()
-  const initializeGitHubService = async (): Promise<void> => {
-    try {
-      await GitHubService.initializeServices()
-    } catch (err) {
-      console.error('Failed to initialize GitHub service:', err)
+    const initializeGitLabService = async (): Promise<void> => {
+        try {
+            await GitLabService.initializeServices()
+        } catch (err) {
+            console.error('Failed to initialize GitLab service:', err)
+        }
     }
-  }
 
-  const initializeGitLabService = async (): Promise<void> => {
-    try {
-      await GitLabService.initializeServices()
-    } catch (err) {
-      console.error('Failed to initialize GitLab service:', err)
+    const initializeAllServices = async (): Promise<void> => {
+        await Promise.allSettled([initializeGitHubService(), initializeGitLabService()])
     }
-  }
+    await initializeAllServices()
 
-  const initializeAllServices = async (): Promise<void> => {
-    await Promise.allSettled([initializeGitHubService(), initializeGitLabService()])
-  }
-  await initializeAllServices()
+    ipcMain.on('github-oauth', async () => {
+        const isDev = process.env.VITE_NODE_ENV === 'development'
+        try {
+            currentAuthProvider = 'github' // Add this line
+            await githubAuth.setupOAuth(mainWindow, isDev)
+        } catch (error: unknown) {
+            console.error('GitHub OAuth failed:', error)
+            currentAuthProvider = null // Add this line
+        }
+    })
 
-  ipcMain.on('github-oauth', async () => {
-    const isDev = process.env.VITE_NODE_ENV === 'development'
-    try {
-      currentAuthProvider = 'github' // Add this line
-      await githubAuth.setupOAuth(mainWindow, isDev)
-    } catch (error: unknown) {
-      console.error('GitHub OAuth failed:', error)
-      currentAuthProvider = null // Add this line
-    }
-  })
+    // GitLab handler
+    ipcMain.on('gitlab-oauth', async () => {
+        const isDev = process.env.VITE_NODE_ENV === 'development'
+        console.log('isDev', isDev)
+        try {
+            currentAuthProvider = 'gitlab' // Add this line
+            await gitlabAuth.setupOAuth(mainWindow, isDev)
+        } catch (error: unknown) {
+            console.error('GitLab OAuth failed:', error)
+            currentAuthProvider = null // Add this line
+        }
+    })
 
-  // GitLab handler
-  ipcMain.on('gitlab-oauth', async () => {
-    const isDev = process.env.VITE_NODE_ENV === 'development'
-    console.log('isDev', isDev)
-    try {
-      currentAuthProvider = 'gitlab' // Add this line
-      await gitlabAuth.setupOAuth(mainWindow, isDev)
-    } catch (error: unknown) {
-      console.error('GitLab OAuth failed:', error)
-      currentAuthProvider = null // Add this line
-    }
-  })
+    createWindow()
 
-  createWindow()
+    app.on('activate', () => {
+        // On macOS it's common to re-create a window in the app when the
+        // dock icon is clicked and there are no other windows open.
+        if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    })
 
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
+    new NextjsEngine().registry()
 
-  new NextjsEngine().registry()
+    new SpringEngine().registry()
 
-  new SpringEngine().registry()
+    new WorkspaceRepository().initialize()
 
-  new WorkspaceRepository().initialize()
-
-  await IGRPStudioSettings.initialize()
-  new AppUpdater(mainWindow)
+    await IGRPStudioSettings.initialize()
+    new AppUpdater(mainWindow)
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
 })
 
 ipcMain.on('open-external-url', (_event, url) => {
-  if (url) {
-    // Open the provided URL in the default browser
-    shell.openExternal(url)
-  } else {
-    console.error('No URL provided')
-  }
+    if (url) {
+        // Open the provided URL in the default browser
+        shell.openExternal(url)
+    } else {
+        console.error('No URL provided')
+    }
 })
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
 ipcMain.handle(
-  'read-directory',
-  async (_event: IpcMainInvokeEvent, dirPath: string): Promise<FileTree[] | { error: string }> => {
-    try {
-      return readDirectory(dirPath)
-    } catch (error: unknown) {
-      console.error('Error reading directory:', error)
-      return {
-        error: error instanceof Error ? error.message : 'Failed to read directory'
-      }
+    'read-directory',
+    async (
+        _event: IpcMainInvokeEvent,
+        dirPath: string
+    ): Promise<FileTree[] | { error: string }> => {
+        try {
+            return readDirectory(dirPath)
+        } catch (error: unknown) {
+            console.error('Error reading directory:', error)
+            return {
+                error: error instanceof Error ? error.message : 'Failed to read directory'
+            }
+        }
     }
-  }
 )
 
 ipcMain.handle(
-  'read-file',
-  async (_event: IpcMainInvokeEvent, filePath: string): Promise<string | null> => {
-    try {
-      return await readProjectFile(filePath)
-    } catch (error) {
-      console.error('Error reading file:', error)
-      return null
+    'read-file',
+    async (_event: IpcMainInvokeEvent, filePath: string): Promise<string | null> => {
+        try {
+            return await readProjectFile(filePath)
+        } catch (error) {
+            console.error('Error reading file:', error)
+            return null
+        }
     }
-  }
 )
 
 ipcMain.handle('get-app-version', () => {
-  return app.getVersion()
+    return app.getVersion()
 })
 
 ipcMain.on('open-directory-dialog', async (event) => {
-  await dialog
-    .showOpenDialog(mainWindow, {
-      properties: ['openDirectory', 'createDirectory', 'showHiddenFiles'],
-      buttonLabel: 'Select Destination Folder'
-    })
-    .then((result) => {
-      event.sender.send('file-content', result)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+    await dialog
+        .showOpenDialog(mainWindow, {
+            properties: ['openDirectory', 'createDirectory', 'showHiddenFiles'],
+            buttonLabel: 'Select Destination Folder'
+        })
+        .then((result) => {
+            event.sender.send('file-content', result)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
 })
 
 ipcMain.handle('open-directory', async (_event, buttonLabel?: string): Promise<IOpenProject> => {
-  return await openDirectory(buttonLabel)
+    return await openDirectory(buttonLabel)
 })
 
 ipcMain.handle(
-  'igrp-studio:fetch-files',
-  async (_event, basePath: string): Promise<FileTree[] | { error: string }> => {
-    try {
-      return readIgrpStudioDirectory(basePath)
-    } catch (error) {
-      console.error('Error reading directory:', error)
-      return {
-        error: error instanceof Error ? error.message : 'Failed to read directory'
-      }
+    'igrp-studio:fetch-files',
+    async (_event, basePath: string): Promise<FileTree[] | { error: string }> => {
+        try {
+            return readIgrpStudioDirectory(basePath)
+        } catch (error) {
+            console.error('Error reading directory:', error)
+            return {
+                error: error instanceof Error ? error.message : 'Failed to read directory'
+            }
+        }
     }
-  }
 )
 
 ipcMain.handle(
-  'igrp-studio:get-json-content',
-  async (_event, filePath: string): Promise<unknown> => {
-    return await getJsonContent(filePath)
-  }
+    'igrp-studio:get-json-content',
+    async (_event, filePath: string): Promise<unknown> => {
+        return await getJsonContent(filePath)
+    }
 )
 
 ipcMain.handle(
-  'igrp-studio:get-file-content',
-  async (_event, filePath: string): Promise<unknown> => {
-    return await getFileContent(filePath)
-  }
+    'igrp-studio:get-file-content',
+    async (_event, filePath: string): Promise<unknown> => {
+        return await getFileContent(filePath)
+    }
 )
 
 ipcMain.handle(
-  'igrp-studio:open-ide',
-  async (_event, { basePath, ideType }: { basePath: string; ideType: string }) => {
-    if (!basePath || !IDES[ideType]) return
+    'igrp-studio:open-ide',
+    async (_event, { basePath, ideType }: { basePath: string; ideType: string }) => {
+        if (!basePath || !IDES[ideType]) return
 
-    const ideConfig = IDES[ideType]
-    const command = `${ideConfig.command} "${basePath}"`
+        const ideConfig = IDES[ideType]
+        const command = `${ideConfig.command} "${basePath}"`
 
-    exec(command, (err): void => {
-      if (err) {
-        console.error(`Error opening ${ideConfig.name}:`, err)
-      }
-    })
-  }
+        exec(command, (err): void => {
+            if (err) {
+                console.error(`Error opening ${ideConfig.name}:`, err)
+            }
+        })
+    }
 )
 
 ipcMain.handle(
-  'igrp-studio:ides',
-  async (): Promise<Array<{ key: string; config: IDEDetails }>> => {
-    return await detectInstalledIDEs()
-  }
+    'igrp-studio:ides',
+    async (): Promise<Array<{ key: string; config: IDEDetails }>> => {
+        return await detectInstalledIDEs()
+    }
 )
 
 // Handle IPC events
 ipcMain.on('minimize-window', () => {
-  mainWindow.minimize()
+    mainWindow.minimize()
 })
 
 ipcMain.on('maximize-window', () => {
-  if (mainWindow.isMaximized()) {
-    mainWindow.unmaximize()
-  } else {
-    mainWindow.maximize()
-  }
+    if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize()
+    } else {
+        mainWindow.maximize()
+    }
 })
 
 ipcMain.on('close-window', () => {
-  mainWindow.close()
+    mainWindow.close()
 })
 
 ipcMain.handle('is-window-maximized', () => {
-  return mainWindow.isMaximized()
+    return mainWindow.isMaximized()
 })
 
 ipcMain.on('restore-window', () => {
-  mainWindow.unmaximize()
+    mainWindow.unmaximize()
 })
 
 ipcMain.on('start-drag', (): void => {
-  mainWindow.on('move', () => {
-    const windowBounds = mainWindow.getBounds()
-    const displayBounds = screen.getDisplayMatching(windowBounds).bounds
+    mainWindow.on('move', () => {
+        const windowBounds = mainWindow.getBounds()
+        const displayBounds = screen.getDisplayMatching(windowBounds).bounds
 
-    // Snap to top-left corner
-    if (windowBounds.x <= displayBounds.x + 10 && windowBounds.y <= displayBounds.y + 10) {
-      mainWindow.setBounds({
-        x: displayBounds.x,
-        y: displayBounds.y,
-        width: displayBounds.width / 2,
-        height: displayBounds.height / 2
-      })
-    }
-  })
+        // Snap to top-left corner
+        if (windowBounds.x <= displayBounds.x + 10 && windowBounds.y <= displayBounds.y + 10) {
+            mainWindow.setBounds({
+                x: displayBounds.x,
+                y: displayBounds.y,
+                width: displayBounds.width / 2,
+                height: displayBounds.height / 2
+            })
+        }
+    })
 })
 
 ipcMain.handle('check-project-config', async (_event, targetDir: string) => {
-  try {
-    const { folderExists, config } = await checkAndReadBaseApi(targetDir)
-    return { folderExists, config }
-  } catch (error) {
-    console.error('Error checking project config:', error)
-    return { folderExists: false, config: null }
-  }
+    try {
+        const { folderExists, config } = await checkAndReadBaseApi(targetDir)
+        return { folderExists, config }
+    } catch (error) {
+        console.error('Error checking project config:', error)
+        return { folderExists: false, config: null }
+    }
 })
 
 app.on('open-url', (event, url) => {
-  event.preventDefault()
-  console.log('Received URL via open-url:', url)
+    event.preventDefault()
+    console.log('Received URL via open-url:', url)
 
-  if (mainWindow) {
-    if (url.includes('oauth/callback')) {
-      if (currentAuthProvider === 'github') {
-        console.log('Processing GitHub callback')
-        githubAuth.handleProtocolCallback(url, mainWindow)
-      } else if (currentAuthProvider === 'gitlab') {
-        console.log('Processing GitLab callback')
-        gitlabAuth.handleProtocolCallback(url, mainWindow)
-      } else {
-        console.error('Received OAuth callback but no active provider is set')
-        // Try to guess based on URL
-        if (url.includes('github')) {
-          githubAuth.handleProtocolCallback(url, mainWindow)
-        } else if (url.includes('gitlab')) {
-          gitlabAuth.handleProtocolCallback(url, mainWindow)
+    if (mainWindow) {
+        if (url.includes('oauth/callback')) {
+            if (currentAuthProvider === 'github') {
+                console.log('Processing GitHub callback')
+                githubAuth.handleProtocolCallback(url, mainWindow)
+            } else if (currentAuthProvider === 'gitlab') {
+                console.log('Processing GitLab callback')
+                gitlabAuth.handleProtocolCallback(url, mainWindow)
+            } else {
+                console.error('Received OAuth callback but no active provider is set')
+                // Try to guess based on URL
+                if (url.includes('github')) {
+                    githubAuth.handleProtocolCallback(url, mainWindow)
+                } else if (url.includes('gitlab')) {
+                    gitlabAuth.handleProtocolCallback(url, mainWindow)
+                }
+            }
         }
-      }
     }
-  }
 })
 
 // NEXTJS
 ipcMain.on('start-nextjs', (_event, basePath) => {
-  nextJsManager.setNextJsPath(basePath)
-  nextJsManager.startNextJsServer()
+    nextJsManager.setNextJsPath(basePath)
+    nextJsManager.startNextJsServer()
 })
 
 ipcMain.on('open-preview', (_event, pageName) => {
-  nextJsManager.openPreviewWindow(pageName)
+    nextJsManager.openPreviewWindow(pageName)
 })
 
 ipcMain.on('stop-nextjs', () => {
-  nextJsManager.stopNextJsServer()
+    nextJsManager.stopNextJsServer()
 })
 
 // 📌 IPC para UI chamar o check update manualmente
 ipcMain.handle('check-for-updates', async () => {
-  try {
-    const updateCheckResult = await autoUpdater.checkForUpdates()
-    return updateCheckResult?.updateInfo?.version || null
-  } catch (error) {
-    console.error('Update check failed:', error)
-    return null
-  }
+    try {
+        const updateCheckResult = await autoUpdater.checkForUpdates()
+        return updateCheckResult?.updateInfo?.version || null
+    } catch (error) {
+        console.error('Update check failed:', error)
+        return null
+    }
 })
 
 // 📌 Update channel (beta / stable)
 ipcMain.handle('update:get-channel', () => {
-  return IGRPStudioSettings.getUpdateChannel()
+    return IGRPStudioSettings.getUpdateChannel()
 })
 
 ipcMain.handle('update:set-channel', async (_event, channel: 'stable' | 'beta') => {
-  if (channel !== 'stable' && channel !== 'beta') return
-  IGRPStudioSettings.setUpdateChannel(channel)
-  applyUpdateChannelConfig()
+    if (channel !== 'stable' && channel !== 'beta') return
+    IGRPStudioSettings.setUpdateChannel(channel)
+    applyUpdateChannelConfig()
 })
 
 ipcMain.handle('update:reconfigure-channel', () => {
-  applyUpdateChannelConfig()
+    applyUpdateChannelConfig()
 })
 
 // 📌 IPC para iniciar o download manualmente
 ipcMain.handle('download-update', async () => {
-  return autoUpdater.downloadUpdate()
+    return autoUpdater.downloadUpdate()
 })
 
 // 📌 IPC para instalar a atualização quando o usuário clicar
 ipcMain.handle('install-update', async () => {
-  autoUpdater.quitAndInstall()
+    autoUpdater.quitAndInstall()
 })
 
 // Handle folder watching
 ipcMain.handle('watch-folder', (_, folderPath: string) => {
-  return folderWatcher.watchFolder(folderPath, (event) => {
-    mainWindow?.webContents.send('folder-change', event)
-  })
+    return folderWatcher.watchFolder(folderPath, (event) => {
+        mainWindow?.webContents.send('folder-change', event)
+    })
 })

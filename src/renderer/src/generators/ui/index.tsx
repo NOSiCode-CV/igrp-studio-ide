@@ -1,35 +1,35 @@
-import { JSX, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ROUTES } from '@renderer/routes/routeConstants'
 import { TabProvider } from '@renderer/components/navigation/TabContext'
-import TabManager from './components/TabManager'
+import { ROUTES } from '@renderer/routes/routeConstants'
 import { EngineService } from '@renderer/services/EngineService'
-import { ComponentsProvider } from './contexts/ComponentsContext'
+import { type JSX, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ComponentsLoader } from './components/ComponentsLoader'
+import TabManager from './components/TabManager'
+import { ComponentsProvider } from './contexts/ComponentsContext'
 
 interface PageBuilderProps {
-  basePath?: string
+    basePath?: string
 }
 
 const GeneratorUI = ({ basePath }: PageBuilderProps): JSX.Element => {
-  const navigate = useNavigate()
+    const navigate = useNavigate()
 
-  useEffect(() => {
-    if (basePath == '' || basePath === undefined) {
-      navigate(ROUTES.HOME)
-    }
+    useEffect(() => {
+        if (basePath == '' || basePath === undefined) {
+            navigate(ROUTES.HOME)
+        }
 
-    if (basePath) EngineService.startWatching(basePath)
-  }, [basePath])
+        if (basePath) EngineService.startWatching(basePath)
+    }, [basePath])
 
-  return (
-    <TabProvider>
-      <ComponentsProvider>
-        <ComponentsLoader />
-        {basePath && <TabManager basePath={basePath} />}
-      </ComponentsProvider>
-    </TabProvider>
-  )
+    return (
+        <TabProvider>
+            <ComponentsProvider>
+                <ComponentsLoader />
+                {basePath && <TabManager basePath={basePath} />}
+            </ComponentsProvider>
+        </TabProvider>
+    )
 }
 
 export default GeneratorUI
