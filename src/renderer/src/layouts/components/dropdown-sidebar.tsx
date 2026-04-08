@@ -297,9 +297,11 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                                 <IGRPDropdownMenuItemPrimitive
                                     onClick={(e) => {
                                         e.stopPropagation()
+                                        const actionId = `new-action-${menuItem.id || menuItem.label}`
                                         handleDropdownClick({
-                                            ...menu,
                                             ...menuItem,
+                                            ...menu,
+                                            id: actionId,
                                             isNew: true
                                         })
                                     }}
