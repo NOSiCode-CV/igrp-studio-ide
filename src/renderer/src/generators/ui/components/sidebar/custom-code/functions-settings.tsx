@@ -412,7 +412,7 @@ export const FunctionArguments = ({
                                     </div>
 
                                     {arg.isFunction && (
-                                        <div className="mt-6 p-4 border rounded-lg bg-white">
+                                        <div className="mt-6 p-4 border rounded-lg bg-card">
                                             <div className="flex items-center justify-between mb-4">
                                                 <h4 className="font-medium">
                                                     Function Configuration
@@ -440,7 +440,7 @@ export const FunctionArguments = ({
                                                         (param, paramIndex) => (
                                                             <div
                                                                 key={param.id}
-                                                                className="flex items-center gap-2 p-3 border rounded bg-gray-50"
+                                                                className="flex items-center gap-2 p-3 border rounded bg-muted/50"
                                                             >
                                                                 <div className="flex-1">
                                                                     <IGRPInputPrimitive
@@ -519,7 +519,7 @@ export const FunctionArguments = ({
 
                                                 {arg.functionParameters &&
                                                     arg.functionParameters.length === 0 && (
-                                                        <p className="text-sm text-gray-500 text-center py-4">
+                                                        <p className="text-sm text-muted-foreground text-center py-4">
                                                             No parameters defined. Click &quot;Add
                                                             Parameter&quot; to add function
                                                             parameters.
