@@ -10,13 +10,13 @@ import {
     type IGRPOptionsProps,
     IGRPScrollAreaPrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import { FormList } from '@renderer/components/form-list'
 import { handleChangeValueObject } from '@renderer/generators/api/helpers'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { type FormikProps, useFormik } from 'formik'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import BindingFormList from './binding-form-list'
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext'
 
 interface BindingFilterType {
@@ -186,7 +186,7 @@ export const BindingConfigurationFilterModal = ({
                         </IGRPDialogHeaderPrimitive>
                         <form onSubmit={formik.handleSubmit} className="space-y-4">
                             <div className="border rounded-sm">
-                                <FormList
+                                <BindingFormList
                                     columns={columns}
                                     formik={formik}
                                     data={formik.values.fields}
