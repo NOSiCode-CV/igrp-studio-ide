@@ -1,6 +1,6 @@
 # Release notes – IGRP Studio (latest)
 
-Use este texto nas release notes da próxima versão (GitHub Release body ou ficheiro no S3). Atualize a versão no título se necessário.
+Use este texto nas release notes da próxima versão (GitHub Release body, tag v{versão}). Atualize a versão no título se necessário.
 
 ---
 

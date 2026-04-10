@@ -24,6 +24,8 @@
         "release:mac:arm64:signed": "./scripts/sign-and-build.sh --arm64",
         "release:mac:all:signed": "npm run release:mac:universal:signed && npm run release:mac:x64:signed && npm run release:mac:arm64:signed",
         "test": "jest",
+        "test:release-notes": "node scripts/test-release-notes-fetch.mjs",
+        "test:release-notes:local": "node scripts/test-release-notes-fetch.mjs 0.2.0-beta.10.4 --local",
         "setup": "yarn install && yarn dev",
         "lint": "biome check --write",
         "format": "biome format --write"
