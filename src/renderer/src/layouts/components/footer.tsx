@@ -11,6 +11,7 @@ import {
 import { DebugTerminal } from '@renderer/components/debug-terminal'
 import Doctor from '@renderer/components/doctor'
 import { SHOW_UPDATE_MODAL_EVENT } from '@renderer/components/update-banner'
+import { captureRendererException } from '@renderer/init-sentry'
 import { AlertCircle, HelpCircle, Stethoscope, Wifi, WifiOff } from 'lucide-react'
 import { type JSX, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -101,17 +102,24 @@ export function Footer(): JSX.Element {
         if (appVersion) handleCheckUpdate()
     }, [appVersion, t])
 
-    /*  const simulateError = (): void => {
-    const error = new Error('This is a simulated error from the renderer process.')
+    /** Dev-only: exercise GlitchTip/Sentry (renderer SDK + main via IPC). */
+    const runMonitoringTestError = (): void => {
+        const error = new Error('IGRP Studio: monitoring test (footer, simulated)')
+        error.name = 'MonitoringTestError'
 
-    if (window.electron?.reportError) {
-      window.electron.reportError(error)
-      setLog('Simulated error sent to logger')
-    } else {
-      console.error('Electron reportError bridge is not available')
-      throw error
+        captureRendererException(error, {
+            source: 'footer-monitoring-test',
+            simulated: true
+        })
+
+        if (window.electron?.reportError) {
+            window.electron.reportError(error)
+            setLog(t('monitoringTestSent'))
+        } else {
+            setLog(t('monitoringTestNoBridge'))
+            console.warn('[Monitoring test] window.electron.reportError not available')
+        }
     }
-  } */
 
     return (
         <IGRPTooltipProviderPrimitive>
@@ -133,8 +141,8 @@ export function Footer(): JSX.Element {
                                 </span>
                             </span>
                         ) : lastUpdateType === 'available' ||
-                          lastUpdateType === 'progress' ||
-                          lastUpdateType === 'downloaded' ? (
+                            lastUpdateType === 'progress' ||
+                            lastUpdateType === 'downloaded' ? (
                             <button
                                 type="button"
                                 onClick={() =>
@@ -163,9 +171,24 @@ export function Footer(): JSX.Element {
                 <div className="flex items-center space-x-3">
                     <IGRPSeparator orientation="vertical" className="h-4" />
 
-                    {/*  <button onClick={simulateError} className="">
-            Simulate Error
-          </button> */}
+                    {import.meta.env.DEV ? (
+                        <IGRPTooltipPrimitive>
+                            <IGRPTooltipTriggerPrimitive asChild>
+                                <IGRPButtonPrimitive
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-6 text-xs px-2"
+                                    onClick={runMonitoringTestError}
+                                >
+                                    {t('monitoringTestButton')}
+                                </IGRPButtonPrimitive>
+                            </IGRPTooltipTriggerPrimitive>
+                            <IGRPTooltipContentPrimitive side="top">
+                                <p className="max-w-xs">{t('monitoringTestTooltip')}</p>
+                            </IGRPTooltipContentPrimitive>
+                        </IGRPTooltipPrimitive>
+                    ) : null}
 
                     <IGRPTooltipPrimitive>
                         <IGRPTooltipTriggerPrimitive asChild>

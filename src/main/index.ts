@@ -23,7 +23,7 @@ import {
 } from './helpers'
 import { githubAuth } from './helpers/git-auth/github-auth'
 import { gitlabAuth } from './helpers/git-auth/gitlab-auth'
-import { initializeLogger, sendErrorReport } from './helpers/logger'
+import { initMainSentryEarly, initializeLogger, sendErrorReport } from './helpers/logger'
 import { closeApp, installExtensions } from './helpers/utils'
 import { GitStore } from './services/git-store'
 import { GitHubService } from './services/github-service'
@@ -60,9 +60,11 @@ let currentAuthProvider: 'github' | 'gitlab' | null = null
 
 dotenv.config()
 
+initMainSentryEarly()
+
 process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error)
-    sendErrorReport(error)
+    void sendErrorReport(error, { errorType: 'uncaughtException' })
 })
 
 function createWindow(): void {
@@ -111,9 +113,7 @@ function createWindow(): void {
 
     installExtensions(mainWindow)
 
-    initializeLogger({
-        endpoint: 'localhost:4317'
-    })
+    void initializeLogger()
 }
 
 // This method will be called when Electron has finished
@@ -189,9 +189,22 @@ app.whenReady().then(async () => {
     // IPC test
     ipcMain.on('ping', () => console.log('pong'))
 
-    ipcMain.on('report-error', (_, error: Error) => {
-        sendErrorReport(error)
-    })
+    ipcMain.on(
+        'report-error',
+        (
+            _,
+            payload: Error | { message: string; name?: string; stack?: string }
+        ) => {
+            const err =
+                payload instanceof Error
+                    ? payload
+                    : Object.assign(new Error(payload.message), {
+                          name: payload.name ?? 'Error',
+                          stack: payload.stack
+                      })
+            void sendErrorReport(err, { source: 'renderer-ipc' })
+        }
+    )
 
     await GitStore.initialize()
     const initializeGitHubService = async (): Promise<void> => {

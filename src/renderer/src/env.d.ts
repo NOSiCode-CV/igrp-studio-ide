@@ -15,6 +15,11 @@ interface ImportMetaEnv {
     readonly VITE_GITHUB_CLIENT_SECRET: string
     /** Optional: Personal Access Token for GitHub API (e.g. release notes in private repo). Not the OAuth client secret. */
     readonly VITE_GITHUB_TOKEN?: string
+
+    /** Injected from SENTRY_DSN at build (see electron.vite.config). */
+    readonly VITE_SENTRY_DSN: string
+    /** Set to "true" in .env to send one test event from the renderer in dev. */
+    readonly VITE_SENTRY_TEST: string
     readonly VITE_GITLAB_BASE_URL: string
     readonly VITE_GITLAB_CLIENT_ID: string
     readonly VITE_GITLAB_CLIENT_SECRET: string

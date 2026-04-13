@@ -1,89 +1,42 @@
-// logger.ts
+/**
+ * Monitoring phase 1: Sentry on main process only (no OTLP).
+ * Call initMainSentryEarly() right after dotenv; registerMainMonitoringHooks() when the app window is created.
+ */
 
 import * as Sentry from '@sentry/electron/main'
 import { app, ipcMain } from 'electron'
 import { v4 as uuidv4 } from 'uuid'
 
-// Initialize the logger
 const sessionId: string = uuidv4()
-let isInitialized = false
-let isSentryInitialized = false
+let sentryMainEnabled = false
+let monitoringHooksRegistered = false
 
-interface ErrorPayload {
-    errorId: string
-    timestamp: string
-    message: string
-    stack?: string
-    name: string
-    platform: NodeJS.Platform
-    osVersion: string
-    electronVersion: string
-    processType: string
-    appVersion: string
-    sessionId: string
-    additionalAttributes: Record<string, unknown>
-}
-
-// Configuration interface
-interface LoggerConfig {
-    endpoint: string
-    insecure?: boolean
-    metadata?: Record<string, string>
-}
-
-const defaultConfig: LoggerConfig = {
-    endpoint: 'localhost:4317', // Use your existing otel-collector port
-    insecure: true
-}
-
-let currentConfig: LoggerConfig = defaultConfig
-
-export async function initializeLogger(config: Partial<LoggerConfig> = {}): Promise<void> {
-    try {
-        const finalConfig = { ...defaultConfig, ...config }
-
-        currentConfig = finalConfig
-
-        initializeSentry(finalConfig.metadata)
-
-        // Mark as initialized
-        isInitialized = true
-
-        // Set up IPC handler for renderer process errors
-        ipcMain.handle(
-            'send-error-report',
-            async (
-                _event,
-                {
-                    error,
-                    context = {}
-                }: {
-                    error: unknown
-                    context?: Record<string, unknown>
-                }
-            ) => {
-                return await sendErrorReport(deserializeError(error), context)
+function applyMainScope(metadata?: Record<string, string>): void {
+    Sentry.withScope((scope: Sentry.Scope) => {
+        scope.setTag('session_id', sessionId)
+        scope.setTag('process_type', process.type ?? 'browser')
+        scope.setContext('device', {
+            osVersion: process.getSystemVersion(),
+            platform: process.platform,
+            electronVersion: process.versions.electron
+        })
+        if (metadata) {
+            for (const [k, v] of Object.entries(metadata)) {
+                scope.setTag(k, v)
             }
-        )
-
-        // Enhanced error handlers
-        setupProcessHandlers()
-
-        console.log(
-            'Logger initialized successfully, will send to otel-collector on port 4317, session ID:',
-            sessionId
-        )
-    } catch (error) {
-        console.error('Failed to initialize logger:', error)
-        isInitialized = false
-    }
+        }
+    })
 }
 
-function initializeSentry(metadata?: Record<string, string>): void {
-    const sentryDsn = process.env.SENTRY_DSN
+/**
+ * Call immediately after `dotenv.config()` so uncaught errors during startup can be reported.
+ */
+export function initMainSentryEarly(metadata?: Record<string, string>): void {
+    if (sentryMainEnabled) return
 
+    const sentryDsn = process.env.SENTRY_DSN
     if (!sentryDsn) {
-        console.warn('Sentry DSN not provided. Sentry integration will remain disabled.')
+        console.warn('[Sentry] SENTRY_DSN not set; main process monitoring disabled.')
         return
     }
 
@@ -95,10 +48,11 @@ function initializeSentry(metadata?: Record<string, string>): void {
             dsn: sentryDsn,
             environment,
             release: app.getVersion(),
-            //enableUnresponsive: true,
+            // GlitchTip (and some self-hosted) do not support Sentry sessions
+            autoSessionTracking: false,
             tracesSampleRate: process.env.SENTRY_TRACES_SAMPLE_RATE
                 ? Number(process.env.SENTRY_TRACES_SAMPLE_RATE)
-                : undefined,
+                : 0,
             attachStacktrace: true,
             beforeSend(event) {
                 event.tags = {
@@ -109,49 +63,57 @@ function initializeSentry(metadata?: Record<string, string>): void {
                 return event
             }
         })
-
-        Sentry.withScope((scope: Sentry.Scope) => {
-            scope.setTag('session_id', sessionId)
-            scope.setTag('process_type', process.type ?? 'browser')
-            scope.setContext('device', {
-                osVersion: process.getSystemVersion(),
-                platform: process.platform,
-                electronVersion: process.versions.electron
-            })
-            if (metadata) {
-                scope.setTags(metadata)
-            }
-        })
-
-        isSentryInitialized = true
-        console.log('Sentry initialized successfully for main process')
+        applyMainScope(metadata)
+        sentryMainEnabled = true
+        console.log('[Sentry] Main process initialized')
     } catch (error) {
-        console.error('Failed to initialize Sentry:', error)
-        isSentryInitialized = false
+        console.error('[Sentry] Main init failed:', error)
     }
 }
 
-function setupProcessHandlers(): void {
-    // Handle uncaught exceptions
-    process.on('uncaughtException', async (error) => {
-        await sendErrorReport(error, { errorType: 'uncaughtException' })
+/**
+ * IPC and app-level hooks (call once when creating the main window).
+ */
+export function registerMainMonitoringHooks(): void {
+    if (monitoringHooksRegistered) return
+    monitoringHooksRegistered = true
+
+    ipcMain.handle(
+        'send-error-report',
+        async (
+            _event,
+            {
+                error,
+                context = {}
+            }: {
+                error: unknown
+                context?: Record<string, unknown>
+            }
+        ) => {
+            return await sendErrorReport(deserializeError(error), context)
+        }
+    )
+
+    process.on('unhandledRejection', (reason) => {
+        const err = reason instanceof Error ? reason : new Error(String(reason))
+        void sendErrorReport(err, { errorType: 'unhandledRejection' })
     })
 
-    // Handle unhandled rejections
-    process.on('unhandledRejection', async (reason) => {
-        const error = reason instanceof Error ? reason : new Error(String(reason))
-        await sendErrorReport(error, { errorType: 'unhandledRejection' })
-    })
-
-    // Handle Electron's renderer process crashes
-    app.on('render-process-gone', async (_event, _webContents, details) => {
-        const error = new Error(`Renderer process gone: ${details.reason}`)
-        await sendErrorReport(error, {
+    app.on('render-process-gone', (_event, _webContents, details) => {
+        const err = new Error(`Renderer process gone: ${details.reason}`)
+        void sendErrorReport(err, {
             errorType: 'rendererProcessGone',
             exitCode: details.exitCode,
             reason: details.reason
         })
     })
+}
+
+/** @deprecated Phase 1: use initMainSentryEarly + registerMainMonitoringHooks; kept for call sites. */
+export async function initializeLogger(_config?: { metadata?: Record<string, string> }): Promise<void> {
+    initMainSentryEarly(_config?.metadata)
+    registerMainMonitoringHooks()
+    console.log('[Monitoring] Logger registered (Sentry main), session:', sessionId)
 }
 
 function deserializeError(errorObj: unknown): Error {
@@ -165,124 +127,12 @@ function deserializeError(errorObj: unknown): Error {
     return error
 }
 
-async function sendToOtelCollector(errorData: ErrorPayload): Promise<boolean> {
-    try {
-        // Create the OpenTelemetry OTLP request payload
-        const request = {
-            resourceLogs: [
-                {
-                    resource: {
-                        attributes: [
-                            {
-                                key: 'service.name',
-                                value: { stringValue: 'igrp-studio-horizon' }
-                            },
-                            {
-                                key: 'app.version',
-                                value: { stringValue: app.getVersion() }
-                            },
-                            {
-                                key: 'os.platform',
-                                value: { stringValue: process.platform }
-                            },
-                            {
-                                key: 'os.version',
-                                value: {
-                                    stringValue: process.getSystemVersion()
-                                }
-                            },
-                            {
-                                key: 'electron.version',
-                                value: {
-                                    stringValue: process.versions.electron
-                                }
-                            },
-                            {
-                                key: 'session.id',
-                                value: { stringValue: sessionId }
-                            }
-                        ]
-                    },
-                    scopeLogs: [
-                        {
-                            scope: {},
-                            logRecords: [
-                                {
-                                    timeUnixNano: Date.now() * 1e6,
-                                    severityText: 'ERROR',
-                                    body: { stringValue: errorData.message },
-                                    attributes: [
-                                        {
-                                            key: 'error.id',
-                                            value: {
-                                                stringValue: errorData.errorId
-                                            }
-                                        },
-                                        {
-                                            key: 'exception.stacktrace',
-                                            value: {
-                                                stringValue: errorData.stack ?? ''
-                                            }
-                                        },
-                                        {
-                                            key: 'exception.type',
-                                            value: {
-                                                stringValue: errorData.name
-                                            }
-                                        },
-                                        {
-                                            key: 'process.type',
-                                            value: {
-                                                stringValue: errorData.processType
-                                            }
-                                        },
-                                        ...Object.entries(errorData.additionalAttributes).map(
-                                            ([key, value]) => ({
-                                                key,
-                                                value: {
-                                                    stringValue: String(value)
-                                                }
-                                            })
-                                        )
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-
-        // Send to your existing otel-collector using OTLP/gRPC format
-        const response = await fetch(`http://${currentConfig.endpoint}/v1/logs`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Client-Version': app.getVersion(),
-                'X-Client-Platform': process.platform
-            },
-            body: JSON.stringify(request)
-        })
-
-        if (response.ok) {
-            console.log('Error report sent successfully to otel-collector')
-            return true
-        } else {
-            console.error('Failed to send to otel-collector:', response.status)
-            return false
-        }
-    } catch (error) {
-        console.error('Error sending to otel-collector:', error)
-        return false
-    }
-}
-
 export async function sendErrorReport(
     error: Error,
     additionalAttributes: Record<string, unknown> = {}
 ): Promise<string | null> {
-    if (!isInitialized) {
-        console.error('Logger not initialized', error)
+    if (!sentryMainEnabled) {
+        console.error('[Monitoring] Sentry not configured:', error)
         return null
     }
 
@@ -290,66 +140,37 @@ export async function sendErrorReport(
         const timestamp = Date.now()
         const errorId = uuidv4()
 
-        if (isSentryInitialized) {
-            Sentry.withScope((scope) => {
-                scope.setTag('error_id', errorId)
-                scope.setTag('process_type', process.type ?? 'browser')
-                scope.setExtra('sessionId', sessionId)
-                scope.setExtra('appVersion', app.getVersion())
-                Object.entries(additionalAttributes).forEach(([key, value]) => {
-                    scope.setExtra(key, value)
-                })
-                scope.setContext('error', {
-                    timestamp: new Date(timestamp).toISOString(),
-                    osVersion: process.getSystemVersion(),
-                    electronVersion: process.versions.electron
-                })
-
-                Sentry.captureException(error)
+        Sentry.withScope((scope) => {
+            scope.setTag('error_id', errorId)
+            scope.setTag('process_type', process.type ?? 'browser')
+            scope.setExtra('sessionId', sessionId)
+            scope.setExtra('appVersion', app.getVersion())
+            for (const [key, value] of Object.entries(additionalAttributes)) {
+                scope.setExtra(key, value)
+            }
+            scope.setContext('error', {
+                timestamp: new Date(timestamp).toISOString(),
+                osVersion: process.getSystemVersion(),
+                electronVersion: process.versions.electron
             })
-        }
-
-        const errorData: ErrorPayload = {
-            errorId,
-            timestamp: new Date(timestamp).toISOString(),
-            message: error.message,
-            stack: error.stack,
-            name: error.name,
-            platform: process.platform,
-            osVersion: process.getSystemVersion(),
-            electronVersion: process.versions.electron,
-            processType: process.type ?? 'browser',
-            appVersion: app.getVersion(),
-            sessionId,
-            additionalAttributes
-        }
-
-        // Send to your existing otel-collector
-        const success = await sendToOtelCollector(errorData)
-
-        if (success) {
-            console.log('Error report sent to otel-collector successfully')
-        } else {
-            // Fallback to console if otel-collector fails
-            console.error('Error Report (otel-collector failed, console fallback):', errorData)
-        }
+            Sentry.captureException(error)
+        })
 
         return errorId
     } catch (e) {
-        console.error('Failed to send error report:', e)
+        console.error('[Monitoring] sendErrorReport failed:', e)
         return null
     }
 }
 
 export async function shutdownLogger(): Promise<void> {
     try {
-        isInitialized = false
-        if (isSentryInitialized) {
+        if (sentryMainEnabled) {
             await Sentry.close(2000)
-            isSentryInitialized = false
+            sentryMainEnabled = false
         }
-        console.log('Logger shutdown successfully')
+        console.log('[Monitoring] Shutdown complete')
     } catch (error) {
-        console.error('Failed to shutdown logger:', error)
+        console.error('[Monitoring] Shutdown failed:', error)
     }
 }

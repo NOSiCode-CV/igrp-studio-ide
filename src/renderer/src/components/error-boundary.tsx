@@ -1,4 +1,5 @@
 import logo from '@renderer/assets/images/igrp-green.svg'
+import { captureRendererException } from '@renderer/init-sentry'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import { AlertCircle } from 'lucide-react'
 import { Component, type ErrorInfo, type ReactNode } from 'react'
@@ -26,6 +27,10 @@ class ErrorBoundary extends Component<Props, State> {
     // Log error details
     componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
         console.error('Error caught by ErrorBoundary:', error, errorInfo)
+        captureRendererException(error, {
+            componentStack: errorInfo.componentStack,
+            boundary: 'root'
+        })
     }
 
     // Function to navigate to another page

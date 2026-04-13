@@ -35,7 +35,13 @@ export default defineConfig({
             }
         },
         define: {
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+            'import.meta.env.VITE_SENTRY_DSN': JSON.stringify(
+                process.env.SENTRY_DSN || process.env.VITE_SENTRY_DSN || ''
+            ),
+            'import.meta.env.VITE_SENTRY_TEST': JSON.stringify(
+                process.env.VITE_SENTRY_TEST || ''
+            )
         },
         plugins: [react()],
         optimizeDeps: {

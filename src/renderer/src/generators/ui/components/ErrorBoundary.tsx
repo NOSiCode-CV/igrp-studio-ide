@@ -1,4 +1,5 @@
 import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { captureRendererException } from '@renderer/init-sentry'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
 import React from 'react'
 
@@ -95,17 +96,20 @@ export class ComponentErrorBoundary extends React.Component<
     }
 
     private reportError = (error: Error, errorInfo: React.ErrorInfo) => {
-        // In a real application, you would send this to your error tracking service
-        // Example: Sentry, LogRocket, etc.
+        captureRendererException(error, {
+            componentStack: errorInfo.componentStack,
+            boundary: 'component'
+        })
         try {
-            // Example analytics call
-            if ((window as any).analytics) {
-                ;(window as any).analytics.track('error_boundary_caught', {
-                    error: error.message,
-                    stack: error.stack,
-                    componentStack: errorInfo.componentStack,
-                    timestamp: new Date().toISOString()
-                })
+            if ((window as unknown as { analytics?: { track: (e: string, p: object) => void } })
+                .analytics) {
+                ;(window as unknown as { analytics: { track: (e: string, p: object) => void } })
+                    .analytics.track('error_boundary_caught', {
+                        error: error.message,
+                        stack: error.stack,
+                        componentStack: errorInfo.componentStack,
+                        timestamp: new Date().toISOString()
+                    })
             }
         } catch (reportingError) {
             // Silently fail if error reporting fails

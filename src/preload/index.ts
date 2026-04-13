@@ -21,6 +21,11 @@ const handleError = (error: unknown): HandlerResponse => ({
     error: (error as Error).message || 'An unknown error occurred'
 })
 
+/** IPC cannot serialize Error instances reliably; send a plain object. */
+function serializeErrorForIpc(error: Error): { message: string; name: string; stack?: string } {
+    return { message: error.message, name: error.name, stack: error.stack }
+}
+
 // Update channel type for auto-updates (stable | beta)
 export type UpdateChannel = 'stable' | 'beta'
 
@@ -40,7 +45,8 @@ type ExtendedElectronAPI = typeof electronAPI & {
 
 // Custom APIs for renderer
 const api = {
-    reportError: (error: Error) => ipcRenderer.send('report-error', error),
+    reportError: (error: Error) =>
+        ipcRenderer.send('report-error', serializeErrorForIpc(error)),
 
     fetchSelectors: (module: string, basePath: string) =>
         ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
@@ -579,7 +585,8 @@ if (process.contextIsolated) {
             onFolderChange: (callback: (event: WatchEvent) => void) => {
                 ipcRenderer.on('folder-change', (_, data: WatchEvent) => callback(data))
             },
-            reportError: (error: Error) => ipcRenderer.send('report-error', error)
+            reportError: (error: Error) =>
+                ipcRenderer.send('report-error', serializeErrorForIpc(error))
         })
         contextBridge.exposeInMainWorld('api', api)
         contextBridge.exposeInMainWorld('engine', engine)
@@ -605,7 +612,8 @@ if (process.contextIsolated) {
         onFolderChange: (callback: (event: WatchEvent) => void) => {
             ipcRenderer.on('folder-change', (_, data: WatchEvent) => callback(data))
         },
-        reportError: (error: Error) => ipcRenderer.send('report-error', error)
+        reportError: (error: Error) =>
+            ipcRenderer.send('report-error', serializeErrorForIpc(error))
     }
     window.api = api
     window.engine = engine
