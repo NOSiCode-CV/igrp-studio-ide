@@ -4,6 +4,7 @@ import {
     IGRPSidebarProviderPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { UpdateModalBottomLeft } from '@renderer/components/update-banner'
+import { IntegratedTerminal } from '@renderer/components/integrated-terminal'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import {
     Sidebar,
@@ -70,6 +71,7 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
                         </IGRPSidebarInsetPrimitive>
                     </div>
                     <Footer />
+                    <IntegratedTerminal />
                     <UpdateModalBottomLeft />
                 </div>
             </IGRPSidebarProviderPrimitive>

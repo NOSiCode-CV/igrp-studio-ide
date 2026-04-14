@@ -10,7 +10,9 @@ import {
     shell
 } from 'electron'
 import fs from 'fs'
+import * as os from 'os'
 import path, { join } from 'path'
+import * as pty from 'node-pty'
 import icon from '../../resources/icon.png?asset'
 import {
     checkAndReadBaseApi,
@@ -54,6 +56,7 @@ import { folderWatcher } from './helpers/watch-folder'
 import { WorkspaceRepository } from './services/workspace-service'
 
 let mainWindow: BrowserWindow
+const ptySessions = new Map<string, pty.IPty>()
 
 let nextJsManager: NextJsManager
 let currentAuthProvider: 'github' | 'gitlab' | null = null
@@ -114,6 +117,51 @@ function createWindow(): void {
     installExtensions(mainWindow)
 
     void initializeLogger()
+}
+
+function resolveTerminalShell(): string {
+    if (os.platform() === 'win32') {
+        return 'powershell.exe'
+    }
+
+    return process.env.SHELL || 'bash'
+}
+
+function resolveTerminalCwd(targetCwd?: string): string {
+    if (targetCwd && fs.existsSync(targetCwd) && fs.statSync(targetCwd).isDirectory()) {
+        return targetCwd
+    }
+    return os.homedir()
+}
+
+function createPtyProcess(sessionId: string, targetCwd?: string): pty.IPty {
+    const existingSession = ptySessions.get(sessionId)
+    if (existingSession) {
+        return existingSession
+    }
+
+    const terminalProcess = pty.spawn(resolveTerminalShell(), [], {
+        name: 'xterm-color',
+        cols: 80,
+        rows: 30,
+        cwd: resolveTerminalCwd(targetCwd),
+        env: process.env as Record<string, string>
+    })
+
+    terminalProcess.onData((data) => {
+        if (!mainWindow || mainWindow.isDestroyed()) return
+        mainWindow.webContents.send('pty-data', { sessionId, data })
+    })
+
+    terminalProcess.onExit(() => {
+        if (!mainWindow || mainWindow.isDestroyed()) return
+        mainWindow.webContents.send('pty-exit', { sessionId })
+        ptySessions.delete(sessionId)
+    })
+
+    ptySessions.set(sessionId, terminalProcess)
+
+    return terminalProcess
 }
 
 // This method will be called when Electron has finished
@@ -188,6 +236,37 @@ app.whenReady().then(async () => {
 
     // IPC test
     ipcMain.on('ping', () => console.log('pong'))
+
+    ipcMain.on('pty-create', (_, payload: { sessionId: string; cwd?: string }) => {
+        const { sessionId, cwd } = payload
+        if (!sessionId) return
+        createPtyProcess(sessionId, cwd)
+    })
+
+    ipcMain.on('pty-input', (_, payload: { sessionId: string; data: string }) => {
+        const { sessionId, data } = payload
+        if (!sessionId) return
+        if (!data) return
+        createPtyProcess(sessionId).write(data)
+    })
+
+    ipcMain.on(
+        'pty-resize',
+        (_, payload: { sessionId: string; cols: number; rows: number }) => {
+            const { sessionId, cols, rows } = payload
+            if (!sessionId) return
+            if (!cols || !rows) return
+            createPtyProcess(sessionId).resize(cols, rows)
+        }
+    )
+
+    ipcMain.on('pty-destroy', (_, sessionId: string) => {
+        if (!sessionId) return
+        const targetSession = ptySessions.get(sessionId)
+        if (!targetSession) return
+        targetSession.kill()
+        ptySessions.delete(sessionId)
+    })
 
     ipcMain.on(
         'report-error',
@@ -274,6 +353,10 @@ app.whenReady().then(async () => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+    for (const session of ptySessions.values()) {
+        session.kill()
+    }
+    ptySessions.clear()
     if (process.platform !== 'darwin') {
         app.quit()
     }

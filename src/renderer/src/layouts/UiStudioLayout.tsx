@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { createSelector } from 'reselect'
+import { IntegratedTerminal } from '../components/integrated-terminal'
 import { Footer } from './components/footer'
 import Header from './components/header'
 
@@ -53,6 +54,7 @@ const Layout = (props: LayoutProps): React.JSX.Element => {
                         })}
                     </div>
                     <Footer />
+                    <IntegratedTerminal />
                 </div>
             </IGRPSidebarProvider>
         </div>

@@ -28,3 +28,16 @@ interface ImportMetaEnv {
 interface ImportMeta {
     readonly env: ImportMetaEnv
 }
+
+interface TerminalBridge {
+    create: (sessionId: string, cwd?: string) => void
+    send: (sessionId: string, data: string) => void
+    resize: (sessionId: string, cols: number, rows: number) => void
+    destroy: (sessionId: string) => void
+    onData: (callback: (payload: { sessionId: string; data: string }) => void) => () => void
+    onExit: (callback: (payload: { sessionId: string }) => void) => () => void
+}
+
+interface Window {
+    terminal: TerminalBridge
+}

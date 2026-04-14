@@ -9,10 +9,11 @@ import {
     IGRPTooltipTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { DebugTerminal } from '@renderer/components/debug-terminal'
+import { TERMINAL_TOGGLE_EVENT } from '@renderer/components/integrated-terminal'
 import Doctor from '@renderer/components/doctor'
 import { SHOW_UPDATE_MODAL_EVENT } from '@renderer/components/update-banner'
 import { captureRendererException } from '@renderer/init-sentry'
-import { AlertCircle, HelpCircle, Stethoscope, Wifi, WifiOff } from 'lucide-react'
+import { AlertCircle, HelpCircle, Stethoscope, Terminal, Wifi, WifiOff } from 'lucide-react'
 import { type JSX, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -205,6 +206,22 @@ export function Footer(): JSX.Element {
                     </IGRPTooltipPrimitive>
 
                     <DebugTerminal />
+
+                    <IGRPTooltipPrimitive>
+                        <IGRPTooltipTriggerPrimitive asChild>
+                            <IGRPButtonPrimitive
+                                size="icon"
+                                variant="ghost"
+                                className="h-6 w-6"
+                                onClick={() => window.dispatchEvent(new Event(TERMINAL_TOGGLE_EVENT))}
+                            >
+                                <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
+                            </IGRPButtonPrimitive>
+                        </IGRPTooltipTriggerPrimitive>
+                        <IGRPTooltipContentPrimitive side="top">
+                            Terminal (Ctrl+`)
+                        </IGRPTooltipContentPrimitive>
+                    </IGRPTooltipPrimitive>
 
                     <IGRPTooltipPrimitive>
                         <IGRPTooltipTriggerPrimitive asChild>

@@ -566,6 +566,28 @@ const igrpStudioSettings = {
         ipcRenderer.invoke(EVENTS.BPMN.SET_SELECTED_PROCESS, processDefinitionId),
     getSelectedBPMNProcess: () => ipcRenderer.invoke(EVENTS.BPMN.GET_SELECTED_PROCESS)
 }
+
+const terminal = {
+    create: (sessionId: string, cwd?: string) => ipcRenderer.send('pty-create', { sessionId, cwd }),
+    send: (sessionId: string, data: string) => ipcRenderer.send('pty-input', { sessionId, data }),
+    resize: (sessionId: string, cols: number, rows: number) =>
+        ipcRenderer.send('pty-resize', { sessionId, cols, rows }),
+    destroy: (sessionId: string) => ipcRenderer.send('pty-destroy', sessionId),
+    onData: (callback: (payload: { sessionId: string; data: string }) => void) => {
+        const subscription = (
+            _: Electron.IpcRendererEvent,
+            payload: { sessionId: string; data: string }
+        ) => callback(payload)
+        ipcRenderer.on('pty-data', subscription)
+        return () => ipcRenderer.removeListener('pty-data', subscription)
+    },
+    onExit: (callback: (payload: { sessionId: string }) => void) => {
+        const subscription = (_: Electron.IpcRendererEvent, payload: { sessionId: string }) =>
+            callback(payload)
+        ipcRenderer.on('pty-exit', subscription)
+        return () => ipcRenderer.removeListener('pty-exit', subscription)
+    }
+}
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
@@ -594,6 +616,7 @@ if (process.contextIsolated) {
         contextBridge.exposeInMainWorld('menu', windowControls)
         contextBridge.exposeInMainWorld('appLogicAPI', appLogic)
         contextBridge.exposeInMainWorld('igrpStudioSettings', igrpStudioSettings)
+        contextBridge.exposeInMainWorld('terminal', terminal)
     } catch (error) {
         console.error(error)
     }
@@ -621,6 +644,7 @@ if (process.contextIsolated) {
     window.menu = windowControls
     window.appLogicAPI = appLogic
     window.igrpStudioSettings = igrpStudioSettings
+    window.terminal = terminal
 }
 
 declare global {
@@ -632,5 +656,6 @@ declare global {
         menu: typeof windowControls
         appLogicAPI: typeof appLogic
         igrpStudioSettings: typeof igrpStudioSettings
+        terminal: typeof terminal
     }
 }

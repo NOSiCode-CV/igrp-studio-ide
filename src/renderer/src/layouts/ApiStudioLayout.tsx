@@ -13,6 +13,7 @@ import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import type { ProjectData } from 'src/main/types'
+import { IntegratedTerminal } from '../components/integrated-terminal'
 import { AppIGRPSidebar } from './components/app-sidebar'
 import { Footer } from './components/footer'
 import Header from './components/header'
@@ -86,6 +87,7 @@ const Layout = (props: LayoutProps): React.ReactNode => {
                     </div>
                 </div>
                 <Footer />
+                <IntegratedTerminal />
             </IGRPSidebarProviderPrimitive>
         </div>
     )
