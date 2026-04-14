@@ -108,6 +108,7 @@ const PageWrapper = ({ onOpenNew, open, tab }: NewProps) => {
         <>
             {Component && (
                 <Component
+                    key={tab.id}
                     selectors={selectors}
                     currentItem={tab.item}
                     onCloseTab={hangleClose}

@@ -11,7 +11,6 @@ import {
     IGRPScrollAreaPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import type { FieldValidation } from '@igrp/igrp-studio-nextjs-engine/types'
-import { FormList } from '@renderer/components/form-list'
 import { SelectInput, TextInput } from '@renderer/generators/api/components/inputs-form'
 import { handleChangeValueObject } from '@renderer/generators/api/helpers'
 import useStudio from '@renderer/hooks/use-studio'
@@ -25,6 +24,7 @@ import type { JSX } from 'react/jsx-runtime'
 import { useTranslation } from 'react-i18next'
 import type { SchemaTypeItem } from 'src/main/types'
 import { COMPONENT } from '../ComponentTypes'
+import BindingFormList from './binding-form-list'
 import { useDroppedComponents } from '../dnd/DroppedComponentsContext'
 import useCustomCode from '../hooks/useCustomCode'
 
@@ -509,7 +509,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
 
                             {columns.length > 0 && (
                                 <div className="border rounded-sm">
-                                    <FormList
+                                    <BindingFormList
                                         columns={columns}
                                         formik={formik}
                                         data={formik.values.fields}
