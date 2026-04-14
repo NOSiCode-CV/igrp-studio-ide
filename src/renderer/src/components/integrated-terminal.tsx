@@ -50,7 +50,10 @@ export function IntegratedTerminal(): JSX.Element {
     const [sessions, setSessions] = useState<TerminalSession[]>(() => [firstSession])
     const [activeSessionId, setActiveSessionId] = useState<string>(firstSession.id)
     const [contextMenu, setContextMenu] = useState<TerminalContextMenu | null>(null)
+    const [renamingSessionId, setRenamingSessionId] = useState<string | null>(null)
+    const [renameValue, setRenameValue] = useState('')
     const sessionCounterRef = useRef(1)
+    const renameInputRef = useRef<HTMLInputElement | null>(null)
     const panelRef = useRef<HTMLDivElement>(null)
     const hostRefs = useRef<Map<string, HTMLDivElement>>(new Map())
     const sessionRefs = useRef<
@@ -113,6 +116,10 @@ export function IntegratedTerminal(): JSX.Element {
     const closeSession = useCallback(
         (sessionId: string) => {
             setContextMenu(null)
+            if (renamingSessionId === sessionId) {
+                setRenamingSessionId(null)
+                setRenameValue('')
+            }
             const sessionRef = sessionRefs.current.get(sessionId)
             if (sessionRef) {
                 sessionRef.terminal.dispose()
@@ -140,13 +147,47 @@ export function IntegratedTerminal(): JSX.Element {
                 return filteredSessions
             })
         },
-        [activeSessionId]
+        [activeSessionId, renamingSessionId]
     )
+
+    const startRenameSession = useCallback(
+        (sessionId: string) => {
+            const targetSession = sessions.find((session) => session.id === sessionId)
+            if (!targetSession) return
+            setContextMenu(null)
+            setRenamingSessionId(sessionId)
+            setRenameValue(targetSession.title)
+        },
+        [sessions]
+    )
+
+    const commitRenameSession = useCallback(() => {
+        if (!renamingSessionId) return
+        const nextTitle = renameValue.trim()
+        if (!nextTitle) {
+            setRenamingSessionId(null)
+            setRenameValue('')
+            return
+        }
+        setSessions((previousSessions) =>
+            previousSessions.map((session) =>
+                session.id === renamingSessionId ? { ...session, title: nextTitle } : session
+            )
+        )
+        setRenamingSessionId(null)
+        setRenameValue('')
+    }, [renameValue, renamingSessionId])
+
+    const cancelRenameSession = useCallback(() => {
+        setRenamingSessionId(null)
+        setRenameValue('')
+    }, [])
 
     useEffect(() => {
         const onToggle = (): void => {
             setIsOpen((previous) => !previous)
             setContextMenu(null)
+            setRenamingSessionId(null)
         }
 
         const onShortcut = (event: KeyboardEvent): void => {
@@ -181,6 +222,12 @@ export function IntegratedTerminal(): JSX.Element {
             window.removeEventListener('blur', closeContextMenu)
         }
     }, [contextMenu])
+
+    useEffect(() => {
+        if (!renamingSessionId) return
+        renameInputRef.current?.focus()
+        renameInputRef.current?.select()
+    }, [renamingSessionId])
 
     useEffect(() => {
         if (!isOpen) return
@@ -356,7 +403,26 @@ export function IntegratedTerminal(): JSX.Element {
                                 }}
                             >
                                 <TerminalIcon className="h-3.5 w-3.5" />
-                                {session.title}
+                                {renamingSessionId === session.id ? (
+                                    <input
+                                        ref={renameInputRef}
+                                        value={renameValue}
+                                        onChange={(event) => setRenameValue(event.target.value)}
+                                        onBlur={commitRenameSession}
+                                        onKeyDown={(event) => {
+                                            if (event.key === 'Enter') {
+                                                event.preventDefault()
+                                                commitRenameSession()
+                                            } else if (event.key === 'Escape') {
+                                                event.preventDefault()
+                                                cancelRenameSession()
+                                            }
+                                        }}
+                                        className="h-6 px-1.5 rounded-sm bg-[#2a2a2a] text-[#d4d4d4] outline-none border border-[#3a3a3a]"
+                                    />
+                                ) : (
+                                    session.title
+                                )}
                             </button>
                             {sessions.length > 1 && (
                                 <button
@@ -423,6 +489,13 @@ export function IntegratedTerminal(): JSX.Element {
                     className="fixed z-50 min-w-40 border border-[#2a2a2a] bg-[#1b1b1b] rounded-md shadow-lg p-1"
                     style={{ left: contextMenu.x, top: contextMenu.y }}
                 >
+                    <button
+                        type="button"
+                        className="w-full text-left text-xs px-2 py-1.5 rounded-sm hover:bg-[#2a2a2a] text-[#d4d4d4]"
+                        onClick={() => startRenameSession(contextMenu.sessionId)}
+                    >
+                        Rename
+                    </button>
                     <button
                         type="button"
                         className="w-full text-left text-xs px-2 py-1.5 rounded-sm hover:bg-[#2a2a2a] text-[#d4d4d4]"
