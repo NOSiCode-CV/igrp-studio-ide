@@ -5,9 +5,11 @@ import UiStudioLayout from '@renderer/layouts/UiStudioLayout'
 import Connections from '@renderer/pages/connections'
 import IDEInitialScreen from '@renderer/pages/ide-initial-screen'
 import ProjectSettings from '@renderer/pages/project/project-settings'
+import WelcomeOnboardingPage from '@renderer/pages/welcome-onboarding'
 import React, { type JSX, Suspense } from 'react'
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ROUTES } from './routeConstants'
+import StartupGate from './startup-gate'
 
 const GeneratorUI = React.lazy(() => import('@renderer/generators/ui'))
 const GeneratorAPI = React.lazy(() => import('@renderer/generators/api'))
@@ -50,10 +52,8 @@ function AppRoutes(): JSX.Element {
         <Suspense fallback={<Loader />}>
             <HashRouter>
                 <Routes>
-                    <Route
-                        path="/"
-                        element={<Navigate to={ROUTES.PATH_IDE_INITIAL_SCREEN} replace />}
-                    />
+                    <Route path="/" element={<StartupGate />} />
+                    <Route path={ROUTES.PATH_WELCOME_ONBOARDING} element={<WelcomeOnboardingPage />} />
                     {allRoutes.map((route) => (
                         <Route
                             key={route.path}

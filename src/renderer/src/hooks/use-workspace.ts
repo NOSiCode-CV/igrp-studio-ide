@@ -159,6 +159,12 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
             dispatch(setChangeStatus(true))
 
+            try {
+                await window.igrpStudioSettings.setWelcomeOnboardingCompleted(true)
+            } catch {
+                // non-blocking
+            }
+
             return result
         } catch (err) {
             showErrorToast(err)

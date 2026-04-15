@@ -4,14 +4,15 @@ import {
     IGRPTabsPrimitive,
     IGRPTabsTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import { EmptyList } from '@renderer/components/empty-list'
 import Loader from '@renderer/components/loader'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
+import { ROUTES } from '@renderer/routes/routeConstants'
+import CreateWorkspace from '@renderer/pages/workspaces/components/create-workspace'
 import WorkspaceDiagram from '@renderer/pages/workspaces/workspace-diagram'
 import { Container, FolderKanban, Network, Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import CreateWorkspace from './workspaces/components/create-workspace'
+import { useNavigate } from 'react-router-dom'
 import Resources from './workspaces/resources'
 import WelcomeHeader from './workspaces/welcome-header'
 import { WorkspaceDocker } from './workspaces/workspace-docker'
@@ -19,8 +20,9 @@ import { WorkspaceSettings } from './workspaces/workspace-settings'
 
 const IDEInitialScreen = (): React.JSX.Element => {
     const { t } = useTranslation()
-    const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false)
-    const [hasWorkspace, setHasWorkspace] = useState(false)
+    const navigate = useNavigate()
+    /** False until we know whether to stay on IDE (onboarding done) or redirect to /welcome */
+    const [ideGateReady, setIdeGateReady] = useState(false)
 
     const {
         workspace,
@@ -29,21 +31,41 @@ const IDEInitialScreen = (): React.JSX.Element => {
     } = useWorkspace()
 
     useEffect(() => {
-        const checkWorkspaces = async (): Promise<void> => {
-            setHasWorkspace(workspace !== null)
-
-            setShowWorkspaceDialog(workspace === null || workspace === undefined)
+        if (workspacesLoading) {
+            return
+        }
+        if (workspace) {
+            setIdeGateReady(true)
+            return
         }
 
-        checkWorkspaces()
-    }, [workspace, workspacesLoading])
+        let cancelled = false
+        void (async () => {
+            try {
+                const completed = await window.igrpStudioSettings.getWelcomeOnboardingCompleted()
+                if (cancelled) return
+                if (!completed) {
+                    navigate(ROUTES.PATH_WELCOME_ONBOARDING, { replace: true })
+                    return
+                }
+            } catch {
+                if (!cancelled) {
+                    navigate(ROUTES.PATH_WELCOME_ONBOARDING, { replace: true })
+                }
+                return
+            }
+            if (cancelled) return
+            setIdeGateReady(true)
+        })()
+        return () => {
+            cancelled = true
+        }
+    }, [workspacesLoading, workspace, navigate])
 
-    const handleCreationSuccess = (): void => {
-        setShowWorkspaceDialog(false)
-        setHasWorkspace(true)
-    }
+    const showBlockingCreateWorkspace =
+        ideGateReady && !workspace && !workspacesLoading
 
-    if (workspacesLoading) {
+    if (workspacesLoading || (!workspace && !ideGateReady)) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <Loader />
@@ -53,14 +75,15 @@ const IDEInitialScreen = (): React.JSX.Element => {
 
     return (
         <div className="mx-auto p-6 space-y-6 flex flex-col h-full">
-            {!workspace ? (
-                <div className="p-3 space-y-4 border-dashed rounded-lg">
-                    <EmptyList
-                        title={t('workspaceNotFound')}
-                        description={t('workspaceNotExist')}
-                    />
-                </div>
-            ) : (
+            {showBlockingCreateWorkspace && (
+                <CreateWorkspace
+                    open
+                    preventDismiss
+                    mode="dialog"
+                    onOpenChange={() => undefined}
+                />
+            )}
+            {workspace ? (
                 <>
                     <WelcomeHeader />
                     <IGRPTabsPrimitive defaultValue="resources">
@@ -84,7 +107,7 @@ const IDEInitialScreen = (): React.JSX.Element => {
                         </IGRPTabsListPrimitive>
 
                         <IGRPTabsContentPrimitive value="resources" className="mt-0 space-y-6">
-                            {hasWorkspace && workspace && <Resources />}
+                            {workspace && <Resources />}
                         </IGRPTabsContentPrimitive>
 
                         <IGRPTabsContentPrimitive
@@ -103,11 +126,7 @@ const IDEInitialScreen = (): React.JSX.Element => {
                         </IGRPTabsContentPrimitive>
                     </IGRPTabsPrimitive>
                 </>
-            )}
-
-            {showWorkspaceDialog && (
-                <CreateWorkspace open={showWorkspaceDialog} onSuccess={handleCreationSuccess} />
-            )}
+            ) : null}
         </div>
     )
 }

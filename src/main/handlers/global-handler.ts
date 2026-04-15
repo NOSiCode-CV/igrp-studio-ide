@@ -199,6 +199,25 @@ ipcMain.handle(EVENTS.LANGUAGE.SET_LANGUAGE, (_event, lang: string) => {
     }
 })
 
+ipcMain.handle(EVENTS.ONBOARDING.GET_WELCOME_COMPLETED, () => {
+    try {
+        return IGRPStudioSettings.getWelcomeOnboardingCompleted()
+    } catch (error) {
+        console.error('Error getting welcome onboarding flag:', error)
+        return false
+    }
+})
+
+ipcMain.handle(EVENTS.ONBOARDING.SET_WELCOME_COMPLETED, (_event, completed: boolean) => {
+    try {
+        IGRPStudioSettings.setWelcomeOnboardingCompleted(Boolean(completed))
+        return true
+    } catch (error) {
+        console.error('Error setting welcome onboarding flag:', error)
+        return false
+    }
+})
+
 // BPMN Project Preference IPC Handlers
 ipcMain.handle(EVENTS.BPMN.SET_SELECTED_PROJECT, async (_event, projectId: string) => {
     try {

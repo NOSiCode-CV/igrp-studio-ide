@@ -210,6 +210,8 @@ declare const igrpStudioSettings: {
     getSelectedBPMNProject: () => Promise<string | undefined>
     setSelectedBPMNProcess: (processDefinitionId: string) => Promise<any>
     getSelectedBPMNProcess: () => Promise<string | undefined>
+    getWelcomeOnboardingCompleted: () => Promise<boolean>
+    setWelcomeOnboardingCompleted: (completed: boolean) => Promise<boolean>
 }
 declare global {
     interface Window {

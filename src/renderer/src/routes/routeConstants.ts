@@ -1,5 +1,6 @@
 export const ROUTES = {
     HOME: '#/',
+    PATH_WELCOME_ONBOARDING: '/welcome',
     IDE_INITIAL_SCREEN: '/ide-initial-screen',
     PATH_PAGE_BUILDER_API: '/page-builder-api',
     PATH_PAGE_API_CONRTROLLER: '/page-controller',

@@ -91,6 +91,10 @@ export const EVENTS = {
         GET_LANGUAGE: 'igrp-studio-settings:get-language',
         SET_LANGUAGE: 'igrp-studio-settings:set-language'
     },
+    ONBOARDING: {
+        GET_WELCOME_COMPLETED: 'igrp-studio-settings:get-welcome-onboarding-completed',
+        SET_WELCOME_COMPLETED: 'igrp-studio-settings:set-welcome-onboarding-completed'
+    },
     CONNECTION: {
         GET_CONNECTIONS: 'igrp-studio-settings:get-connections',
         SAVE_CONNECTION: 'igrp-studio-settings:save-connection',

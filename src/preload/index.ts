@@ -564,7 +564,12 @@ const igrpStudioSettings = {
     // BPMN Process Preference methods
     setSelectedBPMNProcess: (processDefinitionId: string) =>
         ipcRenderer.invoke(EVENTS.BPMN.SET_SELECTED_PROCESS, processDefinitionId),
-    getSelectedBPMNProcess: () => ipcRenderer.invoke(EVENTS.BPMN.GET_SELECTED_PROCESS)
+    getSelectedBPMNProcess: () => ipcRenderer.invoke(EVENTS.BPMN.GET_SELECTED_PROCESS),
+
+    getWelcomeOnboardingCompleted: () =>
+        ipcRenderer.invoke(EVENTS.ONBOARDING.GET_WELCOME_COMPLETED),
+    setWelcomeOnboardingCompleted: (completed: boolean) =>
+        ipcRenderer.invoke(EVENTS.ONBOARDING.SET_WELCOME_COMPLETED, completed)
 }
 
 const terminal = {

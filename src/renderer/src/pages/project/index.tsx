@@ -10,8 +10,7 @@ import {
     IGRPInputPrimitive,
     IGRPLabelPrimitive,
     IGRPRadioGroupItemPrimitive,
-    IGRPRadioGroupPrimitive,
-    IGRPScrollAreaPrimitive
+    IGRPRadioGroupPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { FrameworkIcon } from '@renderer/components/framework-icon'
 import { LabelRequired } from '@renderer/components/label-required'
@@ -644,26 +643,29 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 )}
             </IGRPDialogTriggerPrimitive>
             <IGRPDialogContentPrimitive
-                className="relative overflow-hidden max-h-[80svh] sm:max-w-[700px] lg:max-w-[800px] p-0 max-w-4xl"
+                className="flex min-h-0 max-h-[min(90vh,calc(100dvh-2rem))] w-[calc(100vw-2rem)] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:max-w-[700px] lg:max-w-[800px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
                 {isCreatingProject && (
-                    <div className="fixed inset-0 z-[70] bg-background/85 backdrop-blur-[1px] flex items-center justify-center">
+                    <div className="absolute inset-0 z-[70] flex items-center justify-center rounded-[inherit] bg-background/85 backdrop-blur-[1px]">
                         <div className="flex items-center gap-2 text-sm font-medium">
                             <Loader2 className="h-4 w-4 animate-spin" />
                             <span>A criar projeto e a abrir...</span>
                         </div>
                     </div>
                 )}
-                <IGRPDialogHeaderPrimitive className="p-4">
+                <IGRPDialogHeaderPrimitive className="shrink-0 border-b border-border px-4 py-3 sm:px-6">
                     <IGRPDialogTitlePrimitive>{t('newProject')}</IGRPDialogTitlePrimitive>
                     <IGRPDialogDescriptionPrimitive>
                         {t('newProject')}
                     </IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
-                <IGRPScrollAreaPrimitive className="max-h-[calc(80svh-80px)]">
-                    <form onSubmit={formik.handleSubmit} className="mx-6 mb-6">
+                <form
+                    onSubmit={formik.handleSubmit}
+                    className="flex min-h-0 flex-1 flex-col"
+                >
+                    <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-4 sm:px-6">
                         <div className="relative mb-6">
                             <div className="absolute top-5 left-0 right-0 h-[2px] bg-muted" />
                             <div className="relative flex justify-between">
@@ -680,50 +682,50 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 ))}
                             </div>
                         </div>
-                        <div className="py-2">{renderStepContent()}</div>
+                        <div className="pb-2">{renderStepContent()}</div>
+                    </div>
 
-                        <IGRPDialogFooterPrimitive>
-                            <div className="flex w-full justify-between mt-4">
-                                {step > 1 ? (
-                                    <IGRPButtonPrimitive
-                                        type="button"
-                                        variant="outline"
-                                        onClick={handleBack}
-                                        disabled={isCreatingProject}
-                                    >
-                                        <ArrowLeft className="w-4 h-4 mr-2" />
-                                        {t('back')}
-                                    </IGRPButtonPrimitive>
-                                ) : (
-                                    <div />
-                                )}
-                                {step < STEPS.length ? (
-                                    <IGRPButtonPrimitive
-                                        type="button"
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            handleNext()
-                                        }}
-                                        disabled={!canNavigateToStep(step + 1) || isCreatingProject}
-                                    >
-                                        {t('next')}
-                                        <ArrowRight className="w-4 h-4 ml-2" />
-                                    </IGRPButtonPrimitive>
-                                ) : (
-                                    <IGRPButtonPrimitive
-                                        type="submit"
-                                        disabled={formik.isSubmitting || isCreatingProject}
-                                    >
-                                        {(formik.isSubmitting || isCreatingProject) && (
-                                            <Loader2 className="animate-spin" />
-                                        )}
-                                        {isCreatingProject ? 'A criar...' : t('createProject')}
-                                    </IGRPButtonPrimitive>
-                                )}
-                            </div>
-                        </IGRPDialogFooterPrimitive>
-                    </form>
-                </IGRPScrollAreaPrimitive>
+                    <IGRPDialogFooterPrimitive className="mt-0 shrink-0 border-t border-border bg-background px-4 py-3 sm:px-6">
+                        <div className="flex w-full justify-between gap-2">
+                            {step > 1 ? (
+                                <IGRPButtonPrimitive
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleBack}
+                                    disabled={isCreatingProject}
+                                >
+                                    <ArrowLeft className="w-4 h-4 mr-2" />
+                                    {t('back')}
+                                </IGRPButtonPrimitive>
+                            ) : (
+                                <div />
+                            )}
+                            {step < STEPS.length ? (
+                                <IGRPButtonPrimitive
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        handleNext()
+                                    }}
+                                    disabled={!canNavigateToStep(step + 1) || isCreatingProject}
+                                >
+                                    {t('next')}
+                                    <ArrowRight className="w-4 h-4 ml-2" />
+                                </IGRPButtonPrimitive>
+                            ) : (
+                                <IGRPButtonPrimitive
+                                    type="submit"
+                                    disabled={formik.isSubmitting || isCreatingProject}
+                                >
+                                    {(formik.isSubmitting || isCreatingProject) && (
+                                        <Loader2 className="animate-spin" />
+                                    )}
+                                    {isCreatingProject ? 'A criar...' : t('createProject')}
+                                </IGRPButtonPrimitive>
+                            )}
+                        </div>
+                    </IGRPDialogFooterPrimitive>
+                </form>
             </IGRPDialogContentPrimitive>
         </IGRPDialogPrimitive>
     )
