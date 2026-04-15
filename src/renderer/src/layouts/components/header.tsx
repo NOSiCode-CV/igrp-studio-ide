@@ -45,7 +45,7 @@ interface HeaderProps {
 const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     const { t } = useTranslation()
     const dispatch: any = useDispatch()
-    const { isGitEnabled } = useSelector((state: RootState) => state.git)
+    const isGitEnabled = useSelector((state: RootState) => state.git.isGitEnabled)
     const isMac = window.api.i18nextElectronBackend.clientOptions.platform === 'darwin'
 
     const { workspace } = useWorkspace()
@@ -129,6 +129,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         className?: string
     }): JSX.Element => (
         <button
+            type="button"
             onClick={onClick}
             className={cn(
                 'flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300',
@@ -234,11 +235,10 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     </IGRPTooltipContentPrimitive>
                                 </IGRPTooltipPrimitive>
                                 <IGRPDropdownMenuContentPrimitive align="end">
-                                    {installedIDEs.map(
-                                        ({ key, config }, index): React.ReactNode => {
+                                    {installedIDEs.map(({ key, config }): React.ReactNode => {
                                             return (
                                                 <IGRPDropdownMenuItemPrimitive
-                                                    key={index}
+                                                    key={key}
                                                     onClick={() => openIDE(key)}
                                                     className="flex items-center"
                                                 >
@@ -246,8 +246,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                                     {config.name}
                                                 </IGRPDropdownMenuItemPrimitive>
                                             )
-                                        }
-                                    )}
+                                        })}
                                 </IGRPDropdownMenuContentPrimitive>
                             </IGRPDropdownMenuPrimitive>
 

@@ -78,12 +78,10 @@ const CreateWorkspace = ({ open, onSuccess, onOpenChange }: CreateWorkspaceProps
     }
 
     const handleSelectDirectory = async (): Promise<void> => {
-        window.electron.ipcRenderer.send('open-directory-dialog')
-        window.electron.ipcRenderer.on('file-content', (_e: any, result: any) => {
-            if (!result.canceled) {
-                setDirectoryPath(result.filePaths[0])
-            }
-        })
+        const result = await window.api.openDirectory(t('workspace.locationLabel'))
+        if (!result.canceled && result.basePath) {
+            setDirectoryPath(result.basePath)
+        }
     }
 
     return (

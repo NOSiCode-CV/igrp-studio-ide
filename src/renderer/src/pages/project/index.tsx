@@ -67,6 +67,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     const [open, setOpen] = React.useState(false)
     const [step, setStep] = React.useState(1)
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null)
+    const [isCreatingProject, setIsCreatingProject] = React.useState(false)
 
     const { t } = useTranslation()
 
@@ -75,17 +76,20 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         actions: { saveOrOpenProject }
     } = useWorkspace()
 
-    const initialValues: ProjectData = {
-        id: '',
-        name: '',
-        type: undefined,
-        framework: 'springboot',
-        config: {},
-        path: '',
-        themeColor: '#000000',
-        icon: '',
-        workspaceId: workspace.id
-    }
+    const initialValues: ProjectData = React.useMemo(
+        () => ({
+            id: '',
+            name: '',
+            type: undefined,
+            framework: 'springboot',
+            config: {},
+            path: '',
+            themeColor: '#000000',
+            icon: '',
+            workspaceId: workspace.id
+        }),
+        [workspace.id]
+    )
 
     const validationSchema = useProjectValidation({ t, step })
 
@@ -93,14 +97,20 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         enableReinitialize: true,
         initialValues,
         validationSchema,
-        onSubmit: (values, actions) => {
-            console.log(values)
-            actions.setSubmitting(false)
-            saveOrOpenProject({ project: { ...formik.values } })
+        onSubmit: async (values, actions) => {
+            setIsCreatingProject(true)
+            try {
+                await saveOrOpenProject({ project: { ...values } })
+            } finally {
+                actions.setSubmitting(false)
+                setIsCreatingProject(false)
+            }
         }
     })
 
     const inputRef = React.useRef<HTMLInputElement>(null)
+    const iconUploadRef = React.useRef<HTMLInputElement>(null)
+    const wasOpenRef = React.useRef(open)
 
     React.useEffect(() => {
         if (inputRef.current) {
@@ -181,32 +191,35 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
      * - Legacy assets paths -> fetches file securely via IPC
      * - Base64 data URLs -> returns as is (for backward compatibility)
      */
-    const getIconPreviewUrl = async (iconPath: string): Promise<string | null> => {
-        if (!iconPath) return null
+    const getIconPreviewUrl = React.useCallback(
+        async (iconPath: string): Promise<string | null> => {
+            if (!iconPath) return null
 
-        // If it's a base64 string (for backward compatibility), return as is
-        if (iconPath.startsWith('data:')) {
-            return iconPath
-        }
+            // If it's a base64 string (for backward compatibility), return as is
+            if (iconPath.startsWith('data:')) {
+                return iconPath
+            }
 
-        // If it's a relative path, fetch the file securely
-        if (iconPath.startsWith('icons/') || iconPath.startsWith('assets/')) {
-            try {
-                const result = await window.api.getIconFile(iconPath, workspace.path)
-                if (result.success) {
-                    return result.data
-                } else {
-                    console.warn('Failed to load icon file:', result.error)
+            // If it's a relative path, fetch the file securely
+            if (iconPath.startsWith('icons/') || iconPath.startsWith('assets/')) {
+                try {
+                    const result = await window.api.getIconFile(iconPath, workspace.path)
+                    if (result.success) {
+                        return result.data
+                    } else {
+                        console.warn('Failed to load icon file:', result.error)
+                        return null
+                    }
+                } catch (error) {
+                    console.error('Error loading icon file:', error)
                     return null
                 }
-            } catch (error) {
-                console.error('Error loading icon file:', error)
-                return null
             }
-        }
 
-        return null
-    }
+            return null
+        },
+        [workspace.path]
+    )
 
     const isFrontend = formik.values.type === 'frontend'
 
@@ -248,13 +261,11 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         }
     }
 
-    const handleOpenDirectory = () => {
-        window.electron.ipcRenderer.send('open-directory-dialog')
-        window.electron.ipcRenderer.on('file-content', (_e: any, result: any) => {
-            if (!result.canceled) {
-                formik.setFieldValue('path', result.filePaths[0])
-            }
-        })
+    const handleOpenDirectory = async () => {
+        const result = await window.api.openDirectory(t('projectDirectory'))
+        if (!result.canceled && result.basePath) {
+            formik.setFieldValue('path', result.basePath)
+        }
     }
 
     const handleChangeType = (value: string) => {
@@ -272,14 +283,15 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         : null
 
     React.useEffect(() => {
-        if (open) return
-        formik.setValues(initialValues)
-        setStep(1)
-    }, [open])
+        const wasOpen = wasOpenRef.current
+        wasOpenRef.current = open
 
-    React.useEffect(() => {
-        formik.handleBlur('projectName')
-    }, [])
+        // Reset only when the dialog transitions from open -> closed
+        if (wasOpen && !open) {
+            formik.resetForm({ values: initialValues })
+            setStep(1)
+        }
+    }, [formik.resetForm, initialValues, open])
 
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -297,11 +309,14 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     }, [])
 
     React.useEffect(() => {
-        formik.setFieldValue(
-            'path',
-            `${workspace.path}/projects/${formik.values?.config?.name ?? formik.values.name}`
-        )
-    }, [workspace, formik.values.name, formik.values?.config])
+        const targetPath = `${workspace.path}/projects/${
+            formik.values?.config?.name ?? formik.values.name
+        }`
+
+        if (formik.values.path !== targetPath) {
+            formik.setFieldValue('path', targetPath, false)
+        }
+    }, [formik.setFieldValue, formik.values?.config?.name, formik.values.name, formik.values.path, workspace.path])
 
     // Update preview when icon changes
     React.useEffect(() => {
@@ -315,7 +330,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         }
 
         updatePreview()
-    }, [formik.values.icon, workspace.path, formik.values.name])
+    }, [formik.values.icon, getIconPreviewUrl])
 
     const renderStep1 = () => (
         <div className="space-y-4">
@@ -342,6 +357,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             <div className="space-y-2">
                 <IGRPLabelPrimitive>{t('projectIcon')}</IGRPLabelPrimitive>
                 <input
+                    ref={iconUploadRef}
                     type="file"
                     id="icon-upload"
                     accept="image/*"
@@ -374,7 +390,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     variant="outline"
                                     size="sm"
                                     type="button"
-                                    onClick={() => document.getElementById('icon-upload')?.click()}
+                                    onClick={() => iconUploadRef.current?.click()}
                                 >
                                     {t('upload')}...
                                 </IGRPButtonPrimitive>
@@ -628,10 +644,18 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 )}
             </IGRPDialogTriggerPrimitive>
             <IGRPDialogContentPrimitive
-                className="overflow-hidden max-h-[80svh] sm:max-w-[700px] lg:max-w-[800px] p-0 max-w-4xl"
+                className="relative overflow-hidden max-h-[80svh] sm:max-w-[700px] lg:max-w-[800px] p-0 max-w-4xl"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
+                {isCreatingProject && (
+                    <div className="fixed inset-0 z-[70] bg-background/85 backdrop-blur-[1px] flex items-center justify-center">
+                        <div className="flex items-center gap-2 text-sm font-medium">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>A criar projeto e a abrir...</span>
+                        </div>
+                    </div>
+                )}
                 <IGRPDialogHeaderPrimitive className="p-4">
                     <IGRPDialogTitlePrimitive>{t('newProject')}</IGRPDialogTitlePrimitive>
                     <IGRPDialogDescriptionPrimitive>
@@ -665,6 +689,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         type="button"
                                         variant="outline"
                                         onClick={handleBack}
+                                        disabled={isCreatingProject}
                                     >
                                         <ArrowLeft className="w-4 h-4 mr-2" />
                                         {t('back')}
@@ -679,7 +704,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                             e.preventDefault()
                                             handleNext()
                                         }}
-                                        disabled={!canNavigateToStep(step + 1)}
+                                        disabled={!canNavigateToStep(step + 1) || isCreatingProject}
                                     >
                                         {t('next')}
                                         <ArrowRight className="w-4 h-4 ml-2" />
@@ -687,12 +712,12 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 ) : (
                                     <IGRPButtonPrimitive
                                         type="submit"
-                                        disabled={formik.isSubmitting}
+                                        disabled={formik.isSubmitting || isCreatingProject}
                                     >
-                                        {formik.isSubmitting && (
+                                        {(formik.isSubmitting || isCreatingProject) && (
                                             <Loader2 className="animate-spin" />
                                         )}
-                                        {t('createProject')}
+                                        {isCreatingProject ? 'A criar...' : t('createProject')}
                                     </IGRPButtonPrimitive>
                                 )}
                             </div>

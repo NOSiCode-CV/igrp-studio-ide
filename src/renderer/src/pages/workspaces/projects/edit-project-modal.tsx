@@ -43,6 +43,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
     } = useWorkspace()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const nameInputRef = useRef<HTMLInputElement>(null)
 
     const validationSchema = Yup.object().shape({
         name: Yup.string()
@@ -131,14 +132,10 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
 
     useEffect(() => {
         if (isOpen && formik.values.name) {
-            // Focus on the name input when modal opens
-            const nameInput = document.getElementById('project-name')
-            if (nameInput) {
-                nameInput.focus()
-                ;(nameInput as HTMLInputElement).select()
-            }
+            nameInputRef.current?.focus()
+            nameInputRef.current?.select()
         }
-    }, [isOpen])
+    }, [formik.values.name, isOpen])
 
     return (
         <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
@@ -209,6 +206,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                         <div className="space-y-2">
                             <LabelRequired>{t('projectName')}</LabelRequired>
                             <IGRPInputPrimitive
+                                ref={nameInputRef}
                                 id="project-name"
                                 name="name"
                                 value={formik.values.name}

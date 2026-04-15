@@ -178,7 +178,7 @@ export const WorkspaceSwitcher = ({
                                 />
                                 {filteredWorkspaces.map((workspace, index) => (
                                     <IGRPDropdownMenuItemPrimitive
-                                        key={index}
+                                        key={workspace.id}
                                         onSelect={() => handleChangeWorkspace(workspace)}
                                         className={cn(
                                             workspace.id === selectedWorkspace.id &&

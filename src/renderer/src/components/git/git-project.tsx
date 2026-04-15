@@ -12,7 +12,6 @@ import { getUUID } from '@renderer/utils'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 import type { Repository } from 'src/main/types'
 import useToast from '../../hooks/useToast'
 import { EmptyState } from '../empty-state'
@@ -32,7 +31,6 @@ export default function GitProject() {
         actions: { saveOrOpenProject }
     } = useWorkspace()
 
-    const navigate = useNavigate()
     const dispatch: any = useDispatch()
 
     const [nameDialog, setNameDialog] = useState({
@@ -45,7 +43,7 @@ export default function GitProject() {
     const { checkLocalProjects } = useGit()
 
     useEffect(() => {
-        window.electron.ipcRenderer.on('clone-progress', async (_event: any, data: any) => {
+        const onCloneProgress = async (_event: any, data: any) => {
             if (data.status === 'success' || data.status === 'error') {
                 setCloningRepoId(null)
             }
@@ -86,33 +84,33 @@ export default function GitProject() {
             } else if (data.status === 'error') {
                 showErrorToast(t('failedCloneRepository', { message: data.message }))
             }
-        })
+        }
 
-        window.electron.ipcRenderer.on(
-            'request-project-name',
-            (_event: any, { defaultName }: { defaultName: string }) => {
-                setNameDialog({
-                    isOpen: true,
-                    defaultName,
-                    onConfirm: async (name: string) => {
-                        window.electron.ipcRenderer.send('project-name-response', name)
-                        setNameDialog((prev) => ({ ...prev, isOpen: false }))
-                    }
-                })
-            }
-        )
+        const onRequestProjectName = (_event: any, { defaultName }: { defaultName: string }) => {
+            setNameDialog({
+                isOpen: true,
+                defaultName,
+                onConfirm: async (name: string) => {
+                    window.electron.ipcRenderer.send('project-name-response', name)
+                    setNameDialog((prev) => ({ ...prev, isOpen: false }))
+                }
+            })
+        }
+
+        window.electron.ipcRenderer.on('clone-progress', onCloneProgress)
+        window.electron.ipcRenderer.on('request-project-name', onRequestProjectName)
 
         return () => {
-            window.electron.ipcRenderer.removeAllListeners('clone-progress')
-            window.electron.ipcRenderer.removeAllListeners('request-project-name')
+            window.electron.ipcRenderer.removeListener('clone-progress', onCloneProgress)
+            window.electron.ipcRenderer.removeListener('request-project-name', onRequestProjectName)
         }
-    }, [dispatch, navigate, showSuccessToast, showErrorToast, t, cloningRepoId])
+    }, [dispatch, saveOrOpenProject, showSuccessToast, showErrorToast, t, cloningRepoId, workspace.id])
 
     const handleClone = async (repo: Repository) => {
         setCloningRepoId(repo.id)
         try {
             await window.electron.ipcRenderer.invoke('clone-repository', repo.clone_url)
-        } catch (error) {
+        } catch {
             setCloningRepoId(null)
         }
     }

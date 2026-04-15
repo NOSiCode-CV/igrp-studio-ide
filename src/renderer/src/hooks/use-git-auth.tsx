@@ -1,4 +1,3 @@
-import type { RootState } from '@renderer/redux'
 import {
     addGitLabProvider,
     type GitLabProvider,
@@ -9,35 +8,33 @@ import {
     setProviderUser,
     updateGitLabProvider
 } from '@renderer/redux/git/reducer'
-import { useEffect, useState } from 'react'
+import {
+    selectActiveProvider,
+    selectActiveProviderId,
+    selectGitLabProviders,
+    selectIsInitialized,
+    selectRepositoriesGitHub,
+    selectRepositoriesGitLab,
+    selectUserGitHub,
+    selectUserGitLab
+} from '@renderer/redux/git/selectors'
+import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import type { Repository } from 'src/main/types'
 
 const useGitAuth = () => {
     const dispatch = useDispatch()
     const [isLoading, setIsLoading] = useState(false)
-    const {
-        userGitHub,
-        userGitLab,
-        repositoriesGitHub,
-        repositoriesGitLab,
-        isInitialized,
-        gitLabProviders,
-        activeProviderId
-    } = useSelector((state: RootState) => state.git)
+    const userGitHub = useSelector(selectUserGitHub)
+    const userGitLab = useSelector(selectUserGitLab)
+    const repositoriesGitHub = useSelector(selectRepositoriesGitHub)
+    const repositoriesGitLab = useSelector(selectRepositoriesGitLab)
+    const isInitialized = useSelector(selectIsInitialized)
+    const gitLabProviders = useSelector(selectGitLabProviders)
+    const activeProviderId = useSelector(selectActiveProviderId)
+    const activeProvider = useSelector(selectActiveProvider)
 
-    // Get the currently active provider
-    const activeProvider =
-        activeProviderId === 'github'
-            ? {
-                  id: 'github',
-                  name: 'GitHub',
-                  user: userGitHub,
-                  repositories: repositoriesGitHub
-              }
-            : gitLabProviders.find((p) => p.id === activeProviderId)
-
-    const loadGithubData = async (): Promise<void> => {
+    const loadGithubData = useCallback(async (): Promise<void> => {
         setIsLoading(true)
 
         const processGitHubUserInfo = async (): Promise<void> => {
@@ -114,43 +111,40 @@ const useGitAuth = () => {
         await Promise.allSettled(promises)
 
         setIsLoading(false)
-    }
+    }, [activeProviderId, dispatch])
 
     useEffect(() => {
-        window.electron.ipcRenderer.on(
-            'github-oauth-success',
-            async (_event: any, data: any): Promise<void> => {
-                await window.electron.ipcRenderer.invoke('gitauth-initialize', data.access_token)
-                dispatch(setActiveProvider('github'))
+        const onGitHubOAuthSuccess = async (_event: any, data: any): Promise<void> => {
+            await window.electron.ipcRenderer.invoke('gitauth-initialize', data.access_token)
+            dispatch(setActiveProvider('github'))
+            await loadGithubData()
+        }
+
+        const onGitLabOAuthSuccess = async (_event: any, data: any): Promise<void> => {
+            const providerId = data.providerId || activeProviderId
+            if (providerId && providerId !== 'github') {
+                await window.electron.ipcRenderer.invoke(
+                    'gitlab-initialize',
+                    data.access_token,
+                    providerId
+                )
+                dispatch(setActiveProvider(providerId))
                 await loadGithubData()
             }
-        )
+        }
 
-        window.electron.ipcRenderer.on(
-            'gitlab-oauth-success',
-            async (_event: any, data: any): Promise<void> => {
-                const providerId = data.providerId || activeProviderId
-                if (providerId && providerId !== 'github') {
-                    await window.electron.ipcRenderer.invoke(
-                        'gitlab-initialize',
-                        data.access_token,
-                        providerId
-                    )
-                    dispatch(setActiveProvider(providerId))
-                    await loadGithubData()
-                }
-            }
-        )
+        window.electron.ipcRenderer.on('github-oauth-success', onGitHubOAuthSuccess)
+        window.electron.ipcRenderer.on('gitlab-oauth-success', onGitLabOAuthSuccess)
 
         if (!isInitialized) {
             loadGithubData()
         }
 
         return () => {
-            window.electron.ipcRenderer.removeAllListeners('github-oauth-success')
-            window.electron.ipcRenderer.removeAllListeners('gitlab-oauth-success')
+            window.electron.ipcRenderer.removeListener('github-oauth-success', onGitHubOAuthSuccess)
+            window.electron.ipcRenderer.removeListener('gitlab-oauth-success', onGitLabOAuthSuccess)
         }
-    }, [isInitialized, dispatch, activeProviderId])
+    }, [isInitialized, dispatch, activeProviderId, loadGithubData])
 
     const handleLoginGithub = (): void => {
         dispatch(setActiveProvider('github'))

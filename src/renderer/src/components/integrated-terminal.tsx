@@ -29,6 +29,9 @@ type RootState = {
     }
 }
 
+const selectBasePath = (state: RootState): string => state.PageBuilder.basePath
+const selectWorkspacePath = (state: RootState): string => state.PageBuilder.workspace?.path ?? ''
+
 const createSessionId = (): string =>
     `terminal-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 
@@ -40,10 +43,8 @@ const createSession = (labelNumber: number): TerminalSession => ({
 export function IntegratedTerminal(): JSX.Element {
     const firstSession = createSession(1)
     const location = useLocation()
-    const { basePath, workspacePath } = useSelector((state: RootState) => ({
-        basePath: state.PageBuilder.basePath,
-        workspacePath: state.PageBuilder.workspace?.path ?? ''
-    }))
+    const basePath = useSelector(selectBasePath)
+    const workspacePath = useSelector(selectWorkspacePath)
     const [isOpen, setIsOpen] = useState(false)
     const [panelHeight, setPanelHeight] = useState(DEFAULT_PANEL_HEIGHT)
     const [isResizing, setIsResizing] = useState(false)
