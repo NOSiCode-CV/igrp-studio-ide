@@ -930,5 +930,7 @@
     "you_are_running_latest_version": "You are running the latest version",
     "update_check_failed": "Failed to check for updates",
     "readOnly": "Read Only",
-    "view_progress": "View Progress"
+    "view_progress": "View Progress",
+    "gitRepoRootDetected": "Monorepo detected. Git repo root: {{root}}",
+    "gitSyncRepoRootWarning": "Sync will run in the Git repo root: {{root}}"
 }

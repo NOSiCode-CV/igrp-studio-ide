@@ -13,8 +13,8 @@ import {
     IGRPIcon,
     IGRPTooltipContentPrimitive,
     IGRPTooltipPrimitive,
+    IGRPTooltipTriggerPrimitive,
     IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import logo from '@renderer/assets/images/igrp-green.svg'
 import DockerControls from '@renderer/components/docker-controls'
@@ -155,6 +155,11 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     }
 
     const isProjectAtive = config?.name !== undefined && config?.name !== null
+    const isMonorepoLinked =
+        !!basePath &&
+        config?.storageMode === 'linked' &&
+        !!config?.gitRootPath &&
+        config.gitRootPath !== basePath
     return (
         <>
             <IGRPTooltipProviderPrimitive>
@@ -209,15 +214,57 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
 
                             {basePath && (
                                 <>
-                                    <BranchSwitcher
-                                        projectPath={basePath || ''}
-                                        onError={showErrorToast}
-                                        onSuccess={showSuccessToast}
-                                        onBranchChange={() => {
-                                            dispatch(onGetPages(basePath || ''))
-                                        }}
-                                    />
-                                    {isGitEnabled && <SyncButton basePath={basePath || ''} />}
+                                    {isMonorepoLinked ? (
+                                        <IGRPTooltipPrimitive>
+                                            <IGRPTooltipTriggerPrimitive asChild>
+                                                <div>
+                                                    <BranchSwitcher
+                                                        projectPath={basePath || ''}
+                                                        onError={showErrorToast}
+                                                        onSuccess={showSuccessToast}
+                                                        onBranchChange={() => {
+                                                            dispatch(onGetPages(basePath || ''))
+                                                        }}
+                                                    />
+                                                </div>
+                                            </IGRPTooltipTriggerPrimitive>
+                                            <IGRPTooltipContentPrimitive>
+                                                <p>
+                                                    {t('gitRepoRootDetected', {
+                                                        root: config?.gitRootPath
+                                                    })}
+                                                </p>
+                                            </IGRPTooltipContentPrimitive>
+                                        </IGRPTooltipPrimitive>
+                                    ) : (
+                                        <BranchSwitcher
+                                            projectPath={basePath || ''}
+                                            onError={showErrorToast}
+                                            onSuccess={showSuccessToast}
+                                            onBranchChange={() => {
+                                                dispatch(onGetPages(basePath || ''))
+                                            }}
+                                        />
+                                    )}
+                                    {isGitEnabled &&
+                                        (isMonorepoLinked ? (
+                                            <IGRPTooltipPrimitive>
+                                                <IGRPTooltipTriggerPrimitive asChild>
+                                                    <div>
+                                                        <SyncButton basePath={basePath || ''} />
+                                                    </div>
+                                                </IGRPTooltipTriggerPrimitive>
+                                                <IGRPTooltipContentPrimitive>
+                                                    <p>
+                                                        {t('gitSyncRepoRootWarning', {
+                                                            root: config?.gitRootPath
+                                                        })}
+                                                    </p>
+                                                </IGRPTooltipContentPrimitive>
+                                            </IGRPTooltipPrimitive>
+                                        ) : (
+                                            <SyncButton basePath={basePath || ''} />
+                                        ))}
                                 </>
                             )}
 

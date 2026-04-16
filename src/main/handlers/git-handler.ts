@@ -101,6 +101,9 @@ ipcMain.handle('get-changes-count', async (_event, projectPath: string) => {
 ipcMain.handle('is-git-initialized', async (_event, projectPath: string) => {
     return GitService.isGitInitialized(projectPath)
 })
+ipcMain.handle('git-repo-root', async (_event, projectPath: string) => {
+    return GitService.getRepoRoot(projectPath)
+})
 ipcMain.handle('initialize-git', async (_event, projectPath: string) => {
     return GitService.initializeGit(projectPath)
 })

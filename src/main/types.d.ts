@@ -63,6 +63,13 @@ export interface ProjectData {
      * linked: project lives outside the workspace (e.g. monorepo); do not copy/move sources
      */
     storageMode?: ProjectStorageMode
+    /**
+     * Absolute path to the Git repository root (from `git rev-parse --show-toplevel`).
+     * When project is inside a monorepo, this will differ from `path`.
+     */
+    gitRootPath?: string
+    /** ISO timestamp when gitRootPath was last detected */
+    gitRepoRootDetectedAt?: string
     themeColor?: string
     location?: location
     createdAt?: string

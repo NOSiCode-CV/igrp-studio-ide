@@ -267,6 +267,30 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
             dispatch(setConfig(result))
 
+            // Detect git repo root (monorepo support) and persist on the project
+            try {
+                const repoRoot: string | null = await window.electron.ipcRenderer.invoke(
+                    'git-repo-root',
+                    result.path
+                )
+                if (
+                    repoRoot &&
+                    (result.gitRootPath !== repoRoot || !result.gitRepoRootDetectedAt)
+                ) {
+                    const nowIso = new Date().toISOString()
+                    const patch = {
+                        gitRootPath: repoRoot,
+                        gitRepoRootDetectedAt: nowIso
+                    }
+                    // Persist + update store config to keep UI consistent
+                    await window.igrpStudio.workspace.updateProject(result.id, patch)
+                    const updatedResult = { ...result, ...patch }
+                    dispatch(setConfig(updatedResult))
+                }
+            } catch {
+                // non-blocking: git may be unavailable or folder is not a repo
+            }
+
             onSuccess?.()
 
             navigateToNextPage(navigate, project)

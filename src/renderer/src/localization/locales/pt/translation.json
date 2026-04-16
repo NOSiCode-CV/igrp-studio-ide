@@ -927,5 +927,7 @@
     "workspaceOpenedSuccessfully": "{{name}} aberto com sucesso",
     "you_are_running_latest_version": "Você está executando a versão mais recente",
     "update_check_failed": "Falha ao verificar atualizações",
-    "readOnly": "Somente Leitura"
+    "readOnly": "Somente Leitura",
+    "gitRepoRootDetected": "Monorepo detetado. Raiz do repositório Git: {{root}}",
+    "gitSyncRepoRootWarning": "A sincronização será executada na raiz do repositório Git: {{root}}"
 }
