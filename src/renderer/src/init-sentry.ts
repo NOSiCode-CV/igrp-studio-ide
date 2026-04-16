@@ -37,7 +37,13 @@ export function captureRendererException(
     error: Error,
     context?: Record<string, unknown>
 ): void {
-    if (!import.meta.env.VITE_SENTRY_DSN) return
+    if (!import.meta.env.VITE_SENTRY_DSN) {
+        if (import.meta.env.DEV) {
+            console.info('[Sentry] Renderer capture skipped: no DSN configured')
+        }
+        return
+    }
+
     Sentry.withScope((scope) => {
         if (context) {
             for (const [k, v] of Object.entries(context)) {
@@ -46,4 +52,7 @@ export function captureRendererException(
         }
         Sentry.captureException(error)
     })
+
+    // Best effort: give transport time to send before hard reloads/navigation.
+    void Sentry.flush(2000)
 }
