@@ -1,5 +1,11 @@
 import {
     IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogDescriptionPrimitive,
+    IGRPDialogFooterPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
     IGRPDropdownMenuContentPrimitive,
     IGRPDropdownMenuItemPrimitive,
     IGRPDropdownMenuPrimitive,
@@ -27,6 +33,7 @@ import {
     GitFork,
     LayoutGrid,
     List,
+    LoaderCircle,
     type LucideIcon,
     PlusCircle,
     Server
@@ -149,6 +156,9 @@ const Resources = () => {
     const [sortOrder, setSortOrder] = useState<string>('lastModified')
     const [sortOrderService, setSortOrderService] = useState<string>('lastModified')
     const [allProjects, setAllProjects] = useState<ProjectData[]>([])
+    const [openProjectDialog, setOpenProjectDialog] = useState(false)
+    const [pendingOpenProject, setPendingOpenProject] = useState<IOpenProject | null>(null)
+    const [isOpeningProject, setIsOpeningProject] = useState(false)
 
     const { showErrorToast } = useToast()
 
@@ -206,13 +216,38 @@ const Resources = () => {
             return
         }
 
-        saveOrOpenProject({
-            project: {
-                ...config,
-                id: config.id ?? getId(),
-                workspaceId: workspace.id
-            }
-        })
+        setPendingOpenProject(result)
+        setOpenProjectDialog(true)
+    }
+
+    const closeOpenProjectDialog = (): void => {
+        if (isOpeningProject) return
+        setOpenProjectDialog(false)
+        setPendingOpenProject(null)
+    }
+
+    const confirmOpenProject = async (storageMode: 'linked' | 'managed'): Promise<void> => {
+        const config = pendingOpenProject?.config
+        if (!config) {
+            closeOpenProjectDialog()
+            return
+        }
+
+        setIsOpeningProject(true)
+        try {
+            await saveOrOpenProject({
+                project: {
+                    ...config,
+                    id: config.id ?? getId(),
+                    workspaceId: workspace.id,
+                    storageMode
+                }
+            })
+
+            closeOpenProjectDialog()
+        } finally {
+            setIsOpeningProject(false)
+        }
     }
 
     const ProjectActions = () => {
@@ -244,6 +279,56 @@ const Resources = () => {
                         workspace={workspace}
                     />
                 )}
+
+                <IGRPDialogPrimitive
+                    open={openProjectDialog}
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            closeOpenProjectDialog()
+                            return
+                        }
+                        setOpenProjectDialog(true)
+                    }}
+                >
+                    <IGRPDialogContentPrimitive>
+                        <IGRPDialogHeaderPrimitive>
+                            <IGRPDialogTitlePrimitive>{t('openProjectOptionsTitle')}</IGRPDialogTitlePrimitive>
+                            <IGRPDialogDescriptionPrimitive>
+                                {t('openProjectOptionsDescription')}
+                            </IGRPDialogDescriptionPrimitive>
+                        </IGRPDialogHeaderPrimitive>
+
+                        <IGRPDialogFooterPrimitive className="grid grid-cols-2 gap-2">
+                            <IGRPButtonPrimitive
+                                variant="outline"
+                                onClick={() => confirmOpenProject('linked')}
+                                disabled={isOpeningProject}
+                            >
+                                {isOpeningProject ? (
+                                    <span className="inline-flex items-center gap-2">
+                                        <LoaderCircle className="h-4 w-4 animate-spin" />
+                                        {t('opening')}
+                                    </span>
+                                ) : (
+                                    t('openProjectAsLinked')
+                                )}
+                            </IGRPButtonPrimitive>
+                            <IGRPButtonPrimitive
+                                onClick={() => confirmOpenProject('managed')}
+                                disabled={isOpeningProject}
+                            >
+                                {isOpeningProject ? (
+                                    <span className="inline-flex items-center gap-2">
+                                        <LoaderCircle className="h-4 w-4 animate-spin" />
+                                        {t('opening')}
+                                    </span>
+                                ) : (
+                                    t('importProjectToWorkspace')
+                                )}
+                            </IGRPButtonPrimitive>
+                        </IGRPDialogFooterPrimitive>
+                    </IGRPDialogContentPrimitive>
+                </IGRPDialogPrimitive>
             </>
         )
     }

@@ -11,6 +11,8 @@ export type ProjectType = 'frontend' | 'backend'
 
 export type FrameworkType = 'springboot' | 'nextjs' | 'dotnet'
 
+export type ProjectStorageMode = 'managed' | 'linked'
+
 export interface NextConfigData {
     name: string
     description?: string
@@ -56,6 +58,11 @@ export interface ProjectData {
     config: ConfigData | any
     service?: any
     path: string
+    /**
+     * managed: project is placed under <workspace>/projects/<name>
+     * linked: project lives outside the workspace (e.g. monorepo); do not copy/move sources
+     */
+    storageMode?: ProjectStorageMode
     themeColor?: string
     location?: location
     createdAt?: string
