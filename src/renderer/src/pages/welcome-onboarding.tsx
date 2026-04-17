@@ -1,9 +1,20 @@
+import { IGRPCopyTo } from '@igrp/igrp-framework-react-design-system'
 import logo from '@renderer/assets/images/igrp-green.svg'
+import Doctor from '@renderer/components/doctor'
 import Loader from '@renderer/components/loader'
-import CreateWorkspace from '@renderer/pages/workspaces/components/create-workspace'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
+import CreateWorkspace from '@renderer/pages/workspaces/components/create-workspace'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { ArrowRight, ChevronLeft, ChevronRight, Database, Sparkles, Zap } from 'lucide-react'
+import {
+    ArrowRight,
+    ChevronLeft,
+    ChevronRight,
+    Database,
+    Sparkles,
+    Stethoscope,
+    Terminal,
+    Zap
+} from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { type ReactNode, useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -53,6 +64,15 @@ const slides: Slide[] = [
         icon: <Database className="w-8 h-8 text-white" />,
         color: 'from-slate-700 to-slate-900',
         image: 'https://picsum.photos/seed/igrp-dev/800/600'
+    },
+    {
+        id: 5,
+        title: 'Prepare your environment',
+        description:
+            'Run Doctor to validate your local setup and install @igrp/cli to start projects and open Studio directly from the terminal.',
+        icon: <Stethoscope className="w-8 h-8 text-white" />,
+        color: 'from-emerald-500 to-teal-600',
+        image: 'https://picsum.photos/seed/igrp-doctor-cli/800/600'
     }
 ]
 
@@ -67,7 +87,9 @@ export default function WelcomeSwipe() {
     const [currentSlide, setCurrentSlide] = useState(0)
     const [direction, setDirection] = useState(0)
     const [isCreateWorkspaceOpen, setIsCreateWorkspaceOpen] = useState(false)
+    const [isDoctorOpen, setIsDoctorOpen] = useState(false)
     const aiCodeLineWidths = [92, 78, 86, 70]
+    const isSetupSlide = slides[currentSlide].title === 'Prepare your environment'
 
     const goToApplicationsHome = useCallback(() => {
         navigate(ROUTES.PATH_IDE_INITIAL_SCREEN, { replace: true })
@@ -217,17 +239,27 @@ export default function WelcomeSwipe() {
                                 </motion.p>
 
                                 <div className="flex items-center gap-4">
-                                    {currentSlide === slides.length - 1 ? (
-                                        <motion.button
-                                            type="button"
-                                            whileHover={{ scale: 1.02 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            onClick={() => void handleLaunchStudio()}
-                                            className="px-8 py-3.5 bg-primary text-primary-foreground rounded-xl font-semibold flex items-center gap-2 shadow-lg shadow-primary/20"
-                                        >
-                                            Launch Studio
-                                            <ArrowRight className="w-4 h-4" />
-                                        </motion.button>
+                                    {isSetupSlide ? (
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsDoctorOpen(true)}
+                                                className="px-6 py-3 bg-slate-50 border border-slate-200 text-ink rounded-xl font-semibold flex items-center gap-2 hover:bg-slate-100 transition-colors"
+                                            >
+                                                Run Doctor
+                                                <Stethoscope className="w-4 h-4" />
+                                            </button>
+                                            <motion.button
+                                                type="button"
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                onClick={() => void handleLaunchStudio()}
+                                                className="px-8 py-3 bg-emerald-600 text-white rounded-xl font-semibold flex items-center gap-2 shadow-lg shadow-emerald-600/20"
+                                            >
+                                                Launch Studio
+                                                <ArrowRight className="w-4 h-4" />
+                                            </motion.button>
+                                        </div>
                                     ) : (
                                         <button
                                             type="button"
@@ -261,11 +293,10 @@ export default function WelcomeSwipe() {
                                     setDirection(idx > currentSlide ? 1 : -1)
                                     setCurrentSlide(idx)
                                 }}
-                                className={`h-2 rounded-full transition-all duration-300 ${
-                                    idx === currentSlide
+                                className={`h-2 rounded-full transition-all duration-300 ${idx === currentSlide
                                         ? 'w-6 bg-primary'
                                         : 'w-2 bg-muted hover:bg-muted-foreground/30'
-                                }`}
+                                    }`}
                             />
                         ))}
                     </div>
@@ -285,7 +316,28 @@ export default function WelcomeSwipe() {
                         <div className="flex-1 flex gap-4">
                             <div className="w-1/4 bg-muted/60 rounded-lg border border-border" />
                             <div className="flex-1 rounded-lg border border-dashed border-border flex items-center justify-center bg-muted/40 overflow-hidden">
-                                {slides[currentSlide].title === 'AI-Powered Code Generation' ? (
+                                {isSetupSlide ? (
+                                    <div className="flex flex-col h-full w-full p-4 gap-4">
+                                        <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                                            <Terminal className="w-4 h-4 text-slate-400" />
+                                            <span className="text-[10px] font-bold text-slate-800 uppercase tracking-widest">
+                                                IGRP CLI
+                                            </span>
+                                            <IGRPCopyTo value="npm install -g @igrp/cli --registry=https://sonatype.nosi.cv/repository/igrp-group/" />
+                                        </div>
+                                        <div className="flex-1 bg-slate-50 rounded-lg p-4 font-mono text-[10px] text-slate-600 leading-relaxed border border-slate-100">
+                                            <span className="text-emerald-600">npm</span> install -g
+                                            @igrp/cli
+                                            --registry=https://sonatype.nosi.cv/repository/igrp-group/
+                                        </div>
+                                        <div className="mt-auto bg-emerald-50 border border-emerald-100 p-3 rounded-lg flex items-center gap-2">
+                                            <Stethoscope className="w-3 h-3 text-emerald-600" />
+                                            <span className="text-[9px] font-bold text-emerald-700 uppercase tracking-widest">
+                                                Run doctor before starting
+                                            </span>
+                                        </div>
+                                    </div>
+                                ) : slides[currentSlide].title === 'AI-Powered Code Generation' ? (
                                     <div className="flex flex-col gap-2 p-4 w-full">
                                         {aiCodeLineWidths.map((width, i) => (
                                             <motion.div
@@ -350,11 +402,10 @@ export default function WelcomeSwipe() {
                         type="button"
                         onClick={prevSlide}
                         disabled={currentSlide === 0}
-                        className={`p-2 rounded-full bg-card shadow-md border border-border transition-all pointer-events-auto ${
-                            currentSlide === 0
+                        className={`p-2 rounded-full bg-card shadow-md border border-border transition-all pointer-events-auto ${currentSlide === 0
                                 ? 'opacity-0 scale-50'
                                 : 'opacity-100 scale-100 hover:bg-muted'
-                        }`}
+                            }`}
                     >
                         <ChevronLeft className="w-5 h-5 text-foreground" />
                     </button>
@@ -368,6 +419,7 @@ export default function WelcomeSwipe() {
                     goToApplicationsHome()
                 }}
             />
+            <Doctor open={isDoctorOpen} setOpen={setIsDoctorOpen} />
         </div>
     )
 }
