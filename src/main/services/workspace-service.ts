@@ -279,7 +279,11 @@ export class WorkspaceRepository {
             const storageMode = updates.storageMode ?? 'managed'
             updatedProject.storageMode = storageMode
 
-            await this.addProjectToStudioWorkspace(workspace, updatedProject, storageMode === 'managed')
+            await this.addProjectToStudioWorkspace(
+                workspace,
+                updatedProject,
+                storageMode === 'managed'
+            )
 
             foundProject = updatedProject
         }

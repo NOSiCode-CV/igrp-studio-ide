@@ -66,21 +66,21 @@ const CreateWorkspace = ({
     const isWindows = currentPlatform === 'win32'
     const platformGuide = isWindows
         ? {
-            label: 'Windows',
-            Icon: Monitor,
-            instruction: (
-                <>
-                    Run Notepad as <strong>Administrator</strong> and open:
-                </>
-            ),
-            command: 'C:\\Windows\\System32\\drivers\\etc\\hosts'
-        }
+              label: 'Windows',
+              Icon: Monitor,
+              instruction: (
+                  <>
+                      Run Notepad as <strong>Administrator</strong> and open:
+                  </>
+              ),
+              command: 'C:\\Windows\\System32\\drivers\\etc\\hosts'
+          }
         : {
-            label: 'macOS / Linux',
-            Icon: Cpu,
-            instruction: <>Open your terminal and run:</>,
-            command: 'sudo nano /etc/hosts'
-        }
+              label: 'macOS / Linux',
+              Icon: Cpu,
+              instruction: <>Open your terminal and run:</>,
+              command: 'sudo nano /etc/hosts'
+          }
     const stepKeys = ['form', 'docker', 'dns'] as const
     const totalSteps = stepKeys.length
 
@@ -164,7 +164,9 @@ const CreateWorkspace = ({
             </div>
             <div className="compact-form-field space-y-2">
                 <div className="compact-form-field space-y-2">
-                    <IGRPLabelPrimitive htmlFor="slug">{t('workspace.slug')} <span className="text-red-500">*</span></IGRPLabelPrimitive>
+                    <IGRPLabelPrimitive htmlFor="slug">
+                        {t('workspace.slug')} <span className="text-red-500">*</span>
+                    </IGRPLabelPrimitive>
                     <IGRPInputPrimitive
                         id="slug"
                         value={slug}
@@ -172,9 +174,9 @@ const CreateWorkspace = ({
                         placeholder={t('workspace.slug')}
                     />
                 </div>
-                {directoryPath && <p className="text-xs text-muted-foreground">
-                    {`${directoryPath}/${slug}`}
-                </p>}
+                {directoryPath && (
+                    <p className="text-xs text-muted-foreground">{`${directoryPath}/${slug}`}</p>
+                )}
             </div>
 
             <div className="compact-form-field space-y-2">
@@ -190,7 +192,9 @@ const CreateWorkspace = ({
             </div>
 
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('workspace.locationLabel')} <span className="text-red-500">*</span></IGRPLabelPrimitive>
+                <IGRPLabelPrimitive>
+                    {t('workspace.locationLabel')} <span className="text-red-500">*</span>
+                </IGRPLabelPrimitive>
                 <div className="flex gap-2">
                     <IGRPInputPrimitive
                         value={directoryPath}
@@ -210,7 +214,7 @@ const CreateWorkspace = ({
                     </IGRPButtonPrimitive>
                 </div>
             </div>
-        </div >
+        </div>
     )
 
     const infoSteps = [
@@ -222,7 +226,9 @@ const CreateWorkspace = ({
                     <div className="rounded-xl border border-border bg-muted/20 p-4">
                         <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border">
                             <Play className="w-4 h-4 text-primary" />
-                            <span className="text-sm font-semibold text-foreground">Run in Docker</span>
+                            <span className="text-sm font-semibold text-foreground">
+                                Run in Docker
+                            </span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-3">
                             This launches proxy, authentication, databases, and core services.
@@ -274,7 +280,9 @@ const CreateWorkspace = ({
                             </p>
                             <div className="flex h-10 min-h-10 max-h-10 gap-0 overflow-hidden rounded-md ring-1 ring-border/50">
                                 <code className="flex min-h-0 min-w-0 flex-1 items-center overflow-hidden bg-foreground px-3 font-mono text-[10px] leading-tight text-background">
-                                    <span className="min-w-0 break-all">{platformGuide.command}</span>
+                                    <span className="min-w-0 break-all">
+                                        {platformGuide.command}
+                                    </span>
                                 </code>
                                 <IGRPButtonPrimitive
                                     type="button"
@@ -287,7 +295,9 @@ const CreateWorkspace = ({
                                     <Copy className="h-4 w-4 shrink-0" />
                                 </IGRPButtonPrimitive>
                             </div>
-                            <p className="text-[10px] text-primary mt-2 font-medium">Add: 127.0.0.1 {slug}</p>
+                            <p className="text-[10px] text-primary mt-2 font-medium">
+                                Add: 127.0.0.1 {slug}
+                            </p>
                         </div>
                     </div>
                     <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
@@ -361,17 +371,22 @@ const CreateWorkspace = ({
                 className="max-w-[560px]"
                 {...(preventDismiss
                     ? {
-                          onInteractOutside: (e: { preventDefault: () => void }) => e.preventDefault(),
+                          onInteractOutside: (e: { preventDefault: () => void }) =>
+                              e.preventDefault(),
                           onEscapeKeyDown: (e: { preventDefault: () => void }) => e.preventDefault()
                       }
                     : {})}
             >
                 <IGRPDialogHeaderPrimitive>
                     <IGRPDialogTitlePrimitive>
-                        {dialogStep === 0 ? t('workspace.createTitle') : infoSteps[dialogStep - 1].title}
+                        {dialogStep === 0
+                            ? t('workspace.createTitle')
+                            : infoSteps[dialogStep - 1].title}
                     </IGRPDialogTitlePrimitive>
                     <IGRPDialogDescriptionPrimitive>
-                        {dialogStep === 0 ? t('createWorkspaceInfo') : infoSteps[dialogStep - 1].description}
+                        {dialogStep === 0
+                            ? t('createWorkspaceInfo')
+                            : infoSteps[dialogStep - 1].description}
                     </IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
                 {dialogStep === 0 ? formFieldsContent : infoSteps[dialogStep - 1].content}
@@ -381,8 +396,9 @@ const CreateWorkspace = ({
                         {stepKeys.map((stepKey, idx) => (
                             <div
                                 key={stepKey}
-                                className={`h-1.5 rounded-full transition-all duration-300 ${idx === dialogStep ? 'w-6 bg-primary' : 'w-1.5 bg-muted'
-                                    }`}
+                                className={`h-1.5 rounded-full transition-all duration-300 ${
+                                    idx === dialogStep ? 'w-6 bg-primary' : 'w-1.5 bg-muted'
+                                }`}
                             />
                         ))}
                     </div>
@@ -402,13 +418,19 @@ const CreateWorkspace = ({
                             <IGRPButtonPrimitive
                                 type="button"
                                 disabled={dialogStep === 0 && !isFormStepValid}
-                                onClick={() => setDialogStep((prev) => Math.min(prev + 1, totalSteps - 1))}
+                                onClick={() =>
+                                    setDialogStep((prev) => Math.min(prev + 1, totalSteps - 1))
+                                }
                             >
                                 Next
                                 <ChevronRight className="w-4 h-4" />
                             </IGRPButtonPrimitive>
                         ) : (
-                            <IGRPButtonPrimitive type="button" onClick={handleCreate} disabled={isCreateDisabled}>
+                            <IGRPButtonPrimitive
+                                type="button"
+                                onClick={handleCreate}
+                                disabled={isCreateDisabled}
+                            >
                                 {isCreating ? t('creating') : t('workspace.createButton')}
                             </IGRPButtonPrimitive>
                         )}

@@ -39,9 +39,7 @@ export default defineConfig({
             'import.meta.env.VITE_SENTRY_DSN': JSON.stringify(
                 process.env.SENTRY_DSN || process.env.VITE_SENTRY_DSN || ''
             ),
-            'import.meta.env.VITE_SENTRY_TEST': JSON.stringify(
-                process.env.VITE_SENTRY_TEST || ''
-            )
+            'import.meta.env.VITE_SENTRY_TEST': JSON.stringify(process.env.VITE_SENTRY_TEST || '')
         },
         plugins: [react()],
         optimizeDeps: {

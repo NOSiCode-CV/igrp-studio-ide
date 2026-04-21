@@ -53,7 +53,10 @@ function AppRoutes(): JSX.Element {
             <HashRouter>
                 <Routes>
                     <Route path="/" element={<StartupGate />} />
-                    <Route path={ROUTES.PATH_WELCOME_ONBOARDING} element={<WelcomeOnboardingPage />} />
+                    <Route
+                        path={ROUTES.PATH_WELCOME_ONBOARDING}
+                        element={<WelcomeOnboardingPage />}
+                    />
                     {allRoutes.map((route) => (
                         <Route
                             key={route.path}

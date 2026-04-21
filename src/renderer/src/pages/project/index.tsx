@@ -315,7 +315,13 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         if (formik.values.path !== targetPath) {
             formik.setFieldValue('path', targetPath, false)
         }
-    }, [formik.setFieldValue, formik.values?.config?.name, formik.values.name, formik.values.path, workspace.path])
+    }, [
+        formik.setFieldValue,
+        formik.values?.config?.name,
+        formik.values.name,
+        formik.values.path,
+        workspace.path
+    ])
 
     // Update preview when icon changes
     React.useEffect(() => {
@@ -661,10 +667,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         {t('newProject')}
                     </IGRPDialogDescriptionPrimitive>
                 </IGRPDialogHeaderPrimitive>
-                <form
-                    onSubmit={formik.handleSubmit}
-                    className="flex min-h-0 flex-1 flex-col"
-                >
+                <form onSubmit={formik.handleSubmit} className="flex min-h-0 flex-1 flex-col">
                     <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-4 sm:px-6">
                         <div className="relative mb-6">
                             <div className="absolute top-5 left-0 right-0 h-[2px] bg-muted" />

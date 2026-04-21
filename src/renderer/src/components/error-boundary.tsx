@@ -112,8 +112,8 @@ class ErrorBoundary extends Component<Props, State> {
                                 Something went wrong
                             </h2>
                             <p className="mt-1 text-center text-gray-500 dark:text-gray-300">
-                                Click the logo to return home, or copy the error details and share them with
-                                the team.
+                                Click the logo to return home, or copy the error details and share
+                                them with the team.
                             </p>
                         </div>
 
@@ -145,7 +145,9 @@ class ErrorBoundary extends Component<Props, State> {
                                     <button
                                         type="button"
                                         onClick={this.copyError}
-                                        aria-label={this.state.copied ? 'Copied' : 'Copy error details'}
+                                        aria-label={
+                                            this.state.copied ? 'Copied' : 'Copy error details'
+                                        }
                                         title={this.state.copied ? 'Copied' : 'Copy'}
                                         className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-semibold text-white hover:bg-gray-800 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-gray-100"
                                     >

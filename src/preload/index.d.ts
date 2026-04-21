@@ -53,6 +53,7 @@ declare const api: {
     }
     runDoctorChecks: () => Promise<ToolCheck[]>
     saveDoctorReport: (results: any) => Promise<any>
+    installIGRPCLI: () => Promise<{ success: boolean; output?: string; error?: string }>
     saveProjectIcon: (data: {
         filePath: string
         fileData: ArrayBuffer

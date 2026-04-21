@@ -48,8 +48,6 @@ export function initMainSentryEarly(metadata?: Record<string, string>): void {
             dsn: sentryDsn,
             environment,
             release: app.getVersion(),
-            // GlitchTip (and some self-hosted) do not support Sentry sessions
-            autoSessionTracking: false,
             tracesSampleRate: process.env.SENTRY_TRACES_SAMPLE_RATE
                 ? Number(process.env.SENTRY_TRACES_SAMPLE_RATE)
                 : 0,
@@ -110,7 +108,9 @@ export function registerMainMonitoringHooks(): void {
 }
 
 /** @deprecated Phase 1: use initMainSentryEarly + registerMainMonitoringHooks; kept for call sites. */
-export async function initializeLogger(_config?: { metadata?: Record<string, string> }): Promise<void> {
+export async function initializeLogger(_config?: {
+    metadata?: Record<string, string>
+}): Promise<void> {
     initMainSentryEarly(_config?.metadata)
     registerMainMonitoringHooks()
     console.log('[Monitoring] Logger registered (Sentry main), session:', sessionId)

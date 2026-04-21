@@ -45,8 +45,7 @@ type ExtendedElectronAPI = typeof electronAPI & {
 
 // Custom APIs for renderer
 const api = {
-    reportError: (error: Error) =>
-        ipcRenderer.send('report-error', serializeErrorForIpc(error)),
+    reportError: (error: Error) => ipcRenderer.send('report-error', serializeErrorForIpc(error)),
 
     fetchSelectors: (module: string, basePath: string) =>
         ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
@@ -78,6 +77,8 @@ const api = {
 
     runDoctorChecks: (): Promise<ToolCheck[]> => ipcRenderer.invoke('run-doctor-checks'),
     saveDoctorReport: (results) => ipcRenderer.invoke('save-doctor-report', results),
+    installIGRPCLI: (): Promise<{ success: boolean; output?: string; error?: string }> =>
+        ipcRenderer.invoke('install-igrp-cli'),
 
     saveProjectIcon: (data: { filePath: string; fileData: ArrayBuffer; assetsPath: string }) =>
         ipcRenderer.invoke('save-project-icon', data),
@@ -640,8 +641,7 @@ if (process.contextIsolated) {
         onFolderChange: (callback: (event: WatchEvent) => void) => {
             ipcRenderer.on('folder-change', (_, data: WatchEvent) => callback(data))
         },
-        reportError: (error: Error) =>
-            ipcRenderer.send('report-error', serializeErrorForIpc(error))
+        reportError: (error: Error) => ipcRenderer.send('report-error', serializeErrorForIpc(error))
     }
     window.api = api
     window.engine = engine

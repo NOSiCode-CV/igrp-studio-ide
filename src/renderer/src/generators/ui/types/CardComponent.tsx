@@ -1,7 +1,7 @@
 import type { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types'
 import { cn } from '@renderer/lib/utils'
 import type { JSX } from 'react'
-import { COMPONENT_MAP, ICON_MAP } from '../ComponentTypes'
+import { COMPONENT_MAP } from '../ComponentTypes'
 import { generateAllClasses } from '../components/settings/style/utils'
 import { useFakedata } from '../hooks/useFakeData'
 import IGRPStudioCustomComponent from './components/CustomComponent'
@@ -30,14 +30,13 @@ const CardComponent = ({ comp, group, hoverClass, onDragEnd }: CardComponentProp
     // Extract icon properties for button components
     const iconProps = iconProperties
         ? {
-            ...iconProperties
-        }
+              ...iconProperties
+          }
         : {}
 
     return (
         <>
             {Component ? (
-                //@ts-expect-error - This is a workaround to allow the component to be rendered
                 <Component
                     {...args}
                     {...FAKE_COMPONENT_DATA?.properties}

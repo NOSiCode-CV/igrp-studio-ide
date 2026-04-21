@@ -648,7 +648,9 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
             <FormErrors />
             {formData.length === 0 ? (
                 <div className="w-full border rounded-lg overflow-hidden">
-                    <div className="p-4 text-sm text-muted-foreground text-center">Sem nada para apresentar</div>
+                    <div className="p-4 text-sm text-muted-foreground text-center">
+                        Sem nada para apresentar
+                    </div>
                 </div>
             ) : (
                 <div className="w-full border rounded-lg overflow-hidden">
@@ -660,9 +662,14 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
 
                             return (
                                 <React.Fragment key={rowId}>
-                                    {renderTableRow(rowId, index, row, (props: ChangeFnProps): void => {
-                                        onChangeValue(props)
-                                    })}
+                                    {renderTableRow(
+                                        rowId,
+                                        index,
+                                        row,
+                                        (props: ChangeFnProps): void => {
+                                            onChangeValue(props)
+                                        }
+                                    )}
                                     {isDataArray &&
                                         row?.fields.map((col: any, ii: number) =>
                                             renderTableRow(

@@ -142,8 +142,8 @@ export function Footer(): JSX.Element {
                                 </span>
                             </span>
                         ) : lastUpdateType === 'available' ||
-                            lastUpdateType === 'progress' ||
-                            lastUpdateType === 'downloaded' ? (
+                          lastUpdateType === 'progress' ||
+                          lastUpdateType === 'downloaded' ? (
                             <button
                                 type="button"
                                 onClick={() =>
@@ -213,7 +213,9 @@ export function Footer(): JSX.Element {
                                 size="icon"
                                 variant="ghost"
                                 className="h-6 w-6"
-                                onClick={() => window.dispatchEvent(new Event(TERMINAL_TOGGLE_EVENT))}
+                                onClick={() =>
+                                    window.dispatchEvent(new Event(TERMINAL_TOGGLE_EVENT))
+                                }
                             >
                                 <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
                             </IGRPButtonPrimitive>

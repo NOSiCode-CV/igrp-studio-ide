@@ -250,15 +250,12 @@ app.whenReady().then(async () => {
         createPtyProcess(sessionId).write(data)
     })
 
-    ipcMain.on(
-        'pty-resize',
-        (_, payload: { sessionId: string; cols: number; rows: number }) => {
-            const { sessionId, cols, rows } = payload
-            if (!sessionId) return
-            if (!cols || !rows) return
-            createPtyProcess(sessionId).resize(cols, rows)
-        }
-    )
+    ipcMain.on('pty-resize', (_, payload: { sessionId: string; cols: number; rows: number }) => {
+        const { sessionId, cols, rows } = payload
+        if (!sessionId) return
+        if (!cols || !rows) return
+        createPtyProcess(sessionId).resize(cols, rows)
+    })
 
     ipcMain.on('pty-destroy', (_, sessionId: string) => {
         if (!sessionId) return
@@ -270,10 +267,7 @@ app.whenReady().then(async () => {
 
     ipcMain.on(
         'report-error',
-        (
-            _,
-            payload: Error | { message: string; name?: string; stack?: string }
-        ) => {
+        (_, payload: Error | { message: string; name?: string; stack?: string }) => {
             const err =
                 payload instanceof Error
                     ? payload

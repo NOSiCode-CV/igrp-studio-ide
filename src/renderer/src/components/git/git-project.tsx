@@ -104,7 +104,15 @@ export default function GitProject() {
             window.electron.ipcRenderer.removeListener('clone-progress', onCloneProgress)
             window.electron.ipcRenderer.removeListener('request-project-name', onRequestProjectName)
         }
-    }, [dispatch, saveOrOpenProject, showSuccessToast, showErrorToast, t, cloningRepoId, workspace.id])
+    }, [
+        dispatch,
+        saveOrOpenProject,
+        showSuccessToast,
+        showErrorToast,
+        t,
+        cloningRepoId,
+        workspace.id
+    ])
 
     const handleClone = async (repo: Repository) => {
         setCloningRepoId(repo.id)

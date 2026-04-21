@@ -62,8 +62,7 @@ const IDEInitialScreen = (): React.JSX.Element => {
         }
     }, [workspacesLoading, workspace, navigate])
 
-    const showBlockingCreateWorkspace =
-        ideGateReady && !workspace && !workspacesLoading
+    const showBlockingCreateWorkspace = ideGateReady && !workspace && !workspacesLoading
 
     if (workspacesLoading || (!workspace && !ideGateReady)) {
         return (
@@ -76,12 +75,7 @@ const IDEInitialScreen = (): React.JSX.Element => {
     return (
         <div className="mx-auto p-6 space-y-6 flex flex-col h-full">
             {showBlockingCreateWorkspace && (
-                <CreateWorkspace
-                    open
-                    preventDismiss
-                    mode="dialog"
-                    onOpenChange={() => undefined}
-                />
+                <CreateWorkspace open preventDismiss mode="dialog" onOpenChange={() => undefined} />
             )}
             {workspace ? (
                 <>

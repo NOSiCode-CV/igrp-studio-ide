@@ -101,15 +101,18 @@ export class ComponentErrorBoundary extends React.Component<
             boundary: 'component'
         })
         try {
-            if ((window as unknown as { analytics?: { track: (e: string, p: object) => void } })
-                .analytics) {
-                ;(window as unknown as { analytics: { track: (e: string, p: object) => void } })
-                    .analytics.track('error_boundary_caught', {
-                        error: error.message,
-                        stack: error.stack,
-                        componentStack: errorInfo.componentStack,
-                        timestamp: new Date().toISOString()
-                    })
+            if (
+                (window as unknown as { analytics?: { track: (e: string, p: object) => void } })
+                    .analytics
+            ) {
+                ;(
+                    window as unknown as { analytics: { track: (e: string, p: object) => void } }
+                ).analytics.track('error_boundary_caught', {
+                    error: error.message,
+                    stack: error.stack,
+                    componentStack: errorInfo.componentStack,
+                    timestamp: new Date().toISOString()
+                })
             }
         } catch (reportingError) {
             // Silently fail if error reporting fails

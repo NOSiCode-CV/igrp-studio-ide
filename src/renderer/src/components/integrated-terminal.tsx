@@ -1,9 +1,6 @@
 'use client'
 
-import {
-    IGRPButtonPrimitive,
-    IGRPSeparator
-} from '@igrp/igrp-framework-react-design-system'
+import { IGRPButtonPrimitive, IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import { Eraser, Plus, Terminal as TerminalIcon, X } from 'lucide-react'
 import { SearchAddon } from '@xterm/addon-search'
 import { FitAddon } from '@xterm/addon-fit'
@@ -79,9 +76,7 @@ export function IntegratedTerminal(): JSX.Element {
     const resolveSessionCwd = useCallback((): string | undefined => {
         const pathname = location.pathname
         const isHomeContext =
-            pathname === '/' ||
-            pathname === ROUTES.IDE_INITIAL_SCREEN ||
-            pathname === ROUTES.HOME
+            pathname === '/' || pathname === ROUTES.IDE_INITIAL_SCREEN || pathname === ROUTES.HOME
 
         if (isHomeContext) {
             return workspacePath || basePath || undefined
@@ -106,13 +101,16 @@ export function IntegratedTerminal(): JSX.Element {
         sessionRef.terminal.write('\x1b[2J\x1b[3J\x1b[H')
     }, [activeSessionId])
 
-    const registerTerminalHost = useCallback((sessionId: string, element: HTMLDivElement | null) => {
-        if (!element) {
-            hostRefs.current.delete(sessionId)
-            return
-        }
-        hostRefs.current.set(sessionId, element)
-    }, [])
+    const registerTerminalHost = useCallback(
+        (sessionId: string, element: HTMLDivElement | null) => {
+            if (!element) {
+                hostRefs.current.delete(sessionId)
+                return
+            }
+            hostRefs.current.set(sessionId, element)
+        },
+        []
+    )
 
     const closeSession = useCallback(
         (sessionId: string) => {
@@ -130,7 +128,9 @@ export function IntegratedTerminal(): JSX.Element {
             window.terminal.destroy(sessionId)
 
             setSessions((previousSessions) => {
-                const filteredSessions = previousSessions.filter((session) => session.id !== sessionId)
+                const filteredSessions = previousSessions.filter(
+                    (session) => session.id !== sessionId
+                )
                 if (filteredSessions.length === 0) {
                     const nextCounter = sessionCounterRef.current + 1
                     sessionCounterRef.current = nextCounter
@@ -509,4 +509,3 @@ export function IntegratedTerminal(): JSX.Element {
         </div>
     )
 }
-

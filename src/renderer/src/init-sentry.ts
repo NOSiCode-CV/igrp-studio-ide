@@ -2,6 +2,7 @@
  * Sentry renderer (Electron) — Phase 1.
  * DSN comes from import.meta.env.VITE_SENTRY_DSN (injected from SENTRY_DSN at build in electron.vite.config).
  */
+import { flush } from '@sentry/core'
 import * as Sentry from '@sentry/electron/renderer'
 
 export function initRendererSentry(): void {
@@ -19,7 +20,6 @@ export function initRendererSentry(): void {
         Sentry.init({
             dsn,
             environment,
-            autoSessionTracking: false,
             tracesSampleRate: 0,
             attachStacktrace: true
         })
@@ -33,10 +33,7 @@ export function initRendererSentry(): void {
     }
 }
 
-export function captureRendererException(
-    error: Error,
-    context?: Record<string, unknown>
-): void {
+export function captureRendererException(error: Error, context?: Record<string, unknown>): void {
     if (!import.meta.env.VITE_SENTRY_DSN) {
         if (import.meta.env.DEV) {
             console.info('[Sentry] Renderer capture skipped: no DSN configured')
@@ -54,5 +51,5 @@ export function captureRendererException(
     })
 
     // Best effort: give transport time to send before hard reloads/navigation.
-    void Sentry.flush(2000)
+    void flush(2000)
 }

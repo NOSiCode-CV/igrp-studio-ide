@@ -292,7 +292,9 @@ const Resources = () => {
                 >
                     <IGRPDialogContentPrimitive>
                         <IGRPDialogHeaderPrimitive>
-                            <IGRPDialogTitlePrimitive>{t('openProjectOptionsTitle')}</IGRPDialogTitlePrimitive>
+                            <IGRPDialogTitlePrimitive>
+                                {t('openProjectOptionsTitle')}
+                            </IGRPDialogTitlePrimitive>
                             <IGRPDialogDescriptionPrimitive>
                                 {t('openProjectOptionsDescription')}
                             </IGRPDialogDescriptionPrimitive>

@@ -14,7 +14,7 @@ import {
     IGRPTooltipContentPrimitive,
     IGRPTooltipPrimitive,
     IGRPTooltipTriggerPrimitive,
-    IGRPTooltipProviderPrimitive,
+    IGRPTooltipProviderPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import logo from '@renderer/assets/images/igrp-green.svg'
 import DockerControls from '@renderer/components/docker-controls'
@@ -283,17 +283,17 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                 </IGRPTooltipPrimitive>
                                 <IGRPDropdownMenuContentPrimitive align="end">
                                     {installedIDEs.map(({ key, config }): React.ReactNode => {
-                                            return (
-                                                <IGRPDropdownMenuItemPrimitive
-                                                    key={key}
-                                                    onClick={() => openIDE(key)}
-                                                    className="flex items-center"
-                                                >
-                                                    <IGRPIcon iconName={config.icon} />
-                                                    {config.name}
-                                                </IGRPDropdownMenuItemPrimitive>
-                                            )
-                                        })}
+                                        return (
+                                            <IGRPDropdownMenuItemPrimitive
+                                                key={key}
+                                                onClick={() => openIDE(key)}
+                                                className="flex items-center"
+                                            >
+                                                <IGRPIcon iconName={config.icon} />
+                                                {config.name}
+                                            </IGRPDropdownMenuItemPrimitive>
+                                        )
+                                    })}
                                 </IGRPDropdownMenuContentPrimitive>
                             </IGRPDropdownMenuPrimitive>
 
