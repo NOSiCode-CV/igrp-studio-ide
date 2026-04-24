@@ -32,7 +32,7 @@ import type {
     Port,
     Volume,
     WorkspaceService
-} from '@igrp/igrp-studio-nextjs-engine/types'
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { ProjectIcon } from '@renderer/components/shared-ui'
 import { getDefaultProperties } from '@renderer/generators/ui/dnd/helpers'
 import { useWorkspace } from '@renderer/hooks/use-workspace'

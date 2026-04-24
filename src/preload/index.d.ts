@@ -8,10 +8,8 @@ import {
     ToolCheck,
     BPMNConfig
 } from '../main/types'
-import {
-    ComponentRegistrationConfig,
-    ServiceWorkspace
-} from '@igrp/igrp-studio-nextjs-engine/types'
+import { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import { ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
 
 type UpdateChannel = 'stable' | 'beta'

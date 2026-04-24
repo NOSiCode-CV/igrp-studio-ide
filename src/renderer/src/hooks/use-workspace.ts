@@ -2,7 +2,7 @@ import type {
     ProjectWorkspace,
     ServiceWorkspace,
     WorkspaceService
-} from '@igrp/igrp-studio-nextjs-engine/types'
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import useToast from '@renderer/hooks/useToast'
 import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks'
@@ -456,6 +456,11 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     useEffect(() => {
         refreshWorkspaces()
     }, [])
+
+    useEffect(() => {
+        if (!changeStatus) return
+        refreshWorkspaces().finally(() => dispatch(setChangeStatus(false)))
+    }, [changeStatus])
 
     return {
         workspaces,
