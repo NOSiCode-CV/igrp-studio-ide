@@ -38,6 +38,39 @@ interface TerminalBridge {
     onExit: (callback: (payload: { sessionId: string }) => void) => () => void
 }
 
+type MarkItDownConvertResult =
+    | { ok: true; markdown: string; durationMs: number }
+    | {
+          ok: false
+          error: string
+          code?: 'unsupported' | 'too-large' | 'not-found' | 'timeout' | 'spawn' | 'runtime'
+      }
+
+interface MarkItDownHistoryEntry {
+    id: string
+    fileName: string
+    filePath: string
+    sizeBytes: number
+    markdown: string
+    convertedAt: number
+    durationMs: number
+}
+
+interface MarkItDownBridge {
+    openWindow: () => void
+    pickFile: () => Promise<string | null>
+    convert: (filePath: string) => Promise<MarkItDownConvertResult>
+    saveMarkdown: (payload: {
+        markdown: string
+        suggestedName?: string
+    }) => Promise<{ ok: true; path: string } | { ok: false; error?: string }>
+    getFilePath: (file: File) => string
+    getHistory: () => Promise<MarkItDownHistoryEntry[]>
+    deleteHistoryItem: (id: string) => Promise<void>
+    clearHistory: () => Promise<void>
+}
+
 interface Window {
     terminal: TerminalBridge
+    markitdown: MarkItDownBridge
 }

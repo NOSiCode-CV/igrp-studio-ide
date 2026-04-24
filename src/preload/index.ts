@@ -1,9 +1,7 @@
 import { electronAPI } from '@electron-toolkit/preload'
-import type {
-    ComponentRegistrationConfig,
-    ServiceWorkspace
-} from '@igrp/igrp-studio-nextjs-engine/types'
-import { contextBridge, ipcRenderer } from 'electron'
+import type { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import type { ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { preloadBindings } from 'i18next-electron-fs-backend'
 import { EVENTS } from '../main/constants/events'
 import type { WatchEvent } from '../main/helpers/watch-folder'
@@ -573,6 +571,21 @@ const igrpStudioSettings = {
         ipcRenderer.invoke(EVENTS.ONBOARDING.SET_WELCOME_COMPLETED, completed)
 }
 
+const markitdown = {
+    openWindow: (): void => {
+        ipcRenderer.send(EVENTS.MARKITDOWN.OPEN_WINDOW)
+    },
+    pickFile: (): Promise<string | null> => ipcRenderer.invoke(EVENTS.MARKITDOWN.PICK_FILE),
+    convert: (filePath: string) => ipcRenderer.invoke(EVENTS.MARKITDOWN.CONVERT, filePath),
+    saveMarkdown: (payload: { markdown: string; suggestedName?: string }) =>
+        ipcRenderer.invoke(EVENTS.MARKITDOWN.SAVE_MARKDOWN, payload),
+    getFilePath: (file: File): string => webUtils.getPathForFile(file),
+    getHistory: () => ipcRenderer.invoke(EVENTS.MARKITDOWN.GET_HISTORY),
+    deleteHistoryItem: (id: string) =>
+        ipcRenderer.invoke(EVENTS.MARKITDOWN.DELETE_HISTORY_ITEM, id),
+    clearHistory: () => ipcRenderer.invoke(EVENTS.MARKITDOWN.CLEAR_HISTORY)
+}
+
 const terminal = {
     create: (sessionId: string, cwd?: string) => ipcRenderer.send('pty-create', { sessionId, cwd }),
     send: (sessionId: string, data: string) => ipcRenderer.send('pty-input', { sessionId, data }),
@@ -623,6 +636,7 @@ if (process.contextIsolated) {
         contextBridge.exposeInMainWorld('appLogicAPI', appLogic)
         contextBridge.exposeInMainWorld('igrpStudioSettings', igrpStudioSettings)
         contextBridge.exposeInMainWorld('terminal', terminal)
+        contextBridge.exposeInMainWorld('markitdown', markitdown)
     } catch (error) {
         console.error(error)
     }
@@ -650,6 +664,7 @@ if (process.contextIsolated) {
     window.appLogicAPI = appLogic
     window.igrpStudioSettings = igrpStudioSettings
     window.terminal = terminal
+    window.markitdown = markitdown
 }
 
 declare global {
@@ -662,5 +677,6 @@ declare global {
         appLogicAPI: typeof appLogic
         igrpStudioSettings: typeof igrpStudioSettings
         terminal: typeof terminal
+        markitdown: typeof markitdown
     }
 }

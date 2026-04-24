@@ -112,6 +112,15 @@ export const EVENTS = {
         CHECK: 'docker-check',
         DAEMON_STATUS: 'docker-daemon-status'
     },
+    MARKITDOWN: {
+        OPEN_WINDOW: 'markitdown:open-window',
+        CONVERT: 'markitdown:convert',
+        PICK_FILE: 'markitdown:pick-file',
+        SAVE_MARKDOWN: 'markitdown:save-markdown',
+        GET_HISTORY: 'markitdown:get-history',
+        DELETE_HISTORY_ITEM: 'markitdown:delete-history-item',
+        CLEAR_HISTORY: 'markitdown:clear-history'
+    },
     ERROR: 'error',
     LOG: 'log'
 }

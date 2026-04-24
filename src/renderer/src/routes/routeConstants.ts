@@ -8,5 +8,6 @@ export const ROUTES = {
     PATH_IDE_INITIAL_SCREEN: '/ide-initial-screen',
     PATH_IDE_APP_LOGIC: '/app-logic',
     PATH_PROJECT_SETTINGS: '/project-settings',
-    PATH_CONNECTIONS: '/connections'
+    PATH_CONNECTIONS: '/connections',
+    PATH_MARKITDOWN: '/markitdown'
 }

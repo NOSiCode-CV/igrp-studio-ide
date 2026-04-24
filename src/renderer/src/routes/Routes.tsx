@@ -4,6 +4,7 @@ import MainLayout from '@renderer/layouts/MainLayout'
 import UiStudioLayout from '@renderer/layouts/UiStudioLayout'
 import Connections from '@renderer/pages/connections'
 import IDEInitialScreen from '@renderer/pages/ide-initial-screen'
+import MarkItDownPage from '@renderer/pages/markitdown'
 import ProjectSettings from '@renderer/pages/project/project-settings'
 import WelcomeOnboardingPage from '@renderer/pages/welcome-onboarding'
 import React, { type JSX, Suspense } from 'react'
@@ -57,6 +58,7 @@ function AppRoutes(): JSX.Element {
                         path={ROUTES.PATH_WELCOME_ONBOARDING}
                         element={<WelcomeOnboardingPage />}
                     />
+                    <Route path={ROUTES.PATH_MARKITDOWN} element={<MarkItDownPage />} />
                     {allRoutes.map((route) => (
                         <Route
                             key={route.path}

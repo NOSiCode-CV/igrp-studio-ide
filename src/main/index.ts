@@ -39,6 +39,7 @@ import './handlers/git-handler'
 import './handlers/app-logic-handlers'
 import './handlers/docker-handler'
 import './handlers/global-handler'
+import './handlers/markitdown-handler'
 import './helpers/fetch-request'
 
 import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
