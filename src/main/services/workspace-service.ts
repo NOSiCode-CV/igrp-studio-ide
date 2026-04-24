@@ -7,12 +7,12 @@ import {
     saveCustomWorkspaceComposeFile,
     updateProjectToWorkspace,
     updateServiceToWorkspace
-} from '@igrp/igrp-studio-nextjs-engine'
+} from '@igrp/igrp-studio-workspace-engine'
 import type {
     ProjectWorkspace,
     ServiceWorkspace,
     WorkspaceService
-} from '@igrp/igrp-studio-nextjs-engine/types'
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { app } from 'electron'
 import fs from 'fs'
 import { mkdir, readFile, writeFile } from 'fs/promises'

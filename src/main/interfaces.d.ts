@@ -15,14 +15,14 @@ import {
 
 import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes'
 import { Connection, HandlerResponse, PageableProjects, ProjectData } from './types'
+import { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import {
-    ComponentRegistrationConfig,
     DockerServiceRegistrationConfig,
     ProjectWorkspace,
-    ServiceWorkspace
-} from '@igrp/igrp-studio-nextjs-engine/types'
+    ServiceWorkspace,
+    WorkspaceService
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { IWorkspace, DatabaseResponse } from 'src/main/types'
-import { WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/types'
 
 export interface IWorkspaceRepository {
     // Workspace Operations

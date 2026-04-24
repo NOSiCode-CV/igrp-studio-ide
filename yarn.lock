@@ -461,9 +461,9 @@
     min-dash "^5.0.0"
 
 "@bpmn-io/properties-panel@^3.30.2":
-  version "3.41.1"
-  resolved "https://registry.yarnpkg.com/@bpmn-io/properties-panel/-/properties-panel-3.41.1.tgz#8f6a3dc715d2a078f3c1094d0f06c83705b67070"
-  integrity sha512-p8Y+w0IINjnJo1XmcgBjWMM0VRpsfvc87gaCUDQipo89V1DGduwk5Nl6xsJGXrNtE7s2jUdbtK4xdReMMOAPHw==
+  version "3.41.2"
+  resolved "https://registry.yarnpkg.com/@bpmn-io/properties-panel/-/properties-panel-3.41.2.tgz#af09f0087d66be75841d3fb060a534b65cb2e824"
+  integrity sha512-gAND4tCa9Z/Su0Zr3+Xk6iOp0kgbQcmNYmBrDHS/S0Qp+axt7bBDhFw6HpYWyjyhvjR+NHFI0Izf2dVS5u40AQ==
   dependencies:
     "@bpmn-io/feel-editor" "^2.5.2"
     "@carbon/icons" "^11.69.0"
@@ -1343,10 +1343,10 @@
     vaul "^1.1.2"
     zod "^4.3.6"
 
-"@igrp/igrp-studio-nextjs-engine@0.2.0-beta.2":
-  version "0.2.0-beta.2"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.2.0-beta.2.tgz#1449410b4fcb3e3dd6db47404d9cbb47c03a867d"
-  integrity sha512-koNaZExUi1JstTs+NT8sucOjimkF/T2UctkEnMc27McXaCZaBCpnGVcd8h7qOVOjXJnv6O3g7ZIYi8olB59HfA==
+"@igrp/igrp-studio-nextjs-engine@0.2.0-beta.4":
+  version "0.2.0-beta.4"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.2.0-beta.4.tgz#a0fbc0fc8de0c076f2e9df0c90435f934de7c729"
+  integrity sha512-uYTTWePe4wg0zwxT32UWbqoVKpML7LRG9AECmKCuMQ6NsXvALYiWAbHOUOeJZGQklPUlei+zk550kmKDQRA1pQ==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -1361,6 +1361,7 @@
     js-beautify "^1.15.4"
     js-yaml "^4.1.0"
     jszip "^3.10.1"
+    liquidjs "^10.25.0"
     original-fs "^1.2.0"
     prettier "^3.3.3"
     react "^18.3.1"
@@ -1386,10 +1387,10 @@
     source-map-loader "^5.0.0"
     ts-loader "^9.5.4"
 
-"@igrp/igrp-studio-workspace-engine@0.2.0-beta.3":
-  version "0.2.0-beta.3"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-workspace-engine/-/igrp-studio-workspace-engine-0.2.0-beta.3.tgz#1dbefdf3325f32e958bd572de3eb2e770a7cff2a"
-  integrity sha512-tiIwblMN8lih97M27wZtGJnxAX5VD5vwZj9vl493609zskFMsQlw+0HaH9R4QhsilVjaWih7Pxh9LWPmzgIY8A==
+"@igrp/igrp-studio-workspace-engine@0.2.0-beta.6":
+  version "0.2.0-beta.6"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-workspace-engine/-/igrp-studio-workspace-engine-0.2.0-beta.6.tgz#5ea05d1234d3a242f071c41d363d735ed5db133d"
+  integrity sha512-OD9g1y0iyykxIMcg4M/7ClqxQcSaabu91UQUmb7cj3/qsQxXMxdircZ4R3HbUlIiTUPpLQ/McJOxR1fVqQBcYw==
   dependencies:
     ajv "^8.18.0"
     ajv-errors "^3.0.0"
@@ -4317,9 +4318,9 @@ ajv@^6.10.0, ajv@^6.12.0:
     uri-js "^4.2.2"
 
 ajv@^8.0.0, ajv@^8.17.1, ajv@^8.18.0:
-  version "8.18.0"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.18.0.tgz#8864186b6738d003eb3a933172bb3833e10cefbc"
-  integrity sha512-PlXPeEWMXMZ7sPYOHqmDyCJzcfNrUr3fGNKtezX14ykXOEIvyK81d+qydx89KY5O71FKMPaQ2vBfBFI5NHR63A==
+  version "8.20.0"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.20.0.tgz#304b3636add88ba7d936760dd50ece006dea95f9"
+  integrity sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==
   dependencies:
     fast-deep-equal "^3.1.3"
     fast-uri "^3.0.1"
@@ -6155,9 +6156,9 @@ find-up@^4.0.0, find-up@^4.1.0:
     path-exists "^4.0.0"
 
 focus-trap@^8.0.0:
-  version "8.0.1"
-  resolved "https://registry.yarnpkg.com/focus-trap/-/focus-trap-8.0.1.tgz#b3018898086884b82d1eb7c4b37625a501ee2543"
-  integrity sha512-9ptSG6z51YQOstI/oN4XuVGP/03u2nh0g//qz7L6zX0i6PZiPnkcf3GenXq7N2hZnASXaMxTPpbKwdI+PFvxlw==
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/focus-trap/-/focus-trap-8.1.0.tgz#51e2ab9f2a55e1cf37eff6d939c986002709d509"
+  integrity sha512-T65crff26CKV2CZ3csg5y05r+560srp0b8EbAif35euW58hzklVf/Gb4Q+/HCtB8e9III3QFEyk5BWV5XJuOyw==
   dependencies:
     tabbable "^6.4.0"
 
@@ -7544,6 +7545,13 @@ linkify-it@^5.0.0:
   integrity sha512-5aHCbzQRADcdP+ATqnDuhhJ/MRIqDkZX5pyjFHRRysS8vZ5AbqGEoFIb6pYHPZ+L/OC2Lc+xT8uHVVR5CAK/wQ==
   dependencies:
     uc.micro "^2.0.0"
+
+liquidjs@^10.25.0:
+  version "10.25.7"
+  resolved "https://registry.yarnpkg.com/liquidjs/-/liquidjs-10.25.7.tgz#75c5765ae42e04da30fba15ae20daab57c4a7a8c"
+  integrity sha512-rPCjJLiD4eDhQjvv964AeXFC+HbeYBbZrd7Z82Q6hqv1lX7G+5w4SJcKLn9CAAAwHI4aS3dTdo083UB79K3pDA==
+  dependencies:
+    commander "^10.0.0"
 
 locate-path@^5.0.0:
   version "5.0.0"

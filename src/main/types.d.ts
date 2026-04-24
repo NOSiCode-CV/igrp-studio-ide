@@ -1,4 +1,4 @@
-import { WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/types'
+import { WorkspaceService } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 
 type Handler = (event: IpcMainInvokeEvent, ...args: any[]) => any
 
