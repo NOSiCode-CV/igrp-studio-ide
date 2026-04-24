@@ -23,6 +23,7 @@ export function useMarkdownConverter(): {
     state: ConverterState
     convert: (filePath: string) => Promise<void>
     loadFromHistory: (fileName: string, filePath: string, markdown: string) => void
+    setMarkdown: (value: string) => void
     clear: () => void
 } {
     const [state, setState] = useState<ConverterState>(initialState)
@@ -85,9 +86,13 @@ export function useMarkdownConverter(): {
         []
     )
 
+    const setMarkdown = useCallback((value: string): void => {
+        setState((prev) => ({ ...prev, markdown: value }))
+    }, [])
+
     const clear = useCallback((): void => {
         setState(initialState)
     }, [])
 
-    return { state, convert, loadFromHistory, clear }
+    return { state, convert, loadFromHistory, setMarkdown, clear }
 }

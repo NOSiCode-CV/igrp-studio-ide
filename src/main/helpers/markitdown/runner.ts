@@ -1,4 +1,5 @@
 import { spawn } from 'child_process'
+import { app } from 'electron'
 import fs from 'fs'
 import path from 'path'
 import {
@@ -10,6 +11,28 @@ import {
 export type MarkItDownConvertResult =
     | { ok: true; markdown: string; durationMs: number }
     | { ok: false; error: string; code?: 'unsupported' | 'too-large' | 'not-found' | 'timeout' | 'spawn' | 'runtime' }
+
+interface ExecutableSpec {
+    command: string
+    baseArgs: string[]
+}
+
+function resolveExecutable(): ExecutableSpec {
+    if (app.isPackaged) {
+        const platformDir =
+            process.platform === 'darwin'
+                ? 'mac'
+                : process.platform === 'win32'
+                  ? 'win'
+                  : 'linux'
+        const binaryName = process.platform === 'win32' ? 'markitdown.exe' : 'markitdown'
+        const binary = path.join(process.resourcesPath, 'markitdown-bin', platformDir, binaryName)
+        return { command: binary, baseArgs: [] }
+    }
+
+    const pythonCandidate = process.platform === 'win32' ? 'python' : 'python3'
+    return { command: pythonCandidate, baseArgs: ['-m', 'markitdown'] }
+}
 
 export async function convertFileToMarkdown(filePath: string): Promise<MarkItDownConvertResult> {
     const absolutePath = path.resolve(filePath)
@@ -41,8 +64,8 @@ export async function convertFileToMarkdown(filePath: string): Promise<MarkItDow
         }
     }
 
-    const command = process.platform === 'win32' ? 'python' : 'python3'
-    const args = ['-m', 'markitdown', absolutePath]
+    const { command, baseArgs } = resolveExecutable()
+    const args = [...baseArgs, absolutePath]
 
     return await new Promise<MarkItDownConvertResult>((resolve) => {
         const startedAt = Date.now()

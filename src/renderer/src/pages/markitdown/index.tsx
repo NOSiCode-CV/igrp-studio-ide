@@ -1,4 +1,4 @@
-import { IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system'
+import MonacoEditor from '@renderer/components/monaco-editor'
 import { FileText, Loader2 } from 'lucide-react'
 import { type JSX, useCallback, useEffect } from 'react'
 import { Group, Panel, Separator } from 'react-resizable-panels'
@@ -10,7 +10,7 @@ import { useConversionHistory } from './hooks/useConversionHistory'
 import { useMarkdownConverter } from './hooks/useMarkdownConverter'
 
 const MarkItDownPage = (): JSX.Element => {
-    const { state, convert, loadFromHistory, clear } = useMarkdownConverter()
+    const { state, convert, loadFromHistory, setMarkdown, clear } = useMarkdownConverter()
     const history = useConversionHistory()
 
     useEffect(() => {
@@ -90,14 +90,24 @@ const MarkItDownPage = (): JSX.Element => {
                     ) : (
                         <Group orientation="horizontal" className="h-full flex">
                             <Panel defaultSize="50%" minSize="20%" className="h-full">
-                                <IGRPScrollAreaPrimitive className="h-full">
-                                    <pre className="text-xs font-mono whitespace-pre-wrap break-words p-4 text-foreground">
-                                        {state.markdown ||
-                                            (state.isConverting
-                                                ? ''
-                                                : 'Markdown code will appear here.')}
-                                    </pre>
-                                </IGRPScrollAreaPrimitive>
+                                <MonacoEditor
+                                    filePath={
+                                        state.filePath
+                                            ? `file:///markitdown/${state.filePath.replace(/[\\/]/g, '_')}.md`
+                                            : 'file:///markitdown/untitled.md'
+                                    }
+                                    content={state.markdown}
+                                    onChange={setMarkdown}
+                                    language="markdown"
+                                    height="100%"
+                                    options={{
+                                        readOnly: state.isConverting,
+                                        fontSize: 13,
+                                        lineNumbers: 'on',
+                                        scrollBeyondLastLine: false,
+                                        padding: { top: 8, bottom: 8 }
+                                    }}
+                                />
                             </Panel>
                             <Separator className="w-px bg-border hover:bg-primary/40 transition-colors cursor-col-resize" />
                             <Panel defaultSize="50%" minSize="20%" className="h-full">

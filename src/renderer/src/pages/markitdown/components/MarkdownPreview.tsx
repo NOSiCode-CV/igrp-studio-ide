@@ -1,6 +1,8 @@
 import { IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { FileText } from 'lucide-react'
 import { type JSX, useMemo } from 'react'
 import { renderMarkdownToSafeHtml } from '../utils/markdown-renderer'
+import './markdown-preview.css'
 
 interface MarkdownPreviewProps {
     markdown: string
@@ -15,20 +17,23 @@ const MarkdownPreview = ({
 
     if (!markdown) {
         return (
-            <div className="flex h-full items-center justify-center text-sm text-muted-foreground p-6">
-                {emptyLabel}
+            <div className="md-preview flex h-full flex-col items-center justify-center gap-2 text-sm text-muted-foreground p-6">
+                <FileText className="h-8 w-8 opacity-40" />
+                <span>{emptyLabel}</span>
             </div>
         )
     }
 
     return (
-        <IGRPScrollAreaPrimitive className="h-full">
-            <div
-                className="prose prose-sm dark:prose-invert max-w-none p-4"
-                // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized via DOMPurify in renderMarkdownToSafeHtml
-                dangerouslySetInnerHTML={{ __html: html }}
-            />
-        </IGRPScrollAreaPrimitive>
+        <div className="md-preview h-full">
+            <IGRPScrollAreaPrimitive className="h-full">
+                <article
+                    className="prose prose-sm dark:prose-invert max-w-3xl mx-auto px-8 py-8"
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized via DOMPurify in renderMarkdownToSafeHtml
+                    dangerouslySetInnerHTML={{ __html: html }}
+                />
+            </IGRPScrollAreaPrimitive>
+        </div>
     )
 }
 
