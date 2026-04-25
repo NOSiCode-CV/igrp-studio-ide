@@ -38,12 +38,8 @@ const Layout = (props: LayoutProps): React.ReactNode => {
 
     useEffect(() => {
         if (changeStatus) {
-            // Add a small delay to ensure file system operations complete
-            const timer = setTimeout(() => {
-                dispatch(onGetFolderFiles(basePath))
-                dispatch(onSetChangeStatus(false))
-            }, 100)
-            return () => clearTimeout(timer)
+            dispatch(onGetFolderFiles(basePath))
+            dispatch(onSetChangeStatus(false))
         }
         return undefined
         // eslint-disable-next-line react-hooks/exhaustive-deps

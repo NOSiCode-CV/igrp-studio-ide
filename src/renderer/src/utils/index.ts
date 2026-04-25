@@ -3,6 +3,7 @@ import { enUS, pt } from 'date-fns/locale'
 import i18next from 'i18next'
 import {
     Activity,
+    Cable,
     Circle,
     Database,
     FileKey,
@@ -96,6 +97,8 @@ export const getIcon = (folderName: string): LucideIcon => {
     switch (folderName.toLowerCase()) {
         case 'controllers':
             return Activity
+        case 'graphql':
+            return Cable
         case 'models':
             return Database
         case 'dto':

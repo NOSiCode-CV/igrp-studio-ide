@@ -7,6 +7,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { preloadBindings } from 'i18next-electron-fs-backend'
 import { EVENTS } from '../main/constants/events'
 import type { WatchEvent } from '../main/helpers/watch-folder'
+import type { GraphQLOperation } from '../main/types/graphql-manifest.types'
 import type {
     BPMNConfig,
     Connection,
@@ -78,6 +79,24 @@ const api = {
 
     getIconFile: (iconPath: string, workspacePath: string) =>
         ipcRenderer.invoke('get-icon-file', iconPath, workspacePath)
+}
+
+const graphql = {
+    createGraphQLOperation: (
+        basePath: string,
+        moduleName: string,
+        operation: Omit<GraphQLOperation, 'id'> & { id?: string }
+    ) => ipcRenderer.invoke(EVENTS.GRAPHQL.CREATE_OPERATION, basePath, moduleName, operation),
+    updateGraphQLOperation: (
+        basePath: string,
+        moduleName: string,
+        operationId: string,
+        updates: Partial<Omit<GraphQLOperation, 'id'>>
+    ) => ipcRenderer.invoke(EVENTS.GRAPHQL.UPDATE_OPERATION, basePath, moduleName, operationId, updates),
+    deleteGraphQLOperation: (basePath: string, moduleName: string, operationId: string) =>
+        ipcRenderer.invoke(EVENTS.GRAPHQL.DELETE_OPERATION, basePath, moduleName, operationId),
+    listGraphQLOperations: (basePath: string, moduleName: string) =>
+        ipcRenderer.invoke(EVENTS.GRAPHQL.LIST_OPERATIONS, basePath, moduleName)
 }
 
 const engine = {
@@ -582,6 +601,7 @@ if (process.contextIsolated) {
             reportError: (error: Error) => ipcRenderer.send('report-error', error)
         })
         contextBridge.exposeInMainWorld('api', api)
+        contextBridge.exposeInMainWorld('graphql', graphql)
         contextBridge.exposeInMainWorld('engine', engine)
         contextBridge.exposeInMainWorld('igrpStudio', repo)
         contextBridge.exposeInMainWorld('menu', windowControls)
@@ -608,6 +628,7 @@ if (process.contextIsolated) {
         reportError: (error: Error) => ipcRenderer.send('report-error', error)
     }
     window.api = api
+    window.graphql = graphql
     window.engine = engine
     window.igrpStudio = repo
     window.menu = windowControls
@@ -619,6 +640,7 @@ declare global {
     interface Window {
         electron: ExtendedElectronAPI
         api: typeof api
+        graphql: typeof graphql
         engine: typeof engine
         igrpStudio: typeof repo
         menu: typeof windowControls

@@ -21,3 +21,28 @@ interface ImportMetaEnv {
 interface ImportMeta {
     readonly env: ImportMetaEnv
 }
+
+interface Window {
+    graphql: {
+        createGraphQLOperation: (
+            basePath: string,
+            moduleName: string,
+            operation: import('./generators/api/pages/graphql/types').GraphQLOperationPayload
+        ) => Promise<import('./generators/api/pages/graphql/types').GraphQLPersistedOperation>
+        updateGraphQLOperation: (
+            basePath: string,
+            moduleName: string,
+            operationId: string,
+            updates: Partial<import('./generators/api/pages/graphql/types').GraphQLOperationPayload>
+        ) => Promise<import('./generators/api/pages/graphql/types').GraphQLPersistedOperation>
+        deleteGraphQLOperation: (
+            basePath: string,
+            moduleName: string,
+            operationId: string
+        ) => Promise<void>
+        listGraphQLOperations: (
+            basePath: string,
+            moduleName: string
+        ) => Promise<import('./generators/api/pages/graphql/types').GraphQLPersistedOperation[]>
+    }
+}

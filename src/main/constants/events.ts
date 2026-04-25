@@ -16,6 +16,12 @@ export const EVENTS = {
         CREATE_CONTROLLER: 'spring-engine:create-controller',
         FETCH_SELECTORS: 'spring-engine:fetch-selectors'
     },
+    GRAPHQL: {
+        CREATE_OPERATION: 'graphql:create-operation',
+        UPDATE_OPERATION: 'graphql:update-operation',
+        DELETE_OPERATION: 'graphql:delete-operation',
+        LIST_OPERATIONS: 'graphql:list-operations'
+    },
     NEXT: {
         CREATE_PAGE: 'next-engine:create-page',
         CREATE_PROCESS: 'next-engine:create-process',
