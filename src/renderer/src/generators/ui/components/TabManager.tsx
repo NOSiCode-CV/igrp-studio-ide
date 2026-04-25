@@ -15,7 +15,7 @@ import {
     DroppedComponentsProvider,
     useDroppedComponents,
     useDroppedComponentsAdmin
-} from '../dnd/DroppedComponentsContext'
+} from '../contexts/EditorContext'
 import PageManager, { type PageDefinition } from '../page/page-manager'
 import { convertFileTreeToPageDefinition } from '../page/utils/bpmn-helpers'
 import FormEngine from '../page-builder'

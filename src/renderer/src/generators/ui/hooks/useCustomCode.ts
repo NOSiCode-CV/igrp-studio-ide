@@ -3,7 +3,7 @@ import type {
     CustomFunctionConfig,
     State
 } from '@igrp/igrp-studio-nextjs-engine/types'
-import { useDroppedComponents } from '@renderer/generators/ui/dnd/DroppedComponentsContext'
+import { useDroppedComponents } from '@renderer/generators/ui/contexts/EditorContext'
 import useStudio from '@renderer/hooks/use-studio'
 import { EngineService } from '@renderer/services/EngineService'
 import { useEffect, useMemo, useState } from 'react'

@@ -35,7 +35,7 @@ import { ChevronRight, FunctionSquare, Loader, Loader2, Pencil, Plus, Trash2 } f
 import { type JSX, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import * as Yup from 'yup'
-import { useDroppedComponents } from '../../../dnd/DroppedComponentsContext'
+import { useDroppedComponents } from '../../../contexts/EditorContext'
 import useCustomCode from '../../../hooks/useCustomCode'
 import { ImportComponent } from './custom-code-imports'
 import { SnnipetComponent } from './custom-code-snippet'

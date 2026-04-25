@@ -10,7 +10,7 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useSt
 import { ContainerScrollArea } from '../api/components/ContainerScrollArea'
 import { CodeContentJson, CodeContentTS } from './components/CodeContent'
 import { handleDragEnd } from './dnd/DraggableItemManager'
-import { useDroppedComponents } from './dnd/DroppedComponentsContext'
+import { useDroppedComponents } from './contexts/EditorContext'
 import { useComponentInitialization } from './hooks/useComponentInitialization'
 // Custom hooks for better organization
 import { useComponentRegistration } from './hooks/useComponentRegistration'
@@ -19,7 +19,7 @@ import useCustomCode from './hooks/useCustomCode'
 import { usePageSave } from './hooks/usePageSave'
 import { useTagManager } from './hooks/useTagManager'
 import type { PageDefinition } from './page/page-manager'
-import IGRPStudioMainComponent from './types/components/MainComponent'
+import IGRPStudioMainComponent from './renderers/components/MainComponent'
 
 interface PageBuilderProps {
     basePath: string

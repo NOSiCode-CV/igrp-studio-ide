@@ -3,7 +3,7 @@ import type { State } from '@igrp/igrp-studio-nextjs-engine/types'
 import useStudio from '@renderer/hooks/use-studio'
 import type { DataValue, StructuredComponent } from '@renderer/lib/dnd/types'
 import { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react'
-import { useDroppedComponents } from '../dnd/DroppedComponentsContext'
+import { useDroppedComponents } from '../contexts/EditorContext'
 import { getRequiredDataSchema } from '../dnd/helpers'
 import { useComponents } from './useComponents'
 

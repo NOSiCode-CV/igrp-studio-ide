@@ -1,4 +1,4 @@
-import BindingFormList from '../../../ui/components/binding-form-list'
+import BindingFormList from '../../../ui/components/modals/binding-form-list'
 import type { IColumnsTabelProps } from '../../types/Interfaces'
 
 interface AttributesCardProps {

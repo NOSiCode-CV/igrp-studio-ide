@@ -136,21 +136,21 @@ import {
     WrapText
 } from 'lucide-react'
 import type React from 'react'
-import IGRPStudioAccordion from './types/components/Accordion'
-import IGRPStudioAlert from './types/components/Alert'
-import IGRPStudioCard from './types/components/Card'
-import IGRPStudioCardDetails from './types/components/CardDetails'
-import IGRPStudioColumn from './types/components/Column'
-import IGRPStudioColumns from './types/components/Columns'
-import IGRPStudioContainer from './types/components/Container'
-import IGRPStudioFlex from './types/components/Flex'
-import IGRPStudioForm from './types/components/Form'
-import IGRPStudioFormList from './types/components/FormList'
-import IGRPStudioFragment from './types/components/Fragment'
-import IGRPStudioGrid from './types/components/Grid'
-import IGRPStudioInfoCard from './types/components/InfoCard'
-import IGRPStudioPage from './types/components/MainComponent'
-import IGRPStudioMenuNavigation from './types/components/MenuNavigation'
+import IGRPStudioAccordion from './renderers/components/Accordion'
+import IGRPStudioAlert from './renderers/components/Alert'
+import IGRPStudioCard from './renderers/components/Card'
+import IGRPStudioCardDetails from './renderers/components/CardDetails'
+import IGRPStudioColumn from './renderers/components/Column'
+import IGRPStudioColumns from './renderers/components/Columns'
+import IGRPStudioContainer from './renderers/components/Container'
+import IGRPStudioFlex from './renderers/components/Flex'
+import IGRPStudioForm from './renderers/components/Form'
+import IGRPStudioFormList from './renderers/components/FormList'
+import IGRPStudioFragment from './renderers/components/Fragment'
+import IGRPStudioGrid from './renderers/components/Grid'
+import IGRPStudioInfoCard from './renderers/components/InfoCard'
+import IGRPStudioPage from './renderers/components/MainComponent'
+import IGRPStudioMenuNavigation from './renderers/components/MenuNavigation'
 import {
     IGRPSTudioDialogFooter,
     IGRPSTudioDialogHeader,
@@ -158,14 +158,14 @@ import {
     IGRPStudioDialogDescription,
     IGRPStudioDialogTrigger,
     IGRPStudioModalDialog
-} from './types/components/ModalDialog'
-import IGRPStudioPageHeader from './types/components/PageHeader'
-import IGRPStudioParagraph from './types/components/Paragraph'
-import IGRPStudioRepetitive from './types/components/RepetitiveList'
-import IGRPStudioSection from './types/components/Section'
-import IGRPStudioTable from './types/components/Table'
-import IGRPStudioTabs from './types/components/Tabs'
-import IGRPStudioTextList from './types/components/TextList'
+} from './renderers/components/ModalDialog'
+import IGRPStudioPageHeader from './renderers/components/PageHeader'
+import IGRPStudioParagraph from './renderers/components/Paragraph'
+import IGRPStudioRepetitive from './renderers/components/RepetitiveList'
+import IGRPStudioSection from './renderers/components/Section'
+import IGRPStudioTable from './renderers/components/Table'
+import IGRPStudioTabs from './renderers/components/Tabs'
+import IGRPStudioTextList from './renderers/components/TextList'
 
 // Component Categories
 export const GROUP_COMPONET: Record<string, string> = {
