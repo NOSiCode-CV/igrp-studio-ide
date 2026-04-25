@@ -114,7 +114,19 @@ const useCustomCode = (): CustomCodeHook => {
                         ...(result.hooks || [])
                     ])
                     setTypes(result.types || [])
-                    setCustomComponents(result.components || [])
+                    const nextComponents = result.components || []
+                    setCustomComponents((prev) => {
+                        // Keep reference stable when content is unchanged so
+                        // downstream effects (useComponentRegistration) don't
+                        // re-fire on every fetch.
+                        if (prev.length === nextComponents.length) {
+                            const sameContent = prev.every(
+                                (c: any, i: number) => c?.name === nextComponents[i]?.name
+                            )
+                            if (sameContent) return prev
+                        }
+                        return nextComponents
+                    })
                 }
             } catch (err) {
                 setError(err instanceof Error ? err : new Error('Failed to load resources'))
