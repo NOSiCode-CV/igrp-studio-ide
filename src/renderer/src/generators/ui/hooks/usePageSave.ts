@@ -33,9 +33,33 @@ interface PageSaveProps {
 }
 
 interface SaveError {
-    message: string
+    message: unknown
     code?: string
-    details?: string
+    details?: unknown
+}
+
+const getSaveErrorMessage = (error: unknown): string | undefined => {
+    if (error instanceof Error) return error.message
+    if (typeof error === 'string') return error
+
+    if (Array.isArray(error)) {
+        const messages = error
+            .map(getSaveErrorMessage)
+            .filter((message): message is string => Boolean(message))
+
+        return messages.join('\n\n') || undefined
+    }
+
+    if (typeof error === 'object' && error !== null) {
+        const { details, error: nestedError, message } = error as Record<string, unknown>
+
+        if (typeof message === 'string') return message
+        if (message !== undefined) return getSaveErrorMessage(message)
+        if (typeof details === 'string') return details
+        if (nestedError !== undefined) return getSaveErrorMessage(nestedError)
+    }
+
+    return undefined
 }
 
 /**
@@ -89,7 +113,7 @@ export const usePageSave = ({
 
             console.log('Saving configuration:', restData)
 
-            let error: string | undefined
+            let error: unknown
 
             if (isBpmnProcess) {
                 const result = await window.engine.createProcessStep(
@@ -118,7 +142,7 @@ export const usePageSave = ({
             showSuccessToast('Components saved successfully')
             dispatch(onSetChangeStatus(true))
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+            const errorMessage = getSaveErrorMessage(error) || 'Unknown error occurred'
             showErrorToast(errorMessage)
             console.error('Save error:', error)
         }
