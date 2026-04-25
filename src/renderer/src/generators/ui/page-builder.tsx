@@ -9,7 +9,6 @@ import RENDERER_CONFIG from '@renderer/renderer.config'
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 import { ContainerScrollArea } from '../api/components/ContainerScrollArea'
 import { CodeContentJson, CodeContentTS } from './components/CodeContent'
-import SidebarRight from './components/sidebar/sidebar-right'
 import { handleDragEnd } from './dnd/DraggableItemManager'
 import { useDroppedComponents } from './dnd/DroppedComponentsContext'
 import { useComponentInitialization } from './hooks/useComponentInitialization'
@@ -58,7 +57,6 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             handleReorderChildInComponent,
             removeRow,
             clearEditingComponent,
-            currentComponent,
             restData
         } = useDroppedComponents()
 
@@ -236,7 +234,6 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                         <ContainerScrollArea>{renderContent}</ContainerScrollArea>
                     </div>
                 </IGRPSidebarInsetPrimitive>
-                {currentComponent && <SidebarRight />}
             </div>
         )
     }
