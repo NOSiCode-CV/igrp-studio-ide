@@ -1,14 +1,6 @@
 import {
-    IGRPAccordionContentPrimitive,
-    IGRPAccordionItemPrimitive,
-    IGRPAccordionPrimitive,
-    IGRPAccordionTriggerPrimitive,
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
     type IGRPOptionsProps,
     IGRPSidebarContentPrimitive,
-    IGRPSidebarHeaderPrimitive,
     IGRPSidebarPrimitive,
     IGRPTabsContentPrimitive,
     IGRPTabsListPrimitive,
@@ -18,16 +10,15 @@ import {
 import type { State } from '@igrp/igrp-studio-nextjs-engine/types'
 import { EmptyList } from '@renderer/components/empty-list'
 import Loader from '@renderer/components/loader'
-import { CheckboxInput } from '@renderer/generators/api/components/inputs-form'
 import useStudio from '@renderer/hooks/use-studio'
 import type { DataValue, StructuredComponent } from '@renderer/lib/dnd/types'
-import { RotateCcw, Settings, X } from 'lucide-react'
+import { Settings } from 'lucide-react'
 import {
     type ChangeEvent,
     type ComponentProps,
+    memo,
     useCallback,
     useEffect,
-    useId,
     useMemo,
     useState
 } from 'react'
@@ -37,9 +28,11 @@ import { getRequiredDataSchema } from '../../dnd/helpers'
 import { useComponents } from '../../hooks/useComponents'
 import useCustomCode from '../../hooks/useCustomCode'
 import Interactions from '../settings/Interactions'
-import RenderPropsConfig from '../settings/properties'
 import { StyleTab } from '../settings/style'
 import CopyContent from './copy-content'
+import ComponentIdentitySection from './sidebar-right-identity'
+import SidebarRightHeader from './sidebar-right-header'
+import PropertiesPanel from './sidebar-right-properties-panel'
 
 interface SidebarRightProps extends ComponentProps<typeof IGRPSidebarPrimitive> {
     comp?: StructuredComponent
@@ -98,27 +91,6 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
-    // Helper function to check if a key is referenced in properties (including nested objects)
-    const isKeyReferencedInProperties = useCallback(
-        (key: string, propertiesObj: Record<string, any>): boolean => {
-            for (const [propKey, propValue] of Object.entries(propertiesObj)) {
-                // Check if the property key matches the data key
-                if (propKey === key) {
-                    return true
-                }
-
-                // If property value is an object, recursively check its keys
-                if (propValue && typeof propValue === 'object' && !Array.isArray(propValue)) {
-                    if (isKeyReferencedInProperties(key, propValue)) {
-                        return true
-                    }
-                }
-            }
-            return false
-        },
-        []
-    )
-
     useEffect(() => {
         const options =
             parentComp?.children
@@ -167,7 +139,6 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                     // If the key doesn't exist in the current data, add it
                     if (!(key in data)) {
                         cleanedData[key] = requiredDataSchema[key]
-                        // hasChanges = true;
                     }
                 })
 
@@ -180,7 +151,6 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                         Object.keys(cleanedData[key]).length === 0
                     ) {
                         delete cleanedData[key]
-                        // hasChanges = true;
                     }
                 })
 
@@ -201,7 +171,6 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                 const data = await getPropertiesComponent(currentPath, componentName)
                 setPropsComponent(data)
 
-                // Função para fazer deep merge de objetos
                 const deepMerge = (target: any, source: any): any => {
                     const result = { ...target }
 
@@ -213,7 +182,6 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                         ) {
                             result[key] = deepMerge(target[key], source[key])
                         } else {
-                            // Always use source value if it exists
                             result[key] = source[key]
                         }
                     }
@@ -221,72 +189,63 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                     return result
                 }
 
-                const target = // Aplica os valores padrão
-                    Object.entries(data ?? {}).reduce(
-                        (acc, [key, config]) => {
-                            if (config.type === 'object' && config.properties) {
-                                acc[key] = Object.entries(config.properties).reduce(
-                                    (objAcc, [propKey, propConfig]: [string, any]) => {
-                                        if (
-                                            propConfig.default !== undefined ||
-                                            propConfig.required
-                                        ) {
-                                            objAcc[propKey] = propConfig.default
-                                        }
-                                        return objAcc
-                                    },
-                                    {} as Record<string, any>
-                                )
-                            } else if (config.default || config.required) {
-                                acc[key] = config.default
-                            }
+                const target = Object.entries(data ?? {}).reduce(
+                    (acc, [key, config]) => {
+                        if (config.type === 'object' && config.properties) {
+                            acc[key] = Object.entries(config.properties).reduce(
+                                (objAcc, [propKey, propConfig]: [string, any]) => {
+                                    if (
+                                        propConfig.default !== undefined ||
+                                        propConfig.required
+                                    ) {
+                                        objAcc[propKey] = propConfig.default
+                                    }
+                                    return objAcc
+                                },
+                                {} as Record<string, any>
+                            )
+                        } else if (config.default || config.required) {
+                            acc[key] = config.default
+                        }
+                        return acc
+                    },
+                    {} as Record<string, any>
+                )
+                const source = Object.entries(currentComp?.properties ?? {}).reduce(
+                    (acc, [key, value]) => {
+                        const schemaConfig = (data as Record<string, any>)?.[key]
+
+                        if (!schemaConfig) {
                             return acc
-                        },
-                        {} as Record<string, any>
-                    )
-                const source = // Filter properties based on schema and requirements
-                    Object.entries(currentComp?.properties ?? {}).reduce(
-                        (acc, [key, value]) => {
-                            const schemaConfig = (data as Record<string, any>)?.[key]
+                        }
 
-                            // Skip if property not in schema
-                            if (!schemaConfig) {
-                                return acc
+                        if (schemaConfig.type === 'object' && schemaConfig.properties) {
+                            const filteredNestedProps = Object.entries(value || {}).reduce(
+                                (nestedAcc, [nestedKey, nestedValue]) => {
+                                    const nestedConfig = schemaConfig.properties[nestedKey]
+                                    if (
+                                        nestedConfig &&
+                                        (nestedConfig.required || nestedValue !== undefined)
+                                    ) {
+                                        nestedAcc[nestedKey] = nestedValue
+                                    }
+                                    return nestedAcc
+                                },
+                                {} as Record<string, any>
+                            )
+
+                            if (Object.keys(filteredNestedProps).length > 0) {
+                                acc[key] = filteredNestedProps
                             }
+                        } else if (schemaConfig.required || value !== undefined) {
+                            acc[key] = value
+                        }
 
-                            // Handle nested objects
-                            if (schemaConfig.type === 'object' && schemaConfig.properties) {
-                                const filteredNestedProps = Object.entries(value || {}).reduce(
-                                    (nestedAcc, [nestedKey, nestedValue]) => {
-                                        const nestedConfig = schemaConfig.properties[nestedKey]
-                                        // Keep if in schema and (required or value exists, including null)
-                                        if (
-                                            nestedConfig &&
-                                            (nestedConfig.required || nestedValue !== undefined)
-                                        ) {
-                                            nestedAcc[nestedKey] = nestedValue
-                                        }
-                                        return nestedAcc
-                                    },
-                                    {} as Record<string, any>
-                                )
+                        return acc
+                    },
+                    {} as Record<string, any>
+                )
 
-                                if (Object.keys(filteredNestedProps).length > 0) {
-                                    acc[key] = filteredNestedProps
-                                }
-                            }
-                            // Handle non-object properties
-                            else if (schemaConfig.required || value !== undefined) {
-                                // Keep the value if it exists in current properties (including null)
-                                acc[key] = value
-                            }
-
-                            return acc
-                        },
-                        {} as Record<string, any>
-                    )
-
-                // Initialize form values with deep merge
                 const initialValues = deepMerge(target, source)
 
                 setTempEditingComponent(
@@ -307,7 +266,7 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
         loadProps()
     }, [componentId, componentName, currentPath, currentComp])
 
-    // Load properties component
+    // Load child properties component
     useEffect(() => {
         if (!componentName) return
 
@@ -316,7 +275,6 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                 const data = await getChildPropertiesComponent(currentPath, componentName)
                 setPropsComponentChild(data && !Array.isArray(data) ? data : {})
 
-                // Initialize form values
                 const initialValues = Object.entries(data ?? {}).reduce(
                     (acc, [key, config]) => {
                         if (config.default !== null || config.required) {
@@ -397,15 +355,14 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
         handleUpdateChildComponent(componentId, {
             ...currentComp
         })
-    }, [currentComp, componentId])
+    }, [currentComp, componentId, handleUpdateChildComponent])
 
     const handleClose = useCallback(() => {
         clearEditingComponent()
     }, [clearEditingComponent])
 
-    const udpateTag = (e: ChangeEvent<HTMLInputElement>): void => {
+    const handleTagChange = useCallback((e: ChangeEvent<HTMLInputElement>): void => {
         if (!componentId) return
-
         setTempEditingComponent(
             (prev) =>
                 ({
@@ -413,51 +370,38 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                     tag: e.target.value
                 }) as StructuredComponent
         )
-    }
+    }, [componentId])
 
-    const udpateTypeRenderComponent = (useClient: boolean): void => {
+    const handleUseClientChange = useCallback((useClient: boolean): void => {
         if (!componentId) return
         setAllRestData({ ...restData, useClient })
-    }
+    }, [componentId, restData, setAllRestData])
 
-    const udpateDataProperties = ({
-        field,
-        state,
-        value
-    }: {
-        field: string
-        state?: State
-        value?: DataValue
-    }): void => {
-        if (!componentId) return
+    const handleSelectState = useCallback(
+        (field: string, state: State | undefined, value: DataValue | undefined) => {
+            if (!componentId) return
 
-        const updatedData = { ...tempEditingComponent?.data }
+            const updatedData = { ...tempEditingComponent?.data }
+            delete updatedData[field]
 
-        delete updatedData[field]
-
-        if (state) {
-            updatedData[field] = {
-                state
+            if (state) {
+                updatedData[field] = { state }
             }
-        }
 
-        if (value) {
-            updatedData[field] = {
-                value
+            if (value) {
+                updatedData[field] = { value }
             }
-        }
 
-        setTempEditingComponent(
-            (prev) =>
-                ({
-                    ...prev,
-                    data: updatedData
-                }) as StructuredComponent
-        )
-    }
-
-    const idTag = useId()
-    const idUseClient = useId()
+            setTempEditingComponent(
+                (prev) =>
+                    ({
+                        ...prev,
+                        data: updatedData
+                    }) as StructuredComponent
+            )
+        },
+        [componentId, tempEditingComponent]
+    )
 
     return (
         <IGRPSidebarPrimitive
@@ -470,31 +414,12 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                 } as React.CSSProperties & { '--sidebar-width': string }
             }
         >
-            <IGRPSidebarHeaderPrimitive>
-                <div className="items-center justify-between flex flex-1">
-                    <div className="space-y-1">
-                        <h4 className="text-sm font-medium leading-none">{t('settings')}</h4>
-                        {componentName && <p className="text-sm text-muted-foreground"></p>}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        {!comp && (
-                            <>
-                                <IGRPButtonPrimitive
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={resetTempData}
-                                    title={t('resetChanges')}
-                                >
-                                    <RotateCcw className="h-4 w-4" />
-                                </IGRPButtonPrimitive>
-                                <IGRPButtonPrimitive variant={'ghost'} onClick={handleClose}>
-                                    <X />
-                                </IGRPButtonPrimitive>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </IGRPSidebarHeaderPrimitive>
+            <SidebarRightHeader
+                componentName={componentName}
+                showActions={!comp}
+                onReset={resetTempData}
+                onClose={handleClose}
+            />
             <IGRPSidebarContentPrimitive>
                 <div className="space-y-4 p-2 px-3">
                     {isLoading ? (
@@ -507,25 +432,16 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                         />
                     ) : (
                         <>
-                            <div className="space-y-2">
-                                <IGRPLabelPrimitive htmlFor={'tab'}>
-                                    {`${label || componentName} - ${componentId}`}
-                                </IGRPLabelPrimitive>
-                                <IGRPInputPrimitive
-                                    id={idTag}
-                                    value={tempEditingComponent?.tag}
-                                    onChange={udpateTag}
-                                />
-                            </div>
-                            {isRootComponent && (
-                                <CheckboxInput
-                                    id={idUseClient}
-                                    label={t('useClient')}
-                                    onChange={(value: boolean) => udpateTypeRenderComponent(value)}
-                                    value={restData?.useClient ?? true}
-                                    info={t('useClientInfo')}
-                                />
-                            )}
+                            <ComponentIdentitySection
+                                label={label}
+                                componentName={componentName}
+                                componentId={componentId}
+                                tag={tempEditingComponent.tag}
+                                isRootComponent={isRootComponent}
+                                useClient={restData?.useClient ?? true}
+                                onTagChange={handleTagChange}
+                                onUseClientChange={handleUseClientChange}
+                            />
                             <IGRPTabsPrimitive className="flex-1" defaultValue="props">
                                 <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
                                     <IGRPTabsTriggerPrimitive value="props">
@@ -543,85 +459,18 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                                 </IGRPTabsListPrimitive>
 
                                 <IGRPTabsContentPrimitive value="props" className="space-y-6">
-                                    <IGRPAccordionPrimitive
-                                        type="single"
-                                        collapsible
-                                        className="w-full"
-                                        defaultValue="item-1"
-                                    >
-                                        <IGRPAccordionItemPrimitive value="item-1">
-                                            <IGRPAccordionTriggerPrimitive
-                                                iconName="ChevronDown"
-                                                showIcon
-                                                iconPlacement="end"
-                                            >
-                                                {t('properties')}
-                                            </IGRPAccordionTriggerPrimitive>
-                                            <IGRPAccordionContentPrimitive className="space-y-2">
-                                                {propsComponent && (
-                                                    <RenderPropsConfig
-                                                        propsComp={propsComponent}
-                                                        formValues={
-                                                            tempEditingComponent?.properties
-                                                        }
-                                                        pageOptions={pageOptions}
-                                                        dataProperties={tempEditingComponent.data}
-                                                        statesOptions={statesOptions}
-                                                        columnsOptions={columnsOptions}
-                                                        tag={tempEditingComponent?.tag || ''}
-                                                        onInputChange={
-                                                            handleComponentPropertyChange
-                                                        }
-                                                        onSelectState={(
-                                                            field: string,
-                                                            state: State | undefined,
-                                                            value: DataValue | undefined
-                                                        ) =>
-                                                            udpateDataProperties({
-                                                                field,
-                                                                state,
-                                                                value
-                                                            })
-                                                        }
-                                                    />
-                                                )}
-                                            </IGRPAccordionContentPrimitive>
-                                        </IGRPAccordionItemPrimitive>
-                                        {Object.keys(propsComponentChild).length > 0 && (
-                                            <IGRPAccordionItemPrimitive value="item-2">
-                                                <IGRPAccordionTriggerPrimitive
-                                                    iconName="ChevronDown"
-                                                    showIcon
-                                                    iconPlacement="end"
-                                                >
-                                                    {t('childProperties')}
-                                                </IGRPAccordionTriggerPrimitive>
-                                                <IGRPAccordionContentPrimitive className="space-y-2">
-                                                    <RenderPropsConfig
-                                                        propsComp={propsComponentChild}
-                                                        formValues={childformValues}
-                                                        pageOptions={pageOptions}
-                                                        dataProperties={tempEditingComponent.data}
-                                                        statesOptions={statesOptions}
-                                                        columnsOptions={columnsOptions}
-                                                        tag={tempEditingComponent?.tag || ''}
-                                                        onInputChange={handleChildPropertyChange}
-                                                        onSelectState={(
-                                                            field: string,
-                                                            state: State | undefined,
-                                                            value: DataValue | undefined
-                                                        ) =>
-                                                            udpateDataProperties({
-                                                                field,
-                                                                state,
-                                                                value
-                                                            })
-                                                        }
-                                                    />
-                                                </IGRPAccordionContentPrimitive>
-                                            </IGRPAccordionItemPrimitive>
-                                        )}
-                                    </IGRPAccordionPrimitive>
+                                    <PropertiesPanel
+                                        propsComponent={propsComponent}
+                                        propsComponentChild={propsComponentChild}
+                                        tempEditingComponent={tempEditingComponent}
+                                        childformValues={childformValues}
+                                        pageOptions={pageOptions}
+                                        statesOptions={statesOptions}
+                                        columnsOptions={columnsOptions}
+                                        onComponentPropertyChange={handleComponentPropertyChange}
+                                        onChildPropertyChange={handleChildPropertyChange}
+                                        onSelectState={handleSelectState}
+                                    />
                                 </IGRPTabsContentPrimitive>
                                 <IGRPTabsContentPrimitive value="styles" className="space-y-6">
                                     <StyleTab
@@ -656,4 +505,4 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
     )
 }
 
-export default SidebarRight
+export default memo(SidebarRight)
