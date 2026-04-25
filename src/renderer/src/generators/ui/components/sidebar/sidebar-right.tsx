@@ -1,5 +1,4 @@
 import {
-    type IGRPOptionsProps,
     IGRPSidebarContentPrimitive,
     IGRPSidebarPrimitive,
     IGRPTabsContentPrimitive,
@@ -7,26 +6,15 @@ import {
     IGRPTabsPrimitive,
     IGRPTabsTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import type { State } from '@igrp/igrp-studio-nextjs-engine/types'
 import { EmptyList } from '@renderer/components/empty-list'
 import Loader from '@renderer/components/loader'
 import useStudio from '@renderer/hooks/use-studio'
-import type { DataValue, StructuredComponent } from '@renderer/lib/dnd/types'
+import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { Settings } from 'lucide-react'
-import {
-    type ChangeEvent,
-    type ComponentProps,
-    memo,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState
-} from 'react'
+import { type ComponentProps, memo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDroppedComponents } from '../../dnd/DroppedComponentsContext'
-import { getRequiredDataSchema } from '../../dnd/helpers'
-import { useComponents } from '../../hooks/useComponents'
 import useCustomCode from '../../hooks/useCustomCode'
+import { useSidebarRightState } from '../../hooks/useSidebarRightState'
 import Interactions from '../settings/Interactions'
 import { StyleTab } from '../settings/style'
 import CopyContent from './copy-content'
@@ -42,366 +30,32 @@ interface SidebarRightProps extends ComponentProps<typeof IGRPSidebarPrimitive> 
 
 const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) => {
     const { t } = useTranslation()
-    const { getPropertiesComponent, getDataComponent, getChildPropertiesComponent, pageOptions } =
-        useStudio()
-    const {
-        currentComponent: editingComponentParams,
-        handleUpdateChildComponent,
-        clearEditingComponent,
-        setAllRestData,
-        restData
-    } = useDroppedComponents()
-
+    const { pageOptions } = useStudio()
     const { statesOptions } = useCustomCode()
-    const { getArqumentsOptions } = useComponents()
-    const argumentsOptions = getArqumentsOptions()
 
-    // Memoized derived state
-    const currentComp = useMemo(
-        () => comp || editingComponentParams?.component,
-        [comp, editingComponentParams]
-    )
-
-    const isRootComponent = useMemo(() => {
-        return (
-            currentComp?.componentName === 'page' ||
-            currentComp?.componentName === 'component' ||
-            currentComp?.componentName === 'processStep'
-        )
-    }, [currentComp])
-
-    const currentPath = path || editingComponentParams?.path || ''
-
-    const { label, data, componentName, childProperties = {}, id: componentId } = currentComp || {}
-
-    // State management
-    const [tempEditingComponent, setTempEditingComponent] = useState<
-        StructuredComponent | undefined
-    >(undefined)
-
-    const [propsComponent, setPropsComponent] = useState<Record<string, any>>({})
-
-    const [childformValues, setChildformValues] = useState<Record<string, any>>({})
-
-    const [propsComponentChild, setPropsComponentChild] = useState<Record<string, any>>({})
-
-    const [columnsOptions, setColumnsOptions] = useState<
-        (IGRPOptionsProps & { type?: 'column' | 'pageParam' })[]
-    >([])
-
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-
-    useEffect(() => {
-        const options =
-            parentComp?.children
-                .filter(
-                    (column) =>
-                        column?.properties?.dataProperties &&
-                        !column.properties.dataProperties.isVirtual &&
-                        column.properties.dataProperties.isType
-                )
-                .map((column) => {
-                    return {
-                        value: column.tag,
-                        label: column.properties.headerTitle,
-                        type: 'column' as const
-                    }
-                }) ?? []
-
-        // Join all data sources with type indicators
-        const combinedDataOptions = [
-            ...argumentsOptions.map((option) => ({
-                ...option,
-                type: 'pageParam' as const,
-                label: `${option.label} (Variable)`
-            })),
-            ...options
-        ]
-
-        setColumnsOptions(combinedDataOptions)
-    }, [parentComp])
-
-    // Load properties component and delete data not in the schema
-    useEffect(() => {
-        if (!componentId || !componentName) return
-
-        setTempEditingComponent(undefined)
-
-        getDataComponent(currentPath, componentName).then((response) => {
-            const requiredDataSchema = getRequiredDataSchema(response)
-
-            // Check if each key in data exists in response
-            if (data && requiredDataSchema) {
-                const cleanedData = { ...data }
-
-                // Iterate through each key in the response
-                Object.keys(requiredDataSchema).forEach((key) => {
-                    // If the key doesn't exist in the current data, add it
-                    if (!(key in data)) {
-                        cleanedData[key] = requiredDataSchema[key]
-                    }
-                })
-
-                // Remove keys with empty object values
-                Object.keys(cleanedData).forEach((key) => {
-                    if (
-                        cleanedData[key] &&
-                        typeof cleanedData[key] === 'object' &&
-                        !Array.isArray(cleanedData[key]) &&
-                        Object.keys(cleanedData[key]).length === 0
-                    ) {
-                        delete cleanedData[key]
-                    }
-                })
-
-                setTempEditingComponent(
-                    (prev) =>
-                        ({
-                            ...currentComp,
-                            ...prev,
-                            data: cleanedData
-                        }) as StructuredComponent
-                )
-            }
-        })
-
-        const loadProps = async (): Promise<void> => {
-            try {
-                setIsLoading(true)
-                const data = await getPropertiesComponent(currentPath, componentName)
-                setPropsComponent(data)
-
-                const deepMerge = (target: any, source: any): any => {
-                    const result = { ...target }
-
-                    for (const key in source) {
-                        if (
-                            source[key] instanceof Object &&
-                            key in target &&
-                            target[key] instanceof Object
-                        ) {
-                            result[key] = deepMerge(target[key], source[key])
-                        } else {
-                            result[key] = source[key]
-                        }
-                    }
-
-                    return result
-                }
-
-                const target = Object.entries(data ?? {}).reduce(
-                    (acc, [key, config]) => {
-                        if (config.type === 'object' && config.properties) {
-                            acc[key] = Object.entries(config.properties).reduce(
-                                (objAcc, [propKey, propConfig]: [string, any]) => {
-                                    if (
-                                        propConfig.default !== undefined ||
-                                        propConfig.required
-                                    ) {
-                                        objAcc[propKey] = propConfig.default
-                                    }
-                                    return objAcc
-                                },
-                                {} as Record<string, any>
-                            )
-                        } else if (config.default || config.required) {
-                            acc[key] = config.default
-                        }
-                        return acc
-                    },
-                    {} as Record<string, any>
-                )
-                const source = Object.entries(currentComp?.properties ?? {}).reduce(
-                    (acc, [key, value]) => {
-                        const schemaConfig = (data as Record<string, any>)?.[key]
-
-                        if (!schemaConfig) {
-                            return acc
-                        }
-
-                        if (schemaConfig.type === 'object' && schemaConfig.properties) {
-                            const filteredNestedProps = Object.entries(value || {}).reduce(
-                                (nestedAcc, [nestedKey, nestedValue]) => {
-                                    const nestedConfig = schemaConfig.properties[nestedKey]
-                                    if (
-                                        nestedConfig &&
-                                        (nestedConfig.required || nestedValue !== undefined)
-                                    ) {
-                                        nestedAcc[nestedKey] = nestedValue
-                                    }
-                                    return nestedAcc
-                                },
-                                {} as Record<string, any>
-                            )
-
-                            if (Object.keys(filteredNestedProps).length > 0) {
-                                acc[key] = filteredNestedProps
-                            }
-                        } else if (schemaConfig.required || value !== undefined) {
-                            acc[key] = value
-                        }
-
-                        return acc
-                    },
-                    {} as Record<string, any>
-                )
-
-                const initialValues = deepMerge(target, source)
-
-                setTempEditingComponent(
-                    (prev) =>
-                        ({
-                            ...currentComp,
-                            ...prev,
-                            properties: initialValues
-                        }) as StructuredComponent
-                )
-            } catch (error) {
-                console.error('Error loading properties component:', error)
-            } finally {
-                setIsLoading(false)
-            }
-        }
-
-        loadProps()
-    }, [componentId, componentName, currentPath, currentComp])
-
-    // Load child properties component
-    useEffect(() => {
-        if (!componentName) return
-
-        const loadProps = async () => {
-            try {
-                const data = await getChildPropertiesComponent(currentPath, componentName)
-                setPropsComponentChild(data && !Array.isArray(data) ? data : {})
-
-                const initialValues = Object.entries(data ?? {}).reduce(
-                    (acc, [key, config]) => {
-                        if (config.default !== null || config.required) {
-                            acc[key] = childProperties[key] ?? config.default
-                        }
-                        return acc
-                    },
-                    {} as Record<string, any>
-                )
-
-                setChildformValues(initialValues)
-            } catch (error) {
-                console.error('Error loading properties component:', error)
-            }
-        }
-
-        loadProps()
-    }, [componentName, currentPath])
-
-    // Debounced component update
-    useEffect(() => {
-        if (!componentId || tempEditingComponent?.id !== componentId) return
-        handleUpdateChildComponent(componentId, {
-            ...tempEditingComponent
-        })
-    }, [tempEditingComponent, componentId])
-
-    useEffect(() => {
-        if (!componentId) return
-        handleUpdateChildComponent(componentId, {
-            childProperties: { ...childformValues }
-        })
-    }, [childformValues, componentId])
-
-    // Helper function to set nested values in objects
-    const setNestedValue = useCallback(
-        (
-            obj: Record<string, any>,
-            path: string[],
-            val: string | boolean | number
-        ): Record<string, string | boolean | number | undefined> => {
-            const [first, ...rest] = path
-            if (rest.length === 0) {
-                return { ...obj, [first]: val }
-            }
-            return {
-                ...obj,
-                [first]: setNestedValue(obj[first] || {}, rest, val)
-            }
-        },
-        []
-    )
-
-    // Custom event handlers
-    const handleComponentPropertyChange = useCallback(
-        (fieldPath: string, value: string | boolean) => {
-            setTempEditingComponent((prev) => {
-                if (!prev) return prev
-                return {
-                    ...prev,
-                    properties: setNestedValue(prev.properties || {}, fieldPath.split('.'), value)
-                }
-            })
-        },
-        [setNestedValue]
-    )
-
-    const handleChildPropertyChange = useCallback(
-        (fieldPath: string, value: string | boolean) => {
-            setChildformValues((prev) => setNestedValue(prev, fieldPath.split('.'), value))
-        },
-        [setNestedValue]
-    )
-
-    // Function to reset temp data to original component data
-    const resetTempData = useCallback(() => {
-        if (!componentId) return
-        handleUpdateChildComponent(componentId, {
-            ...currentComp
-        })
-    }, [currentComp, componentId, handleUpdateChildComponent])
-
-    const handleClose = useCallback(() => {
-        clearEditingComponent()
-    }, [clearEditingComponent])
-
-    const handleTagChange = useCallback((e: ChangeEvent<HTMLInputElement>): void => {
-        if (!componentId) return
-        setTempEditingComponent(
-            (prev) =>
-                ({
-                    ...prev,
-                    tag: e.target.value
-                }) as StructuredComponent
-        )
-    }, [componentId])
-
-    const handleUseClientChange = useCallback((useClient: boolean): void => {
-        if (!componentId) return
-        setAllRestData({ ...restData, useClient })
-    }, [componentId, restData, setAllRestData])
-
-    const handleSelectState = useCallback(
-        (field: string, state: State | undefined, value: DataValue | undefined) => {
-            if (!componentId) return
-
-            const updatedData = { ...tempEditingComponent?.data }
-            delete updatedData[field]
-
-            if (state) {
-                updatedData[field] = { state }
-            }
-
-            if (value) {
-                updatedData[field] = { value }
-            }
-
-            setTempEditingComponent(
-                (prev) =>
-                    ({
-                        ...prev,
-                        data: updatedData
-                    }) as StructuredComponent
-            )
-        },
-        [componentId, tempEditingComponent]
-    )
+    const {
+        currentComp,
+        currentPath,
+        isRootComponent,
+        label,
+        componentName,
+        componentId,
+        tempEditingComponent,
+        propsComponent,
+        propsComponentChild,
+        childformValues,
+        columnsOptions,
+        isLoading,
+        handleUpdateChildComponent,
+        restData,
+        handleComponentPropertyChange,
+        handleChildPropertyChange,
+        handleSelectState,
+        handleTagChange,
+        handleUseClientChange,
+        resetTempData,
+        handleClose
+    } = useSidebarRightState({ comp, parentComp, path })
 
     return (
         <IGRPSidebarPrimitive
