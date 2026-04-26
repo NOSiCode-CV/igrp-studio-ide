@@ -1,6 +1,12 @@
 import { Gitlab } from '@gitbeaker/rest'
 import type { BrowserWindow } from 'electron'
 import { GitAuthExpiredError, isAuthError } from '../helpers/git-auth/git-auth-errors'
+import {
+    clearRepoCache,
+    isRateLimitError,
+    readRepoCache,
+    writeRepoCache
+} from '../helpers/git-auth/repo-cache'
 import { isOnline } from '../helpers/network-utils'
 import type { GitProviderConfig } from '../types'
 import { GitStore } from './git-store'
@@ -37,6 +43,8 @@ export const GitLabService = {
             })
 
             GitStore.setToken('gitlab', token)
+            // New session — drop any cache from a previous account.
+            clearRepoCache('gitlab')
 
             return true
         } catch (error) {
@@ -64,14 +72,20 @@ export const GitLabService = {
     },
 
     async listIGRPStudioRepositoriesGitlab(_window: BrowserWindow) {
+        if (!gitlab) return []
+
+        const cached = readRepoCache<any[]>('gitlab')
+        if (cached) return cached
+
         try {
             const online = await isOnline()
             if (!online) throw new Error('ERR_INTERNET_DISCONNECTED')
 
-            if (!gitlab) throw new Error('GitLab client not initialized')
             const igrpRepos: any = []
             const batchSize = 10
 
+            // Gitbeaker's .all() walks pagination internally and returns
+            // every project the user has access to.
             const repos = await gitlab.Projects.all({
                 membership: true,
                 orderBy: 'last_activity_at',
@@ -155,11 +169,18 @@ export const GitLabService = {
                 igrpRepos.push(...results.filter((r) => r !== null))
             }
 
+            writeRepoCache('gitlab', igrpRepos)
             return igrpRepos
         } catch (error) {
             console.error('Error listing GitLab repositories:', error)
             const auth = isAuthError(error)
             if (auth.match) throw new GitAuthExpiredError('gitlab', auth.status)
+            if (isRateLimitError(error)) {
+                const err = new Error('GITLAB_RATE_LIMITED')
+                ;(err as any).code = 'RATE_LIMITED'
+                ;(err as any).providerType = 'gitlab'
+                throw err
+            }
             throw error
         }
     },

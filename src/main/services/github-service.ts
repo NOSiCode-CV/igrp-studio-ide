@@ -1,6 +1,12 @@
 import type { BrowserWindow } from 'electron'
 import { describeProviderType } from '../config/git-providers'
 import { GitAuthExpiredError, isAuthError } from '../helpers/git-auth/git-auth-errors'
+import {
+    clearRepoCache,
+    isRateLimitError,
+    readRepoCache,
+    writeRepoCache
+} from '../helpers/git-auth/repo-cache'
 import { isOnline } from '../helpers/network-utils'
 import { GitStore } from './git-store'
 
@@ -39,6 +45,8 @@ export const GitHubService = {
             const apiUrl = deriveApiUrl(baseUrl)
             octokit = new Octokit(apiUrl ? { auth: token, baseUrl: apiUrl } : { auth: token })
             await octokit.users.getAuthenticated()
+            // New session — drop any cache from a previous account.
+            clearRepoCache('github')
             return true
         } catch (error) {
             console.error('Failed to initialize GitHub client:', error)
@@ -66,25 +74,32 @@ export const GitHubService = {
     },
 
     async listIGRPStudioRepositoriesGithub(_window: BrowserWindow) {
+        if (!octokit) return []
+
+        // Serve from cache when available — keeps the UI snappy and
+        // protects the rate limit on rapid refreshes.
+        const cached = readRepoCache<any[]>('github')
+        if (cached) return cached
+
         try {
-            const igrpRepos: any = []
-            const batchSize = 10
-
-            if (!octokit) return []
-
             const online = await isOnline()
             if (!online) throw new Error('ERR_INTERNET_DISCONNECTED')
 
-            const { data: repos } = await octokit.repos?.listForAuthenticatedUser({
-                sort: 'updated',
-                per_page: 100,
-                page: 1,
-                visibility: 'all'
-            })
+            // octokit.paginate transparently walks the Link headers and
+            // returns every page flattened, not just the first 100 repos.
+            const repos: any[] = await octokit.paginate(
+                octokit.repos.listForAuthenticatedUser,
+                {
+                    sort: 'updated',
+                    per_page: 100,
+                    visibility: 'all'
+                }
+            )
 
+            const igrpRepos: any[] = []
+            const batchSize = 10
             for (let i = 0; i < repos.length; i += batchSize) {
                 const batch = repos.slice(i, i + batchSize)
-
                 const promises = batch.map(async (repo) => {
                     try {
                         await octokit.repos.getContent({
@@ -92,7 +107,6 @@ export const GitHubService = {
                             repo: repo.name,
                             path: '.igrpstudio'
                         })
-
                         return {
                             id: repo.id,
                             name: repo.name,
@@ -112,15 +126,23 @@ export const GitHubService = {
                         return null
                     }
                 })
-
                 const results = await Promise.all(promises)
                 igrpRepos.push(...results.filter((r) => r !== null))
             }
 
+            writeRepoCache('github', igrpRepos)
             return igrpRepos
         } catch (error) {
             const auth = isAuthError(error)
             if (auth.match) throw new GitAuthExpiredError('github', auth.status)
+            if (isRateLimitError(error)) {
+                // Surface a stable shape the renderer can recognise and
+                // toast appropriately.
+                const err = new Error('GITHUB_RATE_LIMITED')
+                ;(err as any).code = 'RATE_LIMITED'
+                ;(err as any).providerType = 'github'
+                throw err
+            }
             throw error
         }
     }

@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import { GitAuthExpiredError } from '../helpers/git-auth/git-auth-errors'
+import { clearRepoCache } from '../helpers/git-auth/repo-cache'
 import { GitService } from '../services/git-service'
 import { GitStore } from '../services/git-store'
 import { GitHubService } from '../services/github-service'
@@ -18,9 +19,19 @@ function notifyTokenExpired(providerType: GitProviderType, status: number): void
 }
 
 /**
- * Run a git API call, intercept GitAuthExpiredError and broadcast the
- * matching renderer event before re-throwing. Keeps every IPC handler
- * focussed on its happy path.
+ * Notify renderer windows that a provider hit its rate limit so the
+ * UI can fall back to a friendly toast instead of an opaque error.
+ */
+function notifyRateLimited(providerType: GitProviderType): void {
+    for (const win of BrowserWindow.getAllWindows()) {
+        win.webContents.send('git-rate-limited', { providerType })
+    }
+}
+
+/**
+ * Run a git API call, intercept GitAuthExpiredError and rate-limit
+ * errors and broadcast the matching renderer event before re-throwing.
+ * Keeps every IPC handler focussed on its happy path.
  */
 async function withAuthErrorHandling<T>(fn: () => Promise<T>): Promise<T> {
     try {
@@ -28,6 +39,8 @@ async function withAuthErrorHandling<T>(fn: () => Promise<T>): Promise<T> {
     } catch (error) {
         if (error instanceof GitAuthExpiredError) {
             notifyTokenExpired(error.providerType, error.status)
+        } else if (error && typeof error === 'object' && (error as any).code === 'RATE_LIMITED') {
+            notifyRateLimited((error as any).providerType as GitProviderType)
         }
         throw error
     }
@@ -53,11 +66,21 @@ ipcMain.handle(
     }
 )
 ipcMain.handle('logout-github', async () => {
+    clearRepoCache('github')
     return GitStore.logoutGithub()
 })
 ipcMain.handle('logout-gitlab', async () => {
+    clearRepoCache('gitlab')
     return GitStore.logoutGitlab()
 })
+
+ipcMain.handle(
+    'git-provider:invalidate-repo-cache',
+    async (_event, providerType?: GitProviderType) => {
+        clearRepoCache(providerType)
+        return true
+    }
+)
 ipcMain.handle('gitlab-initialize', async (_event, token) => {
     try {
         await GitLabService.initialize(token)

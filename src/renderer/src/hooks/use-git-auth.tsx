@@ -162,9 +162,19 @@ const useGitAuth = () => {
             )
         }
 
+        const onRateLimited = (
+            _event: any,
+            payload: { providerType: 'github' | 'gitlab' }
+        ): void => {
+            window.dispatchEvent(
+                new CustomEvent('git:rate-limited', { detail: payload })
+            )
+        }
+
         window.electron.ipcRenderer.on('github-oauth-success', onGitHubOAuthSuccess)
         window.electron.ipcRenderer.on('gitlab-oauth-success', onGitLabOAuthSuccess)
         window.electron.ipcRenderer.on('git-token-expired', onTokenExpired)
+        window.electron.ipcRenderer.on('git-rate-limited', onRateLimited)
 
         if (!isInitialized) {
             loadGithubData()
@@ -174,6 +184,7 @@ const useGitAuth = () => {
             window.electron.ipcRenderer.removeListener('github-oauth-success', onGitHubOAuthSuccess)
             window.electron.ipcRenderer.removeListener('gitlab-oauth-success', onGitLabOAuthSuccess)
             window.electron.ipcRenderer.removeListener('git-token-expired', onTokenExpired)
+            window.electron.ipcRenderer.removeListener('git-rate-limited', onRateLimited)
         }
     }, [isInitialized, dispatch, activeProviderId, loadGithubData])
 

@@ -905,6 +905,7 @@
     "client_id_required": "Client ID é obrigatório",
     "client_secret_required": "Client Secret é obrigatório",
     "token_expired": "A sessão do {{provider}} expirou. Volte a ligar.",
+    "rate_limited": "Limite de pedidos do {{provider}} atingido. Tente novamente daqui a alguns minutos.",
     "configSaved": "Configuração salva com sucesso",
     "configSaveError": "Falha ao salvar configuração",
     "providerActivated": "Provedor ativado com sucesso",
