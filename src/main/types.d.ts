@@ -244,14 +244,36 @@ export interface ServiceInfo {
     statusMessage?: string
 }
 
+export type GitProviderType = 'github' | 'gitlab'
+
 export interface GitProviderConfig {
     id: string
+    /**
+     * Discriminates which auth/API client to use for this instance.
+     * Older configs without `type` are treated as 'gitlab' for backwards
+     * compatibility with the legacy storage layout.
+     */
+    type?: GitProviderType
     name: string
+    /** Web base URL of the host (e.g. https://github.com, https://git.nosi.cv). */
     baseUrl: string
     clientId: string
     clientSecret: string
     active: boolean
     isDefault?: boolean
+}
+
+/**
+ * Common surface implemented by GitHubService and GitLabService. Lets
+ * provider-agnostic code drive auth and repository listings without
+ * knowing which kind of host is on the other side.
+ */
+export interface IGitProvider {
+    readonly type: GitProviderType
+    initialize(token: string, config?: GitProviderConfig): Promise<void> | void
+    getUserInfo(): Promise<unknown>
+    listRepositories(window: unknown): Promise<unknown[]>
+    logout(): void
 }
 
 export type ToolCheck = {

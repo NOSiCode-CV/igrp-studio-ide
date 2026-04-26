@@ -126,7 +126,28 @@ ipcMain.handle('is-auto-commit', async () => {
     return GitStore.isAutoCommit()
 })
 
-///GitLabService store config
+/* ------------------------------------------------------------------ */
+/*  Generic provider configs (works for any GitProviderType)          */
+/* ------------------------------------------------------------------ */
+ipcMain.handle('git-provider:list-configs', async (_event, type?: 'github' | 'gitlab') => {
+    return GitStore.getProviderConfigs(type)
+})
+
+ipcMain.handle('git-provider:save-config', async (_event, config: GitProviderConfig) => {
+    return GitStore.saveProviderConfig(config)
+})
+
+ipcMain.handle('git-provider:remove-config', async (_event, id: string): Promise<void> => {
+    return GitStore.removeProviderConfig(id)
+})
+
+ipcMain.handle('git-provider:set-active', async (_event, id: string): Promise<void> => {
+    return GitStore.setActiveProviderConfig(id)
+})
+
+/* ------------------------------------------------------------------ */
+/*  Legacy GitLab-only aliases (renderer hooks still target these)    */
+/* ------------------------------------------------------------------ */
 ipcMain.handle('get-gitlab-config', async () => {
     return GitLabService.getGitlabConfigs()
 })

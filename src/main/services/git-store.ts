@@ -1,16 +1,12 @@
 import { safeStorage } from 'electron'
-import type { GitProviderConfig } from '../types'
+import type { GitProviderConfig, GitProviderType } from '../types'
 
 let store: any = null
 
 const ENCRYPTED_PREFIX = 'enc:v1:'
+const PROVIDER_CONFIGS_KEY = 'providerConfigs'
+const LEGACY_GITLAB_CONFIGS_KEY = 'gitlabConfigs'
 
-/**
- * Encrypt a string with electron.safeStorage when available. Falls back to
- * the plaintext value (with a clear marker) on platforms where safeStorage
- * is unavailable so the data still loads if the user later updates Electron
- * or moves between OSes.
- */
 function encryptValue(value: string): string {
     if (!value) return value
     if (safeStorage.isEncryptionAvailable()) {
@@ -21,16 +17,11 @@ function encryptValue(value: string): string {
 }
 
 function decryptValue(value: string | null | undefined): string | null {
-    if (!value) return null
-    if (typeof value !== 'string') return null
-    if (!value.startsWith(ENCRYPTED_PREFIX)) {
-        // Legacy plaintext value or unsupported environment.
-        return value
-    }
+    if (!value || typeof value !== 'string') return null
+    if (!value.startsWith(ENCRYPTED_PREFIX)) return value
     const payload = value.slice(ENCRYPTED_PREFIX.length)
     try {
-        const buf = Buffer.from(payload, 'base64')
-        return safeStorage.decryptString(buf)
+        return safeStorage.decryptString(Buffer.from(payload, 'base64'))
     } catch (error) {
         console.error('[GitStore] Failed to decrypt value:', error)
         return null
@@ -47,6 +38,35 @@ function decryptConfigSecret(config: GitProviderConfig): GitProviderConfig {
     const decrypted = decryptValue(config.clientSecret)
     if (decrypted === null) return config
     return { ...config, clientSecret: decrypted }
+}
+
+/** Older configs were saved without `type` and only held GitLab instances. */
+function normalizeConfig(c: GitProviderConfig): GitProviderConfig {
+    return { ...c, type: c.type ?? 'gitlab' }
+}
+
+function readProviderConfigs(): GitProviderConfig[] {
+    if (!store) return []
+    let stored = (store.get(PROVIDER_CONFIGS_KEY, null) as GitProviderConfig[] | null) ?? null
+    if (!stored) {
+        // One-time migration from the legacy gitlab-only key.
+        const legacy = (store.get(LEGACY_GITLAB_CONFIGS_KEY, []) as GitProviderConfig[]) ?? []
+        if (legacy.length > 0) {
+            stored = legacy.map(normalizeConfig)
+            store.set(PROVIDER_CONFIGS_KEY, stored)
+        } else {
+            stored = []
+        }
+    }
+    return stored.map(normalizeConfig)
+}
+
+function writeProviderConfigs(configs: GitProviderConfig[]): void {
+    store?.set(PROVIDER_CONFIGS_KEY, configs)
+    // Keep the legacy mirror in sync so an older app version (rolled back)
+    // still sees the GitLab entries it knew about.
+    const gitlabOnly = configs.filter((c) => (c.type ?? 'gitlab') === 'gitlab')
+    store?.set(LEGACY_GITLAB_CONFIGS_KEY, gitlabOnly)
 }
 
 export const GitStore = {
@@ -124,42 +144,56 @@ export const GitStore = {
         return store.get('project_paths', {})
     },
 
-    getGitlabConfigs: (): GitProviderConfig[] => {
-        const stored = (store.get('gitlabConfigs', []) as GitProviderConfig[]) ?? []
-        return stored.map(decryptConfigSecret)
+    /* ------------------------------------------------------------------ */
+    /*  Generic provider config API                                       */
+    /* ------------------------------------------------------------------ */
+
+    /** Returns all stored provider configs, decrypted. */
+    getProviderConfigs(type?: GitProviderType): GitProviderConfig[] {
+        const all = readProviderConfigs().map(decryptConfigSecret)
+        return type ? all.filter((c) => (c.type ?? 'gitlab') === type) : all
     },
 
-    saveGitlabConfig: (config: GitProviderConfig) => {
-        const stored = (store.get('gitlabConfigs', []) as GitProviderConfig[]) ?? []
-        const encrypted = encryptConfigSecret(config)
-        const existingIndex = stored.findIndex((c) => c.id === config.id)
-
-        let newConfigs: GitProviderConfig[]
-        if (existingIndex !== -1) {
-            const next = [...stored]
-            next[existingIndex] = encrypted
-            newConfigs = next
-        } else {
-            newConfigs = [...stored, encrypted]
-        }
-
-        store.set('gitlabConfigs', newConfigs)
+    saveProviderConfig(config: GitProviderConfig): void {
+        const normalized = normalizeConfig(config)
+        const stored = readProviderConfigs()
+        const encrypted = encryptConfigSecret(normalized)
+        const idx = stored.findIndex((c) => c.id === normalized.id)
+        const next = [...stored]
+        if (idx === -1) next.push(encrypted)
+        else next[idx] = encrypted
+        writeProviderConfigs(next)
     },
 
-    removeGitlabConfig: (id: string) => {
-        const stored = (store.get('gitlabConfigs', []) as GitProviderConfig[]) ?? []
+    removeProviderConfig(id: string): void {
+        const stored = readProviderConfigs()
         const next = stored.filter((c) => c.id !== id)
-        if (next.length !== stored.length) {
-            store.set('gitlabConfigs', next)
-        }
+        if (next.length !== stored.length) writeProviderConfigs(next)
     },
 
-    setActiveGitlabConfig: (id: string) => {
-        const stored = (store.get('gitlabConfigs', []) as GitProviderConfig[]) ?? []
-        const next = stored.map((c) => ({
-            ...c,
-            active: c.id === id
-        }))
-        store.set('gitlabConfigs', next)
-    }
+    /**
+     * Marks one config as active. If `scopeToType` is true (default), only
+     * configs of the same type are deactivated so users can keep one active
+     * GitHub instance alongside one active GitLab instance.
+     */
+    setActiveProviderConfig(id: string, scopeToType: boolean = true): void {
+        const stored = readProviderConfigs()
+        const target = stored.find((c) => c.id === id)
+        if (!target) return
+        const next = stored.map((c) => {
+            if (scopeToType && (c.type ?? 'gitlab') !== (target.type ?? 'gitlab')) return c
+            return { ...c, active: c.id === id }
+        })
+        writeProviderConfigs(next)
+    },
+
+    /* ------------------------------------------------------------------ */
+    /*  Legacy GitLab-only aliases (kept for backwards compatibility)     */
+    /* ------------------------------------------------------------------ */
+
+    getGitlabConfigs: (): GitProviderConfig[] => GitStore.getProviderConfigs('gitlab'),
+    saveGitlabConfig: (config: GitProviderConfig) =>
+        GitStore.saveProviderConfig({ ...config, type: 'gitlab' }),
+    removeGitlabConfig: (id: string) => GitStore.removeProviderConfig(id),
+    setActiveGitlabConfig: (id: string) => GitStore.setActiveProviderConfig(id)
 }
