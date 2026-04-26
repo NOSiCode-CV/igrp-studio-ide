@@ -5,6 +5,7 @@ import {
 } from '@igrp/igrp-framework-react-design-system'
 import { UpdateModalBottomLeft } from '@renderer/components/update-banner'
 import { IntegratedTerminal } from '@renderer/components/integrated-terminal'
+import { useGitTokenExpiredToast } from '@renderer/hooks/use-git-token-expired-toast'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import {
     Sidebar,
@@ -24,6 +25,7 @@ interface LayoutProps {
 }
 
 const MainLayout = (props: LayoutProps): React.ReactElement => {
+    useGitTokenExpiredToast()
     const {
         workspace,
         actions: { switchWorkspace }

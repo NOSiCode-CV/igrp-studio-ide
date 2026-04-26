@@ -1,9 +1,37 @@
 import { BrowserWindow, ipcMain } from 'electron'
+import { GitAuthExpiredError } from '../helpers/git-auth/git-auth-errors'
 import { GitService } from '../services/git-service'
 import { GitStore } from '../services/git-store'
 import { GitHubService } from '../services/github-service'
 import { GitLabService } from '../services/gitlab-service'
-import type { GitProviderConfig } from '../types'
+import type { GitProviderConfig, GitProviderType } from '../types'
+
+/**
+ * Notify all renderer windows that a provider's token is no longer valid.
+ * The renderer should clear the user/repos state for that provider and
+ * prompt the user to reconnect.
+ */
+function notifyTokenExpired(providerType: GitProviderType, status: number): void {
+    for (const win of BrowserWindow.getAllWindows()) {
+        win.webContents.send('git-token-expired', { providerType, status })
+    }
+}
+
+/**
+ * Run a git API call, intercept GitAuthExpiredError and broadcast the
+ * matching renderer event before re-throwing. Keeps every IPC handler
+ * focussed on its happy path.
+ */
+async function withAuthErrorHandling<T>(fn: () => Promise<T>): Promise<T> {
+    try {
+        return await fn()
+    } catch (error) {
+        if (error instanceof GitAuthExpiredError) {
+            notifyTokenExpired(error.providerType, error.status)
+        }
+        throw error
+    }
+}
 
 // GitHub
 ipcMain.handle(
@@ -58,18 +86,22 @@ ipcMain.handle('set-project-path', (_event, { repoId, path }: { repoId: number; 
     GitStore.setProjectPath(repoId, path)
 })
 ipcMain.handle('github-user-info', async () => {
-    return GitHubService.getUserInfo()
+    return withAuthErrorHandling(() => GitHubService.getUserInfo())
 })
 ipcMain.handle('gitlab-user-info', async () => {
-    return GitLabService.getUserInfo()
+    return withAuthErrorHandling(() => GitLabService.getUserInfo())
 })
 ipcMain.handle('github-repositories', async (event) => {
     const mainWindow = BrowserWindow.fromWebContents(event.sender)
-    return GitHubService.listIGRPStudioRepositoriesGithub(mainWindow as BrowserWindow)
+    return withAuthErrorHandling(() =>
+        GitHubService.listIGRPStudioRepositoriesGithub(mainWindow as BrowserWindow)
+    )
 })
 ipcMain.handle('gitlab-repositories', async (event) => {
     const mainWindow = BrowserWindow.fromWebContents(event.sender)
-    return GitLabService.listIGRPStudioRepositoriesGitlab(mainWindow as BrowserWindow)
+    return withAuthErrorHandling(() =>
+        GitLabService.listIGRPStudioRepositoriesGitlab(mainWindow as BrowserWindow)
+    )
 })
 
 // Git

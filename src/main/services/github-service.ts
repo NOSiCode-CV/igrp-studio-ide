@@ -1,5 +1,6 @@
 import type { BrowserWindow } from 'electron'
 import { describeProviderType } from '../config/git-providers'
+import { GitAuthExpiredError, isAuthError } from '../helpers/git-auth/git-auth-errors'
 import { isOnline } from '../helpers/network-utils'
 import { GitStore } from './git-store'
 
@@ -42,6 +43,8 @@ export const GitHubService = {
         } catch (error) {
             console.error('Failed to initialize GitHub client:', error)
             octokit = null
+            const auth = isAuthError(error)
+            if (auth.match) throw new GitAuthExpiredError('github', auth.status)
             throw error
         }
     },
@@ -52,8 +55,14 @@ export const GitHubService = {
         const online = await isOnline()
         if (!online) throw new Error('ERR_INTERNET_DISCONNECTED')
 
-        const { data } = await octokit?.users?.getAuthenticated()
-        return data
+        try {
+            const { data } = await octokit?.users?.getAuthenticated()
+            return data
+        } catch (error) {
+            const auth = isAuthError(error)
+            if (auth.match) throw new GitAuthExpiredError('github', auth.status)
+            throw error
+        }
     },
 
     async listIGRPStudioRepositoriesGithub(_window: BrowserWindow) {
@@ -110,6 +119,8 @@ export const GitHubService = {
 
             return igrpRepos
         } catch (error) {
+            const auth = isAuthError(error)
+            if (auth.match) throw new GitAuthExpiredError('github', auth.status)
             throw error
         }
     }

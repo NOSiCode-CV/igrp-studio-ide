@@ -904,6 +904,7 @@
     "base_url_invalid": "URL base tem que ser um URL http(s) válido",
     "client_id_required": "Client ID é obrigatório",
     "client_secret_required": "Client Secret é obrigatório",
+    "token_expired": "A sessão do {{provider}} expirou. Volte a ligar.",
     "configSaved": "Configuração salva com sucesso",
     "configSaveError": "Falha ao salvar configuração",
     "providerActivated": "Provedor ativado com sucesso",

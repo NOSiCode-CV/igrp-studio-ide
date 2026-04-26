@@ -1,5 +1,6 @@
 import { Gitlab } from '@gitbeaker/rest'
 import type { BrowserWindow } from 'electron'
+import { GitAuthExpiredError, isAuthError } from '../helpers/git-auth/git-auth-errors'
 import { isOnline } from '../helpers/network-utils'
 import type { GitProviderConfig } from '../types'
 import { GitStore } from './git-store'
@@ -41,6 +42,8 @@ export const GitLabService = {
         } catch (error) {
             console.error('Failed to initialize GitLab client:', error)
             gitlab = null
+            const auth = isAuthError(error)
+            if (auth.match) throw new GitAuthExpiredError('gitlab', auth.status)
             throw error
         }
     },
@@ -51,7 +54,13 @@ export const GitLabService = {
         const online = await isOnline()
         if (!online) throw new Error('ERR_INTERNET_DISCONNECTED')
 
-        return gitlab.Users.current()
+        try {
+            return await gitlab.Users.current()
+        } catch (error) {
+            const auth = isAuthError(error)
+            if (auth.match) throw new GitAuthExpiredError('gitlab', auth.status)
+            throw error
+        }
     },
 
     async listIGRPStudioRepositoriesGitlab(_window: BrowserWindow) {
@@ -149,6 +158,8 @@ export const GitLabService = {
             return igrpRepos
         } catch (error) {
             console.error('Error listing GitLab repositories:', error)
+            const auth = isAuthError(error)
+            if (auth.match) throw new GitAuthExpiredError('gitlab', auth.status)
             throw error
         }
     },

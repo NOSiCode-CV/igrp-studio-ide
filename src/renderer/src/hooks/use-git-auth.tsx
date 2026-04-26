@@ -137,8 +137,34 @@ const useGitAuth = () => {
             }
         }
 
+        const onTokenExpired = (
+            _event: any,
+            payload: { providerType: 'github' | 'gitlab'; status: number }
+        ): void => {
+            const { providerType } = payload
+            if (providerType === 'github') {
+                dispatch(setProviderUser({ providerId: 'github', user: null }))
+                dispatch(setProviderRepositories({ providerId: 'github', repositories: [] }))
+            } else if (activeProviderId && activeProviderId !== 'github') {
+                dispatch(setProviderUser({ providerId: activeProviderId, user: null }))
+                dispatch(
+                    setProviderRepositories({
+                        providerId: activeProviderId,
+                        repositories: []
+                    })
+                )
+            }
+            // The application surfaces the toast via use-token-expired-toast
+            // (registered once at the layout level) so consumers that mount
+            // multiple instances of useGitAuth do not see duplicates.
+            window.dispatchEvent(
+                new CustomEvent('git:token-expired', { detail: payload })
+            )
+        }
+
         window.electron.ipcRenderer.on('github-oauth-success', onGitHubOAuthSuccess)
         window.electron.ipcRenderer.on('gitlab-oauth-success', onGitLabOAuthSuccess)
+        window.electron.ipcRenderer.on('git-token-expired', onTokenExpired)
 
         if (!isInitialized) {
             loadGithubData()
@@ -147,6 +173,7 @@ const useGitAuth = () => {
         return () => {
             window.electron.ipcRenderer.removeListener('github-oauth-success', onGitHubOAuthSuccess)
             window.electron.ipcRenderer.removeListener('gitlab-oauth-success', onGitLabOAuthSuccess)
+            window.electron.ipcRenderer.removeListener('git-token-expired', onTokenExpired)
         }
     }, [isInitialized, dispatch, activeProviderId, loadGithubData])
 
