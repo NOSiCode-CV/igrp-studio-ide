@@ -1,3 +1,6 @@
+// Must come first so process.env is populated before any module that reads
+// env vars at top-level evaluation (e.g. git-auth's DEV_PORT capture).
+import './helpers/env'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { exec } from 'child_process'
 import {
