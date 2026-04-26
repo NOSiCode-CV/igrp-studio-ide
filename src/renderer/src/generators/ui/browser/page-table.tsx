@@ -22,6 +22,8 @@ interface PageTableProps {
     handleAddComponents: (page: PageDefinition) => void
     openDialogNewPage: (page?: PageDefinition) => void
     handleDuplicate: (page: PageDefinition) => void
+    handleMove?: (page: PageDefinition) => void
+    handleCreateScopedComponent?: (page: PageDefinition) => void
     setIsSubPage: (isSubPage: boolean) => void
 }
 
@@ -34,6 +36,8 @@ export const PageTable = ({
     handleAddComponents,
     openDialogNewPage,
     handleDuplicate,
+    handleMove,
+    handleCreateScopedComponent,
     setIsSubPage
 }: PageTableProps) => {
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
@@ -161,6 +165,8 @@ export const PageTable = ({
                                             onAddComponents={() => handleAddComponents(page)}
                                             openDialogNewPage={openDialogNewPage}
                                             onDuplicate={handleDuplicate}
+                                            onMove={handleMove}
+                                            onCreateScopedComponent={handleCreateScopedComponent}
                                             setIsSubPage={setIsSubPage}
                                         />
                                     </IGRPTableCellPrimitive>
@@ -212,6 +218,10 @@ export const PageTable = ({
                                                     }
                                                     openDialogNewPage={openDialogNewPage}
                                                     onDuplicate={handleDuplicate}
+                                                    onMove={handleMove}
+                                                    onCreateScopedComponent={
+                                                        handleCreateScopedComponent
+                                                    }
                                                     setIsSubPage={setIsSubPage}
                                                 />
                                             </IGRPTableCellPrimitive>
@@ -264,6 +274,10 @@ export const PageTable = ({
                                                     }
                                                     openDialogNewPage={openDialogNewPage}
                                                     onDuplicate={handleDuplicate}
+                                                    onMove={handleMove}
+                                                    onCreateScopedComponent={
+                                                        handleCreateScopedComponent
+                                                    }
                                                     setIsSubPage={setIsSubPage}
                                                 />
                                             </IGRPTableCellPrimitive>

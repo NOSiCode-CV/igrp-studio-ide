@@ -22,6 +22,7 @@ import { ENV_TYPES } from '@renderer/constants/appConstants'
 import { CreateComponentModal } from '@renderer/generators/ui/browser/components/create-component-modal'
 import { CreatePageModal } from '@renderer/generators/ui/browser/components/create-page-modal'
 import { DuplicatePageModal } from '@renderer/generators/ui/browser/components/duplicate-page-modal'
+import { MovePageModal } from '@renderer/generators/ui/browser/components/move-page-modal'
 import useStudio from '@renderer/hooks/use-studio'
 import ProjectSettings from '@renderer/pages/project'
 import { getFileThree as onGetPages } from '@renderer/redux/thunks'
@@ -64,6 +65,11 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
     const [showformPage, setFormPage] = useState<boolean>(false)
     const [showFormComponent, setFormComponent] = useState(false)
     const [showDuplicateModal, setShowDuplicateModal] = useState<boolean>(false)
+    const [showMoveModal, setShowMoveModal] = useState<boolean>(false)
+    const [pageToMove, setPageToMove] = useState<PageDefinition | undefined>(undefined)
+    const [scopedComponentTarget, setScopedComponentTarget] = useState<
+        PageDefinition | undefined
+    >(undefined)
     const [deleteModal, setDeleteModal] = useState<boolean>(false)
     const [loadingTable, isLoadingTable] = useState<boolean>(true)
     const [searchTerm, setSearchTerm] = useState('')
@@ -87,6 +93,17 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
     const handleDuplicate = (page: PageDefinition): void => {
         setPageToDuplicate(page)
         setShowDuplicateModal(true)
+    }
+
+    const handleMove = (page: PageDefinition): void => {
+        setPageToMove(page)
+        setShowMoveModal(true)
+    }
+
+    const handleCreateScopedComponent = (page: PageDefinition): void => {
+        setScopedComponentTarget(page)
+        setCurrentComponent(undefined)
+        setFormComponent(true)
     }
 
     const confirmDeletion = async (): Promise<void> => {
@@ -115,6 +132,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
         setFormComponent(false)
         setShowDuplicateModal(false)
         setPageToDuplicate(undefined)
+        setScopedComponentTarget(undefined)
         isLoadingTable(true)
 
         // If we were creating a sub-page, open the newly created sub-page
@@ -345,6 +363,10 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                                                 onAddComponents={handleAddComponents}
                                                 onEdit={handleEdit}
                                                 onDuplicate={handleDuplicate}
+                                                onMove={handleMove}
+                                                onCreateScopedComponent={
+                                                    handleCreateScopedComponent
+                                                }
                                                 components={components}
                                                 subPages={subPages}
                                                 openDialogNewPage={openDialogNewPage}
@@ -369,6 +391,8 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                                 handleAddComponents={handleAddComponents}
                                 openDialogNewPage={openDialogNewPage}
                                 handleDuplicate={handleDuplicate}
+                                handleMove={handleMove}
+                                handleCreateScopedComponent={handleCreateScopedComponent}
                                 setIsSubPage={setIsSubPage}
                             />
                         )}
@@ -401,10 +425,25 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
             <CreateComponentModal
                 basePath={basePath}
                 isOpen={showFormComponent}
-                onClose={() => setFormComponent(false)}
+                onClose={() => {
+                    setFormComponent(false)
+                    setScopedComponentTarget(undefined)
+                }}
                 onConfirm={handleNewPage}
                 pageOptions={pageOptions}
                 currentComponent={currentComponent}
+                lockedPage={
+                    scopedComponentTarget
+                        ? {
+                              pageName: scopedComponentTarget.pageName,
+                              path:
+                                  (scopedComponentTarget.content?.path as string | undefined) ??
+                                  scopedComponentTarget.pagePath ??
+                                  '',
+                              description: scopedComponentTarget.description
+                          }
+                        : undefined
+                }
             />
 
             <DuplicatePageModal
@@ -413,6 +452,19 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                 onClose={() => setShowDuplicateModal(false)}
                 onConfirm={handleNewPage}
                 pageToDuplicate={pageToDuplicate}
+            />
+
+            <MovePageModal
+                isOpen={showMoveModal}
+                onClose={() => {
+                    setShowMoveModal(false)
+                    setPageToMove(undefined)
+                }}
+                onConfirm={() => {
+                    isLoadingTable(true)
+                }}
+                page={pageToMove}
+                allPages={tableData.filter((p) => p.isPage)}
             />
 
             <AlertDialogDelete

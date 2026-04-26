@@ -24,6 +24,8 @@ export interface PageCardProps {
     onAddComponents: (page: PageDefinition) => void
     openDialogNewPage?: (page: PageDefinition, isSubPage?: boolean) => void
     onDuplicate?: (page: PageDefinition) => void
+    onCreateScopedComponent?: (page: PageDefinition) => void
+    onMove?: (page: PageDefinition) => void
     setIsSubPage: (isSubPage: boolean) => void
 }
 
@@ -36,6 +38,8 @@ export function PageCardView({
     openDialogNewPage,
     subPages,
     onDuplicate,
+    onCreateScopedComponent,
+    onMove,
     setIsSubPage
 }: PageCardProps) {
     const { isPage, description, pageName, pagePath } = page
@@ -118,6 +122,8 @@ export function PageCardView({
                                     onAddComponents={onAddComponents}
                                     openDialogNewPage={openDialogNewPage}
                                     onDuplicate={onDuplicate}
+                                    onCreateScopedComponent={onCreateScopedComponent}
+                                    onMove={onMove}
                                     setIsSubPage={setIsSubPage}
                                 />
                             </div>

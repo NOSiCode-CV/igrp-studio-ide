@@ -300,3 +300,30 @@ ipcMain.handle(EVENTS.BPMN.GET_SELECTED_PROCESS, async () => {
         return undefined
     }
 })
+
+/**
+ * Update a page's parentName field directly on its `.igrpstudio` JSON.
+ * Used by the Move action in the page browser — the operation is purely
+ * metadata so we skip the engine round-trip and just rewrite the file.
+ */
+ipcMain.handle(
+    'page:set-parent',
+    async (_event, jsonPath: string, parentName: string | null) => {
+        try {
+            const raw = await fs.promises.readFile(jsonPath, 'utf-8')
+            const data = JSON.parse(raw) as Record<string, unknown>
+            if (parentName) data.parentName = parentName
+            else delete data.parentName
+            await fs.promises.writeFile(
+                jsonPath,
+                `${JSON.stringify(data, null, 2)}\n`,
+                'utf-8'
+            )
+            return { success: true as const }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error'
+            console.error('Failed to update page parent:', message)
+            return { success: false as const, error: message }
+        }
+    }
+)

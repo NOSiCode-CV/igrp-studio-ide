@@ -15,9 +15,16 @@ import {
     Folder,
     FolderOpen,
     MoreHorizontal,
+    Move,
+    Plus,
     Trash
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+
+interface PageActionMenuProps extends PageCardProps {
+    onCreateScopedComponent?: (page: PageDefinition) => void
+    onMove?: (page: PageDefinition) => void
+}
 
 export const PageActionMenu = ({
     page,
@@ -26,8 +33,10 @@ export const PageActionMenu = ({
     onAddComponents,
     openDialogNewPage,
     onDuplicate,
+    onCreateScopedComponent,
+    onMove,
     setIsSubPage
-}: PageCardProps) => {
+}: PageActionMenuProps) => {
     const { t } = useTranslation()
     const { isPage } = page
     return (
@@ -55,15 +64,31 @@ export const PageActionMenu = ({
                     {t('addComponents')}
                 </IGRPDropdownMenuItemPrimitive>
                 {isPage && (
-                    <IGRPDropdownMenuItemPrimitive
-                        onSelect={() => {
-                            openDialogNewPage?.(page)
-                            setIsSubPage(true)
-                        }}
-                    >
-                        <Component />
-                        {t('Create SubPage')}
-                    </IGRPDropdownMenuItemPrimitive>
+                    <>
+                        <IGRPDropdownMenuItemPrimitive
+                            onSelect={() => {
+                                openDialogNewPage?.(page)
+                                setIsSubPage(true)
+                            }}
+                        >
+                            <Component />
+                            {t('createSubPage')}
+                        </IGRPDropdownMenuItemPrimitive>
+                        {onCreateScopedComponent && (
+                            <IGRPDropdownMenuItemPrimitive
+                                onSelect={() => onCreateScopedComponent(page)}
+                            >
+                                <Plus />
+                                {t('createScopedComponent')}
+                            </IGRPDropdownMenuItemPrimitive>
+                        )}
+                        {onMove && (
+                            <IGRPDropdownMenuItemPrimitive onSelect={() => onMove(page)}>
+                                <Move />
+                                {t('movePage')}
+                            </IGRPDropdownMenuItemPrimitive>
+                        )}
+                    </>
                 )}
                 <IGRPDropdownMenuItemPrimitive
                     className="text-destructive"

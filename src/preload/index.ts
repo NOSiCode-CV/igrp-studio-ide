@@ -58,6 +58,9 @@ const api = {
     getFileContent: (filePath: string) =>
         ipcRenderer.invoke('igrp-studio:get-file-content', filePath),
 
+    setPageParent: (jsonPath: string, parentName: string | null) =>
+        ipcRenderer.invoke('page:set-parent', jsonPath, parentName),
+
     readDirectory: (basePath: string) => ipcRenderer.invoke('read-directory', basePath),
 
     readProjectFile: (filePath: string) => ipcRenderer.invoke('read-file', filePath),

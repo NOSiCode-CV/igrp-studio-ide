@@ -33,6 +33,10 @@ declare const api: {
     fetchFiles: (basePath: string) => Promise<any>
     getJsonContent: (filePath: string) => Promise<any>
     getFileContent: (filePath: string) => Promise<any>
+    setPageParent: (
+        jsonPath: string,
+        parentName: string | null
+    ) => Promise<{ success: boolean; error?: string }>
     readDirectory: (basePath: string) => Promise<any>
     readProjectFile: (filePath: string) => Promise<any>
     openIDE: ({ basePath, ideType }: { basePath: string; ideType: string }) => Promise<any>

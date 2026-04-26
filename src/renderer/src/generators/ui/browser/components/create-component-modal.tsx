@@ -46,6 +46,12 @@ interface CreateComponentModalProps {
     basePath: string
     pageOptions: any[]
     currentComponent?: PageDefinition
+    /**
+     * When provided, the modal forces the new component to be scoped to
+     * this page (scope='page', pageName/pagePath pre-filled and locked).
+     * The page combobox is hidden so the user cannot accidentally retarget.
+     */
+    lockedPage?: { pageName: string; path: string; description?: string }
     onClose: () => void
     onConfirm: () => void
 }
@@ -56,7 +62,8 @@ export function CreateComponentModal({
     onClose,
     onConfirm,
     pageOptions,
-    currentComponent
+    currentComponent,
+    lockedPage
 }: CreateComponentModalProps): JSX.Element {
     const { t } = useTranslation()
 
@@ -72,7 +79,6 @@ export function CreateComponentModal({
             if (currentComponent?.path) {
                 try {
                     const currentData = await window.api.getJsonContent(currentComponent.path)
-                    console.log('Current component data loaded:', currentData)
                     setFormInitialValues({
                         ...initialValues,
                         ...currentData
@@ -90,13 +96,22 @@ export function CreateComponentModal({
                     ...initialValues,
                     ...currentComponent.content
                 })
+            } else if (lockedPage) {
+                // Scoped-component flow: pre-fill the page binding so the
+                // user only has to provide the component name & icon.
+                setFormInitialValues({
+                    ...initialValues,
+                    scope: 'page',
+                    pageName: lockedPage.pageName,
+                    pagePath: lockedPage.path
+                })
             } else {
                 setFormInitialValues(initialValues)
             }
         }
 
         loadCurrentData()
-    }, [currentComponent, isOpen])
+    }, [currentComponent, isOpen, lockedPage])
 
     useEffect(() => {
         formik.resetForm()
@@ -199,27 +214,35 @@ export function CreateComponentModal({
                                 <IGRPLabelPrimitive htmlFor="Associar">
                                     {t('pages')}
                                 </IGRPLabelPrimitive>
-                                <IGRPCombobox
-                                    name="pagePath"
-                                    className="col-span-3"
-                                    value={formik.values.pagePath || ''}
-                                    options={pageOptions}
-                                    placeholder="Select page"
-                                    helperText={t('componentAssociation')}
-                                    onChange={(selectedValue) => {
-                                        const selected = pageOptions.find(
-                                            (opt) => opt.value === selectedValue
-                                        )
+                                {lockedPage ? (
+                                    <p className="text-sm text-muted-foreground border rounded px-3 py-2 bg-muted/40">
+                                        {t('scoped_to_page', {
+                                            page: lockedPage.description || lockedPage.pageName
+                                        })}
+                                    </p>
+                                ) : (
+                                    <IGRPCombobox
+                                        name="pagePath"
+                                        className="col-span-3"
+                                        value={formik.values.pagePath || ''}
+                                        options={pageOptions}
+                                        placeholder="Select page"
+                                        helperText={t('componentAssociation')}
+                                        onChange={(selectedValue) => {
+                                            const selected = pageOptions.find(
+                                                (opt) => opt.value === selectedValue
+                                            )
 
-                                        // Update all fields at once to avoid double-click issue
-                                        formik.setValues({
-                                            ...formik.values,
-                                            pagePath: selected?.path || undefined,
-                                            pageName: selected?.value || undefined,
-                                            scope: selectedValue ? 'page' : 'app'
-                                        })
-                                    }}
-                                />
+                                            // Update all fields at once to avoid double-click issue
+                                            formik.setValues({
+                                                ...formik.values,
+                                                pagePath: selected?.path || undefined,
+                                                pageName: selected?.value || undefined,
+                                                scope: selectedValue ? 'page' : 'app'
+                                            })
+                                        }}
+                                    />
+                                )}
                             </div>
                             <div className="flex-1 overflow-hidden">
                                 <IconBrowser
