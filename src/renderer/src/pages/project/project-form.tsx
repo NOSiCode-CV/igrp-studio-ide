@@ -83,6 +83,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             framework: 'springboot',
             config: {},
             path: '',
+            storageMode: 'managed',
             themeColor: '#000000',
             icon: '',
             workspaceId: workspace.id
@@ -308,6 +309,11 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     }, [])
 
     React.useEffect(() => {
+        // Only auto-compute the path while the project is managed by the
+        // workspace. In linked mode the user picks the location via the
+        // Browse button, so we must not overwrite their selection.
+        if (formik.values.storageMode === 'linked') return
+
         const targetPath = `${workspace.path}/projects/${
             formik.values?.config?.name ?? formik.values.name
         }`
@@ -320,6 +326,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         formik.values?.config?.name,
         formik.values.name,
         formik.values.path,
+        formik.values.storageMode,
         workspace.path
     ])
 
@@ -566,6 +573,46 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 </div>
 
                 <div className="space-y-2">
+                    <IGRPLabelPrimitive>{t('projectLocation')}</IGRPLabelPrimitive>
+                    <IGRPRadioGroupPrimitive
+                        value={formik.values.storageMode ?? 'managed'}
+                        onValueChange={(value) => {
+                            formik.setFieldValue('storageMode', value)
+                            // Switching back to managed clears any custom
+                            // path so the auto-compute effect can take
+                            // over again on the next render.
+                            if (value === 'managed') {
+                                formik.setFieldValue('path', '')
+                            }
+                        }}
+                        className="grid grid-cols-2 gap-2"
+                    >
+                        <label className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40">
+                            <IGRPRadioGroupItemPrimitive value="managed" id="storage-managed" />
+                            <div className="space-y-0.5">
+                                <p className="text-sm font-medium">
+                                    {t('projectLocationManaged')}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    {t('projectLocationManagedHint')}
+                                </p>
+                            </div>
+                        </label>
+                        <label className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40">
+                            <IGRPRadioGroupItemPrimitive value="linked" id="storage-linked" />
+                            <div className="space-y-0.5">
+                                <p className="text-sm font-medium">
+                                    {t('projectLocationLinked')}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    {t('projectLocationLinkedHint')}
+                                </p>
+                            </div>
+                        </label>
+                    </IGRPRadioGroupPrimitive>
+                </div>
+
+                <div className="space-y-2">
                     <IGRPLabelPrimitive htmlFor="path">{t('projectDirectory')}</IGRPLabelPrimitive>
                     <div className="flex gap-2">
                         <IGRPInputPrimitive
@@ -575,7 +622,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             placeholder={t('enterProjectDirectory')}
-                            readOnly
+                            readOnly={formik.values.storageMode !== 'linked'}
                         />
                         <IGRPButtonPrimitive
                             variant="outline"
@@ -585,7 +632,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 e.preventDefault()
                                 handleOpenDirectory()
                             }}
-                            disabled
+                            disabled={formik.values.storageMode !== 'linked'}
                         >
                             <FolderOpen className="h-4 w-4" />
                         </IGRPButtonPrimitive>
