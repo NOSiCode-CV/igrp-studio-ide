@@ -26,6 +26,7 @@ import {
     readIgrpStudioDirectory,
     readProjectFile
 } from './helpers'
+import { buildGitAuth, getProviderConfigById } from './helpers/git-auth/git-auth-factory'
 import { githubAuth } from './helpers/git-auth/github-auth'
 import { gitlabAuth } from './helpers/git-auth/gitlab-auth'
 import { initMainSentryEarly, initializeLogger, sendErrorReport } from './helpers/logger'
@@ -64,6 +65,13 @@ const ptySessions = new Map<string, pty.IPty>()
 
 let nextJsManager: NextJsManager
 let currentAuthProvider: 'github' | 'gitlab' | null = null
+/**
+ * Tracks the GitAuth instance that initiated the in-flight OAuth flow.
+ * When set it is used to handle the protocol callback so dynamic configs
+ * (e.g. GitHub Enterprise instances saved via the UI) can complete the
+ * round-trip alongside the env-based singletons.
+ */
+let activeAuthInstance: import('./helpers/git-auth/git-auth').GitAuth | null = null
 
 dotenv.config()
 
@@ -199,16 +207,16 @@ app.whenReady().then(async () => {
                     mainWindow.focus()
 
                     if (url.includes('oauth/callback')) {
-                        if (currentAuthProvider === 'github') {
+                        if (activeAuthInstance) {
+                            activeAuthInstance.handleProtocolCallback(url, mainWindow)
+                        } else if (currentAuthProvider === 'github') {
                             githubAuth.handleProtocolCallback(url, mainWindow)
                         } else if (currentAuthProvider === 'gitlab') {
                             gitlabAuth.handleProtocolCallback(url, mainWindow)
-                        } else {
-                            if (url.includes('github')) {
-                                githubAuth.handleProtocolCallback(url, mainWindow)
-                            } else if (url.includes('gitlab')) {
-                                gitlabAuth.handleProtocolCallback(url, mainWindow)
-                            }
+                        } else if (url.includes('github')) {
+                            githubAuth.handleProtocolCallback(url, mainWindow)
+                        } else if (url.includes('gitlab')) {
+                            gitlabAuth.handleProtocolCallback(url, mainWindow)
                         }
                     }
                 }
@@ -217,7 +225,9 @@ app.whenReady().then(async () => {
             if (process.argv.length > 1) {
                 const url = process.argv[process.argv.length - 1]
                 if (url.startsWith('igrp-studio://')) {
-                    if (url.includes('github')) {
+                    if (activeAuthInstance) {
+                        activeAuthInstance.handleProtocolCallback(url, mainWindow)
+                    } else if (url.includes('github')) {
                         githubAuth.handleProtocolCallback(url, mainWindow)
                     } else if (url.includes('gitlab')) {
                         gitlabAuth.handleProtocolCallback(url, mainWindow)
@@ -305,27 +315,42 @@ app.whenReady().then(async () => {
     }
     await initializeAllServices()
 
-    ipcMain.on('github-oauth', async () => {
+    ipcMain.on('github-oauth', async (_event, configId?: string) => {
         const isDev = process.env.VITE_NODE_ENV === 'development'
         try {
-            currentAuthProvider = 'github' // Add this line
-            await githubAuth.setupOAuth(mainWindow, isDev)
+            currentAuthProvider = 'github'
+            const auth = configId
+                ? (() => {
+                      const cfg = getProviderConfigById(configId)
+                      return cfg ? buildGitAuth(cfg) : githubAuth
+                  })()
+                : githubAuth
+            activeAuthInstance = auth
+            await auth.setupOAuth(mainWindow, isDev)
         } catch (error: unknown) {
             console.error('GitHub OAuth failed:', error)
-            currentAuthProvider = null // Add this line
+            currentAuthProvider = null
+            activeAuthInstance = null
         }
     })
 
     // GitLab handler
-    ipcMain.on('gitlab-oauth', async () => {
+    ipcMain.on('gitlab-oauth', async (_event, configId?: string) => {
         const isDev = process.env.VITE_NODE_ENV === 'development'
-        console.log('isDev', isDev)
         try {
-            currentAuthProvider = 'gitlab' // Add this line
-            await gitlabAuth.setupOAuth(mainWindow, isDev)
+            currentAuthProvider = 'gitlab'
+            const auth = configId
+                ? (() => {
+                      const cfg = getProviderConfigById(configId)
+                      return cfg ? buildGitAuth(cfg) : gitlabAuth
+                  })()
+                : gitlabAuth
+            activeAuthInstance = auth
+            await auth.setupOAuth(mainWindow, isDev)
         } catch (error: unknown) {
             console.error('GitLab OAuth failed:', error)
-            currentAuthProvider = null // Add this line
+            currentAuthProvider = null
+            activeAuthInstance = null
         }
     })
 
@@ -532,7 +557,10 @@ app.on('open-url', (event, url) => {
 
     if (mainWindow) {
         if (url.includes('oauth/callback')) {
-            if (currentAuthProvider === 'github') {
+            if (activeAuthInstance) {
+                console.log('Processing OAuth callback via active auth instance')
+                activeAuthInstance.handleProtocolCallback(url, mainWindow)
+            } else if (currentAuthProvider === 'github') {
                 console.log('Processing GitHub callback')
                 githubAuth.handleProtocolCallback(url, mainWindow)
             } else if (currentAuthProvider === 'gitlab') {
@@ -540,7 +568,6 @@ app.on('open-url', (event, url) => {
                 gitlabAuth.handleProtocolCallback(url, mainWindow)
             } else {
                 console.error('Received OAuth callback but no active provider is set')
-                // Try to guess based on URL
                 if (url.includes('github')) {
                     githubAuth.handleProtocolCallback(url, mainWindow)
                 } else if (url.includes('gitlab')) {

@@ -6,18 +6,24 @@ import { GitLabService } from '../services/gitlab-service'
 import type { GitProviderConfig } from '../types'
 
 // GitHub
-ipcMain.handle('gitauth-initialize', async (_event, token) => {
-    try {
-        await GitHubService.initialize(token)
-        await GitLabService.initialize(token)
-        GitStore.setToken('github', token)
-        GitStore.setToken('gitlab', token)
-        return true
-    } catch (error) {
-        console.error('GitAuth initialization failed:', error)
-        throw error
+ipcMain.handle(
+    'gitauth-initialize',
+    async (_event, token: string, baseUrl?: string) => {
+        try {
+            // GitAuth.handleAuthSuccess already initialised the matching
+            // service with the right baseUrl. This handler exists so the
+            // renderer can re-establish state after a reload; we forward
+            // the baseUrl so a previously-configured Enterprise instance
+            // is not silently downgraded to github.com.
+            await GitHubService.initialize(token, baseUrl)
+            GitStore.setToken('github', token)
+            return true
+        } catch (error) {
+            console.error('GitAuth initialization failed:', error)
+            throw error
+        }
     }
-})
+)
 ipcMain.handle('logout-github', async () => {
     return GitStore.logoutGithub()
 })

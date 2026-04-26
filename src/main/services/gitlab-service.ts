@@ -21,11 +21,18 @@ export const GitLabService = {
         return false
     },
 
-    async initialize(token: string) {
+    /**
+     * @param token   OAuth access token
+     * @param baseUrl Optional GitLab host (e.g. https://git.nosi.cv).
+     *                When omitted falls back to VITE_GITLAB_HOST env var
+     *                (kept for backwards compatibility with the singleton).
+     */
+    async initialize(token: string, baseUrl?: string) {
         try {
+            const host = baseUrl || process.env.VITE_GITLAB_HOST
             gitlab = new Gitlab({
                 oauthToken: token,
-                host: process.env.VITE_GITLAB_HOST
+                host
             })
 
             GitStore.setToken('gitlab', token)

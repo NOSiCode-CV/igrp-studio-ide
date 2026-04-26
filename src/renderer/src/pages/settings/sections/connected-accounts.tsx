@@ -11,16 +11,26 @@ import { Github, Gitlab, Plus, Settings, Trash2 } from 'lucide-react'
 import { type ReactNode, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-// Componente para o formulário de configuração GitLab
-function GitLabConfigForm({
-    config,
-    onSave,
-    onCancel
-}: {
-    config: GitLabProvider
-    onSave: (config: GitLabProvider) => void
+type ProviderType = 'github' | 'gitlab'
+
+interface ProviderConfig {
+    id: string
+    type: ProviderType
+    name: string
+    baseUrl: string
+    clientId: string
+    clientSecret: string
+    active: boolean
+    isDefault?: boolean
+}
+
+interface ProviderConfigFormProps {
+    config: ProviderConfig
+    onSave: (config: ProviderConfig) => void
     onCancel: () => void
-}): React.ReactNode {
+}
+
+function ProviderConfigForm({ config, onSave, onCancel }: ProviderConfigFormProps): React.ReactNode {
     const { t } = useTranslation()
     const [name, setName] = useState(config.name)
     const [baseUrl, setBaseUrl] = useState(config.baseUrl)
@@ -34,6 +44,8 @@ function GitLabConfigForm({
         setClientSecret(config.clientSecret)
     }, [config])
 
+    const isGitHub = config.type === 'github'
+
     const handleSave = (): void => {
         onSave({ ...config, name, baseUrl, clientId, clientSecret })
     }
@@ -41,22 +53,32 @@ function GitLabConfigForm({
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('custom_gitlab_name')}</IGRPLabelPrimitive>
+                <IGRPLabelPrimitive>
+                    {isGitHub ? t('custom_github_name') : t('custom_gitlab_name')}
+                </IGRPLabelPrimitive>
                 <IGRPInputPrimitive
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder={t('custom_gitlab_name_placeholder')}
+                    placeholder={
+                        isGitHub
+                            ? t('custom_github_name_placeholder')
+                            : t('custom_gitlab_name_placeholder')
+                    }
                     className="input"
                 />
             </div>
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('gitlab_base_url')}</IGRPLabelPrimitive>
+                <IGRPLabelPrimitive>
+                    {isGitHub ? t('github_base_url') : t('gitlab_base_url')}
+                </IGRPLabelPrimitive>
                 <IGRPInputPrimitive
                     type="text"
                     value={baseUrl}
                     onChange={(e) => setBaseUrl(e.target.value)}
-                    placeholder="https://gitlab.example.com"
+                    placeholder={
+                        isGitHub ? 'https://github.example.com' : 'https://gitlab.example.com'
+                    }
                     className="input"
                 />
             </div>
@@ -192,17 +214,69 @@ export function ConnectedAccountsSettings(): React.ReactNode {
 
     const { showSuccessToast, showErrorToast } = useToast()
 
-    const [isGitLabConfigVisible, setIsGitLabConfigVisible] = useState(false)
-    const [editingProvider, setEditingProvider] = useState<GitLabProvider | null>(null)
+    const [editingConfig, setEditingConfig] = useState<ProviderConfig | null>(null)
+    const [formType, setFormType] = useState<ProviderType | null>(null)
+    const [githubConfigs, setGithubConfigs] = useState<ProviderConfig[]>([])
 
-    const handleGitLabConfigSave = async (config: GitLabProvider): Promise<void> => {
-        const response = await saveGitlabConfig(config)
-        if (response.success) {
-            showSuccessToast(t('configSaved'))
-            setIsGitLabConfigVisible(false)
-            setEditingProvider(null)
-        } else {
+    const loadGithubConfigs = async (): Promise<void> => {
+        try {
+            const configs = (await window.electron.ipcRenderer.invoke(
+                'git-provider:list-configs',
+                'github'
+            )) as ProviderConfig[]
+            setGithubConfigs(configs ?? [])
+        } catch (error) {
+            console.error('Failed to load GitHub provider configs:', error)
+        }
+    }
+
+    useEffect(() => {
+        getGitlabConfig()
+        loadGithubConfigs()
+    }, [])
+
+    const handleSaveConfig = async (config: ProviderConfig): Promise<void> => {
+        try {
+            if (config.type === 'gitlab') {
+                const response = await saveGitlabConfig(config as unknown as GitLabProvider)
+                if (response.success) {
+                    showSuccessToast(t('configSaved'))
+                    closeForm()
+                } else {
+                    showErrorToast(t('configSaveError'))
+                }
+            } else {
+                await window.electron.ipcRenderer.invoke('git-provider:save-config', config)
+                showSuccessToast(t('configSaved'))
+                await loadGithubConfigs()
+                closeForm()
+            }
+        } catch (error) {
+            console.error('Failed to save provider config:', error)
             showErrorToast(t('configSaveError'))
+        }
+    }
+
+    const handleDeleteConfig = async (
+        id: string,
+        type: ProviderType
+    ): Promise<void> => {
+        try {
+            if (type === 'gitlab') {
+                const response = await handleRemoveGitLabProvider(id)
+                if (response.success) {
+                    showSuccessToast(t('providerDeleted'))
+                } else {
+                    showErrorToast(t('providerDeleteError'))
+                }
+            } else {
+                await window.electron.ipcRenderer.invoke('git-provider:remove-config', id)
+                showSuccessToast(t('providerDeleted'))
+                await loadGithubConfigs()
+            }
+        } catch (error) {
+            console.error('Failed to delete provider config:', error)
+            showErrorToast(t('providerDeleteError'))
         }
     }
 
@@ -211,27 +285,45 @@ export function ConnectedAccountsSettings(): React.ReactNode {
         showSuccessToast(t('providerActivated'))
     }
 
-    const handleDeleteProvider = async (providerId: string) => {
-        const response = await handleRemoveGitLabProvider(providerId)
-        if (response.success) {
-            showSuccessToast(t('providerDeleted'))
-        } else {
-            showErrorToast(t('providerDeleteError'))
-        }
+    const handleEditProvider = (
+        provider: GitLabProvider | ProviderConfig,
+        type: ProviderType
+    ): void => {
+        setEditingConfig({
+            id: provider.id,
+            type,
+            name: provider.name,
+            baseUrl: provider.baseUrl,
+            clientId: provider.clientId,
+            clientSecret: provider.clientSecret,
+            active: !!provider.active,
+            isDefault: provider.isDefault
+        })
+        setFormType(type)
     }
 
-    const handleEditProvider = (provider: GitLabProvider): void => {
-        setEditingProvider(provider)
-        setIsGitLabConfigVisible(true)
+    const openAddForm = (type: ProviderType): void => {
+        setEditingConfig(null)
+        setFormType(formType === type ? null : type)
     }
+
+    const closeForm = (): void => {
+        setEditingConfig(null)
+        setFormType(null)
+    }
+
+    const blankConfig = (type: ProviderType): ProviderConfig => ({
+        id: nanoid(),
+        type,
+        name: '',
+        baseUrl: '',
+        clientId: '',
+        clientSecret: '',
+        active: false,
+        isDefault: false
+    })
 
     const isGithubConnected = activeProviderId === 'github' && !!activeProvider?.user
-    /*  const isGitLabConnected =
-        activeProviderId !== 'github' && !!activeProvider?.user;
- */
-    useEffect(() => {
-        getGitlabConfig()
-    }, [])
 
     return (
         <div>
@@ -243,7 +335,7 @@ export function ConnectedAccountsSettings(): React.ReactNode {
             </div>
 
             <div className="space-y-4">
-                {/* GitHub Account */}
+                {/* Default GitHub */}
                 <Account
                     name="github"
                     icon={<Github size={20} />}
@@ -252,6 +344,24 @@ export function ConnectedAccountsSettings(): React.ReactNode {
                     action={isGithubConnected ? logoutGithub : loginGithub}
                     onActivate={() => handleActivateProvider('github')}
                 />
+
+                {/* Custom GitHub instances (e.g. GitHub Enterprise) */}
+                {githubConfigs.map((provider) => (
+                    <Account
+                        key={provider.id}
+                        name={provider.name}
+                        icon={<Github size={20} />}
+                        connected={activeProviderId === provider.id && !!activeProvider?.user}
+                        isActive={activeProviderId === provider.id}
+                        isDefault={false}
+                        isConfigured={!!provider.clientId && !!provider.clientSecret}
+                        action={() =>
+                            window.electron.ipcRenderer.send('github-oauth', provider.id)
+                        }
+                        onEdit={() => handleEditProvider(provider, 'github')}
+                        onDelete={() => handleDeleteConfig(provider.id, 'github')}
+                    />
+                ))}
 
                 {/* GitLab Providers */}
                 {gitLabProviders.map((provider) => (
@@ -269,47 +379,38 @@ export function ConnectedAccountsSettings(): React.ReactNode {
                                 : () => loginGitLab(provider.id)
                         }
                         onActivate={() => handleActivateProvider(provider.id)}
-                        onEdit={() => handleEditProvider(provider)}
-                        onDelete={() => handleDeleteProvider(provider.id)}
+                        onEdit={() => handleEditProvider(provider, 'gitlab')}
+                        onDelete={() => handleDeleteConfig(provider.id, 'gitlab')}
                     />
                 ))}
 
-                {/* GitLab Configuration Form */}
-                {isGitLabConfigVisible && (
+                {/* Provider Configuration Form */}
+                {formType && (
                     <div className="mt-4 p-4 border rounded bg-gray-50">
                         <h3 className="text-md font-medium mb-4">
-                            {editingProvider ? t('edit_gitlab_config') : t('add_gitlab_config')}
+                            {editingConfig
+                                ? formType === 'github'
+                                    ? t('edit_github_config')
+                                    : t('edit_gitlab_config')
+                                : formType === 'github'
+                                  ? t('add_github_config')
+                                  : t('add_gitlab_config')}
                         </h3>
-                        <GitLabConfigForm
-                            config={
-                                editingProvider || {
-                                    id: nanoid(),
-                                    name: '',
-                                    baseUrl: '',
-                                    clientId: '',
-                                    clientSecret: '',
-                                    active: false,
-                                    isDefault: false
-                                }
-                            }
-                            onSave={handleGitLabConfigSave}
-                            onCancel={() => {
-                                setIsGitLabConfigVisible(false)
-                                setEditingProvider(null)
-                            }}
+                        <ProviderConfigForm
+                            config={editingConfig ?? blankConfig(formType)}
+                            onSave={handleSaveConfig}
+                            onCancel={closeForm}
                         />
                     </div>
                 )}
 
-                {/* Add GitLab Button */}
-                <div className="pt-2">
-                    <IGRPButtonPrimitive
-                        variant="outline"
-                        onClick={() => {
-                            setEditingProvider(null)
-                            setIsGitLabConfigVisible(!isGitLabConfigVisible)
-                        }}
-                    >
+                {/* Add Provider Buttons */}
+                <div className="pt-2 flex flex-wrap gap-2">
+                    <IGRPButtonPrimitive variant="outline" onClick={() => openAddForm('github')}>
+                        <Plus size={16} className="mr-2" />
+                        {t('add_github')}
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive variant="outline" onClick={() => openAddForm('gitlab')}>
                         <Plus size={16} className="mr-2" />
                         {t('add_gitlab')}
                     </IGRPButtonPrimitive>

@@ -115,7 +115,11 @@ const useGitAuth = () => {
 
     useEffect(() => {
         const onGitHubOAuthSuccess = async (_event: any, data: any): Promise<void> => {
-            await window.electron.ipcRenderer.invoke('gitauth-initialize', data.access_token)
+            await window.electron.ipcRenderer.invoke(
+                'gitauth-initialize',
+                data.access_token,
+                data.baseUrl
+            )
             dispatch(setActiveProvider('github'))
             await loadGithubData()
         }

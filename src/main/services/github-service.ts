@@ -4,6 +4,20 @@ import { GitStore } from './git-store'
 
 let octokit: any = null
 
+const DEFAULT_GITHUB_HOST = 'https://github.com'
+
+/**
+ * Derive the Octokit `baseUrl` (REST API host) from a GitHub web host.
+ *  - https://github.com           -> https://api.github.com
+ *  - https://github.example.com   -> https://github.example.com/api/v3
+ */
+function deriveApiUrl(webHost?: string): string | undefined {
+    if (!webHost) return undefined
+    const host = webHost.replace(/\/+$/, '')
+    if (host === DEFAULT_GITHUB_HOST) return 'https://api.github.com'
+    return `${host}/api/v3`
+}
+
 export const GitHubService = {
     async initializeServices() {
         try {
@@ -19,12 +33,18 @@ export const GitHubService = {
         return false
     },
 
-    async initialize(token: string) {
+    /**
+     * @param token  OAuth access token
+     * @param baseUrl Optional GitHub host (e.g. https://github.example.com).
+     *                Pass it for GitHub Enterprise; omit for github.com.
+     */
+    async initialize(token: string, baseUrl?: string) {
         try {
             const online = await isOnline()
             if (!online) return false
             const { Octokit } = await import('@octokit/rest')
-            octokit = new Octokit({ auth: token })
+            const apiUrl = deriveApiUrl(baseUrl)
+            octokit = new Octokit(apiUrl ? { auth: token, baseUrl: apiUrl } : { auth: token })
             await octokit.users.getAuthenticated()
             return true
         } catch (error) {
