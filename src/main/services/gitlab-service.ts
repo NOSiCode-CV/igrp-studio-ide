@@ -156,5 +156,9 @@ export const GitLabService = {
 
     async setActiveGitlabConfig(id: string) {
         GitStore.setActiveGitlabConfig(id)
+    },
+
+    async removeGitlabConfig(id: string) {
+        GitStore.removeGitlabConfig(id)
     }
 }

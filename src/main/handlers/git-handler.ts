@@ -130,10 +130,14 @@ ipcMain.handle('is-auto-commit', async () => {
 ipcMain.handle('get-gitlab-config', async () => {
     return GitLabService.getGitlabConfigs()
 })
-ipcMain.handle('set-ative-gitlab-config', async (_event, id: string): Promise<void> => {
+ipcMain.handle('set-active-gitlab-config', async (_event, id: string): Promise<void> => {
     return GitLabService.setActiveGitlabConfig(id)
 })
 
 ipcMain.handle('save-gitlab-config', async (_event, config: GitProviderConfig) => {
     return GitLabService.saveGitlabConfig(config)
+})
+
+ipcMain.handle('remove-gitlab-config', async (_event, id: string): Promise<void> => {
+    return GitLabService.removeGitlabConfig(id)
 })
