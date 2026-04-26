@@ -58,7 +58,7 @@ import {
 import type { JSX } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { IWorkspace, ServiceInfo } from 'src/main/types'
-import { ConfigurationDialog } from './components/configuration-dialog'
+import { ConfigurationDialog } from '../components/configuration-dialog'
 
 // Custom Node Components
 interface ServiceNodeData {

@@ -19,7 +19,7 @@ import { springEngineChangelog } from '@renderer/components/version-alert-resume
 import { useGit } from '@renderer/hooks/use-git'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
-import { ProjectConfigForm } from '@renderer/pages/project'
+import { ProjectConfigForm } from '@renderer/pages/project/project-form'
 import Dependency from '@renderer/pages/workspaces/components/dependency'
 import type { RootState } from '@renderer/redux'
 import { Check, Copy, GitBranch, GitBranchIcon, Package, Server } from 'lucide-react'

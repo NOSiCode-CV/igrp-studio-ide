@@ -12,7 +12,7 @@ import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { baseColors } from './base-color'
+import { baseColors } from '../base-color'
 
 export function AppearanceSettings() {
     const { t } = useTranslation()

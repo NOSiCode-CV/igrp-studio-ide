@@ -31,11 +31,11 @@ import { ROUTES } from '@renderer/routes/routeConstants'
 import { Bell, Globe, Home, Keyboard, Link, Settings, Shirt } from 'lucide-react'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { AboutSettings } from './about-settings'
-import { AppearanceSettings } from './appearance'
-import { ConnectedAccountsSettings } from './connected-accounts-settings'
-import KeyboardShortcuts from './keyboard-shortcuts'
-import { LanguageSettings } from './language-settings'
+import { AboutSettings } from './sections/about'
+import { AppearanceSettings } from './sections/appearance'
+import { ConnectedAccountsSettings } from './sections/connected-accounts'
+import KeyboardShortcuts from './sections/keyboard-shortcuts'
+import { LanguageSettings } from './sections/language'
 
 const data = {
     nav: [

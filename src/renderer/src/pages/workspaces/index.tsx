@@ -24,7 +24,7 @@ import { SearchInput, SubHeadline } from '@renderer/components/shared-ui'
 import { useDocker } from '@renderer/hooks/use-docker'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
-import { ProjectWizard } from '@renderer/pages/project'
+import { ProjectWizard } from '@renderer/pages/project/project-form'
 import { getId } from '@renderer/utils'
 import {
     EllipsisVertical,
