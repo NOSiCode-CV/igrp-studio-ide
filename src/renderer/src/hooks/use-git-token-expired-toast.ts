@@ -1,46 +1,93 @@
-import { useEffect } from 'react'
+import {
+    setActiveProvider,
+    setProviderRepositories,
+    setProviderUser
+} from '@renderer/redux/git/reducer'
+import { selectActiveProviderId } from '@renderer/redux/git/selectors'
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import useToast from './useToast'
 
-interface TokenExpiredDetail {
+interface TokenExpiredPayload {
     providerType: 'github' | 'gitlab'
     status: number
 }
 
-interface RateLimitedDetail {
+interface RateLimitedPayload {
     providerType: 'github' | 'gitlab'
 }
 
+const DEDUPE_WINDOW_MS = 5_000
+
 /**
- * Surfaces toasts when any git provider reports an expired token or a
- * rate-limit hit. Mount once near the application root (e.g. inside the
- * layout) — the underlying CustomEvents are dispatched by the
- * useGitAuth hook so this stays decoupled from how many useGitAuth
- * instances exist.
+ * Single owner of the git-* IPC error broadcasts.
+ *
+ * Mount once near the application root (MainLayout) so:
+ *  - a renderer-side dedupe window collapses bursts of token-expired /
+ *    rate-limited events fired by main when several IPC calls (user
+ *    info + repositories, etc.) happen back-to-back;
+ *  - the toast surfaces exactly once per provider per burst;
+ *  - Redux cleanup runs once.
+ *
+ * Previously this hook only owned the toast and useGitAuth forwarded
+ * IPC events through a window CustomEvent. Each useGitAuth instance
+ * dispatched the same event so consumers saw N toasts.
  */
 export function useGitTokenExpiredToast(): void {
     const { t } = useTranslation()
     const { showErrorToast } = useToast()
+    const dispatch = useDispatch()
+    const activeProviderId = useSelector(selectActiveProviderId)
+    const lastFiredRef = useRef<Map<string, number>>(new Map())
 
     useEffect(() => {
         const labelFor = (type: 'github' | 'gitlab'): string =>
             type === 'github' ? 'GitHub' : 'GitLab'
 
-        const onExpired = (event: Event): void => {
-            const detail = (event as CustomEvent<TokenExpiredDetail>).detail
-            showErrorToast(t('token_expired', { provider: labelFor(detail.providerType) }))
+        const shouldFire = (key: string): boolean => {
+            const now = Date.now()
+            const last = lastFiredRef.current.get(key) ?? 0
+            if (now - last < DEDUPE_WINDOW_MS) return false
+            lastFiredRef.current.set(key, now)
+            return true
         }
 
-        const onRateLimited = (event: Event): void => {
-            const detail = (event as CustomEvent<RateLimitedDetail>).detail
-            showErrorToast(t('rate_limited', { provider: labelFor(detail.providerType) }))
+        const onTokenExpired = (_event: any, payload: TokenExpiredPayload): void => {
+            if (!payload?.providerType) return
+            if (!shouldFire(`expired:${payload.providerType}`)) return
+
+            const { providerType } = payload
+            if (providerType === 'github') {
+                dispatch(setProviderUser({ providerId: 'github', user: null }))
+                dispatch(setProviderRepositories({ providerId: 'github', repositories: [] }))
+            } else if (activeProviderId && activeProviderId !== 'github') {
+                dispatch(setProviderUser({ providerId: activeProviderId, user: null }))
+                dispatch(
+                    setProviderRepositories({
+                        providerId: activeProviderId,
+                        repositories: []
+                    })
+                )
+            }
+            dispatch(setActiveProvider(null))
+
+            showErrorToast(t('token_expired', { provider: labelFor(providerType) }))
         }
 
-        window.addEventListener('git:token-expired', onExpired)
-        window.addEventListener('git:rate-limited', onRateLimited)
+        const onRateLimited = (_event: any, payload: RateLimitedPayload): void => {
+            if (!payload?.providerType) return
+            if (!shouldFire(`rate:${payload.providerType}`)) return
+
+            showErrorToast(t('rate_limited', { provider: labelFor(payload.providerType) }))
+        }
+
+        window.electron.ipcRenderer.on('git-token-expired', onTokenExpired)
+        window.electron.ipcRenderer.on('git-rate-limited', onRateLimited)
+
         return () => {
-            window.removeEventListener('git:token-expired', onExpired)
-            window.removeEventListener('git:rate-limited', onRateLimited)
+            window.electron.ipcRenderer.removeListener('git-token-expired', onTokenExpired)
+            window.electron.ipcRenderer.removeListener('git-rate-limited', onRateLimited)
         }
-    }, [showErrorToast, t])
+    }, [activeProviderId, dispatch, showErrorToast, t])
 }
