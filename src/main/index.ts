@@ -30,6 +30,7 @@ import { buildGitAuth, getProviderConfigById } from './helpers/git-auth/git-auth
 import { githubAuth } from './helpers/git-auth/github-auth'
 import { gitlabAuth } from './helpers/git-auth/gitlab-auth'
 import { initMainSentryEarly, initializeLogger, sendErrorReport } from './helpers/logger'
+import { registerPowerRecovery } from './helpers/power-recovery'
 import { closeApp, installExtensions } from './helpers/utils'
 import { GitStore } from './services/git-store'
 import { GitHubService } from './services/github-service'
@@ -355,6 +356,7 @@ app.whenReady().then(async () => {
     })
 
     createWindow()
+    registerPowerRecovery()
 
     app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
