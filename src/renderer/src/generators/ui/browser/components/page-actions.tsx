@@ -59,9 +59,12 @@ export const PageActionMenu = ({
                     <Copy />
                     {t('duplicate')}
                 </IGRPDropdownMenuItemPrimitive>
-                <IGRPDropdownMenuItemPrimitive onClick={() => onAddComponents(page)}>
+                <IGRPDropdownMenuItemPrimitive
+                    onClick={() => onAddComponents(page)}
+                    className="text-primary font-medium"
+                >
                     <Component />
-                    {t('addComponents')}
+                    {t('openEditor')}
                 </IGRPDropdownMenuItemPrimitive>
                 {isPage && (
                     <>

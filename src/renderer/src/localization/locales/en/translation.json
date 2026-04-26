@@ -910,6 +910,7 @@
     "rate_limited": "{{provider}} rate limit reached. Please try again in a few minutes.",
     "createSubPage": "Create SubPage",
     "createScopedComponent": "Create scoped component",
+    "openEditor": "Open editor",
     "movePage": "Move…",
     "move": "Move",
     "move_page_title": "Move page",

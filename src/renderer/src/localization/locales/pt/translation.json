@@ -908,6 +908,7 @@
     "rate_limited": "Limite de pedidos do {{provider}} atingido. Tente novamente daqui a alguns minutos.",
     "createSubPage": "Criar Sub-página",
     "createScopedComponent": "Criar componente da página",
+    "openEditor": "Abrir editor",
     "movePage": "Mover…",
     "move": "Mover",
     "move_page_title": "Mover página",
