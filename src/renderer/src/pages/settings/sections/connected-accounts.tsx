@@ -30,24 +30,68 @@ interface ProviderConfigFormProps {
     onCancel: () => void
 }
 
+interface FormErrors {
+    name?: string
+    baseUrl?: string
+    clientId?: string
+    clientSecret?: string
+}
+
+function isHttpUrl(value: string): boolean {
+    try {
+        const url = new URL(value)
+        return url.protocol === 'http:' || url.protocol === 'https:'
+    } catch {
+        return false
+    }
+}
+
+function validateForm(values: {
+    name: string
+    baseUrl: string
+    clientId: string
+    clientSecret: string
+}): FormErrors {
+    const errors: FormErrors = {}
+    if (!values.name.trim()) errors.name = 'name_required'
+    if (!values.baseUrl.trim()) errors.baseUrl = 'base_url_required'
+    else if (!isHttpUrl(values.baseUrl)) errors.baseUrl = 'base_url_invalid'
+    if (!values.clientId.trim()) errors.clientId = 'client_id_required'
+    if (!values.clientSecret.trim()) errors.clientSecret = 'client_secret_required'
+    return errors
+}
+
 function ProviderConfigForm({ config, onSave, onCancel }: ProviderConfigFormProps): React.ReactNode {
     const { t } = useTranslation()
     const [name, setName] = useState(config.name)
     const [baseUrl, setBaseUrl] = useState(config.baseUrl)
     const [clientId, setClientId] = useState(config.clientId)
     const [clientSecret, setClientSecret] = useState(config.clientSecret)
+    const [errors, setErrors] = useState<FormErrors>({})
+    const [touched, setTouched] = useState(false)
 
     useEffect(() => {
         setName(config.name)
         setBaseUrl(config.baseUrl)
         setClientId(config.clientId)
         setClientSecret(config.clientSecret)
+        setErrors({})
+        setTouched(false)
     }, [config])
 
     const isGitHub = config.type === 'github'
 
     const handleSave = (): void => {
+        const next = validateForm({ name, baseUrl, clientId, clientSecret })
+        setErrors(next)
+        setTouched(true)
+        if (Object.keys(next).length > 0) return
         onSave({ ...config, name, baseUrl, clientId, clientSecret })
+    }
+
+    const showError = (key: keyof FormErrors): string | null => {
+        if (!touched) return null
+        return errors[key] ? t(errors[key] as string) : null
     }
 
     return (
@@ -67,6 +111,9 @@ function ProviderConfigForm({ config, onSave, onCancel }: ProviderConfigFormProp
                     }
                     className="input"
                 />
+                {showError('name') && (
+                    <p className="text-xs text-red-600">{showError('name')}</p>
+                )}
             </div>
             <div className="space-y-2">
                 <IGRPLabelPrimitive>
@@ -81,6 +128,9 @@ function ProviderConfigForm({ config, onSave, onCancel }: ProviderConfigFormProp
                     }
                     className="input"
                 />
+                {showError('baseUrl') && (
+                    <p className="text-xs text-red-600">{showError('baseUrl')}</p>
+                )}
             </div>
             <div className="space-y-2">
                 <IGRPLabelPrimitive>{t('client_id')}</IGRPLabelPrimitive>
@@ -90,6 +140,9 @@ function ProviderConfigForm({ config, onSave, onCancel }: ProviderConfigFormProp
                     onChange={(e) => setClientId(e.target.value)}
                     className="input"
                 />
+                {showError('clientId') && (
+                    <p className="text-xs text-red-600">{showError('clientId')}</p>
+                )}
             </div>
             <div className="space-y-2">
                 <IGRPLabelPrimitive>{t('client_secret')}</IGRPLabelPrimitive>
@@ -99,6 +152,9 @@ function ProviderConfigForm({ config, onSave, onCancel }: ProviderConfigFormProp
                     onChange={(e) => setClientSecret(e.target.value)}
                     className="input"
                 />
+                {showError('clientSecret') && (
+                    <p className="text-xs text-red-600">{showError('clientSecret')}</p>
+                )}
             </div>
             <div className="flex space-x-2">
                 <IGRPButtonPrimitive onClick={handleSave}>
@@ -246,10 +302,18 @@ export function ConnectedAccountsSettings(): React.ReactNode {
                     showErrorToast(t('configSaveError'))
                 }
             } else {
-                await window.electron.ipcRenderer.invoke('git-provider:save-config', config)
-                showSuccessToast(t('configSaved'))
-                await loadGithubConfigs()
-                closeForm()
+                const result = (await window.electron.ipcRenderer.invoke(
+                    'git-provider:save-config',
+                    config
+                )) as { success: boolean; error?: string }
+                if (result.success) {
+                    showSuccessToast(t('configSaved'))
+                    await loadGithubConfigs()
+                    closeForm()
+                } else {
+                    console.error('Provider config validation failed:', result.error)
+                    showErrorToast(result.error || t('configSaveError'))
+                }
             }
         } catch (error) {
             console.error('Failed to save provider config:', error)

@@ -140,7 +140,13 @@ ipcMain.handle('git-provider:list-configs', async (_event, type?: 'github' | 'gi
 })
 
 ipcMain.handle('git-provider:save-config', async (_event, config: GitProviderConfig) => {
-    return GitStore.saveProviderConfig(config)
+    try {
+        GitStore.saveProviderConfig(config)
+        return { success: true as const }
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error'
+        return { success: false as const, error: message }
+    }
 })
 
 ipcMain.handle('git-provider:remove-config', async (_event, id: string): Promise<void> => {

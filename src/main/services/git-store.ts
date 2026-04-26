@@ -1,4 +1,5 @@
 import { safeStorage } from 'electron'
+import { validateProviderConfig } from '../config/git-provider-schema'
 import type { GitProviderConfig, GitProviderType } from '../types'
 
 let store: any = null
@@ -156,6 +157,13 @@ export const GitStore = {
 
     saveProviderConfig(config: GitProviderConfig): void {
         const normalized = normalizeConfig(config)
+        const validation = validateProviderConfig(normalized)
+        if (!validation.success) {
+            const summary = validation.errors
+                ?.map((e) => `${e.field}: ${e.message}`)
+                .join('; ')
+            throw new Error(`Invalid provider config — ${summary}`)
+        }
         const stored = readProviderConfigs()
         const encrypted = encryptConfigSecret(normalized)
         const idx = stored.findIndex((c) => c.id === normalized.id)

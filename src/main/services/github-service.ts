@@ -1,21 +1,13 @@
 import type { BrowserWindow } from 'electron'
+import { describeProviderType } from '../config/git-providers'
 import { isOnline } from '../helpers/network-utils'
 import { GitStore } from './git-store'
 
 let octokit: any = null
 
-const DEFAULT_GITHUB_HOST = 'https://github.com'
-
-/**
- * Derive the Octokit `baseUrl` (REST API host) from a GitHub web host.
- *  - https://github.com           -> https://api.github.com
- *  - https://github.example.com   -> https://github.example.com/api/v3
- */
 function deriveApiUrl(webHost?: string): string | undefined {
     if (!webHost) return undefined
-    const host = webHost.replace(/\/+$/, '')
-    if (host === DEFAULT_GITHUB_HOST) return 'https://api.github.com'
-    return `${host}/api/v3`
+    return describeProviderType('github')?.apiUrlFor(webHost)
 }
 
 export const GitHubService = {
