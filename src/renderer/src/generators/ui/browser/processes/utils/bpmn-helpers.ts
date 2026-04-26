@@ -1,5 +1,5 @@
 import type { BPMNProjectArtifact, BPMNProjectProcessDefinition, FileTree } from 'src/main/types'
-import type { PageDefinition } from '../page-manager'
+import type { PageDefinition } from '../../page-manager'
 import { getKeyFromFormKey } from './form-key-utils'
 
 /** Matches version folder names: v1, v2, v9, etc. */

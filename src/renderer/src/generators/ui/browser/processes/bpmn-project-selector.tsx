@@ -42,7 +42,7 @@ import { CopyLegacyVersionModal } from './components/copy-legacy-version'
 import { GenerateNewStepForm } from './components/generate-new-step-form'
 // Import refactored components and hooks
 import { useBPMNProjects, useProcessDefinitions } from './hooks/useBPMNData'
-import type { PageDefinition } from './page-manager'
+import type { PageDefinition } from '../page-manager'
 import { findProcess, findStepProcess } from './utils/bpmn-helpers'
 import { bpmnProcessStepInteractions } from './utils/bpmn-process-step-interactions'
 import {

@@ -9,14 +9,14 @@ import {
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
 import { EmptyList } from '@renderer/components/empty-list'
 import { SubHeadline } from '@renderer/components/shared-ui'
-import { BPMNConfigCard } from '@renderer/generators/ui/page/components/bpmn-config-card'
+import { BPMNConfigCard } from '@renderer/generators/ui/browser/processes/components/bpmn-config-card'
 import { bpmnService } from '@renderer/services/bpmn-service'
 import { Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { BPMNConfig, BPMNConfigs, FileTree } from 'src/main/types'
 import { BPMNProjectSelector } from './bpmn-project-selector'
 import { BPMNConfigModal } from './components/bpmn-connection-modal'
-import type { PageDefinition } from './page-manager'
+import type { PageDefinition } from '../page-manager'
 
 interface BPMNManagerProps {
     onPageClick?: (pageDefinition: PageDefinition | FileTree) => void

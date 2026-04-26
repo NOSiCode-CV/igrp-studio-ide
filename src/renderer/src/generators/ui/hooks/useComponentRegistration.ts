@@ -3,7 +3,7 @@ import { EngineService } from '@renderer/services/EngineService'
 import { useEffect } from 'react'
 import type { FileTree } from 'src/main/types'
 import { useComponentsContext } from '../contexts/ComponentsContext'
-import type { PageDefinition } from '../page/page-manager'
+import type { PageDefinition } from '../browser/page-manager'
 
 interface ComponentRegistrationProps {
     customComponents: ComponentDef[]

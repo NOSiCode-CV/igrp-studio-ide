@@ -20,7 +20,7 @@ import { SearchInput } from '@renderer/components/shared-ui'
 import { Cloud, Component, HardDrive, UserCog } from 'lucide-react'
 import type { JSX } from 'react'
 import type { BPMNProjectArtifact, BPMNProjectProcessDefinition, FileTree } from 'src/main/types'
-import type { PageDefinition } from '../page-manager'
+import type { PageDefinition } from '../../page-manager'
 import { convertFileTreeToPageDefinition } from '../utils/bpmn-helpers'
 import { GenerateNewStepForm } from './generate-new-step-form'
 

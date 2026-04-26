@@ -14,7 +14,7 @@ import {
 import { AlertTriangle, Component, Copy, EllipsisVertical, RotateCw, Wrench } from 'lucide-react'
 import type { JSX } from 'react/jsx-runtime'
 import type { BPMNProjectArtifact, BPMNProjectProcessDefinition, FileTree } from 'src/main/types'
-import type { PageDefinition } from '../page-manager'
+import type { PageDefinition } from '../../page-manager'
 import { convertFileTreeToPageDefinition } from '../utils/bpmn-helpers'
 import { getFormKeyType, getNormalizedFormKey } from '../utils/form-key-utils'
 

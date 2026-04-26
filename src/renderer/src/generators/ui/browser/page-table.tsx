@@ -8,7 +8,7 @@ import {
     IGRPTablePrimitive,
     IGRPTableRowPrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import { PageActionMenu, PageTypeIcon } from '@renderer/generators/ui/page/components/page-actions'
+import { PageActionMenu, PageTypeIcon } from '@renderer/generators/ui/browser/components/page-actions'
 import { ChevronDown, ChevronRight, Component, FileText } from 'lucide-react'
 import React, { useState } from 'react'
 import type { PageDefinition } from './page-manager'

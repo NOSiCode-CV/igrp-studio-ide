@@ -5,8 +5,8 @@ import {
     IGRPDropdownMenuPrimitive,
     IGRPDropdownMenuTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import type { PageCardProps } from '@renderer/generators/ui/page/page-card-view'
-import type { PageDefinition } from '@renderer/generators/ui/page/page-manager'
+import type { PageCardProps } from '@renderer/generators/ui/browser/page-card-view'
+import type { PageDefinition } from '@renderer/generators/ui/browser/page-manager'
 import {
     Component,
     Copy,

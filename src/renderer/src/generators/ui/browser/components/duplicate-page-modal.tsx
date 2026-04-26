@@ -9,7 +9,7 @@ import {
 import type { ComponentConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
 import { TextInput } from '@renderer/generators/api/components/inputs-form'
-import type { PageDefinition } from '@renderer/generators/ui/page/page-manager'
+import type { PageDefinition } from '@renderer/generators/ui/browser/page-manager'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
 import { getId } from '@renderer/utils'

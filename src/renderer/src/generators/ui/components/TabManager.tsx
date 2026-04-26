@@ -16,8 +16,8 @@ import {
     useDroppedComponents,
     useDroppedComponentsAdmin
 } from '../contexts/EditorContext'
-import PageManager, { type PageDefinition } from '../page/page-manager'
-import { convertFileTreeToPageDefinition } from '../page/utils/bpmn-helpers'
+import PageManager, { type PageDefinition } from '../browser/page-manager'
+import { convertFileTreeToPageDefinition } from '../browser/processes/utils/bpmn-helpers'
 import FormEngine from '../page-builder'
 import NavigationBar from './NavigationBar'
 import SidebarRight from './sidebar/sidebar-right'

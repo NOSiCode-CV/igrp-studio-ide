@@ -18,7 +18,7 @@ import { useConfigdata } from './hooks/useConfigData'
 import useCustomCode from './hooks/useCustomCode'
 import { usePageSave } from './hooks/usePageSave'
 import { useTagManager } from './hooks/useTagManager'
-import type { PageDefinition } from './page/page-manager'
+import type { PageDefinition } from './browser/page-manager'
 import IGRPStudioMainComponent from './renderers/components/MainComponent'
 
 interface PageBuilderProps {
