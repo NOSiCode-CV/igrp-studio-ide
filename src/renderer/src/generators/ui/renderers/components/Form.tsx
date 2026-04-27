@@ -79,7 +79,7 @@ const IGRPStudioForm: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                   * state) and when it already holds fields. Visible by
                   * default when empty, fades in on hover otherwise.
                   */}
-                <IGRPButtonPrimitive
+               {/*  <IGRPButtonPrimitive
                     type="button"
                     variant="outline"
                     size="sm"
@@ -94,15 +94,15 @@ const IGRPStudioForm: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                 >
                     <FileJson className="h-3.5 w-3.5" />
                     {t('import_schema_button')}
-                </IGRPButtonPrimitive>
+                </IGRPButtonPrimitive> */}
             </div>
 
-            <ImportJsonSchemaModal
+            {/* <ImportJsonSchemaModal
                 isOpen={showImport}
                 onClose={() => setShowImport(false)}
                 onConfirm={handleImport}
                 existingChildrenCount={children?.length ?? 0}
-            />
+            /> */}
         </>
     )
 }

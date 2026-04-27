@@ -575,7 +575,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                     </IGRPButtonPrimitive>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    {newBinding && (
+                                    {/* {newBinding && (
                                         <div className="flex items-center gap-2">
                                             <IGRPLabelPrimitive
                                                 htmlFor="isEnum"
@@ -591,7 +591,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                                 }
                                             />
                                         </div>
-                                    )}
+                                    )} */}
                                     <div className="flex items-center gap-2">
                                         <IGRPLabelPrimitive
                                             htmlFor="definitionType"
