@@ -207,6 +207,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             path: '',
             fields: [],
             isEnum: false,
+            definitionType: 'auto' as 'zod-object' | 'json-schema' | 'auto',
             ...compType
         },
         onSubmit: async (values, actions) => {
@@ -237,6 +238,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             createOrUpdateType({
                 ...updatedComponent,
                 isEnum: !!values.isEnum,
+                definitionType: values.definitionType ?? 'auto',
                 path: !newBinding && typeFilePath ? typeFilePath : ''
             })
 
@@ -562,23 +564,50 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                         Existing
                                     </IGRPButtonPrimitive>
                                 </div>
-                                {newBinding && (
+                                <div className="flex items-center gap-3">
+                                    {newBinding && (
+                                        <div className="flex items-center gap-2">
+                                            <IGRPLabelPrimitive
+                                                htmlFor="isEnum"
+                                                className="text-sm cursor-pointer"
+                                            >
+                                                {t('enumType')}
+                                            </IGRPLabelPrimitive>
+                                            <IGRPSwitch
+                                                id="isEnum"
+                                                checked={isEnum}
+                                                onCheckedChange={(checked) =>
+                                                    formik.setFieldValue('isEnum', checked)
+                                                }
+                                            />
+                                        </div>
+                                    )}
                                     <div className="flex items-center gap-2">
                                         <IGRPLabelPrimitive
-                                            htmlFor="isEnum"
-                                            className="text-sm cursor-pointer"
+                                            htmlFor="definitionType"
+                                            className="text-sm whitespace-nowrap"
                                         >
-                                            {t('enumType')}
+                                            {t('definitionType')}
                                         </IGRPLabelPrimitive>
-                                        <IGRPSwitch
-                                            id="isEnum"
-                                            checked={isEnum}
-                                            onCheckedChange={(checked) =>
-                                                formik.setFieldValue('isEnum', checked)
+                                        <select
+                                            id="definitionType"
+                                            value={
+                                                (formik.values.definitionType as string) ?? 'auto'
                                             }
-                                        />
+                                            onChange={(e) =>
+                                                formik.setFieldValue(
+                                                    'definitionType',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="h-8 rounded-md border bg-background px-2 text-sm"
+                                        >
+                                            <option value="auto">{t('definitionTypeAuto')}</option>
+                                            <option value="zod-object">Zod object</option>
+                                            <option value="json-schema">JSON Schema</option>
+                                        </select>
                                     </div>
-                                )}
+                                </div>
                             </div>
 
                             <TextInput

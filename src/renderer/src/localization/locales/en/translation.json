@@ -919,6 +919,8 @@
     "enumType": "Enum type",
     "enumCaseName": "Case name",
     "enumCaseValue": "Value",
+    "definitionType": "Definition",
+    "definitionTypeAuto": "Auto",
     "errorMessages": "Errors",
     "errorMessagesHint": "Set custom error messages for the active validations.",
     "errorMessagesEmpty": "Enable a validation first to assign a custom error message.",
