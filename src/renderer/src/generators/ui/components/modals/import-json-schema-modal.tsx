@@ -11,11 +11,10 @@ import {
     IGRPRadioGroupPrimitive,
     IGRPTextAreaPrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import { convertJsonSchemaToForm } from '@igrp/igrp-studio-nextjs-engine'
 import useToast from '@renderer/hooks/useToast'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { getUUID } from '@renderer/utils'
-import { type JSX, useEffect, useMemo, useState } from 'react'
+import { type JSX, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 type ImportMode = 'replace' | 'append'
@@ -58,54 +57,87 @@ export function ImportJsonSchemaModal({
 
     const [raw, setRaw] = useState('')
     const [mode, setMode] = useState<ImportMode>('replace')
+    const [components, setComponents] = useState<StructuredComponent[] | null>(null)
+    const [parseError, setParseError] = useState<string | null>(null)
+    const [schemaError, setSchemaError] = useState<string | null>(null)
+    const [isConverting, setIsConverting] = useState(false)
 
     useEffect(() => {
         if (!isOpen) {
             setRaw('')
             setMode('replace')
+            setComponents(null)
+            setParseError(null)
+            setSchemaError(null)
         }
     }, [isOpen])
 
     /**
-     * Parse + convert lazily so the preview count and the error state
-     * react instantly to user edits without leaking the conversion to
-     * the confirm path.
+     * Convert through the engine over IPC. The engine bundles fs-extra
+     * (used by its codegen path) which can't load in the renderer, so
+     * the conversion has to round-trip through main. Debounced via the
+     * raw input change cycle so stale results never overwrite a fresh
+     * one.
      */
-    const { components, parseError, schemaError } = useMemo(() => {
+    useEffect(() => {
         if (!raw.trim()) {
-            return {
-                components: null as StructuredComponent[] | null,
-                parseError: null as string | null,
-                schemaError: null as string | null
-            }
+            setComponents(null)
+            setParseError(null)
+            setSchemaError(null)
+            return
         }
+
         let parsed: unknown
         try {
             parsed = JSON.parse(raw)
         } catch (e) {
-            return {
-                components: null,
-                parseError: (e as Error).message,
-                schemaError: null
-            }
+            setComponents(null)
+            setParseError((e as Error).message)
+            setSchemaError(null)
+            return
         }
-        try {
-            const converted = convertJsonSchemaToForm(parsed as never) as StructuredComponent[]
-            return {
-                components: converted.map(regenerateIds),
-                parseError: null,
-                schemaError: null
+
+        let cancelled = false
+        setIsConverting(true)
+        setParseError(null)
+        setSchemaError(null)
+
+        ;(async () => {
+            try {
+                const result = (await window.engine.convertJsonSchema(parsed)) as
+                    | { result?: StructuredComponent[]; error?: string }
+                    | StructuredComponent[]
+                if (cancelled) return
+
+                // Engine handler returns the array directly via
+                // handleWithCustomErrors success path; defensive in case
+                // an envelope sneaks in.
+                const list = Array.isArray(result) ? result : (result.result ?? null)
+                const errMsg = !Array.isArray(result) ? result.error : null
+
+                if (errMsg) {
+                    setComponents(null)
+                    setSchemaError(errMsg)
+                } else if (list) {
+                    setComponents(list.map(regenerateIds))
+                    setSchemaError(null)
+                }
+            } catch (e) {
+                if (!cancelled) {
+                    setComponents(null)
+                    setSchemaError((e as Error).message)
+                }
+            } finally {
+                if (!cancelled) setIsConverting(false)
             }
-        } catch (e) {
-            return {
-                components: null,
-                parseError: null,
-                schemaError: (e as Error).message
-            }
+        })()
+
+        return () => {
+            cancelled = true
         }
     }, [raw])
 
-    const canConfirm = !!components && components.length > 0
+    const canConfirm = !!components && components.length > 0 && !isConverting
 
     const handleConfirm = (): void => {
         if (!components) {

@@ -92,6 +92,7 @@ declare const engine: {
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     createPage: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    convertJsonSchema: (schema: unknown) => Promise<HandlerResponse>
     registry: (engineType: string) => Promise<HandlerResponse>
     getComponent: (engineType: string) => Promise<HandlerResponse>
     registerComponent: (

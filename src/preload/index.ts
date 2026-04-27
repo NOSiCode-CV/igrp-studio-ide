@@ -260,6 +260,14 @@ const engine = {
         }
     },
 
+    convertJsonSchema: async (schema: unknown): Promise<HandlerResponse> => {
+        try {
+            return await ipcRenderer.invoke(EVENTS.NEXT.CONVERT_JSON_SCHEMA, schema)
+        } catch (error) {
+            return handleError(error)
+        }
+    },
+
     registry: async (engineType: string): Promise<HandlerResponse> => {
         try {
             return await ipcRenderer.invoke(EVENTS.NEXT.REGISTRY_COMPONENT, engineType)

@@ -26,7 +26,8 @@ export const EVENTS = {
         GET_CODE_SNIPPET: 'engine:get-code-snippet',
         LOAD_METADATA: 'engine:load-metadata',
         REGISTER_COMPONENT: 'engine:register-component',
-        CREATE_PROCESS_STEP: 'engine:create-process-step'
+        CREATE_PROCESS_STEP: 'engine:create-process-step',
+        CONVERT_JSON_SCHEMA: 'next-engine:convert-json-schema'
     },
     REPOSITORY: {
         INITIALIZE: 'repository:initialize',
