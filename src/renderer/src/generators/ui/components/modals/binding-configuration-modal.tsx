@@ -38,34 +38,79 @@ interface LabeledElementField {
     label: string
     fields?: LabeledElementField[]
     isList?: boolean
+    isKey?: boolean
     nullable?: boolean
 }
 
 const defaultFieldType: LabeledElementField = {
     componentId: '',
     name: '',
-    type: 'string',
+    type: 'text',
     required: false,
     defaultValue: undefined,
     label: '',
     isList: false,
+    isKey: false,
     nullable: false
 }
 
+/**
+ * Mirrors the engine's FIELD_TYPES constant
+ * (node_modules/@igrp/igrp-studio-nextjs-engine/dist/utils/constants.d.ts).
+ * Kept inline because the engine does not re-export the constant from
+ * its public entry point yet. The order intentionally matches the
+ * engine source so a quick visual diff catches drift.
+ */
 const FIELD_TYPES: SchemaTypeItem[] = [
-    { value: 'string', label: 'String' },
+    { value: 'text', label: 'Text' },
     { value: 'number', label: 'Number' },
-    { value: 'boolean', label: 'Boolean' },
-    { value: 'date', label: 'Date' },
-    { value: 'array', label: 'Array/Options' },
-    { value: 'email', label: 'Email' },
+    { value: 'select', label: 'Select' },
+    { value: 'select2', label: 'Select (multi)' },
     { value: 'password', label: 'Password' },
-    { value: 'tel', label: 'Telephone' },
-    { value: 'url', label: 'URL' },
     { value: 'color', label: 'Color' },
+    { value: 'checkbox', label: 'Checkbox' },
+    { value: 'switch', label: 'Switch' },
+    { value: 'radio', label: 'Radio' },
     { value: 'file', label: 'File' },
-    { value: 'object', label: 'Object' }
+    { value: 'tel', label: 'Telephone' },
+    { value: 'range', label: 'Range' },
+    { value: 'time', label: 'Time' },
+    { value: 'date', label: 'Date' },
+    { value: 'button', label: 'Button' }
 ]
+
+/**
+ * Map values stored under the previous (engine-misaligned) vocabulary
+ * back to the engine's FieldTypes. Keeps existing projects loadable
+ * after the rename. Returns the original value when no mapping applies
+ * so unknown values stay visible (rather than silently swallowed).
+ */
+const LEGACY_TYPE_MAP: Record<string, { type: string; isList?: boolean }> = {
+    string: { type: 'text' },
+    boolean: { type: 'checkbox' },
+    email: { type: 'text' },
+    url: { type: 'text' },
+    array: { type: 'text', isList: true },
+    integer: { type: 'number' }
+    // 'object' is intentionally NOT mapped — extractValidFields uses it
+    // as an internal marker for nested struct (FormList) entries, and
+    // the engine treats fields[] presence as the actual struct signal.
+}
+
+function normalizeFieldType<T extends { type: string; isList?: boolean; fields?: any[] }>(
+    field: T
+): T {
+    const mapped = LEGACY_TYPE_MAP[field.type]
+    const nested = field.fields ? field.fields.map(normalizeFieldType) : undefined
+    if (!mapped && !nested) return field
+    return {
+        ...field,
+        ...(mapped
+            ? { type: mapped.type, isList: mapped.isList ?? field.isList }
+            : {}),
+        ...(nested ? { fields: nested } : {})
+    }
+}
 
 interface BindingProps {
     path: string
@@ -145,6 +190,11 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                       key: 'isList',
                       name: 'IsList?',
                       type: 'checkbox'
+                  },
+                  {
+                      key: 'isKey',
+                      name: 'Key?',
+                      type: 'checkbox'
                   }
               ]
             : []),
@@ -174,24 +224,37 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
     }
 
     const getDefaultValue = (field: LabeledElementField): string => {
-        if ((field.defaultValue === '' || field.defaultValue === undefined) && field.required) {
-            if (field.type === 'string') {
-                return ''
-            }
-            if (field.type === 'number') {
-                return '0'
-            }
-            if (field.type === 'boolean') {
-                return 'false'
-            }
-            if (field.type === 'date') {
-                return 'new Date()'
-            }
-            if (field.type === 'array') {
-                return '[]'
-            }
+        if (field.defaultValue !== '' && field.defaultValue !== undefined) {
+            return field.defaultValue
         }
-        return field.defaultValue || ''
+        if (!field.required) return ''
+
+        // List fields default to an empty array regardless of element type.
+        if (field.isList) return '[]'
+
+        switch (field.type) {
+            case 'number':
+            case 'range':
+                return '0'
+            case 'checkbox':
+            case 'switch':
+                return 'false'
+            case 'date':
+            case 'time':
+                return 'new Date()'
+            case 'text':
+            case 'password':
+            case 'tel':
+            case 'color':
+            case 'file':
+            case 'select':
+            case 'select2':
+            case 'radio':
+            case 'button':
+                return ''
+            default:
+                return ''
+        }
     }
 
     const formik = useFormik({
@@ -416,13 +479,13 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
     useEffect(() => {
         // Auto-add fields from children if not already in the list
         if (comp.children?.length) {
-            const currentFields: any[] = formik.values.fields || []
+            const currentFields: any[] = (formik.values.fields || []).map(normalizeFieldType)
 
             const { fields } = extractValidFields(comp.children)
 
             const updatedFields = updateFieldsWithSubFields(fields, currentFields)
 
-            formik.setFieldValue('fields', [...updatedFields])
+            formik.setFieldValue('fields', [...updatedFields.map(normalizeFieldType)])
         }
     }, [components, comp.children])
 
