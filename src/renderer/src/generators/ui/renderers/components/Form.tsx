@@ -21,6 +21,8 @@ const IGRPStudioForm: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     const { setEditingComponent, handleUpdateChildComponent } = useDroppedComponents()
     const [showImport, setShowImport] = useState(false)
 
+    const isEmpty = !children?.length
+
     const handleEditClick = (component: StructuredComponent) => {
         setEditingComponent({
             path: '',
@@ -32,8 +34,7 @@ const IGRPStudioForm: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
         importedChildren: StructuredComponent[],
         mode: 'replace' | 'append'
     ): void => {
-        const next =
-            mode === 'append' ? [...(children ?? []), ...importedChildren] : importedChildren
+        const next = mode === 'append' ? [...(children ?? []), ...importedChildren] : importedChildren
         handleUpdateChildComponent(componentId, { children: next })
     }
 
@@ -63,13 +64,21 @@ const IGRPStudioForm: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
 
     return (
         <>
-            <Droppable
-                component={comp}
-                onDrop={onDragEnd}
-                className={cn(formVariants({ variant, className }), 'group/form relative')}
-            >
-                {renderFields()}
+            <div className="relative group/form">
+                <Droppable
+                    component={comp}
+                    onDrop={onDragEnd}
+                    className={cn(formVariants({ variant, className }))}
+                >
+                    {renderFields()}
+                </Droppable>
 
+                {/*
+                  * Sibling of Droppable so it renders both when the form
+                  * is empty (Droppable swaps children for the empty
+                  * state) and when it already holds fields. Visible by
+                  * default when empty, fades in on hover otherwise.
+                  */}
                 <IGRPButtonPrimitive
                     type="button"
                     variant="outline"
@@ -79,16 +88,14 @@ const IGRPStudioForm: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                         setShowImport(true)
                     }}
                     className={cn(
-                        'absolute top-2 right-2 gap-1.5 z-10 transition-opacity',
-                        children?.length
-                            ? 'opacity-0 group-hover/form:opacity-100'
-                            : 'opacity-100'
+                        'absolute top-2 right-2 gap-1.5 z-10 transition-opacity bg-background',
+                        isEmpty ? 'opacity-100' : 'opacity-0 group-hover/form:opacity-100'
                     )}
                 >
                     <FileJson className="h-3.5 w-3.5" />
                     {t('import_schema_button')}
                 </IGRPButtonPrimitive>
-            </Droppable>
+            </div>
 
             <ImportJsonSchemaModal
                 isOpen={showImport}

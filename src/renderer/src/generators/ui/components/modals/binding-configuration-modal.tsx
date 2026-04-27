@@ -360,11 +360,11 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                             name: 'IsList?',
                             type: 'checkbox'
                         },
-                        {
+                       /*  {
                             key: 'isKey',
                             name: 'Key?',
                             type: 'checkbox'
-                        }
+                        } */
                     ]
                   : []),
               { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
@@ -651,7 +651,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                 />
                             )}
 
-                            <details className="rounded-md border bg-muted/20">
+                            <details className="rounded-md border bg-muted/20 hidden">
                                 <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium">
                                     {t('advancedOptions')}
                                 </summary>
