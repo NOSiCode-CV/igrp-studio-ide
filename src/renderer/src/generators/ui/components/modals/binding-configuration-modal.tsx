@@ -7,8 +7,10 @@ import {
     IGRPDialogHeaderPrimitive,
     IGRPDialogPrimitive,
     IGRPDialogTitlePrimitive,
+    IGRPLabelPrimitive,
     type IGRPOptionsProps,
-    IGRPScrollAreaPrimitive
+    IGRPScrollAreaPrimitive,
+    IGRPSwitch
 } from '@igrp/igrp-framework-react-design-system'
 import type { FieldValidation } from '@igrp/igrp-studio-nextjs-engine/types'
 import { SelectInput, TextInput } from '@renderer/generators/api/components/inputs-form'
@@ -154,66 +156,6 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
 
     const [formDefaultData, setFormDefaultData] = useState<any>(null)
 
-    const columns = [
-        { key: 'label', name: t('label'), type: 'label' },
-        { key: 'name', name: t('name'), type: 'text', readonly: !newBinding },
-        ...(!newBinding
-            ? [
-                  {
-                      key: 'newType',
-                      name: t('type'),
-                      type: 'select',
-                      options: fieldsTypeOptions
-                  }
-              ]
-            : []),
-
-        ...(newBinding
-            ? [
-                  {
-                      key: 'type',
-                      name: t('dataType'),
-                      type: 'typeSelectorDropdown',
-                      options: FIELD_TYPES
-                  },
-                  {
-                      key: 'required',
-                      name: 'Required?',
-                      type: 'checkbox'
-                  },
-                  {
-                      key: 'nullable',
-                      name: 'Nullable?',
-                      type: 'checkbox'
-                  },
-                  {
-                      key: 'isList',
-                      name: 'IsList?',
-                      type: 'checkbox'
-                  },
-                  {
-                      key: 'isKey',
-                      name: 'Key?',
-                      type: 'checkbox'
-                  }
-              ]
-            : []),
-        { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
-        {
-            key: 'group',
-            name: '',
-            type: 'group',
-            items: [
-                {
-                    key: 'validation',
-                    name: '',
-                    type: 'popoverFormValidation',
-                    options: []
-                }
-            ]
-        }
-    ]
-
     const validate = (): boolean => {
         const fieldNames = formik.values.fields.map((f) => f.name)
         if (new Set(fieldNames).size !== fieldNames.length) {
@@ -264,6 +206,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             name: tag,
             path: '',
             fields: [],
+            isEnum: false,
             ...compType
         },
         onSubmit: async (values, actions) => {
@@ -293,6 +236,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
 
             createOrUpdateType({
                 ...updatedComponent,
+                isEnum: !!values.isEnum,
                 path: !newBinding && typeFilePath ? typeFilePath : ''
             })
 
@@ -352,6 +296,80 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             setOpen(false)
         }
     })
+
+    const isEnum = !!formik.values.isEnum
+
+    /**
+     * Enum types collapse to a flat list of named cases — engine codegen
+     * derives the discriminated union from `fields[].name` and the
+     * stored `defaultValue` for each entry. We hide every column that
+     * does not apply (type selector, list/key flags, validation popover).
+     */
+    const columns = isEnum
+        ? [
+              { key: 'name', name: t('enumCaseName'), type: 'text' },
+              { key: 'defaultValue', name: t('enumCaseValue'), type: 'text' },
+              { key: 'label', name: t('label'), type: 'text' }
+          ]
+        : [
+              { key: 'label', name: t('label'), type: 'label' },
+              { key: 'name', name: t('name'), type: 'text', readonly: !newBinding },
+              ...(!newBinding
+                  ? [
+                        {
+                            key: 'newType',
+                            name: t('type'),
+                            type: 'select',
+                            options: fieldsTypeOptions
+                        }
+                    ]
+                  : []),
+
+              ...(newBinding
+                  ? [
+                        {
+                            key: 'type',
+                            name: t('dataType'),
+                            type: 'typeSelectorDropdown',
+                            options: FIELD_TYPES
+                        },
+                        {
+                            key: 'required',
+                            name: 'Required?',
+                            type: 'checkbox'
+                        },
+                        {
+                            key: 'nullable',
+                            name: 'Nullable?',
+                            type: 'checkbox'
+                        },
+                        {
+                            key: 'isList',
+                            name: 'IsList?',
+                            type: 'checkbox'
+                        },
+                        {
+                            key: 'isKey',
+                            name: 'Key?',
+                            type: 'checkbox'
+                        }
+                    ]
+                  : []),
+              { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
+              {
+                  key: 'group',
+                  name: '',
+                  type: 'group',
+                  items: [
+                      {
+                          key: 'validation',
+                          name: '',
+                          type: 'popoverFormValidation',
+                          options: []
+                      }
+                  ]
+              }
+          ]
 
     const getFields = (): LabeledElementField[] => selectedTypeData?.fields ?? []
 
@@ -523,7 +541,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                             </IGRPDialogDescriptionPrimitive>
                         </IGRPDialogHeaderPrimitive>
                         <form onSubmit={formik.handleSubmit} className="space-y-4">
-                            <div className="flex">
+                            <div className="flex items-center justify-between">
                                 <div className="relative flex rounded-lg border bg-muted p-0.5 text-sm space-x-2">
                                     <IGRPButtonPrimitive
                                         type="button"
@@ -544,6 +562,23 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                         Existing
                                     </IGRPButtonPrimitive>
                                 </div>
+                                {newBinding && (
+                                    <div className="flex items-center gap-2">
+                                        <IGRPLabelPrimitive
+                                            htmlFor="isEnum"
+                                            className="text-sm cursor-pointer"
+                                        >
+                                            {t('enumType')}
+                                        </IGRPLabelPrimitive>
+                                        <IGRPSwitch
+                                            id="isEnum"
+                                            checked={isEnum}
+                                            onCheckedChange={(checked) =>
+                                                formik.setFieldValue('isEnum', checked)
+                                            }
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             <TextInput
