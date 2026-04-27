@@ -207,7 +207,11 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             path: '',
             fields: [],
             isEnum: false,
+            isMainType: false,
             definitionType: 'auto' as 'zod-object' | 'json-schema' | 'auto',
+            tags: [] as string[],
+            customInstanceName: '',
+            customInitInstanceName: '',
             ...compType
         },
         onSubmit: async (values, actions) => {
@@ -238,7 +242,13 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             createOrUpdateType({
                 ...updatedComponent,
                 isEnum: !!values.isEnum,
+                isMainType: !!values.isMainType,
                 definitionType: values.definitionType ?? 'auto',
+                tags: Array.isArray(values.tags)
+                    ? values.tags.filter((tag: string) => tag.trim().length > 0)
+                    : [],
+                customInstanceName: values.customInstanceName?.trim() || undefined,
+                customInitInstanceName: values.customInitInstanceName?.trim() || undefined,
                 path: !newBinding && typeFilePath ? typeFilePath : ''
             })
 
@@ -603,8 +613,15 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                             className="h-8 rounded-md border bg-background px-2 text-sm"
                                         >
                                             <option value="auto">{t('definitionTypeAuto')}</option>
-                                            <option value="zod-object">Zod object</option>
-                                            <option value="json-schema">JSON Schema</option>
+                                            {/*
+                                              * Hidden until the engine ships a working type.liquid
+                                              * branching on definitionType. The wiring (R6 inputs +
+                                              * persisted shape) is in place — re-enable these
+                                              * options when the engine template is fixed.
+                                              *
+                                              * <option value="zod-object">Zod object</option>
+                                              * <option value="json-schema">JSON Schema</option>
+                                              */}
                                         </select>
                                     </div>
                                 </div>
@@ -633,6 +650,104 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                     isRequired
                                 />
                             )}
+
+                            <details className="rounded-md border bg-muted/20">
+                                <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium">
+                                    {t('advancedOptions')}
+                                </summary>
+                                <div className="space-y-3 px-3 pb-3 pt-1">
+                                    <div className="space-y-1">
+                                        <IGRPLabelPrimitive
+                                            htmlFor="tags"
+                                            className="text-sm"
+                                        >
+                                            {t('typeTags')}
+                                        </IGRPLabelPrimitive>
+                                        <input
+                                            id="tags"
+                                            value={(formik.values.tags ?? []).join(', ')}
+                                            onChange={(e) =>
+                                                formik.setFieldValue(
+                                                    'tags',
+                                                    e.target.value
+                                                        .split(',')
+                                                        .map((t) => t.trim())
+                                                        .filter(Boolean)
+                                                )
+                                            }
+                                            placeholder={t('typeTagsPlaceholder')}
+                                            className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <IGRPSwitch
+                                            id="isMainType"
+                                            checked={!!formik.values.isMainType}
+                                            onCheckedChange={(checked) =>
+                                                formik.setFieldValue('isMainType', checked)
+                                            }
+                                        />
+                                        <IGRPLabelPrimitive
+                                            htmlFor="isMainType"
+                                            className="text-sm cursor-pointer"
+                                        >
+                                            {t('mainType')}
+                                        </IGRPLabelPrimitive>
+                                    </div>
+
+                                    {formik.values.definitionType !== 'auto' && (
+                                        <>
+                                            <div className="space-y-1">
+                                                <IGRPLabelPrimitive
+                                                    htmlFor="customInstanceName"
+                                                    className="text-sm"
+                                                >
+                                                    {t('customInstanceName')}
+                                                </IGRPLabelPrimitive>
+                                                <input
+                                                    id="customInstanceName"
+                                                    value={formik.values.customInstanceName ?? ''}
+                                                    onChange={(e) =>
+                                                        formik.setFieldValue(
+                                                            'customInstanceName',
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder={t(
+                                                        'customInstanceNamePlaceholder'
+                                                    )}
+                                                    className="h-9 w-full rounded-md border bg-background px-3 text-sm font-mono"
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <IGRPLabelPrimitive
+                                                    htmlFor="customInitInstanceName"
+                                                    className="text-sm"
+                                                >
+                                                    {t('customInitInstanceName')}
+                                                </IGRPLabelPrimitive>
+                                                <input
+                                                    id="customInitInstanceName"
+                                                    value={
+                                                        formik.values.customInitInstanceName ?? ''
+                                                    }
+                                                    onChange={(e) =>
+                                                        formik.setFieldValue(
+                                                            'customInitInstanceName',
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder={t(
+                                                        'customInitInstanceNamePlaceholder'
+                                                    )}
+                                                    className="h-9 w-full rounded-md border bg-background px-3 text-sm font-mono"
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </details>
 
                             {columns.length > 0 && (
                                 <div className="border rounded-sm">
