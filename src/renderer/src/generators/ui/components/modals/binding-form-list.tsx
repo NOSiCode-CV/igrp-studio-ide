@@ -197,18 +197,47 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
             </div>
         ) : null
 
+    /**
+     * Default track width per column type. Picked so eight columns
+     * (label + name + type + four booleans + default + popover) plus
+     * the row-action button still fit inside an 800-900px modal
+     * without triggering horizontal overflow.
+     */
+    const trackForType = (type: string): string => {
+        switch (type) {
+            case 'checkbox':
+                return '60px'
+            case 'group':
+                return '48px'
+            case 'label':
+                return 'minmax(0, 1fr)'
+            case 'text':
+                return 'minmax(0, 1.4fr)'
+            case 'typeSelectorDropdown':
+            case 'select':
+            case 'multiSelect':
+                return 'minmax(0, 1fr)'
+            default:
+                return 'minmax(0, 1fr)'
+        }
+    }
+
+    const gridTemplate =
+        columns.map((col) => col.width || trackForType(col.type)).join(' ') +
+        (removeRow ? ' 48px' : '')
+
     const renderTableHeader = (): React.ReactNode => {
         return (
-            <div className="flex flex-1 gap-4 p-3 bg-muted/50 border-b text-sm font-medium text-muted-foreground">
-                {columns.map(({ name: columnName, width, type }, index) => (
+            <div
+                className="grid gap-4 px-3 py-3 bg-muted/50 border-b text-sm font-medium text-muted-foreground"
+                style={{ gridTemplateColumns: gridTemplate }}
+            >
+                {columns.map(({ name: columnName, type }, index) => (
                     <div
-                        style={{ width }}
                         key={index}
                         className={cn(
                             'flex items-center',
-                            type === 'text' ? 'min-w-40' : '',
-                            type === 'checkbox' ? 'justify-center' : '',
-                            type === 'label' ? 'min-w-30' : ''
+                            type === 'checkbox' ? 'justify-center text-center' : ''
                         )}
                     >
                         {index === 0 ? (
@@ -224,7 +253,7 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
                     </div>
                 ))}
                 {removeRow && (
-                    <div className="flex justify-end items-center ml-auto">
+                    <div className="flex justify-end items-center">
                         {addRow && (
                             <IGRPTooltipProviderPrimitive>
                                 <IGRPTooltipPrimitive>
@@ -560,11 +589,7 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
             <div
                 key={rowId}
                 className="group/item w-full border-b border-border/50 last:border-b-0 grid gap-4 px-3 py-1"
-                style={{
-                    gridTemplateColumns:
-                        columns.map((col) => col.width || '1fr').join(' ') +
-                        (removeRow ? ' 100px' : '')
-                }}
+                style={{ gridTemplateColumns: gridTemplate }}
             >
                 {columns.map(({ key, type, options, items, readonly }, index2) => {
                     const selectValue = ['select'].includes(type)
@@ -581,8 +606,7 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
                         <React.Fragment key={index2}>
                             <div
                                 className={cn(
-                                    'flex items-center',
-                                    type === 'text' ? 'min-w-40' : '',
+                                    'flex items-center min-w-0',
                                     type === 'checkbox' ? 'justify-center' : ''
                                 )}
                             >

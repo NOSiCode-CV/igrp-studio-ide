@@ -529,7 +529,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
     return (
         <>
             <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-                <IGRPDialogContentPrimitive className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max-h-[80vh]">
+                <IGRPDialogContentPrimitive className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px]! lg:max-w-[900px]! max-h-[80vh]">
                     <IGRPScrollAreaPrimitive className="h-full p-4 max-h-[70vh] overflow-auto">
                         <IGRPDialogHeaderPrimitive className="mb-4">
                             <IGRPDialogTitlePrimitive>
