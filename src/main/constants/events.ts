@@ -122,6 +122,59 @@ export const EVENTS = {
         DELETE_HISTORY_ITEM: 'markitdown:delete-history-item',
         CLEAR_HISTORY: 'markitdown:clear-history'
     },
+    SPEC_KB: {
+        ADD_FILE: 'spec:kb:add-file',
+        ADD_URL: 'spec:kb:add-url',
+        LIST: 'spec:kb:list',
+        GET: 'spec:kb:get',
+        REMOVE: 'spec:kb:remove',
+        REINDEX: 'spec:kb:reindex',
+        SEARCH: 'spec:kb:search',
+        PROGRESS: 'spec:kb:progress'
+    },
+    SPEC_LLM: {
+        STATUSES: 'spec:llm:statuses',
+        LIST_MODELS: 'spec:llm:list-models',
+        CHAT_START: 'spec:llm:chat-start',
+        CHAT_CANCEL: 'spec:llm:chat-cancel',
+        CHAT_CHUNK: 'spec:llm:chat-chunk',
+        DETECT_CLIS: 'spec:llm:detect-clis'
+    },
+    SPEC_SETTINGS: {
+        GET_SECRETS_STATUS: 'spec:settings:get-secrets-status',
+        SET_SECRET: 'spec:settings:set-secret',
+        TEST_SECRET: 'spec:settings:test-secret',
+        GET_PREFERENCES: 'spec:settings:get-preferences',
+        SET_PREFERENCES: 'spec:settings:set-preferences'
+    },
+    SPEC_DOC: {
+        LIST: 'spec:doc:list',
+        READ: 'spec:doc:read',
+        CREATE: 'spec:doc:create',
+        UPDATE: 'spec:doc:update',
+        MOVE: 'spec:doc:move',
+        REMOVE: 'spec:doc:remove',
+        CONVERT_AND_INSERT: 'spec:doc:convert-and-insert',
+        EXPORT: 'spec:doc:export',
+        CHANGED: 'spec:doc:changed'
+    },
+    SPEC_PROTOTYPE: {
+        GENERATE_START: 'spec:prototype:generate-start',
+        GENERATE_CANCEL: 'spec:prototype:generate-cancel',
+        GENERATE_CHUNK: 'spec:prototype:generate-chunk',
+        APPLY_OPS: 'spec:prototype:apply-ops',
+        LIST_FILES: 'spec:prototype:list-files',
+        READ_FILE: 'spec:prototype:read-file',
+        START_DEV: 'spec:prototype:start-dev',
+        STOP_DEV: 'spec:prototype:stop-dev',
+        DEV_STATUS: 'spec:prototype:dev-status',
+        DEV_LOG: 'spec:prototype:dev-log',
+        GET_DEV_LOG_BUFFER: 'spec:prototype:get-dev-log-buffer',
+        LIST_SNAPSHOTS: 'spec:prototype:list-snapshots',
+        RESTORE_SNAPSHOT: 'spec:prototype:restore-snapshot',
+        EXPORT: 'spec:prototype:export',
+        TREE_CHANGED: 'spec:prototype:tree-changed'
+    },
     ERROR: 'error',
     LOG: 'log'
 }

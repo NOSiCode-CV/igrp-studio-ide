@@ -308,7 +308,8 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     ): Promise<void> => {
         const navigationMap = {
             [ENV_TYPES.NEXTJS]: ROUTES.PATH_PAGE_BUILDER_UI,
-            [ENV_TYPES.SPRING]: ROUTES.PATH_PAGE_BUILDER_API
+            [ENV_TYPES.SPRING]: ROUTES.PATH_PAGE_BUILDER_API,
+            [ENV_TYPES.SPECIFICATION]: ROUTES.PATH_PAGE_BUILDER_SPECIFICATION
         }
         const path = navigationMap[appConfig.framework as keyof typeof navigationMap]
         if (path) navigate(path)

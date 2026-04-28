@@ -191,8 +191,15 @@ export class WorkspaceRepository {
         }
 
         if (!existingProject) {
-            //call engine
-            await addProjectToWorkspace(workspaceConfig, workspacePath)
+            // Specification projects manage their own folder structure via
+            // SpecificationEngine (docs/, kb/, vectors/, chats/, prototype/).
+            // The third-party workspace engine doesn't know the 'specification'
+            // type and would crash on a lookup. Skip its registration here —
+            // metadata is still persisted via this.saveData below.
+            if (framework !== 'specification') {
+                //call engine
+                await addProjectToWorkspace(workspaceConfig, workspacePath)
+            }
         } else {
             console.log(`Project "${config.name}" already exists in workspace. Skipping addition.`)
         }

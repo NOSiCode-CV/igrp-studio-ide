@@ -597,6 +597,181 @@ const markitdown = {
     clearHistory: () => ipcRenderer.invoke(EVENTS.MARKITDOWN.CLEAR_HISTORY)
 }
 
+const specPrototype = {
+    generateStart: (payload: {
+        requestId: string
+        basePath: string
+        userMessage: string
+        specContext?: string
+        lastTurnSummary?: string
+        providerId: string
+        model: string
+    }) => ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.GENERATE_START, payload),
+    generateCancel: (requestId: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.GENERATE_CANCEL, { requestId }),
+    applyOps: (basePath: string, raw: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.APPLY_OPS, { basePath, raw }),
+    listFiles: (basePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.LIST_FILES, { basePath }),
+    readFile: (basePath: string, path: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.READ_FILE, { basePath, path }),
+    startDev: (basePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.START_DEV, { basePath }),
+    stopDev: (basePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.STOP_DEV, { basePath }),
+    devStatus: (basePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.DEV_STATUS, { basePath }),
+    getDevLogBuffer: (basePath: string, limit?: number) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.GET_DEV_LOG_BUFFER, { basePath, limit }),
+    listSnapshots: (basePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.LIST_SNAPSHOTS, { basePath }),
+    restoreSnapshot: (basePath: string, sha: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.RESTORE_SNAPSHOT, { basePath, sha }),
+    export: (basePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.EXPORT, { basePath }),
+    onChunk: (
+        callback: (payload: { requestId: string; chunk: any }) => void
+    ): (() => void) => {
+        const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
+        ipcRenderer.on(EVENTS.SPEC_PROTOTYPE.GENERATE_CHUNK, sub)
+        return () => ipcRenderer.removeListener(EVENTS.SPEC_PROTOTYPE.GENERATE_CHUNK, sub)
+    },
+    onDevLog: (
+        callback: (payload: { basePath: string; entry: any }) => void
+    ): (() => void) => {
+        const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
+        ipcRenderer.on(EVENTS.SPEC_PROTOTYPE.DEV_LOG, sub)
+        return () => ipcRenderer.removeListener(EVENTS.SPEC_PROTOTYPE.DEV_LOG, sub)
+    },
+    onDevStatus: (
+        callback: (payload: { basePath: string; status: any }) => void
+    ): (() => void) => {
+        const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
+        ipcRenderer.on(EVENTS.SPEC_PROTOTYPE.DEV_STATUS, sub)
+        return () => ipcRenderer.removeListener(EVENTS.SPEC_PROTOTYPE.DEV_STATUS, sub)
+    },
+    onTreeChanged: (
+        callback: (payload: { basePath: string }) => void
+    ): (() => void) => {
+        const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
+        ipcRenderer.on(EVENTS.SPEC_PROTOTYPE.TREE_CHANGED, sub)
+        return () => ipcRenderer.removeListener(EVENTS.SPEC_PROTOTYPE.TREE_CHANGED, sub)
+    }
+}
+
+const specLLM = {
+    statuses: () => ipcRenderer.invoke(EVENTS.SPEC_LLM.STATUSES),
+    listModels: () => ipcRenderer.invoke(EVENTS.SPEC_LLM.LIST_MODELS),
+    chatStart: (payload: {
+        requestId: string
+        providerId: string
+        messages: { role: 'system' | 'user' | 'assistant'; content: string }[]
+        model: string
+        temperature?: number
+        maxTokens?: number
+        systemPrompt?: string
+    }) => ipcRenderer.invoke(EVENTS.SPEC_LLM.CHAT_START, payload),
+    chatCancel: (requestId: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_LLM.CHAT_CANCEL, { requestId }),
+    detectCLIs: () => ipcRenderer.invoke(EVENTS.SPEC_LLM.DETECT_CLIS),
+    onChunk: (
+        callback: (
+            payload: {
+                requestId: string
+                chunk:
+                    | { type: 'delta'; content: string }
+                    | { type: 'tool-call'; name: string; arguments: string }
+                    | { type: 'usage'; promptTokens?: number; completionTokens?: number }
+                    | { type: 'error'; message: string; code?: string }
+                    | { type: 'done' }
+            }
+        ) => void
+    ): (() => void) => {
+        const subscription = (
+            _event: Electron.IpcRendererEvent,
+            payload: Parameters<typeof callback>[0]
+        ) => callback(payload)
+        ipcRenderer.on(EVENTS.SPEC_LLM.CHAT_CHUNK, subscription)
+        return () => ipcRenderer.removeListener(EVENTS.SPEC_LLM.CHAT_CHUNK, subscription)
+    }
+}
+
+const specSettings = {
+    getSecretsStatus: () => ipcRenderer.invoke(EVENTS.SPEC_SETTINGS.GET_SECRETS_STATUS),
+    setSecret: (provider: 'openrouter' | 'openai' | 'voyage', value: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_SETTINGS.SET_SECRET, { provider, value }),
+    testSecret: (provider: 'openrouter' | 'openai' | 'voyage') =>
+        ipcRenderer.invoke(EVENTS.SPEC_SETTINGS.TEST_SECRET, { provider }),
+    getPreferences: () => ipcRenderer.invoke(EVENTS.SPEC_SETTINGS.GET_PREFERENCES),
+    setPreferences: (patch: {
+        defaultLLM?: string
+        defaultEmbeddings?: { provider: 'openai' | 'voyage' | 'stub'; model: string }
+        cliPaths?: Record<string, string>
+    }) => ipcRenderer.invoke(EVENTS.SPEC_SETTINGS.SET_PREFERENCES, patch)
+}
+
+const specDoc = {
+    list: (basePath: string) => ipcRenderer.invoke(EVENTS.SPEC_DOC.LIST, { basePath }),
+    read: (basePath: string, docId: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DOC.READ, { basePath, docId }),
+    create: (
+        basePath: string,
+        input: { name: string; parentId?: string | null; type?: 'file' | 'folder'; content?: string }
+    ) => ipcRenderer.invoke(EVENTS.SPEC_DOC.CREATE, { basePath, ...input }),
+    update: (
+        basePath: string,
+        docId: string,
+        patch: { content?: string; name?: string; kbRefs?: string[] }
+    ) => ipcRenderer.invoke(EVENTS.SPEC_DOC.UPDATE, { basePath, docId, ...patch }),
+    move: (basePath: string, docId: string, newParentId: string | null) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DOC.MOVE, { basePath, docId, newParentId }),
+    remove: (basePath: string, docId: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DOC.REMOVE, { basePath, docId }),
+    convertAndInsert: (sourcePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DOC.CONVERT_AND_INSERT, { sourcePath }),
+    exportDocument: (basePath: string, docId: string, format: 'pdf' | 'docx') =>
+        ipcRenderer.invoke(EVENTS.SPEC_DOC.EXPORT, { basePath, docId, format }),
+    onChanged: (callback: () => void): (() => void) => {
+        const subscription = () => callback()
+        ipcRenderer.on(EVENTS.SPEC_DOC.CHANGED, subscription)
+        return () => ipcRenderer.removeListener(EVENTS.SPEC_DOC.CHANGED, subscription)
+    },
+    getFilePath: (file: File): string => webUtils.getPathForFile(file)
+}
+
+const specKB = {
+    list: (basePath: string) => ipcRenderer.invoke(EVENTS.SPEC_KB.LIST, { basePath }),
+    get: (basePath: string, itemId: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_KB.GET, { basePath, itemId }),
+    addFile: (basePath: string, filePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_KB.ADD_FILE, { basePath, filePath }),
+    addUrl: (basePath: string, url: string, youtube = false) =>
+        ipcRenderer.invoke(EVENTS.SPEC_KB.ADD_URL, { basePath, url, youtube }),
+    reindex: (basePath: string, itemId: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_KB.REINDEX, { basePath, itemId }),
+    remove: (basePath: string, itemId: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_KB.REMOVE, { basePath, itemId }),
+    search: (
+        basePath: string,
+        query: string,
+        topK = 8,
+        opts: { kbItemIds?: string[] } = {}
+    ) =>
+        ipcRenderer.invoke(EVENTS.SPEC_KB.SEARCH, {
+            basePath,
+            query,
+            topK,
+            kbItemIds: opts.kbItemIds
+        }),
+    onProgress: (callback: (item: any) => void): (() => void) => {
+        const subscription = (_event: Electron.IpcRendererEvent, item: any) => callback(item)
+        ipcRenderer.on(EVENTS.SPEC_KB.PROGRESS, subscription)
+        return () => ipcRenderer.removeListener(EVENTS.SPEC_KB.PROGRESS, subscription)
+    },
+    pickFile: (): Promise<string | null> => ipcRenderer.invoke(EVENTS.MARKITDOWN.PICK_FILE),
+    getFilePath: (file: File): string => webUtils.getPathForFile(file)
+}
+
 const terminal = {
     create: (sessionId: string, cwd?: string) => ipcRenderer.send('pty-create', { sessionId, cwd }),
     send: (sessionId: string, data: string) => ipcRenderer.send('pty-input', { sessionId, data }),
@@ -648,6 +823,11 @@ if (process.contextIsolated) {
         contextBridge.exposeInMainWorld('igrpStudioSettings', igrpStudioSettings)
         contextBridge.exposeInMainWorld('terminal', terminal)
         contextBridge.exposeInMainWorld('markitdown', markitdown)
+        contextBridge.exposeInMainWorld('specKB', specKB)
+        contextBridge.exposeInMainWorld('specDoc', specDoc)
+        contextBridge.exposeInMainWorld('specLLM', specLLM)
+        contextBridge.exposeInMainWorld('specSettings', specSettings)
+        contextBridge.exposeInMainWorld('specPrototype', specPrototype)
     } catch (error) {
         console.error(error)
     }
@@ -676,6 +856,11 @@ if (process.contextIsolated) {
     window.igrpStudioSettings = igrpStudioSettings
     window.terminal = terminal
     window.markitdown = markitdown
+    window.specKB = specKB
+    window.specDoc = specDoc
+    window.specLLM = specLLM
+    window.specSettings = specSettings
+    window.specPrototype = specPrototype
 }
 
 declare global {
@@ -689,5 +874,10 @@ declare global {
         igrpStudioSettings: typeof igrpStudioSettings
         terminal: typeof terminal
         markitdown: typeof markitdown
+        specKB: typeof specKB
+        specDoc: typeof specDoc
+        specLLM: typeof specLLM
+        specSettings: typeof specSettings
+        specPrototype: typeof specPrototype
     }
 }

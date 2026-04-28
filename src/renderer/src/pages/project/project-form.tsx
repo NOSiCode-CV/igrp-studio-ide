@@ -24,6 +24,7 @@ import {
     Monitor,
     PlusCircle,
     Server,
+    Sparkles,
     Upload
 } from 'lucide-react'
 import * as React from 'react'
@@ -31,9 +32,16 @@ import { useTranslation } from 'react-i18next'
 import type { FrameworkType, ProjectData } from 'src/main/types'
 import { DotNetConfig } from './components/configurations/dotnet-config'
 import { NextConfig } from './components/configurations/next-config'
+import { SpecificationConfig } from './components/configurations/specification-config'
 import { SpringConfig } from './components/configurations/spring-config'
 import { StepButton } from './components/step-button'
-import { backendFrameworks, frontendFrameworks, STEPS, THEME_COLORS } from './data'
+import {
+    backendFrameworks,
+    frontendFrameworks,
+    specificationFrameworks,
+    STEPS,
+    THEME_COLORS
+} from './data'
 import { useProjectValidation } from './validation'
 
 interface ConfigComponentProps {
@@ -47,7 +55,8 @@ type ConfigComponent = React.FC<ConfigComponentProps>
 const componentsMap: Record<string, ConfigComponent> = {
     springboot: SpringConfig,
     nextjs: NextConfig,
-    dotnet: DotNetConfig
+    dotnet: DotNetConfig,
+    specification: SpecificationConfig
 }
 
 export const ProjectConfigForm = ({
@@ -222,8 +231,13 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     )
 
     const isFrontend = formik.values.type === 'frontend'
+    const isSpecification = formik.values.type === 'specification'
 
-    const frameworks = isFrontend ? frontendFrameworks : backendFrameworks
+    const frameworks = isSpecification
+        ? specificationFrameworks
+        : isFrontend
+          ? frontendFrameworks
+          : backendFrameworks
 
     const canNavigateToStep = (targetStep: number) => {
         if (targetStep === 1) return true
@@ -418,7 +432,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                     name="type"
                     value={formik.values.type}
                     onValueChange={(value) => handleChangeType(value)}
-                    className="grid grid-cols-2 gap-4 mt-2"
+                    className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2"
                 >
                     <div
                         className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
@@ -462,6 +476,31 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 <div>{t('backend')}</div>
                                 <div className="text-sm text-gray-500">
                                     {t('backendDescription')}
+                                </div>
+                            </div>
+                        </IGRPLabelPrimitive>
+                    </div>
+                    <div
+                        className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
+                            formik.values.type === 'specification' ? 'border-primary' : ''
+                        }`}
+                    >
+                        <IGRPRadioGroupItemPrimitive
+                            value="specification"
+                            id="specification"
+                            className="sr-only"
+                        />
+                        <IGRPLabelPrimitive
+                            htmlFor="specification"
+                            className="flex items-center gap-2 cursor-pointer"
+                        >
+                            <Sparkles className="w-5 h-5" />
+                            <div>
+                                <div>{t('specification', { defaultValue: 'Specification' })}</div>
+                                <div className="text-sm text-gray-500">
+                                    {t('specificationDescription', {
+                                        defaultValue: 'Document and prototype using AI'
+                                    })}
                                 </div>
                             </div>
                         </IGRPLabelPrimitive>

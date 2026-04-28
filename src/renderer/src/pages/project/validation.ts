@@ -8,7 +8,7 @@ export function useProjectValidation({ t, step }: { t: any; step: number }) {
             .matches(PATTERNS.SPECIAL_CHARACTERS_PROJECT_NAME, t('msgSpecialCharactersRegex'))
             .max(100, t('maxLengthExceeded', { max: 100 })),
         type: Yup.string().oneOf(
-            ['frontend', 'backend'],
+            ['frontend', 'backend', 'specification'],
             t('fieldRequired', { name: t('projectType') })
         ),
         framework: Yup.string().required(t('fieldRequired', { name: t('framework') })),

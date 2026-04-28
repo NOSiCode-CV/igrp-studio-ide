@@ -223,6 +223,7 @@
     "connect": "Connect",
     "disconnect": "Disconnect",
     "about": "About",
+    "ai_providers": "AI Providers",
     "found_new_version": "Found a new version",
     "check_update": "Check Update",
     "versionOutdated": "Version Outdated",

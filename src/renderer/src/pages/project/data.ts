@@ -50,6 +50,18 @@ export const frontendFrameworks = [
     }
 ]
 
+export const specificationFrameworks = [
+    {
+        id: 'specification',
+        name: 'AI Specification',
+        description: 'Document and prototype using AI',
+        icon: '/placeholder.svg?height=40&width=40',
+        stars: '—',
+        views: '—',
+        availableSupport: true
+    }
+]
+
 export const backendFrameworks = [
     {
         id: 'springboot',

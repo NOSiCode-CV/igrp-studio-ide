@@ -7,9 +7,9 @@ type HandlerResponse<T = any> = {
     error?: string
 }
 
-export type ProjectType = 'frontend' | 'backend'
+export type ProjectType = 'frontend' | 'backend' | 'specification'
 
-export type FrameworkType = 'springboot' | 'nextjs' | 'dotnet'
+export type FrameworkType = 'springboot' | 'nextjs' | 'dotnet' | 'specification'
 
 export type ProjectStorageMode = 'managed' | 'linked'
 
@@ -47,7 +47,25 @@ export interface SpringConfigData {
     package?: string
 }
 
-export type ConfigData = SpringConfigData | NextConfigData | DotNetConfigData
+export interface SpecificationConfigData {
+    name: string
+    description?: string
+    workspaceId: string
+    id: string
+    version: string
+    /** LLM padrão para o AIAssistant */
+    defaultLLM?: { provider: 'openrouter' | 'cli'; model: string }
+    /** Provider/modelo de embeddings para a Knowledge Base */
+    embeddings?: { provider: 'openai' | 'voyage' | 'local'; model: string }
+    /** System prompt opcional aplicado a todos os chats do projeto */
+    systemPrompt?: string
+}
+
+export type ConfigData =
+    | SpringConfigData
+    | NextConfigData
+    | DotNetConfigData
+    | SpecificationConfigData
 
 export interface ProjectData {
     id: string

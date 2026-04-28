@@ -45,6 +45,11 @@ import './handlers/app-logic-handlers'
 import './handlers/docker-handler'
 import './handlers/global-handler'
 import './handlers/markitdown-handler'
+import './handlers/spec-kb-handler'
+import './handlers/spec-doc-handler'
+import './handlers/spec-llm-handler'
+import './handlers/spec-prototype-handler'
+import { prototypeDevServer } from './services/prototype/prototype-dev-server'
 import './helpers/fetch-request'
 
 import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
@@ -95,7 +100,10 @@ function createWindow(): void {
         ...(process.platform === 'linux' ? { icon } : {}),
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
-            sandbox: false
+            sandbox: false,
+            // Required so the Specification project type can preview the
+            // Next.js dev server inside an Electron <webview> element.
+            webviewTag: true
         },
         titleBarStyle: 'hidden',
         icon: path.join(__dirname, 'resources/icons', 'icon.icns') // Set icon for the window
@@ -382,6 +390,9 @@ app.on('window-all-closed', () => {
         session.kill()
     }
     ptySessions.clear()
+    // Tear down any running Next.js dev servers spawned by Specification
+    // projects so we don't leak ports on quit.
+    void prototypeDevServer.stopAll()
     if (process.platform !== 'darwin') {
         app.quit()
     }

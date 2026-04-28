@@ -4,6 +4,9 @@ import { Provider } from 'react-redux'
 import { ActiveThemeProvider } from './components/active-theme-provider'
 import { ThemeProvider } from './components/theme-provider'
 import rootReducer from './redux'
+import { subscribeDocsChanged } from './redux/specDocs/thunks'
+import { subscribeKBProgress } from './redux/specKB/thunks'
+import { subscribePrototypeEvents } from './redux/specPrototype/thunks'
 import AppRoutes from './routes/Routes'
 import { ThemeService } from './services/ThemeService'
 
@@ -14,6 +17,22 @@ import { IGRPToasterPrimitive } from '@igrp/igrp-framework-react-design-system'
 
 // Configure Redux store
 const store = configureStore({ reducer: rootReducer, devTools: true })
+
+// Subscribe once to spec:kb progress events so KB items refresh in real time.
+if (typeof window !== 'undefined' && (window as any).specKB) {
+    subscribeKBProgress()(store.dispatch)
+}
+
+// Subscribe once to spec:doc changes so the documents tree refreshes when the
+// backend reports mutations from any source.
+if (typeof window !== 'undefined' && (window as any).specDoc) {
+    subscribeDocsChanged(() => store.getState().PageBuilder.basePath)(store.dispatch)
+}
+
+// Subscribe once to prototype dev-server logs/status events.
+if (typeof window !== 'undefined' && (window as any).specPrototype) {
+    subscribePrototypeEvents()(store.dispatch)
+}
 
 const App = (): JSX.Element => {
     const [activeThemeValue, setActiveThemeValue] = useState<string>('igrp')

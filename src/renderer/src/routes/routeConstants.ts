@@ -9,5 +9,6 @@ export const ROUTES = {
     PATH_IDE_APP_LOGIC: '/app-logic',
     PATH_PROJECT_SETTINGS: '/project-settings',
     PATH_CONNECTIONS: '/connections',
-    PATH_MARKITDOWN: '/markitdown'
+    PATH_MARKITDOWN: '/markitdown',
+    PATH_PAGE_BUILDER_SPECIFICATION: '/page-builder-specification'
 }

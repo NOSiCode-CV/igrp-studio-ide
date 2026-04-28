@@ -28,10 +28,11 @@ import {
     IGRPTooltipTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { Bell, Globe, Home, Keyboard, Link, Settings, Shirt } from 'lucide-react'
+import { Bell, Globe, Home, Keyboard, Link, Settings, Shirt, Sparkles } from 'lucide-react'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { AboutSettings } from './sections/about'
+import { AIProvidersSettings } from './sections/ai-providers'
 import { AppearanceSettings } from './sections/appearance'
 import { ConnectedAccountsSettings } from './sections/connected-accounts'
 import KeyboardShortcuts from './sections/keyboard-shortcuts'
@@ -40,6 +41,7 @@ import { LanguageSettings } from './sections/language'
 const data = {
     nav: [
         { name: 'about', icon: Home, component: AboutSettings },
+        { name: 'ai_providers', icon: Sparkles, component: AIProvidersSettings },
         { name: 'language', icon: Globe, component: LanguageSettings },
         {
             name: 'connected_accounts',
