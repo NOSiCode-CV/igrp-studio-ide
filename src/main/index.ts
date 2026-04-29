@@ -49,6 +49,7 @@ import './handlers/spec-kb-handler'
 import './handlers/spec-doc-handler'
 import './handlers/spec-llm-handler'
 import './handlers/spec-prototype-handler'
+import './handlers/spec-data-handler'
 import { prototypeDevServer } from './services/prototype/prototype-dev-server'
 import './helpers/fetch-request'
 

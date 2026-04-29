@@ -4,12 +4,33 @@ import * as go from 'gojs'
 import { useEffect, useRef } from 'react'
 import type { ModelData, RelationData } from './types'
 
-interface ERDDiagramProps {
+interface ERDCanvasProps {
     models: ModelData[]
     relations: RelationData[]
+    /**
+     * Fired with the new gojs location ("x y") whenever the user finishes
+     * dragging a node. Caller is expected to debounce + persist.
+     */
+    onNodeMoved?: (key: string, loc: string) => void
+    /** Fired when the user clicks a node in the canvas. */
+    onNodeClicked?: (key: string) => void
+    /**
+     * Optional handle into the underlying gojs diagram so callers can
+     * implement actions like "Auto layout" via toolbar buttons.
+     */
+    onDiagramReady?: (diagram: go.Diagram) => void
+    /** When set, overrides the default 100vh height. */
+    height?: string | number
 }
 
-export default function ERDDiagram({ models, relations }: ERDDiagramProps) {
+export default function ERDCanvas({
+    models,
+    relations,
+    onNodeMoved,
+    onNodeClicked,
+    onDiagramReady,
+    height
+}: ERDCanvasProps) {
     const diagramRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -65,8 +86,14 @@ export default function ERDDiagram({ models, relations }: ERDDiagramProps) {
             {
                 selectable: true,
                 resizable: true,
-                layoutConditions: go.Part.LayoutStandard & ~go.Part.LayoutNodeSized
+                layoutConditions: go.Part.LayoutStandard & ~go.Part.LayoutNodeSized,
+                click: (_e, obj) => {
+                    const node = obj as go.Node
+                    if (onNodeClicked && node.data?.key)
+                        onNodeClicked(String(node.data.key))
+                }
             },
+            new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
             $(go.Shape, 'Rectangle', {
                 fill: '#2F4F4F',
                 stroke: '#00FFFF',
@@ -170,10 +197,25 @@ export default function ERDDiagram({ models, relations }: ERDDiagramProps) {
         // Initialize the model data
         diagram.model = new go.GraphLinksModel(models, relations)
 
+        // Persist drag positions back to the caller. SelectionMoved fires once
+        // at the end of a drag (mouse up); the binding above keeps node.data.loc
+        // in sync, so we just forward the new value.
+        if (onNodeMoved) {
+            diagram.addDiagramListener('SelectionMoved', () => {
+                diagram.selection.each((part) => {
+                    if (part instanceof go.Node && part.data?.key) {
+                        onNodeMoved(String(part.data.key), String(part.data.loc ?? ''))
+                    }
+                })
+            })
+        }
+
+        onDiagramReady?.(diagram)
+
         return () => {
             diagram.div = null
         }
-    }, [models, relations])
+    }, [models, relations, onNodeMoved, onNodeClicked, onDiagramReady])
 
-    return <div ref={diagramRef} style={{ height: '100vh' }} />
+    return <div ref={diagramRef} style={{ height: height ?? '100vh' }} />
 }

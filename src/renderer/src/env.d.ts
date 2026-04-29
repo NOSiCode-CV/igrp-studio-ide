@@ -355,6 +355,185 @@ interface SpecPrototypeBridge {
     ) => () => void
 }
 
+// ─── Spec Data Models bridge ───────────────────────────────────────────────
+// Mirrors `src/main/services/spec-data-service.ts` and
+// `src/renderer/src/features/data-models/types/entity.ts` — keep in sync.
+
+type SpecDataFieldType =
+    | 'string'
+    | 'int'
+    | 'decimal'
+    | 'boolean'
+    | 'date'
+    | 'datetime'
+    | 'json'
+    | 'enum'
+    | 'reference'
+
+interface SpecDataField {
+    id: string
+    name: string
+    type: SpecDataFieldType
+    nullable?: boolean
+    primaryKey?: boolean
+    unique?: boolean
+    indexed?: boolean
+    defaultValue?: string | number | boolean | null
+    enumValues?: string[]
+    referenceEntityId?: string
+    referenceFieldId?: string
+    description?: string
+    advancedType?: string
+}
+
+type SpecDataRelationKind =
+    | 'one-to-one'
+    | 'one-to-many'
+    | 'many-to-one'
+    | 'many-to-many'
+
+interface SpecDataRelation {
+    id: string
+    kind: SpecDataRelationKind
+    fromEntityId: string
+    fromFieldId?: string
+    toEntityId: string
+    toFieldId?: string
+    joinEntityId?: string
+    description?: string
+}
+
+interface SpecDataNodeLayout {
+    x: number
+    y: number
+    width?: number
+    height?: number
+}
+
+type SpecDataEntitySource =
+    | { kind: 'manual' }
+    | { kind: 'imported'; connection: string; table: string; importedAt: string }
+
+interface SpecDataEntity {
+    id: string
+    name: string
+    description?: string
+    fields: SpecDataField[]
+    relations: SpecDataRelation[]
+    source: SpecDataEntitySource
+    layout?: SpecDataNodeLayout
+    createdAt: string
+    updatedAt: string
+}
+
+interface SpecDataEntitySummary {
+    id: string
+    name: string
+    source: SpecDataEntitySource
+    updatedAt: string
+}
+
+interface SpecDataCreateInput {
+    name: string
+    description?: string
+    fields?: SpecDataField[]
+    relations?: SpecDataRelation[]
+    source?: SpecDataEntitySource
+    layout?: SpecDataNodeLayout
+}
+
+interface SpecDataUpdatePatch {
+    name?: string
+    description?: string
+    fields?: SpecDataField[]
+    relations?: SpecDataRelation[]
+    source?: SpecDataEntitySource
+    layout?: SpecDataNodeLayout
+}
+
+interface SpecDataSchemaDiff {
+    entityId: string
+    connection: string
+    table: string
+    checkedAt: string
+    inSync: boolean
+    addedInDb: { name: string; type: string }[]
+    removedInDb: { name: string; type: SpecDataFieldType }[]
+    changed: {
+        name: string
+        before: { type: SpecDataFieldType; nullable: boolean; primaryKey: boolean }
+        after: { type: string; nullable: boolean; primaryKey: boolean }
+    }[]
+}
+
+type SpecDataOpKind =
+    | 'entity-create'
+    | 'entity-update'
+    | 'entity-delete'
+    | 'relation-add'
+    | 'relation-remove'
+
+interface SpecDataAppliedOp {
+    op: SpecDataOpKind
+    entityId?: string
+    name?: string
+}
+
+interface SpecDataApplyResult {
+    summary: string
+    applied: SpecDataAppliedOp[]
+    failed: { op: { op: SpecDataOpKind } & Record<string, unknown>; error: string }[]
+}
+
+type SpecDataChunk =
+    | { type: 'delta'; content: string }
+    | { type: 'op-applied'; op: SpecDataAppliedOp }
+    | {
+          type: 'op-failed'
+          op: { op: SpecDataOpKind } & Record<string, unknown>
+          error: string
+      }
+    | { type: 'summary'; summary: string }
+    | { type: 'parse-error'; message: string; raw: string }
+    | { type: 'error'; message: string; code?: string }
+    | { type: 'done' }
+
+interface SpecDataBridge {
+    list: (basePath: string) => Promise<SpecDataEntitySummary[]>
+    get: (basePath: string, entityId: string) => Promise<SpecDataEntity | null>
+    create: (basePath: string, input: SpecDataCreateInput) => Promise<SpecDataEntity>
+    update: (
+        basePath: string,
+        entityId: string,
+        patch: SpecDataUpdatePatch
+    ) => Promise<SpecDataEntity>
+    remove: (basePath: string, entityId: string) => Promise<{ ok: true }>
+    importFromDb: (
+        basePath: string,
+        connectionName: string,
+        tables: string[]
+    ) => Promise<SpecDataEntity[]>
+    diffWithDb: (basePath: string, entityId: string) => Promise<SpecDataSchemaDiff>
+    exportDdl: (
+        basePath: string,
+        dialect: 'postgresql' | 'mysql'
+    ) => Promise<{ ok: boolean; path?: string; cancelled?: boolean }>
+    applyOps: (basePath: string, raw: string) => Promise<SpecDataApplyResult>
+    generateStart: (payload: {
+        requestId: string
+        basePath: string
+        userMessage: string
+        specContext?: string
+        providerId: string
+        model: string
+    }) => Promise<{ ok: true }>
+    generateCancel: (requestId: string) => Promise<{ ok: true }>
+    onChunk: (
+        callback: (payload: { requestId: string; chunk: SpecDataChunk }) => void
+    ) => () => void
+    onChanged: (callback: () => void) => () => void
+}
+
 interface Window {
     terminal: TerminalBridge
     markitdown: MarkItDownBridge
@@ -363,4 +542,5 @@ interface Window {
     specLLM: SpecLLMBridge
     specSettings: SpecSettingsBridge
     specPrototype: SpecPrototypeBridge
+    specData: SpecDataBridge
 }

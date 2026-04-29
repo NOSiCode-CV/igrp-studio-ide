@@ -12,10 +12,10 @@ import {
     SidebarContent,
     SidebarFooter
 } from '@renderer/layouts/components/app-sidebar-default'
-import { Database, FileText } from 'lucide-react'
+import { FileText } from 'lucide-react'
 import type React from 'react'
 import { useMemo } from 'react'
-import { WorkspaceSwitcher } from '../pages/workspaces/components/workspace-switch'
+import { WorkspaceSwitcher } from '../browser/workspaces/components/workspace-switch'
 import { Footer } from './components/footer'
 import FooterSidebar from './components/footer-sidebar'
 import Header from './components/header'
@@ -33,12 +33,6 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
 
     const navData = useMemo(
         () => [
-            {
-                name: 'Database',
-                type: 'item' as const,
-                icon: Database,
-                href: '#/connections'
-            },
             {
                 name: 'Markdown Converter',
                 type: 'item' as const,

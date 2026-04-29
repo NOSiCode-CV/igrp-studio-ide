@@ -1,8 +1,8 @@
 'use client'
 
 import { useIGRPToast } from '@igrp/igrp-framework-react-design-system'
-import { AppLogicIPCClient } from '@renderer/pages/app-logic/client'
-import { EnvironmentValidator } from '@renderer/pages/app-logic/validation'
+import { AppLogicIPCClient } from '@renderer/features/app-logic/client'
+import { EnvironmentValidator } from '@renderer/features/app-logic/validation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AppLogicEnvironment, ConnectionTest } from 'src/main/types'
 

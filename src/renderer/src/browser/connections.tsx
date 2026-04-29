@@ -1,5 +1,5 @@
 import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea'
-import { ConnectionManager } from '@renderer/generators/api/components/DatabaseManager/ConnectionManager'
+import { ConnectionManager } from '@renderer/features/data-models'
 import { useTranslation } from 'react-i18next'
 
 export default function Connections() {

@@ -10,6 +10,8 @@ export interface ModelData {
     name: string
     items: Attribute[]
     inheritedItems: Attribute[]
+    /** Optional gojs location string, e.g. "120 240". Restored on render. */
+    loc?: string
 }
 
 export interface RelationData {

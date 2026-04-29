@@ -1,6 +1,7 @@
 import { combineReducers, type Reducer } from 'redux'
 import gitSlice, { type GitState } from './git/reducer'
 import PageBuilderReducer, { type StudioState } from './pageBuilder/reducer'
+import specDataReducer, { type SpecDataState } from './specData/reducer'
 import specDocsReducer, { type SpecDocsState } from './specDocs/reducer'
 import specKBReducer, { type SpecKBState } from './specKB/reducer'
 import specPrototypeReducer, {
@@ -13,6 +14,7 @@ export type RootState = {
     specKB: SpecKBState
     specDocs: SpecDocsState
     specPrototype: SpecPrototypeState
+    specData: SpecDataState
 }
 
 const rootReducer: Reducer<RootState> = combineReducers({
@@ -20,6 +22,7 @@ const rootReducer: Reducer<RootState> = combineReducers({
     git: gitSlice,
     specKB: specKBReducer,
     specDocs: specDocsReducer,
-    specPrototype: specPrototypeReducer
+    specPrototype: specPrototypeReducer,
+    specData: specDataReducer
 })
 export default rootReducer

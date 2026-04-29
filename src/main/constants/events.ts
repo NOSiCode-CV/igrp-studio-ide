@@ -158,6 +158,22 @@ export const EVENTS = {
         EXPORT: 'spec:doc:export',
         CHANGED: 'spec:doc:changed'
     },
+    SPEC_DATA: {
+        LIST: 'spec:data:list',
+        GET: 'spec:data:get',
+        CREATE: 'spec:data:create',
+        UPDATE: 'spec:data:update',
+        REMOVE: 'spec:data:remove',
+        REORDER: 'spec:data:reorder',
+        APPLY_OPS: 'spec:data:apply-ops',
+        IMPORT_FROM_DB: 'spec:data:import-from-db',
+        DIFF_WITH_DB: 'spec:data:diff-with-db',
+        EXPORT_DDL: 'spec:data:export-ddl',
+        GENERATE_START: 'spec:data:generate-start',
+        GENERATE_CANCEL: 'spec:data:generate-cancel',
+        GENERATE_CHUNK: 'spec:data:generate-chunk',
+        CHANGED: 'spec:data:changed'
+    },
     SPEC_PROTOTYPE: {
         GENERATE_START: 'spec:prototype:generate-start',
         GENERATE_CANCEL: 'spec:prototype:generate-cancel',

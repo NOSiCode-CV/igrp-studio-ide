@@ -37,15 +37,15 @@ export type Database = {
     tableName: string
 }
 
-interface TableManagerProps {
+interface TablePickerProps {
     onRowsSubmit: (rows: Set<string>) => void
     onSelectedConnection: (value: string) => void
 }
 
-export function TableManager({
+export function TablePicker({
     onSelectedConnection,
     onRowsSubmit
-}: TableManagerProps): React.ReactNode {
+}: TablePickerProps): React.ReactNode {
     const { t } = useTranslation()
     const { showErrorToast } = useToast()
 

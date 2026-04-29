@@ -266,6 +266,26 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                     onViewModeChange={(mode) => dispatch(docViewModeChanged(mode))}
                     chatOpen={chatOpen}
                     onToggleChat={() => dispatch(docChatToggled(undefined))}
+                    canExport={Boolean(basePath)}
+                    onExport={async (format) => {
+                        if (!basePath) return
+                        try {
+                            const result = await window.specDoc.exportDocument(
+                                basePath,
+                                node.id,
+                                format
+                            )
+                            if (result.ok && result.path) {
+                                window.alert(
+                                    `Exported "${node.name}" as ${format.toUpperCase()} to:\n${result.path}`
+                                )
+                            }
+                        } catch (err) {
+                            window.alert(
+                                `Export failed: ${err instanceof Error ? err.message : String(err)}`
+                            )
+                        }
+                    }}
                 />
                 <div className="flex min-h-0 flex-1 overflow-hidden">
                     {(viewMode === 'edit' || viewMode === 'split') && (

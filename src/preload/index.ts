@@ -772,6 +772,52 @@ const specKB = {
     getFilePath: (file: File): string => webUtils.getPathForFile(file)
 }
 
+const specData = {
+    list: (basePath: string) => ipcRenderer.invoke(EVENTS.SPEC_DATA.LIST, { basePath }),
+    get: (basePath: string, entityId: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DATA.GET, { basePath, entityId }),
+    create: (basePath: string, input: unknown) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DATA.CREATE, { basePath, input }),
+    update: (basePath: string, entityId: string, patch: unknown) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DATA.UPDATE, { basePath, entityId, patch }),
+    remove: (basePath: string, entityId: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DATA.REMOVE, { basePath, entityId }),
+    importFromDb: (basePath: string, connectionName: string, tables: string[]) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DATA.IMPORT_FROM_DB, {
+            basePath,
+            connectionName,
+            tables
+        }),
+    diffWithDb: (basePath: string, entityId: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DATA.DIFF_WITH_DB, { basePath, entityId }),
+    exportDdl: (basePath: string, dialect: 'postgresql' | 'mysql') =>
+        ipcRenderer.invoke(EVENTS.SPEC_DATA.EXPORT_DDL, { basePath, dialect }),
+    applyOps: (basePath: string, raw: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DATA.APPLY_OPS, { basePath, raw }),
+    generateStart: (payload: {
+        requestId: string
+        basePath: string
+        userMessage: string
+        specContext?: string
+        providerId: string
+        model: string
+    }) => ipcRenderer.invoke(EVENTS.SPEC_DATA.GENERATE_START, payload),
+    generateCancel: (requestId: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_DATA.GENERATE_CANCEL, { requestId }),
+    onChunk: (
+        callback: (payload: { requestId: string; chunk: any }) => void
+    ): (() => void) => {
+        const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
+        ipcRenderer.on(EVENTS.SPEC_DATA.GENERATE_CHUNK, sub)
+        return () => ipcRenderer.removeListener(EVENTS.SPEC_DATA.GENERATE_CHUNK, sub)
+    },
+    onChanged: (callback: () => void): (() => void) => {
+        const subscription = () => callback()
+        ipcRenderer.on(EVENTS.SPEC_DATA.CHANGED, subscription)
+        return () => ipcRenderer.removeListener(EVENTS.SPEC_DATA.CHANGED, subscription)
+    }
+}
+
 const terminal = {
     create: (sessionId: string, cwd?: string) => ipcRenderer.send('pty-create', { sessionId, cwd }),
     send: (sessionId: string, data: string) => ipcRenderer.send('pty-input', { sessionId, data }),
@@ -828,6 +874,7 @@ if (process.contextIsolated) {
         contextBridge.exposeInMainWorld('specLLM', specLLM)
         contextBridge.exposeInMainWorld('specSettings', specSettings)
         contextBridge.exposeInMainWorld('specPrototype', specPrototype)
+        contextBridge.exposeInMainWorld('specData', specData)
     } catch (error) {
         console.error(error)
     }
@@ -861,6 +908,7 @@ if (process.contextIsolated) {
     window.specLLM = specLLM
     window.specSettings = specSettings
     window.specPrototype = specPrototype
+    window.specData = specData
 }
 
 declare global {
@@ -879,5 +927,6 @@ declare global {
         specLLM: typeof specLLM
         specSettings: typeof specSettings
         specPrototype: typeof specPrototype
+        specData: typeof specData
     }
 }

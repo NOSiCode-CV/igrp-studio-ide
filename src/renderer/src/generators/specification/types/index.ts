@@ -1,4 +1,9 @@
-export type SpecificationTab = 'documents' | 'knowledge-base' | 'prototype'
+export type SpecificationTab =
+    | 'documents'
+    | 'knowledge-base'
+    | 'data'
+    | 'prototype'
+    | 'processes'
 
 export interface SpecificationProject {
     id: string

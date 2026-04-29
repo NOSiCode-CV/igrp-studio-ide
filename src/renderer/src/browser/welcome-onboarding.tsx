@@ -3,7 +3,7 @@ import logo from '@renderer/assets/images/igrp-green.svg'
 import Doctor from '@renderer/components/doctor'
 import Loader from '@renderer/components/loader'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
-import CreateWorkspace from '@renderer/pages/workspaces/components/create-workspace'
+import CreateWorkspace from '@renderer/browser/workspaces/components/create-workspace'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import {
     ArrowRight,

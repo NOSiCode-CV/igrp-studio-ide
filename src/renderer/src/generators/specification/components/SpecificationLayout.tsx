@@ -3,18 +3,21 @@ import {
     IGRPSidebarMenuItemPrimitive,
     IGRPSidebarMenuPrimitive
 } from '@igrp/igrp-framework-react-design-system'
+import { DataModelsPanel } from '@renderer/features/data-models'
 import { cn } from '@renderer/lib/utils'
 import { loadDocs } from '@renderer/redux/specDocs/thunks'
 import { loadKB } from '@renderer/redux/specKB/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { FileText, Home, Library, Sparkles } from 'lucide-react'
+import { Database, FileText, Home, Library, Sparkles, Workflow } from 'lucide-react'
 import { useEffect, type JSX } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { ProcessesSelectionProvider } from '../../../features/bpmn/components/ProcessesSelection'
 import { useSpecification } from '../contexts/SpecificationContext'
 import type { SpecificationTab } from '../types'
 import DocumentsPanel from './DocumentsPanel'
 import KnowledgeBasePanel from './KnowledgeBasePanel'
+import ProcessesPanel from './ProcessesPanel'
 import PrototypePanel from './PrototypePanel'
 
 interface SpecificationLayoutProps {
@@ -28,11 +31,14 @@ interface RailItem {
     icon: typeof FileText
 }
 
-// Ordered to match the data flow: KB feeds Documents, Documents feed Prototype.
+// Ordered to match the data flow: KB feeds Documents, Documents feed Prototype,
+// Processes lives next to the rest of the spec authoring surface.
 const RAIL_ITEMS: RailItem[] = [
     { id: 'knowledge-base', label: 'Knowledge', icon: Library },
     { id: 'documents', label: 'Documents', icon: FileText },
-    { id: 'prototype', label: 'Prototype', icon: Sparkles }
+    { id: 'data', label: 'Data', icon: Database },
+    { id: 'prototype', label: 'Prototype', icon: Sparkles },
+    { id: 'processes', label: 'Processes', icon: Workflow }
 ]
 
 const RailButton = ({
@@ -76,7 +82,9 @@ const SecondaryPanel = ({
             ? 'Documents'
             : activeTab === 'knowledge-base'
               ? 'Knowledge Base'
-              : 'Prototype'
+              : activeTab === 'processes'
+                ? 'Processes'
+                : 'Prototype'
 
     return (
         <aside className="flex w-[320px] flex-col border-r bg-sidebar/40">
@@ -96,6 +104,9 @@ const SecondaryPanel = ({
                 )}
                 {activeTab === 'prototype' && (
                     <PrototypePanel basePath={basePath} currentItem={currentItem} variant="list" />
+                )}
+                {activeTab === 'processes' && (
+                    <ProcessesPanel basePath={basePath} currentItem={currentItem} variant="list" />
                 )}
             </div>
         </aside>
@@ -126,6 +137,10 @@ const MainContent = ({
             {activeTab === 'prototype' && (
                 <PrototypePanel basePath={basePath} currentItem={currentItem} variant="content" />
             )}
+            {activeTab === 'processes' && (
+                <ProcessesPanel basePath={basePath} currentItem={currentItem} variant="content" />
+            )}
+            {activeTab === 'data' && basePath && <DataModelsPanel basePath={basePath} />}
         </main>
     )
 }
@@ -148,7 +163,8 @@ const SpecificationLayout = ({
     }, [basePath, dispatch])
 
     return (
-        <div className="flex h-full w-full pb-8">
+        <ProcessesSelectionProvider>
+            <div className="flex h-full w-full pb-8">
             {/* Icon rail — same 80px width as the Studio's main sidebar
                 (`app-sidebar.tsx`), so the two layouts look continuous when the
                 user navigates between generators. */}
@@ -188,8 +204,8 @@ const SpecificationLayout = ({
             </aside>
 
             {/* Secondary panel — hidden for tabs that own their own multi-pane
-                layout (currently only Prototype). */}
-            {activeTab !== 'prototype' && (
+                layout (Prototype, Data). */}
+            {activeTab !== 'prototype' && activeTab !== 'data' && (
                 <SecondaryPanel
                     activeTab={activeTab}
                     basePath={basePath}
@@ -199,7 +215,8 @@ const SpecificationLayout = ({
 
             {/* Main content */}
             <MainContent activeTab={activeTab} basePath={basePath} currentItem={currentItem} />
-        </div>
+            </div>
+        </ProcessesSelectionProvider>
     )
 }
 

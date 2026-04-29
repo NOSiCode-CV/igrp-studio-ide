@@ -1,9 +1,12 @@
+import {
+    convertModelData,
+    ERDCanvas,
+    type ModelData,
+    type RelationData
+} from '@renderer/features/data-models'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { convertModelData } from './convertModelData'
-import ERDDiagram from './ERDDiagram'
-import type { ModelData, RelationData } from './types'
 
 export default function ERDLayout({ currentItem }: { currentItem: any }) {
     const { t } = useTranslation()
@@ -25,7 +28,7 @@ export default function ERDLayout({ currentItem }: { currentItem: any }) {
     return (
         <>
             {convertedModelData && relations ? (
-                <ERDDiagram models={convertedModelData} relations={relations} />
+                <ERDCanvas models={convertedModelData} relations={relations} />
             ) : (
                 <p className="text-foreground">{t('loadingDiagram')}</p>
             )}

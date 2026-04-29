@@ -20,7 +20,7 @@ import {
 import { SHORTCUTS } from '@renderer/constants/shortcut'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import { cn } from '@renderer/lib/utils'
-import CreateWorkspace from '@renderer/pages/workspaces/components/create-workspace'
+import CreateWorkspace from '@renderer/browser/workspaces/components/create-workspace'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import { EllipsisVertical, FolderKanban, FolderOpen, Pin, Plus } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'

@@ -70,12 +70,16 @@ export function DocToolbar({
                         label="Split"
                     />
                 </div>
+                <ExportMenu
+                    onExport={onExport}
+                    disabled={!onExport || !canExport}
+                />
                 <IGRPButtonPrimitive
                     variant={chatOpen ? 'secondary' : 'ghost'}
                     size="sm"
                     className="h-8 gap-2 text-xs"
                     onClick={onToggleChat}
-                    title="AI Assistant (coming soon)"
+                    title="AI Assistant"
                 >
                     <MessageSquare
                         size={14}
@@ -84,6 +88,78 @@ export function DocToolbar({
                     Assistant
                 </IGRPButtonPrimitive>
             </div>
+        </div>
+    )
+}
+
+function ExportMenu({
+    onExport,
+    disabled
+}: {
+    onExport?: (format: DocExportFormat) => Promise<void> | void
+    disabled?: boolean
+}): JSX.Element {
+    const [open, setOpen] = useState(false)
+    const [busy, setBusy] = useState<DocExportFormat | null>(null)
+    const ref = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (!open) return
+        const handler = (event: MouseEvent) => {
+            if (!ref.current?.contains(event.target as Node)) setOpen(false)
+        }
+        document.addEventListener('mousedown', handler)
+        return () => document.removeEventListener('mousedown', handler)
+    }, [open])
+
+    const trigger = async (format: DocExportFormat) => {
+        if (!onExport) return
+        setOpen(false)
+        setBusy(format)
+        try {
+            await onExport(format)
+        } finally {
+            setBusy(null)
+        }
+    }
+
+    return (
+        <div ref={ref} className="relative">
+            <IGRPButtonPrimitive
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-2 text-xs"
+                onClick={() => setOpen((v) => !v)}
+                disabled={disabled || busy !== null}
+                title="Export this document"
+            >
+                {busy ? (
+                    <Loader2 size={14} className="animate-spin" />
+                ) : (
+                    <Download size={14} />
+                )}
+                Export
+            </IGRPButtonPrimitive>
+            {open && (
+                <div className="absolute right-0 top-9 z-30 w-44 rounded-md border bg-popover p-1 shadow-md">
+                    <button
+                        type="button"
+                        className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs hover:bg-accent"
+                        onClick={() => trigger('pdf')}
+                    >
+                        <FileText size={12} className="text-red-500" />
+                        Export as PDF…
+                    </button>
+                    <button
+                        type="button"
+                        className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-xs hover:bg-accent"
+                        onClick={() => trigger('docx')}
+                    >
+                        <FileText size={12} className="text-blue-500" />
+                        Export as Word (.docx)…
+                    </button>
+                </div>
+            )}
         </div>
     )
 }

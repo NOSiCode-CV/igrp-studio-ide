@@ -28,7 +28,7 @@ import {
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-export type AIAssistantMode = 'docs' | 'prototype'
+export type AIAssistantMode = 'docs' | 'prototype' | 'data' | 'process'
 
 export interface AIAssistantContextInput {
     /** Latest user message — lets the host run RAG against it before replying. */
@@ -71,6 +71,12 @@ interface ChatMessage {
         commitSha?: string | null
         summary?: string
     }
+    /** Data-models-only summary surfaced after an entity-ops turn finishes. */
+    data?: {
+        applied: number
+        failed: number
+        summary?: string
+    }
 }
 
 /**
@@ -84,6 +90,12 @@ export type ChatBackend =
           kind: 'prototype'
           basePath: string
           /** Dispatcher hook so the host can capture per-chunk events into Redux. */
+          onTurnEvent?: (action: { type: string; payload?: unknown }) => void
+      }
+    | {
+          kind: 'data'
+          basePath: string
+          /** Dispatcher hook for the `specData` slice — mirrors prototype. */
           onTurnEvent?: (action: { type: string; payload?: unknown }) => void
       }
 
@@ -130,7 +142,9 @@ export function AIAssistant({
     title = 'AI Assistant',
     placeholder = mode === 'prototype'
         ? 'Add feature to prototype…'
-        : 'Ask about this document…',
+        : mode === 'process'
+          ? 'Ask about this process…'
+          : 'Ask about this document…',
     submitLabel = mode === 'prototype' ? 'Build' : 'Send',
     headerSlot,
     onAssistantOutput,
@@ -311,9 +325,78 @@ export function AIAssistant({
             }
         })
 
+        const offData = window.specData?.onChunk(({ requestId, chunk }) => {
+            const dispatcher =
+                onTurnEventRef.current?.kind === 'data'
+                    ? onTurnEventRef.current.onTurnEvent
+                    : undefined
+
+            setMessages((prev) => {
+                const idx = prev.findIndex((m) => m.id === requestId)
+                if (idx < 0) return prev
+                const copy = [...prev]
+                const target = { ...copy[idx] }
+                target.data = target.data ?? { applied: 0, failed: 0 }
+
+                switch (chunk.type) {
+                    case 'delta':
+                        target.content = (target.content || '') + chunk.content
+                        break
+                    case 'op-applied':
+                        target.data.applied += 1
+                        dispatcher?.({
+                            type: 'specData/dataTurnApplied',
+                            payload: { requestId, op: chunk.op }
+                        })
+                        break
+                    case 'op-failed':
+                        target.data.failed += 1
+                        dispatcher?.({
+                            type: 'specData/dataTurnFailed',
+                            payload: {
+                                requestId,
+                                op: { op: chunk.op.op, error: chunk.error }
+                            }
+                        })
+                        break
+                    case 'summary':
+                        target.data.summary = chunk.summary
+                        dispatcher?.({
+                            type: 'specData/dataTurnSummary',
+                            payload: { requestId, summary: chunk.summary }
+                        })
+                        break
+                    case 'parse-error':
+                        target.error = `Parse error: ${chunk.message}`
+                        dispatcher?.({
+                            type: 'specData/dataTurnParseError',
+                            payload: { requestId, message: chunk.message }
+                        })
+                        break
+                    case 'error':
+                        target.error = chunk.message
+                        break
+                    case 'done':
+                        target.streaming = false
+                        dispatcher?.({
+                            type: 'specData/dataTurnFinished',
+                            payload: { requestId }
+                        })
+                        break
+                }
+                copy[idx] = target
+                return copy
+            })
+            if (chunk.type === 'done') {
+                setStreaming(false)
+                setActiveRequestId(null)
+            }
+        })
+
         return () => {
             offLLM?.()
             offProto?.()
+            offData?.()
         }
     }, [])
 
@@ -418,6 +501,22 @@ export function AIAssistant({
                     payload: { requestId }
                 })
                 window.specPrototype
+                    .generateStart({
+                        requestId,
+                        basePath: chatBackend.basePath,
+                        userMessage:
+                            (lastUser?.content ?? '') + (intentDirective || ''),
+                        specContext: ctx.systemPrompt,
+                        providerId: selected.providerId,
+                        model: selected.modelId
+                    })
+                    .catch(onError)
+            } else if (chatBackend.kind === 'data') {
+                chatBackend.onTurnEvent?.({
+                    type: 'specData/dataTurnStarted',
+                    payload: { requestId }
+                })
+                window.specData
                     .generateStart({
                         requestId,
                         basePath: chatBackend.basePath,
@@ -819,6 +918,22 @@ function MessageBubble({
                             {message.prototype.failed > 0 && (
                                 <span className="text-red-500">
                                     {message.prototype.failed} failed
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {message.data && (message.data.applied > 0 || message.data.failed > 0) && (
+                    <div className="mt-2 rounded-md border bg-background/60 p-2 text-[10px]">
+                        <div className="font-medium text-foreground">
+                            {message.data.summary ?? 'Data turn'}
+                        </div>
+                        <div className="mt-1 flex gap-3 text-muted-foreground">
+                            <span>{message.data.applied} applied</span>
+                            {message.data.failed > 0 && (
+                                <span className="text-red-500">
+                                    {message.data.failed} failed
                                 </span>
                             )}
                         </div>

@@ -24,7 +24,7 @@ import { CreatePageModal } from '@renderer/generators/ui/browser/components/crea
 import { DuplicatePageModal } from '@renderer/generators/ui/browser/components/duplicate-page-modal'
 import { MovePageModal } from '@renderer/generators/ui/browser/components/move-page-modal'
 import useStudio from '@renderer/hooks/use-studio'
-import ProjectSettings from '@renderer/pages/project'
+import ProjectSettings from '@renderer/browser/project'
 import { getFileThree as onGetPages } from '@renderer/redux/thunks'
 import { FileCode, LayoutGrid, Plus, Settings, TableIcon, Workflow } from 'lucide-react'
 import { useEffect, useState } from 'react'
