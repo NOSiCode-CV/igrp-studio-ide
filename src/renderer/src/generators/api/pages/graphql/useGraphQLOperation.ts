@@ -78,6 +78,23 @@ const getCachedGraphQLOperations = (filesThree: any[], moduleName?: string): Gra
     return Array.isArray(manifest?.operations) ? manifest.operations : []
 }
 
+const getGraphQLTypesFromTree = (
+    filesThree: any[],
+    moduleName: string | undefined,
+    kind: 'graphqlType' | 'graphqlInput'
+): { name: string }[] => {
+    if (!moduleName) return []
+
+    const moduleNode = filesThree.find((item: any) => item.name === moduleName)
+    const graphQLDirectory = moduleNode?.children?.find((child: any) => child.name === 'graphql')
+    const typesDirectory = graphQLDirectory?.children?.find((child: any) => child.name === 'types')
+    const files = typesDirectory?.children ?? []
+
+    return files
+        .filter((file: any) => !file.isDirectory && file.content?.type === kind)
+        .map((file: any) => ({ name: file.content?.name || file.name }))
+}
+
 export const useGraphQLOperation = ({
     currentItem,
     onCloseTab
@@ -154,6 +171,16 @@ export const useGraphQLOperation = ({
         }
     }
 
+    const graphqlTypes = useMemo(
+        () => getGraphQLTypesFromTree(filesThree, currentItem?.module, 'graphqlType'),
+        [filesThree, currentItem?.module]
+    )
+
+    const graphqlInputs = useMemo(
+        () => getGraphQLTypesFromTree(filesThree, currentItem?.module, 'graphqlInput'),
+        [filesThree, currentItem?.module]
+    )
+
     const sharedTypeOptions = useMemo(() => {
         const artifactOptions = [...dto, ...models, ...responses, ...enums].map((item: any) => ({
             label: item.content?.name || item.name,
@@ -176,6 +203,28 @@ export const useGraphQLOperation = ({
         return Array.from(unique.values())
     }, [dto, models, responses, enums])
 
+    const returnTypeOptions = useMemo(() => {
+        const graphqlTypeOptions = graphqlTypes.map(({ name }) => ({ label: name, value: name }))
+
+        const unique = new Map<string, { label: string; value: string }>()
+        ;[...sharedTypeOptions, ...graphqlTypeOptions].forEach((option) => {
+            unique.set(option.value, option)
+        })
+
+        return Array.from(unique.values())
+    }, [sharedTypeOptions, graphqlTypes])
+
+    const inputTypeOptions = useMemo(() => {
+        const graphqlInputOptions = graphqlInputs.map(({ name }) => ({ label: name, value: name }))
+
+        const unique = new Map<string, { label: string; value: string }>()
+        ;[...sharedTypeOptions, ...graphqlInputOptions].forEach((option) => {
+            unique.set(option.value, option)
+        })
+
+        return Array.from(unique.values())
+    }, [sharedTypeOptions, graphqlInputs])
+
     const operationType = formik.values.operationType
 
     return {
@@ -191,7 +240,7 @@ export const useGraphQLOperation = ({
         isSubscription: operationType === 'subscription',
         isPersisted: Boolean(savedOperation?.id),
         handleDelete,
-        returnTypeOptions: sharedTypeOptions,
-        inputTypeOptions: sharedTypeOptions
+        returnTypeOptions,
+        inputTypeOptions
     }
 }
