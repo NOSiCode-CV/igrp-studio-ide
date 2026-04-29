@@ -1,4 +1,4 @@
-import { combineReducers, type Reducer } from 'redux'
+import { combineReducers, type Reducer } from '@reduxjs/toolkit'
 import gitSlice, { type GitState } from './git/reducer'
 import PageBuilderReducer, { type StudioState } from './pageBuilder/reducer'
 import specDataReducer, { type SpecDataState } from './specData/reducer'

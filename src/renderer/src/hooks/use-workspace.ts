@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { type NavigateFunction, useNavigate } from 'react-router-dom'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 import type { HandlerResponse, IWorkspace, ProjectData, ServiceInfo } from 'src/main/types'
 
 interface RootState {

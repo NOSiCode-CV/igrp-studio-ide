@@ -1,5 +1,5 @@
 import type { RootState } from '@renderer/redux'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 
 const selectGitState = (state: RootState) => state.git
 
