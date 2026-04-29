@@ -9,8 +9,9 @@ import { Database } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { DataChatPanel } from './chat/DataChatPanel'
-import { ProjectERDCanvas } from './diagram/ProjectERDCanvas'
+import { ReactFlowERD } from './diagram/ReactFlowERD'
 import { EntityEditor } from './editor/EntityEditor'
+import { EntityFormModal } from './editor/EntityFormModal'
 import { EntityList } from './editor/EntityList'
 import { ImportFromDbWizard } from './import/ImportFromDbWizard'
 
@@ -39,7 +40,8 @@ export function DataModelsPanel({
     const { t } = useTranslation()
     const [selectedId, setSelectedId] = useState<string | null>(null)
     const [importOpen, setImportOpen] = useState(false)
-    const [view, setView] = useState<'entities' | 'erd'>('entities')
+    const [newEntityOpen, setNewEntityOpen] = useState(false)
+    const [view, setView] = useState<'entities' | 'erd'>('erd')
 
     // Cmd/Ctrl+I → open import wizard. Cmd/Ctrl+S is intentionally NOT
     // intercepted: autosave runs continuously already, and the host shell
@@ -73,11 +75,11 @@ export function DataModelsPanel({
                 >
                     <div className="flex items-center justify-between border-b px-3 py-1.5">
                         <IGRPTabsListPrimitive>
-                            <IGRPTabsTriggerPrimitive value="entities">
-                                {t('entities')}
-                            </IGRPTabsTriggerPrimitive>
                             <IGRPTabsTriggerPrimitive value="erd">
                                 {t('erd')}
+                            </IGRPTabsTriggerPrimitive>
+                            <IGRPTabsTriggerPrimitive value="entities">
+                                {t('entities')}
                             </IGRPTabsTriggerPrimitive>
                         </IGRPTabsListPrimitive>
                         <IGRPButtonPrimitive
@@ -119,13 +121,13 @@ export function DataModelsPanel({
                         value="erd"
                         className="flex-1 min-h-0"
                     >
-                        <ProjectERDCanvas
+                        <ReactFlowERD
                             basePath={basePath}
                             onEntityClick={(id) => {
                                 setSelectedId(id)
                                 setView('entities')
                             }}
-                            onImportFromDb={() => setImportOpen(true)}
+                            onNewEntity={() => setNewEntityOpen(true)}
                         />
                     </IGRPTabsContentPrimitive>
                 </IGRPTabsPrimitive>
@@ -136,6 +138,15 @@ export function DataModelsPanel({
                 basePath={basePath}
                 onImported={(ids) => {
                     if (ids.length > 0) setSelectedId(ids[0])
+                }}
+            />
+            <EntityFormModal
+                open={newEntityOpen}
+                onOpenChange={setNewEntityOpen}
+                onSubmit={async (input) => {
+                    const created = await window.specData.create(basePath, input)
+                    setSelectedId(created.id)
+                    setView('entities')
                 }}
             />
         </div>

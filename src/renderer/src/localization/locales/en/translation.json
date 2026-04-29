@@ -1057,6 +1057,7 @@
     "imported": "Imported",
     "imported_from_db": "Imported from a database",
     "auto_layout": "Auto layout",
+    "open_in_editor": "Open in editor",
     "saving_dots": "Saving…",
     "saved_at": "Saved at {{time}}",
     "check_drift": "Check drift",

@@ -1054,6 +1054,7 @@
     "imported": "Importado",
     "imported_from_db": "Importado de uma base de dados",
     "auto_layout": "Auto-organizar",
+    "open_in_editor": "Abrir no editor",
     "saving_dots": "A gravar…",
     "saved_at": "Gravado às {{time}}",
     "check_drift": "Verificar drift",

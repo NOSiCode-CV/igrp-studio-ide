@@ -2,14 +2,8 @@
 // Generators and pages MUST import from here only — never reach into subpaths.
 
 // --- diagram ---
-export { default as ERDCanvas } from './diagram/ERDCanvas'
-export { convertModelData } from './diagram/convertModelData'
-export {
-    entitiesToDiagramModel,
-    parseDiagramLoc
-} from './diagram/entitiesToDiagramModel'
-export { ProjectERDCanvas } from './diagram/ProjectERDCanvas'
-export type { Attribute, ModelData, RelationData } from './diagram/types'
+export { apiModelsToEntities } from './diagram/apiModelsToEntities'
+export { ReactFlowERD } from './diagram/ReactFlowERD'
 
 // --- connection ---
 export { ConnectionForm } from './connection/ConnectionForm'

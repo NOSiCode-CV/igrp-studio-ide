@@ -19,9 +19,31 @@ import { EditorHeader } from './EditorHeader'
 import { ProcessDetails } from './ProcessDetails'
 import { XmlTab } from './XmlTab'
 
+/**
+ * Optional hook for the consumer (e.g. the Specification rail) to inject extra
+ * sections into the chat's system prompt — typically Knowledge Base chunks
+ * retrieved via RAG against `basePath`. Kept as a callback so `features/bpmn`
+ * stays independent of the Specification slice / its Redux store.
+ */
+export interface ProcessChatAddendum {
+    /** Toggles the "Use KB" pill in the AIAssistant header. */
+    supportsKB: boolean
+    /**
+     * Resolved on every chat request. Receives the user's latest message + the
+     * "Use KB" toggle so the host can run RAG and ground the prompt.
+     */
+    build: (input: { userMessage: string; useKB: boolean }) => Promise<{
+        /** Extra prompt sections appended below the BPMN context. */
+        text: string
+        /** Suffix shown next to the AIAssistant context label. */
+        labelSuffix?: string
+    }>
+}
+
 export interface ProcessEditorProps {
     processId: string
     onClose?: () => void
+    chatAddendum?: ProcessChatAddendum
 }
 
 type EditorTab = 'diagram' | 'xml'
@@ -49,7 +71,11 @@ const ErrorState = ({ message, onRetry }: ErrorStateProps): JSX.Element => (
     </div>
 )
 
-export function ProcessEditor({ processId, onClose }: ProcessEditorProps): JSX.Element {
+export function ProcessEditor({
+    processId,
+    onClose,
+    chatAddendum
+}: ProcessEditorProps): JSX.Element {
     const [tab, setTab] = useState<EditorTab>('diagram')
     const [sidePanel, setSidePanel] = useState<'closed' | 'delegates' | 'chat'>('closed')
     const helperOpen = sidePanel === 'delegates'
@@ -191,14 +217,31 @@ export function ProcessEditor({ processId, onClose }: ProcessEditorProps): JSX.E
                             mode="process"
                             title=""
                             placeholder="Ask about this process…"
-                            contextProvider={() => ({
-                                systemPrompt: buildProcessSystemPrompt({
+                            supportsKB={chatAddendum?.supportsKB ?? false}
+                            contextProvider={async ({ userMessage, useKB }) => {
+                                const processSection = buildProcessSystemPrompt({
                                     processName,
                                     processKey,
                                     projectName,
                                     xml
                                 })
-                            })}
+                                if (!chatAddendum) {
+                                    return { systemPrompt: processSection }
+                                }
+                                const extra = await chatAddendum.build({
+                                    userMessage,
+                                    useKB
+                                })
+                                const systemPrompt = extra.text
+                                    ? `${processSection}\n\n${extra.text}`
+                                    : processSection
+                                return {
+                                    systemPrompt,
+                                    contextLabel: extra.labelSuffix
+                                        ? `Process · ${processName}${extra.labelSuffix}`
+                                        : `Process · ${processName}`
+                                }
+                            }}
                             className="h-full"
                         />
                     </div>
