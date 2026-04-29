@@ -135,3 +135,7 @@ Estratégia:
 ## Decisões abertas
 
 _(preencher à medida que surgirem)_
+
+## Lições
+
+- **Sempre verificar `electron.vite.config.ts` (alias, define, optimizeDeps) antes de remover deps.** Na Fase 1 removi `path-browserify` por aparentar não ter imports, mas é consumido via alias `path → path-browserify` para shimar `require("path")` em `i18next-electron-fs-backend` no renderer. Restaurado no commit seguinte.
