@@ -347,6 +347,7 @@ ipcMain.handle(
 ipcMain.handle(
     'igrp-studio:get-json-content',
     async (_event, filePath: string): Promise<unknown> => {
+        if (!filePath) return null
         return await getJsonContent(filePath)
     }
 )

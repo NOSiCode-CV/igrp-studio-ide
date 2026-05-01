@@ -123,7 +123,7 @@ export const useGraphQLOperation = ({
             try {
                 const validationErrors = await validateGraphQLOperation(values, {
                     operations: cachedOperations,
-                    availableTypeValues: sharedTypeOptions.map((option) => option.value)
+                    availableTypeValues: returnTypeOptions.map((option) => option.value)
                 })
 
                 if (Object.keys(validationErrors).length > 0) {

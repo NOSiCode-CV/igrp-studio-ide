@@ -14,6 +14,7 @@ export const EVENTS = {
         CREATE_ENUM: 'spring-engine:create-enum',
         CREATE_RESPONSE: 'spring-engine:create-response',
         CREATE_CONTROLLER: 'spring-engine:create-controller',
+        CREATE_GRAPHQL_SCHEMA: 'spring-engine:create-graphql-schema',
         FETCH_SELECTORS: 'spring-engine:fetch-selectors'
     },
     GRAPHQL: {

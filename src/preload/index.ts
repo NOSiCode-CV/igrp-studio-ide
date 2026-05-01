@@ -167,6 +167,22 @@ const engine = {
             return handleError(error)
         }
     },
+    createGraphqlSchema: async (
+        schemaConfig: any,
+        engineType: string,
+        basePath: string
+    ): Promise<HandlerResponse> => {
+        try {
+            return await ipcRenderer.invoke(
+                EVENTS.SPRING.CREATE_GRAPHQL_SCHEMA,
+                schemaConfig,
+                engineType,
+                basePath
+            )
+        } catch (error) {
+            return handleError(error)
+        }
+    },
     createModule: async (
         moduleConfig: any,
         engineType: string,

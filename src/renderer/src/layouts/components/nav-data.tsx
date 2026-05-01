@@ -327,6 +327,12 @@ const useNavdata = (filesThree: FileTree[]) => {
                 const graphQLOperations = Array.isArray(graphQLManifest?.operations)
                     ? graphQLManifest.operations
                     : []
+                const graphQLTypesDirectory = graphQLDirectory?.children?.find(
+                    (child: any) => child.isDirectory && child.name === 'types'
+                )
+                const graphQLTypeFiles: any[] = graphQLTypesDirectory?.children?.filter(
+                    (file: any) => !file.isDirectory && file.name.endsWith('.json')
+                ) ?? []
 
                 folderMenuItem.subItems?.push({
                     id: `graphql-${folder.name}`,
@@ -429,6 +435,35 @@ const useNavdata = (filesThree: FileTree[]) => {
                                     dropdownMenus: [menuItemsConfig.delete] as any,
                                     content: operation
                                 }))
+                        },
+                        {
+                            id: `graphql-types-${folder.name}`,
+                            label: 'Types',
+                            module: folder.name,
+                            type: OPTION_TYPE.GRAPHQL,
+                            dropdownMenus: [
+                                {
+                                    ...menuItemsConfig.newDto,
+                                    dropdownclick: () =>
+                                        openGraphQLAction(
+                                            OPTION_TYPE.DATA_OBJECTS,
+                                            folder.name,
+                                            'New Type'
+                                        )
+                                }
+                            ] as any,
+                            subItems: graphQLTypeFiles.map((file: any) => ({
+                                id: file.content?.id || file.name,
+                                label: file.content?.name || file.name.replace('.json', ''),
+                                path: file.path,
+                                module: folder.name,
+                                type: OPTION_TYPE.DATA_OBJECTS,
+                                link: ROUTES.PATH_PAGE_BUILDER_API,
+                                click: onClickItem,
+                                dropdownclick: onClickItem,
+                                dropdownMenus: [menuItemsConfig.delete] as any,
+                                content: file.content
+                            }))
                         },
                         {
                             id: `graphql-subscriptions-${folder.name}`,

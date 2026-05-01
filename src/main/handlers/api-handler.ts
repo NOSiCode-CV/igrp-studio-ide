@@ -62,6 +62,14 @@ handleWithCustomErrors(
 )
 
 handleWithCustomErrors(
+    EVENTS.SPRING.CREATE_GRAPHQL_SCHEMA,
+    async (_event, schemaConfig: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        await engine.createGraphqlSchema?.(schemaConfig, basePath)
+    }
+)
+
+handleWithCustomErrors(
     EVENTS.SPRING.CREATE_CONTROLLER,
     async (_event, controllerConfig: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType)
