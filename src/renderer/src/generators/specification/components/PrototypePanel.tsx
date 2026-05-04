@@ -216,7 +216,13 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
 
                 <div className="relative flex-1 overflow-hidden p-6">
                     {activeTab === 'preview' && (
-                        <PreviewPane device={device} url={devStatus.url} running={devStatus.running} />
+                        <PreviewPane
+                            device={device}
+                            url={devStatus.url}
+                            running={devStatus.running}
+                            installing={devStatus.installing}
+                            onSwitchToLogs={() => setActiveTab('logs')}
+                        />
                     )}
                     {activeTab === 'files' && <FilesPane basePath={basePath} />}
                     {activeTab === 'logs' && <LogsPane />}
@@ -340,12 +346,25 @@ const DeviceButton = ({
 const PreviewPane = ({
     device,
     url,
-    running
+    running,
+    installing,
+    onSwitchToLogs
 }: {
     device: DeviceFrame
     url: string | null
     running: boolean
+    installing: boolean
+    onSwitchToLogs: () => void
 }): JSX.Element => {
+    // Surface the latest install/dev-server error inline. Without this, a
+    // failed start would only show "Dev server is stopped" with no clue.
+    const lastError = useSelector((s: RootState) => {
+        const logs = s.specPrototype.logs
+        for (let i = logs.length - 1; i >= 0; i--) {
+            if (logs[i].level === 'error') return logs[i]
+        }
+        return null
+    })
     const widthClass =
         device === 'desktop'
             ? 'w-full'
@@ -373,15 +392,52 @@ const PreviewPane = ({
                             style={{ width: '100%', height: '100%', border: 'none' }}
                         />
                     ) : (
-                        <div className="flex h-full flex-col items-center justify-center gap-4 text-gray-400">
+                        <div className="flex h-full flex-col items-center justify-center gap-4 px-8 text-gray-500">
                             <LayoutIcon size={48} className="opacity-20" />
-                            <div className="space-y-1 text-center text-sm italic">
-                                <p>{running ? 'Starting preview…' : 'Dev server is stopped.'}</p>
-                                <p className="text-[11px]">
-                                    {running
-                                        ? 'Waiting for the dev server to bind to its port.'
-                                        : 'Click ▶ in the toolbar to start, or describe a feature in the Build chat.'}
-                                </p>
+                            <div className="max-w-md space-y-2 text-center text-sm">
+                                {installing ? (
+                                    <>
+                                        <p className="font-medium text-gray-700">
+                                            Installing dependencies…
+                                        </p>
+                                        <p className="text-[11px] italic text-gray-500">
+                                            Running <code>npm install</code> for the first time.
+                                            This can take a couple of minutes — see the Logs tab
+                                            for live progress.
+                                        </p>
+                                    </>
+                                ) : running ? (
+                                    <>
+                                        <p className="italic">Starting preview…</p>
+                                        <p className="text-[11px] italic">
+                                            Waiting for the dev server to bind to its port.
+                                        </p>
+                                    </>
+                                ) : lastError ? (
+                                    <>
+                                        <p className="font-medium text-red-600">
+                                            Dev server failed to start.
+                                        </p>
+                                        <pre className="max-h-32 overflow-y-auto rounded-md border border-red-200 bg-red-50 p-2 text-left text-[11px] text-red-700">
+                                            {lastError.line}
+                                        </pre>
+                                        <button
+                                            type="button"
+                                            onClick={onSwitchToLogs}
+                                            className="text-[11px] text-primary hover:underline"
+                                        >
+                                            Open Logs tab for details →
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p className="italic">Dev server is stopped.</p>
+                                        <p className="text-[11px] italic">
+                                            Click ▶ in the toolbar to start, or describe a feature
+                                            in the Build chat.
+                                        </p>
+                                    </>
+                                )}
                             </div>
                         </div>
                     )}

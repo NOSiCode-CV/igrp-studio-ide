@@ -13,6 +13,7 @@ export interface PrototypeDevStatus {
     url: string | null
     pid: number | null
     startedAt: number | null
+    installing: boolean
 }
 
 export interface PrototypeLog {
@@ -66,7 +67,8 @@ const initialDevStatus: PrototypeDevStatus = {
     port: null,
     url: null,
     pid: null,
-    startedAt: null
+    startedAt: null,
+    installing: false
 }
 
 export const initialSpecPrototypeState: SpecPrototypeState = {

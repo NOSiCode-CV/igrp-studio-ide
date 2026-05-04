@@ -31,6 +31,8 @@ export interface DevServerStatus {
     url: string | null
     pid: number | null
     startedAt: number | null
+    /** True while `npm install` is running for the prototype's first boot. */
+    installing: boolean
 }
 
 interface ManagedServer {
@@ -48,18 +50,28 @@ const PROTOTYPE_SUBDIR = 'prototype'
 
 class PrototypeDevServerService {
     private readonly servers = new Map<string, ManagedServer>()
+    private readonly installing = new Set<string>()
 
     status(basePath: string): DevServerStatus {
+        const isInstalling = this.installing.has(basePath)
         const server = this.servers.get(basePath)
         if (!server) {
-            return { running: false, port: null, url: null, pid: null, startedAt: null }
+            return {
+                running: false,
+                port: null,
+                url: null,
+                pid: null,
+                startedAt: null,
+                installing: isInstalling
+            }
         }
         return {
             running: !server.proc.killed && server.proc.exitCode === null,
             port: server.port,
             url: `http://localhost:${server.port}`,
             pid: server.proc.pid ?? null,
-            startedAt: server.startedAt
+            startedAt: server.startedAt,
+            installing: isInstalling
         }
     }
 
@@ -86,6 +98,28 @@ class PrototypeDevServerService {
             throw new Error(
                 `${cwd} has no package.json — the prototype scaffold is incomplete.`
             )
+        }
+
+        // Auto-install dependencies on first run. The Next.js scaffold writes
+        // package.json but doesn't run `npm install`, so the very first dev
+        // server boot would fail with "next: command not found". We install
+        // lazily and stream progress to the Logs tab so the user sees what's
+        // happening.
+        if (!fs.existsSync(join(cwd, 'node_modules'))) {
+            this.installing.add(basePath)
+            broadcast(EVENTS.SPEC_PROTOTYPE.DEV_STATUS, {
+                basePath,
+                status: this.status(basePath)
+            })
+            try {
+                await this.installDependencies(basePath, cwd)
+            } finally {
+                this.installing.delete(basePath)
+                broadcast(EVENTS.SPEC_PROTOTYPE.DEV_STATUS, {
+                    basePath,
+                    status: this.status(basePath)
+                })
+            }
         }
 
         const port = await prototypePortPool.acquire(basePath)
@@ -210,6 +244,58 @@ class PrototypeDevServerService {
             stops.push(this.stop(basePath).catch(() => undefined))
         }
         await Promise.all(stops)
+    }
+
+    /**
+     * Runs `npm install` inside the prototype folder and streams progress to
+     * the Logs tab. Resolves when install finishes (success), rejects with a
+     * descriptive error on failure so the caller can surface it.
+     */
+    private installDependencies(basePath: string, cwd: string): Promise<void> {
+        const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm'
+        const banner = (line: string, level: DevLogLevel = 'info'): void => {
+            const entry: DevLogEntry = { timestamp: Date.now(), level, line }
+            broadcast(EVENTS.SPEC_PROTOTYPE.DEV_LOG, { basePath, entry })
+        }
+
+        banner('[install] node_modules missing — running `npm install` (first run only)…')
+
+        return new Promise((resolve, reject) => {
+            const proc = spawn(
+                npm,
+                ['install', '--no-audit', '--no-fund', '--prefer-offline'],
+                {
+                    cwd,
+                    env: { ...process.env, FORCE_COLOR: '0', npm_config_progress: 'false' },
+                    shell: false
+                }
+            )
+
+            const consume = (level: DevLogLevel) => (chunk: Buffer) => {
+                chunk
+                    .toString()
+                    .split(/\r?\n/)
+                    .map((l) => l.trimEnd())
+                    .filter(Boolean)
+                    .forEach((line) => banner(line, level))
+            }
+            proc.stdout?.on('data', consume('info'))
+            proc.stderr?.on('data', consume('warn'))
+            proc.on('error', (err) => {
+                banner(`[install] spawn failed: ${err.message}`, 'error')
+                reject(err)
+            })
+            proc.on('exit', (code) => {
+                if (code === 0) {
+                    banner('[install] dependencies installed ✓')
+                    resolve()
+                } else {
+                    const message = `npm install exited with code ${code}`
+                    banner(`[install] ${message}`, 'error')
+                    reject(new Error(message))
+                }
+            })
+        })
     }
 }
 

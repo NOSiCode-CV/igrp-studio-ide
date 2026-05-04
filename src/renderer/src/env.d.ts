@@ -289,6 +289,7 @@ interface SpecPrototypeDevStatus {
     url: string | null
     pid: number | null
     startedAt: number | null
+    installing: boolean
 }
 
 interface SpecPrototypeDevLog {
