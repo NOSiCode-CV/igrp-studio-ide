@@ -10,10 +10,8 @@ import { useTabs } from '@renderer/components/navigation/TabContext'
 import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { cn } from '@renderer/lib/utils'
-import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
-import { Activity, BellRing, Cable, Plus, RefreshCcw, WandSparkles } from 'lucide-react'
+import { Activity, BellRing, Cable, Plus, WandSparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { GraphQLService } from './service'
 import type { GraphQLPersistedOperation, GraphQLOperationType } from './types'
 import { GraphQLOperationEditor } from './operation-editor'
@@ -66,7 +64,6 @@ export const GraphQLOverviewLayout = ({ currentItem }: GraphQLPageProps) => {
     const moduleName = currentItem?.module || 'shared'
     const [operations, setOperations] = useState<GraphQLPersistedOperation[]>([])
     const [loading, setLoading] = useState(false)
-    const dispatch: any = useDispatch()
     const { handleNewTab } = useTabs()
     const { changeStatus, basePath } = useStudioAPI(moduleName)
 
@@ -160,20 +157,6 @@ export const GraphQLOverviewLayout = ({ currentItem }: GraphQLPageProps) => {
                     </div>
                 </IGRPCardHeaderPrimitive>
             </IGRPCardPrimitive>
-
-            <div className="flex justify-end">
-                <IGRPButtonPrimitive
-                    variant="outline"
-                    type="button"
-                    onClick={async () => {
-                        await loadOperations()
-                        dispatch(onSetChangeStatus(false))
-                    }}
-                >
-                    <RefreshCcw className="h-4 w-4" />
-                    Refresh
-                </IGRPButtonPrimitive>
-            </div>
 
             <div className="grid gap-4 lg:grid-cols-3">
                 {groupedOperations.map((group) => (

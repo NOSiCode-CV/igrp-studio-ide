@@ -4,39 +4,48 @@ import type { GraphQLOperationFormValues, GraphQLPersistedOperation } from './ty
 
 const PRIMITIVES = new Set(['Boolean', 'String', 'Int', 'Float', 'ID'])
 
+const GQL_TO_ENGINE_TYPE: Record<string, string> = {
+    Int: 'integer',
+    Float: 'float',
+    Boolean: 'boolean',
+    String: 'string',
+    ID: 'string'
+}
+
 function buildSchemaConfig(moduleName: string, schemaName: string, ops: GraphQLPersistedOperation[]) {
     const queries: object[] = []
     const mutations: object[] = []
-    const inputRefs = new Set<string>()
 
     for (const op of ops) {
         if (op.operationType === 'subscription') continue
-        const collectionType = op.returnMode === 'list' ? 'list' : 'single'
-        const returnPart = PRIMITIVES.has(op.returnType)
-            ? { returnType: op.returnType, collectionType }
-            : { returnTypeRef: op.returnType, collectionType }
-        const argsPart =
-            op.args && op.args.length > 0
-                ? {
-                      args: op.args.map((a) => ({
-                          name: a.name,
-                          type: a.type,
-                          nullable: !a.required,
-                          ...(a.description ? { description: a.description } : {})
-                      }))
-                  }
-                : {}
+
+        const returnObj = PRIMITIVES.has(op.returnType)
+            ? { objectType: 'java' as const, type: GQL_TO_ENGINE_TYPE[op.returnType] ?? op.returnType }
+            : { objectType: 'graphqlType' as const, type: op.returnType }
+
+        const baseParams = (op.args ?? []).map((a) => ({
+            name: a.name,
+            objectType: (PRIMITIVES.has(a.type) ? 'java' : 'graphqlInput') as 'java' | 'graphqlInput',
+            type: GQL_TO_ENGINE_TYPE[a.type] ?? a.type,
+            required: a.required
+        }))
 
         if (op.operationType === 'query') {
-            queries.push({ name: op.name, ...argsPart, ...returnPart })
+            queries.push({
+                name: op.name,
+                ...(baseParams.length > 0 ? { params: baseParams } : {}),
+                return: returnObj,
+                collectionType: op.returnMode === 'list' ? 'list' : 'single'
+            })
         } else if (op.operationType === 'mutation') {
+            const mutationParams = op.inputType
+                ? [{ name: 'input', objectType: 'graphqlInput' as const, type: op.inputType, required: true }, ...baseParams]
+                : baseParams
             mutations.push({
                 name: op.name,
-                ...(op.inputType ? { inputRef: op.inputType } : {}),
-                ...argsPart,
-                ...returnPart
+                ...(mutationParams.length > 0 ? { params: mutationParams } : {}),
+                return: returnObj
             })
-            if (op.inputType && !PRIMITIVES.has(op.inputType)) inputRefs.add(op.inputType)
         }
     }
 
@@ -45,25 +54,9 @@ function buildSchemaConfig(moduleName: string, schemaName: string, ops: GraphQLP
         name: schemaName,
         module: moduleName,
         typeRef: schemaName,
-        ...(inputRefs.size > 0 ? { inputRefs: Array.from(inputRefs) } : {}),
         ...(queries.length > 0 ? { queries } : {}),
         ...(mutations.length > 0 ? { mutations } : {})
     }
-}
-
-async function persistSchemaToEngine(
-    basePath: string,
-    moduleName: string,
-    schemaName: string
-): Promise<void> {
-    if (PRIMITIVES.has(schemaName)) return
-    const allOps = await window.graphql.listGraphQLOperations(basePath, moduleName)
-    const schemaOps = allOps.filter((op) => op.returnType === schemaName)
-    const config = buildSchemaConfig(moduleName, schemaName, schemaOps)
-    console.log('[GraphQL] createGraphqlSchema config:', JSON.stringify(config, null, 2))
-    console.log('[GraphQL] basePath:', basePath)
-    const result = await window.engine.createGraphqlSchema(config, ENV_TYPES.SPRING, basePath)
-    console.log('[GraphQL] createGraphqlSchema result:', result)
 }
 
 export const GraphQLService = {
@@ -74,11 +67,9 @@ export const GraphQLService = {
     ): Promise<GraphQLPersistedOperation> {
         const payload = toGraphQLOperationPayload({ ...values, id: undefined })
         const result = await window.graphql.createGraphQLOperation(basePath, moduleName, payload)
-
         if (payload.operationType !== 'subscription') {
-            await persistSchemaToEngine(basePath, moduleName, payload.returnType)
+            await GraphQLService.generateSchemas(basePath, moduleName)
         }
-
         return result
     },
 
@@ -95,11 +86,9 @@ export const GraphQLService = {
             operationId,
             payload
         )
-
         if (payload.operationType !== 'subscription') {
-            await persistSchemaToEngine(basePath, moduleName, payload.returnType)
+            await GraphQLService.generateSchemas(basePath, moduleName)
         }
-
         return result
     },
 
@@ -110,11 +99,23 @@ export const GraphQLService = {
     ): Promise<void> {
         const allOps = await window.graphql.listGraphQLOperations(basePath, moduleName)
         const target = allOps.find((op) => op.id === operationId)
-
         await window.graphql.deleteGraphQLOperation(basePath, moduleName, operationId)
-
         if (target && target.operationType !== 'subscription') {
-            await persistSchemaToEngine(basePath, moduleName, target.returnType)
+            await GraphQLService.generateSchemas(basePath, moduleName)
+        }
+    },
+
+    async generateSchemas(basePath: string, moduleName: string): Promise<void> {
+        const allOps = await window.graphql.listGraphQLOperations(basePath, moduleName)
+        const uniqueReturnTypes = new Set(
+            allOps
+                .filter((op) => op.operationType !== 'subscription' && !PRIMITIVES.has(op.returnType))
+                .map((op) => op.returnType)
+        )
+        for (const schemaName of uniqueReturnTypes) {
+            const schemaOps = allOps.filter((op) => op.returnType === schemaName)
+            const config = buildSchemaConfig(moduleName, schemaName, schemaOps)
+            await window.engine.createGraphqlSchema(config, ENV_TYPES.SPRING, basePath)
         }
     },
 
