@@ -8,16 +8,15 @@ import { useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { GraphQLService } from './service'
 import { buildGraphQLOperationTouched, validateGraphQLOperation } from './validation'
-import type {
-    GraphQLOperationFormValues,
-    GraphQLPersistedOperation
-} from './types'
+import type { GraphQLOperationFormValues, GraphQLPersistedOperation } from './types'
 
 interface CachedGraphQLManifest {
     operations?: GraphQLPersistedOperation[]
 }
 
-const getOperationTypeFromItem = (currentItem: any): GraphQLOperationFormValues['operationType'] => {
+const getOperationTypeFromItem = (
+    currentItem: any
+): GraphQLOperationFormValues['operationType'] => {
     if (currentItem?.content?.operationType) {
         return currentItem.content.operationType
     }
@@ -66,7 +65,10 @@ const buildInitialValues = (currentItem: any): GraphQLOperationFormValues => {
     }
 }
 
-const getCachedGraphQLOperations = (filesThree: any[], moduleName?: string): GraphQLPersistedOperation[] => {
+const getCachedGraphQLOperations = (
+    filesThree: any[],
+    moduleName?: string
+): GraphQLPersistedOperation[] => {
     if (!moduleName) return []
 
     const moduleNode = filesThree.find((item: any) => item.name === moduleName)
@@ -105,7 +107,9 @@ export const useGraphQLOperation = ({
     const dispatch: any = useDispatch()
     const { handleRenameTab } = useTabs()
     const { showErrorToast, showSuccessToast } = useToast()
-    const { dto, models, responses, enums, basePath, filesThree } = useStudioAPI(currentItem?.module)
+    const { dto, models, responses, enums, basePath, filesThree } = useStudioAPI(
+        currentItem?.module
+    )
 
     const [savedOperation, setSavedOperation] = useState<GraphQLPersistedOperation | null>(
         currentItem?.content || null
@@ -140,7 +144,11 @@ export const useGraphQLOperation = ({
                           savedOperation.id,
                           values
                       )
-                    : await GraphQLService.createGraphQLOperation(basePath, currentItem.module, values)
+                    : await GraphQLService.createGraphQLOperation(
+                          basePath,
+                          currentItem.module,
+                          values
+                      )
 
                 setSavedOperation(result)
                 formik.setFieldValue('id', result.id, false)
@@ -160,7 +168,11 @@ export const useGraphQLOperation = ({
         }
 
         try {
-            await GraphQLService.deleteGraphQLOperation(basePath, currentItem.module, savedOperation.id)
+            await GraphQLService.deleteGraphQLOperation(
+                basePath,
+                currentItem.module,
+                savedOperation.id
+            )
             dispatch(onSetChangeStatus(true))
             showSuccessToast(`GraphQL operation "${savedOperation.name}" deleted successfully`)
             onCloseTab()

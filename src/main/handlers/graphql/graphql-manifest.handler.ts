@@ -72,6 +72,9 @@ ipcMain.handle(
     }
 )
 
-ipcMain.handle(EVENTS.GRAPHQL.LIST_OPERATIONS, async (_event, basePath: string, moduleName: string) => {
-    return await listGraphQLOperations(basePath, moduleName)
-})
+ipcMain.handle(
+    EVENTS.GRAPHQL.LIST_OPERATIONS,
+    async (_event, basePath: string, moduleName: string) => {
+        return await listGraphQLOperations(basePath, moduleName)
+    }
+)

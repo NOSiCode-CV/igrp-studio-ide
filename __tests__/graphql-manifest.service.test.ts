@@ -12,9 +12,7 @@ import {
     validateManifest
 } from '../src/main/services/graphql/graphql-manifest.service'
 
-function createBaseOperation(
-    overrides: Partial<GraphQLOperation> = {}
-): GraphQLOperation {
+function createBaseOperation(overrides: Partial<GraphQLOperation> = {}): GraphQLOperation {
     return {
         id: 'op-1',
         operationType: 'query',
@@ -254,23 +252,25 @@ describe('graphql manifest service', () => {
             expect(errors.some((error) => error.code === 'duplicate_argument_name')).toBe(true)
         })
 
-        it.each(['statusCode', 'headers', 'contentType', 'body'])(
-            'rejects forbidden REST-like field %s',
-            (fieldName) => {
-                const operation = {
-                    ...createBaseOperation(),
-                    [fieldName]: fieldName === 'statusCode' ? 200 : {}
-                }
-
-                const errors = validateManifest(
-                    createManifest({
-                        operations: [operation as unknown as GraphQLOperation]
-                    })
-                )
-
-                expect(errors.some((error) => error.code === 'forbidden_rest_field')).toBe(true)
+        it.each([
+            'statusCode',
+            'headers',
+            'contentType',
+            'body'
+        ])('rejects forbidden REST-like field %s', (fieldName) => {
+            const operation = {
+                ...createBaseOperation(),
+                [fieldName]: fieldName === 'statusCode' ? 200 : {}
             }
-        )
+
+            const errors = validateManifest(
+                createManifest({
+                    operations: [operation as unknown as GraphQLOperation]
+                })
+            )
+
+            expect(errors.some((error) => error.code === 'forbidden_rest_field')).toBe(true)
+        })
     })
 
     describe('crud operations', () => {
@@ -300,7 +300,7 @@ describe('graphql manifest service', () => {
             })
 
             expect(operation.inputType).toBe('CreateCarroInput')
-            expect((await listOperations(projectPath, 'catalogo'))).toHaveLength(1)
+            expect(await listOperations(projectPath, 'catalogo')).toHaveLength(1)
         })
 
         it('creates a valid subscription with eventTopic', async () => {
@@ -313,7 +313,7 @@ describe('graphql manifest service', () => {
             })
 
             expect(operation.eventTopic).toBe('carro.created')
-            expect((await listOperations(projectPath, 'catalogo'))).toHaveLength(1)
+            expect(await listOperations(projectPath, 'catalogo')).toHaveLength(1)
         })
 
         it('updates an operation by id', async () => {

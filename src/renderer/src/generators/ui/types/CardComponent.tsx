@@ -30,8 +30,8 @@ const CardComponent = ({ comp, group, hoverClass, onDragEnd }: CardComponentProp
     // Extract icon properties for button components
     const iconProps = iconProperties
         ? {
-            ...iconProperties
-        }
+              ...iconProperties
+          }
         : {}
 
     return (

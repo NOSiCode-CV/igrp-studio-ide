@@ -9,13 +9,15 @@ import useStudio from '@renderer/hooks/use-studio'
 import { useEffect, useState } from 'react'
 
 export interface CustomComponentProps {
-
     comp: StructuredComponent
     onDragEnd: (result: DragEndResult) => void
     isDisabled?: boolean
 }
 
-const IGRPStudioCustomComponent: React.FC<CustomComponentProps> = ({ comp, onDragEnd }: CustomComponentProps) => {
+const IGRPStudioCustomComponent: React.FC<CustomComponentProps> = ({
+    comp,
+    onDragEnd
+}: CustomComponentProps) => {
     const { id: componentId, children: buttonComponents, componentName, properties } = comp
 
     const { findComponentById } = useStudio()
@@ -69,7 +71,6 @@ const IGRPStudioCustomComponent: React.FC<CustomComponentProps> = ({ comp, onDra
     }
 
     return (
-
         <div className="border border-dashed border-gray-200 p-4 rounded-lg">
             <div className="flex items-center gap-3 flex-wrap md:flex-nowrap mb-2">
                 {Icon && (
@@ -80,14 +81,12 @@ const IGRPStudioCustomComponent: React.FC<CustomComponentProps> = ({ comp, onDra
                 <div className="text-base font-medium text-muted-foreground truncate">
                     {componentLabel}
                 </div>
-
             </div>
-            {hasChildren && <Droppable
-                component={comp}
-                onDrop={onDragEnd}
-            >
-                {renderButtons()}
-            </Droppable>}
+            {hasChildren && (
+                <Droppable component={comp} onDrop={onDragEnd}>
+                    {renderButtons()}
+                </Droppable>
+            )}
         </div>
     )
 }

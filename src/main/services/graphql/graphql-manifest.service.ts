@@ -165,7 +165,8 @@ export function validateManifest(manifest: unknown): GraphQLManifestValidationEr
 
         if (
             typedOperation.operationType === 'mutation' &&
-            (typeof typedOperation.inputType !== 'string' || typedOperation.inputType.trim().length === 0)
+            (typeof typedOperation.inputType !== 'string' ||
+                typedOperation.inputType.trim().length === 0)
         ) {
             errors.push({
                 field: `${operationField}.inputType`,
@@ -212,7 +213,10 @@ export function validateManifest(manifest: unknown): GraphQLManifestValidationEr
 
                 const typedArgument = argument as Partial<GraphQLArgument>
 
-                if (typeof typedArgument.name !== 'string' || typedArgument.name.trim().length === 0) {
+                if (
+                    typeof typedArgument.name !== 'string' ||
+                    typedArgument.name.trim().length === 0
+                ) {
                     errors.push({
                         field: `${argumentField}.name`,
                         message: 'Argument name is required',
@@ -228,7 +232,10 @@ export function validateManifest(manifest: unknown): GraphQLManifestValidationEr
                     seenArgumentNames.add(typedArgument.name)
                 }
 
-                if (typeof typedArgument.type !== 'string' || typedArgument.type.trim().length === 0) {
+                if (
+                    typeof typedArgument.type !== 'string' ||
+                    typedArgument.type.trim().length === 0
+                ) {
                     errors.push({
                         field: `${argumentField}.type`,
                         message: 'Argument type is required',
@@ -340,7 +347,9 @@ export async function updateOperation(
     updates: Partial<Omit<GraphQLOperation, 'id'>>
 ): Promise<GraphQLOperation> {
     const manifest = await loadManifest(basePath, moduleName)
-    const operationIndex = manifest.operations.findIndex((operation) => operation.id === operationId)
+    const operationIndex = manifest.operations.findIndex(
+        (operation) => operation.id === operationId
+    )
 
     if (operationIndex === -1) {
         throw new Error(`GraphQL operation "${operationId}" not found`)
@@ -385,7 +394,10 @@ export async function deleteOperation(
     await saveManifest(basePath, moduleName, updatedManifest)
 }
 
-export async function listOperations(basePath: string, moduleName: string): Promise<GraphQLOperation[]> {
+export async function listOperations(
+    basePath: string,
+    moduleName: string
+): Promise<GraphQLOperation[]> {
     const manifest = await loadManifest(basePath, moduleName)
     return manifest.operations
 }

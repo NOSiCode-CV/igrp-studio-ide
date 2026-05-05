@@ -36,7 +36,8 @@ const operationGroups: Array<{
     key: GraphQLOperationType
     title: string
     icon: React.ElementType
-    optionType: typeof OPTION_TYPE.GRAPHQL_QUERY
+    optionType:
+        | typeof OPTION_TYPE.GRAPHQL_QUERY
         | typeof OPTION_TYPE.GRAPHQL_MUTATION
         | typeof OPTION_TYPE.GRAPHQL_SUBSCRIPTION
 }> = [
@@ -186,7 +187,9 @@ export const GraphQLOverviewLayout = ({ currentItem }: GraphQLPageProps) => {
                             <div className="space-y-2">
                                 {group.items.length === 0 && (
                                     <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-                                        {loading ? 'Loading...' : `No ${group.title.toLowerCase()} yet.`}
+                                        {loading
+                                            ? 'Loading...'
+                                            : `No ${group.title.toLowerCase()} yet.`}
                                     </div>
                                 )}
 

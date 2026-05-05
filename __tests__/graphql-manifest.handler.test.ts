@@ -71,7 +71,7 @@ describe('graphql manifest handler', () => {
         })
     })
 
-        it('delegates deleteGraphQLOperation to the service', async () => {
+    it('delegates deleteGraphQLOperation to the service', async () => {
         serviceMock.deleteOperation.mockResolvedValue(undefined)
 
         await expect(deleteGraphQLOperation(basePath, 'catalogo', 'op-1')).resolves.toBeUndefined()

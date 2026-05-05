@@ -92,7 +92,14 @@ const graphql = {
         moduleName: string,
         operationId: string,
         updates: Partial<Omit<GraphQLOperation, 'id'>>
-    ) => ipcRenderer.invoke(EVENTS.GRAPHQL.UPDATE_OPERATION, basePath, moduleName, operationId, updates),
+    ) =>
+        ipcRenderer.invoke(
+            EVENTS.GRAPHQL.UPDATE_OPERATION,
+            basePath,
+            moduleName,
+            operationId,
+            updates
+        ),
     deleteGraphQLOperation: (basePath: string, moduleName: string, operationId: string) =>
         ipcRenderer.invoke(EVENTS.GRAPHQL.DELETE_OPERATION, basePath, moduleName, operationId),
     listGraphQLOperations: (basePath: string, moduleName: string) =>

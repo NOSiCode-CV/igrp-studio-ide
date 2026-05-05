@@ -330,9 +330,10 @@ const useNavdata = (filesThree: FileTree[]) => {
                 const graphQLTypesDirectory = graphQLDirectory?.children?.find(
                     (child: any) => child.isDirectory && child.name === 'types'
                 )
-                const graphQLTypeFiles: any[] = graphQLTypesDirectory?.children?.filter(
-                    (file: any) => !file.isDirectory && file.name.endsWith('.json')
-                ) ?? []
+                const graphQLTypeFiles: any[] =
+                    graphQLTypesDirectory?.children?.filter(
+                        (file: any) => !file.isDirectory && file.name.endsWith('.json')
+                    ) ?? []
 
                 folderMenuItem.subItems?.push({
                     id: `graphql-${folder.name}`,

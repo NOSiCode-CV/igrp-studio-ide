@@ -43,11 +43,7 @@ export const GraphQLOperationEditor = ({
                 formik.handleSubmit()
             }}
         >
-            <NavigationBar
-                title={title}
-                isNew={!isPersisted}
-                onDelete={handleDelete}
-            />
+            <NavigationBar title={title} isNew={!isPersisted} onDelete={handleDelete} />
 
             <div className="space-y-4 p-4">
                 <IGRPCardPrimitive>
@@ -158,7 +154,9 @@ export const GraphQLOperationEditor = ({
                 {isSubscription && (
                     <IGRPCardPrimitive>
                         <IGRPCardHeaderPrimitive>
-                            <IGRPCardTitlePrimitive>Event Pattern Configuration</IGRPCardTitlePrimitive>
+                            <IGRPCardTitlePrimitive>
+                                Event Pattern Configuration
+                            </IGRPCardTitlePrimitive>
                             <IGRPCardDescriptionPrimitive>
                                 Define which events trigger this GraphQL subscription.
                             </IGRPCardDescriptionPrimitive>
@@ -232,7 +230,9 @@ export const GraphQLOperationEditor = ({
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
                                         error={(formik.errors.args as any)?.[index]?.name}
-                                        isTouched={Boolean((formik.touched.args as any)?.[index]?.name)}
+                                        isTouched={Boolean(
+                                            (formik.touched.args as any)?.[index]?.name
+                                        )}
                                     />
                                     <SelectInput
                                         id={`args.${index}.type`}
@@ -249,7 +249,9 @@ export const GraphQLOperationEditor = ({
                                             formik.setFieldValue(`args.${index}.type`, value)
                                         }
                                         error={(formik.errors.args as any)?.[index]?.type}
-                                        isTouched={Boolean((formik.touched.args as any)?.[index]?.type)}
+                                        isTouched={Boolean(
+                                            (formik.touched.args as any)?.[index]?.type
+                                        )}
                                     />
                                     <TextInput
                                         id={`args.${index}.defaultValue`}
@@ -276,7 +278,10 @@ export const GraphQLOperationEditor = ({
                                             label="Required"
                                             value={formik.values.args[index].required}
                                             onChange={(value) =>
-                                                formik.setFieldValue(`args.${index}.required`, value)
+                                                formik.setFieldValue(
+                                                    `args.${index}.required`,
+                                                    value
+                                                )
                                             }
                                         />
                                     </div>

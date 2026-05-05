@@ -36,9 +36,7 @@ export async function validateGraphQLOperation(
         errors.name = 'Operation name is required'
     } else if (!isValidGraphQLName(operationName)) {
         errors.name = 'Operation name must be a valid GraphQL field name'
-    } else if (
-        siblingOperations.some((operation) => normalize(operation.name) === operationName)
-    ) {
+    } else if (siblingOperations.some((operation) => normalize(operation.name) === operationName)) {
         errors.name = `A ${values.operationType} with this name already exists`
     }
 
@@ -96,7 +94,9 @@ export async function validateGraphQLOperation(
     })
 
     if (argErrors.some(Boolean)) {
-        errors.args = argErrors.map((entry) => entry ?? {}) as FormikErrors<GraphQLArgumentFormValue>[]
+        errors.args = argErrors.map(
+            (entry) => entry ?? {}
+        ) as FormikErrors<GraphQLArgumentFormValue>[]
     }
 
     return errors

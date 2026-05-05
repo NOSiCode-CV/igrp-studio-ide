@@ -38,9 +38,7 @@ export const toGraphQLOperationPayload = (
     values: GraphQLOperationFormValues
 ): GraphQLOperationPayload => {
     const operationType = values.operationType
-    const sanitizedArgs = values.args
-        .filter(hasArgumentContent)
-        .map(sanitizeArgument)
+    const sanitizedArgs = values.args.filter(hasArgumentContent).map(sanitizeArgument)
 
     const payload: GraphQLOperationPayload = {
         ...(trimToUndefined(values.id) ? { id: trimToUndefined(values.id) } : {}),

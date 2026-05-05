@@ -12,7 +12,11 @@ const GQL_TO_ENGINE_TYPE: Record<string, string> = {
     ID: 'string'
 }
 
-function buildSchemaConfig(moduleName: string, schemaName: string, ops: GraphQLPersistedOperation[]) {
+function buildSchemaConfig(
+    moduleName: string,
+    schemaName: string,
+    ops: GraphQLPersistedOperation[]
+) {
     const queries: object[] = []
     const mutations: object[] = []
 
@@ -20,12 +24,17 @@ function buildSchemaConfig(moduleName: string, schemaName: string, ops: GraphQLP
         if (op.operationType === 'subscription') continue
 
         const returnObj = PRIMITIVES.has(op.returnType)
-            ? { objectType: 'java' as const, type: GQL_TO_ENGINE_TYPE[op.returnType] ?? op.returnType }
+            ? {
+                  objectType: 'java' as const,
+                  type: GQL_TO_ENGINE_TYPE[op.returnType] ?? op.returnType
+              }
             : { objectType: 'graphqlType' as const, type: op.returnType }
 
         const baseParams = (op.args ?? []).map((a) => ({
             name: a.name,
-            objectType: (PRIMITIVES.has(a.type) ? 'java' : 'graphqlInput') as 'java' | 'graphqlInput',
+            objectType: (PRIMITIVES.has(a.type) ? 'java' : 'graphqlInput') as
+                | 'java'
+                | 'graphqlInput',
             type: GQL_TO_ENGINE_TYPE[a.type] ?? a.type,
             required: a.required
         }))
@@ -39,7 +48,15 @@ function buildSchemaConfig(moduleName: string, schemaName: string, ops: GraphQLP
             })
         } else if (op.operationType === 'mutation') {
             const mutationParams = op.inputType
-                ? [{ name: 'input', objectType: 'graphqlInput' as const, type: op.inputType, required: true }, ...baseParams]
+                ? [
+                      {
+                          name: 'input',
+                          objectType: 'graphqlInput' as const,
+                          type: op.inputType,
+                          required: true
+                      },
+                      ...baseParams
+                  ]
                 : baseParams
             mutations.push({
                 name: op.name,
@@ -109,7 +126,9 @@ export const GraphQLService = {
         const allOps = await window.graphql.listGraphQLOperations(basePath, moduleName)
         const uniqueReturnTypes = new Set(
             allOps
-                .filter((op) => op.operationType !== 'subscription' && !PRIMITIVES.has(op.returnType))
+                .filter(
+                    (op) => op.operationType !== 'subscription' && !PRIMITIVES.has(op.returnType)
+                )
                 .map((op) => op.returnType)
         )
         for (const schemaName of uniqueReturnTypes) {
