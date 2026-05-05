@@ -8,10 +8,12 @@ interface GitProviderConfig {
     authUrl: string
     tokenUrl: string
     provider: 'github' | 'gitlab'
+    /** Web host (e.g. https://github.example.com) — needed by GitHub Enterprise. */
+    baseUrl?: string
 }
 
 interface GitService {
-    initialize: (token: string) => void
+    initialize: (token: string, baseUrl?: string) => void
 }
 
 const DEV_PORT = process.env.VITE_DEV_PORT || 4000
@@ -148,11 +150,12 @@ export class GitAuth {
     private handleAuthSuccess(data: any, mainWindow: BrowserWindow) {
         if (data.access_token) {
             this.tokenService.setToken(this.config.provider, data.access_token)
-            this.gitService.initialize(data.access_token)
+            this.gitService.initialize(data.access_token, this.config.baseUrl)
 
             mainWindow.webContents.send(`${this.config.provider}-oauth-success`, {
                 access_token: data.access_token,
-                scope: data.scope
+                scope: data.scope,
+                baseUrl: this.config.baseUrl
             })
             mainWindow.show()
             mainWindow.focus()

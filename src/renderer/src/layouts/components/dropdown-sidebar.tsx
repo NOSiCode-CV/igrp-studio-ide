@@ -313,10 +313,12 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                                 <IGRPDropdownMenuItemPrimitive
                                     onClick={(e) => {
                                         e.stopPropagation()
+                                        const actionId = `new-action-${menuItem.id || menuItem.label}`
                                         handleDropdownClick({
                                             ...menuItem,
                                             ...menu,
-                                            isNew: menu.isNew ?? true
+                                            isNew: menu.isNew ?? true,
+                                            id: actionId,
                                         })
                                     }}
                                     variant={isDelete ? 'destructive' : 'default'}

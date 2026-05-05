@@ -2,7 +2,7 @@ import type {
     ProjectWorkspace,
     ServiceWorkspace,
     WorkspaceService
-} from '@igrp/igrp-studio-nextjs-engine/types'
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import useToast from '@renderer/hooks/useToast'
 import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks'
@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { type NavigateFunction, useNavigate } from 'react-router-dom'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 import type { HandlerResponse, IWorkspace, ProjectData, ServiceInfo } from 'src/main/types'
 
 interface RootState {
@@ -159,6 +159,12 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
             dispatch(setChangeStatus(true))
 
+            try {
+                await window.igrpStudioSettings.setWelcomeOnboardingCompleted(true)
+            } catch {
+                // non-blocking
+            }
+
             return result
         } catch (err) {
             showErrorToast(err)
@@ -261,6 +267,30 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
             dispatch(setConfig(result))
 
+            // Detect git repo root (monorepo support) and persist on the project
+            try {
+                const repoRoot: string | null = await window.electron.ipcRenderer.invoke(
+                    'git-repo-root',
+                    result.path
+                )
+                if (
+                    repoRoot &&
+                    (result.gitRootPath !== repoRoot || !result.gitRepoRootDetectedAt)
+                ) {
+                    const nowIso = new Date().toISOString()
+                    const patch = {
+                        gitRootPath: repoRoot,
+                        gitRepoRootDetectedAt: nowIso
+                    }
+                    // Persist + update store config to keep UI consistent
+                    await window.igrpStudio.workspace.updateProject(result.id, patch)
+                    const updatedResult = { ...result, ...patch }
+                    dispatch(setConfig(updatedResult))
+                }
+            } catch {
+                // non-blocking: git may be unavailable or folder is not a repo
+            }
+
             onSuccess?.()
 
             navigateToNextPage(navigate, project)
@@ -278,7 +308,8 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     ): Promise<void> => {
         const navigationMap = {
             [ENV_TYPES.NEXTJS]: ROUTES.PATH_PAGE_BUILDER_UI,
-            [ENV_TYPES.SPRING]: ROUTES.PATH_PAGE_BUILDER_API
+            [ENV_TYPES.SPRING]: ROUTES.PATH_PAGE_BUILDER_API,
+            [ENV_TYPES.SPECIFICATION]: ROUTES.PATH_PAGE_BUILDER_SPECIFICATION
         }
         const path = navigationMap[appConfig.framework as keyof typeof navigationMap]
         if (path) navigate(path)
@@ -426,6 +457,11 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     useEffect(() => {
         refreshWorkspaces()
     }, [])
+
+    useEffect(() => {
+        if (!changeStatus) return
+        refreshWorkspaces().finally(() => dispatch(setChangeStatus(false)))
+    }, [changeStatus])
 
     return {
         workspaces,

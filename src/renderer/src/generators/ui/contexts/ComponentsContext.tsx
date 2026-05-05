@@ -24,7 +24,18 @@ export const ComponentsProvider: React.FC<{ children: ReactNode }> = ({ children
                 return []
             }
             const components = result.result?.components ?? []
-            setComponentsRegistered(components)
+            setComponentsRegistered((prev) => {
+                // Skip update if same length and same names — avoids cascading
+                // re-renders when multiple PageBuilder tabs trigger registration
+                // with identical results.
+                if (prev.length === components.length) {
+                    const sameContent = prev.every(
+                        (c, i) => c.name === components[i]?.name
+                    )
+                    if (sameContent) return prev
+                }
+                return components
+            })
             return components
         } catch (error) {
             console.error('[Debug] ComponentsContext: Failed to load components:', error)

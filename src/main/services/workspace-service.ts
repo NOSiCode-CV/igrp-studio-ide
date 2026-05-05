@@ -7,12 +7,12 @@ import {
     saveCustomWorkspaceComposeFile,
     updateProjectToWorkspace,
     updateServiceToWorkspace
-} from '@igrp/igrp-studio-nextjs-engine'
+} from '@igrp/igrp-studio-workspace-engine'
 import type {
     ProjectWorkspace,
     ServiceWorkspace,
     WorkspaceService
-} from '@igrp/igrp-studio-nextjs-engine/types'
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { app } from 'electron'
 import fs from 'fs'
 import { mkdir, readFile, writeFile } from 'fs/promises'
@@ -191,14 +191,21 @@ export class WorkspaceRepository {
         }
 
         if (!existingProject) {
-            //call engine
-            await addProjectToWorkspace(workspaceConfig, workspacePath)
+            // Specification projects manage their own folder structure via
+            // SpecificationEngine (docs/, kb/, vectors/, chats/, prototype/).
+            // The third-party workspace engine doesn't know the 'specification'
+            // type and would crash on a lookup. Skip its registration here —
+            // metadata is still persisted via this.saveData below.
+            if (framework !== 'specification') {
+                //call engine
+                await addProjectToWorkspace(workspaceConfig, workspacePath)
+            }
         } else {
             console.log(`Project "${config.name}" already exists in workspace. Skipping addition.`)
         }
 
         if (move) {
-            const result = await this.validateAndMoveProject(newProject, workspacePath)
+            const result = await this.validateAndImportProject(newProject, workspacePath)
             if (result.nameChanged) {
                 console.log(
                     `Project name changed from "${result.originalName}" to "${newProject.config.name}" due to existing directory`
@@ -276,7 +283,14 @@ export class WorkspaceRepository {
 
             workspace.updatedAt = new Date().toISOString()
 
-            await this.addProjectToStudioWorkspace(workspace, updatedProject, true)
+            const storageMode = updates.storageMode ?? 'managed'
+            updatedProject.storageMode = storageMode
+
+            await this.addProjectToStudioWorkspace(
+                workspace,
+                updatedProject,
+                storageMode === 'managed'
+            )
 
             foundProject = updatedProject
         }
@@ -486,13 +500,16 @@ export class WorkspaceRepository {
     async listProjects(workspaceId: string): Promise<ProjectData[]> {
         const data = await this.loadData()
         const workspace = data.workspaces.find((w) => w.id === workspaceId)
-        return (
-            workspace?.projects?.sort((a, b) => {
-                const dateA = new Date(a.updatedAt || a.createdAt || '1970-01-01T00:00:00Z')
-                const dateB = new Date(b.updatedAt || b.createdAt || '1970-01-01T00:00:00Z')
-                return dateB.getTime() - dateA.getTime()
-            }) || []
-        )
+        const projects = (workspace?.projects || []).map((p) => ({
+            ...p,
+            storageMode: p.storageMode ?? 'managed'
+        }))
+
+        return projects.sort((a, b) => {
+            const dateA = new Date(a.updatedAt || a.createdAt || '1970-01-01T00:00:00Z')
+            const dateB = new Date(b.updatedAt || b.createdAt || '1970-01-01T00:00:00Z')
+            return dateB.getTime() - dateA.getTime()
+        })
     }
 
     async getRecentWorkspaces(limit = 15): Promise<IWorkspace[]> {
@@ -642,7 +659,7 @@ export class WorkspaceRepository {
             .slice(0, limit)
     }
 
-    async validateAndMoveProject(
+    async validateAndImportProject(
         project: ProjectData,
         workspacePath: string
     ): Promise<{ nameChanged: boolean; originalName?: string }> {
@@ -680,19 +697,15 @@ export class WorkspaceRepository {
             nameChanged = true
         }
 
-        // Move the project
+        // Import (copy) the project into the workspace structure
         try {
             await fs.promises.cp(project.path, expectedPath, {
                 recursive: true
             })
-            await fs.promises.rm(project.path, {
-                recursive: true,
-                force: true
-            })
             project.path = expectedPath
             project.updatedAt = new Date().toISOString()
         } catch (error: any) {
-            throw new Error(`Failed to move project: ${error.message}`)
+            throw new Error(`Failed to import project: ${error.message}`)
         }
 
         return { nameChanged, originalName }

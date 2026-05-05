@@ -2,7 +2,7 @@ import type { Arguments, FieldValidation, State } from '@igrp/igrp-studio-nextjs
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { useCallback } from 'react'
 import { COMPONENT } from '../ComponentTypes'
-import { useDroppedComponents } from '../dnd/DroppedComponentsContext'
+import { useDroppedComponents } from '../contexts/EditorContext'
 
 interface LabeledElementField {
     componentId: string

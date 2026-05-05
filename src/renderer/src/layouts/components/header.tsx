@@ -13,8 +13,8 @@ import {
     IGRPIcon,
     IGRPTooltipContentPrimitive,
     IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
+    IGRPTooltipTriggerPrimitive,
+    IGRPTooltipProviderPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import logo from '@renderer/assets/images/igrp-green.svg'
 import DockerControls from '@renderer/components/docker-controls'
@@ -26,7 +26,7 @@ import { useDocker } from '@renderer/hooks/use-docker'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
 import { cn } from '@renderer/lib/utils'
-import { SettingsDialog } from '@renderer/pages/settings/settings-dialog'
+import { SettingsDialog } from '@renderer/browser/settings'
 import type { RootState } from '@renderer/redux'
 import { getFileThree as onGetPages } from '@renderer/redux/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
@@ -45,7 +45,7 @@ interface HeaderProps {
 const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     const { t } = useTranslation()
     const dispatch: any = useDispatch()
-    const { isGitEnabled } = useSelector((state: RootState) => state.git)
+    const isGitEnabled = useSelector((state: RootState) => state.git.isGitEnabled)
     const isMac = window.api.i18nextElectronBackend.clientOptions.platform === 'darwin'
 
     const { workspace } = useWorkspace()
@@ -129,6 +129,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         className?: string
     }): JSX.Element => (
         <button
+            type="button"
             onClick={onClick}
             className={cn(
                 'flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300',
@@ -154,6 +155,11 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     }
 
     const isProjectAtive = config?.name !== undefined && config?.name !== null
+    const isMonorepoLinked =
+        !!basePath &&
+        config?.storageMode === 'linked' &&
+        !!config?.gitRootPath &&
+        config.gitRootPath !== basePath
     return (
         <>
             <IGRPTooltipProviderPrimitive>
@@ -208,15 +214,57 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
 
                             {basePath && (
                                 <>
-                                    <BranchSwitcher
-                                        projectPath={basePath || ''}
-                                        onError={showErrorToast}
-                                        onSuccess={showSuccessToast}
-                                        onBranchChange={() => {
-                                            dispatch(onGetPages(basePath || ''))
-                                        }}
-                                    />
-                                    {isGitEnabled && <SyncButton basePath={basePath || ''} />}
+                                    {isMonorepoLinked ? (
+                                        <IGRPTooltipPrimitive>
+                                            <IGRPTooltipTriggerPrimitive asChild>
+                                                <div>
+                                                    <BranchSwitcher
+                                                        projectPath={basePath || ''}
+                                                        onError={showErrorToast}
+                                                        onSuccess={showSuccessToast}
+                                                        onBranchChange={() => {
+                                                            dispatch(onGetPages(basePath || ''))
+                                                        }}
+                                                    />
+                                                </div>
+                                            </IGRPTooltipTriggerPrimitive>
+                                            <IGRPTooltipContentPrimitive>
+                                                <p>
+                                                    {t('gitRepoRootDetected', {
+                                                        root: config?.gitRootPath
+                                                    })}
+                                                </p>
+                                            </IGRPTooltipContentPrimitive>
+                                        </IGRPTooltipPrimitive>
+                                    ) : (
+                                        <BranchSwitcher
+                                            projectPath={basePath || ''}
+                                            onError={showErrorToast}
+                                            onSuccess={showSuccessToast}
+                                            onBranchChange={() => {
+                                                dispatch(onGetPages(basePath || ''))
+                                            }}
+                                        />
+                                    )}
+                                    {isGitEnabled &&
+                                        (isMonorepoLinked ? (
+                                            <IGRPTooltipPrimitive>
+                                                <IGRPTooltipTriggerPrimitive asChild>
+                                                    <div>
+                                                        <SyncButton basePath={basePath || ''} />
+                                                    </div>
+                                                </IGRPTooltipTriggerPrimitive>
+                                                <IGRPTooltipContentPrimitive>
+                                                    <p>
+                                                        {t('gitSyncRepoRootWarning', {
+                                                            root: config?.gitRootPath
+                                                        })}
+                                                    </p>
+                                                </IGRPTooltipContentPrimitive>
+                                            </IGRPTooltipPrimitive>
+                                        ) : (
+                                            <SyncButton basePath={basePath || ''} />
+                                        ))}
                                 </>
                             )}
 
@@ -234,20 +282,18 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     </IGRPTooltipContentPrimitive>
                                 </IGRPTooltipPrimitive>
                                 <IGRPDropdownMenuContentPrimitive align="end">
-                                    {installedIDEs.map(
-                                        ({ key, config }, index): React.ReactNode => {
-                                            return (
-                                                <IGRPDropdownMenuItemPrimitive
-                                                    key={index}
-                                                    onClick={() => openIDE(key)}
-                                                    className="flex items-center"
-                                                >
-                                                    <IGRPIcon iconName={config.icon} />
-                                                    {config.name}
-                                                </IGRPDropdownMenuItemPrimitive>
-                                            )
-                                        }
-                                    )}
+                                    {installedIDEs.map(({ key, config }): React.ReactNode => {
+                                        return (
+                                            <IGRPDropdownMenuItemPrimitive
+                                                key={key}
+                                                onClick={() => openIDE(key)}
+                                                className="flex items-center"
+                                            >
+                                                <IGRPIcon iconName={config.icon} />
+                                                {config.name}
+                                            </IGRPDropdownMenuItemPrimitive>
+                                        )
+                                    })}
                                 </IGRPDropdownMenuContentPrimitive>
                             </IGRPDropdownMenuPrimitive>
 

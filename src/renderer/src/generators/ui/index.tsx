@@ -15,12 +15,12 @@ const GeneratorUI = ({ basePath }: PageBuilderProps): JSX.Element => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (basePath == '' || basePath === undefined) {
+        if (basePath === '' || basePath === undefined) {
             navigate(ROUTES.HOME)
         }
 
         if (basePath) EngineService.startWatching(basePath)
-    }, [basePath])
+    }, [basePath, navigate])
 
     return (
         <TabProvider>

@@ -10,6 +10,8 @@ files:
   - '!{.env,.env.*,.npmrc,yarn.lock}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 # Desativar asar para as dependências e binários .node ficarem no disco
+# (inclui native bindings de node-pty, parcel/watcher, cpu-features e
+# @lancedb/lancedb — Specification project type / Knowledge Base).
 asar: false
 win:
   executableName: igrp-studio

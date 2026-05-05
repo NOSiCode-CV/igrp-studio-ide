@@ -98,7 +98,8 @@ export const httpMethods = [
 export enum ENV_TYPES {
     NEXTJS = 'nextjs',
     SPRING = 'springboot',
-    DOTNET = 'dotnet'
+    DOTNET = 'dotnet',
+    SPECIFICATION = 'specification'
 }
 
 export const DatabaseOptions = [

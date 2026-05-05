@@ -1,0 +1,105 @@
+---
+title: Integrated Terminal
+sidebar_position: 5
+---
+
+# Integrated Terminal
+
+The **Integrated Terminal** brings a real shell directly into IGRP Studio, similar to VS Code.
+
+It supports:
+
+- Real command execution (`ls`, `git status`, `npm run dev`, etc.)
+- ANSI colors and escape sequences
+- Multi-terminal tabs/sessions
+- Resize-aware rendering
+- Context-aware startup directory (`cwd`)
+
+## Architecture
+
+The terminal is implemented with:
+
+- **`node-pty`** in the Electron **main process** (spawns shell processes)
+- **`xterm.js`** in the **renderer process** (terminal UI)
+- **IPC bridge** via preload (`contextBridge`) for secure communication
+
+### Process responsibilities
+
+- **Main**:
+  - Creates and manages PTY sessions by `sessionId`
+  - Forwards PTY output/events to renderer
+  - Handles input, resize, and kill actions per session
+- **Preload**:
+  - Exposes safe `window.terminal` API
+- **Renderer**:
+  - Renders tabbed terminal UI
+  - Sends keyboard input and resize updates
+  - Handles tab operations (new, clear, rename, kill)
+
+## Features
+
+### Open / Toggle
+
+- Click the terminal icon in the footer
+- Shortcut: `Ctrl+\`` (Windows/Linux) or `Cmd+\`` (macOS)
+
+### Multi-terminal tabs
+
+- Create a new session with the **+** button
+- Switch between tabs by clicking a tab
+- Close a tab with the close icon (`x`)
+
+### Tab context menu
+
+Right-click a tab to open context actions:
+
+- `Rename` (inline edit)
+- `Kill Terminal` (kills PTY and removes tab)
+
+### Clear terminal
+
+- Click the eraser icon to clear the active terminal viewport/buffer
+
+### Panel resize
+
+- Drag the panel top resizer handle
+- Minimum height: `200px`
+- Default height: `300px`
+
+## Context-aware `cwd`
+
+When a terminal session starts, the initial directory is chosen by UI context:
+
+- **Home / initial context**: workspace path
+- **Project / studio context**: project base path
+
+Fallback behavior:
+
+1. chosen context path
+2. alternate context path
+3. user home directory
+
+If a provided path is invalid or not a directory, the main process safely falls back to home.
+
+## Security
+
+- `nodeIntegration` remains disabled
+- Renderer does not access Node APIs directly
+- All terminal operations go through preload bridge methods
+
+## Packaging note
+
+Because `node-pty` is native:
+
+- Rebuild after dependency changes:
+
+```bash
+npm run rebuild:node-pty
+```
+
+- Ensure native artifacts are included in packaging:
+
+```json
+"extraResources": ["node_modules/node-pty/build/**"]
+```
+

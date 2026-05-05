@@ -19,6 +19,18 @@ export const GitService = {
         }
     },
 
+    async getRepoRoot(projectPath: string): Promise<string | null> {
+        try {
+            const { stdout } = await execAsync('git rev-parse --show-toplevel', {
+                cwd: projectPath
+            })
+            const root = stdout?.trim()
+            return root ? root : null
+        } catch {
+            return null
+        }
+    },
+
     async initializeGit(projectPath: string) {
         try {
             await execAsync('git init', { cwd: projectPath })

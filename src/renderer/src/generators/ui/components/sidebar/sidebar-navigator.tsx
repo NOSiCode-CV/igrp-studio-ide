@@ -14,7 +14,7 @@ import { ChevronRight, File, Folder } from 'lucide-react'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 
 interface FileExplorerSidebarProps {
     basePath: string
