@@ -1,14 +1,19 @@
 import {
     IGRPBadgePrimitive,
     IGRPButtonPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
     IGRPInputPrimitive,
     IGRPSkeletonPrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import { AlertTriangle, Plug, Plus, RotateCcw, Search, Workflow } from 'lucide-react'
-import { type JSX, useMemo } from 'react'
+import { AlertTriangle, Plug, Plus, RotateCcw, Search, Settings, Workflow } from 'lucide-react'
+import { type JSX, useMemo, useState } from 'react'
 import { cn } from '../../../lib/utils'
 import { useProcessStudioClient } from '../client/client-context'
 import { useProcessDefinitions, useProjects } from '../hooks/useProcessDefinitions'
+import { BPMNConnectionsManager } from './connection/BPMNConnectionsManager'
 import { useProcessesSelection } from './ProcessesSelection'
 
 interface ProcessListProps {
@@ -25,6 +30,7 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
     const { binding, loading: clientLoading } = useProcessStudioClient()
     const { projectId, processId, search, setProjectId, setProcessId, setSearch } =
         useProcessesSelection()
+    const [manageOpen, setManageOpen] = useState<boolean>(false)
 
     const projectsQuery = useProjects()
     const projects = projectsQuery.data ?? []
@@ -46,45 +52,102 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
         )
     }, [processes, search])
 
+    const manageDialog = (
+        <IGRPDialogPrimitive open={manageOpen} onOpenChange={setManageOpen}>
+            <IGRPDialogContentPrimitive className="sm:max-w-6xl w-[95vw] max-h-[85vh] overflow-hidden flex flex-col p-0">
+                <IGRPDialogHeaderPrimitive className="border-b px-6 py-4 shrink-0">
+                    <IGRPDialogTitlePrimitive>
+                        Manage BPMN API connections
+                    </IGRPDialogTitlePrimitive>
+                </IGRPDialogHeaderPrimitive>
+                <div className="flex-1 overflow-y-auto px-6 py-4">
+                    <BPMNConnectionsManager compact />
+                </div>
+            </IGRPDialogContentPrimitive>
+        </IGRPDialogPrimitive>
+    )
+
     if (!binding && !clientLoading) {
         return (
-            <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
-                <Plug className="h-8 w-8 text-muted-foreground" />
-                <div className="space-y-1">
-                    <p className="text-sm font-medium">No active BPMN configuration</p>
-                    <p className="text-xs text-muted-foreground">
-                        Open the UI Generator → BPMN tab → API Configuration to add
-                        and activate a Process API endpoint.
-                    </p>
+            <>
+                <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+                    <Plug className="h-8 w-8 text-muted-foreground" />
+                    <div className="space-y-1">
+                        <p className="text-sm font-medium">No active BPMN configuration</p>
+                        <p className="text-xs text-muted-foreground">
+                            Add a Process API endpoint and activate it to start
+                            managing process definitions.
+                        </p>
+                    </div>
+                    <IGRPButtonPrimitive size="sm" onClick={() => setManageOpen(true)}>
+                        <Plus className="mr-1 h-4 w-4" />
+                        Add BPMN connection
+                    </IGRPButtonPrimitive>
                 </div>
-            </div>
+                {manageDialog}
+            </>
         )
     }
 
     const queryError = projectsQuery.error ?? processesQuery.error
     if (queryError) {
         return (
-            <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
-                <AlertTriangle className="h-8 w-8 text-destructive" />
-                <p className="max-w-xs text-xs text-muted-foreground">{queryError.message}</p>
-                <IGRPButtonPrimitive
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                        if (projectsQuery.error) projectsQuery.refetch()
-                        if (processesQuery.error) processesQuery.refetch()
-                    }}
-                >
-                    <RotateCcw className="mr-1 h-4 w-4" />
-                    Retry
-                </IGRPButtonPrimitive>
-            </div>
+            <>
+                <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+                    <AlertTriangle className="h-8 w-8 text-destructive" />
+                    <p className="max-w-xs text-xs text-muted-foreground">
+                        {queryError.message}
+                    </p>
+                    <div className="flex gap-2">
+                        <IGRPButtonPrimitive
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                if (projectsQuery.error) projectsQuery.refetch()
+                                if (processesQuery.error) processesQuery.refetch()
+                            }}
+                        >
+                            <RotateCcw className="mr-1 h-4 w-4" />
+                            Retry
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setManageOpen(true)}
+                        >
+                            <Settings className="mr-1 h-4 w-4" />
+                            Manage connections
+                        </IGRPButtonPrimitive>
+                    </div>
+                </div>
+                {manageDialog}
+            </>
         )
     }
 
     return (
         <div className={cn('flex flex-col', variant === 'full' ? 'h-full' : 'h-full')}>
             <div className="space-y-2 border-b p-3">
+                {binding && (
+                    <div
+                        className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground"
+                        title={binding.config.apiUrl}
+                    >
+                        <div className="flex min-w-0 items-center gap-1">
+                            <Plug className="h-3 w-3 shrink-0" />
+                            <span className="truncate">{binding.config.name}</span>
+                        </div>
+                        <IGRPButtonPrimitive
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-1 text-xs"
+                            onClick={() => setManageOpen(true)}
+                            title="Manage BPMN connections"
+                        >
+                            <Settings className="h-3.5 w-3.5" />
+                        </IGRPButtonPrimitive>
+                    </div>
+                )}
                 <select
                     className="w-full rounded border bg-background px-2 py-1 text-sm"
                     value={effectiveProjectId ?? ''}
@@ -179,6 +242,7 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
                     </ul>
                 )}
             </div>
+            {manageDialog}
         </div>
     )
 }

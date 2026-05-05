@@ -35,3 +35,7 @@ export {
     ProcessesSelectionProvider,
     useProcessesSelection
 } from './components/ProcessesSelection'
+
+export { BPMNConfigCard } from './components/connection/BPMNConfigCard'
+export { BPMNConnectionModal } from './components/connection/BPMNConnectionModal'
+export { BPMNConnectionsManager } from './components/connection/BPMNConnectionsManager'

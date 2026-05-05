@@ -57,6 +57,16 @@ export function ProcessStudioClientProvider({
         void refresh()
     }, [refresh])
 
+    // Re-load when any surface (BPMNConnectionsManager, legacy bpmn-manager,
+    // another window) edits / activates a config.
+    useEffect(() => {
+        const handler = (): void => {
+            void refresh()
+        }
+        window.addEventListener('bpmn-config-changed', handler)
+        return () => window.removeEventListener('bpmn-config-changed', handler)
+    }, [refresh])
+
     const binding = useMemo<ProcessStudioClientBinding | null>(() => {
         if (!activeConfig) return null
         return buildProcessStudioClient(activeConfig)

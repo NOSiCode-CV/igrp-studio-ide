@@ -6,15 +6,16 @@ import { cn } from '@renderer/lib/utils'
 import {
     AlertCircle,
     ArrowDownToLine,
+    Check,
     Copy,
     Library,
     Loader2,
     MessageSquare,
     RefreshCw,
-    Replace,
     Send,
     Square,
-    Trash2
+    Trash2,
+    X
 } from 'lucide-react'
 import {
     type FormEvent,
@@ -27,6 +28,10 @@ import {
 } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import {
+    parseSearchReplaceBlocks,
+    type SREdit
+} from '../../utils/searchReplaceParser'
 
 export type AIAssistantMode = 'docs' | 'prototype' | 'data' | 'process'
 
@@ -44,8 +49,14 @@ export interface AIAssistantContext {
     contextLabel?: string
 }
 
-export type ApplyMode = 'append' | 'replace'
-export type ChatIntent = 'ask' | ApplyMode
+/**
+ * Per-message proposal status reported by the host. The assistant doesn't
+ * own the diff itself — when a reply contains SEARCH/REPLACE blocks we fire
+ * `onProposeChange` and the host renders a diff inside the document editor.
+ * The host then mirrors back the resolution status so the chat bubble can
+ * show a small badge.
+ */
+export type ProposalStatus = 'pending' | 'applied' | 'rejected' | 'stale'
 
 interface ChatMessage {
     id: string
@@ -53,17 +64,6 @@ interface ChatMessage {
     content: string
     streaming?: boolean
     error?: string
-    /**
-     * For assistant messages: when set, the markdown block in the reply is
-     * auto-applied to the host document on completion.
-     */
-    applyOnDone?: ApplyMode
-    /**
-     * Auto-apply was requested but skipped because the reply did not contain
-     * a fenced markdown block. Shown as an inline notice; user can still
-     * apply manually via the hover actions.
-     */
-    autoApplySkipped?: boolean
     /** Prototype-only summary surfaced after a build turn finishes. */
     prototype?: {
         applied: number
@@ -116,8 +116,18 @@ interface AIAssistantProps {
     headerSlot?: ReactNode
     /** Optional handler invoked after each completed assistant message. */
     onAssistantOutput?: (msg: ChatMessage) => void
-    /** Apply markdown from an assistant message to the host document. */
-    onApplyToDocument?: (applyMode: ApplyMode, markdown: string) => void
+    /**
+     * Fires when an assistant reply contains SEARCH/REPLACE edit blocks. The
+     * host applies them onto the current document (via the parser util),
+     * captures a snapshot, swaps the editor for a diff preview, and mirrors
+     * resolution back through `proposalStatus`.
+     */
+    onProposeChange?: (messageId: string, edits: SREdit[]) => void
+    /**
+     * Per-message resolution status mirrored back from the host. Drives a
+     * compact status badge on the assistant bubble (pending/applied/etc).
+     */
+    proposalStatus?: Record<string, ProposalStatus | undefined>
     /** Where requests are dispatched. Default `{ kind: 'llm' }`. */
     chatBackend?: ChatBackend
     /**
@@ -148,7 +158,8 @@ export function AIAssistant({
     submitLabel = mode === 'prototype' ? 'Build' : 'Send',
     headerSlot,
     onAssistantOutput,
-    onApplyToDocument,
+    onProposeChange,
+    proposalStatus,
     chatBackend = { kind: 'llm' },
     supportsKB = false,
     className
@@ -157,7 +168,6 @@ export function AIAssistant({
     const [input, setInput] = useState('')
     const [streaming, setStreaming] = useState(false)
     const [activeRequestId, setActiveRequestId] = useState<string | null>(null)
-    const [intent, setIntent] = useState<ChatIntent>('ask')
     const [useKB, setUseKB] = useState<boolean>(supportsKB)
 
     const [models, setModels] = useState<ProviderModel[]>([])
@@ -406,10 +416,10 @@ export function AIAssistant({
         if (el) el.scrollTop = el.scrollHeight
     }, [messages])
 
-    // After an assistant message finishes streaming, notify the host AND
-    // auto-apply if the user picked a non-ask intent. Auto-apply requires a
-    // fenced markdown block; otherwise we mark it skipped so the user can
-    // apply manually (or refine the prompt and Retry).
+    // After an assistant message finishes streaming, parse the reply for
+    // SEARCH/REPLACE blocks (Aider format). If any are present, hand them to
+    // the host so it can apply them onto the current doc and show a diff in
+    // the editor. Replies without blocks stay as conversation in the bubble.
     useEffect(() => {
         if (streaming) return
         const last = messages[messages.length - 1]
@@ -417,18 +427,11 @@ export function AIAssistant({
 
         onAssistantOutput?.(last)
 
-        if (!last.applyOnDone || !onApplyToDocument || !last.content.trim()) return
+        if (!onProposeChange || !last.content.trim()) return
 
-        const markdown = extractFencedMarkdown(last.content)
-        if (markdown && markdown.trim()) {
-            onApplyToDocument(last.applyOnDone, markdown)
-        } else {
-            // Reply was prose — skip auto-apply, surface a notice on the bubble.
-            setMessages((prev) =>
-                prev.map((m) =>
-                    m.id === last.id ? { ...m, autoApplySkipped: true } : m
-                )
-            )
+        const edits = parseSearchReplaceBlocks(last.content)
+        if (edits.length > 0) {
+            onProposeChange(last.id, edits)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [streaming])
@@ -439,15 +442,14 @@ export function AIAssistant({
      * Used by both the composer and the Retry button on failed messages.
      */
     const dispatchChat = useCallback(
-        async (history: ChatMessage[], applyOnDone?: ApplyMode) => {
+        async (history: ChatMessage[]) => {
             if (!selected || streaming) return
             const requestId = `r-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
             const assistantMsg: ChatMessage = {
                 id: requestId,
                 role: 'assistant',
                 content: '',
-                streaming: true,
-                applyOnDone
+                streaming: true
             }
             const nextMessages = [...history, assistantMsg]
             setMessages(nextMessages)
@@ -460,20 +462,13 @@ export function AIAssistant({
                 useKB
             })
 
-            // When the user picked an apply intent, append a directive so the
-            // model returns ONLY a fenced markdown block, ready to drop in.
-            const intentDirective =
-                applyOnDone === 'replace'
-                    ? '\n\n[Studio intent: REPLACE the current document. Reply with one fenced markdown block ready to overwrite the file. No prose outside.]'
-                    : applyOnDone === 'append'
-                      ? '\n\n[Studio intent: APPEND to the current document. Reply with one fenced markdown block containing only the new fragment. No prose outside.]'
-                      : ''
-
-            const wireMessages = history.map((m, idx) =>
-                idx === history.length - 1 && m.role === 'user' && intentDirective
-                    ? { role: m.role, content: m.content + intentDirective }
-                    : { role: m.role, content: m.content }
-            )
+            // The system prompt (assembled by the host's `contextProvider`)
+            // already teaches the SEARCH/REPLACE format for Documents and
+            // sets expectations for other modes — no extra directive needed.
+            const wireMessages = history.map((m) => ({
+                role: m.role,
+                content: m.content
+            }))
 
             // Route through the prototype pipeline when the host opted in.
             // The prototype generator wants the user message + spec context;
@@ -505,7 +500,7 @@ export function AIAssistant({
                         requestId,
                         basePath: chatBackend.basePath,
                         userMessage:
-                            (lastUser?.content ?? '') + (intentDirective || ''),
+                            lastUser?.content ?? '',
                         specContext: ctx.systemPrompt,
                         providerId: selected.providerId,
                         model: selected.modelId
@@ -521,7 +516,7 @@ export function AIAssistant({
                         requestId,
                         basePath: chatBackend.basePath,
                         userMessage:
-                            (lastUser?.content ?? '') + (intentDirective || ''),
+                            lastUser?.content ?? '',
                         specContext: ctx.systemPrompt,
                         providerId: selected.providerId,
                         model: selected.modelId
@@ -547,24 +542,15 @@ export function AIAssistant({
             event.preventDefault()
             if (!selected || !input.trim() || streaming) return
 
-            // Confirm replace if the doc has content; otherwise it's a no-op risk.
-            if (intent === 'replace' && onApplyToDocument) {
-                if (!window.confirm('This reply will REPLACE the current document. Continue?')) {
-                    return
-                }
-            }
-
             const userMsg: ChatMessage = {
                 id: `u-${Date.now()}`,
                 role: 'user',
                 content: input.trim()
             }
             setInput('')
-            const applyOnDone: ApplyMode | undefined =
-                intent === 'ask' ? undefined : intent
-            await dispatchChat([...messages, userMsg], applyOnDone)
+            await dispatchChat([...messages, userMsg])
         },
-        [dispatchChat, input, intent, messages, onApplyToDocument, selected, streaming]
+        [dispatchChat, input, messages, selected, streaming]
     )
 
     /**
@@ -728,7 +714,7 @@ export function AIAssistant({
                                 ? () => handleRetry(m.id)
                                 : undefined
                         }
-                        onApplyToDocument={onApplyToDocument}
+                        proposalStatus={proposalStatus?.[m.id]}
                     />
                 ))}
             </div>
@@ -739,43 +725,11 @@ export function AIAssistant({
                     <p className="mb-1.5 text-[10px] text-muted-foreground">{ctxLabel}</p>
                 )}
 
-                {/* Intent picker — only meaningful when the host can accept output. */}
-                {onApplyToDocument && (
-                    <div className="mb-2 flex items-center gap-1 rounded-md border bg-card p-0.5 text-[10px]">
-                        <IntentTab
-                            active={intent === 'ask'}
-                            onClick={() => setIntent('ask')}
-                            label="Ask"
-                            title="Just chat — replies stay in the panel"
-                        />
-                        <IntentTab
-                            active={intent === 'append'}
-                            onClick={() => setIntent('append')}
-                            icon={<ArrowDownToLine size={10} />}
-                            label="Append"
-                            title="Auto-append the markdown reply to the current document"
-                        />
-                        <IntentTab
-                            active={intent === 'replace'}
-                            onClick={() => setIntent('replace')}
-                            icon={<Replace size={10} />}
-                            label="Replace"
-                            title="Auto-replace the current document with the markdown reply"
-                        />
-                    </div>
-                )}
-
                 <div className="flex items-end gap-2">
                     <IGRPInputPrimitive
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder={
-                            intent === 'replace'
-                                ? 'Describe the new document…'
-                                : intent === 'append'
-                                  ? 'Describe the section to add…'
-                                  : placeholder
-                        }
+                        placeholder={placeholder}
                         disabled={!selected || streaming}
                         className="h-9 flex-1 text-[12px]"
                     />
@@ -798,11 +752,7 @@ export function AIAssistant({
                             disabled={!selected || !input.trim()}
                         >
                             <Send size={12} />
-                            {intent === 'append'
-                                ? 'Append'
-                                : intent === 'replace'
-                                  ? 'Replace'
-                                  : submitLabel}
+                            {submitLabel}
                         </IGRPButtonPrimitive>
                     )}
                 </div>
@@ -811,43 +761,14 @@ export function AIAssistant({
     )
 }
 
-/**
- * Returns the largest fenced markdown block found in the response, or null
- * when no block is present. We deliberately do NOT fall back to raw text —
- * auto-applying prose would dump conversational filler into the doc. Manual
- * "Insert" still uses {@link extractMarkdownOrFull} for a softer fallback.
- */
-function extractFencedMarkdown(content: string): string | null {
-    const trimmed = content.trim()
-    if (!trimmed) return null
-    const fenceRegex = /```(?:markdown|md)?\n([\s\S]*?)\n```/g
-    const blocks: string[] = []
-    let match: RegExpExecArray | null
-    // eslint-disable-next-line no-cond-assign
-    while ((match = fenceRegex.exec(trimmed)) !== null) {
-        blocks.push(match[1])
-    }
-    if (blocks.length === 0) return null
-    return blocks.sort((a, b) => b.length - a.length)[0]
-}
-
-/**
- * Manual-apply variant: prefers a fenced block, falls back to the full
- * trimmed content when none is found. Used by the hover Insert/Replace
- * actions where the user is in control.
- */
-function extractMarkdownOrFull(content: string): string {
-    return extractFencedMarkdown(content) ?? content.trim()
-}
-
 function MessageBubble({
     message,
     onRetry,
-    onApplyToDocument
+    proposalStatus
 }: {
     message: ChatMessage
     onRetry?: () => void
-    onApplyToDocument?: (mode: ApplyMode, markdown: string) => void
+    proposalStatus?: ProposalStatus
 }): JSX.Element {
     const [copied, setCopied] = useState(false)
     const isUser = message.role === 'user'
@@ -890,15 +811,29 @@ function MessageBubble({
                     </div>
                 )}
 
-                {message.autoApplySkipped && (
-                    <p className="mt-2 flex items-start gap-1 text-[10px] text-amber-600">
-                        <AlertCircle size={10} className="mt-0.5 shrink-0" />
-                        <span>
-                            Auto-apply skipped — reply did not contain a fenced markdown
-                            block. Use the actions below to apply manually, or Retry the
-                            request.
-                        </span>
-                    </p>
+                {proposalStatus === 'pending' && (
+                    <div className="mt-2 flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary/5 px-2 py-1 text-[10px] text-primary">
+                        <ArrowDownToLine size={10} />
+                        Diff aberto no editor — review aí
+                    </div>
+                )}
+                {proposalStatus === 'applied' && (
+                    <div className="mt-2 flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/5 px-2 py-1 text-[10px] text-emerald-700 dark:text-emerald-400">
+                        <Check size={10} />
+                        Applied to document
+                    </div>
+                )}
+                {proposalStatus === 'rejected' && (
+                    <div className="mt-2 flex items-center gap-1.5 rounded-md border bg-muted/40 px-2 py-1 text-[10px] text-muted-foreground">
+                        <X size={10} />
+                        Rejected
+                    </div>
+                )}
+                {proposalStatus === 'stale' && (
+                    <div className="mt-2 flex items-center gap-1.5 rounded-md border bg-muted/40 px-2 py-1 text-[10px] text-muted-foreground opacity-70">
+                        <X size={10} />
+                        Replaced by a newer proposal
+                    </div>
                 )}
 
                 {message.prototype && (message.prototype.applied > 0 || message.prototype.failed > 0 || message.prototype.commitSha) && (
@@ -947,38 +882,6 @@ function MessageBubble({
                             label={copied ? 'Copied' : 'Copy'}
                             onClick={handleCopy}
                         />
-                        {onApplyToDocument && (
-                            <>
-                                <BubbleAction
-                                    icon={<ArrowDownToLine size={10} />}
-                                    label="Insert"
-                                    title="Append the markdown to the current document"
-                                    onClick={() =>
-                                        onApplyToDocument(
-                                            'append',
-                                            extractMarkdownOrFull(message.content)
-                                        )
-                                    }
-                                />
-                                <BubbleAction
-                                    icon={<Replace size={10} />}
-                                    label="Replace"
-                                    title="Overwrite the current document with this markdown"
-                                    onClick={() => {
-                                        if (
-                                            window.confirm(
-                                                'Replace the current document with this content?'
-                                            )
-                                        ) {
-                                            onApplyToDocument(
-                                                'replace',
-                                                extractMarkdownOrFull(message.content)
-                                            )
-                                        }
-                                    }}
-                                />
-                            </>
-                        )}
                     </div>
                 )}
 
@@ -1001,37 +904,6 @@ function MessageBubble({
                 )}
             </div>
         </div>
-    )
-}
-
-function IntentTab({
-    active,
-    onClick,
-    icon,
-    label,
-    title
-}: {
-    active: boolean
-    onClick: () => void
-    icon?: ReactNode
-    label: string
-    title?: string
-}): JSX.Element {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            title={title}
-            className={cn(
-                'flex flex-1 items-center justify-center gap-1 rounded px-2 py-1 transition-colors',
-                active
-                    ? 'bg-secondary font-medium text-secondary-foreground'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-            )}
-        >
-            {icon}
-            {label}
-        </button>
     )
 }
 

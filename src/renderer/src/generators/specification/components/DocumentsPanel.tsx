@@ -23,6 +23,12 @@ import { useSpecification } from '../contexts/SpecificationContext'
 import { AIAssistant } from './shared/AIAssistant'
 import { type JSX, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import {
+    applyEdits,
+    type SREdit,
+    type SROp
+} from '../utils/searchReplaceParser'
+import { DocDiffPreview } from './documents/DocDiffPreview'
 import { DocEditor } from './documents/DocEditor'
 import { DocFooter } from './documents/DocFooter'
 import { DocInspector } from './documents/DocInspector'
@@ -232,6 +238,65 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedId])
 
+    // Pending assistant proposal — when set, the editor area swaps to a
+    // read-only diff view with Apply/Reject. The model emits SEARCH/REPLACE
+    // edit blocks; we apply them onto a snapshot of the current buffer and
+    // diff snapshot vs. result. Only one proposal is active at a time;
+    // newer proposals push older ones into history as 'stale'.
+    const [pendingProposal, setPendingProposal] = useState<{
+        messageId: string
+        edits: SREdit[]
+        snapshot: string
+        applied: string
+        ops: SROp[]
+    } | null>(null)
+    const [proposalHistory, setProposalHistory] = useState<
+        Record<string, 'applied' | 'rejected' | 'stale'>
+    >({})
+
+    const proposalStatus = useMemo(() => {
+        const map: Record<string, 'pending' | 'applied' | 'rejected' | 'stale'> = {
+            ...proposalHistory
+        }
+        if (pendingProposal) map[pendingProposal.messageId] = 'pending'
+        return map
+    }, [pendingProposal, proposalHistory])
+
+    const handleProposeChange = useCallback(
+        (messageId: string, edits: SREdit[]) => {
+            const { result, ops } = applyEdits(buffer, edits)
+            setPendingProposal((prev) => {
+                if (prev && prev.messageId !== messageId) {
+                    setProposalHistory((h) => ({ ...h, [prev.messageId]: 'stale' }))
+                }
+                return {
+                    messageId,
+                    edits,
+                    snapshot: buffer,
+                    applied: result,
+                    ops
+                }
+            })
+        },
+        [buffer]
+    )
+
+    const handleApplyProposal = useCallback(() => {
+        if (!pendingProposal) return
+        handleEditorChange(pendingProposal.applied)
+        setProposalHistory((h) => ({
+            ...h,
+            [pendingProposal.messageId]: 'applied'
+        }))
+        setPendingProposal(null)
+    }, [pendingProposal, handleEditorChange])
+
+    const handleRejectProposal = useCallback(() => {
+        if (!pendingProposal) return
+        setProposalHistory((h) => ({ ...h, [pendingProposal.messageId]: 'rejected' }))
+        setPendingProposal(null)
+    }, [pendingProposal])
+
     const handleDropFile = async (filePath: string) => {
         try {
             const { markdown } = await window.specDoc.convertAndInsert(filePath)
@@ -295,11 +360,21 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                                 viewMode === 'split' && 'border-r'
                             )}
                         >
-                            <DocEditor
-                                value={buffer}
-                                onChange={handleEditorChange}
-                                onDropFile={handleDropFile}
-                            />
+                            {pendingProposal ? (
+                                <DocDiffPreview
+                                    original={pendingProposal.snapshot}
+                                    proposed={pendingProposal.applied}
+                                    ops={pendingProposal.ops}
+                                    onApply={handleApplyProposal}
+                                    onReject={handleRejectProposal}
+                                />
+                            ) : (
+                                <DocEditor
+                                    value={buffer}
+                                    onChange={handleEditorChange}
+                                    onDropFile={handleDropFile}
+                                />
+                            )}
                         </div>
                     )}
                     {(viewMode === 'preview' || viewMode === 'split') && (
@@ -312,15 +387,8 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                             <AIAssistant
                                 mode="docs"
                                 supportsKB
-                                onApplyToDocument={(applyMode, markdown) => {
-                                    const next =
-                                        applyMode === 'replace'
-                                            ? markdown
-                                            : buffer.trim()
-                                              ? `${buffer}\n\n${markdown}`
-                                              : markdown
-                                    handleEditorChange(next)
-                                }}
+                                onProposeChange={handleProposeChange}
+                                proposalStatus={proposalStatus}
                                 contextProvider={async ({ userMessage, useKB }) => {
                                     const refs = node.kbRefs ?? []
                                     const linked = kbItems.filter((k) => refs.includes(k.id))
@@ -369,12 +437,36 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                                         [
                                             'You are the inline AI Assistant of an IGRP Studio "Specification" project, helping the user author the markdown document open in their editor.',
                                             '',
-                                            'Output contract — VERY IMPORTANT:',
-                                            '1. When the user asks you to draft, fill, generate, write or rewrite the document (or any section of it), respond with **only** a single fenced markdown block, opened with ```markdown and closed with ```. No prose before or after the block.',
-                                            '2. When the user asks you to add or extend (e.g. "add a Risks section"), still emit a single fenced markdown block — but containing only the new fragment to be appended, without restating the rest of the document.',
-                                            '3. When the user asks an analytical or conversational question ("what is missing?", "summarise this", "is this consistent?"), reply in plain prose. Do NOT wrap normal answers in a fenced block.',
-                                            '4. Never answer with both prose AND a markdown block. The Studio will copy/insert the block verbatim into the user\'s document — surrounding prose would leak into the file.',
-                                            '5. Ground every factual claim in (a) the document, (b) the Knowledge Base chunks below when present, (c) the linked items list. Cite chunks inline as `[KB: <item name>]`. If the KB does not contain the answer, say so; do not invent.'
+                                            '## Editing protocol — VERY IMPORTANT',
+                                            '',
+                                            'When the user asks you to MODIFY the document (add a section, fix a sentence, replace a heading, delete a paragraph, draft a new doc, etc.), reply with one or more SEARCH/REPLACE blocks in this EXACT format:',
+                                            '',
+                                            '<<<<<<< SEARCH',
+                                            '<exact text from the current document, including whitespace>',
+                                            '=======',
+                                            '<the new text>',
+                                            '>>>>>>> REPLACE',
+                                            '',
+                                            '### Rules',
+                                            '1. The text inside SEARCH must match the document VERBATIM — same characters, same whitespace, same line breaks. Quote enough surrounding context to be UNIQUE in the doc.',
+                                            '2. To INSERT new content (no existing text to replace) leave SEARCH empty:',
+                                            '   <<<<<<< SEARCH',
+                                            '   =======',
+                                            '   ## New section',
+                                            '   Content here.',
+                                            '   >>>>>>> REPLACE',
+                                            '   This appends to the end of the document. To insert at a specific spot, use a SEARCH block that matches a unique anchor (e.g. a heading) and put the new content before/after it inside REPLACE.',
+                                            '3. To DELETE content, leave REPLACE empty.',
+                                            '4. To REWRITE the whole document, emit a single block whose SEARCH matches the entire current doc.',
+                                            '5. Multiple blocks are allowed; they are applied in order. Each SEARCH must match the doc as it was BEFORE any edits in this turn (do not chain matches against your own previous REPLACE).',
+                                            '6. Do NOT wrap the blocks in a code fence. Emit the raw `<<<<<<< SEARCH … >>>>>>> REPLACE` lines.',
+                                            '7. Do NOT mix prose and edit blocks in the same reply. Either you are editing (only blocks) or you are answering a question (only prose).',
+                                            '',
+                                            '### When NOT to emit blocks',
+                                            'When the user asks an analytical or conversational question ("what is missing?", "summarise this", "is this consistent?", "explain X"), reply in plain prose. The Studio only opens the diff editor when blocks are present.',
+                                            '',
+                                            '### Grounding',
+                                            'Ground every factual claim in (a) the document, (b) the Knowledge Base chunks below when present, (c) the linked items list. Cite chunks inline as `[KB: <item name>]`. If the KB does not contain the answer, say so; do not invent.'
                                         ].join('\n')
                                     )
 

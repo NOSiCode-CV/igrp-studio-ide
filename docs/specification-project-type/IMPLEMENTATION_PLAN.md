@@ -349,6 +349,60 @@ Bloqueadores:
 4. **Tests** — `M2D.16` (docs CRUD) + `M3.13` (chunker determinismo + KB pipeline E2E) podem correr em paralelo a M4.
 5. **M5** — Polish (estados especiais, command palette `Cmd/Ctrl+K`, i18n completa, docs utilizador, testes E2E mínimos).
 
+## 12.bis Decisões de design — edição interativa de Documents
+
+### Histórico
+
+| Iteração | Modelo | Razão de descontinuação |
+|---|---|---|
+| **v1 — Auto-apply silencioso** (M2D.10/11) | Intent picker `Ask / Append / Replace`. Em Append/Replace o reply (bloco \`\`\`markdown) era aplicado automaticamente ao buffer. | Sem revisão humana; replaces destruíam edições. |
+| **v2 — DiffCard inline na bolha** (M2D.16) | Mesma base de Append/Replace, mas em vez de auto-apply mostrava um `DiffCard` dentro da bolha do chat com Apply/Reject. | Diff no chat era pequeno, fora do contexto do editor; user feedback: "queria a interação no próprio documento, tal como Claude Code edita ficheiros". |
+| **v3 — DocDiffPreview no editor** (M2D.16.b) | DiffCard movido para fora do chat: `pendingProposal` no host troca o `DocEditor` por `Monaco DiffEditor` inline com toolbar Apply/Reject. | Continuava limitado a Append (concatena no fim) ou Replace (todo o doc). Não permitia "corrigir o início e adicionar no fim na mesma resposta", nem edits surgical. |
+| **v4 — SEARCH/REPLACE blocks** (**M2D.17, atual**) | Resposta do LLM contém um ou mais blocos `<<<<<<< SEARCH … ======= … >>>>>>> REPLACE`. Host parseia + aplica em ordem sobre snapshot; resultado vai para `DocDiffPreview`. Múltiplas edições por turno, surgical, com fallback fuzzy quando o whitespace não bate certo. | — |
+
+### Por que SEARCH/REPLACE (e não alternativas)
+
+- **Tool calling JSON** (`insert(line, text)` etc.) — exige modelo com function-calling fiável e adiciona schema externo. Excessivo para markdown.
+- **Unified diff (formato git)** — modelos erram com frequência nos números de linha e linhas de contexto. Pior na prática.
+- **Re-emitir o doc inteiro com diff** — funciona para docs pequenos (era a v3); cresce em custo de tokens linearmente com o tamanho do doc, e o modelo tende a "alucinar" mudanças em zonas que não devia tocar.
+- **SEARCH/REPLACE (Aider/Cursor)** — battle-tested. Funciona em qualquer LLM via prompt. Cobre insert/replace/delete/rewrite com uma só primitiva. Custo proporcional ao tamanho da edição, não do doc.
+
+### Contrato com o LLM (system prompt para Documents)
+
+O `contextProvider` em `DocumentsPanel.tsx` injecta no system prompt um bloco que ensina o formato com 2 exemplos (insert + replace). Resumo das regras:
+
+- Quando o utilizador pede para **modificar** o doc, responder com um ou mais blocos SEARCH/REPLACE — sem prosa à volta, sem code-fence wrapper.
+- Quando o utilizador faz uma **pergunta**, responder em prosa normal (sem blocos).
+- `SEARCH` tem de bater **verbatim** com o doc (whitespace incluído). Quotar contexto suficiente para ser único.
+- `SEARCH` vazio + `REPLACE` com conteúdo → **append** no fim do doc.
+- `SEARCH` com texto + `REPLACE` vazio → **delete**.
+- Múltiplos blocos aplicam em ordem; cada um faz match contra o doc *antes de qualquer edição deste turno*.
+
+### Robustez do parser
+
+- `parseSearchReplaceBlocks(text)` — regex tolerante (whitespace nos delimiters, opcional após SEARCH/REPLACE).
+- `applyEdits(original, edits)` — para cada edit:
+  1. Match literal exacto.
+  2. Fallback: match com whitespace normalizado (`\s+` ↔ ` `).
+  3. Se 0 matches ou >1 match (ambíguo) → marca op como `failed` com motivo, mas continua com os outros edits.
+- Resultado expõe `{ result, ops: [{kind, ok, ...}] }` para a UI mostrar resumo + falhas.
+
+### UI
+
+- **Intent picker removido** em modo `docs` — uma única caixa de chat. O modelo decide se é conversa ou edição pelo conteúdo da resposta.
+- **Bolha do chat** mostra resumo compacto: "3 edições propostas — review no editor" (ou status `applied` / `rejected` / `stale` quando histórico).
+- **DocDiffPreview** continua a usar Monaco DiffEditor inline; toolbar mostra agora "N edições · M falhas" em vez de Append/Replace.
+- **Falhas parciais** (blocos que não fizeram match) ficam listadas num accordion na toolbar; o user pode aplicar o resto e voltar a pedir ajuda no chat para os que falharam.
+
+### Ficheiros impactados
+
+- **NEW** `src/renderer/src/generators/specification/utils/searchReplaceParser.ts` — parser + applier puro (testável).
+- **MOD** `components/shared/AIAssistant.tsx` — remove intent picker e `applyOnDone`; useEffect de staging passa a chamar `parseSearchReplaceBlocks` e fire `onProposeChange(messageId, edits)`.
+- **MOD** `components/DocumentsPanel.tsx` — `pendingProposal` carrega `{messageId, edits, snapshot, applied, ops}`; `contextProvider` injecta o prompt SEARCH/REPLACE.
+- **MOD** `components/documents/DocDiffPreview.tsx` — drop prop `mode`, aceita `ops` para o resumo.
+- **DEL** `components/shared/DiffCard.tsx` (já apagado em v3).
+- **CLEANUP** `package.json` — remover deps `diff` + `@types/diff` (não usadas após v4; Monaco DiffEditor faz o diff visual).
+
 ## 13. Estado actual (snapshot)
 
 ### Concluído
@@ -356,6 +410,7 @@ Bloqueadores:
 |---|---|---|
 | M1 — Foundations | ✅ | Engine + wizard + sidebar-09 layout + navegação automática + rail alinhado ao Studio |
 | M2D — Documents | ✅ | Monaco + react-markdown + GFM + drop + templates + ToC + KB inline + kbRefs |
+| M2D.17 — Edição interativa SEARCH/REPLACE | 🚧 | Parser + applier + system prompt + UI sem intent picker · ver §12.bis |
 | M2L — LLM Stack | ✅ | OpenRouter SSE + Claude Code CLI (auto-probe nvm/login-shell) + Settings UI (AI Providers + Local CLIs) + AIAssistant com intent picker + Retry + action bar |
 | M3 — KB + RAG | ✅ | LanceDB + chunker sha1 + OpenAI/stub embeddings + UI completa + **RAG real** (search-by-refs + KB toggle no AIAssistant + chunks no system prompt) |
 | M4.0 — Prototype UI shell | ✅ | Chat + Tabs (Preview multi-viewport / Files / Logs / History) + Footer placeholders |
@@ -370,7 +425,8 @@ Bloqueadores:
 ### Decisões importantes registadas
 - **Fluxo de dados unidireccional:** KB → Documents → Prototype. Documents linka KB via `kbRefs[]`, não envia para KB.
 - **Rail order** reflecte o data flow: **Knowledge → Documents → Prototype**.
-- **Output contract do AIAssistant em Documents** força o LLM a responder só com bloco \`\`\`markdown para edits/drafts e prosa para perguntas. Auto-apply (Append/Replace) só dispara quando há bloco fenced; caso contrário marca skipped + mostra acções manuais.
+- **Output contract do AIAssistant em Documents (M2D.16, descontinuado)** — versão original forçava bloco \`\`\`markdown e auto-apply em Append/Replace. **Substituído em M2D.17** (ver abaixo) por edits SEARCH/REPLACE com diff inline no editor.
+- **Edição interativa do Documents (M2D.17, ✅ adoptado 2026-05)** — o AIAssistant deixa de devolver "o documento todo"/"um fragmento" e passa a emitir blocos `<<<<<<< SEARCH … ======= … >>>>>>> REPLACE` (formato Aider). O host parseia, aplica em ordem sobre um snapshot do buffer, e mostra o resultado num **Monaco DiffEditor** que substitui o `DocEditor` enquanto há proposta pendente. **Apply** consolida tudo de uma vez no buffer; **Reject** descarta. Cobre insert/replace/delete/full-rewrite com uma só primitiva, é multi-edit por turno, não exige function-calling no LLM (funciona em qualquer modelo via prompt). Ver "Decisões de design — edição interativa de Documents" mais abaixo.
 - **RAG ground rule:** AIAssistant cita `[KB: <item name>]` quando consulta chunks reais; quando não encontra, declara explicitamente em vez de inventar.
 - **Embeddings em dev:** auto-fallback para stub determinístico quando não há key OpenAI; sem precisar de env flag.
 - **CLI detection:** cascade override → PATH → login shell (`zsh -lic`) → known paths (incluindo nvm versions). Resolve o problema do Electron lançado do Finder não ter PATH do `.zshrc`.

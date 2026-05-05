@@ -64,7 +64,7 @@ const defaultFieldType: LabeledElementField = {
  * engine source so a quick visual diff catches drift.
  */
 const FIELD_TYPES: SchemaTypeItem[] = [
-    { value: 'text', label: 'Text' },
+    { value: 'string', label: 'String' },
     { value: 'number', label: 'Number' },
     { value: 'select', label: 'Select' },
     { value: 'select2', label: 'Select (multi)' },
