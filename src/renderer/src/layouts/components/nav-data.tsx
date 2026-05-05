@@ -31,26 +31,31 @@ const IGNORED_PATHS = new Set(['baseApi.json', 'permissions.json', '.DS_store'])
 
 const createMenuItems = (t: any) => ({
     newDto: {
+        id: 'new-dto',
         label: t('newDto'),
         actionType: OPTION_TYPE.DATA_OBJECTS,
         icon: getIcon(OPTION_TYPE.DATA_OBJECTS)
     },
     newModels: {
+        id: 'new-model',
         label: t('newModels'),
         actionType: OPTION_TYPE.MODEL,
         icon: getIcon(OPTION_TYPE.MODELS)
     },
     newEnum: {
+        id: 'new-enum',
         label: t('newEnum'),
         actionType: OPTION_TYPE.ENUM,
         icon: getIcon(OPTION_TYPE.ENUM)
     },
     newResponses: {
+        id: 'new-response',
         label: t('newResponses'),
         actionType: OPTION_TYPE.RESPONSE,
         icon: getIcon(OPTION_TYPE.RESPONSE)
     },
     newControllers: {
+        id: 'new-controller',
         label: t('newControllers'),
         actionType: OPTION_TYPE.ACTION,
         icon: getIcon(OPTION_TYPE.ACTION)
@@ -96,6 +101,7 @@ const createMenuItems = (t: any) => ({
         icon: Cable
     },
     newAction: {
+        id: 'new-action',
         label: t('newAction'),
         actionType: OPTION_TYPE.ACTION,
         icon: getIcon(OPTION_TYPE.ACTION)

@@ -8,10 +8,8 @@ import {
     ToolCheck,
     BPMNConfig
 } from '../main/types'
-import {
-    ComponentRegistrationConfig,
-    ServiceWorkspace
-} from '@igrp/igrp-studio-nextjs-engine/types'
+import { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import { ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
 
 type UpdateChannel = 'stable' | 'beta'
@@ -35,6 +33,10 @@ declare const api: {
     fetchFiles: (basePath: string) => Promise<any>
     getJsonContent: (filePath: string) => Promise<any>
     getFileContent: (filePath: string) => Promise<any>
+    setPageParent: (
+        jsonPath: string,
+        parentName: string | null
+    ) => Promise<{ success: boolean; error?: string }>
     readDirectory: (basePath: string) => Promise<any>
     readProjectFile: (filePath: string) => Promise<any>
     openIDE: ({ basePath, ideType }: { basePath: string; ideType: string }) => Promise<any>
@@ -53,6 +55,7 @@ declare const api: {
     }
     runDoctorChecks: () => Promise<ToolCheck[]>
     saveDoctorReport: (results: any) => Promise<any>
+    installIGRPCLI: () => Promise<{ success: boolean; output?: string; error?: string }>
     saveProjectIcon: (data: {
         filePath: string
         fileData: ArrayBuffer
@@ -89,6 +92,7 @@ declare const engine: {
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     createPage: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    convertJsonSchema: (schema: unknown) => Promise<HandlerResponse>
     registry: (engineType: string) => Promise<HandlerResponse>
     getComponent: (engineType: string) => Promise<HandlerResponse>
     registerComponent: (
@@ -210,6 +214,8 @@ declare const igrpStudioSettings: {
     getSelectedBPMNProject: () => Promise<string | undefined>
     setSelectedBPMNProcess: (processDefinitionId: string) => Promise<any>
     getSelectedBPMNProcess: () => Promise<string | undefined>
+    getWelcomeOnboardingCompleted: () => Promise<boolean>
+    setWelcomeOnboardingCompleted: (completed: boolean) => Promise<boolean>
 }
 declare global {
     interface Window {

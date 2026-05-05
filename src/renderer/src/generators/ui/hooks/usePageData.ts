@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { PageDefinition } from '../page/page-manager'
+import type { PageDefinition } from '../browser/page-manager'
 
 interface PageDataSetters {
     setAllArguments: (args: any[]) => void

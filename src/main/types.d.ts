@@ -1,4 +1,4 @@
-import { WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/types'
+import { WorkspaceService } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 
 type Handler = (event: IpcMainInvokeEvent, ...args: any[]) => any
 
@@ -7,9 +7,11 @@ type HandlerResponse<T = any> = {
     error?: string
 }
 
-export type ProjectType = 'frontend' | 'backend'
+export type ProjectType = 'frontend' | 'backend' | 'specification'
 
-export type FrameworkType = 'springboot' | 'nextjs' | 'dotnet'
+export type FrameworkType = 'springboot' | 'nextjs' | 'dotnet' | 'specification'
+
+export type ProjectStorageMode = 'managed' | 'linked'
 
 export interface NextConfigData {
     name: string
@@ -45,7 +47,25 @@ export interface SpringConfigData {
     package?: string
 }
 
-export type ConfigData = SpringConfigData | NextConfigData | DotNetConfigData
+export interface SpecificationConfigData {
+    name: string
+    description?: string
+    workspaceId: string
+    id: string
+    version: string
+    /** LLM padrão para o AIAssistant */
+    defaultLLM?: { provider: 'openrouter' | 'cli'; model: string }
+    /** Provider/modelo de embeddings para a Knowledge Base */
+    embeddings?: { provider: 'openai' | 'voyage' | 'local'; model: string }
+    /** System prompt opcional aplicado a todos os chats do projeto */
+    systemPrompt?: string
+}
+
+export type ConfigData =
+    | SpringConfigData
+    | NextConfigData
+    | DotNetConfigData
+    | SpecificationConfigData
 
 export interface ProjectData {
     id: string
@@ -56,6 +76,18 @@ export interface ProjectData {
     config: ConfigData | any
     service?: any
     path: string
+    /**
+     * managed: project is placed under <workspace>/projects/<name>
+     * linked: project lives outside the workspace (e.g. monorepo); do not copy/move sources
+     */
+    storageMode?: ProjectStorageMode
+    /**
+     * Absolute path to the Git repository root (from `git rev-parse --show-toplevel`).
+     * When project is inside a monorepo, this will differ from `path`.
+     */
+    gitRootPath?: string
+    /** ISO timestamp when gitRootPath was last detected */
+    gitRepoRootDetectedAt?: string
     themeColor?: string
     location?: location
     createdAt?: string
@@ -230,14 +262,36 @@ export interface ServiceInfo {
     statusMessage?: string
 }
 
+export type GitProviderType = 'github' | 'gitlab'
+
 export interface GitProviderConfig {
     id: string
+    /**
+     * Discriminates which auth/API client to use for this instance.
+     * Older configs without `type` are treated as 'gitlab' for backwards
+     * compatibility with the legacy storage layout.
+     */
+    type?: GitProviderType
     name: string
+    /** Web base URL of the host (e.g. https://github.com, https://git.nosi.cv). */
     baseUrl: string
     clientId: string
     clientSecret: string
     active: boolean
     isDefault?: boolean
+}
+
+/**
+ * Common surface implemented by GitHubService and GitLabService. Lets
+ * provider-agnostic code drive auth and repository listings without
+ * knowing which kind of host is on the other side.
+ */
+export interface IGitProvider {
+    readonly type: GitProviderType
+    initialize(token: string, config?: GitProviderConfig): Promise<void> | void
+    getUserInfo(): Promise<unknown>
+    listRepositories(window: unknown): Promise<unknown[]>
+    logout(): void
 }
 
 export type ToolCheck = {

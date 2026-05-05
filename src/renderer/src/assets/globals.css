@@ -2,6 +2,7 @@
 @import "./themes.css";
 
 @plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
 /*
   ---break---
 */

@@ -16,7 +16,7 @@ import {
     SelectInput,
     TextInput
 } from '@renderer/generators/api/components/inputs-form'
-import { useDroppedComponents } from '@renderer/generators/ui/dnd/DroppedComponentsContext'
+import { useDroppedComponents } from '@renderer/generators/ui/contexts/EditorContext'
 import useCustomCode from '@renderer/generators/ui/hooks/useCustomCode'
 import { getId } from '@renderer/utils'
 import { type FormikProps, useFormik } from 'formik'

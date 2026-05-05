@@ -17,7 +17,7 @@ import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
 import { getUUID } from '@renderer/utils'
 import { GitFork, Key, User } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { IWorkspace } from 'src/main/types'
 import { RepositoryList } from './repository-list'
@@ -53,14 +53,14 @@ export function CloneProjectModal({ workspace, open, setOpen }: CloneProjectModa
 
     }; */
 
-    const resetForm = () => {
+    const resetForm = useCallback(() => {
         setProjectUrl('')
         setAuthType('none')
         setUsername('')
         setPassword('')
         setToken('')
         setIsCloning(false)
-    }
+    }, [])
 
     const handleCloneProject = async (): Promise<void> => {
         // Validate required fields
@@ -111,7 +111,7 @@ export function CloneProjectModal({ workspace, open, setOpen }: CloneProjectModa
     }
 
     useEffect(() => {
-        window.electron.ipcRenderer.on('clone-progress', async (_event: any, data: any) => {
+        const onCloneProgress = async (_event: any, data: any) => {
             if (data.status === 'success') {
                 resetForm()
 
@@ -139,13 +139,14 @@ export function CloneProjectModal({ workspace, open, setOpen }: CloneProjectModa
             } else if (data.status === 'error') {
                 showErrorToast(t('failedCloneRepository', { message: data.message }))
             }
-        })
+        }
+
+        window.electron.ipcRenderer.on('clone-progress', onCloneProgress)
 
         return () => {
-            window.electron.ipcRenderer.removeAllListeners('clone-progress')
-            window.electron.ipcRenderer.removeAllListeners('request-project-name')
+            window.electron.ipcRenderer.removeListener('clone-progress', onCloneProgress)
         }
-    }, [])
+    }, [resetForm, saveOrOpenProject, showErrorToast, showSuccessToast, t, workspace.id])
 
     return (
         <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>

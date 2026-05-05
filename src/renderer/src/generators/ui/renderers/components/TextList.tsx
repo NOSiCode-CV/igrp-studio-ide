@@ -1,0 +1,162 @@
+import Draggable from '@renderer/lib/dnd/Draggable'
+import Droppable from '@renderer/lib/dnd/Droppable'
+import type { StructuredComponent } from '@renderer/lib/dnd/types'
+import { cn } from '@renderer/lib/utils'
+import { getLabel } from '@renderer/utils'
+import { COMPONENT } from '../../ComponentTypes'
+import { GenNoInfoComp } from '../../components/GenNoInfoComp'
+import { useDroppedComponents } from '../../contexts/EditorContext'
+import { getHoverClasses } from '../../utils/tailwindGroups'
+import CardComponent, { type CardComponentProps } from '../CardComponent'
+import BoxWrapper from '../tools/BoxWrapper'
+
+const IGRPStudioTextList = ({ comp, group, hoverClass, onDragEnd }: CardComponentProps) => {
+    const {
+        children: components,
+        id: componentId,
+        componentName: parentComponentName,
+        properties
+    } = comp || {}
+
+    const { setEditingComponent } = useDroppedComponents()
+
+    const handleEdit = async (component: StructuredComponent, path: string) => {
+        console.log('path ', path)
+        setEditingComponent({
+            path,
+            component
+        })
+    }
+
+    //RESET Hover if parent is diff current component
+    const { group: _group, hoverClass: _hoverClass } = getHoverClasses({
+        group,
+        hoverClass,
+        componentName: COMPONENT.Container
+    })
+
+    const renderTextListItem = (comp: StructuredComponent, path: string) => {
+        const { children: components, componentName } = comp
+        const { className } = properties
+        const newPath = `${path}/${componentName}`
+        return (
+            <Droppable
+                className={cn('flex w-full flex-col gap-2', className)}
+                onDrop={onDragEnd}
+                component={comp}
+            >
+                {components.length === 0 ? (
+                    <GenNoInfoComp type={getLabel(componentName).toUpperCase()} />
+                ) : (
+                    components.map((child, index) => {
+                        const { properties } = child
+                        const { content } = properties
+
+                        return (
+                            <Draggable
+                                key={child.id}
+                                item={child}
+                                index={index}
+                                mode="MOVE"
+                                dropTargetId={componentId}
+                                layout="horizontal"
+                                className={cn('p-1')}
+                            >
+                                <BoxWrapper
+                                    parentComp={comp}
+                                    comp={child}
+                                    onEdit={() => handleEdit(child, newPath)}
+                                    group="group/item-content"
+                                    className="top-0 opacity-0 group-hover/item-content:opacity-100"
+                                >
+                                    {content ? (
+                                        <>content</>
+                                    ) : (
+                                        <CardComponent comp={child} onDragEnd={onDragEnd} />
+                                    )}
+                                </BoxWrapper>
+                            </Draggable>
+                        )
+                    })
+                )}
+            </Droppable>
+        )
+    }
+
+    const renderTextList = (comp: StructuredComponent) => {
+        const { children: components, componentName } = comp
+        const { className } = properties
+        const path = `${parentComponentName}/${componentName}`
+        return (
+            <Droppable
+                className={cn('flex w-full flex-col gap-2', className)}
+                onDrop={onDragEnd}
+                component={comp}
+            >
+                {components.length === 0 ? (
+                    <GenNoInfoComp type={getLabel(componentName).toUpperCase()} />
+                ) : (
+                    components.map((child, index) => {
+                        return (
+                            <Draggable
+                                key={child.id}
+                                item={child}
+                                index={index}
+                                mode="MOVE"
+                                dropTargetId={componentId}
+                                layout="horizontal"
+                                className={cn('p-1')}
+                            >
+                                <BoxWrapper
+                                    parentComp={comp}
+                                    comp={child}
+                                    onEdit={() => handleEdit(child, path)}
+                                    group="group/text-list-item"
+                                    className="top-0 opacity-0 group-hover/text-list-item:opacity-100"
+                                >
+                                    {renderTextListItem(child, path)}
+                                </BoxWrapper>
+                            </Draggable>
+                        )
+                    })
+                )}
+            </Droppable>
+        )
+    }
+
+    return (
+        <div {...properties} className={cn('space-y-3 relative  p-3')}>
+            {components && components.length > 0 ? (
+                components.map((child: StructuredComponent, index: number) => {
+                    return (
+                        <Draggable
+                            key={child.id}
+                            item={child}
+                            index={index}
+                            dropTargetId={componentId}
+                            mode="MOVE"
+                            className="space-y-2 flex flex-col"
+                        >
+                            <BoxWrapper
+                                comp={child}
+                                parentComp={comp}
+                                onEdit={() => handleEdit(child, parentComponentName)}
+                                group={_group ?? `group/text-list`}
+                                className={cn(
+                                    'space-y-1 flex flex-col opacity-0',
+                                    _hoverClass ?? 'group-hover/text-list:opacity-100'
+                                )}
+                            >
+                                {renderTextList(child)}
+                            </BoxWrapper>
+                        </Draggable>
+                    )
+                })
+            ) : (
+                <GenNoInfoComp type="SECTIONS" />
+            )}
+        </div>
+    )
+}
+
+export default IGRPStudioTextList

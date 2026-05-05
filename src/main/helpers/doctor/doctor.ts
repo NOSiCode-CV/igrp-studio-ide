@@ -39,6 +39,39 @@ export async function runDockerInfoCheck(): Promise<{
     })
 }
 
+export async function runPython310PlusCheck(): Promise<{ success: boolean; error?: string }> {
+    return new Promise((resolve) => {
+        exec(
+            'python3 -c "import sys; sys.exit(0 if sys.version_info >= (3,10) else 1)"',
+            (error) => {
+                if (error) {
+                    resolve({
+                        success: false,
+                        error: 'Python 3.10 or higher is required.'
+                    })
+                } else {
+                    resolve({ success: true })
+                }
+            }
+        )
+    })
+}
+
+export async function runMarkItDownModuleCheck(): Promise<{ success: boolean; error?: string }> {
+    return new Promise((resolve) => {
+        exec('python3 -m markitdown --help', (error) => {
+            if (error) {
+                resolve({
+                    success: false,
+                    error: 'The markitdown Python module is not installed. Run: pip install "markitdown[all]"'
+                })
+            } else {
+                resolve({ success: true })
+            }
+        })
+    })
+}
+
 export async function runDoctorChecks(): Promise<ToolCheck[]> {
     const results: ToolCheck[] = []
 
@@ -76,6 +109,22 @@ export async function runDoctorChecks(): Promise<ToolCheck[]> {
                     if (!dockerCheck.success) {
                         success = false
                         finalError = `Docker daemon is not running: ${dockerCheck.error}`
+                    }
+                }
+
+                if (success && tool.extraCheck === 'python3_10Plus') {
+                    const pyCheck = await runPython310PlusCheck()
+                    if (!pyCheck.success) {
+                        success = false
+                        finalError = pyCheck.error
+                    }
+                }
+
+                if (success && tool.extraCheck === 'markitdownModule') {
+                    const mdCheck = await runMarkItDownModuleCheck()
+                    if (!mdCheck.success) {
+                        success = false
+                        finalError = mdCheck.error
                     }
                 }
             } else {

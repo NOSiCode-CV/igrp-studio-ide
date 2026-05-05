@@ -1,5 +1,6 @@
 // handlers/apiHandler.ts
 
+import { convertJsonSchemaToForm } from '@igrp/igrp-studio-nextjs-engine'
 import type {
     ComponentRegistrationConfig,
     PageConfig,
@@ -18,6 +19,16 @@ handleWithCustomErrors(
     async (_event, project: ProjectData, basePath: string) => {
         const engine = EngineFactory.getEngine(project.framework)
         await engine.createProject(project, basePath)
+    }
+)
+
+handleWithCustomErrors(
+    EVENTS.NEXT.CONVERT_JSON_SCHEMA,
+    async (_event, schema: unknown) => {
+        // Engine ships fs-extra as a transitive dep, so importing it
+        // from the renderer breaks Vite. Keep the conversion main-side
+        // and return the structured component tree over IPC.
+        return convertJsonSchemaToForm(schema as never)
     }
 )
 
