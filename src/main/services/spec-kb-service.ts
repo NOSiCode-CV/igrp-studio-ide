@@ -171,7 +171,9 @@ export class SpecKBService {
         query: string,
         topK = 8,
         opts: { kbItemIds?: string[] } = {}
-    ): Promise<Array<{ id: string; score: number; text: string; metadata?: Record<string, unknown> }>> {
+    ): Promise<
+        Array<{ id: string; score: number; text: string; metadata?: Record<string, unknown> }>
+    > {
         const adapter = await embeddingsService.getAdapter()
         const [vector] = await adapter.embed([query])
 
@@ -289,7 +291,10 @@ export class SpecKBService {
         }
 
         const adapter = await embeddingsService.getAdapter()
-        const vectors = await batchedEmbed(adapter, chunks.map((c) => c.text))
+        const vectors = await batchedEmbed(
+            adapter,
+            chunks.map((c) => c.text)
+        )
 
         await vectorDBService.upsert(
             basePath,

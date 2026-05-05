@@ -251,9 +251,9 @@ const PreviewToolbar = ({
     onToggleDev: () => void
 }): JSX.Element => {
     const reload = () => {
-        const view = document.querySelector(
-            'webview.spec-prototype-preview'
-        ) as { reload?: () => void } | null
+        const view = document.querySelector('webview.spec-prototype-preview') as {
+            reload?: () => void
+        } | null
         view?.reload?.()
     }
     return (
@@ -366,11 +366,7 @@ const PreviewPane = ({
         return null
     })
     const widthClass =
-        device === 'desktop'
-            ? 'w-full'
-            : device === 'tablet'
-              ? 'w-[768px]'
-              : 'w-[375px]'
+        device === 'desktop' ? 'w-full' : device === 'tablet' ? 'w-[768px]' : 'w-[375px]'
     return (
         <div className="flex h-full items-center justify-center">
             <div
@@ -402,8 +398,8 @@ const PreviewPane = ({
                                         </p>
                                         <p className="text-[11px] italic text-gray-500">
                                             Running <code>npm install</code> for the first time.
-                                            This can take a couple of minutes — see the Logs tab
-                                            for live progress.
+                                            This can take a couple of minutes — see the Logs tab for
+                                            live progress.
                                         </p>
                                     </>
                                 ) : running ? (
@@ -518,7 +514,8 @@ const FilesPane = ({ basePath }: { basePath?: string }): JSX.Element => {
                 <div className="flex-1 overflow-y-auto p-2">
                     {tree.length === 0 ? (
                         <p className="px-2 py-3 text-[11px] text-muted-foreground">
-                            No files yet — describe a feature in the Build chat to scaffold the prototype.
+                            No files yet — describe a feature in the Build chat to scaffold the
+                            prototype.
                         </p>
                     ) : (
                         tree.map((node) => (
@@ -795,9 +792,7 @@ const PrototypeFooter = ({ basePath }: { basePath?: string }): JSX.Element => {
                 window.alert(`Exported to:\n${result.path}`)
             }
         } catch (err) {
-            window.alert(
-                `Export failed: ${err instanceof Error ? err.message : String(err)}`
-            )
+            window.alert(`Export failed: ${err instanceof Error ? err.message : String(err)}`)
         }
     }, [basePath])
 

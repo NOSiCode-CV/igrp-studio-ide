@@ -158,9 +158,9 @@ export function DelegatesHelper(): JSX.Element {
                 <IGRPCardHeaderPrimitive>
                     <IGRPCardTitlePrimitive>Available Delegates</IGRPCardTitlePrimitive>
                     <IGRPCardDescriptionPrimitive>
-                        Delegates allow you to integrate custom logic or external services
-                        directly into BPMN process workflows. Use them in Service Tasks by
-                        setting the Implementation Type to{' '}
+                        Delegates allow you to integrate custom logic or external services directly
+                        into BPMN process workflows. Use them in Service Tasks by setting the
+                        Implementation Type to{' '}
                         <IGRPBadgePrimitive variant="secondary">
                             Delegate Expression
                         </IGRPBadgePrimitive>

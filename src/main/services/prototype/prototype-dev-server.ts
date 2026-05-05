@@ -95,9 +95,7 @@ class PrototypeDevServerService {
             throw new Error(`Prototype folder not found at ${cwd}`)
         }
         if (!fs.existsSync(join(cwd, 'package.json'))) {
-            throw new Error(
-                `${cwd} has no package.json — the prototype scaffold is incomplete.`
-            )
+            throw new Error(`${cwd} has no package.json — the prototype scaffold is incomplete.`)
         }
 
         // Auto-install dependencies on first run. The Next.js scaffold writes
@@ -182,9 +180,7 @@ class PrototypeDevServerService {
             broadcast(EVENTS.SPEC_PROTOTYPE.DEV_LOG, { basePath, entry })
 
             const shouldRestart =
-                !server.requestedStop &&
-                code !== 0 &&
-                server.crashCount < MAX_AUTO_RESTART
+                !server.requestedStop && code !== 0 && server.crashCount < MAX_AUTO_RESTART
             this.servers.delete(basePath)
             broadcast(EVENTS.SPEC_PROTOTYPE.DEV_STATUS, {
                 basePath,
@@ -261,15 +257,11 @@ class PrototypeDevServerService {
         banner('[install] node_modules missing — running `npm install` (first run only)…')
 
         return new Promise((resolve, reject) => {
-            const proc = spawn(
-                npm,
-                ['install', '--no-audit', '--no-fund', '--prefer-offline'],
-                {
-                    cwd,
-                    env: { ...process.env, FORCE_COLOR: '0', npm_config_progress: 'false' },
-                    shell: false
-                }
-            )
+            const proc = spawn(npm, ['install', '--no-audit', '--no-fund', '--prefer-offline'], {
+                cwd,
+                env: { ...process.env, FORCE_COLOR: '0', npm_config_progress: 'false' },
+                shell: false
+            })
 
             const consume = (level: DevLogLevel) => (chunk: Buffer) => {
                 chunk

@@ -38,11 +38,7 @@ const TREE_IGNORE = new Set([
 
 const activeGenerations = new Map<string, AbortController>()
 
-function emit(
-    webContents: Electron.WebContents,
-    requestId: string,
-    chunk: PrototypeChunk
-): void {
+function emit(webContents: Electron.WebContents, requestId: string, chunk: PrototypeChunk): void {
     if (webContents.isDestroyed()) return
     webContents.send(EVENTS.SPEC_PROTOTYPE.GENERATE_CHUNK, { requestId, chunk })
 }
@@ -177,10 +173,7 @@ ipcMain.handle(
 
 ipcMain.handle(
     EVENTS.SPEC_PROTOTYPE.GET_DEV_LOG_BUFFER,
-    async (
-        _event,
-        { basePath, limit }: { basePath: string; limit?: number }
-    ) => {
+    async (_event, { basePath, limit }: { basePath: string; limit?: number }) => {
         return prototypeDevServer.getLogBuffer(basePath, limit ?? 200)
     }
 )
@@ -211,7 +204,10 @@ ipcMain.handle(
 
 ipcMain.handle(
     EVENTS.SPEC_PROTOTYPE.EXPORT,
-    async (event, { basePath }: { basePath: string }): Promise<{
+    async (
+        event,
+        { basePath }: { basePath: string }
+    ): Promise<{
         ok: boolean
         path?: string
         cancelled?: boolean

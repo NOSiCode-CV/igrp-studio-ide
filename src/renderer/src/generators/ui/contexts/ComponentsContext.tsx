@@ -29,9 +29,7 @@ export const ComponentsProvider: React.FC<{ children: ReactNode }> = ({ children
                 // re-renders when multiple PageBuilder tabs trigger registration
                 // with identical results.
                 if (prev.length === components.length) {
-                    const sameContent = prev.every(
-                        (c, i) => c.name === components[i]?.name
-                    )
+                    const sameContent = prev.every((c, i) => c.name === components[i]?.name)
                     if (sameContent) return prev
                 }
                 return components

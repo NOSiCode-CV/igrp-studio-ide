@@ -318,7 +318,7 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                                             ...menuItem,
                                             ...menu,
                                             isNew: menu.isNew ?? true,
-                                            id: actionId,
+                                            id: actionId
                                         })
                                     }}
                                     variant={isDelete ? 'destructive' : 'default'}

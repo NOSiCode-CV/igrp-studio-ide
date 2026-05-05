@@ -23,12 +23,11 @@ export const loadKB = (basePath: string) => async (dispatch: Dispatch) => {
     }
 }
 
-export const addKBFile =
-    (basePath: string, filePath: string) => async (dispatch: Dispatch) => {
-        const item: KBItem = await window.specKB.addFile(basePath, filePath)
-        dispatch(kbItemUpserted(item))
-        return item
-    }
+export const addKBFile = (basePath: string, filePath: string) => async (dispatch: Dispatch) => {
+    const item: KBItem = await window.specKB.addFile(basePath, filePath)
+    dispatch(kbItemUpserted(item))
+    return item
+}
 
 export const addKBUrl =
     (basePath: string, url: string, youtube = false) =>
@@ -38,18 +37,16 @@ export const addKBUrl =
         return item
     }
 
-export const reindexKBItem =
-    (basePath: string, itemId: string) => async (dispatch: Dispatch) => {
-        const item: KBItem | null = await window.specKB.reindex(basePath, itemId)
-        if (item) dispatch(kbItemUpserted(item))
-        return item
-    }
+export const reindexKBItem = (basePath: string, itemId: string) => async (dispatch: Dispatch) => {
+    const item: KBItem | null = await window.specKB.reindex(basePath, itemId)
+    if (item) dispatch(kbItemUpserted(item))
+    return item
+}
 
-export const removeKBItem =
-    (basePath: string, itemId: string) => async (dispatch: Dispatch) => {
-        await window.specKB.remove(basePath, itemId)
-        dispatch(kbItemRemoved(itemId))
-    }
+export const removeKBItem = (basePath: string, itemId: string) => async (dispatch: Dispatch) => {
+    await window.specKB.remove(basePath, itemId)
+    dispatch(kbItemRemoved(itemId))
+}
 
 export const semanticSearchKB =
     (basePath: string, query: string, topK = 8) =>
@@ -69,7 +66,8 @@ export const semanticSearchKB =
  * call once on app/store init.
  */
 export const subscribeKBProgress =
-    () => (dispatch: Dispatch): (() => void) => {
+    () =>
+    (dispatch: Dispatch): (() => void) => {
         return window.specKB.onProgress((item: KBItem) => {
             dispatch(kbItemUpserted(item))
         })

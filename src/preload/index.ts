@@ -659,8 +659,7 @@ const specPrototype = {
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.READ_FILE, { basePath, path }),
     startDev: (basePath: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.START_DEV, { basePath }),
-    stopDev: (basePath: string) =>
-        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.STOP_DEV, { basePath }),
+    stopDev: (basePath: string) => ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.STOP_DEV, { basePath }),
     devStatus: (basePath: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.DEV_STATUS, { basePath }),
     getDevLogBuffer: (basePath: string, limit?: number) =>
@@ -669,32 +668,23 @@ const specPrototype = {
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.LIST_SNAPSHOTS, { basePath }),
     restoreSnapshot: (basePath: string, sha: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.RESTORE_SNAPSHOT, { basePath, sha }),
-    export: (basePath: string) =>
-        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.EXPORT, { basePath }),
-    onChunk: (
-        callback: (payload: { requestId: string; chunk: any }) => void
-    ): (() => void) => {
+    export: (basePath: string) => ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.EXPORT, { basePath }),
+    onChunk: (callback: (payload: { requestId: string; chunk: any }) => void): (() => void) => {
         const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
         ipcRenderer.on(EVENTS.SPEC_PROTOTYPE.GENERATE_CHUNK, sub)
         return () => ipcRenderer.removeListener(EVENTS.SPEC_PROTOTYPE.GENERATE_CHUNK, sub)
     },
-    onDevLog: (
-        callback: (payload: { basePath: string; entry: any }) => void
-    ): (() => void) => {
+    onDevLog: (callback: (payload: { basePath: string; entry: any }) => void): (() => void) => {
         const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
         ipcRenderer.on(EVENTS.SPEC_PROTOTYPE.DEV_LOG, sub)
         return () => ipcRenderer.removeListener(EVENTS.SPEC_PROTOTYPE.DEV_LOG, sub)
     },
-    onDevStatus: (
-        callback: (payload: { basePath: string; status: any }) => void
-    ): (() => void) => {
+    onDevStatus: (callback: (payload: { basePath: string; status: any }) => void): (() => void) => {
         const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
         ipcRenderer.on(EVENTS.SPEC_PROTOTYPE.DEV_STATUS, sub)
         return () => ipcRenderer.removeListener(EVENTS.SPEC_PROTOTYPE.DEV_STATUS, sub)
     },
-    onTreeChanged: (
-        callback: (payload: { basePath: string }) => void
-    ): (() => void) => {
+    onTreeChanged: (callback: (payload: { basePath: string }) => void): (() => void) => {
         const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
         ipcRenderer.on(EVENTS.SPEC_PROTOTYPE.TREE_CHANGED, sub)
         return () => ipcRenderer.removeListener(EVENTS.SPEC_PROTOTYPE.TREE_CHANGED, sub)
@@ -717,17 +707,15 @@ const specLLM = {
         ipcRenderer.invoke(EVENTS.SPEC_LLM.CHAT_CANCEL, { requestId }),
     detectCLIs: () => ipcRenderer.invoke(EVENTS.SPEC_LLM.DETECT_CLIS),
     onChunk: (
-        callback: (
-            payload: {
-                requestId: string
-                chunk:
-                    | { type: 'delta'; content: string }
-                    | { type: 'tool-call'; name: string; arguments: string }
-                    | { type: 'usage'; promptTokens?: number; completionTokens?: number }
-                    | { type: 'error'; message: string; code?: string }
-                    | { type: 'done' }
-            }
-        ) => void
+        callback: (payload: {
+            requestId: string
+            chunk:
+                | { type: 'delta'; content: string }
+                | { type: 'tool-call'; name: string; arguments: string }
+                | { type: 'usage'; promptTokens?: number; completionTokens?: number }
+                | { type: 'error'; message: string; code?: string }
+                | { type: 'done' }
+        }) => void
     ): (() => void) => {
         const subscription = (
             _event: Electron.IpcRendererEvent,
@@ -758,7 +746,12 @@ const specDoc = {
         ipcRenderer.invoke(EVENTS.SPEC_DOC.READ, { basePath, docId }),
     create: (
         basePath: string,
-        input: { name: string; parentId?: string | null; type?: 'file' | 'folder'; content?: string }
+        input: {
+            name: string
+            parentId?: string | null
+            type?: 'file' | 'folder'
+            content?: string
+        }
     ) => ipcRenderer.invoke(EVENTS.SPEC_DOC.CREATE, { basePath, ...input }),
     update: (
         basePath: string,
@@ -793,12 +786,7 @@ const specKB = {
         ipcRenderer.invoke(EVENTS.SPEC_KB.REINDEX, { basePath, itemId }),
     remove: (basePath: string, itemId: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_KB.REMOVE, { basePath, itemId }),
-    search: (
-        basePath: string,
-        query: string,
-        topK = 8,
-        opts: { kbItemIds?: string[] } = {}
-    ) =>
+    search: (basePath: string, query: string, topK = 8, opts: { kbItemIds?: string[] } = {}) =>
         ipcRenderer.invoke(EVENTS.SPEC_KB.SEARCH, {
             basePath,
             query,
@@ -846,9 +834,7 @@ const specData = {
     }) => ipcRenderer.invoke(EVENTS.SPEC_DATA.GENERATE_START, payload),
     generateCancel: (requestId: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_DATA.GENERATE_CANCEL, { requestId }),
-    onChunk: (
-        callback: (payload: { requestId: string; chunk: any }) => void
-    ): (() => void) => {
+    onChunk: (callback: (payload: { requestId: string; chunk: any }) => void): (() => void) => {
         const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
         ipcRenderer.on(EVENTS.SPEC_DATA.GENERATE_CHUNK, sub)
         return () => ipcRenderer.removeListener(EVENTS.SPEC_DATA.GENERATE_CHUNK, sub)

@@ -57,8 +57,6 @@ export const GIT_PROVIDER_TYPES: GitProviderTypeDescriptor[] = [GITHUB, GITLAB]
  * Lookup helper. Returns undefined when the type is unknown so callers
  * can decide whether to throw or fall back gracefully.
  */
-export function describeProviderType(
-    type: GitProviderType
-): GitProviderTypeDescriptor | undefined {
+export function describeProviderType(type: GitProviderType): GitProviderTypeDescriptor | undefined {
     return GIT_PROVIDER_TYPES.find((p) => p.type === type)
 }

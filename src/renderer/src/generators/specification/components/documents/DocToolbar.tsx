@@ -70,10 +70,7 @@ export function DocToolbar({
                         label="Split"
                     />
                 </div>
-                <ExportMenu
-                    onExport={onExport}
-                    disabled={!onExport || !canExport}
-                />
+                <ExportMenu onExport={onExport} disabled={!onExport || !canExport} />
                 <IGRPButtonPrimitive
                     variant={chatOpen ? 'secondary' : 'ghost'}
                     size="sm"
@@ -81,10 +78,7 @@ export function DocToolbar({
                     onClick={onToggleChat}
                     title="AI Assistant"
                 >
-                    <MessageSquare
-                        size={14}
-                        className={cn(chatOpen ? 'text-primary' : '')}
-                    />
+                    <MessageSquare size={14} className={cn(chatOpen ? 'text-primary' : '')} />
                     Assistant
                 </IGRPButtonPrimitive>
             </div>
@@ -133,11 +127,7 @@ function ExportMenu({
                 disabled={disabled || busy !== null}
                 title="Export this document"
             >
-                {busy ? (
-                    <Loader2 size={14} className="animate-spin" />
-                ) : (
-                    <Download size={14} />
-                )}
+                {busy ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
                 Export
             </IGRPButtonPrimitive>
             {open && (

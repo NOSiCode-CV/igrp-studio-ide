@@ -45,10 +45,7 @@ export function FieldsTable({
 }: FieldsTableProps): React.ReactNode {
     const { t } = useTranslation()
 
-    const typeOptions = useMemo(
-        () => FIELD_TYPES.map((type) => ({ label: type, value: type })),
-        []
-    )
+    const typeOptions = useMemo(() => FIELD_TYPES.map((type) => ({ label: type, value: type })), [])
     const referenceOptions = useMemo(
         () => referenceTargets.map((e) => ({ label: e.name, value: e.id })),
         [referenceTargets]
@@ -77,9 +74,7 @@ export function FieldsTable({
     const duplicateName = (name: string, currentIndex: number): boolean => {
         const trimmed = name.trim().toLowerCase()
         if (!trimmed) return false
-        return fields.some(
-            (f, i) => i !== currentIndex && f.name.trim().toLowerCase() === trimmed
-        )
+        return fields.some((f, i) => i !== currentIndex && f.name.trim().toLowerCase() === trimmed)
     }
 
     return (
@@ -193,7 +188,9 @@ export function FieldsTable({
                                             onChange={(e) =>
                                                 update(index, {
                                                     defaultValue:
-                                                        e.target.value === '' ? null : e.target.value
+                                                        e.target.value === ''
+                                                            ? null
+                                                            : e.target.value
                                                 })
                                             }
                                             placeholder="—"
@@ -205,7 +202,8 @@ export function FieldsTable({
                                                 value={field.referenceEntityId ?? ''}
                                                 onChange={(v) =>
                                                     update(index, {
-                                                        referenceEntityId: (v as string) || undefined
+                                                        referenceEntityId:
+                                                            (v as string) || undefined
                                                     })
                                                 }
                                                 options={referenceOptions}

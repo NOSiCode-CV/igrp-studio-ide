@@ -1,4 +1,7 @@
-import type { ProjectWorkspace, ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import type {
+    ProjectWorkspace,
+    ServiceWorkspace
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { ipcMain } from 'electron'
 import { ERROR_CODES, EVENTS } from '../constants/events'
 import { handleWithCustomErrors } from '../helpers'

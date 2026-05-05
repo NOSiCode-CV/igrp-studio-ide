@@ -60,11 +60,7 @@ export function NewNodeDialog({ open, mode, onConfirm, onClose }: NewNodeDialogP
     }
 
     const title =
-        mode?.kind === 'rename'
-            ? 'Rename'
-            : mode?.type === 'folder'
-              ? 'New folder'
-              : 'New document'
+        mode?.kind === 'rename' ? 'Rename' : mode?.type === 'folder' ? 'New folder' : 'New document'
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()

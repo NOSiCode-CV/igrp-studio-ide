@@ -80,23 +80,99 @@
 }
 
 /* highlight.js — light theme (GitHub) */
-.md-preview .hljs { color: #24292e; background: transparent; }
-.md-preview .hljs-comment, .md-preview .hljs-quote { color: #6a737d; font-style: italic; }
-.md-preview .hljs-keyword, .md-preview .hljs-selector-tag, .md-preview .hljs-section, .md-preview .hljs-title, .md-preview .hljs-name { color: #d73a49; }
-.md-preview .hljs-variable, .md-preview .hljs-template-variable, .md-preview .hljs-attr, .md-preview .hljs-attribute { color: #005cc5; }
-.md-preview .hljs-string, .md-preview .hljs-regexp, .md-preview .hljs-doctag, .md-preview .hljs-deletion { color: #032f62; }
-.md-preview .hljs-number, .md-preview .hljs-literal, .md-preview .hljs-meta, .md-preview .hljs-type, .md-preview .hljs-symbol, .md-preview .hljs-link { color: #005cc5; }
-.md-preview .hljs-built_in, .md-preview .hljs-builtin-name, .md-preview .hljs-class .hljs-title { color: #6f42c1; }
-.md-preview .hljs-addition { color: #22863a; background: #f0fff4; }
-.md-preview .hljs-emphasis { font-style: italic; }
-.md-preview .hljs-strong { font-weight: 600; }
+.md-preview .hljs {
+    color: #24292e;
+    background: transparent;
+}
+.md-preview .hljs-comment,
+.md-preview .hljs-quote {
+    color: #6a737d;
+    font-style: italic;
+}
+.md-preview .hljs-keyword,
+.md-preview .hljs-selector-tag,
+.md-preview .hljs-section,
+.md-preview .hljs-title,
+.md-preview .hljs-name {
+    color: #d73a49;
+}
+.md-preview .hljs-variable,
+.md-preview .hljs-template-variable,
+.md-preview .hljs-attr,
+.md-preview .hljs-attribute {
+    color: #005cc5;
+}
+.md-preview .hljs-string,
+.md-preview .hljs-regexp,
+.md-preview .hljs-doctag,
+.md-preview .hljs-deletion {
+    color: #032f62;
+}
+.md-preview .hljs-number,
+.md-preview .hljs-literal,
+.md-preview .hljs-meta,
+.md-preview .hljs-type,
+.md-preview .hljs-symbol,
+.md-preview .hljs-link {
+    color: #005cc5;
+}
+.md-preview .hljs-built_in,
+.md-preview .hljs-builtin-name,
+.md-preview .hljs-class .hljs-title {
+    color: #6f42c1;
+}
+.md-preview .hljs-addition {
+    color: #22863a;
+    background: #f0fff4;
+}
+.md-preview .hljs-emphasis {
+    font-style: italic;
+}
+.md-preview .hljs-strong {
+    font-weight: 600;
+}
 
 /* highlight.js — dark theme overrides (GitHub Dark) */
-:is(.dark) .md-preview .hljs { color: #c9d1d9; }
-:is(.dark) .md-preview .hljs-comment, :is(.dark) .md-preview .hljs-quote { color: #8b949e; }
-:is(.dark) .md-preview .hljs-keyword, :is(.dark) .md-preview .hljs-selector-tag, :is(.dark) .md-preview .hljs-section, :is(.dark) .md-preview .hljs-title, :is(.dark) .md-preview .hljs-name { color: #ff7b72; }
-:is(.dark) .md-preview .hljs-variable, :is(.dark) .md-preview .hljs-template-variable, :is(.dark) .md-preview .hljs-attr, :is(.dark) .md-preview .hljs-attribute { color: #79c0ff; }
-:is(.dark) .md-preview .hljs-string, :is(.dark) .md-preview .hljs-regexp, :is(.dark) .md-preview .hljs-doctag, :is(.dark) .md-preview .hljs-deletion { color: #a5d6ff; }
-:is(.dark) .md-preview .hljs-number, :is(.dark) .md-preview .hljs-literal, :is(.dark) .md-preview .hljs-meta, :is(.dark) .md-preview .hljs-type, :is(.dark) .md-preview .hljs-symbol, :is(.dark) .md-preview .hljs-link { color: #79c0ff; }
-:is(.dark) .md-preview .hljs-built_in, :is(.dark) .md-preview .hljs-builtin-name, :is(.dark) .md-preview .hljs-class .hljs-title { color: #d2a8ff; }
-:is(.dark) .md-preview .hljs-addition { color: #aff5b4; background: rgba(46, 160, 67, 0.15); }
+:is(.dark) .md-preview .hljs {
+    color: #c9d1d9;
+}
+:is(.dark) .md-preview .hljs-comment,
+:is(.dark) .md-preview .hljs-quote {
+    color: #8b949e;
+}
+:is(.dark) .md-preview .hljs-keyword,
+:is(.dark) .md-preview .hljs-selector-tag,
+:is(.dark) .md-preview .hljs-section,
+:is(.dark) .md-preview .hljs-title,
+:is(.dark) .md-preview .hljs-name {
+    color: #ff7b72;
+}
+:is(.dark) .md-preview .hljs-variable,
+:is(.dark) .md-preview .hljs-template-variable,
+:is(.dark) .md-preview .hljs-attr,
+:is(.dark) .md-preview .hljs-attribute {
+    color: #79c0ff;
+}
+:is(.dark) .md-preview .hljs-string,
+:is(.dark) .md-preview .hljs-regexp,
+:is(.dark) .md-preview .hljs-doctag,
+:is(.dark) .md-preview .hljs-deletion {
+    color: #a5d6ff;
+}
+:is(.dark) .md-preview .hljs-number,
+:is(.dark) .md-preview .hljs-literal,
+:is(.dark) .md-preview .hljs-meta,
+:is(.dark) .md-preview .hljs-type,
+:is(.dark) .md-preview .hljs-symbol,
+:is(.dark) .md-preview .hljs-link {
+    color: #79c0ff;
+}
+:is(.dark) .md-preview .hljs-built_in,
+:is(.dark) .md-preview .hljs-builtin-name,
+:is(.dark) .md-preview .hljs-class .hljs-title {
+    color: #d2a8ff;
+}
+:is(.dark) .md-preview .hljs-addition {
+    color: #aff5b4;
+    background: rgba(46, 160, 67, 0.15);
+}

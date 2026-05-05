@@ -112,10 +112,7 @@ const slice = createSlice({
             state.activeFileContent = null
             state.activeFileLoading = true
         },
-        protoActiveFileLoaded(
-            state,
-            action: PayloadAction<{ path: string; content: string }>
-        ) {
+        protoActiveFileLoaded(state, action: PayloadAction<{ path: string; content: string }>) {
             // Race guard: only commit when path still matches current selection.
             if (state.activeFile === action.payload.path) {
                 state.activeFileContent = action.payload.content
@@ -127,10 +124,7 @@ const slice = createSlice({
             state.activeFileContent = null
             state.activeFileLoading = false
         },
-        protoTurnStarted(
-            state,
-            action: PayloadAction<{ requestId: string }>
-        ) {
+        protoTurnStarted(state, action: PayloadAction<{ requestId: string }>) {
             state.turns[action.payload.requestId] = {
                 requestId: action.payload.requestId,
                 summary: null,
@@ -182,10 +176,7 @@ const slice = createSlice({
             turn.sha = action.payload.sha
             turn.summary = action.payload.summary
         },
-        protoTurnParseError(
-            state,
-            action: PayloadAction<{ requestId: string; message: string }>
-        ) {
+        protoTurnParseError(state, action: PayloadAction<{ requestId: string; message: string }>) {
             const turn = state.turns[action.payload.requestId]
             if (!turn) return
             turn.parseError = action.payload.message

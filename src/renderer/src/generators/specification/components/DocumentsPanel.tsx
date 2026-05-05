@@ -90,7 +90,7 @@ const ListVariant = ({ basePath }: PanelProps): JSX.Element => {
                     name,
                     parentId: dialogMode.parentId ?? null,
                     type: dialogMode.type,
-                    content: dialogMode.type === 'file' ? template?.content ?? '' : undefined
+                    content: dialogMode.type === 'file' ? (template?.content ?? '') : undefined
                 })
             )
         } else {
@@ -331,7 +331,12 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                                     // chunks from LanceDB and ground the prompt in them.
                                     let kbBlock = ''
                                     let labelSuffix = ''
-                                    if (useKB && linked.length > 0 && userMessage.trim() && basePath) {
+                                    if (
+                                        useKB &&
+                                        linked.length > 0 &&
+                                        userMessage.trim() &&
+                                        basePath
+                                    ) {
                                         try {
                                             const hits = await window.specKB.search(
                                                 basePath,
@@ -340,7 +345,9 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                                                 { kbItemIds: linked.map((k) => k.id) }
                                             )
                                             if (hits.length > 0) {
-                                                const lookup = new Map(linked.map((k) => [k.id, k.name]))
+                                                const lookup = new Map(
+                                                    linked.map((k) => [k.id, k.name])
+                                                )
                                                 const formatted = hits
                                                     .map((h, idx) => {
                                                         const ownerId = h.metadata?.kbItemId as
@@ -373,7 +380,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                                             '1. When the user asks you to draft, fill, generate, write or rewrite the document (or any section of it), respond with **only** a single fenced markdown block, opened with ```markdown and closed with ```. No prose before or after the block.',
                                             '2. When the user asks you to add or extend (e.g. "add a Risks section"), still emit a single fenced markdown block — but containing only the new fragment to be appended, without restating the rest of the document.',
                                             '3. When the user asks an analytical or conversational question ("what is missing?", "summarise this", "is this consistent?"), reply in plain prose. Do NOT wrap normal answers in a fenced block.',
-                                            '4. Never answer with both prose AND a markdown block. The Studio will copy/insert the block verbatim into the user\'s document — surrounding prose would leak into the file.',
+                                            "4. Never answer with both prose AND a markdown block. The Studio will copy/insert the block verbatim into the user's document — surrounding prose would leak into the file.",
                                             '5. Ground every factual claim in (a) the document, (b) the Knowledge Base chunks below when present, (c) the linked items list. Cite chunks inline as `[KB: <item name>]`. If the KB does not contain the answer, say so; do not invent.'
                                         ].join('\n')
                                     )

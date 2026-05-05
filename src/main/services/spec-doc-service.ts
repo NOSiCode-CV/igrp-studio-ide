@@ -116,7 +116,9 @@ export class SpecDocService {
         }
         if (Array.isArray(patch.kbRefs)) {
             // Dedupe and reject empty ids defensively.
-            node.kbRefs = Array.from(new Set(patch.kbRefs.filter((id) => typeof id === 'string' && id)))
+            node.kbRefs = Array.from(
+                new Set(patch.kbRefs.filter((id) => typeof id === 'string' && id))
+            )
         }
         node.updatedAt = new Date().toISOString()
         nodes[idx] = node
@@ -157,9 +159,9 @@ export class SpecDocService {
         for (const node of toRemove) {
             if (node.type === 'file') {
                 await fsp.unlink(filePath(basePath, node.id)).catch(() => undefined)
-                await fsp.rm(assetsDir(basePath, node.id), { recursive: true, force: true }).catch(
-                    () => undefined
-                )
+                await fsp
+                    .rm(assetsDir(basePath, node.id), { recursive: true, force: true })
+                    .catch(() => undefined)
             }
         }
 
@@ -179,7 +181,6 @@ export class SpecDocService {
         if (!result.ok) throw new Error(`MarkItDown failed: ${result.error}`)
         return { markdown: result.markdown }
     }
-
 }
 
 // ─── helpers ───────────────────────────────────────────────────────────────

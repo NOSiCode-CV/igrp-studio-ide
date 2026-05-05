@@ -53,8 +53,8 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
                 <div className="space-y-1">
                     <p className="text-sm font-medium">No active BPMN configuration</p>
                     <p className="text-xs text-muted-foreground">
-                        Open the UI Generator → BPMN tab → API Configuration to add
-                        and activate a Process API endpoint.
+                        Open the UI Generator → BPMN tab → API Configuration to add and activate a
+                        Process API endpoint.
                     </p>
                 </div>
             </div>

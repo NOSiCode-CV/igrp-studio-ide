@@ -182,10 +182,7 @@ export class VectorDBService {
     }
 
     /** Drops the entire collection (used by spec-kb-service.removeItem cascade). */
-    async dropCollection(
-        basePath: string,
-        collection = DEFAULT_COLLECTION
-    ): Promise<void> {
+    async dropCollection(basePath: string, collection = DEFAULT_COLLECTION): Promise<void> {
         const lib = await loadLanceDB()
         const db = await lib.connect(join(basePath, 'vectors'))
         const tables = await db.tableNames()

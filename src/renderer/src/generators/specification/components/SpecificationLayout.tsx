@@ -145,10 +145,7 @@ const MainContent = ({
     )
 }
 
-const SpecificationLayout = ({
-    basePath,
-    currentItem
-}: SpecificationLayoutProps): JSX.Element => {
+const SpecificationLayout = ({ basePath, currentItem }: SpecificationLayoutProps): JSX.Element => {
     const { activeTab, setActiveTab } = useSpecification()
     const navigate = useNavigate()
     const dispatch = useDispatch<any>()
@@ -165,56 +162,56 @@ const SpecificationLayout = ({
     return (
         <ProcessesSelectionProvider>
             <div className="flex h-full w-full pb-8">
-            {/* Icon rail — same 80px width as the Studio's main sidebar
+                {/* Icon rail — same 80px width as the Studio's main sidebar
                 (`app-sidebar.tsx`), so the two layouts look continuous when the
                 user navigates between generators. */}
-            <aside className="flex w-20 shrink-0 flex-col items-stretch gap-2 border-r bg-sidebar p-2">
-                <IGRPSidebarMenuPrimitive>
-                    <IGRPSidebarMenuItemPrimitive>
-                        <IGRPSidebarMenuButtonPrimitive
-                            size="lg"
-                            asChild
-                            className="md:h-8 md:p-0 items-center justify-center"
-                        >
-                            <a
-                                href={ROUTES.HOME}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    navigate(ROUTES.HOME)
-                                }}
+                <aside className="flex w-20 shrink-0 flex-col items-stretch gap-2 border-r bg-sidebar p-2">
+                    <IGRPSidebarMenuPrimitive>
+                        <IGRPSidebarMenuItemPrimitive>
+                            <IGRPSidebarMenuButtonPrimitive
+                                size="lg"
+                                asChild
+                                className="md:h-8 md:p-0 items-center justify-center"
                             >
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                                    <Home className="size-4" />
-                                </div>
-                            </a>
-                        </IGRPSidebarMenuButtonPrimitive>
-                    </IGRPSidebarMenuItemPrimitive>
-                </IGRPSidebarMenuPrimitive>
+                                <a
+                                    href={ROUTES.HOME}
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        navigate(ROUTES.HOME)
+                                    }}
+                                >
+                                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                                        <Home className="size-4" />
+                                    </div>
+                                </a>
+                            </IGRPSidebarMenuButtonPrimitive>
+                        </IGRPSidebarMenuItemPrimitive>
+                    </IGRPSidebarMenuPrimitive>
 
-                <div className="my-1 h-px bg-border" />
+                    <div className="my-1 h-px bg-border" />
 
-                {RAIL_ITEMS.map((item) => (
-                    <RailButton
-                        key={item.id}
-                        item={item}
-                        active={activeTab === item.id}
-                        onClick={() => setActiveTab(item.id)}
-                    />
-                ))}
-            </aside>
+                    {RAIL_ITEMS.map((item) => (
+                        <RailButton
+                            key={item.id}
+                            item={item}
+                            active={activeTab === item.id}
+                            onClick={() => setActiveTab(item.id)}
+                        />
+                    ))}
+                </aside>
 
-            {/* Secondary panel — hidden for tabs that own their own multi-pane
+                {/* Secondary panel — hidden for tabs that own their own multi-pane
                 layout (Prototype, Data). */}
-            {activeTab !== 'prototype' && activeTab !== 'data' && (
-                <SecondaryPanel
-                    activeTab={activeTab}
-                    basePath={basePath}
-                    currentItem={currentItem}
-                />
-            )}
+                {activeTab !== 'prototype' && activeTab !== 'data' && (
+                    <SecondaryPanel
+                        activeTab={activeTab}
+                        basePath={basePath}
+                        currentItem={currentItem}
+                    />
+                )}
 
-            {/* Main content */}
-            <MainContent activeTab={activeTab} basePath={basePath} currentItem={currentItem} />
+                {/* Main content */}
+                <MainContent activeTab={activeTab} basePath={basePath} currentItem={currentItem} />
             </div>
         </ProcessesSelectionProvider>
     )

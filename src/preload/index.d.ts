@@ -105,6 +105,11 @@ declare const engine: {
     getCodeSnippets: (engineType: string) => Promise<HandlerResponse>
     createProcess: (process: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     createProcessStep: (step: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    createGraphqlSchema: (
+        config: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>
 }
 declare const repo: {
     workspace: {

@@ -104,4 +104,3 @@ function toNextConfig(config: SpecificationConfigData): NextConfigData {
         version: config.version
     }
 }
-

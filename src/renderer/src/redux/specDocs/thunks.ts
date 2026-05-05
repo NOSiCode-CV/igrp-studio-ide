@@ -24,20 +24,19 @@ export const loadDocs = (basePath: string) => async (dispatch: Dispatch) => {
     }
 }
 
-export const selectDoc =
-    (basePath: string, docId: string | null) => async (dispatch: Dispatch) => {
-        if (!basePath || !docId) {
-            dispatch(docSelected({ id: null, content: '' }))
-            return
-        }
-        const result = await window.specDoc.read(basePath, docId)
-        dispatch(
-            docSelected({
-                id: result?.node.id ?? null,
-                content: result?.content ?? ''
-            })
-        )
+export const selectDoc = (basePath: string, docId: string | null) => async (dispatch: Dispatch) => {
+    if (!basePath || !docId) {
+        dispatch(docSelected({ id: null, content: '' }))
+        return
     }
+    const result = await window.specDoc.read(basePath, docId)
+    dispatch(
+        docSelected({
+            id: result?.node.id ?? null,
+            content: result?.content ?? ''
+        })
+    )
+}
 
 export const createDocNode =
     (
@@ -65,15 +64,13 @@ export const renameDocNode =
         return node
     }
 
-export const removeDocNode =
-    (basePath: string, docId: string) => async (dispatch: Dispatch) => {
-        await window.specDoc.remove(basePath, docId)
-        dispatch(docNodeRemoved(docId))
-    }
+export const removeDocNode = (basePath: string, docId: string) => async (dispatch: Dispatch) => {
+    await window.specDoc.remove(basePath, docId)
+    dispatch(docNodeRemoved(docId))
+}
 
 export const moveDocNode =
-    (basePath: string, docId: string, newParentId: string | null) =>
-    async (dispatch: Dispatch) => {
+    (basePath: string, docId: string, newParentId: string | null) => async (dispatch: Dispatch) => {
         const node = await window.specDoc.move(basePath, docId, newParentId)
         dispatch(docNodeUpserted(node))
         return node

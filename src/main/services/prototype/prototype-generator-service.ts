@@ -20,12 +20,7 @@ import { promisify } from 'node:util'
 import { GitService } from '../git-service'
 import { llmRouter } from '../llm/llm-router'
 import type { LLMMessage } from '../llm/types'
-import {
-    applyFileOps,
-    parseFileOps,
-    type AppliedFileOp,
-    type FileOp
-} from './file-ops'
+import { applyFileOps, parseFileOps, type AppliedFileOp, type FileOp } from './file-ops'
 
 const execFileAsync = promisify(execFile)
 
@@ -168,11 +163,7 @@ interface PromptInput {
     fileTree: string[]
 }
 
-function buildSystemPrompt({
-    specContext,
-    lastTurnSummary,
-    fileTree
-}: PromptInput): string {
+function buildSystemPrompt({ specContext, lastTurnSummary, fileTree }: PromptInput): string {
     const sections: string[] = []
     sections.push(
         [
@@ -248,9 +239,7 @@ async function ensureGitRepo(prototypeRoot: string): Promise<void> {
     if (fs.existsSync(join(prototypeRoot, '.git'))) return
     await execFileAsync('git', ['init', '-b', 'main'], { cwd: prototypeRoot })
     // Best-effort initial commit so subsequent ones have a parent.
-    await execFileAsync('git', ['add', '-A'], { cwd: prototypeRoot }).catch(
-        () => undefined
-    )
+    await execFileAsync('git', ['add', '-A'], { cwd: prototypeRoot }).catch(() => undefined)
     await execFileAsync('git', ['commit', '--allow-empty', '-m', 'init'], {
         cwd: prototypeRoot
     }).catch(() => undefined)
@@ -270,10 +259,7 @@ async function readHeadSha(prototypeRoot: string): Promise<string | null> {
 function sanitizeCommitMessage(summary: string): string {
     // Single line, escape backticks and double quotes. Fall back to a generic
     // message when the LLM gives nothing usable.
-    const cleaned = summary
-        .replace(/[`"]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim()
+    const cleaned = summary.replace(/[`"]/g, '').replace(/\s+/g, ' ').trim()
     return cleaned ? cleaned.slice(0, 200) : 'prototype turn'
 }
 

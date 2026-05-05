@@ -91,10 +91,7 @@ export function DataModelsPanel({
                             {t('import_from_db')}
                         </IGRPButtonPrimitive>
                     </div>
-                    <IGRPTabsContentPrimitive
-                        value="entities"
-                        className="flex-1 flex min-h-0"
-                    >
+                    <IGRPTabsContentPrimitive value="entities" className="flex-1 flex min-h-0">
                         <div className="w-[260px] border-r overflow-hidden">
                             <EntityList
                                 basePath={basePath}
@@ -117,10 +114,7 @@ export function DataModelsPanel({
                             )}
                         </div>
                     </IGRPTabsContentPrimitive>
-                    <IGRPTabsContentPrimitive
-                        value="erd"
-                        className="flex-1 min-h-0"
-                    >
+                    <IGRPTabsContentPrimitive value="erd" className="flex-1 min-h-0">
                         <ReactFlowERD
                             basePath={basePath}
                             onEntityClick={(id) => {
