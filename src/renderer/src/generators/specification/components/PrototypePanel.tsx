@@ -1,4 +1,5 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import MonacoEditor, { DiffEditor } from '@monaco-editor/react'
+import { IGRPButtonPrimitive, IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system'
 import { cn } from '@renderer/lib/utils'
 import type { RootState } from '@renderer/redux'
 import {
@@ -43,8 +44,7 @@ import {
     RotateCcw,
     Smartphone,
     Tablet,
-    Terminal,
-    X
+    Terminal
 } from 'lucide-react'
 import { type JSX, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -541,37 +541,203 @@ const FilesPane = ({ basePath }: { basePath?: string }): JSX.Element => {
                     )}
                 </div>
             </aside>
-            <section className="flex flex-1 flex-col bg-background">
-                <header className="flex h-10 items-center justify-between border-b bg-card px-4">
+            <FileViewer
+                basePath={basePath}
+                activeFile={activeFile}
+                activeFileContent={activeFileContent}
+                loading={loading}
+                changedPaths={changedPaths}
+            />
+        </div>
+    )
+}
+
+// ─── File viewer (Monaco read-only + optional diff vs HEAD~1) ────────────
+
+const languageFromExt = (path: string): string => {
+    const ext = path.split('.').pop()?.toLowerCase() ?? ''
+    switch (ext) {
+        case 'ts':
+        case 'tsx':
+            return 'typescript'
+        case 'js':
+        case 'jsx':
+        case 'mjs':
+        case 'cjs':
+            return 'javascript'
+        case 'json':
+            return 'json'
+        case 'md':
+        case 'markdown':
+            return 'markdown'
+        case 'css':
+            return 'css'
+        case 'scss':
+        case 'sass':
+            return 'scss'
+        case 'html':
+        case 'htm':
+            return 'html'
+        case 'yml':
+        case 'yaml':
+            return 'yaml'
+        case 'sh':
+        case 'bash':
+        case 'zsh':
+            return 'shell'
+        case 'sql':
+            return 'sql'
+        case 'py':
+            return 'python'
+        case 'rb':
+            return 'ruby'
+        case 'go':
+            return 'go'
+        case 'rs':
+            return 'rust'
+        default:
+            return 'plaintext'
+    }
+}
+
+const monacoOptions = {
+    readOnly: true,
+    fontSize: 13,
+    fontFamily:
+        'JetBrains Mono, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+    minimap: { enabled: false },
+    wordWrap: 'on' as const,
+    scrollBeyondLastLine: false,
+    renderLineHighlight: 'none' as const,
+    folding: true,
+    glyphMargin: false,
+    padding: { top: 12, bottom: 12 }
+}
+
+const FileViewer = ({
+    basePath,
+    activeFile,
+    activeFileContent,
+    loading,
+    changedPaths
+}: {
+    basePath?: string
+    activeFile: string | null
+    activeFileContent: string | null
+    loading: boolean
+    changedPaths: Record<string, FileChangeKind>
+}): JSX.Element => {
+    const status = activeFile ? changedPaths[activeFile] : undefined
+    const canDiff = Boolean(activeFile && status === 'modified')
+    // If the active file isn't dirty in the last turn, force off — avoids
+    // a stale diff sticking around when the user navigates to an untouched
+    // file after viewing a modified one.
+    const [diffOn, setDiffOn] = useState(false)
+    useEffect(() => {
+        if (!canDiff) setDiffOn(false)
+    }, [canDiff, activeFile])
+
+    const [previousContent, setPreviousContent] = useState<string | null>(null)
+    const [diffLoading, setDiffLoading] = useState(false)
+    useEffect(() => {
+        if (!diffOn || !basePath || !activeFile) {
+            setPreviousContent(null)
+            return
+        }
+        let cancelled = false
+        setDiffLoading(true)
+        window.specPrototype
+            .readFileAt(basePath, 'HEAD~1', activeFile)
+            .then((res) => {
+                if (cancelled) return
+                setPreviousContent(res.content)
+            })
+            .catch(() => {
+                if (cancelled) return
+                setPreviousContent(null)
+            })
+            .finally(() => {
+                if (cancelled) return
+                setDiffLoading(false)
+            })
+        return () => {
+            cancelled = true
+        }
+    }, [diffOn, basePath, activeFile])
+
+    const language = activeFile ? languageFromExt(activeFile) : 'plaintext'
+
+    return (
+        <section className="flex flex-1 flex-col bg-background">
+            <header className="flex h-10 items-center justify-between border-b bg-card px-4">
+                <div className="flex items-center gap-3">
                     <span className="font-mono text-[11px] text-muted-foreground">
                         {activeFile ? `prototype/${activeFile}` : 'No file selected'}
                     </span>
-                    {activeFile && (
-                        <IGRPButtonPrimitive
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            disabled
+                    {status && (
+                        <span
+                            className={cn(
+                                'rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide',
+                                status === 'new'
+                                    ? 'bg-emerald-500/15 text-emerald-500'
+                                    : status === 'modified'
+                                      ? 'bg-blue-500/15 text-blue-500'
+                                      : 'bg-red-500/15 text-red-500'
+                            )}
                         >
-                            <X size={12} />
-                        </IGRPButtonPrimitive>
-                    )}
-                </header>
-                <div className="flex-1 overflow-auto bg-background">
-                    {loading ? (
-                        <p className="p-6 text-[11px] text-muted-foreground">Loading…</p>
-                    ) : activeFileContent === null ? (
-                        <p className="p-6 text-[11px] text-muted-foreground">
-                            Select a file from the explorer to preview its contents.
-                        </p>
-                    ) : (
-                        <pre className="whitespace-pre-wrap p-6 font-mono text-[12px] leading-relaxed">
-                            <code>{activeFileContent}</code>
-                        </pre>
+                            {status}
+                        </span>
                     )}
                 </div>
-            </section>
-        </div>
+                <div className="flex items-center gap-1">
+                    {canDiff && (
+                        <button
+                            type="button"
+                            onClick={() => setDiffOn((v) => !v)}
+                            className={cn(
+                                'rounded px-2 py-1 text-[10px] font-medium transition-colors',
+                                diffOn
+                                    ? 'bg-secondary text-secondary-foreground'
+                                    : 'text-muted-foreground hover:bg-accent'
+                            )}
+                            title="Compare with previous commit (HEAD~1)"
+                        >
+                            {diffOn ? 'Hide diff' : 'View diff'}
+                        </button>
+                    )}
+                </div>
+            </header>
+            <div className="flex-1 overflow-hidden bg-background">
+                {loading ? (
+                    <p className="p-6 text-[11px] text-muted-foreground">Loading…</p>
+                ) : activeFileContent === null ? (
+                    <p className="p-6 text-[11px] text-muted-foreground">
+                        Select a file from the explorer to preview its contents.
+                    </p>
+                ) : diffOn ? (
+                    diffLoading ? (
+                        <p className="p-6 text-[11px] text-muted-foreground">Loading diff…</p>
+                    ) : (
+                        <DiffEditor
+                            height="100%"
+                            language={language}
+                            original={previousContent ?? ''}
+                            modified={activeFileContent}
+                            theme="vs-dark"
+                            options={{ ...monacoOptions, renderSideBySide: false }}
+                        />
+                    )
+                ) : (
+                    <MonacoEditor
+                        height="100%"
+                        language={language}
+                        value={activeFileContent}
+                        theme="vs-dark"
+                        options={monacoOptions}
+                    />
+                )}
+            </div>
+        </section>
     )
 }
 
@@ -646,34 +812,146 @@ const FileTreeRow = ({
 
 // ─── Logs ─────────────────────────────────────────────────────────────────
 
+type LogFilter = 'all' | 'errors' | 'warns+errors'
+
 const LogsPane = (): JSX.Element => {
+    const dispatch = useDispatch<any>()
     const logs = useSelector((s: RootState) => s.specPrototype.logs)
     const scrollRef = useRef<HTMLDivElement>(null)
 
+    const [search, setSearch] = useState('')
+    const [filter, setFilter] = useState<LogFilter>('all')
+    // Pause auto-scroll while the user is hovering — stops the viewport
+    // from snapping back to bottom while they read older lines.
+    const [paused, setPaused] = useState(false)
+
+    const filtered = useMemo(() => {
+        const needle = search.trim().toLowerCase()
+        return logs.filter((log) => {
+            if (filter === 'errors' && log.level !== 'error') return false
+            if (filter === 'warns+errors' && log.level === 'info') return false
+            if (needle && !log.line.toLowerCase().includes(needle)) return false
+            return true
+        })
+    }, [logs, search, filter])
+
     useEffect(() => {
+        if (paused) return
         const el = scrollRef.current
         if (el) el.scrollTop = el.scrollHeight
+    }, [filtered, paused])
+
+    const handleClear = useCallback(() => {
+        dispatch({ type: 'specPrototype/protoLogsReplaced', payload: [] })
+    }, [dispatch])
+
+    const handleCopy = useCallback(async () => {
+        const text = filtered
+            .map((l) => `[${new Date(l.timestamp).toISOString()}] ${l.level.padEnd(5)} ${l.line}`)
+            .join('\n')
+        try {
+            await navigator.clipboard.writeText(text)
+        } catch {
+            // noop — not all envs grant clipboard access; failing silently
+            // is fine since the user retains the logs visible on screen.
+        }
+    }, [filtered])
+
+    const counts = useMemo(() => {
+        let info = 0
+        let warn = 0
+        let error = 0
+        for (const log of logs) {
+            if (log.level === 'error') error++
+            else if (log.level === 'warn') warn++
+            else info++
+        }
+        return { info, warn, error }
     }, [logs])
 
     return (
         <div className="flex h-full flex-col rounded-xl border bg-background">
-            <div className="flex items-center gap-2 border-b px-6 py-3 text-emerald-500">
-                <Terminal size={14} />
-                <span className="text-[10px] font-bold uppercase tracking-widest">
-                    Dev Server Logs
-                </span>
-                <span className="ml-auto text-[10px] text-muted-foreground">
-                    {logs.length} entries
-                </span>
+            <div className="flex items-center gap-3 border-b px-4 py-2.5">
+                <div className="flex items-center gap-2 text-emerald-500">
+                    <Terminal size={14} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">
+                        Dev Server Logs
+                    </span>
+                </div>
+                <div className="flex items-center gap-1 rounded-md border bg-card p-0.5">
+                    <LogFilterButton
+                        active={filter === 'all'}
+                        onClick={() => setFilter('all')}
+                        label={`All (${logs.length})`}
+                    />
+                    <LogFilterButton
+                        active={filter === 'warns+errors'}
+                        onClick={() => setFilter('warns+errors')}
+                        label={`Warn+Err (${counts.warn + counts.error})`}
+                    />
+                    <LogFilterButton
+                        active={filter === 'errors'}
+                        onClick={() => setFilter('errors')}
+                        label={`Err (${counts.error})`}
+                    />
+                </div>
+                <div className="relative flex-1 max-w-xs">
+                    <Search
+                        size={11}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
+                    <IGRPInputPrimitive
+                        placeholder="Search…"
+                        className="h-7 pl-7 text-[11px]"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </div>
+                <div className="ml-auto flex items-center gap-1">
+                    {paused && (
+                        <span className="text-[10px] text-amber-500" title="Auto-scroll paused">
+                            paused
+                        </span>
+                    )}
+                    <IGRPButtonPrimitive
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        title="Copy filtered logs to clipboard"
+                        onClick={handleCopy}
+                        disabled={filtered.length === 0}
+                    >
+                        <Copy size={12} />
+                    </IGRPButtonPrimitive>
+                    <IGRPButtonPrimitive
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        title="Clear logs"
+                        onClick={handleClear}
+                        disabled={logs.length === 0}
+                    >
+                        <Trash2 size={12} />
+                    </IGRPButtonPrimitive>
+                </div>
             </div>
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 font-mono text-[12px]">
+            <div
+                ref={scrollRef}
+                onMouseEnter={() => setPaused(true)}
+                onMouseLeave={() => setPaused(false)}
+                className="flex-1 overflow-y-auto p-4 font-mono text-[12px]"
+            >
                 {logs.length === 0 ? (
                     <p className="italic text-muted-foreground">
                         No logs yet. The dev server starts when you open the Preview tab or hit ▶.
                     </p>
+                ) : filtered.length === 0 ? (
+                    <p className="italic text-muted-foreground">
+                        No entries match the current filter.
+                    </p>
                 ) : (
                     <div className="space-y-1">
-                        {logs.map((log, idx) => (
+                        {filtered.map((log, idx) => (
                             <LogLine key={idx} log={log} />
                         ))}
                     </div>
@@ -682,6 +960,27 @@ const LogsPane = (): JSX.Element => {
         </div>
     )
 }
+
+const LogFilterButton = ({
+    active,
+    onClick,
+    label
+}: {
+    active: boolean
+    onClick: () => void
+    label: string
+}): JSX.Element => (
+    <button
+        type="button"
+        onClick={onClick}
+        className={cn(
+            'rounded px-2 py-0.5 text-[10px] font-medium transition-colors',
+            active ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-accent'
+        )}
+    >
+        {label}
+    </button>
+)
 
 const LogLine = ({ log }: { log: PrototypeLog }): JSX.Element => {
     const ts = new Date(log.timestamp).toLocaleTimeString()

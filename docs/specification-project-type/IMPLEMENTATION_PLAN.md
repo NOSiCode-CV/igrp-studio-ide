@@ -380,7 +380,7 @@ export class PrototypeGeneratorService {
 - [ ] **M4.5** Preload `window.specPrototype` + tipos.
 - [ ] **M4.6** Slice `redux/specPrototype` (sessions, files tree, logs, snapshots).
 - [ ] **M4.7** Preview real com `<webview>` apontando para `localhost:<port>`.
-- [ ] **M4.8** Files com tree dinâmico + diff viewer (badges new/modified vindas do último turn).
+- [x] **M4.8** Files com tree dinâmico + diff viewer ✅ — `<MonacoEditor>` read-only com `languageFromExt` (ts/tsx, js, json, md, css, html, yaml, sh, sql, py, rb, go, rs); badges new/modified/deleted no header alimentadas por `state.changedPaths`; toggle "View diff" só visível em ficheiros modified, abre `<DiffEditor>` HEAD vs HEAD~1 via novo IPC `spec:prototype:read-file-at` (`git show HEAD~1:<path>`, sandbox-validated com regex `[A-Za-z0-9_/.~^-]` no ref).
 - [ ] **M4.9** Logs em streaming real (xterm-style).
 - [ ] **M4.10** History com `git log` real + restore (`git reset --hard <sha>`).
 - [ ] **M4.11** Snapshot card no chat (cada turn) com restore inline.
