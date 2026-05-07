@@ -12,6 +12,7 @@
         "typecheck": "npm run typecheck:node && npm run typecheck:web",
         "start": "electron-vite preview ",
         "dev": "electron-vite dev ",
+        "dev:clean": "NODE_OPTIONS=--no-deprecation electron-vite dev ",
         "build": "npm run format && npm run typecheck && electron-vite build",
         "postinstall": "electron-builder install-app-deps",
         "build:unpack": "npm run build && electron-builder --dir",

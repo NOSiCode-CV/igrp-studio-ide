@@ -40,6 +40,8 @@ export const EVENTS = {
             FIND_ALL: 'repository:workspace:find-all',
             FIND_RECENT: 'repository:workspace:find-recent',
             OPEN: 'repository:workspace:open',
+            INSTALL_OPTIONAL_STACKS: 'repository:workspace:install-optional-stacks',
+            GET_OPTIONAL_STACKS_STATUS: 'repository:workspace:get-optional-stacks-status',
             SAVE_CUSTOM_YAML: 'engine:save-custom-ymal'
         },
         PROJECT: {
@@ -106,6 +108,7 @@ export const EVENTS = {
     },
     DOCKER: {
         UP: 'docker-up',
+        DEPLOY_PROJECT: 'docker-deploy-project',
         DOWN: 'docker-down',
         STATUS: 'docker-status',
         STOP: 'docker-stop',

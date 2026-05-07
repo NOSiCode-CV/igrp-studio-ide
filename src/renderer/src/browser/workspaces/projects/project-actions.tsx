@@ -10,9 +10,11 @@ import {
 } from '@igrp/igrp-framework-react-design-system'
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
+import { useDocker } from '@renderer/hooks/use-docker'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
-import { Edit, ExternalLink, MoreVertical, Repeat, Trash } from 'lucide-react'
+import { Edit, ExternalLink, MoreVertical, Repeat, Rocket, Trash } from 'lucide-react'
+import path from 'path'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ProjectData, ServiceInfo } from 'src/main/types'
@@ -41,8 +43,10 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     const { t } = useTranslation()
 
     const {
+        workspace,
         actions: { removeProject }
     } = useWorkspace()
+    const { getProjectBrowserUrl } = useDocker({ workspace })
 
     const handleDelete = async () => {
         try {
@@ -54,19 +58,67 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     }
 
     const handleExternalLink = () => {
-        // Implement your external link logic here
-        console.log(t('openExternalLinkFor'), project.name, service)
+        const url = getProjectBrowserUrl(project, service)
+        if (!url) return
+        window.open(url, '_blank')
+    }
+
+    const handleDeployDocker = async () => {
+        try {
+            if (window.igrpStudio.docker.deployProject) {
+                await window.igrpStudio.docker.deployProject(project.path)
+                return
+            }
+
+            if (window.electron?.ipcRenderer?.invoke) {
+                try {
+                    await window.electron.ipcRenderer.invoke('docker-deploy-project', project.path)
+                    return
+                } catch (error) {
+                    if (
+                        error instanceof Error &&
+                        !error.message.includes("No handler registered for 'docker-deploy-project'")
+                    ) {
+                        throw error
+                    }
+                }
+            }
+
+            await window.igrpStudio.docker.up(project.path)
+        } catch (error: unknown) {
+            showErrorToast(error)
+        }
     }
 
     const handleEditProject = () => {
         setIsEditModalOpen(true)
     }
 
-    const findServiceByProjectName = (uuid: string): ServiceInfo | undefined => {
-        return services.find((service) => service.labels?.uuid === uuid)
+    const findServiceByProjectName = (project: ProjectData): ServiceInfo | undefined => {
+        const byUuid = services.find((service) => service.labels?.uuid === project.id)
+        if (byUuid) return byUuid
+
+        const projectName = (project.name || '').toLowerCase().trim()
+        const projectDirName = path.basename(project.path || '').toLowerCase().trim()
+        const candidates = [projectName, projectDirName].filter(Boolean)
+        if (candidates.length === 0) return undefined
+        return services.find((service) => {
+            const serviceName = (service.name || '').toLowerCase()
+            const composeFile = (service.composeFile || '').toLowerCase()
+            const matchesCandidate = candidates.some(
+                (candidate) =>
+                    serviceName === candidate ||
+                    serviceName.endsWith(`-${candidate}`) ||
+                    serviceName.includes(`-${candidate}-`)
+            )
+            return (
+                composeFile.includes('igrp-projects-compose.yml') &&
+                matchesCandidate
+            )
+        })
     }
 
-    const service = findServiceByProjectName(project.id)
+    const service = findServiceByProjectName(project)
 
     return (
         <>
@@ -86,12 +138,17 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                         {t('editProject')}
                     </IGRPDropdownMenuItemPrimitive>
 
-                    {service?.status === 'running' && (
+                    {getProjectBrowserUrl(project, service) && (
                         <IGRPDropdownMenuItemPrimitive onClick={handleExternalLink}>
                             <ExternalLink className="mr-2 h-4 w-4" />
                             {t('openInBrowser')}
                         </IGRPDropdownMenuItemPrimitive>
                     )}
+
+                    <IGRPDropdownMenuItemPrimitive onClick={handleDeployDocker}>
+                        <Rocket className="mr-2 h-4 w-4" />
+                        Deploy Docker
+                    </IGRPDropdownMenuItemPrimitive>
 
                     {project.framework === ENV_TYPES.DOTNET && (
                         <IGRPDropdownMenuItemPrimitive onClick={onConvertToSpringBoot} disabled>
@@ -156,8 +213,8 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
                 onSuccess={() => {
-                    // Refresh the projects list or trigger a re-render
-                    window.location.reload()
+                    // Trigger data refresh without hard reloading the renderer process.
+                    window.dispatchEvent(new Event('igrp:workspace:refresh'))
                 }}
             />
         </>

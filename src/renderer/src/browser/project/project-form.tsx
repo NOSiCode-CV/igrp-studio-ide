@@ -95,9 +95,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             storageMode: 'managed',
             themeColor: '#000000',
             icon: '',
-            workspaceId: workspace.id
+            workspaceId: workspace?.id || ''
         }),
-        [workspace.id]
+        [workspace?.id]
     )
 
     const validationSchema = useProjectValidation({ t, step })
@@ -109,7 +109,15 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         onSubmit: async (values, actions) => {
             setIsCreatingProject(true)
             try {
-                await saveOrOpenProject({ project: { ...values } })
+                await saveOrOpenProject({
+                    project: {
+                        ...values,
+                        name: values?.name || '',
+                        framework: values?.framework || '',
+                        path: values?.path || '',
+                        config: values?.config || {}
+                    }
+                })
             } finally {
                 actions.setSubmitting(false)
                 setIsCreatingProject(false)

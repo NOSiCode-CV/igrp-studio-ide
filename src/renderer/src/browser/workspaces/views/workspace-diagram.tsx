@@ -63,6 +63,7 @@ import { ConfigurationDialog } from '../components/configuration-dialog'
 // Custom Node Components
 interface ServiceNodeData {
     service: ServiceInfo
+    serviceUrl?: string | null
     onAction: (action: string, serviceName: string) => void
     services: ServiceInfo[]
     onEditService: (service: ServiceInfo) => void
@@ -70,38 +71,99 @@ interface ServiceNodeData {
     onOpenInBrowser: (service: ServiceInfo) => void
 }
 
+interface GroupLabelNodeData {
+    label: string
+    colorClass: string
+}
+
+type DiagramServiceStatus =
+    | 'healthy'
+    | 'running'
+    | 'starting'
+    | 'unhealthy'
+    | 'stopped'
+    | 'exited'
+    | 'error'
+    | 'unknown'
+
+type DiagramStackId = 'main' | 'monitoring' | 'process' | 'project'
+
+const resolveDiagramStatus = (service?: ServiceInfo): DiagramServiceStatus => {
+    if (!service) return 'unknown'
+    const status = (service.status || '').toLowerCase()
+    const statusMessage = (service.statusMessage || '').toLowerCase()
+
+    if (status === 'running') {
+        if (statusMessage.includes('unhealthy')) return 'unhealthy'
+        if (statusMessage.includes('health: starting') || statusMessage.includes('starting')) {
+            return 'starting'
+        }
+        if (statusMessage.includes('healthy')) return 'healthy'
+        return 'running'
+    }
+
+    if (status === 'exited') return 'exited'
+    if (status === 'error') return 'error'
+    if (status === 'stopped' || status === 'created' || status === 'dead' || status === 'removing') {
+        return 'stopped'
+    }
+    return 'unknown'
+}
+
+const resolveDiagramStack = (service?: ServiceInfo): DiagramStackId => {
+    if (!service) return 'main'
+    if (service.labels?.is_project === true || service.labels?.is_project === 'true') return 'project'
+    const composeFile = (service.composeFile || '').toLowerCase()
+    if (composeFile.includes('igrp-monitoring-compose.yaml') || composeFile.includes('compose-monitoring.yaml')) {
+        return 'monitoring'
+    }
+    if (composeFile.includes('igrp-process-compose.yaml') || composeFile.includes('compose-process.yaml')) {
+        return 'process'
+    }
+    if (composeFile.includes('igrp-projects-compose.yml') || composeFile.includes('igrp-projects-compose.yaml')) {
+        return 'project'
+    }
+    return (service.stack as DiagramStackId) || 'main'
+}
+
 const ServiceNode: React.FC<{
     data: ServiceNodeData
     selected: boolean
 }> = ({ data, selected }) => {
-    const { service, onAction, onEditService, onDeleteService, onOpenInBrowser } = data
+    const { service, serviceUrl, onAction, onEditService, onDeleteService, onOpenInBrowser } = data
     const { t } = useTranslation()
 
-    const getServiceUrl = (service: ServiceInfo): string | null => {
-        if (!service.ports || service.ports.length === 0) return null
-
-        const port = service.ports[0]
-        const portNumber = port.split(':')[0]
-        return `http://localhost:${portNumber}`
-    }
-
     const getStatusIcon = (): JSX.Element => {
-        switch (service.status) {
-            case 'running':
+        switch (resolveDiagramStatus(service)) {
+            case 'healthy':
                 return <CheckCircle className="h-4 w-4 text-green-500" />
+            case 'running':
+                return <CheckCircle className="h-4 w-4 text-blue-500" />
+            case 'starting':
+                return <Clock className="h-4 w-4 text-amber-500" />
+            case 'unhealthy':
+                return <AlertCircle className="h-4 w-4 text-red-500" />
             case 'stopped':
                 return <Square className="h-4 w-4 text-red-500" />
             case 'exited':
                 return <AlertCircle className="h-4 w-4 text-orange-500" />
+            case 'error':
+                return <AlertCircle className="h-4 w-4 text-red-500" />
             default:
                 return <Clock className="h-4 w-4 text-gray-500" />
         }
     }
 
     const getStatusColor = (): string => {
-        switch (service.status) {
-            case 'running':
+        switch (resolveDiagramStatus(service)) {
+            case 'healthy':
                 return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+            case 'running':
+                return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+            case 'starting':
+                return 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
+            case 'unhealthy':
+                return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
             case 'stopped':
                 return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
             case 'exited':
@@ -200,7 +262,7 @@ const ServiceNode: React.FC<{
                                 {t('editService')}
                             </IGRPDropdownMenuItemPrimitive>
 
-                            {getServiceUrl(service) && (
+                            {serviceUrl && (
                                 <IGRPDropdownMenuItemPrimitive
                                     onClick={() => onOpenInBrowser(service)}
                                 >
@@ -238,6 +300,10 @@ const ServiceNode: React.FC<{
                         {service.image}
                     </div>
                 )}
+                <div className="truncate">
+                    <span className="text-gray-500 dark:text-gray-400">Status:</span>{' '}
+                    {service.statusMessage || service.status}
+                </div>
             </div>
 
             <div className="flex gap-1 mt-2">
@@ -275,8 +341,22 @@ const ServiceNode: React.FC<{
     )
 }
 
+const GroupLabelNode: React.FC<{ data: GroupLabelNodeData }> = ({ data }) => {
+    return (
+        <div
+            className={cn(
+                'rounded-md border px-2 py-1 text-[11px] font-semibold shadow-sm bg-white',
+                data.colorClass
+            )}
+        >
+            {data.label}
+        </div>
+    )
+}
+
 const nodeTypes: NodeTypes = {
-    service: ServiceNode
+    service: ServiceNode,
+    groupLabel: GroupLabelNode
 }
 
 interface WorkspaceDiagramProps {
@@ -414,10 +494,10 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
         (service: ServiceInfo) => {
             const url = getServiceUrl(service)
             if (url) {
-                window.electron.ipcRenderer.send(t('openExternalUrl'), url)
+                window.electron.ipcRenderer.send('open-external-url', url)
             }
         },
-        [getServiceUrl, t]
+        [getServiceUrl]
     )
 
     // Update refs when handlers change
@@ -441,6 +521,15 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
         const nodeHeight = 150
         const margin = 40
         const levelSpacing = 350
+        const stackOrder: DiagramStackId[] = ['main', 'monitoring', 'process', 'project']
+        const stackGap = 70
+        const stackLabelMap: Record<DiagramStackId, { label: string; colorClass: string }> = {
+            main: { label: 'IGRP Stack', colorClass: 'border-blue-300 text-blue-700' },
+            monitoring: { label: 'Monitoring', colorClass: 'border-purple-300 text-purple-700' },
+            process: { label: 'Process', colorClass: 'border-green-300 text-green-700' },
+            project: { label: 'Project', colorClass: 'border-amber-300 text-amber-700' }
+        }
+        const stackLabelAnchors = new Map<DiagramStackId, number>()
 
         // Calculate dependency levels
         const calculateLevels = (services: ServiceInfo[]): Map<string, number> => {
@@ -496,36 +585,66 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
             levelGroups.get(level)!.push(service)
         })
 
-        // Position nodes by level - vertically arranged with better spacing
+        // Position nodes by level and grouped by stack
         for (let level = 0; level <= maxLevel; level++) {
             const levelServices = levelGroups.get(level) || []
             const levelX = level * levelSpacing + margin
+            let yCursor = margin
 
-            levelServices.forEach((service, index) => {
-                const startY = margin + index * (nodeHeight + margin)
-                const x = levelX
-                const y = startY
+            stackOrder.forEach((stackId) => {
+                const grouped = levelServices.filter(
+                    (service) => resolveDiagramStack(service) === stackId
+                )
+                if (grouped.length === 0) return
 
-                newNodes.push({
-                    id: service.name,
-                    type: 'service',
-                    position: { x, y },
-                    data: {
-                        service,
-                        onAction: (action: string, serviceName: string) =>
-                            handleServiceActionRef.current?.(action, serviceName),
-                        services,
-                        onEditService: (service: ServiceInfo) =>
-                            handleEditServiceRef.current?.(service),
-                        onDeleteService: (service: ServiceInfo) =>
-                            handleDeleteServiceRef.current?.(service),
-                        onOpenInBrowser: (service: ServiceInfo) =>
-                            handleOpenInBrowserRef.current?.(service)
-                    },
-                    selected: selectedNode === service.name
+                grouped.forEach((service, index) => {
+                    const x = levelX
+                    const y = yCursor + index * (nodeHeight + margin)
+                    if (!stackLabelAnchors.has(stackId)) {
+                        stackLabelAnchors.set(stackId, y)
+                    }
+
+                    newNodes.push({
+                        id: service.name,
+                        type: 'service',
+                        position: { x, y },
+                        data: {
+                            service,
+                            serviceUrl: getServiceUrl(service),
+                            onAction: (action: string, serviceName: string) =>
+                                handleServiceActionRef.current?.(action, serviceName),
+                            services,
+                            onEditService: (service: ServiceInfo) =>
+                                handleEditServiceRef.current?.(service),
+                            onDeleteService: (service: ServiceInfo) =>
+                                handleDeleteServiceRef.current?.(service),
+                            onOpenInBrowser: (service: ServiceInfo) =>
+                                handleOpenInBrowserRef.current?.(service)
+                        },
+                        selected: selectedNode === service.name
+                    })
                 })
+
+                yCursor += grouped.length * (nodeHeight + margin) + stackGap
             })
         }
+
+        stackOrder.forEach((stackId) => {
+            const anchorY = stackLabelAnchors.get(stackId)
+            if (anchorY === undefined) return
+            const meta = stackLabelMap[stackId]
+            newNodes.push({
+                id: `group-label-${stackId}`,
+                type: 'groupLabel',
+                position: { x: 8, y: Math.max(6, anchorY - 30) },
+                data: {
+                    label: meta.label,
+                    colorClass: meta.colorClass
+                },
+                draggable: false,
+                selectable: false
+            })
+        })
 
         // Create edges based on dependencies
         const newEdges: Edge[] = []
@@ -539,6 +658,18 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                     const targetExists = services.some((s) => s.name === service.name)
 
                     if (sourceExists && targetExists) {
+                        const dependencyService = services.find((s) => s.name === dependencyName)
+                        const stackColorMap: Record<DiagramStackId, string> = {
+                            main: '#3b82f6',
+                            monitoring: '#a855f7',
+                            process: '#22c55e',
+                            project: '#f59e0b'
+                        }
+                        const depStack = resolveDiagramStack(dependencyService)
+                        const edgeColor =
+                            service.status === 'running'
+                                ? stackColorMap[depStack]
+                                : '#6b7280'
                         newEdges.push({
                             id: `${dependencyName}-${service.name}`,
                             source: dependencyName,
@@ -548,7 +679,7 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                             type: 'smoothstep',
                             animated: service.status === 'running',
                             style: {
-                                stroke: service.status === 'running' ? '#10b981' : '#6b7280',
+                                stroke: edgeColor,
                                 strokeWidth: 3
                             },
                             label: 'depends on',
@@ -561,7 +692,7 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                                 type: MarkerType.ArrowClosed,
                                 width: 20,
                                 height: 20,
-                                color: service.status === 'running' ? '#10b981' : '#6b7280'
+                                color: edgeColor
                             }
                         })
                     }
@@ -651,7 +782,9 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
         return () => document.removeEventListener('click', handleClickOutside)
     }, [contextMenu.visible, handleCloseContextMenu])
 
-    const runningServices = services.filter((s) => s.status === 'running').length
+    const healthyServices = services.filter((s) => resolveDiagramStatus(s) === 'healthy').length
+    const startingServices = services.filter((s) => resolveDiagramStatus(s) === 'starting').length
+    const runningServices = services.filter((s) => resolveDiagramStatus(s) === 'running').length
     const totalServices = services.length
 
     if (error) {
@@ -737,13 +870,21 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                 <MiniMap
                     nodeColor={(node) => {
                         const service = node.data?.service
-                        switch (service?.status) {
-                            case 'running':
+                        switch (resolveDiagramStatus(service)) {
+                            case 'healthy':
                                 return '#10b981'
+                            case 'running':
+                                return '#3b82f6'
+                            case 'starting':
+                                return '#f59e0b'
+                            case 'unhealthy':
+                                return '#ef4444'
                             case 'stopped':
                                 return '#ef4444'
                             case 'exited':
                                 return '#f97316'
+                            case 'error':
+                                return '#ef4444'
                             default:
                                 return '#6b7280'
                         }
@@ -776,11 +917,19 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-600 dark:text-gray-300">
                         <div className="flex items-center gap-1">
                             <CheckCircle className="h-3 w-3 text-green-500" />
+                            <span>{healthyServices} healthy</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3 text-amber-500" />
+                            <span>{startingServices} starting</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3 text-blue-500" />
                             <span>{runningServices} running</span>
                         </div>
                         <div className="flex items-center gap-1">
                             <AlertCircle className="h-3 w-3 text-orange-500" />
-                            <span>{totalServices - runningServices} stopped</span>
+                            <span>{totalServices - (healthyServices + startingServices + runningServices)} other</span>
                         </div>
                         <div className="flex items-center gap-1">
                             <Container className="h-3 w-3 text-blue-500" />

@@ -110,6 +110,26 @@ export interface IWorkspace {
     pinned?: boolean
 }
 
+export interface WorkspaceBootstrapOptions {
+    autoStartStack?: boolean
+    installMonitoringStack?: boolean
+    installProcessStack?: boolean
+}
+
+export interface WorkspaceBootstrapResult {
+    stackStarted: boolean
+    optionalStacksInstalled: {
+        monitoring: boolean
+        process: boolean
+    }
+    errors: string[]
+}
+
+export interface OptionalStacksStatus {
+    monitoringInstalled: boolean
+    processInstalled: boolean
+}
+
 export interface IOpenProject {
     canceled: boolean
     folderExists: boolean
@@ -260,6 +280,8 @@ export interface ServiceInfo {
     env_file: { file: string }[]
     createdAt?: string
     statusMessage?: string
+    composeFile?: string
+    stack?: 'main' | 'monitoring' | 'process' | 'project'
 }
 
 export type GitProviderType = 'github' | 'gitlab'
