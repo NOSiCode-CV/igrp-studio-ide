@@ -22,12 +22,13 @@ import {
     ServiceWorkspace,
     WorkspaceService
 } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
-import { IWorkspace, DatabaseResponse } from 'src/main/types'
+import { IWorkspace, DatabaseResponse, WorkspaceBootstrapOptions } from 'src/main/types'
 
 export interface IWorkspaceRepository {
     // Workspace Operations
     createWorkspace(
-        workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>
+        workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>,
+        options?: WorkspaceBootstrapOptions
     ): Promise<HandlerResponse>
     updateWorkspace(id: string, updates: Partial<IWorkspace>): Promise<IWorkspace>
     deleteWorkspace(id: string): Promise<void>

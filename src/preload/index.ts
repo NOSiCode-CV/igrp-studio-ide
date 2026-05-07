@@ -1,8 +1,6 @@
 import { electronAPI } from '@electron-toolkit/preload'
-import type {
-    ComponentRegistrationConfig,
-    ServiceWorkspace
-} from '@igrp/igrp-studio-nextjs-engine/types'
+import type { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import type { ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { contextBridge, ipcRenderer } from 'electron'
 import { preloadBindings } from 'i18next-electron-fs-backend'
 import { EVENTS } from '../main/constants/events'
@@ -13,8 +11,10 @@ import type {
     DatabaseResponse,
     HandlerResponse,
     IWorkspace,
+    OptionalStacksStatus,
     ProjectData,
-    ToolCheck
+    ToolCheck,
+    WorkspaceBootstrapOptions
 } from '../main/types'
 
 const handleError = (error: unknown): HandlerResponse => ({
@@ -402,13 +402,38 @@ const repo = {
         findRecentWorkspaces: (limit?: number) =>
             ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.FIND_RECENT, limit),
         createWorkspace: async (
-            workspace: Omit<IWorkspace, 'id' | 'createdAt'>
+            workspace: Omit<IWorkspace, 'id' | 'createdAt'>,
+            options?: WorkspaceBootstrapOptions
         ): Promise<HandlerResponse> => {
             try {
-                return await ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.CREATE, workspace)
+                return await ipcRenderer.invoke(
+                    EVENTS.REPOSITORY.WORKSPACE.CREATE,
+                    workspace,
+                    options
+                )
             } catch (error) {
                 return handleError(error)
             }
+        },
+        installOptionalStacks: async (
+            workspaceId: string,
+            options: WorkspaceBootstrapOptions
+        ): Promise<HandlerResponse> => {
+            try {
+                return await ipcRenderer.invoke(
+                    EVENTS.REPOSITORY.WORKSPACE.INSTALL_OPTIONAL_STACKS,
+                    workspaceId,
+                    options
+                )
+            } catch (error) {
+                return handleError(error)
+            }
+        },
+        getOptionalStacksStatus: async (workspacePath: string): Promise<OptionalStacksStatus> => {
+            return await ipcRenderer.invoke(
+                EVENTS.REPOSITORY.WORKSPACE.GET_OPTIONAL_STACKS_STATUS,
+                workspacePath
+            )
         },
         updateWorkspace: (workspaceId: string, updates: Partial<IWorkspace>) =>
             ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.UPDATE, workspaceId, updates),
@@ -491,6 +516,8 @@ const repo = {
     },
     docker: {
         up: (projectPath: string) => ipcRenderer.invoke(EVENTS.DOCKER.UP, projectPath),
+        deployProject: (projectPath: string) =>
+            ipcRenderer.invoke(EVENTS.DOCKER.DEPLOY_PROJECT, projectPath),
         down: (projectPath: string, options: { dropVolume?: boolean }) =>
             ipcRenderer.invoke(EVENTS.DOCKER.DOWN, projectPath, options),
         status: (projectPath: string) => ipcRenderer.invoke(EVENTS.DOCKER.STATUS, projectPath),

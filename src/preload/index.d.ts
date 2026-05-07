@@ -4,9 +4,11 @@ import {
     DatabaseResponse,
     HandlerResponse,
     IWorkspace,
+    OptionalStacksStatus,
     ProjectData,
     ToolCheck,
-    BPMNConfig
+    BPMNConfig,
+    WorkspaceBootstrapOptions
 } from '../main/types'
 import { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
@@ -118,8 +120,14 @@ declare const repo: {
         findAllWorkspaces: () => Promise<any>
         findRecentWorkspaces: (limit?: number) => Promise<any>
         createWorkspace: (
-            workspace: Omit<IWorkspace, 'id' | 'createdAt'>
+            workspace: Omit<IWorkspace, 'id' | 'createdAt'>,
+            options?: WorkspaceBootstrapOptions
         ) => Promise<HandlerResponse>
+        installOptionalStacks: (
+            workspaceId: string,
+            options: WorkspaceBootstrapOptions
+        ) => Promise<HandlerResponse>
+        getOptionalStacksStatus: (workspacePath: string) => Promise<OptionalStacksStatus>
         updateWorkspace: (workspaceId: string, updates: Partial<IWorkspace>) => Promise<any>
         deleteWorkspace: (workspaceId: string) => Promise<any>
         getWorkspace: (workspaceId: string) => Promise<any>
@@ -149,6 +157,7 @@ declare const repo: {
     }
     docker: {
         up: (projectPath: string) => Promise<any>
+        deployProject: (projectPath: string) => Promise<any>
         down: (
             projectPath: string,
             options: {

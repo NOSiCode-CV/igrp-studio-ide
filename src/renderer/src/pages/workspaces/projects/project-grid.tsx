@@ -11,6 +11,7 @@ import { useWorkspace } from '@renderer/hooks/use-workspace'
 import { getLocale } from '@renderer/utils'
 import { formatDistanceToNow } from 'date-fns'
 import { Clock, Folder } from 'lucide-react'
+import path from 'path'
 import { useTranslation } from 'react-i18next'
 import type { ProjectData, ServiceInfo } from 'src/main/types'
 import Dependency from '../components/dependency'
@@ -48,15 +49,35 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
         })
     }
 
-    const findServiceByProjectName = (uuid: string): ServiceInfo | undefined => {
-        return services.find((service) => service.labels?.uuid === uuid)
+    const findServiceByProjectName = (project: ProjectData): ServiceInfo | undefined => {
+        const byUuid = services.find((service) => service.labels?.uuid === project.id)
+        if (byUuid) return byUuid
+
+        const projectName = (project.name || '').toLowerCase().trim()
+        const projectDirName = path.basename(project.path || '').toLowerCase().trim()
+        const candidates = [projectName, projectDirName].filter(Boolean)
+        if (candidates.length === 0) return undefined
+        return services.find((service) => {
+            const serviceName = (service.name || '').toLowerCase()
+            const composeFile = (service.composeFile || '').toLowerCase()
+            const matchesCandidate = candidates.some(
+                (candidate) =>
+                    serviceName === candidate ||
+                    serviceName.endsWith(`-${candidate}`) ||
+                    serviceName.includes(`-${candidate}-`)
+            )
+            return (
+                composeFile.includes('igrp-projects-compose.yml') &&
+                matchesCandidate
+            )
+        })
     }
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {sortProjects(
                 projects.map((project, index) => {
-                    const service = findServiceByProjectName(project.id)
+                    const service = findServiceByProjectName(project)
                     const dependsOn = service?.dependsOn || []
                     const ports = service?.ports || []
                     return (
@@ -67,7 +88,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                         <div className="flex items-center space-x-2">
                                             <ProjectIcon
                                                 project={project}
-                                                workspacePath={workspace.path}
+                                                workspacePath={workspace?.path || ''}
                                             />
                                             <span className="text-xs truncate text-ellipsis md:max-w-40">
                                                 {project.name}
@@ -76,7 +97,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                         <ProjectActions
                                             project={project}
                                             projects={projects}
-                                            basePath={workspace.path}
+                                            basePath={workspace?.path || ''}
                                             services={services}
                                         />
                                     </div>
@@ -103,18 +124,20 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                         </>
                                     )}
                                 </div>
-                                <IGRPButtonPrimitive
-                                    variant={'outline'}
-                                    size={'sm'}
-                                    className="w-full"
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        handleOpenProject(project)
-                                    }}
-                                >
-                                    <Folder />
-                                    {t('open')}
-                                </IGRPButtonPrimitive>
+                                <div className="w-full grid grid-cols-1 gap-2">
+                                    <IGRPButtonPrimitive
+                                        variant={'outline'}
+                                        size={'sm'}
+                                        className="w-full"
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            handleOpenProject(project)
+                                        }}
+                                    >
+                                        <Folder />
+                                        {t('open')}
+                                    </IGRPButtonPrimitive>
+                                </div>
                             </IGRPCardFooterPrimitive>
                         </IGRPCardPrimitive>
                     )

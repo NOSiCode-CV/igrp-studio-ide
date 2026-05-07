@@ -9,13 +9,14 @@ import { useWorkspace } from '@renderer/hooks/use-workspace'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import CreateWorkspace from '@renderer/pages/workspaces/components/create-workspace'
 import WorkspaceDiagram from '@renderer/pages/workspaces/workspace-diagram'
-import { Container, FolderKanban, Network, Settings } from 'lucide-react'
+import { Container, FolderKanban, Network, Server, Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import Resources from './workspaces/resources'
 import WelcomeHeader from './workspaces/welcome-header'
 import { WorkspaceDocker } from './workspaces/workspace-docker'
+import { WorkspaceServices } from './workspaces/workspace-services'
 import { WorkspaceSettings } from './workspaces/workspace-settings'
 
 const IDEInitialScreen = (): React.JSX.Element => {
@@ -86,6 +87,10 @@ const IDEInitialScreen = (): React.JSX.Element => {
                                 <FolderKanban className="h-3.5 w-3.5 mr-1.5" />
                                 {t('resources')}
                             </IGRPTabsTriggerPrimitive>
+                            <IGRPTabsTriggerPrimitive value="services">
+                                <Server className="h-3.5 w-3.5 mr-1.5" />
+                                {t('services')}
+                            </IGRPTabsTriggerPrimitive>
                             <IGRPTabsTriggerPrimitive value="diagram">
                                 <Network className="h-3.5 w-3.5 mr-1.5" />
                                 {t('diagram')}
@@ -113,6 +118,10 @@ const IDEInitialScreen = (): React.JSX.Element => {
 
                         <IGRPTabsContentPrimitive value="config" className="mt-0">
                             <WorkspaceDocker workspace={workspace} />
+                        </IGRPTabsContentPrimitive>
+
+                        <IGRPTabsContentPrimitive value="services" className="mt-0">
+                            <WorkspaceServices workspaceId={workspace.id} />
                         </IGRPTabsContentPrimitive>
 
                         <IGRPTabsContentPrimitive value="settings" className="mt-0">

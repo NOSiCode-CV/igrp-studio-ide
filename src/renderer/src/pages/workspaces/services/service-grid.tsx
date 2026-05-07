@@ -24,9 +24,10 @@ import { ServiceFilter } from './service-filter'
 interface ServiceGridProps {
     services: any[]
     workspaceId?: string
+    showFilter?: boolean
 }
 
-export function ServiceGrid({ services }: ServiceGridProps) {
+export function ServiceGrid({ services, showFilter = true }: ServiceGridProps) {
     const [activeCategory, setActiveCategory] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
@@ -49,10 +50,12 @@ export function ServiceGrid({ services }: ServiceGridProps) {
     return (
         <div className="space-y-4">
             {/* Filter Component */}
-            <ServiceFilter
-                onFilterChange={handleFilterChange}
-                totalServices={filteredServices.length}
-            />
+            {showFilter ? (
+                <ServiceFilter
+                    onFilterChange={handleFilterChange}
+                    totalServices={filteredServices.length}
+                />
+            ) : null}
 
             {/* Services Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">

@@ -54,6 +54,8 @@ const CreateWorkspace = ({
     const [workspaceDescription, setWorkspaceDescription] = useState(
         'My development workspace with Docker projects'
     )
+    const [installMonitoringStack, setInstallMonitoringStack] = useState(false)
+    const [installProcessStack, setInstallProcessStack] = useState(false)
     const [directoryPath, setDirectoryPath] = useState('')
     const [dialogStep, setDialogStep] = useState(0)
     const {
@@ -84,6 +86,17 @@ const CreateWorkspace = ({
     const stepKeys = ['form', 'docker', 'dns'] as const
     const totalSteps = stepKeys.length
 
+    const normalizeSlug = useCallback((value: string): string => {
+        return value
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[_\s]+/g, '-')
+            .replace(/[^a-zA-Z-]/g, '')
+            .replace(/-+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .toLowerCase()
+    }, [])
+
     const inputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
@@ -105,6 +118,11 @@ const CreateWorkspace = ({
             return
         }
 
+        if (!/^[a-zA-Z-]+$/.test(slug)) {
+            showErrorToast('Slug must contain only letters and hyphens (a-z, A-Z, -)')
+            return
+        }
+
         const validationError = validateWorkspaceName(workspaceName, slug)
         if (validationError) {
             showErrorToast(validationError)
@@ -113,12 +131,19 @@ const CreateWorkspace = ({
 
         setIsCreating(true)
         try {
-            const workspace = await createWorkspace({
-                name: workspaceName,
-                path: directoryPath,
-                slug,
-                description: workspaceDescription
-            })
+            const workspace = await createWorkspace(
+                {
+                    name: workspaceName,
+                    path: directoryPath,
+                    slug,
+                    description: workspaceDescription
+                },
+                {
+                    autoStartStack: true,
+                    installMonitoringStack,
+                    installProcessStack
+                }
+            )
             if (workspace) {
                 onSuccess?.(workspace)
                 onOpenChange?.(false)
@@ -170,7 +195,7 @@ const CreateWorkspace = ({
                     <IGRPInputPrimitive
                         id="slug"
                         value={slug}
-                        onChange={(e) => setSlug(e.target.value)}
+                        onChange={(e) => setSlug(normalizeSlug(e.target.value))}
                         placeholder={t('workspace.slug')}
                     />
                 </div>
@@ -251,6 +276,39 @@ const CreateWorkspace = ({
                             <Monitor className="w-4 h-4 text-primary mb-2" />
                             <p className="text-xs font-semibold text-foreground">Web Services</p>
                         </div>
+                    </div>
+                    <div className="space-y-2">
+                        <p className="text-xs font-semibold text-foreground">
+                            Optional stacks inside workspace
+                        </p>
+                        <label className="flex items-start gap-2 rounded-lg border border-border p-3 bg-card">
+                            <input
+                                type="checkbox"
+                                className="mt-0.5"
+                                checked={installMonitoringStack}
+                                onChange={(event) =>
+                                    setInstallMonitoringStack(event.currentTarget.checked)
+                                }
+                            />
+                            <span className="text-xs text-muted-foreground">
+                                Install <strong>compose-monitoring.yaml</strong> and monitoring
+                                assets in this workspace.
+                            </span>
+                        </label>
+                        <label className="flex items-start gap-2 rounded-lg border border-border p-3 bg-card">
+                            <input
+                                type="checkbox"
+                                className="mt-0.5"
+                                checked={installProcessStack}
+                                onChange={(event) =>
+                                    setInstallProcessStack(event.currentTarget.checked)
+                                }
+                            />
+                            <span className="text-xs text-muted-foreground">
+                                Install <strong>compose-process.yaml</strong> and process assets in
+                                this workspace.
+                            </span>
+                        </label>
                     </div>
                 </div>
             )

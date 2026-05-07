@@ -17,9 +17,10 @@ import { ServiceFilter } from './service-filter'
 interface ServiceListProps {
     services: any[]
     workspaceId?: string
+    showFilter?: boolean
 }
 
-export function ServiceList({ services }: ServiceListProps) {
+export function ServiceList({ services, showFilter = true }: ServiceListProps) {
     const { t } = useTranslation()
     const [activeCategory, setActiveCategory] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
@@ -43,10 +44,12 @@ export function ServiceList({ services }: ServiceListProps) {
     return (
         <div className="space-y-4">
             {/* Filter Component */}
-            <ServiceFilter
-                onFilterChange={handleFilterChange}
-                totalServices={filteredServices.length}
-            />
+            {showFilter ? (
+                <ServiceFilter
+                    onFilterChange={handleFilterChange}
+                    totalServices={filteredServices.length}
+                />
+            ) : null}
 
             {/* Services Table */}
             <div className="w-full border rounded-lg overflow-hidden">

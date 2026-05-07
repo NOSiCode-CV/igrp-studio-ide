@@ -13,7 +13,14 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { type NavigateFunction, useNavigate } from 'react-router-dom'
 import { createSelector } from 'reselect'
-import type { HandlerResponse, IWorkspace, ProjectData, ServiceInfo } from 'src/main/types'
+import type {
+    HandlerResponse,
+    IWorkspace,
+    OptionalStacksStatus,
+    ProjectData,
+    ServiceInfo,
+    WorkspaceBootstrapOptions
+} from 'src/main/types'
 
 interface RootState {
     PageBuilder: {
@@ -36,8 +43,13 @@ interface UseWorkspaceReturn {
     loading: boolean
     actions: {
         createWorkspace: (
-            workspace: Omit<IWorkspace, 'id' | 'createdAt'>
+            workspace: Omit<IWorkspace, 'id' | 'createdAt'>,
+            options?: WorkspaceBootstrapOptions
         ) => Promise<IWorkspace | null>
+        installOptionalStacks: (
+            options: Pick<WorkspaceBootstrapOptions, 'installMonitoringStack' | 'installProcessStack'>
+        ) => Promise<HandlerResponse>
+        getOptionalStacksStatus: () => Promise<OptionalStacksStatus>
         updateWorkspace: (id: string, updates: Partial<IWorkspace>) => Promise<IWorkspace | null>
         deleteWorkspace: (id: string) => Promise<void>
         switchWorkspace: (upWorkspace: IWorkspace) => Promise<void>
@@ -141,12 +153,16 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     }
 
     const createWorkspace = async (
-        workspaceData: Omit<IWorkspace, 'id' | 'createdAt'>
+        workspaceData: Omit<IWorkspace, 'id' | 'createdAt'>,
+        options?: WorkspaceBootstrapOptions
     ): Promise<IWorkspace | null> => {
         try {
-            const { result, error } = await window.igrpStudio.workspace.createWorkspace({
-                ...workspaceData
-            })
+            const { result, error } = await window.igrpStudio.workspace.createWorkspace(
+                {
+                    ...workspaceData
+                },
+                options
+            )
 
             if (error) {
                 showErrorToast(error)
@@ -154,6 +170,11 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             }
 
             showSuccessToast(`Workspace "${result.name}" created`)
+
+            const bootstrapErrors = (result as any)?.bootstrap?.errors
+            if (Array.isArray(bootstrapErrors) && bootstrapErrors.length > 0) {
+                showErrorToast(bootstrapErrors.join('\n'))
+            }
 
             dispatch(setWorkspace(result))
 
@@ -170,6 +191,21 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             showErrorToast(err)
             throw err
         }
+    }
+
+    const installOptionalStacks = async (
+        options: Pick<WorkspaceBootstrapOptions, 'installMonitoringStack' | 'installProcessStack'>
+    ): Promise<HandlerResponse> => {
+        try {
+            return await window.igrpStudio.workspace.installOptionalStacks(workspace.id, options)
+        } catch (error) {
+            showErrorToast(error)
+            return { error: error as string }
+        }
+    }
+
+    const getOptionalStacksStatus = async (): Promise<OptionalStacksStatus> => {
+        return await window.igrpStudio.workspace.getOptionalStacksStatus(workspace.path)
     }
 
     const markWorkspaceAccessed = async (workspaces: IWorkspace[]): Promise<void> => {
@@ -239,6 +275,10 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         onSuccess
     }: openProjectProps): Promise<void> => {
         try {
+            if (!workspace?.id) {
+                showErrorToast('Nenhum workspace ativo selecionado.')
+                return
+            }
             const { id } = project
             let response: HandlerResponse = {}
             setLoading(true)
@@ -246,7 +286,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             console.log('project to save', project)
 
             if (id) response = await window.igrpStudio.workspace.updateProject(id, project)
-            else response = await window.igrpStudio.workspace.createProject(workspace?.id, project)
+            else response = await window.igrpStudio.workspace.createProject(workspace.id, project)
 
             const { result, error } = response
 
@@ -257,7 +297,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             }
 
             await findAllServices().then((data) => {
-                result.service = data.find((s) => s.labels.uuid === result.id)
+                result.service = data.find((s) => s?.labels?.uuid === result.id)
                 return data
             })
 
@@ -468,6 +508,8 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         loading,
         actions: {
             createWorkspace,
+            installOptionalStacks,
+            getOptionalStacksStatus,
             updateWorkspace,
             deleteWorkspace,
             switchWorkspace,

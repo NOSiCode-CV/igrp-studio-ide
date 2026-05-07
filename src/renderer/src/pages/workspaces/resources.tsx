@@ -35,19 +35,15 @@ import {
     List,
     LoaderCircle,
     type LucideIcon,
-    PlusCircle,
-    Server
+    PlusCircle
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { IOpenProject, ProjectData } from 'src/main/types'
-import { ConfigurationDialog } from './components/configuration-dialog'
 import ProjectGrid from './projects/project-grid'
 import { ProjectList } from './projects/project-list'
-import { ServiceGrid } from './services/service-grid'
-import { ServiceList } from './services/service-list'
 
-type ResourceType = 'project' | 'service'
+type ResourceType = 'project'
 type ViewMode = 'grid' | 'list'
 
 interface ResourceSectionProps {
@@ -150,11 +146,8 @@ const ResourceSection = ({
 
 const Resources = () => {
     const [projectViewMode, setProjectViewMode] = useState<ViewMode>('grid')
-    const [serviceViewMode, setServiceViewMode] = useState<ViewMode>('grid')
     const [projectSearchQuery, setProjectSearchQuery] = useState('')
-    const [serviceSearchQuery, setServiceSearchQuery] = useState('')
     const [sortOrder, setSortOrder] = useState<string>('lastModified')
-    const [sortOrderService, setSortOrderService] = useState<string>('lastModified')
     const [allProjects, setAllProjects] = useState<ProjectData[]>([])
     const [openProjectDialog, setOpenProjectDialog] = useState(false)
     const [pendingOpenProject, setPendingOpenProject] = useState<IOpenProject | null>(null)
@@ -171,7 +164,7 @@ const Resources = () => {
     } = useWorkspace()
 
     const { services, refreshContainers } = useDocker({
-        workspace: workspace!,
+        workspace,
         changeStatus
     })
 
@@ -179,7 +172,19 @@ const Resources = () => {
         fetchProjects()
         refreshWorkspaces()
         refreshContainers()
-    }, [changeStatus, workspace])
+    }, [workspace, changeStatus])
+
+    useEffect(() => {
+        const handler = () => {
+            fetchProjects()
+            refreshWorkspaces()
+            refreshContainers()
+        }
+        window.addEventListener('igrp:workspace:refresh', handler)
+        return () => {
+            window.removeEventListener('igrp:workspace:refresh', handler)
+        }
+    }, [workspace, changeStatus])
 
     const fetchProjects = async () => {
         await findAllProjects().then((data) => {
@@ -187,20 +192,12 @@ const Resources = () => {
         })
     }
 
-    const filteredProjects = allProjects.filter(
-        (project) =>
-            (project.name &&
-                project.name.toLowerCase().includes(projectSearchQuery.toLowerCase())) ||
-            (project.framework &&
-                project.framework.toLowerCase().includes(projectSearchQuery.toLowerCase()))
-    )
-
-    const filteredServices = services.filter(
-        (service) =>
-            !service.labels?.is_project &&
-            service.container_name &&
-            service.container_name.toLowerCase().includes(serviceSearchQuery.toLowerCase())
-    )
+    const normalizedQuery = (projectSearchQuery || '').toLowerCase()
+    const filteredProjects = allProjects.filter((project) => {
+        const projectName = (project?.name || '').toLowerCase()
+        const projectFramework = (project?.framework || '').toLowerCase()
+        return projectName.includes(normalizedQuery) || projectFramework.includes(normalizedQuery)
+    })
 
     const onHandleOpenProjectClick = async (): Promise<void> => {
         const result: IOpenProject = await window.api.openDirectory()
@@ -229,6 +226,11 @@ const Resources = () => {
     const confirmOpenProject = async (storageMode: 'linked' | 'managed'): Promise<void> => {
         const config = pendingOpenProject?.config
         if (!config) {
+            closeOpenProjectDialog()
+            return
+        }
+        if (!workspace?.id) {
+            showErrorToast('Nenhum workspace ativo selecionado.')
             closeOpenProjectDialog()
             return
         }
@@ -335,28 +337,6 @@ const Resources = () => {
         )
     }
 
-    const ServiceActions = () => {
-        const [open, setOpen] = useState(false)
-
-        return (
-            <>
-                <IGRPButtonPrimitive onClick={() => setOpen(true)}>
-                    <PlusCircle className="w-4 h-4" />
-                    {t('newService')}
-                </IGRPButtonPrimitive>
-
-                {open && (
-                    <ConfigurationDialog
-                        services={filteredServices}
-                        isNew={true}
-                        open={open}
-                        setOpen={setOpen}
-                    />
-                )}
-            </>
-        )
-    }
-
     const ProjectEmptyState = () => (
         <div className="shrink-0 border border-dashed rounded-md p-6 text-center">
             <FolderKanban className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
@@ -372,24 +352,6 @@ const Resources = () => {
                     {t('createNewProject')}
                 </IGRPButtonPrimitive>
             </ProjectWizard>
-        </div>
-    )
-
-    const ServiceEmptyState = () => (
-        <div className="border border-dashed rounded-md p-6 text-center">
-            <Server className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-            <h3 className="text-sm font-medium">{t('noServicesFound')}</h3>
-            <p className="text-xs text-muted-foreground mb-3">
-                {serviceSearchQuery
-                    ? `${t('noServicesMatching')} "${serviceSearchQuery}"`
-                    : t('noServicesYet')}
-            </p>
-            <ConfigurationDialog services={filteredServices} isNew={true}>
-                <IGRPButtonPrimitive size="sm">
-                    <PlusCircle className="h-3.5 w-3.5 mr-1" />
-                    {t('addNewService')}
-                </IGRPButtonPrimitive>
-            </ConfigurationDialog>
         </div>
     )
 
@@ -426,29 +388,6 @@ const Resources = () => {
                         workspaceId={workspace.id}
                         services={services}
                     />
-                )}
-            </ResourceSection>
-
-            {/* Services Section */}
-            <ResourceSection
-                type="service"
-                icon={Server}
-                title={t('services')}
-                count={filteredServices.length}
-                searchQuery={serviceSearchQuery}
-                viewMode={serviceViewMode}
-                onViewModeChange={setServiceViewMode}
-                onSearchChange={setServiceSearchQuery}
-                sortValue={sortOrderService}
-                onSortChange={setSortOrderService}
-                isEmpty={filteredServices.length === 0}
-                emptyState={<ServiceEmptyState />}
-                actionButtons={<ServiceActions />}
-            >
-                {serviceViewMode === 'grid' ? (
-                    <ServiceGrid services={filteredServices} workspaceId={workspace.id} />
-                ) : (
-                    <ServiceList services={filteredServices} workspaceId={workspace.id} />
                 )}
             </ResourceSection>
         </div>
