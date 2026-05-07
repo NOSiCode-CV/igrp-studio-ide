@@ -1,11 +1,4 @@
-import {
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
 import { SubHeadline } from '@renderer/components/shared-ui'
-import { BPMNConnectionsManager } from '@renderer/features/bpmn/components/connection/BPMNConnectionsManager'
 import type { FileTree } from 'src/main/types'
 import type { PageDefinition } from '../page-manager'
 import { BPMNProjectSelector } from './bpmn-project-selector'
@@ -30,26 +23,11 @@ export const BPMNManager = ({
                 />
             </div>
 
-            <IGRPTabsPrimitive defaultValue="projects" className="space-y-4">
-                <IGRPTabsListPrimitive>
-                    <IGRPTabsTriggerPrimitive value="projects">Projects</IGRPTabsTriggerPrimitive>
-                    <IGRPTabsTriggerPrimitive value="configuration">
-                        API Configuration
-                    </IGRPTabsTriggerPrimitive>
-                </IGRPTabsListPrimitive>
-
-                <IGRPTabsContentPrimitive value="projects" className="space-y-4">
-                    <BPMNProjectSelector
-                        onPageClick={onPageClick}
-                        bpmnProcesses={bpmnProcesses}
-                        basePath={basePath}
-                    />
-                </IGRPTabsContentPrimitive>
-
-                <IGRPTabsContentPrimitive value="configuration" className="space-y-4">
-                    <BPMNConnectionsManager />
-                </IGRPTabsContentPrimitive>
-            </IGRPTabsPrimitive>
+            <BPMNProjectSelector
+                onPageClick={onPageClick}
+                bpmnProcesses={bpmnProcesses}
+                basePath={basePath}
+            />
         </div>
     )
 }

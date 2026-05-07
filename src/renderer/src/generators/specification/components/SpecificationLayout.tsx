@@ -3,6 +3,7 @@ import {
     IGRPSidebarMenuItemPrimitive,
     IGRPSidebarMenuPrimitive
 } from '@igrp/igrp-framework-react-design-system'
+import { TabProvider } from '@renderer/components/navigation/TabContext'
 import { DataModelsPanel } from '@renderer/features/data-models'
 import { cn } from '@renderer/lib/utils'
 import { loadDocs } from '@renderer/redux/specDocs/thunks'
@@ -164,6 +165,7 @@ const SpecificationLayout = ({
 
     return (
         <ProcessesSelectionProvider>
+        <TabProvider>
             <div className="flex h-full w-full pb-8">
             {/* Icon rail — same 80px width as the Studio's main sidebar
                 (`app-sidebar.tsx`), so the two layouts look continuous when the
@@ -216,6 +218,7 @@ const SpecificationLayout = ({
             {/* Main content */}
             <MainContent activeTab={activeTab} basePath={basePath} currentItem={currentItem} />
             </div>
+        </TabProvider>
         </ProcessesSelectionProvider>
     )
 }

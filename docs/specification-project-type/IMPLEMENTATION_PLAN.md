@@ -230,6 +230,105 @@ export class PrototypeGeneratorService {
 - [x] `Use in Prototype` button no Inspector (placeholder; activa em M4).
 - [x] Eager-load de KB e Docs em `SpecificationLayout` para que Documents tenha sempre KB items disponíveis.
 
+### M2D.18 — Multi-doc tabs 🚧
+
+> **Motivação:** abrir vários documentos em simultâneo, cada um com o seu próprio buffer, AI chat, diff pendente e KB linked. Substitui o modelo single-doc onde trocar de ficheiro fazia flush do buffer e perdia o histórico do chat.
+
+**Decisões de arquitectura**
+
+- **Reutilizar `TabContext`** (`src/renderer/src/components/navigation/TabContext.tsx`) — mesmo provider que o `ui` e `api` generators. `tab.id === docId` (string estável). Tab-0 (placeholder "Overview") fica reservada para "no document open".
+- **Padrão tabs-mounted-hidden** (igual ao `ui/components/TabManager.tsx`) — todos os panes abertos ficam montados, o inactivo recebe `display: hidden`. Sem unmount/remount entre tabs → Monaco e AIAssistant **preservam o estado local** sem precisar de Redux para o chat.
+- **Slice `specDocs` normalizado** — substituído `{ buffer, dirty, viewMode, inspectorOpen, chatOpen }` (singular) por `byDoc: Record<docId, DocPerState>` + `saving: Record<docId, boolean>`. Entries criadas lazy no primeiro `docSelected` ou `docFocused`; removidas em `docTabClosed` / `docNodeRemoved`.
+- **`pendingProposal` + `proposalHistory` + `proposalSummaries` per-doc no Redux** — antes era state local em `DocumentsPanel`. Agora vivem em `byDoc[docId]`, sobrevivem ao `display:hidden` e são acessíveis ao `DocFooter` / outros consumers se preciso.
+- **Selectors `docId`-scoped** (`selectDocBuffer(docId)`, `selectDocViewMode(docId)`, etc.) — nenhum consumer faz `useSelector(s => s.specDocs.byDoc)`. Editar um doc não re-renderiza panes de outros tabs. `makeSelectDocProposalStatus(docId)` usa `createSelector` para memoizar a união pending+history.
+- **`AIAssistant` continua local-state** — `messages: ChatMessage[]` em `useState`, sem Redux. Justificação: cada `DocTabPane` tem o seu `AIAssistant`; com tabs montados, o histórico persiste enquanto o tab estiver aberto. Streaming concorrente já é seguro pelo filtro `findIndex(m => m.id === requestId)` que faz noop em chunks de outras instâncias. Evita refactor invasivo e dispatch-por-token.
+- **`selectDoc` thunk inteligente** — só faz IPC `window.specDoc.read` no primeiro open. Re-clicks despoletam apenas `docFocused` (lightweight, sem IO). Clicks em tab headers já existentes não re-lêem do disco nem fazem flush do buffer.
+- **`TabsCleanup` component** — observa `tabs[]` e dispatcha `docTabClosed(id)` para qualquer id que desapareça. Mantém `byDoc` enxuto.
+
+**Trade-offs assumidos**
+
+- N AIAssistants montados → N setState noop por chunk de streaming. Para 10-15 tabs é trivial (cada noop é ~1µs). Acima disso a UX (não a perf) começa a degradar — limite igual ao do VSCode.
+- N Monaco instances mounted → ~150KB extra por tab. Aceitável até ~15 tabs. Mitigação futura se necessária: refactor `DocEditor` para "1 editor + N models" pattern do VSCode (deferido — YAGNI).
+
+**Ficheiros impactados**
+
+- **MOD** `src/renderer/src/redux/specDocs/reducer.ts` — `byDoc` map + selectors + actions (`docFocused`, `docTabClosed`, `docProposalStaged`, `docProposalResolved`).
+- **MOD** `src/renderer/src/redux/specDocs/thunks.ts` — `selectDoc` agora skipa IPC quando doc já aberto; `saveDocBuffer` payload `{id, ...}`.
+- **MOD** `src/renderer/src/generators/specification/components/DocumentsPanel.tsx` — `ContentVariant` reescrito com `useTabs()` + `TabsNavigation` + `DocTabPane` por tab + `TabsCleanup`. `ListVariant.handleSelect` chama `handleNewTab` antes de `selectDoc`.
+- **MOD** `src/renderer/src/generators/specification/components/SpecificationLayout.tsx` — wrap em `<TabProvider>`.
+- **MOD** `src/renderer/src/generators/specification/components/PrototypePanel.tsx` — usa selectors novos (`selectDocBuffer(selectedId)`).
+- **MOD** `src/renderer/src/generators/specification/utils/searchReplaceParser.ts` — `ProposalStatus` movido para cá (canonical home). `AIAssistant` re-exporta para back-compat.
+- **MOD** `src/renderer/src/generators/specification/components/shared/AIAssistant.tsx` — import de `ProposalStatus` do utils + re-export.
+
+### M2D.19 — Resizable right pane (Chat | Inspector tabs) 🚧
+
+> **Motivação:** o chat estava preso a 360px enquanto o inspector ocupava ~22% à direita; juntos comiam metade do ecrã com o md content esmagado no meio. Utilizador quer chat maior + ajustar a largura à mão.
+
+**Decisões de arquitectura**
+
+- **Right pane mutuamente exclusivo** — chat e inspector partilham o mesmo painel à direita; o utilizador alterna por tabs no header (`Chat | Inspector | ✕`). Justificação: o inspector é principalmente setup (linkar KB, navegar ToC) — raramente preciso de o ter aberto ao mesmo tempo que itera com o chat. Padrão familiar (VSCode/Cursor sidebar).
+- **Slice `rightPane: 'chat' | 'inspector' | null`** substitui `chatOpen` + `inspectorOpen`. Acção única `docRightPaneSet({id, pane})`. Toolbar buttons fazem toggle: clicar o activo colapsa.
+- **`react-resizable-panels` v4** (já em deps, usado em `features/markitdown`) — `Group` + `Panel` + `Separator`. Min 320px, max 50% viewport, default 480px. `onResize` recebe `{inPixels}` e dispatcha `rightPaneWidthChanged`.
+- **Largura persistida em `localStorage`** (key `spec.docs.rightPaneWidth`) — global, não per-doc nem per-tab. Lida no `initialSpecDocsState` via `readPersistedRightPaneWidth()`. `try/catch` em volta de `setItem` para sobreviver a private mode.
+- **Inspector "embedded"** — `DocInspector` perdeu o `<aside w-22% border-l>` e o header "Inspector" próprio; agora renderiza só o body de scroll. O `DocRightPane` (novo componente local em `DocumentsPanel`) fornece o chrome (tabs header, border, fundo).
+- **`DocFooter` ficou só status** — botão de toggle do inspector mudou-se para o `DocToolbar`.
+- **Quando `rightPane === null`** — não renderiza `<Group>`, retorna o `mdColumn` directo. Evita um `Separator` decorativo sem segundo painel.
+- **Toolbar collapse trigger único** (padrão shadcn `SidebarTrigger`) — em vez de dois botões `Assistant + Inspector` na toolbar, ficou um só `PanelRightOpen / PanelRightClose` ao lado do Export. A escolha de tab (Chat vs Inspector) acontece dentro do right pane (no header já existente). Toolbar fica enxuta, sinal visual familiar.
+- **Memória do último modo** — `useState<lastPane>` no `DocTabPane` lembra o último valor não-null de `rightPane`. Reabrir restaura o que estava (inspector → colapsa → reabrir = inspector). State per-tab; sobrevive enquanto a tab estiver montada (que é sempre, no padrão tabs-mounted-hidden). Não precisa de slice change.
+
+**Ficheiros impactados (M2D.19)**
+
+- **MOD** `src/renderer/src/redux/specDocs/reducer.ts` — `DocRightPane` type + `rightPane` field per-doc + `rightPaneWidth` global + actions `docRightPaneSet` / `rightPaneWidthChanged` + selectors `selectDocRightPane` / `selectRightPaneWidth` + helpers de persistência localStorage.
+- **MOD** `src/renderer/src/generators/specification/components/DocumentsPanel.tsx` — `DocTabPane` usa `<Group> + <Panel> + <Separator>`; novo componente local `DocRightPane` (tabs header + close button + body slot).
+- **MOD** `src/renderer/src/generators/specification/components/documents/DocToolbar.tsx` — props `chatOpen + onToggleChat` substituídos por `rightPane + onSetRightPane`; novo grupo de buttons (Assistant + Inspector).
+- **MOD** `src/renderer/src/generators/specification/components/documents/DocFooter.tsx` — drop do botão `onToggleInspector`.
+- **MOD** `src/renderer/src/generators/specification/components/documents/DocInspector.tsx` — drop do `<aside>` chrome e do header "Inspector"; passa a `<div className="flex h-full flex-col">`.
+
+### M2D.20 — Sync scroll Preview → Editor 🚧
+
+> **Motivação:** no `viewMode='split'`, scroll na preview agora segue para a linha equivalente no editor Monaco. Direcção única (preview → editor) — pedido explícito do utilizador. Editor → preview pode vir depois se útil.
+
+**Decisões técnicas**
+
+- **Mapeamento via remark AST:** `react-markdown` v9 expõe `node.position.start.line` para cada bloco do mdast. `DocPreview` usa a prop `components` para anexar `data-source-line={N}` em todos os blocos relevantes (h1-h6, p, ul, ol, blockquote, pre, table, hr). Inline elements (em, strong, code) não recebem o atributo — granularidade de bloco é suficiente.
+- **Hook `usePreviewToEditorScrollSync`** (`hooks/useDocScrollSync.ts`) — adiciona um `scroll` listener no container da preview, throttled com `requestAnimationFrame`. Em cada tick, percorre `[data-source-line]` em ordem de documento e escolhe o primeiro cujo bottom esteja `>= viewportTop` da preview. Chama `editor.revealLineInCenter(line)` no Monaco.
+- **Hook desactivado fora do split** — `enabled = viewMode === 'split' && !pendingProposal`. Quando há `pendingProposal` o editor é trocado por `DocDiffPreview`, partindo a ref do Monaco — desligar o sync evita refs zombie.
+- **Sem editor → preview** — explicitamente fora de scope. Evita feedback-loop guards e mantém a implementação simples.
+- **Refs fora do Redux** — `editorRef`, `previewRef` em `useRef` no `DocTabPane`. State per-tab, sobrevive enquanto a tab estiver montada (sempre, no padrão tabs-mounted-hidden).
+- **Edge case — code blocks longos:** uma `<pre>` ocupa muitas linhas mas o source mapping é fixo (a linha da abertura do fence). Aceite — comportamento idêntico ao VSCode/Cursor markdown preview.
+- **Output contract dos `Components` do react-markdown v9** — tipos rigorosos exigem assinaturas específicas por tag (`HTMLAttributes<HTMLHeadingElement>` etc.). Em vez de um factory genérico (que não satisfaz o contrato), `DocPreview` usa um helper minúsculo `sourceLineAttr(node)` espalhado em cada componente inline.
+
+**Ficheiros impactados (M2D.20)**
+
+- **MOD** `src/renderer/src/generators/specification/components/documents/DocPreview.tsx` — `forwardRef<HTMLDivElement>` + prop `components` com `sourceLineAttr` por bloco.
+- **MOD** `src/renderer/src/generators/specification/components/documents/DocEditor.tsx` — nova prop `onMount?: OnMount` para o pai apanhar a Monaco instance.
+- **NEW** `src/renderer/src/generators/specification/hooks/useDocScrollSync.ts` — hook isolado, rAF-throttled, no-op quando `enabled=false`.
+- **MOD** `src/renderer/src/generators/specification/components/DocumentsPanel.tsx` (`DocTabPane`) — refs + `usePreviewToEditorScrollSync(previewRef, editorRef, viewMode === 'split' && !pendingProposal)`.
+
+### M2D.21 — Chat doc attachments 🚧
+
+> **Motivação:** o utilizador quer anexar outro doc do mesmo spec ao chat actual como input read-only ("baseado no PRD, gera User Stories"). Antes a única forma era enviar para a KB — workflow indirecto e com staleness. Agora há um botão `@ Attach` no composer.
+
+**Decisões de arquitectura**
+
+- **Anexos vivem com a chat session, não com o doc** — `attachedDocIds: string[]` em `useState` no `DocTabPane`. Persiste enquanto a tab estiver aberta (= AIAssistant montado, mensagens preservadas). Não vai para Redux nem para disco. Distinção clara face a `kbRefs` (doc-level, persistido).
+- **Externos → KB; produzidos no spec → chat attach.** Regra simples para o utilizador: se é PDF/URL externo, manda para a KB (com indexação RAG). Se é outro spec doc autorado neste projecto, anexa directamente ao chat — sem indexação intermediária.
+- **Buffer-first read** — `contextProvider` lê via `store.getState().specDocs.byDoc[id]?.buffer` quando o doc anexado também está aberto noutra tab (apanha edições não-guardadas), com fallback para `window.specDoc.read(basePath, id)` quando não. Marca `(unsaved buffer)` no nome quando dirty.
+- **Sem subscrição de `byDoc` no DocTabPane** — uso `useStore()` para obter ref ao store e leio dentro da closure do `contextProvider` (executa por turn, não em cada render). Evita re-render do DocTabPane em cada keystroke de outra tab anexada.
+- **3 papéis explícitos no system prompt** — secção "Document roles — STRICT" diz ao LLM: (1) Active document = único editável via SEARCH/REPLACE; (2) Reference documents = read-only inputs, citação `[Doc: <name>]`, NUNCA emitir SEARCH/REPLACE contra eles; (3) Knowledge Base = external knowledge, citação `[KB: <name>]`, menor autoridade.
+- **Order do system prompt:** instructions → Reference documents (read-only) → Active document (editing target, mais perto da user message) → KB items list → KB chunks (RAG). Active doc fica perto da user message para captura de recência da atenção.
+- **Anti-recursão** — anexos não trazem os seus próprios anexos. 1 nível só. Hard-coded (não há recursão para começar).
+- **Auto-clean orphans** — `useEffect([nodes])` filtra ids que deixaram de existir.
+- **Picker UX** (`DocAttachPicker`) — popover compacto com search + checkboxes. Estimativa de tokens (`~chars/4`) ao lado de cada item quando o buffer já está disponível (i.e. doc também aberto). Self-ref escondido via `excludeDocId={docId}`.
+- **Chips no composer** — acima do textarea, com `(@ Nome ✕)`. Marcador amarelo `●` quando o anexado tem `dirty=true` noutra tab (UX honesta — utilizador sabe que vê o buffer e não a versão guardada).
+- **`composerSlot` prop** no `AIAssistant` — não acopla o picker ao componente (mantém `AIAssistant` reutilizável noutros modes que não querem attach).
+
+**Ficheiros impactados (M2D.21)**
+
+- **MOD** `src/renderer/src/generators/specification/components/shared/AIAssistant.tsx` — props `attachments?: ChatAttachment[]`, `onRemoveAttachment?`, `composerSlot?: ReactNode`. Chips renderizadas acima do textarea; slot antes do hint Enter/Shift+Enter. `ChatAttachment` exported.
+- **NEW** `src/renderer/src/generators/specification/components/documents/DocAttachPicker.tsx` — popover com search + checkboxes; `estimateTokens` callback opcional.
+- **MOD** `src/renderer/src/generators/specification/components/DocumentsPanel.tsx` (`DocTabPane`) — `useState attachedDocIds` + `useStore` (lazy buffer reads); `chatAttachments: ChatAttachment[]` derivado; auto-clean orphans; nova secção "Document roles — STRICT" no system prompt; injecção `## Reference documents` antes de active doc; label do composer ganha sufixo `· N attached`.
+
 ### M2L — LLM Stack ✅ (era parte do M2 original)
 
 > **Backend** dividido em adapters por provider; renderer fala apenas com `LLMRouter` via IPC.
@@ -402,6 +501,23 @@ O `contextProvider` em `DocumentsPanel.tsx` injecta no system prompt um bloco qu
 - **MOD** `components/documents/DocDiffPreview.tsx` — drop prop `mode`, aceita `ops` para o resumo.
 - **DEL** `components/shared/DiffCard.tsx` (já apagado em v3).
 - **CLEANUP** `package.json` — remover deps `diff` + `@types/diff` (não usadas após v4; Monaco DiffEditor faz o diff visual).
+
+### Extensibilidade futura — reuso do AIAssistant fora de markdown
+
+Pendente de refactor. Adiar até existir o **segundo consumidor** (provavelmente o modo `prototype` a editar TS/TSX). Por agora ficam apenas as notas, para evitar abstracção prematura.
+
+| Camada | Estado hoje | O que fazer quando alargarmos |
+|---|---|---|
+| Parser SEARCH/REPLACE (`parseSearchReplaceBlocks`, `applyEdits`) | **Já genérico** — opera em qualquer texto. | Manter como está. |
+| Chat puramente conversacional (sem editor host) | **Já suportado** — basta o host não passar `onProposeChange` / `proposalSummaries` ao `AIAssistant`. O `useEffect` de staging early-returns e o checklist nunca aparece. | Manter como está. |
+| `DocDiffPreview` | Hard-code de `language="markdown"` no Monaco DiffEditor. | Adicionar prop `language?: string` (default `"markdown"`); host passa o language adequado ao formato. |
+| System prompt SEARCH/REPLACE | Vive no `contextProvider` do host (não no `AIAssistant`). Markdown-específico no exemplo. | Cada novo host escreve o seu prompt com exemplos do seu formato. Sem refactor — só prática. |
+| Labels do checklist (`describeEdit`, `firstHeading`) | Markdown-específico (procura `## Heading`). | Extrair para um sistema de `EditAdapter` por linguagem: `markdownEditAdapter`, `codeEditAdapter`, … `summariseEdits(edits, ops, adapter)` aceita o adapter como parâmetro. |
+| Modos `prototype` / `data` | **Já isolados** — usam `chatBackend.kind === 'prototype'\|'data'` com pipelines próprios (file-ops, entity-ops). Não passam pelo caminho SEARCH/REPLACE; coexistem sem conflito. | Manter como está. Quando o prototype quiser editar ficheiros via SR (alternativa ao file-ops actual), reaproveita o parser genérico + adapter de código. |
+
+**Custo estimado do refactor:** ~1h (split do parser, prop `language` no DiffPreview, primeiro adapter).
+
+**Trigger:** primeira feature que peça edição assistida fora de markdown.
 
 ## 13. Estado actual (snapshot)
 

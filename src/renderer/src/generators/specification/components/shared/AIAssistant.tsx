@@ -1,12 +1,11 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
 import { cn } from '@renderer/lib/utils'
 import {
     AlertCircle,
     ArrowDownToLine,
     Check,
+    ChevronDown,
+    ChevronRight,
     Copy,
     Library,
     Loader2,
@@ -20,9 +19,11 @@ import {
 import {
     type FormEvent,
     type JSX,
+    type KeyboardEvent,
     type ReactNode,
     useCallback,
     useEffect,
+    useLayoutEffect,
     useRef,
     useState
 } from 'react'
@@ -30,8 +31,14 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import {
     parseSearchReplaceBlocks,
+    type ProposalStatus,
+    type ProposalSummary,
     type SREdit
 } from '../../utils/searchReplaceParser'
+
+// Re-export for the long-tail of callers that import ProposalStatus from
+// AIAssistant — the canonical home is now `utils/searchReplaceParser`.
+export type { ProposalStatus } from '../../utils/searchReplaceParser'
 
 export type AIAssistantMode = 'docs' | 'prototype' | 'data' | 'process'
 
@@ -56,7 +63,6 @@ export interface AIAssistantContext {
  * The host then mirrors back the resolution status so the chat bubble can
  * show a small badge.
  */
-export type ProposalStatus = 'pending' | 'applied' | 'rejected' | 'stale'
 
 interface ChatMessage {
     id: string
@@ -128,6 +134,23 @@ interface AIAssistantProps {
      * compact status badge on the assistant bubble (pending/applied/etc).
      */
     proposalStatus?: Record<string, ProposalStatus | undefined>
+    /**
+     * Per-message human-readable summary of the edits the assistant
+     * proposed. When present, the bubble renders a checklist instead of
+     * the raw reply (which contains SEARCH/REPLACE markup).
+     */
+    proposalSummaries?: Record<string, ProposalSummary[] | undefined>
+    /**
+     * The message id whose proposal is currently active in the editor (i.e.
+     * diff is open and waiting for Apply/Reject). Only this message's
+     * checklist gets interactive checkboxes; older messages render
+     * read-only.
+     */
+    pendingMessageId?: string | null
+    /** Per-edit selection for the active pending proposal. */
+    pendingSelected?: boolean[]
+    /** Toggle one edit's selection in the active pending proposal. */
+    onProposalEditToggle?: (messageId: string, editIndex: number) => void
     /** Where requests are dispatched. Default `{ kind: 'llm' }`. */
     chatBackend?: ChatBackend
     /**
@@ -136,7 +159,35 @@ interface AIAssistantProps {
      * to plain context otherwise).
      */
     supportsKB?: boolean
+    /**
+     * Read-only chat-level attachments (other docs in the spec). Rendered as
+     * removable chips above the textarea. The host is responsible for
+     * including them in the system prompt via `contextProvider`.
+     */
+    attachments?: ChatAttachment[]
+    /** Remove a chip — host updates its attached-ids state. */
+    onRemoveAttachment?: (id: string) => void
+    /**
+     * Slot rendered before the keyboard hint in the composer footer. Used to
+     * mount an attach button (paperclip) without coupling the picker UI to
+     * this component.
+     */
+    composerSlot?: ReactNode
     className?: string
+}
+
+/**
+ * Chat-level attachment: another doc in the same spec that the host has
+ * pinned as read-only context for the current conversation. Distinct from
+ * `kbRefs` (persistent on the doc) — these live with the chat session.
+ */
+export interface ChatAttachment {
+    id: string
+    name: string
+    /** Visual hint in the chip — currently only 'doc'. */
+    kind: 'doc'
+    /** True when the attached doc has unsaved edits in another tab. */
+    dirty?: boolean
 }
 
 interface ProviderModel {
@@ -160,8 +211,15 @@ export function AIAssistant({
     onAssistantOutput,
     onProposeChange,
     proposalStatus,
+    proposalSummaries,
+    pendingMessageId,
+    pendingSelected,
+    onProposalEditToggle,
     chatBackend = { kind: 'llm' },
     supportsKB = false,
+    attachments,
+    onRemoveAttachment,
+    composerSlot,
     className
 }: AIAssistantProps): JSX.Element {
     const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -176,6 +234,18 @@ export function AIAssistant({
     const [loadError, setLoadError] = useState<string | null>(null)
 
     const scrollRef = useRef<HTMLDivElement>(null)
+    const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+    // Auto-grow the textarea up to a cap, then scroll. Reset on every input
+    // change so deletes shrink the field too. Cap is roughly 8 lines at
+    // 13px / 1.45 line-height ≈ 150px.
+    useLayoutEffect(() => {
+        const el = textareaRef.current
+        if (!el) return
+        el.style.height = 'auto'
+        const next = Math.min(el.scrollHeight, 180)
+        el.style.height = `${next}px`
+    }, [input])
 
     // Load model list + provider readiness on mount.
     useEffect(() => {
@@ -554,6 +624,25 @@ export function AIAssistant({
     )
 
     /**
+     * Composer key bindings — Enter sends, Shift+Enter inserts a newline,
+     * Cmd/Ctrl+Enter also sends (handy when the cursor is mid-line). IME
+     * composition is respected so accents on macOS don't fire a send.
+     */
+    const handleComposerKeyDown = useCallback(
+        (event: KeyboardEvent<HTMLTextAreaElement>) => {
+            if (event.nativeEvent.isComposing) return
+            const send = (event.key === 'Enter' && !event.shiftKey) ||
+                (event.key === 'Enter' && (event.metaKey || event.ctrlKey))
+            if (!send) return
+            event.preventDefault()
+            // Reuse the form submit path so guard logic stays in one place.
+            const form = event.currentTarget.form
+            form?.requestSubmit()
+        },
+        []
+    )
+
+    /**
      * Drops the failed assistant message and re-fires the chat with the same
      * user history that produced it. Useful after transient errors (login,
      * rate limit, network).
@@ -691,7 +780,10 @@ export function AIAssistant({
             </div>
 
             {/* Messages */}
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3">
+            <div
+                ref={scrollRef}
+                className="flex-1 divide-y divide-border/40 overflow-y-auto px-3"
+            >
                 {loadError && (
                     <div className="flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/5 p-2 text-[11px] text-red-500">
                         <AlertCircle size={12} className="mt-0.5 shrink-0" />
@@ -715,46 +807,111 @@ export function AIAssistant({
                                 : undefined
                         }
                         proposalStatus={proposalStatus?.[m.id]}
+                        proposalSummary={proposalSummaries?.[m.id]}
+                        editToggles={
+                            pendingMessageId === m.id && pendingSelected && onProposalEditToggle
+                                ? {
+                                      selected: pendingSelected,
+                                      onToggle: (idx) =>
+                                          onProposalEditToggle(m.id, idx)
+                                  }
+                                : undefined
+                        }
                     />
                 ))}
             </div>
 
-            {/* Composer */}
+            {/* Composer — Claude-Code-style textarea: Enter sends, Shift+Enter
+                inserts a newline, Cmd/Ctrl+Enter sends from anywhere. */}
             <form onSubmit={handleSubmit} className="border-t p-3">
                 {ctxLabel && (
                     <p className="mb-1.5 text-[10px] text-muted-foreground">{ctxLabel}</p>
                 )}
 
-                <div className="flex items-end gap-2">
-                    <IGRPInputPrimitive
+                <div
+                    className={cn(
+                        'flex flex-col gap-1.5 rounded-md border bg-background px-2.5 py-2 transition-shadow',
+                        'focus-within:border-primary/60 focus-within:shadow-[0_0_0_2px_hsl(var(--primary)/0.15)]',
+                        (!selected || streaming) && 'opacity-60'
+                    )}
+                >
+                    {attachments && attachments.length > 0 && (
+                        <div className="-mx-1 flex flex-wrap gap-1">
+                            {attachments.map((att) => (
+                                <span
+                                    key={att.id}
+                                    className="inline-flex items-center gap-1 rounded border bg-muted/40 px-1.5 py-0.5 text-[10px]"
+                                    title={att.dirty ? `${att.name} (unsaved)` : att.name}
+                                >
+                                    <span className="text-muted-foreground">@</span>
+                                    <span className="max-w-[140px] truncate">
+                                        {att.name}
+                                        {att.dirty && (
+                                            <span className="ml-1 text-amber-500">●</span>
+                                        )}
+                                    </span>
+                                    {onRemoveAttachment && (
+                                        <button
+                                            type="button"
+                                            onClick={() => onRemoveAttachment(att.id)}
+                                            className="ml-0.5 rounded p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                                            title="Remove"
+                                        >
+                                            <X size={9} />
+                                        </button>
+                                    )}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                    <textarea
+                        ref={textareaRef}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleComposerKeyDown}
                         placeholder={placeholder}
                         disabled={!selected || streaming}
-                        className="h-9 flex-1 text-[12px]"
+                        rows={2}
+                        className="resize-none bg-transparent text-[12.5px] leading-relaxed outline-none placeholder:text-muted-foreground/70 disabled:cursor-not-allowed"
+                        spellCheck={false}
                     />
-                    {streaming ? (
-                        <IGRPButtonPrimitive
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            className="h-9"
-                            onClick={handleCancel}
-                            title="Stop"
-                        >
-                            <Square size={12} />
-                        </IGRPButtonPrimitive>
-                    ) : (
-                        <IGRPButtonPrimitive
-                            type="submit"
-                            size="sm"
-                            className="h-9 gap-1.5"
-                            disabled={!selected || !input.trim()}
-                        >
-                            <Send size={12} />
-                            {submitLabel}
-                        </IGRPButtonPrimitive>
-                    )}
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            {composerSlot}
+                            <span className="text-[10px] text-muted-foreground">
+                                <kbd className="rounded border bg-muted/40 px-1 py-px font-mono text-[9px]">
+                                    Enter
+                                </kbd>{' '}
+                                send ·{' '}
+                                <kbd className="rounded border bg-muted/40 px-1 py-px font-mono text-[9px]">
+                                    Shift+Enter
+                                </kbd>{' '}
+                                new line
+                            </span>
+                        </div>
+                        {streaming ? (
+                            <IGRPButtonPrimitive
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                className="h-7 gap-1 text-[11px]"
+                                onClick={handleCancel}
+                                title="Stop"
+                            >
+                                <Square size={11} /> Stop
+                            </IGRPButtonPrimitive>
+                        ) : (
+                            <IGRPButtonPrimitive
+                                type="submit"
+                                size="sm"
+                                className="h-7 gap-1 text-[11px]"
+                                disabled={!selected || !input.trim()}
+                            >
+                                <Send size={11} />
+                                {submitLabel}
+                            </IGRPButtonPrimitive>
+                        )}
+                    </div>
                 </div>
             </form>
         </div>
@@ -764,16 +921,30 @@ export function AIAssistant({
 function MessageBubble({
     message,
     onRetry,
-    proposalStatus
+    proposalStatus,
+    proposalSummary,
+    editToggles
 }: {
     message: ChatMessage
     onRetry?: () => void
     proposalStatus?: ProposalStatus
+    proposalSummary?: ProposalSummary[]
+    /** When set, the checklist renders interactive checkboxes wired to this. */
+    editToggles?: {
+        selected: boolean[]
+        onToggle: (editIndex: number) => void
+    }
 }): JSX.Element {
     const [copied, setCopied] = useState(false)
     const isUser = message.role === 'user'
     const canApply =
         !isUser && !message.streaming && !message.error && message.content.trim().length > 0
+    // While streaming, the partial reply may contain raw SEARCH/REPLACE
+    // markup; show a clean placeholder so the user doesn't see ugly
+    // delimiters mid-stream.
+    const looksLikeEdits =
+        !isUser && /<{5,}\s*SEARCH/.test(message.content)
+    const showChecklist = !isUser && proposalSummary && proposalSummary.length > 0
 
     const handleCopy = async () => {
         try {
@@ -787,21 +958,41 @@ function MessageBubble({
 
     return (
         <div
-            className={cn('group flex', isUser ? 'justify-end' : 'justify-start')}
+            className={cn(
+                'group flex py-2.5 text-[12px]',
+                isUser ? 'justify-end' : 'justify-start'
+            )}
         >
+            {/* Assistant messages flow as prose against the panel background
+                with a subtle left guideline; user messages stay as a tight
+                primary-tinted chip on the right. */}
             <div
                 className={cn(
-                    'max-w-[85%] rounded-lg px-3 py-2 text-[12px]',
                     isUser
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-card border border-border',
-                    message.error && !isUser && 'border-red-500/40'
+                        ? 'max-w-[85%] rounded-md bg-primary/90 px-2.5 py-1.5 text-primary-foreground'
+                        : 'min-w-0 flex-1 border-l-2 border-primary/30 pl-2.5',
+                    message.error && !isUser && 'border-red-500/50'
                 )}
             >
                 {isUser ? (
                     <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                ) : showChecklist ? (
+                    <ProposalChecklist
+                        items={proposalSummary!}
+                        status={proposalStatus}
+                        editToggles={editToggles}
+                    />
+                ) : looksLikeEdits ? (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                        <Loader2 size={12} className="animate-spin" />
+                        <span className="text-[11px] italic">
+                            {message.streaming
+                                ? 'Drafting edits…'
+                                : 'Parsing edits…'}
+                        </span>
+                    </div>
                 ) : (
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <div className="prose prose-sm max-w-none leading-snug dark:prose-invert">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                             {message.content || (message.streaming ? '_…thinking_' : '')}
                         </ReactMarkdown>
@@ -812,28 +1003,10 @@ function MessageBubble({
                 )}
 
                 {proposalStatus === 'pending' && (
-                    <div className="mt-2 flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary/5 px-2 py-1 text-[10px] text-primary">
+                    <p className="mt-1.5 flex items-center gap-1 text-[10px] text-primary/80">
                         <ArrowDownToLine size={10} />
-                        Diff aberto no editor — review aí
-                    </div>
-                )}
-                {proposalStatus === 'applied' && (
-                    <div className="mt-2 flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/5 px-2 py-1 text-[10px] text-emerald-700 dark:text-emerald-400">
-                        <Check size={10} />
-                        Applied to document
-                    </div>
-                )}
-                {proposalStatus === 'rejected' && (
-                    <div className="mt-2 flex items-center gap-1.5 rounded-md border bg-muted/40 px-2 py-1 text-[10px] text-muted-foreground">
-                        <X size={10} />
-                        Rejected
-                    </div>
-                )}
-                {proposalStatus === 'stale' && (
-                    <div className="mt-2 flex items-center gap-1.5 rounded-md border bg-muted/40 px-2 py-1 text-[10px] text-muted-foreground opacity-70">
-                        <X size={10} />
-                        Replaced by a newer proposal
-                    </div>
+                        Diff open in editor — review on the left.
+                    </p>
                 )}
 
                 {message.prototype && (message.prototype.applied > 0 || message.prototype.failed > 0 || message.prototype.commitSha) && (
@@ -903,6 +1076,179 @@ function MessageBubble({
                     </div>
                 )}
             </div>
+        </div>
+    )
+}
+
+/**
+ * Claude-Code-style tool-use card: a collapsible header summarising the
+ * edits the assistant proposed, with a checklist body when expanded.
+ * Defaults open while pending review, auto-collapses once resolved so the
+ * chat history stays scannable.
+ */
+function ProposalChecklist({
+    items,
+    status,
+    editToggles
+}: {
+    items: ProposalSummary[]
+    status?: ProposalStatus
+    /** When set, the checklist is interactive — each ok edit gets a checkbox. */
+    editToggles?: {
+        selected: boolean[]
+        onToggle: (editIndex: number) => void
+    }
+}): JSX.Element {
+    const ok = items.filter((i) => i.ok).length
+    const failed = items.length - ok
+    // Active proposals have selected[]; show "selected of total ok" so the
+    // user knows the impact of toggling.
+    const selectedOk = editToggles
+        ? items.reduce(
+              (acc, item, idx) =>
+                  acc + (item.ok && editToggles.selected[idx] ? 1 : 0),
+              0
+          )
+        : ok
+    const [expanded, setExpanded] = useState(status === 'pending' || !status)
+
+    const statusBadge =
+        status === 'applied'
+            ? { text: 'applied', tone: 'text-emerald-600 bg-emerald-500/10' }
+            : status === 'rejected'
+              ? { text: 'rejected', tone: 'text-muted-foreground bg-muted/40' }
+              : status === 'stale'
+                ? { text: 'stale', tone: 'text-muted-foreground bg-muted/40' }
+                : { text: 'pending', tone: 'text-primary bg-primary/10' }
+
+    const allOn =
+        editToggles &&
+        items.every((item, idx) => !item.ok || editToggles.selected[idx])
+    const handleToggleAll = () => {
+        if (!editToggles) return
+        // If everything is on, toggling means unselect all; else select all ok.
+        items.forEach((item, idx) => {
+            if (!item.ok) return
+            const want = !allOn
+            if (editToggles.selected[idx] !== want) editToggles.onToggle(idx)
+        })
+    }
+
+    return (
+        <div className="rounded-md border border-border/60 bg-background/40 font-mono">
+            <button
+                type="button"
+                onClick={() => setExpanded((v) => !v)}
+                className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-[11px] hover:bg-muted/30"
+            >
+                <span className="text-muted-foreground">
+                    {expanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+                </span>
+                <span className="font-semibold tracking-tight">Edit document</span>
+                <span className="text-muted-foreground">
+                    {ok > 0 && (
+                        <span className="text-emerald-600">
+                            ✓ {editToggles ? `${selectedOk}/${ok}` : ok}
+                        </span>
+                    )}
+                    {ok > 0 && failed > 0 && ' · '}
+                    {failed > 0 && (
+                        <span className="text-amber-600">✗ {failed}</span>
+                    )}
+                </span>
+                <span
+                    className={cn(
+                        'ml-auto rounded px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider',
+                        statusBadge.tone
+                    )}
+                >
+                    {statusBadge.text}
+                </span>
+            </button>
+            {expanded && (
+                <>
+                    {editToggles && ok > 0 && (
+                        <div className="flex items-center justify-between border-t border-border/40 px-2 py-1 text-[10px] text-muted-foreground">
+                            <span>Toggle which edits to apply.</span>
+                            <button
+                                type="button"
+                                onClick={handleToggleAll}
+                                className="rounded px-1.5 py-0.5 hover:bg-muted/40"
+                            >
+                                {allOn ? 'Unselect all' : 'Select all'}
+                            </button>
+                        </div>
+                    )}
+                    <ul className="border-t border-border/40 py-1">
+                        {items.map((item, idx) => {
+                            const interactive = Boolean(editToggles && item.ok)
+                            const checked = editToggles
+                                ? editToggles.selected[idx] && item.ok
+                                : item.ok
+                            return (
+                                <li
+                                    key={idx}
+                                    className={cn(
+                                        'flex items-start gap-1.5 px-2 py-0.5 text-[11px]',
+                                        interactive &&
+                                            'cursor-pointer hover:bg-muted/30'
+                                    )}
+                                    onClick={
+                                        interactive
+                                            ? () => editToggles!.onToggle(idx)
+                                            : undefined
+                                    }
+                                >
+                                    {editToggles ? (
+                                        <input
+                                            type="checkbox"
+                                            checked={checked}
+                                            disabled={!item.ok}
+                                            onChange={() =>
+                                                editToggles.onToggle(idx)
+                                            }
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="mt-0.5 h-3 w-3 shrink-0 cursor-pointer accent-primary disabled:cursor-not-allowed disabled:opacity-50"
+                                        />
+                                    ) : (
+                                        <span
+                                            className={cn(
+                                                'mt-0.5 shrink-0',
+                                                item.ok
+                                                    ? 'text-emerald-600'
+                                                    : 'text-amber-600'
+                                            )}
+                                        >
+                                            {item.ok ? (
+                                                <Check size={10} />
+                                            ) : (
+                                                <X size={10} />
+                                            )}
+                                        </span>
+                                    )}
+                                    <div
+                                        className={cn(
+                                            'min-w-0 flex-1 leading-snug',
+                                            interactive &&
+                                                !checked &&
+                                                'opacity-50'
+                                        )}
+                                    >
+                                        <div className="break-words text-foreground">
+                                            {item.label}
+                                        </div>
+                                        {item.detail && (
+                                            <div className="break-words text-[10px] text-muted-foreground">
+                                                {item.detail}
+                                            </div>
+                                        )}
+                                    </div>
+                                </li>
+                            )
+                        })}
+                    </ul>
+                </>
+            )}
         </div>
     )
 }

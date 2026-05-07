@@ -123,12 +123,9 @@ export function DocInspector({
     }
 
     return (
-        <aside className="flex w-[22%] min-w-[260px] shrink-0 flex-col border-l bg-background">
-            <div className="border-b p-4">
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Inspector
-                </h2>
-            </div>
+        // Embedded inside the DocTabPane right pane — the parent owns the
+        // width, border, and header tabs, so we render just the scroll body.
+        <div className="flex h-full flex-col bg-background">
             <div className="flex-1 space-y-8 overflow-y-auto p-4">
                 <section>
                     <h3 className="mb-3 flex items-center gap-2 text-xs font-bold">
@@ -297,6 +294,6 @@ export function DocInspector({
                     Use in Prototype
                 </IGRPButtonPrimitive>
             </div>
-        </aside>
+        </div>
     )
 }

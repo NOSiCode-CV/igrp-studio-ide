@@ -12,6 +12,12 @@ interface DocDiffPreviewProps {
     proposed: string
     /** Per-edit outcome — drives the toolbar summary and the failures list. */
     ops: SROp[]
+    /**
+     * Per-edit selection (optional, in-flight feature). Index-aligned with
+     * `ops`. When provided, the diff reflects only the edits where
+     * `selected[i]` is true.
+     */
+    selected?: boolean[]
     onApply: () => void
     onReject: () => void
     className?: string
@@ -28,6 +34,7 @@ export function DocDiffPreview({
     original,
     proposed,
     ops,
+    selected,
     onApply,
     onReject,
     className
@@ -35,6 +42,16 @@ export function DocDiffPreview({
     const [showFailures, setShowFailures] = useState(false)
     const failed = ops.filter((op): op is Extract<SROp, { ok: false }> => !op.ok)
     const hasChanges = original !== proposed
+
+    // When `selected` is provided, show "Apply N of M" reflecting the user's
+    // per-edit picks; otherwise fall back to the bulk summary.
+    const okTotal = ops.filter((op) => op.ok).length
+    const selectedOk = selected
+        ? ops.reduce(
+              (acc, op, idx) => acc + (op.ok && selected[idx] ? 1 : 0),
+              0
+          )
+        : okTotal
 
     return (
         <div className={cn('flex h-full flex-col', className)}>
@@ -44,7 +61,9 @@ export function DocDiffPreview({
                         Proposal
                     </span>
                     <span className="truncate text-muted-foreground">
-                        {summariseOps(ops)} — review and apply.
+                        {selected
+                            ? `${selectedOk} of ${okTotal} selected — review and apply.`
+                            : `${summariseOps(ops)} — review and apply.`}
                     </span>
                     {failed.length > 0 && (
                         <button
@@ -75,7 +94,8 @@ export function DocDiffPreview({
                         disabled={!hasChanges}
                         title={hasChanges ? 'Apply to document' : 'Nothing to apply'}
                     >
-                        <Check size={12} /> Apply
+                        <Check size={12} />
+                        {selected ? `Apply ${selectedOk}/${okTotal}` : 'Apply'}
                     </IGRPButtonPrimitive>
                 </div>
             </div>

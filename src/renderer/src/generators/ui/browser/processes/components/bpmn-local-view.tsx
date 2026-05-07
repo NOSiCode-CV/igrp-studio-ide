@@ -17,7 +17,7 @@ import {
 import type { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { EmptyList } from '@renderer/components/empty-list'
 import { SearchInput } from '@renderer/components/shared-ui'
-import { Cloud, Component, HardDrive, UserCog } from 'lucide-react'
+import { Cloud, HardDrive, PenSquare, UserCog } from 'lucide-react'
 import type { JSX } from 'react'
 import type { BPMNProjectArtifact, BPMNProjectProcessDefinition, FileTree } from 'src/main/types'
 import type { PageDefinition } from '../../page-manager'
@@ -364,8 +364,8 @@ export const BpmnLocalView = ({
                                                                     onPageClick?.(pageDefinition)
                                                                 }}
                                                             >
-                                                                <Component className="mr-2 h-4 w-4" />
-                                                                Add Components
+                                                                <PenSquare className="mr-2 h-4 w-4" />
+                                                                Open Editor
                                                             </IGRPButtonPrimitive>
                                                         </IGRPCardContentPrimitive>
                                                     </IGRPCardPrimitive>

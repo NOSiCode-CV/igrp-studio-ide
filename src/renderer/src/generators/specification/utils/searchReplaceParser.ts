@@ -214,3 +214,105 @@ export function summariseOps(ops: SROp[]): string {
     if (ok) return `${ok} ediç${ok === 1 ? 'ão' : 'ões'} aplicada${ok === 1 ? '' : 's'}`
     return `${failed} falha${failed === 1 ? '' : 's'}`
 }
+
+/**
+ * Lifecycle of an assistant-proposed edit, mirrored back from the host so
+ * the chat bubble can render a status badge. Defined here (not in
+ * AIAssistant) so non-UI consumers — including the Redux slice — can
+ * import it without dragging the component graph in.
+ */
+export type ProposalStatus = 'pending' | 'applied' | 'rejected' | 'stale'
+
+/**
+ * One-line, human-readable summary of a single edit + its outcome. Powers
+ * the checklist rendered in the chat bubble — we never show the raw
+ * SEARCH/REPLACE block content there.
+ */
+export interface ProposalSummary {
+    ok: boolean
+    /** Short label, e.g. "Added section: Risks". */
+    label: string
+    /** Optional secondary line shown smaller, e.g. failure reason. */
+    detail?: string
+}
+
+export function summariseEdits(edits: SREdit[], ops: SROp[]): ProposalSummary[] {
+    const out: ProposalSummary[] = []
+    const max = Math.min(edits.length, ops.length)
+    for (let i = 0; i < max; i++) {
+        out.push(describeEdit(edits[i], ops[i]))
+    }
+    return out
+}
+
+function describeEdit(edit: SREdit, op: SROp): ProposalSummary {
+    if (!op.ok) {
+        const reason =
+            op.reason === 'no-match'
+                ? 'No match found in the document'
+                : op.reason === 'multiple-matches'
+                  ? 'Ambiguous — multiple matches'
+                  : 'Empty edit block'
+        return {
+            ok: false,
+            label: shortLabel(edit) ?? 'Edit',
+            detail: reason
+        }
+    }
+
+    switch (op.kind) {
+        case 'append': {
+            const heading = firstHeading(edit.replace)
+            return {
+                ok: true,
+                label: heading
+                    ? `Added section: ${heading}`
+                    : `Appended ${countLines(edit.replace)} line${countLines(edit.replace) === 1 ? '' : 's'} at end`
+            }
+        }
+        case 'delete':
+            return {
+                ok: true,
+                label: `Removed: "${truncateOneLine(edit.search, 60)}"`
+            }
+        case 'replace':
+        case 'fuzzy-replace': {
+            const heading = firstHeading(edit.replace) ?? firstHeading(edit.search)
+            return {
+                ok: true,
+                label: heading
+                    ? `Edited section: ${heading}`
+                    : `Replaced "${truncateOneLine(edit.search, 50)}"`,
+                detail: op.kind === 'fuzzy-replace' ? 'Matched with whitespace tolerance' : undefined
+            }
+        }
+    }
+}
+
+function firstHeading(text: string): string | undefined {
+    if (!text) return undefined
+    for (const line of text.split('\n')) {
+        const m = /^\s{0,3}(#{1,6})\s+(.+?)\s*#*\s*$/.exec(line)
+        if (m) return m[2].trim()
+    }
+    return undefined
+}
+
+function countLines(text: string): number {
+    if (!text) return 0
+    return text.split('\n').filter((l) => l.length > 0).length || 1
+}
+
+function truncateOneLine(text: string, max: number): string {
+    const oneLine = text.replace(/\s+/g, ' ').trim()
+    if (oneLine.length <= max) return oneLine
+    return `${oneLine.slice(0, max)}…`
+}
+
+function shortLabel(edit: SREdit): string | undefined {
+    const heading = firstHeading(edit.search) ?? firstHeading(edit.replace)
+    if (heading) return `Edit "${heading}"`
+    if (edit.search) return `Edit "${truncateOneLine(edit.search, 40)}"`
+    if (edit.replace) return `Insert "${truncateOneLine(edit.replace, 40)}"`
+    return undefined
+}

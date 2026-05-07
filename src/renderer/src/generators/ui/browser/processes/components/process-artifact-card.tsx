@@ -11,7 +11,14 @@ import {
     IGRPDropdownMenuPrimitive,
     IGRPDropdownMenuTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import { AlertTriangle, Component, Copy, EllipsisVertical, RotateCw, Wrench } from 'lucide-react'
+import {
+    AlertTriangle,
+    Copy,
+    EllipsisVertical,
+    PenSquare,
+    RotateCw,
+    Wrench
+} from 'lucide-react'
 import type { JSX } from 'react/jsx-runtime'
 import type { BPMNProjectArtifact, BPMNProjectProcessDefinition, FileTree } from 'src/main/types'
 import type { PageDefinition } from '../../page-manager'
@@ -151,8 +158,8 @@ export const ProcessArtifactCard = ({
                             onPageClick?.(convertFileTreeToPageDefinition(stepProcessFound))
                         }
                     >
-                        <Component className="mr-2 h-4 w-4" />
-                        Add Components
+                        <PenSquare className="mr-2 h-4 w-4" />
+                        Open Editor
                     </IGRPButtonPrimitive>
                 ) : (
                     <IGRPButtonPrimitive

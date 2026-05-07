@@ -23,6 +23,11 @@ import {
     stopPrototypeDev
 } from '@renderer/redux/specPrototype/thunks'
 import {
+    selectDocBuffer,
+    selectDocNodes,
+    selectSelectedDocId
+} from '@renderer/redux/specDocs/reducer'
+import {
     AlertCircle,
     CheckCircle2,
     Download,
@@ -73,9 +78,9 @@ const ListVariant = (): JSX.Element => (
 
 const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
     const dispatch = useDispatch<any>()
-    const docs = useSelector((s: RootState) => s.specDocs.nodes)
-    const buffer = useSelector((s: RootState) => s.specDocs.buffer)
-    const selectedId = useSelector((s: RootState) => s.specDocs.selectedId)
+    const docs = useSelector(selectDocNodes)
+    const selectedId = useSelector(selectSelectedDocId)
+    const buffer = useSelector(selectDocBuffer(selectedId))
     const kbItems = useSelector((s: RootState) => s.specKB.items)
     const devStatus = useSelector((s: RootState) => s.specPrototype.devStatus)
     const lastTurnId = useSelector((s: RootState) => s.specPrototype.lastTurnId)

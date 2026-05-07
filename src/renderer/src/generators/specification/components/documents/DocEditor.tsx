@@ -1,4 +1,4 @@
-import MonacoEditor from '@monaco-editor/react'
+import MonacoEditor, { type OnMount } from '@monaco-editor/react'
 import { cn } from '@renderer/lib/utils'
 import { type DragEvent, type JSX, useEffect, useRef, useState } from 'react'
 
@@ -7,6 +7,11 @@ interface DocEditorProps {
     onChange: (value: string) => void
     /** Called when the user drops a file on the editor. */
     onDropFile?: (filePath: string) => void
+    /**
+     * Forward the Monaco editor instance once mounted. Used by the parent
+     * to drive imperative APIs (reveal line, set selection, scroll-sync).
+     */
+    onMount?: OnMount
     className?: string
     placeholder?: string
 }
@@ -15,6 +20,7 @@ export function DocEditor({
     value,
     onChange,
     onDropFile,
+    onMount,
     className,
     placeholder = 'Start writing specification…'
 }: DocEditorProps): JSX.Element {
@@ -62,6 +68,7 @@ export function DocEditor({
                 language="markdown"
                 value={value}
                 onChange={(next) => onChange(next ?? '')}
+                onMount={onMount}
                 theme="vs-dark"
                 options={{
                     fontSize: 13,

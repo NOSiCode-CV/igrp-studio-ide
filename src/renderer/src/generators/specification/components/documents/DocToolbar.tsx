@@ -9,7 +9,8 @@ import {
     Eye,
     FileText,
     Loader2,
-    MessageSquare
+    PanelRightClose,
+    PanelRightOpen
 } from 'lucide-react'
 import { type JSX, useEffect, useRef, useState } from 'react'
 
@@ -20,8 +21,10 @@ interface DocToolbarProps {
     docName: string
     viewMode: DocViewMode
     onViewModeChange: (mode: DocViewMode) => void
-    chatOpen: boolean
-    onToggleChat: () => void
+    /** Whether the right pane is currently open. */
+    paneOpen: boolean
+    /** Toggle the right pane. Parent decides which mode to restore on open. */
+    onTogglePane: () => void
     onExport?: (format: DocExportFormat) => Promise<void> | void
     canExport?: boolean
 }
@@ -31,8 +34,8 @@ export function DocToolbar({
     docName,
     viewMode,
     onViewModeChange,
-    chatOpen,
-    onToggleChat,
+    paneOpen,
+    onTogglePane,
     onExport,
     canExport = true
 }: DocToolbarProps): JSX.Element {
@@ -75,17 +78,18 @@ export function DocToolbar({
                     disabled={!onExport || !canExport}
                 />
                 <IGRPButtonPrimitive
-                    variant={chatOpen ? 'secondary' : 'ghost'}
+                    variant={paneOpen ? 'secondary' : 'ghost'}
                     size="sm"
-                    className="h-8 gap-2 text-xs"
-                    onClick={onToggleChat}
-                    title="AI Assistant"
+                    className="h-8 w-8 p-0"
+                    onClick={onTogglePane}
+                    title={paneOpen ? 'Hide side panel' : 'Show side panel'}
+                    aria-pressed={paneOpen}
                 >
-                    <MessageSquare
-                        size={14}
-                        className={cn(chatOpen ? 'text-primary' : '')}
-                    />
-                    Assistant
+                    {paneOpen ? (
+                        <PanelRightClose size={14} className="text-primary" />
+                    ) : (
+                        <PanelRightOpen size={14} />
+                    )}
                 </IGRPButtonPrimitive>
             </div>
         </div>

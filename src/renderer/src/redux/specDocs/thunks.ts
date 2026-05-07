@@ -1,5 +1,6 @@
 import type { Dispatch } from '@reduxjs/toolkit'
 import {
+    docFocused,
     docNodeRemoved,
     docNodeUpserted,
     docSaveFailure,
@@ -24,10 +25,21 @@ export const loadDocs = (basePath: string) => async (dispatch: Dispatch) => {
     }
 }
 
+/**
+ * Open a doc into a tab + focus it. Reads from disk only when the doc
+ * isn't already in the per-doc map (otherwise just refocuses, preserving
+ * any in-memory edits).
+ */
 export const selectDoc =
-    (basePath: string, docId: string | null) => async (dispatch: Dispatch) => {
+    (basePath: string, docId: string | null) =>
+    async (dispatch: Dispatch, getState: () => any) => {
         if (!basePath || !docId) {
             dispatch(docSelected({ id: null, content: '' }))
+            return
+        }
+        const alreadyOpen = Boolean(getState().specDocs.byDoc[docId])
+        if (alreadyOpen) {
+            dispatch(docFocused(docId))
             return
         }
         const result = await window.specDoc.read(basePath, docId)
@@ -82,13 +94,18 @@ export const moveDocNode =
 /** Debounced auto-save — flushes the editor buffer to disk. */
 export const saveDocBuffer =
     (basePath: string, docId: string, content: string) => async (dispatch: Dispatch) => {
-        dispatch(docSaveStart())
+        dispatch(docSaveStart(docId))
         try {
             const node = await window.specDoc.update(basePath, docId, { content })
             dispatch(docNodeUpserted(node))
-            dispatch(docSaveSuccess())
+            dispatch(docSaveSuccess(docId))
         } catch (err) {
-            dispatch(docSaveFailure(err instanceof Error ? err.message : String(err)))
+            dispatch(
+                docSaveFailure({
+                    id: docId,
+                    error: err instanceof Error ? err.message : String(err)
+                })
+            )
         }
     }
 

@@ -3,6 +3,16 @@ import {
     IGRPButtonPrimitive,
     IGRPCardContentPrimitive,
     IGRPCardPrimitive,
+    IGRPDialogContentPrimitive,
+    IGRPDialogHeaderPrimitive,
+    IGRPDialogPrimitive,
+    IGRPDialogTitlePrimitive,
+    IGRPDropdownMenuContentPrimitive,
+    IGRPDropdownMenuItemPrimitive,
+    IGRPDropdownMenuLabelPrimitive,
+    IGRPDropdownMenuPrimitive,
+    IGRPDropdownMenuSeparatorPrimitive,
+    IGRPDropdownMenuTriggerPrimitive,
     IGRPLoadingSpinner,
     IGRPSelectContentPrimitive,
     IGRPSelectItemPrimitive,
@@ -13,21 +23,20 @@ import {
     IGRPTabsContentPrimitive,
     IGRPTabsListPrimitive,
     IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive,
-    IGRPToggleGroupItemPrimitive,
-    IGRPToggleGroupPrimitive
+    IGRPTabsTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import type { ProcessConfig, ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { nanoid } from '@reduxjs/toolkit'
 import { BPMNDiagramViewer } from '@renderer/components/bpmn-diagram-viewer'
 import { EmptyList } from '@renderer/components/empty-list'
+import { BPMNConnectionsManager } from '@renderer/features/bpmn/components/connection/BPMNConnectionsManager'
 import { SearchInput } from '@renderer/components/shared-ui'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import useToast from '@renderer/hooks/useToast'
 import { getFileThree as onGetPages } from '@renderer/redux/thunks'
 import { bpmnService } from '@renderer/services/bpmn-service'
 import { getId } from '@renderer/utils'
-import { Cloud, HardDrive, RefreshCw } from 'lucide-react'
+import { Check, Cloud, HardDrive, MoreVertical, Plug, RefreshCw } from 'lucide-react'
 import { type JSX, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import type {
@@ -73,6 +82,7 @@ export const BPMNProjectSelector = ({
     const lastFetchedProcessIdRef = useRef<string | null>(null)
     const [showAddComponentsModal, setShowAddComponentsModal] = useState(false)
     const [showCopyLegacyVersionModal, setShowCopyLegacyVersionModal] = useState(false)
+    const [showApiManager, setShowApiManager] = useState(false)
     const [pendingComponentData, setPendingComponentData] = useState<
         | {
               processDefinition: BPMNProjectProcessDefinition
@@ -458,59 +468,100 @@ export const BPMNProjectSelector = ({
         )
     }
 
+    // Cast to `string` so the dropdown's "is active?" comparisons survive
+    // TypeScript's narrowing after the `if (shouldShowLocalView) return …`
+    // branch above (which would otherwise collapse `viewMode` to `'remote'`).
+    const currentViewMode = viewMode as string
+
+    const hasProjects = projects.length > 0
+
     return (
         <div className="space-y-6">
-            {/* Mode Selector */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium">View Mode:</span>
-                    <IGRPToggleGroupPrimitive
-                        type="single"
-                        value={viewMode}
-                        onValueChange={(value) => {
-                            if (value) setViewMode(value as 'local' | 'remote')
-                        }}
-                    >
-                        <IGRPToggleGroupItemPrimitive value="local" aria-label="Local mode">
-                            <HardDrive className="mr-2 h-4 w-4" />
-                            Local
-                        </IGRPToggleGroupItemPrimitive>
-                        <IGRPToggleGroupItemPrimitive value="remote" aria-label="Remote mode">
-                            <Cloud className="mr-2 h-4 w-4" />
-                            Remote
-                        </IGRPToggleGroupItemPrimitive>
-                    </IGRPToggleGroupPrimitive>
-                </div>
-            </div>
-
             {/* Project Selection */}
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium">Select Project</label>
-                    <IGRPButtonPrimitive
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                            bpmnService.clearConfig()
-                            setRefreshTrigger((prev) => prev + 1)
-                        }}
-                        disabled={loading}
-                        className="flex items-center gap-2"
-                    >
-                        <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                        Refresh
-                    </IGRPButtonPrimitive>
+                    {hasProjects ? (
+                        <label className="text-sm font-medium">Select Project</label>
+                    ) : (
+                        <span aria-hidden />
+                    )}
+                    <div className="flex items-center gap-1">
+                        <IGRPButtonPrimitive
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowApiManager(true)}
+                            className="flex items-center gap-2"
+                            title="Manage BPMN API connections"
+                        >
+                            <Plug className="h-4 w-4" />
+                            API
+                        </IGRPButtonPrimitive>
+                        <IGRPButtonPrimitive
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                bpmnService.clearConfig()
+                                setRefreshTrigger((prev) => prev + 1)
+                                if (selectedProject) {
+                                    loadProcessDefinitions(selectedProject.projectId)
+                                }
+                            }}
+                            disabled={loading || loadingProcesses}
+                            className="flex items-center gap-2"
+                        >
+                            <RefreshCw
+                                className={`h-4 w-4 ${loading || loadingProcesses ? 'animate-spin' : ''}`}
+                            />
+                            Refresh
+                        </IGRPButtonPrimitive>
+                        <IGRPDropdownMenuPrimitive>
+                            <IGRPDropdownMenuTriggerPrimitive asChild>
+                                <IGRPButtonPrimitive
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    title="View options"
+                                >
+                                    <MoreVertical className="h-4 w-4" />
+                                </IGRPButtonPrimitive>
+                            </IGRPDropdownMenuTriggerPrimitive>
+                            <IGRPDropdownMenuContentPrimitive align="end" className="min-w-40">
+                                <IGRPDropdownMenuLabelPrimitive className="text-xs text-muted-foreground">
+                                    View Mode
+                                </IGRPDropdownMenuLabelPrimitive>
+                                <IGRPDropdownMenuSeparatorPrimitive />
+                                <IGRPDropdownMenuItemPrimitive
+                                    onClick={() => setViewMode('local')}
+                                >
+                                    <HardDrive className="h-3.5 w-3.5 mr-2" />
+                                    Local
+                                    {currentViewMode === 'local' && (
+                                        <Check className="h-3.5 w-3.5 ml-auto" />
+                                    )}
+                                </IGRPDropdownMenuItemPrimitive>
+                                <IGRPDropdownMenuItemPrimitive
+                                    onClick={() => setViewMode('remote')}
+                                >
+                                    <Cloud className="h-3.5 w-3.5 mr-2" />
+                                    Remote
+                                    {currentViewMode === 'remote' && (
+                                        <Check className="h-3.5 w-3.5 ml-auto" />
+                                    )}
+                                </IGRPDropdownMenuItemPrimitive>
+                            </IGRPDropdownMenuContentPrimitive>
+                        </IGRPDropdownMenuPrimitive>
+                    </div>
                 </div>
-                <IGRPSelectPrimitive
-                    onValueChange={handleProjectChange}
-                    value={selectedProject?.projectId || ''}
-                >
-                    <IGRPSelectTriggerPrimitive className="w-full">
-                        <IGRPSelectValuePrimitive placeholder="Choose a project..." />
-                    </IGRPSelectTriggerPrimitive>
-                    <IGRPSelectContentPrimitive>
-                        {projects.length > 0 &&
-                            projects.map((project) => (
+                {hasProjects && (
+                    <IGRPSelectPrimitive
+                        onValueChange={handleProjectChange}
+                        value={selectedProject?.projectId || ''}
+                    >
+                        <IGRPSelectTriggerPrimitive className="w-full">
+                            <IGRPSelectValuePrimitive placeholder="Choose a project..." />
+                        </IGRPSelectTriggerPrimitive>
+                        <IGRPSelectContentPrimitive>
+                            {projects.map((project) => (
                                 <IGRPSelectItemPrimitive
                                     key={project.projectId}
                                     value={project.projectId}
@@ -530,75 +581,65 @@ export const BPMNProjectSelector = ({
                                     </div>
                                 </IGRPSelectItemPrimitive>
                             ))}
-                    </IGRPSelectContentPrimitive>
-                </IGRPSelectPrimitive>
+                        </IGRPSelectContentPrimitive>
+                    </IGRPSelectPrimitive>
+                )}
             </div>
 
-            {/* Step 2: Select Process */}
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h3 className="text-lg font-semibold">Select Process</h3>
-                        <p className="text-sm text-muted-foreground">
-                            Choose a specific process to view its artifacts, or load all project
-                            artifacts below.
-                        </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
+            {/* Step 2: Select Process — only when a project is chosen so we don't
+                show duplicate "no data" empty states alongside "No projects found" */}
+            {selectedProject && (
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h3 className="text-lg font-semibold">Select Process</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Choose a specific process to view its artifacts, or load all
+                                project artifacts below.
+                            </p>
+                        </div>
                         <SearchInput
                             placeholder="Filter by process key or name..."
                             value={processFilter}
                             onChange={(value) => setProcessFilter(value)}
                             className="lg:w-[250px]"
                         />
-                        <IGRPButtonPrimitive
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 px-2"
-                            onClick={() =>
-                                selectedProject && loadProcessDefinitions(selectedProject.projectId)
-                            }
-                            title="Refresh processes"
-                        >
-                            <RefreshCw className="w-4 h-4" />
-                            Refresh
-                        </IGRPButtonPrimitive>
                     </div>
-                </div>
 
-                {loadingProcesses ? (
-                    <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
-                        <IGRPLoadingSpinner />
-                        <span>Loading process details...</span>
-                    </div>
-                ) : filteredProcesses.length > 0 ? (
-                    <div className="space-y-4">
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                            {filteredProcesses.map((process) => (
-                                <ProcessCard
-                                    key={process.processDefinitionId}
-                                    process={process}
-                                    isSelected={
-                                        selectedProcess?.processDefinitionId ===
-                                        process.processDefinitionId
-                                    }
-                                    onSelectProcess={handleProcessChange}
-                                />
-                            ))}
+                    {loadingProcesses ? (
+                        <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+                            <IGRPLoadingSpinner />
+                            <span>Loading process details...</span>
                         </div>
-                    </div>
-                ) : processDefinitions.length === 0 ? (
-                    <EmptyList
-                        title="No process definitions found"
-                        description="No process definitions found for this project. Please check your BPMN API configuration or try refreshing."
-                    />
-                ) : (
-                    <EmptyList
-                        title="No processes match your filter"
-                        description={`No processes match "${processFilter}". Try adjusting your search terms.`}
-                    />
-                )}
-            </div>
+                    ) : filteredProcesses.length > 0 ? (
+                        <div className="space-y-4">
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                {filteredProcesses.map((process) => (
+                                    <ProcessCard
+                                        key={process.processDefinitionId}
+                                        process={process}
+                                        isSelected={
+                                            selectedProcess?.processDefinitionId ===
+                                            process.processDefinitionId
+                                        }
+                                        onSelectProcess={handleProcessChange}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    ) : processDefinitions.length === 0 ? (
+                        <EmptyList
+                            title="No process definitions found"
+                            description="No process definitions found for this project. Please check your BPMN API configuration or try refreshing."
+                        />
+                    ) : (
+                        <EmptyList
+                            title="No processes match your filter"
+                            description={`No processes match "${processFilter}". Try adjusting your search terms.`}
+                        />
+                    )}
+                </div>
+            )}
 
             {/* Step 3: Process Details with Tabs */}
             {selectedProcess && (
@@ -728,6 +769,19 @@ export const BPMNProjectSelector = ({
                 processFound={pendingComponentData?.processFound || oldProcessFound}
                 bpmnProcesses={bpmnProcesses}
             />
+
+            <IGRPDialogPrimitive open={showApiManager} onOpenChange={setShowApiManager}>
+                <IGRPDialogContentPrimitive className="sm:max-w-6xl w-[95vw] max-h-[85vh] overflow-hidden flex flex-col p-0">
+                    <IGRPDialogHeaderPrimitive className="border-b px-6 py-4 shrink-0">
+                        <IGRPDialogTitlePrimitive>
+                            Manage BPMN API connections
+                        </IGRPDialogTitlePrimitive>
+                    </IGRPDialogHeaderPrimitive>
+                    <div className="flex-1 overflow-y-auto px-6 py-4">
+                        <BPMNConnectionsManager compact />
+                    </div>
+                </IGRPDialogContentPrimitive>
+            </IGRPDialogPrimitive>
         </div>
     )
 }

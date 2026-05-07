@@ -1,20 +1,13 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
-import { Check, Columns2 } from 'lucide-react'
+import { Check } from 'lucide-react'
 import type { JSX } from 'react'
 
 interface DocFooterProps {
     content: string
     saving: boolean
     dirty: boolean
-    onToggleInspector: () => void
 }
 
-export function DocFooter({
-    content,
-    saving,
-    dirty,
-    onToggleInspector
-}: DocFooterProps): JSX.Element {
+export function DocFooter({ content, saving, dirty }: DocFooterProps): JSX.Element {
     const words = content.trim().split(/\s+/).filter(Boolean).length
     const minutes = Math.max(1, Math.ceil(words / 200))
 
@@ -35,15 +28,6 @@ export function DocFooter({
                     )}
                 </span>
             </div>
-            <IGRPButtonPrimitive
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={onToggleInspector}
-                title="Toggle inspector"
-            >
-                <Columns2 size={12} />
-            </IGRPButtonPrimitive>
         </footer>
     )
 }
