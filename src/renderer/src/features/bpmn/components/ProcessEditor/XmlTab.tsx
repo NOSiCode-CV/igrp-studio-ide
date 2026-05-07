@@ -144,11 +144,7 @@ export function XmlTab({ xml, onChange }: XmlTabProps): JSX.Element {
                     onClick={handleManualSave}
                     disabled={!dirty}
                 >
-                    {dirty ? (
-                        <Save className="mr-1 h-4 w-4" />
-                    ) : (
-                        <Check className="mr-1 h-4 w-4" />
-                    )}
+                    {dirty ? <Save className="mr-1 h-4 w-4" /> : <Check className="mr-1 h-4 w-4" />}
                     {dirty ? 'Save' : 'Saved'}
                 </IGRPButtonPrimitive>
             </div>

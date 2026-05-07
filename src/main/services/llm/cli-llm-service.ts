@@ -234,19 +234,17 @@ class CLILLMAdapter implements LLMAdapter {
         })
     }
 
-    async *chat(
-        messages: LLMMessage[],
-        opts: LLMChatOptions
-    ): AsyncIterable<LLMChatChunk> {
+    async *chat(messages: LLMMessage[], opts: LLMChatOptions): AsyncIterable<LLMChatChunk> {
         const status = await this.getStatus()
         if (!status.found) {
             throw new LLMNotConfiguredError(this.id)
         }
 
         const prompt = formatPrompt(messages, opts.systemPrompt)
-        const proc = this.cliId === 'claude'
-            ? this.spawnClaude(status.path ?? 'claude', opts.model)
-            : this.spawnOllama(status.path ?? 'ollama', opts.model)
+        const proc =
+            this.cliId === 'claude'
+                ? this.spawnClaude(status.path ?? 'claude', opts.model)
+                : this.spawnOllama(status.path ?? 'ollama', opts.model)
 
         // Pipe the prompt via stdin so we don't blow argv.
         proc.stdin.write(prompt)

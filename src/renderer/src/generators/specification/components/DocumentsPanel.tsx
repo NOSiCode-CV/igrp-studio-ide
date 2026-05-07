@@ -126,7 +126,7 @@ const ListVariant = ({ basePath }: PanelProps): JSX.Element => {
                     name,
                     parentId: dialogMode.parentId ?? null,
                     type: dialogMode.type,
-                    content: dialogMode.type === 'file' ? template?.content ?? '' : undefined
+                    content: dialogMode.type === 'file' ? (template?.content ?? '') : undefined
                 })
             )
             if (created && created.type === 'file') {

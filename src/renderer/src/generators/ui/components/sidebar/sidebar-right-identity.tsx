@@ -1,7 +1,4 @@
-import {
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { IGRPInputPrimitive, IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system'
 import { CheckboxInput } from '@renderer/generators/api/components/inputs-form'
 import { type ChangeEvent, memo, useId } from 'react'
 import { useTranslation } from 'react-i18next'

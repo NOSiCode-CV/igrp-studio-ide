@@ -1,7 +1,4 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { IGRPButtonPrimitive, IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system'
 import { cn } from '@renderer/lib/utils'
 import type { RootState } from '@renderer/redux'
 import {
@@ -229,7 +226,9 @@ const ListVariant = ({ basePath }: PanelProps): JSX.Element => {
                                 onReindex={() =>
                                     basePath && dispatch(reindexKBItem(basePath, item.id))
                                 }
-                                onRemove={() => basePath && dispatch(removeKBItem(basePath, item.id))}
+                                onRemove={() =>
+                                    basePath && dispatch(removeKBItem(basePath, item.id))
+                                }
                             />
                         ))
                     )}
@@ -241,7 +240,9 @@ const ListVariant = ({ basePath }: PanelProps): JSX.Element => {
                             }
                             onUrl={(url) =>
                                 basePath &&
-                                dispatch(addKBUrl(basePath, url, /youtube\.com|youtu\.be/.test(url)))
+                                dispatch(
+                                    addKBUrl(basePath, url, /youtube\.com|youtu\.be/.test(url))
+                                )
                             }
                             label="Drop files or URLs to index"
                         />
@@ -337,8 +338,8 @@ const KBRow = ({ item, active, onSelect, onReindex, onRemove }: KBRowProps): JSX
 const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
     const dispatch = useDispatch<any>()
     const selectedId = useSelector((s: RootState) => s.specKB.selectedId)
-    const item = useSelector((s: RootState) =>
-        s.specKB.items.find((i) => i.id === selectedId) ?? null
+    const item = useSelector(
+        (s: RootState) => s.specKB.items.find((i) => i.id === selectedId) ?? null
     )
     const lastSearch = useSelector((s: RootState) => s.specKB.lastSearch)
 

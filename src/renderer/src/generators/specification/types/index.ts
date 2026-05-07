@@ -1,9 +1,4 @@
-export type SpecificationTab =
-    | 'documents'
-    | 'knowledge-base'
-    | 'data'
-    | 'prototype'
-    | 'processes'
+export type SpecificationTab = 'documents' | 'knowledge-base' | 'data' | 'prototype' | 'processes'
 
 export interface SpecificationProject {
     id: string
@@ -30,7 +25,17 @@ export interface KBItem {
     id: string
     source: string
     mdPath?: string
-    type: 'pdf' | 'docx' | 'pptx' | 'xlsx' | 'html' | 'image' | 'audio' | 'url' | 'youtube' | 'other'
+    type:
+        | 'pdf'
+        | 'docx'
+        | 'pptx'
+        | 'xlsx'
+        | 'html'
+        | 'image'
+        | 'audio'
+        | 'url'
+        | 'youtube'
+        | 'other'
     status: 'pending' | 'converting' | 'indexing' | 'indexed' | 'error'
     chunks?: number
     error?: string

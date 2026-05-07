@@ -98,7 +98,7 @@ class StubEmbeddings implements EmbeddingsAdapter {
                 seed = createHash('sha256').update(seed).digest()
             }
             // map byte to [-1, 1]
-            out[i] = (seed[i % seed.length] / 127.5) - 1
+            out[i] = seed[i % seed.length] / 127.5 - 1
         }
         return out
     }

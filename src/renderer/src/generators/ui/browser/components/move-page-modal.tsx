@@ -71,9 +71,7 @@ export function MovePageModal({
             }
         }
 
-        const result: MovePageOption[] = [
-            { value: TOP_LEVEL_VALUE, label: t('move_to_top_level') }
-        ]
+        const result: MovePageOption[] = [{ value: TOP_LEVEL_VALUE, label: t('move_to_top_level') }]
         for (const candidate of allPages) {
             if (descendants.has(candidate.pageName)) continue
             result.push({

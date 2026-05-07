@@ -68,15 +68,12 @@ export const DroppedComponentsProvider: React.FC<ProviderProps> = ({ children, a
 
     const slice = byTab[activeTabId] ?? emptyTabSlice()
 
-    const updateSlice = useCallback(
-        (tabId: string, updater: (prev: TabSlice) => TabSlice) => {
-            setByTab((prev) => {
-                const current = prev[tabId] ?? emptyTabSlice()
-                return { ...prev, [tabId]: updater(current) }
-            })
-        },
-        []
-    )
+    const updateSlice = useCallback((tabId: string, updater: (prev: TabSlice) => TabSlice) => {
+        setByTab((prev) => {
+            const current = prev[tabId] ?? emptyTabSlice()
+            return { ...prev, [tabId]: updater(current) }
+        })
+    }, [])
 
     const updateActive = useCallback(
         (updater: (prev: TabSlice) => TabSlice) => updateSlice(activeTabId, updater),
@@ -499,54 +496,55 @@ export const DroppedComponentsProvider: React.FC<ProviderProps> = ({ children, a
     }, [])
 
     const value = useMemo<DroppedComponentsContextType>(
-        () => ({
-            setAllComponents,
-            handleAddChildToComponent,
-            handleRemoveChildFromComponent,
-            handleReorderChildInComponent,
-            handleUpdateChildComponent,
-            removeRow,
-            setEditingComponent,
-            clearEditingComponent,
+        () =>
+            ({
+                setAllComponents,
+                handleAddChildToComponent,
+                handleRemoveChildFromComponent,
+                handleReorderChildInComponent,
+                handleUpdateChildComponent,
+                removeRow,
+                setEditingComponent,
+                clearEditingComponent,
 
-            addType,
-            updateType,
-            removeType,
-            createOrUpdateType,
-            getTypeByComponentId,
-            setAllTypes,
+                addType,
+                updateType,
+                removeType,
+                createOrUpdateType,
+                getTypeByComponentId,
+                setAllTypes,
 
-            addFunction,
-            updateFunction,
-            removeFunction,
-            setAllFunctions,
+                addFunction,
+                updateFunction,
+                removeFunction,
+                setAllFunctions,
 
-            addState,
-            updateState,
-            removeState,
-            setAllStates,
+                addState,
+                updateState,
+                removeState,
+                setAllStates,
 
-            addImport,
-            updateImport,
-            removeImport,
-            setAllImports,
+                addImport,
+                updateImport,
+                removeImport,
+                setAllImports,
 
-            components: slice.components,
-            currentComponent: slice.currentComponent,
-            types: slice.types,
-            functions: slice.functions,
-            states: slice.states,
-            imports: slice.imports,
+                components: slice.components,
+                currentComponent: slice.currentComponent,
+                types: slice.types,
+                functions: slice.functions,
+                states: slice.states,
+                imports: slice.imports,
 
-            setAllArguments,
-            componentArguments: slice.componentArguments,
-            setAllRestData,
-            restData: slice.restData,
+                setAllArguments,
+                componentArguments: slice.componentArguments,
+                setAllRestData,
+                restData: slice.restData,
 
-            // New API for tab cleanup. Cast through unknown to keep external
-            // type compatibility while consumers can opt-in.
-            removeTab
-        } as DroppedComponentsContextType & { removeTab: (tabId: string) => void }),
+                // New API for tab cleanup. Cast through unknown to keep external
+                // type compatibility while consumers can opt-in.
+                removeTab
+            }) as DroppedComponentsContextType & { removeTab: (tabId: string) => void },
         [
             slice,
             setAllComponents,

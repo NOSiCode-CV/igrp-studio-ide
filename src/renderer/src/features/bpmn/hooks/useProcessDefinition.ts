@@ -19,9 +19,7 @@ export function useProcessDefinition(
     const { showErrorToast } = useToast()
 
     const query = useQuery<ProcessDefinition>({
-        queryKey: processId
-            ? bpmnQueryKeys.process(processId)
-            : bpmnQueryKeys.process('__none__'),
+        queryKey: processId ? bpmnQueryKeys.process(processId) : bpmnQueryKeys.process('__none__'),
         queryFn: async () => {
             if (!binding) throw new Error('No active BPMN configuration')
             if (!processId) throw new Error('processId is required')

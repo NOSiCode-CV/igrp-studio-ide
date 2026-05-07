@@ -22,11 +22,7 @@ import { dirname, join } from 'node:path'
 import { BrowserWindow } from 'electron'
 import { EVENTS } from '../constants/events'
 import { ensureDirectoryExists } from '../helpers'
-import {
-    closeKnexConnection,
-    createKnexConnection,
-    getTableStructure
-} from '../helpers/Knex'
+import { closeKnexConnection, createKnexConnection, getTableStructure } from '../helpers/Knex'
 import { entitiesToDdl, type DdlDialect } from './data/entities-to-ddl'
 import { ConnectionRepository } from './database-service'
 
@@ -185,11 +181,7 @@ export class SpecDataService {
         return entity
     }
 
-    async update(
-        basePath: string,
-        entityId: string,
-        patch: UpdateEntityPatch
-    ): Promise<Entity> {
+    async update(basePath: string, entityId: string, patch: UpdateEntityPatch): Promise<Entity> {
         const current = await readEntity(basePath, entityId)
         if (!current) throw new Error(`Entity ${entityId} not found`)
 
@@ -246,9 +238,7 @@ export class SpecDataService {
                 (r) => r.toEntityId === entityId || r.fromEntityId === entityId
             )
             if (referencingRelation) {
-                throw new Error(
-                    `Cannot delete: "${other.name}" has a relation to this entity`
-                )
+                throw new Error(`Cannot delete: "${other.name}" has a relation to this entity`)
             }
         }
 
@@ -306,11 +296,7 @@ export class SpecDataService {
             const dbPk = !!col.is_primary_key
             const beforeNullable = field.nullable !== false
             const beforePk = !!field.primaryKey
-            if (
-                field.type !== dbType ||
-                beforeNullable !== dbNullable ||
-                beforePk !== dbPk
-            ) {
+            if (field.type !== dbType || beforeNullable !== dbNullable || beforePk !== dbPk) {
                 changed.push({
                     name: field.name,
                     before: {
@@ -382,7 +368,8 @@ export class SpecDataService {
         const idByTable = new Map<string, string>()
         for (const { table } of structures) {
             const existing = summaries.find(
-                (s) => s.source.kind === 'imported' &&
+                (s) =>
+                    s.source.kind === 'imported' &&
                     s.source.connection === connectionName &&
                     s.source.table === table
             )
@@ -419,9 +406,7 @@ export class SpecDataService {
             })
 
             // Smart merge with existing entity fields.
-            const mergedFields = existing
-                ? mergeFields(existing.fields, dbFields)
-                : dbFields
+            const mergedFields = existing ? mergeFields(existing.fields, dbFields) : dbFields
 
             // Auto-derive `many-to-one` relations from FK columns.
             const dbRelations: Relation[] = columns
@@ -612,7 +597,9 @@ function toSummary(entity: Entity): EntitySummary {
 }
 
 function assignFieldIds(fields: (Omit<Field, 'id'> | Field)[]): Field[] {
-    return fields.map((f) => ('id' in f && f.id ? (f as Field) : { ...(f as Field), id: randomUUID() }))
+    return fields.map((f) =>
+        'id' in f && f.id ? (f as Field) : { ...(f as Field), id: randomUUID() }
+    )
 }
 
 function assignRelationIds(
@@ -620,7 +607,8 @@ function assignRelationIds(
     fromEntityId: string
 ): Relation[] {
     return relations.map((r) => {
-        const withId = 'id' in r && r.id ? (r as Relation) : { ...(r as Relation), id: randomUUID() }
+        const withId =
+            'id' in r && r.id ? (r as Relation) : { ...(r as Relation), id: randomUUID() }
         return withId.fromEntityId ? withId : { ...withId, fromEntityId }
     })
 }

@@ -130,123 +130,123 @@ export function ProcessEditor({
                 projectName={projectName}
             />
             <div className="flex flex-1 overflow-hidden">
-            <IGRPTabs
-                value={tab}
-                onValueChange={(v) => setTab(v as EditorTab)}
-                className="flex flex-1 flex-col overflow-hidden"
-            >
-                <div className="mx-4 mt-3 flex items-center justify-between gap-3">
-                    <IGRPTabsList>
-                        <IGRPTabsTrigger value="diagram">Diagram</IGRPTabsTrigger>
-                        <IGRPTabsTrigger value="xml">XML</IGRPTabsTrigger>
-                    </IGRPTabsList>
-                    <div className="flex items-center gap-2">
-                        {tab === 'diagram' && (
+                <IGRPTabs
+                    value={tab}
+                    onValueChange={(v) => setTab(v as EditorTab)}
+                    className="flex flex-1 flex-col overflow-hidden"
+                >
+                    <div className="mx-4 mt-3 flex items-center justify-between gap-3">
+                        <IGRPTabsList>
+                            <IGRPTabsTrigger value="diagram">Diagram</IGRPTabsTrigger>
+                            <IGRPTabsTrigger value="xml">XML</IGRPTabsTrigger>
+                        </IGRPTabsList>
+                        <div className="flex items-center gap-2">
+                            {tab === 'diagram' && (
+                                <IGRPButtonPrimitive
+                                    variant={helperOpen ? 'default' : 'outline'}
+                                    size="sm"
+                                    onClick={() =>
+                                        setSidePanel((p) =>
+                                            p === 'delegates' ? 'closed' : 'delegates'
+                                        )
+                                    }
+                                >
+                                    <BookOpen className="mr-1 h-4 w-4" />
+                                    Delegates reference
+                                </IGRPButtonPrimitive>
+                            )}
                             <IGRPButtonPrimitive
-                                variant={helperOpen ? 'default' : 'outline'}
+                                variant={chatOpen ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() =>
-                                    setSidePanel((p) =>
-                                        p === 'delegates' ? 'closed' : 'delegates'
-                                    )
+                                    setSidePanel((p) => (p === 'chat' ? 'closed' : 'chat'))
                                 }
                             >
-                                <BookOpen className="mr-1 h-4 w-4" />
-                                Delegates reference
+                                <MessageSquare className="mr-1 h-4 w-4" />
+                                Assistant
                             </IGRPButtonPrimitive>
+                        </div>
+                    </div>
+                    <IGRPTabsContent value="diagram" className="flex-1 overflow-hidden p-0">
+                        {loadError ? (
+                            <ErrorState
+                                message={loadError.message}
+                                onRetry={() => processQuery.refetch()}
+                            />
+                        ) : isLoading ? (
+                            <TabSkeleton />
+                        ) : (
+                            <DiagramTab
+                                xml={xml}
+                                processKey={processKey}
+                                processName={processName}
+                                onChange={handleChange}
+                                helperOpen={helperOpen}
+                                onHelperClose={() => setSidePanel('closed')}
+                            />
                         )}
-                        <IGRPButtonPrimitive
-                            variant={chatOpen ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() =>
-                                setSidePanel((p) => (p === 'chat' ? 'closed' : 'chat'))
-                            }
-                        >
-                            <MessageSquare className="mr-1 h-4 w-4" />
-                            Assistant
-                        </IGRPButtonPrimitive>
-                    </div>
-                </div>
-                <IGRPTabsContent value="diagram" className="flex-1 overflow-hidden p-0">
-                    {loadError ? (
-                        <ErrorState
-                            message={loadError.message}
-                            onRetry={() => processQuery.refetch()}
-                        />
-                    ) : isLoading ? (
-                        <TabSkeleton />
-                    ) : (
-                        <DiagramTab
-                            xml={xml}
-                            processKey={processKey}
-                            processName={processName}
-                            onChange={handleChange}
-                            helperOpen={helperOpen}
-                            onHelperClose={() => setSidePanel('closed')}
-                        />
-                    )}
-                </IGRPTabsContent>
-                <IGRPTabsContent value="xml" className="flex-1 overflow-hidden p-4">
-                    {loadError ? (
-                        <ErrorState
-                            message={loadError.message}
-                            onRetry={() => processQuery.refetch()}
-                        />
-                    ) : isLoading ? (
-                        <TabSkeleton />
-                    ) : (
-                        <XmlTab xml={xml} onChange={handleChange} />
-                    )}
-                </IGRPTabsContent>
-            </IGRPTabs>
-            {chatOpen && (
-                <aside className="flex w-[360px] shrink-0 flex-col border-l bg-background">
-                    <div className="flex items-center justify-between border-b px-3 py-2">
-                        <h3 className="text-sm font-semibold">AI Assistant</h3>
-                        <IGRPButtonPrimitive
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSidePanel('closed')}
-                            aria-label="Close assistant"
-                        >
-                            <X className="h-4 w-4" />
-                        </IGRPButtonPrimitive>
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                        <AIAssistant
-                            mode="process"
-                            title=""
-                            placeholder="Ask about this process…"
-                            supportsKB={chatAddendum?.supportsKB ?? false}
-                            contextProvider={async ({ userMessage, useKB }) => {
-                                const processSection = buildProcessSystemPrompt({
-                                    processName,
-                                    processKey,
-                                    projectName,
-                                    xml
-                                })
-                                if (!chatAddendum) {
-                                    return { systemPrompt: processSection }
-                                }
-                                const extra = await chatAddendum.build({
-                                    userMessage,
-                                    useKB
-                                })
-                                const systemPrompt = extra.text
-                                    ? `${processSection}\n\n${extra.text}`
-                                    : processSection
-                                return {
-                                    systemPrompt,
-                                    contextLabel: extra.labelSuffix
-                                        ? `Process · ${processName}${extra.labelSuffix}`
-                                        : `Process · ${processName}`
-                                }
-                            }}
-                            className="h-full"
-                        />
-                    </div>
-                </aside>
-            )}
+                    </IGRPTabsContent>
+                    <IGRPTabsContent value="xml" className="flex-1 overflow-hidden p-4">
+                        {loadError ? (
+                            <ErrorState
+                                message={loadError.message}
+                                onRetry={() => processQuery.refetch()}
+                            />
+                        ) : isLoading ? (
+                            <TabSkeleton />
+                        ) : (
+                            <XmlTab xml={xml} onChange={handleChange} />
+                        )}
+                    </IGRPTabsContent>
+                </IGRPTabs>
+                {chatOpen && (
+                    <aside className="flex w-[360px] shrink-0 flex-col border-l bg-background">
+                        <div className="flex items-center justify-between border-b px-3 py-2">
+                            <h3 className="text-sm font-semibold">AI Assistant</h3>
+                            <IGRPButtonPrimitive
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSidePanel('closed')}
+                                aria-label="Close assistant"
+                            >
+                                <X className="h-4 w-4" />
+                            </IGRPButtonPrimitive>
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                            <AIAssistant
+                                mode="process"
+                                title=""
+                                placeholder="Ask about this process…"
+                                supportsKB={chatAddendum?.supportsKB ?? false}
+                                contextProvider={async ({ userMessage, useKB }) => {
+                                    const processSection = buildProcessSystemPrompt({
+                                        processName,
+                                        processKey,
+                                        projectName,
+                                        xml
+                                    })
+                                    if (!chatAddendum) {
+                                        return { systemPrompt: processSection }
+                                    }
+                                    const extra = await chatAddendum.build({
+                                        userMessage,
+                                        useKB
+                                    })
+                                    const systemPrompt = extra.text
+                                        ? `${processSection}\n\n${extra.text}`
+                                        : processSection
+                                    return {
+                                        systemPrompt,
+                                        contextLabel: extra.labelSuffix
+                                            ? `Process · ${processName}${extra.labelSuffix}`
+                                            : `Process · ${processName}`
+                                    }
+                                }}
+                                className="h-full"
+                            />
+                        </div>
+                    </aside>
+                )}
             </div>
         </div>
     )

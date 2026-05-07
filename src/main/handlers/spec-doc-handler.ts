@@ -6,10 +6,7 @@ import { dialog, ipcMain, BrowserWindow } from 'electron'
 import { basename } from 'node:path'
 import { EVENTS } from '../constants/events'
 import { specDocService, type DocNode, type DocNodeType } from '../services/spec-doc-service'
-import {
-    specDocExportService,
-    type DocExportFormat
-} from '../services/spec-doc-export-service'
+import { specDocExportService, type DocExportFormat } from '../services/spec-doc-export-service'
 
 interface ProjectScopedPayload {
     basePath: string
@@ -101,10 +98,7 @@ ipcMain.handle(
 
 ipcMain.handle(
     EVENTS.SPEC_DOC.CONVERT_AND_INSERT,
-    async (
-        _event,
-        { sourcePath }: { sourcePath: string }
-    ): Promise<{ markdown: string }> => {
+    async (_event, { sourcePath }: { sourcePath: string }): Promise<{ markdown: string }> => {
         return specDocService.convertAndInsert(sourcePath)
     }
 )
@@ -158,4 +152,3 @@ ipcMain.handle(
         return { ok: true, path: target }
     }
 )
-

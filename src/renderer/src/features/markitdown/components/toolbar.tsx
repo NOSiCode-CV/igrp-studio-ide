@@ -54,11 +54,7 @@ const Toolbar = ({
                 onClick={handleCopy}
                 disabled={!hasMarkdown}
             >
-                {copied ? (
-                    <Check className="h-4 w-4 mr-2" />
-                ) : (
-                    <Copy className="h-4 w-4 mr-2" />
-                )}
+                {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
                 {copied ? 'Copied' : 'Copy'}
             </IGRPButtonPrimitive>
             <IGRPButtonPrimitive

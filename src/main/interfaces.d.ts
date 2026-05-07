@@ -94,6 +94,7 @@ export interface BaseEngine {
     createModel?(data: EnumConfig, basePath: string): Promise<void>
     createDto?(data: EnumConfig, basePath: string): Promise<void>
     createController?(data: EnumConfig, basePath: string): Promise<void>
+    createGraphqlSchema?(config: any, basePath: string): Promise<void>
 
     serializeElement?: (data: any, basePath: string) => Promise<void>
     createPermission?: (data: any, basePath: string) => Promise<void>

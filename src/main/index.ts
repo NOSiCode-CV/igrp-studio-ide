@@ -45,6 +45,7 @@ import './handlers/git-handler'
 import './handlers/app-logic-handlers'
 import './handlers/docker-handler'
 import './handlers/global-handler'
+import './handlers/graphql/graphql-manifest.handler'
 import './handlers/markitdown-handler'
 import './handlers/spec-kb-handler'
 import './handlers/spec-doc-handler'
@@ -510,6 +511,7 @@ ipcMain.handle(
 ipcMain.handle(
     'igrp-studio:get-json-content',
     async (_event, filePath: string): Promise<unknown> => {
+        if (!filePath) return null
         return await getJsonContent(filePath)
     }
 )

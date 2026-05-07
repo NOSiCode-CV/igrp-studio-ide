@@ -61,7 +61,11 @@ function validateForm(values: {
     return errors
 }
 
-function ProviderConfigForm({ config, onSave, onCancel }: ProviderConfigFormProps): React.ReactNode {
+function ProviderConfigForm({
+    config,
+    onSave,
+    onCancel
+}: ProviderConfigFormProps): React.ReactNode {
     const { t } = useTranslation()
     const [name, setName] = useState(config.name)
     const [baseUrl, setBaseUrl] = useState(config.baseUrl)
@@ -111,9 +115,7 @@ function ProviderConfigForm({ config, onSave, onCancel }: ProviderConfigFormProp
                     }
                     className="input"
                 />
-                {showError('name') && (
-                    <p className="text-xs text-red-600">{showError('name')}</p>
-                )}
+                {showError('name') && <p className="text-xs text-red-600">{showError('name')}</p>}
             </div>
             <div className="space-y-2">
                 <IGRPLabelPrimitive>
@@ -321,10 +323,7 @@ export function ConnectedAccountsSettings(): React.ReactNode {
         }
     }
 
-    const handleDeleteConfig = async (
-        id: string,
-        type: ProviderType
-    ): Promise<void> => {
+    const handleDeleteConfig = async (id: string, type: ProviderType): Promise<void> => {
         try {
             if (type === 'gitlab') {
                 const response = await handleRemoveGitLabProvider(id)
@@ -419,9 +418,7 @@ export function ConnectedAccountsSettings(): React.ReactNode {
                         isActive={activeProviderId === provider.id}
                         isDefault={false}
                         isConfigured={!!provider.clientId && !!provider.clientSecret}
-                        action={() =>
-                            window.electron.ipcRenderer.send('github-oauth', provider.id)
-                        }
+                        action={() => window.electron.ipcRenderer.send('github-oauth', provider.id)}
                         onEdit={() => handleEditProvider(provider, 'github')}
                         onDelete={() => handleDeleteConfig(provider.id, 'github')}
                     />

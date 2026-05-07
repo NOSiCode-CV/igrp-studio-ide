@@ -231,7 +231,11 @@ function validateOp(entry: unknown, idx: number): EntityOp {
             if (!item.patch || typeof item.patch !== 'object') {
                 throw new EntityOpsParseError(`ops[${idx}].patch must be an object`)
             }
-            return { op, id: item.id, patch: validatePatch(item.patch as Record<string, unknown>, idx) }
+            return {
+                op,
+                id: item.id,
+                patch: validatePatch(item.patch as Record<string, unknown>, idx)
+            }
         case 'entity-delete':
             if (typeof item.id !== 'string') {
                 throw new EntityOpsParseError(`ops[${idx}].id required for entity-delete`)
@@ -242,7 +246,9 @@ function validateOp(entry: unknown, idx: number): EntityOp {
                 throw new EntityOpsParseError(`ops[${idx}].from/to required for relation-add`)
             }
             if (typeof item.kind !== 'string' || !RELATION_KINDS.has(item.kind as RelationKind)) {
-                throw new EntityOpsParseError(`ops[${idx}].kind must be one of ${[...RELATION_KINDS].join('|')}`)
+                throw new EntityOpsParseError(
+                    `ops[${idx}].kind must be one of ${[...RELATION_KINDS].join('|')}`
+                )
             }
             return {
                 op,
@@ -257,7 +263,9 @@ function validateOp(entry: unknown, idx: number): EntityOp {
             }
             return { op, id: item.id }
         default:
-            throw new EntityOpsParseError(`ops[${idx}].op must be one of entity-create|entity-update|entity-delete|relation-add|relation-remove`)
+            throw new EntityOpsParseError(
+                `ops[${idx}].op must be one of entity-create|entity-update|entity-delete|relation-add|relation-remove`
+            )
     }
 }
 
@@ -277,10 +285,7 @@ function validateFieldShape(value: unknown, opIdx: number): Partial<Field> {
     return f as Partial<Field>
 }
 
-function validatePatch(
-    patch: Record<string, unknown>,
-    opIdx: number
-): EntityUpdateOp['patch'] {
+function validatePatch(patch: Record<string, unknown>, opIdx: number): EntityUpdateOp['patch'] {
     const out: EntityUpdateOp['patch'] = {}
     if (patch.name !== undefined) {
         if (typeof patch.name !== 'string') {
@@ -389,7 +394,8 @@ export async function applyEntityOps(
                     if (!from) throw new Error(`relation-add: cannot resolve "${op.from}"`)
                     if (!to) throw new Error(`relation-add: cannot resolve "${op.to}"`)
                     const fromEntity = await specDataService.get(basePath, from.entityId)
-                    if (!fromEntity) throw new Error(`relation-add: entity ${from.entityId} disappeared`)
+                    if (!fromEntity)
+                        throw new Error(`relation-add: entity ${from.entityId} disappeared`)
                     const relation: Relation = {
                         id: randomUUID(),
                         kind: op.kind,
@@ -437,10 +443,7 @@ async function cascadingRemove(basePath: string, entityId: string): Promise<void
         const cleanedRelations = ent.relations.filter(
             (r) => r.toEntityId !== entityId && r.fromEntityId !== entityId
         )
-        if (
-            cleanedFields !== ent.fields ||
-            cleanedRelations.length !== ent.relations.length
-        ) {
+        if (cleanedFields !== ent.fields || cleanedRelations.length !== ent.relations.length) {
             await specDataService.update(basePath, s.id, {
                 fields: cleanedFields,
                 relations: cleanedRelations

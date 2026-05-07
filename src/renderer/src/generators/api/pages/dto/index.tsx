@@ -9,7 +9,7 @@ import { SelectInput, TextInput } from '../../components/inputs-form'
 import NavigationBar from '../../components/navigation-bar'
 import { addNewRow, getOptionsByObject, handleChangeValueObject, removeRow } from '../../helpers'
 import AttributesCard from './attributes'
-import { initialValues, TabList, TemplateOptions } from './config'
+import { initialValues, KIND_OPTIONS, TabList, TemplateOptions } from './config'
 import { useDto } from './useDto'
 
 interface DtoProps {
@@ -74,6 +74,21 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                     <IGRPCardContentPrimitive>
                         <div className="flex flex-col gap-4">
                             <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                                <SelectInput
+                                    label="Kind"
+                                    id="type"
+                                    options={KIND_OPTIONS}
+                                    value={formik.values.type}
+                                    onChange={(e) => {
+                                        if (typeof e === 'string') {
+                                            formik.setFieldValue('type', e)
+                                        }
+                                    }}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.errors.type}
+                                    isTouched={formik.touched.type}
+                                    isRequired
+                                />
                                 <TextInput
                                     label={t('name')}
                                     id="name"

@@ -109,10 +109,7 @@ ipcMain.handle(EVENTS.SPEC_SETTINGS.GET_SECRETS_STATUS, async () => {
 
 ipcMain.handle(
     EVENTS.SPEC_SETTINGS.SET_SECRET,
-    async (
-        _event,
-        { provider, value }: { provider: keyof SpecSecrets; value: string }
-    ) => {
+    async (_event, { provider, value }: { provider: keyof SpecSecrets; value: string }) => {
         await specSettingsService.writeSecrets({ [provider]: value } as Partial<SpecSecrets>)
         // Embeddings + LLM caches must drop so the new key takes effect immediately.
         embeddingsService.invalidate()
@@ -122,7 +119,10 @@ ipcMain.handle(
 
 ipcMain.handle(
     EVENTS.SPEC_SETTINGS.TEST_SECRET,
-    async (_event, { provider }: { provider: keyof SpecSecrets }): Promise<{
+    async (
+        _event,
+        { provider }: { provider: keyof SpecSecrets }
+    ): Promise<{
         ok: boolean
         error?: string
     }> => {

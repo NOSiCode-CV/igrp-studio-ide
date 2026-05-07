@@ -15,12 +15,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { EntitySummary, Relation, RelationKind } from '../types/entity'
 
-const RELATION_KINDS: RelationKind[] = [
-    'one-to-one',
-    'one-to-many',
-    'many-to-one',
-    'many-to-many'
-]
+const RELATION_KINDS: RelationKind[] = ['one-to-one', 'one-to-many', 'many-to-one', 'many-to-many']
 
 interface RelationsListProps {
     entityId: string
@@ -49,10 +44,7 @@ export function RelationsList({
     const [autoJoin, setAutoJoin] = useState<boolean>(true)
     const [busy, setBusy] = useState(false)
 
-    const kindOptions = useMemo(
-        () => RELATION_KINDS.map((k) => ({ label: k, value: k })),
-        []
-    )
+    const kindOptions = useMemo(() => RELATION_KINDS.map((k) => ({ label: k, value: k })), [])
     const targetOptions = useMemo(
         () => targets.map((e) => ({ label: e.name, value: e.id })),
         [targets]
@@ -145,9 +137,7 @@ export function RelationsList({
             </IGRPTablePrimitive>
 
             <div className="border rounded p-3 space-y-2 bg-muted/30">
-                <div className="text-xs font-medium text-muted-foreground">
-                    {t('add_relation')}
-                </div>
+                <div className="text-xs font-medium text-muted-foreground">{t('add_relation')}</div>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1">
                         <IGRPLabelPrimitive className="text-xs">
@@ -182,11 +172,7 @@ export function RelationsList({
                         <span>{t('auto_create_join_entity')}</span>
                     </label>
                 )}
-                <IGRPButtonPrimitive
-                    size="sm"
-                    onClick={handleAdd}
-                    disabled={!draftTarget || busy}
-                >
+                <IGRPButtonPrimitive size="sm" onClick={handleAdd} disabled={!draftTarget || busy}>
                     <Plus className="h-4 w-4 mr-1" />
                     {t('add_relation')}
                 </IGRPButtonPrimitive>

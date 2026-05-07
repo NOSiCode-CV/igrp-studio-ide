@@ -41,9 +41,7 @@ const ContentVariant = ({ basePath }: ContentVariantProps): JSX.Element => {
 
                 if (kbItems.length > 0) {
                     const names = kbItems.map((k) => `- ${k.name}`).join('\n')
-                    sections.push(
-                        `## Spec Knowledge Base items (${kbItems.length})\n${names}`
-                    )
+                    sections.push(`## Spec Knowledge Base items (${kbItems.length})\n${names}`)
                 }
 
                 if (docs.length > 0) {
@@ -60,21 +58,14 @@ const ContentVariant = ({ basePath }: ContentVariantProps): JSX.Element => {
                 let labelSuffix = ''
                 if (useKB && kbItems.length > 0 && userMessage.trim()) {
                     try {
-                        const hits = await window.specKB.search(
-                            basePath,
-                            userMessage,
-                            6,
-                            { kbItemIds: kbItems.map((k) => k.id) }
-                        )
+                        const hits = await window.specKB.search(basePath, userMessage, 6, {
+                            kbItemIds: kbItems.map((k) => k.id)
+                        })
                         if (hits.length > 0) {
-                            const lookup = new Map(
-                                kbItems.map((k) => [k.id, k.name])
-                            )
+                            const lookup = new Map(kbItems.map((k) => [k.id, k.name]))
                             const formatted = hits
                                 .map((h, idx) => {
-                                    const ownerId = h.metadata?.kbItemId as
-                                        | string
-                                        | undefined
+                                    const ownerId = h.metadata?.kbItemId as string | undefined
                                     const ownerName = ownerId
                                         ? (lookup.get(ownerId) ?? ownerId)
                                         : 'Unknown'

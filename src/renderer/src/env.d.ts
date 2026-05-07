@@ -158,11 +158,7 @@ interface SpecDocBridge {
         docId: string,
         patch: { content?: string; name?: string; kbRefs?: string[] }
     ) => Promise<SpecDocNode>
-    move: (
-        basePath: string,
-        docId: string,
-        newParentId: string | null
-    ) => Promise<SpecDocNode>
+    move: (basePath: string, docId: string, newParentId: string | null) => Promise<SpecDocNode>
     remove: (basePath: string, docId: string) => Promise<{ ok: true }>
     convertAndInsert: (sourcePath: string) => Promise<{ markdown: string }>
     exportDocument: (
@@ -225,9 +221,7 @@ interface SpecLLMBridge {
     }) => Promise<{ ok: true }>
     chatCancel: (requestId: string) => Promise<{ ok: true }>
     detectCLIs: () => Promise<Record<'claude' | 'ollama', SpecCLIStatus>>
-    onChunk: (
-        callback: (payload: { requestId: string; chunk: SpecLLMChunk }) => void
-    ) => () => void
+    onChunk: (callback: (payload: { requestId: string; chunk: SpecLLMChunk }) => void) => () => void
 }
 
 type SpecSecretProvider = 'openrouter' | 'openai' | 'voyage'
@@ -247,9 +241,7 @@ interface SpecPreferencesPatch {
 interface SpecSettingsBridge {
     getSecretsStatus: () => Promise<SpecSecretsStatus>
     setSecret: (provider: SpecSecretProvider, value: string) => Promise<SpecSecretsStatus>
-    testSecret: (
-        provider: SpecSecretProvider
-    ) => Promise<{ ok: boolean; error?: string }>
+    testSecret: (provider: SpecSecretProvider) => Promise<{ ok: boolean; error?: string }>
     getPreferences: () => Promise<SpecPreferencesPatch>
     setPreferences: (patch: SpecPreferencesPatch) => Promise<SpecPreferencesPatch>
 }
@@ -321,22 +313,13 @@ interface SpecPrototypeBridge {
         raw: string
     ) => Promise<{ summary: string; applied: number; failed: number }>
     listFiles: (basePath: string) => Promise<SpecPrototypeFileEntry[]>
-    readFile: (
-        basePath: string,
-        path: string
-    ) => Promise<{ content: string } | null>
+    readFile: (basePath: string, path: string) => Promise<{ content: string } | null>
     startDev: (basePath: string) => Promise<SpecPrototypeDevStatus>
     stopDev: (basePath: string) => Promise<SpecPrototypeDevStatus>
     devStatus: (basePath: string) => Promise<SpecPrototypeDevStatus>
-    getDevLogBuffer: (
-        basePath: string,
-        limit?: number
-    ) => Promise<SpecPrototypeDevLog[]>
+    getDevLogBuffer: (basePath: string, limit?: number) => Promise<SpecPrototypeDevLog[]>
     listSnapshots: (basePath: string) => Promise<SpecPrototypeSnapshot[]>
-    restoreSnapshot: (
-        basePath: string,
-        sha: string
-    ) => Promise<{ ok: true; sha: string }>
+    restoreSnapshot: (basePath: string, sha: string) => Promise<{ ok: true; sha: string }>
     export: (basePath: string) => Promise<{
         ok: boolean
         path?: string
@@ -351,9 +334,7 @@ interface SpecPrototypeBridge {
     onDevStatus: (
         callback: (payload: { basePath: string; status: SpecPrototypeDevStatus }) => void
     ) => () => void
-    onTreeChanged: (
-        callback: (payload: { basePath: string }) => void
-    ) => () => void
+    onTreeChanged: (callback: (payload: { basePath: string }) => void) => () => void
 }
 
 // ─── Spec Data Models bridge ───────────────────────────────────────────────
@@ -387,11 +368,7 @@ interface SpecDataField {
     advancedType?: string
 }
 
-type SpecDataRelationKind =
-    | 'one-to-one'
-    | 'one-to-many'
-    | 'many-to-one'
-    | 'many-to-many'
+type SpecDataRelationKind = 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many'
 
 interface SpecDataRelation {
     id: string
@@ -483,7 +460,10 @@ interface SpecDataAppliedOp {
 interface SpecDataApplyResult {
     summary: string
     applied: SpecDataAppliedOp[]
-    failed: { op: { op: SpecDataOpKind } & Record<string, unknown>; error: string }[]
+    failed: {
+        op: { op: SpecDataOpKind } & Record<string, unknown>
+        error: string
+    }[]
 }
 
 type SpecDataChunk =
@@ -544,4 +524,26 @@ interface Window {
     specSettings: SpecSettingsBridge
     specPrototype: SpecPrototypeBridge
     specData: SpecDataBridge
+    graphql: {
+        createGraphQLOperation: (
+            basePath: string,
+            moduleName: string,
+            operation: import('./generators/api/pages/graphql/types').GraphQLOperationPayload
+        ) => Promise<import('./generators/api/pages/graphql/types').GraphQLPersistedOperation>
+        updateGraphQLOperation: (
+            basePath: string,
+            moduleName: string,
+            operationId: string,
+            updates: Partial<import('./generators/api/pages/graphql/types').GraphQLOperationPayload>
+        ) => Promise<import('./generators/api/pages/graphql/types').GraphQLPersistedOperation>
+        deleteGraphQLOperation: (
+            basePath: string,
+            moduleName: string,
+            operationId: string
+        ) => Promise<void>
+        listGraphQLOperations: (
+            basePath: string,
+            moduleName: string
+        ) => Promise<import('./generators/api/pages/graphql/types').GraphQLPersistedOperation[]>
+    }
 }

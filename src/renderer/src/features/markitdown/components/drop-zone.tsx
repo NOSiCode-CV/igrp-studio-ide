@@ -64,7 +64,8 @@ const DropZone = ({
             onDrop={handleDrop}
             className={cn(
                 'relative',
-                isOver && 'after:absolute after:inset-0 after:pointer-events-none after:rounded-md after:border-2 after:border-dashed after:border-primary after:bg-primary/5',
+                isOver &&
+                    'after:absolute after:inset-0 after:pointer-events-none after:rounded-md after:border-2 after:border-dashed after:border-primary after:bg-primary/5',
                 className
             )}
         >

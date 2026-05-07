@@ -77,15 +77,13 @@ export const renameDocNode =
         return node
     }
 
-export const removeDocNode =
-    (basePath: string, docId: string) => async (dispatch: Dispatch) => {
-        await window.specDoc.remove(basePath, docId)
-        dispatch(docNodeRemoved(docId))
-    }
+export const removeDocNode = (basePath: string, docId: string) => async (dispatch: Dispatch) => {
+    await window.specDoc.remove(basePath, docId)
+    dispatch(docNodeRemoved(docId))
+}
 
 export const moveDocNode =
-    (basePath: string, docId: string, newParentId: string | null) =>
-    async (dispatch: Dispatch) => {
+    (basePath: string, docId: string, newParentId: string | null) => async (dispatch: Dispatch) => {
         const node = await window.specDoc.move(basePath, docId, newParentId)
         dispatch(docNodeUpserted(node))
         return node

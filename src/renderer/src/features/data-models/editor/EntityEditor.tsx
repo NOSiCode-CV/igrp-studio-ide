@@ -55,7 +55,12 @@ export function EntityEditor({
     }, [entity])
 
     const save = useCallback(
-        async (payload: { name: string; description: string; fields: Field[]; relations: Relation[] }) => {
+        async (payload: {
+            name: string
+            description: string
+            fields: Field[]
+            relations: Relation[]
+        }) => {
             if (!entity) return
             // Skip if nothing actually changed (initial mount fires the effect too).
             if (
@@ -202,13 +207,13 @@ export function EntityEditor({
                     />
                 </div>
                 <div className="text-[10px] text-muted-foreground h-4">
-                    {error
-                        ? <span className="text-destructive">{error}</span>
-                        : dirty
-                          ? t('saving_dots')
-                          : savedAt
-                            ? t('saved_at', { time: new Date(savedAt).toLocaleTimeString() })
-                            : null}
+                    {error ? (
+                        <span className="text-destructive">{error}</span>
+                    ) : dirty ? (
+                        t('saving_dots')
+                    ) : savedAt ? (
+                        t('saved_at', { time: new Date(savedAt).toLocaleTimeString() })
+                    ) : null}
                 </div>
                 {drift.diff && entity.source.kind === 'imported' && (
                     <div
@@ -284,9 +289,7 @@ export function EntityEditor({
                     <IGRPTabsTriggerPrimitive value="sql">
                         {t('sql_preview')}
                     </IGRPTabsTriggerPrimitive>
-                    <IGRPTabsTriggerPrimitive value="erd">
-                        {t('erd')}
-                    </IGRPTabsTriggerPrimitive>
+                    <IGRPTabsTriggerPrimitive value="erd">{t('erd')}</IGRPTabsTriggerPrimitive>
                 </IGRPTabsListPrimitive>
                 <IGRPTabsContentPrimitive value="fields" className="flex-1 overflow-auto px-4 py-3">
                     <FieldsTable

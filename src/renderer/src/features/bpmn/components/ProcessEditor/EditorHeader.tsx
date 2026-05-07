@@ -1,7 +1,4 @@
-import {
-    IGRPBadgePrimitive,
-    IGRPButtonPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { IGRPBadgePrimitive, IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
 import { Check, ChevronLeft, Loader2, Save } from 'lucide-react'
 import type { JSX } from 'react'
 import { cn } from '../../../../lib/utils'
@@ -96,11 +93,7 @@ export function EditorHeader({
                 )}
             </div>
             <div className="flex shrink-0 items-center gap-3">
-                <StatusPill
-                    isSaving={isSaving}
-                    isDirty={isDirty}
-                    lastSavedAt={lastSavedAt}
-                />
+                <StatusPill isSaving={isSaving} isDirty={isDirty} lastSavedAt={lastSavedAt} />
                 <IGRPButtonPrimitive
                     size="sm"
                     variant={isDirty ? 'default' : 'secondary'}

@@ -8,15 +8,7 @@ import {
     IGRPDropdownMenuTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { Database, KeyRound, MoreVertical, Plus, Trash2 } from 'lucide-react'
-import {
-    type FC,
-    memo,
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState
-} from 'react'
+import { type FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
     Background,
@@ -72,110 +64,100 @@ interface EntityNodeData {
     onOpen?: (entityId: string) => void
 }
 
-const EntityNode: FC<{ data: EntityNodeData; selected: boolean }> = memo(
-    ({ data, selected }) => {
-        const { entity, readOnly, onAddField, onDelete, onRename, onOpen } = data
-        const { t } = useTranslation()
-        return (
+const EntityNode: FC<{ data: EntityNodeData; selected: boolean }> = memo(({ data, selected }) => {
+    const { entity, readOnly, onAddField, onDelete, onRename, onOpen } = data
+    const { t } = useTranslation()
+    return (
+        <div
+            className={`min-w-[200px] rounded-md border bg-card text-card-foreground shadow-sm overflow-hidden ${
+                selected ? 'ring-2 ring-primary' : ''
+            }`}
+        >
+            {/* React-flow needs handles even on a custom node so edges can attach. */}
+            <Handle
+                type="target"
+                position={Position.Left}
+                style={{ background: '#888', border: 'none' }}
+            />
+            <Handle
+                type="source"
+                position={Position.Right}
+                style={{ background: '#888', border: 'none' }}
+            />
             <div
-                className={`min-w-[200px] rounded-md border bg-card text-card-foreground shadow-sm overflow-hidden ${
-                    selected ? 'ring-2 ring-primary' : ''
-                }`}
+                className="flex items-center justify-between gap-1 px-2 py-1.5 bg-muted/60 border-b cursor-pointer"
+                onDoubleClick={() => onOpen?.(entity.id)}
             >
-                {/* React-flow needs handles even on a custom node so edges can attach. */}
-                <Handle
-                    type="target"
-                    position={Position.Left}
-                    style={{ background: '#888', border: 'none' }}
-                />
-                <Handle
-                    type="source"
-                    position={Position.Right}
-                    style={{ background: '#888', border: 'none' }}
-                />
-                <div
-                    className="flex items-center justify-between gap-1 px-2 py-1.5 bg-muted/60 border-b cursor-pointer"
-                    onDoubleClick={() => onOpen?.(entity.id)}
-                >
-                    <div className="flex items-center gap-1.5 min-w-0">
-                        {entity.source.kind === 'imported' ? (
-                            <Database className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                        ) : null}
-                        <span className="text-sm font-semibold truncate">{entity.name}</span>
-                    </div>
-                    {!readOnly && (
-                        <IGRPDropdownMenuPrimitive>
-                            <IGRPDropdownMenuTriggerPrimitive asChild>
-                                <button
-                                    type="button"
-                                    className="p-0.5 rounded hover:bg-muted"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <MoreVertical className="h-3.5 w-3.5" />
-                                </button>
-                            </IGRPDropdownMenuTriggerPrimitive>
-                            <IGRPDropdownMenuContentPrimitive align="end">
-                                <IGRPDropdownMenuItemPrimitive
-                                    onClick={() => onOpen?.(entity.id)}
-                                >
-                                    {t('open_in_editor')}
-                                </IGRPDropdownMenuItemPrimitive>
-                                <IGRPDropdownMenuItemPrimitive
-                                    onClick={() => onAddField?.(entity.id)}
-                                >
-                                    <Plus className="h-3.5 w-3.5 mr-2" />
-                                    {t('add_field')}
-                                </IGRPDropdownMenuItemPrimitive>
-                                <IGRPDropdownMenuItemPrimitive
-                                    onClick={() => onRename?.(entity.id)}
-                                >
-                                    {t('rename_entity')}
-                                </IGRPDropdownMenuItemPrimitive>
-                                <IGRPDropdownMenuItemPrimitive
-                                    onClick={() => onDelete?.(entity.id)}
-                                    className="text-destructive"
-                                >
-                                    <Trash2 className="h-3.5 w-3.5 mr-2" />
-                                    {t('delete_entity')}
-                                </IGRPDropdownMenuItemPrimitive>
-                            </IGRPDropdownMenuContentPrimitive>
-                        </IGRPDropdownMenuPrimitive>
-                    )}
+                <div className="flex items-center gap-1.5 min-w-0">
+                    {entity.source.kind === 'imported' ? (
+                        <Database className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    ) : null}
+                    <span className="text-sm font-semibold truncate">{entity.name}</span>
                 </div>
-                <ul className="divide-y text-xs">
-                    {entity.fields.length === 0 ? (
-                        <li className="px-2 py-2 text-muted-foreground italic">
-                            {t('no_fields_yet')}
-                        </li>
-                    ) : (
-                        entity.fields.map((f) => (
-                            <li key={f.id} className="flex items-center gap-1.5 px-2 py-1">
-                                {f.primaryKey && (
-                                    <KeyRound className="h-3 w-3 text-amber-500 shrink-0" />
-                                )}
-                                <span className="font-mono truncate flex-1">{f.name}</span>
-                                <span className="text-muted-foreground shrink-0">{f.type}</span>
-                            </li>
-                        ))
-                    )}
-                </ul>
                 {!readOnly && (
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            onAddField?.(entity.id)
-                        }}
-                        className="w-full flex items-center justify-center gap-1 px-2 py-1 text-[11px] text-muted-foreground hover:bg-muted border-t"
-                    >
-                        <Plus className="h-3 w-3" />
-                        {t('add_field')}
-                    </button>
+                    <IGRPDropdownMenuPrimitive>
+                        <IGRPDropdownMenuTriggerPrimitive asChild>
+                            <button
+                                type="button"
+                                className="p-0.5 rounded hover:bg-muted"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <MoreVertical className="h-3.5 w-3.5" />
+                            </button>
+                        </IGRPDropdownMenuTriggerPrimitive>
+                        <IGRPDropdownMenuContentPrimitive align="end">
+                            <IGRPDropdownMenuItemPrimitive onClick={() => onOpen?.(entity.id)}>
+                                {t('open_in_editor')}
+                            </IGRPDropdownMenuItemPrimitive>
+                            <IGRPDropdownMenuItemPrimitive onClick={() => onAddField?.(entity.id)}>
+                                <Plus className="h-3.5 w-3.5 mr-2" />
+                                {t('add_field')}
+                            </IGRPDropdownMenuItemPrimitive>
+                            <IGRPDropdownMenuItemPrimitive onClick={() => onRename?.(entity.id)}>
+                                {t('rename_entity')}
+                            </IGRPDropdownMenuItemPrimitive>
+                            <IGRPDropdownMenuItemPrimitive
+                                onClick={() => onDelete?.(entity.id)}
+                                className="text-destructive"
+                            >
+                                <Trash2 className="h-3.5 w-3.5 mr-2" />
+                                {t('delete_entity')}
+                            </IGRPDropdownMenuItemPrimitive>
+                        </IGRPDropdownMenuContentPrimitive>
+                    </IGRPDropdownMenuPrimitive>
                 )}
             </div>
-        )
-    }
-)
+            <ul className="divide-y text-xs">
+                {entity.fields.length === 0 ? (
+                    <li className="px-2 py-2 text-muted-foreground italic">{t('no_fields_yet')}</li>
+                ) : (
+                    entity.fields.map((f) => (
+                        <li key={f.id} className="flex items-center gap-1.5 px-2 py-1">
+                            {f.primaryKey && (
+                                <KeyRound className="h-3 w-3 text-amber-500 shrink-0" />
+                            )}
+                            <span className="font-mono truncate flex-1">{f.name}</span>
+                            <span className="text-muted-foreground shrink-0">{f.type}</span>
+                        </li>
+                    ))
+                )}
+            </ul>
+            {!readOnly && (
+                <button
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        onAddField?.(entity.id)
+                    }}
+                    className="w-full flex items-center justify-center gap-1 px-2 py-1 text-[11px] text-muted-foreground hover:bg-muted border-t"
+                >
+                    <Plus className="h-3 w-3" />
+                    {t('add_field')}
+                </button>
+            )}
+        </div>
+    )
+})
 EntityNode.displayName = 'EntityNode'
 
 const NODE_TYPES: NodeTypes = { entity: EntityNode }
@@ -295,10 +277,7 @@ function ReactFlowERDInner({
 
     // ─── React-flow nodes / edges ────────────────────────────────────────
 
-    const idToName = useMemo(
-        () => new Map(entities.map((e) => [e.id, e.name])),
-        [entities]
-    )
+    const idToName = useMemo(() => new Map(entities.map((e) => [e.id, e.name])), [entities])
 
     const initialNodes = useMemo<Node<EntityNodeData>[]>(
         () =>

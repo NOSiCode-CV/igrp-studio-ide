@@ -159,9 +159,7 @@ export const GitStore = {
         const normalized = normalizeConfig(config)
         const validation = validateProviderConfig(normalized)
         if (!validation.success) {
-            const summary = validation.errors
-                ?.map((e) => `${e.field}: ${e.message}`)
-                .join('; ')
+            const summary = validation.errors?.map((e) => `${e.field}: ${e.message}`).join('; ')
             throw new Error(`Invalid provider config — ${summary}`)
         }
         const stored = readProviderConfigs()

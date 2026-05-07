@@ -166,10 +166,7 @@ function validatePayload(value: unknown): FileOpsPayload {
         if (typeof item.path !== 'string' || !item.path.trim()) {
             throw new FileOpsParseError(`ops[${idx}].path must be a non-empty string`)
         }
-        if (
-            (item.op === 'create' || item.op === 'update') &&
-            typeof item.content !== 'string'
-        ) {
+        if ((item.op === 'create' || item.op === 'update') && typeof item.content !== 'string') {
             throw new FileOpsParseError(`ops[${idx}].content is required for ${item.op}`)
         }
         return {
@@ -185,17 +182,13 @@ function validatePayload(value: unknown): FileOpsPayload {
 
 function sandboxedAbsolute(basePath: string, relativePath: string): string {
     if (!relativePath || isAbsolute(relativePath)) {
-        throw new FileOpsSandboxError(
-            `Path must be relative to prototype/: "${relativePath}"`
-        )
+        throw new FileOpsSandboxError(`Path must be relative to prototype/: "${relativePath}"`)
     }
     const root = resolve(basePath, PROTOTYPE_SUBDIR)
     const target = resolve(root, relativePath)
     const rel = relative(root, target)
     if (rel.startsWith('..') || isAbsolute(rel)) {
-        throw new FileOpsSandboxError(
-            `Path escapes the prototype sandbox: "${relativePath}"`
-        )
+        throw new FileOpsSandboxError(`Path escapes the prototype sandbox: "${relativePath}"`)
     }
     return target
 }

@@ -15,11 +15,7 @@ interface BuildPromptInput {
  * its own output-contract preamble; what we add here is project-scoped
  * context the model needs in order to produce sensible entity-ops.
  */
-export function buildDataSystemPrompt({
-    entities,
-    activeDoc,
-    kbHits
-}: BuildPromptInput): string {
+export function buildDataSystemPrompt({ entities, activeDoc, kbHits }: BuildPromptInput): string {
     const sections: string[] = []
 
     sections.push(
@@ -28,9 +24,7 @@ export function buildDataSystemPrompt({
                 ? '_(empty — nothing has been authored yet; use entity-create to bootstrap)_'
                 : entities
                       .map((e) => {
-                          const fieldList = e.fields
-                              .map((f) => `${f.name}: ${f.type}`)
-                              .join(', ')
+                          const fieldList = e.fields.map((f) => `${f.name}: ${f.type}`).join(', ')
                           const relSummary = e.relations.length
                               ? ` · relations: ${e.relations.length}`
                               : ''
@@ -40,9 +34,7 @@ export function buildDataSystemPrompt({
     )
 
     if (activeDoc && activeDoc.content.trim()) {
-        sections.push(
-            `## Active document — ${activeDoc.name}\n\n${activeDoc.content.trim()}`
-        )
+        sections.push(`## Active document — ${activeDoc.name}\n\n${activeDoc.content.trim()}`)
     }
 
     if (kbHits && kbHits.length > 0) {

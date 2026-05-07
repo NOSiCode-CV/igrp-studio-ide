@@ -10,11 +10,7 @@ import { basename } from 'node:path'
 import { BrowserWindow, dialog, ipcMain } from 'electron'
 import { EVENTS } from '../constants/events'
 import type { DdlDialect } from '../services/data/entities-to-ddl'
-import {
-    applyEntityOps,
-    parseEntityOps,
-    type ApplyResult
-} from '../services/data/entity-ops'
+import { applyEntityOps, parseEntityOps, type ApplyResult } from '../services/data/entity-ops'
 import {
     specDataGeneratorService,
     type DataChunk
@@ -30,11 +26,7 @@ import {
 
 const activeGenerations = new Map<string, AbortController>()
 
-function emitChunk(
-    webContents: Electron.WebContents,
-    requestId: string,
-    chunk: DataChunk
-): void {
+function emitChunk(webContents: Electron.WebContents, requestId: string, chunk: DataChunk): void {
     if (webContents.isDestroyed()) return
     webContents.send(EVENTS.SPEC_DATA.GENERATE_CHUNK, { requestId, chunk })
 }
@@ -191,10 +183,7 @@ ipcMain.handle(
     EVENTS.SPEC_DATA.EXPORT_DDL,
     async (
         event,
-        {
-            basePath,
-            dialect
-        }: ProjectScopedPayload & { dialect: DdlDialect }
+        { basePath, dialect }: ProjectScopedPayload & { dialect: DdlDialect }
     ): Promise<{ ok: boolean; path?: string; cancelled?: boolean }> => {
         const { sql } = await specDataService.exportDdl(basePath, dialect)
         const owner = BrowserWindow.fromWebContents(event.sender) ?? undefined

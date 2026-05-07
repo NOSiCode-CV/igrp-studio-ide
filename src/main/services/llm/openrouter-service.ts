@@ -68,10 +68,7 @@ export class OpenRouterAdapter implements LLMAdapter {
         return models
     }
 
-    async *chat(
-        messages: LLMMessage[],
-        opts: LLMChatOptions
-    ): AsyncIterable<LLMChatChunk> {
+    async *chat(messages: LLMMessage[], opts: LLMChatOptions): AsyncIterable<LLMChatChunk> {
         const apiKey = this.apiKey()
         const fullMessages: LLMMessage[] = opts.systemPrompt
             ? [{ role: 'system', content: opts.systemPrompt }, ...messages]

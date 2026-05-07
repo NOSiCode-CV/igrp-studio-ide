@@ -87,14 +87,11 @@ export const GitHubService = {
 
             // octokit.paginate transparently walks the Link headers and
             // returns every page flattened, not just the first 100 repos.
-            const repos: any[] = await octokit.paginate(
-                octokit.repos.listForAuthenticatedUser,
-                {
-                    sort: 'updated',
-                    per_page: 100,
-                    visibility: 'all'
-                }
-            )
+            const repos: any[] = await octokit.paginate(octokit.repos.listForAuthenticatedUser, {
+                sort: 'updated',
+                per_page: 100,
+                visibility: 'all'
+            })
 
             const igrpRepos: any[] = []
             const batchSize = 10

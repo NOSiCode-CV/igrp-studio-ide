@@ -132,9 +132,7 @@ export function DocInspector({
                         <Hash size={14} className="text-primary" /> Table of Contents
                     </h3>
                     {headings.length === 0 ? (
-                        <p className="text-[11px] italic text-muted-foreground">
-                            No headings yet.
-                        </p>
+                        <p className="text-[11px] italic text-muted-foreground">No headings yet.</p>
                     ) : (
                         <div className="space-y-1.5 text-[11px] text-muted-foreground">
                             {headings.map((h) => (

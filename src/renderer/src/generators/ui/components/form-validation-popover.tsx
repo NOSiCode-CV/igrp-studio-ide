@@ -47,7 +47,10 @@ export function FormValidationPopover({
     const [isDate, setIsDate] = useState(false)
     const [isFile, setIsFile] = useState(false)
 
-    const handleValidationKeyChange = (key: string, value: string | boolean | number | unknown[]) => {
+    const handleValidationKeyChange = (
+        key: string,
+        value: string | boolean | number | unknown[]
+    ) => {
         const currentValidation = field?.validation || {}
         const updatedValidation = {
             ...currentValidation,
@@ -507,9 +510,7 @@ export function FormValidationPopover({
                                                     <IGRPInputPrimitive
                                                         className="h-8 flex-1"
                                                         value={getErrorMessage(validation)}
-                                                        placeholder={t(
-                                                            'errorMessagePlaceholder'
-                                                        )}
+                                                        placeholder={t('errorMessagePlaceholder')}
                                                         onChange={(ev) =>
                                                             setErrorMessage(
                                                                 validation,

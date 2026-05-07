@@ -73,10 +73,7 @@ export function DocToolbar({
                         label="Split"
                     />
                 </div>
-                <ExportMenu
-                    onExport={onExport}
-                    disabled={!onExport || !canExport}
-                />
+                <ExportMenu onExport={onExport} disabled={!onExport || !canExport} />
                 <IGRPButtonPrimitive
                     variant={paneOpen ? 'secondary' : 'ghost'}
                     size="sm"
@@ -137,11 +134,7 @@ function ExportMenu({
                 disabled={disabled || busy !== null}
                 title="Export this document"
             >
-                {busy ? (
-                    <Loader2 size={14} className="animate-spin" />
-                ) : (
-                    <Download size={14} />
-                )}
+                {busy ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
                 Export
             </IGRPButtonPrimitive>
             {open && (

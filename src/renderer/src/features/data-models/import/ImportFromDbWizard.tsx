@@ -47,8 +47,11 @@ export function ImportFromDbWizard({
     onImported
 }: ImportFromDbWizardProps): React.ReactNode {
     const { t } = useTranslation()
-    const { connections, loading: loadingConnections, refresh: refreshConnections } =
-        useConnections()
+    const {
+        connections,
+        loading: loadingConnections,
+        refresh: refreshConnections
+    } = useConnections()
 
     const [step, setStep] = useState<Step>('connection')
     const [connectionName, setConnectionName] = useState<string>('')
@@ -83,9 +86,7 @@ export function ImportFromDbWizard({
                 setError(result.message ?? t('failed_to_load_tables'))
                 return
             }
-            setTables(
-                (result.tables as string[]).filter((tbl) => !IGNORED_TABLES.has(tbl)).sort()
-            )
+            setTables((result.tables as string[]).filter((tbl) => !IGNORED_TABLES.has(tbl)).sort())
             setStep('tables')
         } catch (err) {
             setError(err instanceof Error ? err.message : String(err))
@@ -227,18 +228,14 @@ export function ImportFromDbWizard({
                     </div>
                 )}
 
-                {step === 'committing' && (
-                    <p className="py-4 text-sm">{t('importing')}</p>
-                )}
+                {step === 'committing' && <p className="py-4 text-sm">{t('importing')}</p>}
 
                 <IGRPDialogFooterPrimitive>
                     {step !== 'connection' && step !== 'committing' && (
                         <IGRPButtonPrimitive
                             type="button"
                             variant="secondary"
-                            onClick={() =>
-                                setStep(step === 'preview' ? 'tables' : 'connection')
-                            }
+                            onClick={() => setStep(step === 'preview' ? 'tables' : 'connection')}
                         >
                             {t('back')}
                         </IGRPButtonPrimitive>
