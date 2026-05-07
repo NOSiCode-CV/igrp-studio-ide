@@ -1,5 +1,4 @@
 import {
-    IGRPButtonPrimitive,
     IGRPCardContentPrimitive,
     IGRPCardDescriptionPrimitive,
     IGRPCardHeaderPrimitive,
@@ -7,9 +6,10 @@ import {
     IGRPCardTitlePrimitive,
     IGRPSeparator
 } from '@igrp/igrp-framework-react-design-system'
-import { Plus } from 'lucide-react'
+import { FormList } from '../../../../components/form-list'
+import type { IColumnsTabelProps } from '../../types/Interfaces'
 import NavigationBar from '../../components/navigation-bar'
-import { CheckboxInput, SelectInput, TextInput } from '../../components/inputs-form'
+import { SelectInput, TextInput } from '../../components/inputs-form'
 import { addNewRow, removeRow } from '../../helpers'
 import { useGraphQLOperation } from './useGraphQLOperation'
 
@@ -18,12 +18,32 @@ interface GraphQLOperationEditorProps {
     onCloseTab: () => void
 }
 
+const argsColumns: IColumnsTabelProps[] = [
+    { key: 'name', name: 'Name', type: 'text' },
+    {
+        key: 'type',
+        name: 'Type',
+        type: 'select',
+        options: [
+            { label: 'id', value: 'id' },
+            { label: 'string', value: 'string' },
+            { label: 'int', value: 'int' },
+            { label: 'float', value: 'float' },
+            { label: 'boolean', value: 'boolean' }
+        ]
+    },
+    { key: 'defaultValue', name: 'Default Value', type: 'text' },
+    { key: 'description', name: 'Description', type: 'text' },
+    { key: 'required', name: 'Required', type: 'checkbox' }
+]
+
 export const GraphQLOperationEditor = ({
     currentItem,
     onCloseTab
 }: GraphQLOperationEditorProps) => {
     const {
         formik,
+        changeArgValue,
         handleDelete,
         title,
         isMutation,
@@ -176,127 +196,36 @@ export const GraphQLOperationEditor = ({
                     </IGRPCardPrimitive>
                 )}
 
-                <IGRPCardPrimitive>
-                    <IGRPCardHeaderPrimitive>
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <IGRPCardTitlePrimitive>
-                                    {isMutation
-                                        ? 'Mutation Params'
-                                        : isSubscription
-                                          ? 'Subscription Params'
-                                          : 'Query Params'}
-                                </IGRPCardTitlePrimitive>
-                                <IGRPCardDescriptionPrimitive>
-                                    Optional arguments persisted into the GraphQL manifest.
-                                </IGRPCardDescriptionPrimitive>
-                            </div>
-                            <IGRPButtonPrimitive
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                onClick={() =>
-                                    addNewRow(formik, 'args', {
-                                        name: '',
-                                        type: 'string',
-                                        required: false,
-                                        defaultValue: '',
-                                        description: ''
-                                    })
-                                }
-                                title="Add Param"
-                            >
-                                <Plus className="h-4 w-4" />
-                            </IGRPButtonPrimitive>
-                        </div>
-                    </IGRPCardHeaderPrimitive>
-                    <IGRPCardContentPrimitive>
-                        <div className="space-y-4">
-                            {formik.values.args.length === 0 && (
-                                <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-                                    No parameters defined.
-                                </div>
-                            )}
-
-                            {formik.values.args.map((_: unknown, index: number) => (
-                                <div
-                                    key={`arg-${index}`}
-                                    className="grid lg:grid-cols-6 gap-3 items-end rounded-md border p-3"
-                                >
-                                    <TextInput
-                                        id={`args.${index}.name`}
-                                        label="Name"
-                                        value={formik.values.args[index].name}
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        error={(formik.errors.args as any)?.[index]?.name}
-                                        isTouched={Boolean(
-                                            (formik.touched.args as any)?.[index]?.name
-                                        )}
-                                    />
-                                    <SelectInput
-                                        id={`args.${index}.type`}
-                                        label="Type"
-                                        value={formik.values.args[index].type}
-                                        options={[
-                                            { label: 'id', value: 'id' },
-                                            { label: 'string', value: 'string' },
-                                            { label: 'int', value: 'int' },
-                                            { label: 'float', value: 'float' },
-                                            { label: 'boolean', value: 'boolean' }
-                                        ]}
-                                        onChange={(value) =>
-                                            formik.setFieldValue(`args.${index}.type`, value)
-                                        }
-                                        error={(formik.errors.args as any)?.[index]?.type}
-                                        isTouched={Boolean(
-                                            (formik.touched.args as any)?.[index]?.type
-                                        )}
-                                    />
-                                    <TextInput
-                                        id={`args.${index}.defaultValue`}
-                                        label="Default Value"
-                                        value={String(formik.values.args[index].defaultValue ?? '')}
-                                        onChange={(event) =>
-                                            formik.setFieldValue(
-                                                `args.${index}.defaultValue`,
-                                                event.target.value
-                                            )
-                                        }
-                                        onBlur={formik.handleBlur}
-                                    />
-                                    <TextInput
-                                        id={`args.${index}.description`}
-                                        label="Description"
-                                        value={formik.values.args[index].description}
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                    />
-                                    <div className="pb-2">
-                                        <CheckboxInput
-                                            id={`args.${index}.required`}
-                                            label="Required"
-                                            value={formik.values.args[index].required}
-                                            onChange={(value) =>
-                                                formik.setFieldValue(
-                                                    `args.${index}.required`,
-                                                    value
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                    <IGRPButtonPrimitive
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => removeRow(formik, 'args', index)}
-                                    >
-                                        Remove
-                                    </IGRPButtonPrimitive>
-                                </div>
-                            ))}
-                        </div>
-                    </IGRPCardContentPrimitive>
-                </IGRPCardPrimitive>
+                <div className="space-y-3">
+                    <p className="text-sm">
+                        {isMutation
+                            ? 'Mutation Params'
+                            : isSubscription
+                              ? 'Subscription Params'
+                              : 'Query Params'}
+                    </p>
+                    <div className="border rounded-sm py-0">
+                        <FormList
+                            name="args"
+                            data={formik.values.args}
+                            formik={formik}
+                            errors={formik.errors.args}
+                            touched={formik.touched.args}
+                            columns={argsColumns}
+                            changeValue={changeArgValue}
+                            addRow={() =>
+                                addNewRow(formik, 'args', {
+                                    name: '',
+                                    type: 'string',
+                                    required: false,
+                                    defaultValue: '',
+                                    description: ''
+                                })
+                            }
+                            removeRow={(index) => removeRow(formik, 'args', index)}
+                        />
+                    </div>
+                </div>
             </div>
         </form>
     )

@@ -237,10 +237,15 @@ export const useGraphQLOperation = ({
         return Array.from(unique.values())
     }, [sharedTypeOptions, graphqlInputs])
 
+    const changeArgValue = (element: string, position: number, value: any) => {
+        formik.setFieldValue(`args.${position}.${element}`, value)
+    }
+
     const operationType = formik.values.operationType
 
     return {
         formik,
+        changeArgValue,
         title:
             savedOperation?.name ||
             (operationType === 'mutation'
