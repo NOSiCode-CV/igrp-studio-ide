@@ -13,10 +13,7 @@ function makeKey(providerType: GitProviderType, scope: string = 'default'): stri
     return `${providerType}:${scope}`
 }
 
-export function readRepoCache<T>(
-    providerType: GitProviderType,
-    scope?: string
-): T | null {
+export function readRepoCache<T>(providerType: GitProviderType, scope?: string): T | null {
     const key = makeKey(providerType, scope)
     const entry = repoCache.get(key)
     if (!entry) return null
@@ -27,11 +24,7 @@ export function readRepoCache<T>(
     return entry.value as T
 }
 
-export function writeRepoCache<T>(
-    providerType: GitProviderType,
-    value: T,
-    scope?: string
-): void {
+export function writeRepoCache<T>(providerType: GitProviderType, value: T, scope?: string): void {
     const key = makeKey(providerType, scope)
     repoCache.set(key, { value, fetchedAt: Date.now() })
 }

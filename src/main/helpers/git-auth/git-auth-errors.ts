@@ -23,7 +23,11 @@ export class GitAuthExpiredError extends Error {
  */
 export function isAuthError(error: unknown): { match: boolean; status: number } {
     if (!error || typeof error !== 'object') return { match: false, status: 0 }
-    const e = error as { status?: number; response?: { status?: number }; cause?: { response?: { status?: number } } }
+    const e = error as {
+        status?: number
+        response?: { status?: number }
+        cause?: { response?: { status?: number } }
+    }
     const status = e.status ?? e.response?.status ?? e.cause?.response?.status ?? 0
     return { match: status === 401 || status === 403, status }
 }

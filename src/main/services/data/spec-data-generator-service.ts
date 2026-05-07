@@ -9,12 +9,7 @@
 import { llmRouter } from '../llm/llm-router'
 import type { LLMMessage } from '../llm/types'
 import { specDataService } from '../spec-data-service'
-import {
-    applyEntityOps,
-    parseEntityOps,
-    type AppliedEntityOp,
-    type EntityOp
-} from './entity-ops'
+import { applyEntityOps, parseEntityOps, type AppliedEntityOp, type EntityOp } from './entity-ops'
 
 export type DataChunk =
     | { type: 'delta'; content: string }
@@ -47,7 +42,7 @@ class SpecDataGeneratorService {
         const systemPrompt = buildSystemPrompt({
             specContext: input.specContext,
             entities: entitiesSnapshot.filter(Boolean) as NonNullable<
-                typeof entitiesSnapshot[number]
+                (typeof entitiesSnapshot)[number]
             >[]
         })
 
@@ -108,7 +103,12 @@ export const specDataGeneratorService = new SpecDataGeneratorService()
 
 interface PromptInput {
     specContext?: string
-    entities: { id: string; name: string; fields: { name: string; type: string }[]; relations: { kind: string; toEntityId: string }[] }[]
+    entities: {
+        id: string
+        name: string
+        fields: { name: string; type: string }[]
+        relations: { kind: string; toEntityId: string }[]
+    }[]
 }
 
 function buildSystemPrompt({ specContext, entities }: PromptInput): string {
@@ -149,9 +149,7 @@ function buildSystemPrompt({ specContext, entities }: PromptInput): string {
                 ? '_(empty — nothing has been authored yet)_'
                 : entities
                       .map((e) => {
-                          const fieldList = e.fields
-                              .map((f) => `${f.name}: ${f.type}`)
-                              .join(', ')
+                          const fieldList = e.fields.map((f) => `${f.name}: ${f.type}`).join(', ')
                           const relSummary = e.relations.length
                               ? ` · relations: ${e.relations.length}`
                               : ''

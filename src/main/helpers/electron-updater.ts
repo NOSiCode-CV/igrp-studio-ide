@@ -34,7 +34,7 @@ export function applyUpdateChannelConfig(): void {
         channel: feedChannel
     })
     autoUpdater.allowPrerelease = channel === 'beta'
-    log.info('Update channel configured', {
+    log.debug('Update channel configured', {
         channel: feedChannel,
         allowPrerelease: channel === 'beta'
     })
@@ -56,7 +56,7 @@ export default class AppUpdater {
     private updateAvailable: boolean = false
 
     constructor(win: BrowserWindow) {
-        log.info('Initializing App Updater...')
+        log.debug('Initializing App Updater...')
 
         this.win = win
 
@@ -70,7 +70,11 @@ export default class AppUpdater {
     }
 
     sendStatusToWindow(data: UpdateMessage): void {
-        log.info(data.message)
+        if (data.type === 'error') {
+            log.error(data.message, data.error || '')
+        } else {
+            log.debug(data.message)
+        }
         this.win.webContents.send('message-update', data)
     }
 
@@ -194,7 +198,7 @@ export default class AppUpdater {
                 const data = (await res.json()) as { body?: string | null }
                 const body = data?.body?.trim()
                 if (body) {
-                    log.info('Release notes fetched from GitHub', { version, tag })
+                    log.debug('Release notes fetched from GitHub', { version, tag })
                     return body
                 }
             }

@@ -14,7 +14,14 @@ export const EVENTS = {
         CREATE_ENUM: 'spring-engine:create-enum',
         CREATE_RESPONSE: 'spring-engine:create-response',
         CREATE_CONTROLLER: 'spring-engine:create-controller',
+        CREATE_GRAPHQL_SCHEMA: 'spring-engine:create-graphql-schema',
         FETCH_SELECTORS: 'spring-engine:fetch-selectors'
+    },
+    GRAPHQL: {
+        CREATE_OPERATION: 'graphql:create-operation',
+        UPDATE_OPERATION: 'graphql:update-operation',
+        DELETE_OPERATION: 'graphql:delete-operation',
+        LIST_OPERATIONS: 'graphql:list-operations'
     },
     NEXT: {
         CREATE_PAGE: 'next-engine:create-page',
@@ -40,6 +47,8 @@ export const EVENTS = {
             FIND_ALL: 'repository:workspace:find-all',
             FIND_RECENT: 'repository:workspace:find-recent',
             OPEN: 'repository:workspace:open',
+            INSTALL_OPTIONAL_STACKS: 'repository:workspace:install-optional-stacks',
+            GET_OPTIONAL_STACKS_STATUS: 'repository:workspace:get-optional-stacks-status',
             SAVE_CUSTOM_YAML: 'engine:save-custom-ymal'
         },
         PROJECT: {
@@ -106,6 +115,7 @@ export const EVENTS = {
     },
     DOCKER: {
         UP: 'docker-up',
+        DEPLOY_PROJECT: 'docker-deploy-project',
         DOWN: 'docker-down',
         STATUS: 'docker-status',
         STOP: 'docker-stop',

@@ -95,9 +95,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             storageMode: 'managed',
             themeColor: '#000000',
             icon: '',
-            workspaceId: workspace.id
+            workspaceId: workspace?.id || ''
         }),
-        [workspace.id]
+        [workspace?.id]
     )
 
     const validationSchema = useProjectValidation({ t, step })
@@ -109,7 +109,15 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         onSubmit: async (values, actions) => {
             setIsCreatingProject(true)
             try {
-                await saveOrOpenProject({ project: { ...values } })
+                await saveOrOpenProject({
+                    project: {
+                        ...values,
+                        name: values?.name || '',
+                        framework: values?.framework || '',
+                        path: values?.path || '',
+                        config: values?.config || {}
+                    }
+                })
             } finally {
                 actions.setSubmitting(false)
                 setIsCreatingProject(false)
@@ -629,9 +637,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         <label className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40">
                             <IGRPRadioGroupItemPrimitive value="managed" id="storage-managed" />
                             <div className="space-y-0.5">
-                                <p className="text-sm font-medium">
-                                    {t('projectLocationManaged')}
-                                </p>
+                                <p className="text-sm font-medium">{t('projectLocationManaged')}</p>
                                 <p className="text-xs text-muted-foreground">
                                     {t('projectLocationManagedHint')}
                                 </p>
@@ -640,9 +646,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         <label className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40">
                             <IGRPRadioGroupItemPrimitive value="linked" id="storage-linked" />
                             <div className="space-y-0.5">
-                                <p className="text-sm font-medium">
-                                    {t('projectLocationLinked')}
-                                </p>
+                                <p className="text-sm font-medium">{t('projectLocationLinked')}</p>
                                 <p className="text-xs text-muted-foreground">
                                     {t('projectLocationLinkedHint')}
                                 </p>

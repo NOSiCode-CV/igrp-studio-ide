@@ -1,7 +1,4 @@
-import {
-    EntityOpsParseError,
-    parseEntityOps
-} from '../src/main/services/data/entity-ops'
+import { EntityOpsParseError, parseEntityOps } from '../src/main/services/data/entity-ops'
 
 describe('parseEntityOps', () => {
     it('accepts a fenced ```json block', () => {

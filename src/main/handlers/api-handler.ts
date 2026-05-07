@@ -22,15 +22,12 @@ handleWithCustomErrors(
     }
 )
 
-handleWithCustomErrors(
-    EVENTS.NEXT.CONVERT_JSON_SCHEMA,
-    async (_event, schema: unknown) => {
-        // Engine ships fs-extra as a transitive dep, so importing it
-        // from the renderer breaks Vite. Keep the conversion main-side
-        // and return the structured component tree over IPC.
-        return convertJsonSchemaToForm(schema as never)
-    }
-)
+handleWithCustomErrors(EVENTS.NEXT.CONVERT_JSON_SCHEMA, async (_event, schema: unknown) => {
+    // Engine ships fs-extra as a transitive dep, so importing it
+    // from the renderer breaks Vite. Keep the conversion main-side
+    // and return the structured component tree over IPC.
+    return convertJsonSchemaToForm(schema as never)
+})
 
 handleWithCustomErrors(
     EVENTS.SPRING.CREATE_ENUM,
@@ -69,6 +66,14 @@ handleWithCustomErrors(
     async (_event, dtoConfig: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType)
         await engine.createDto?.(dtoConfig, basePath)
+    }
+)
+
+handleWithCustomErrors(
+    EVENTS.SPRING.CREATE_GRAPHQL_SCHEMA,
+    async (_event, schemaConfig: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        await engine.createGraphqlSchema?.(schemaConfig, basePath)
     }
 )
 

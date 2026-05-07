@@ -72,8 +72,8 @@ export function AIProvidersSettings(): JSX.Element {
             <header>
                 <h2 className="text-base font-semibold">AI Providers</h2>
                 <p className="text-xs text-muted-foreground">
-                    API keys are encrypted with the OS keychain (safeStorage). Environment
-                    variables override stored values for development.
+                    API keys are encrypted with the OS keychain (safeStorage). Environment variables
+                    override stored values for development.
                 </p>
             </header>
 
@@ -148,8 +148,8 @@ function LocalCLIsCard(): JSX.Element {
                 <div>
                     <h3 className="text-sm font-medium">Local CLIs</h3>
                     <p className="mt-1 text-xs text-muted-foreground">
-                        Detected automatically from your PATH. Set a custom path if the binary
-                        lives outside the default lookup (e.g. <code>~/.claude/local/claude</code>).
+                        Detected automatically from your PATH. Set a custom path if the binary lives
+                        outside the default lookup (e.g. <code>~/.claude/local/claude</code>).
                     </p>
                 </div>
                 <IGRPButtonPrimitive
@@ -169,10 +169,7 @@ function LocalCLIsCard(): JSX.Element {
                     const status = statuses?.[cli]
                     const ok = status?.found
                     return (
-                        <div
-                            key={cli}
-                            className="rounded-md border bg-background p-3"
-                        >
+                        <div key={cli} className="rounded-md border bg-background p-3">
                             <div className="flex items-center gap-2 text-xs">
                                 <span className="font-medium capitalize">{cli}</span>
                                 {ok ? (
@@ -226,8 +223,8 @@ function LocalCLIsCard(): JSX.Element {
             </div>
 
             <p className="mt-3 text-[10px] text-muted-foreground">
-                Tip: Claude Code is usually at <code>~/.claude/local/claude</code> on macOS.
-                If <code>which claude</code> works in your terminal but not here, the Studio was
+                Tip: Claude Code is usually at <code>~/.claude/local/claude</code> on macOS. If{' '}
+                <code>which claude</code> works in your terminal but not here, the Studio was
                 launched with a different PATH — set the custom path above.
             </p>
         </div>
@@ -315,7 +312,11 @@ function ProviderCard({ provider, configured, onChanged }: ProviderCardProps): J
                                 type={reveal ? 'text' : 'password'}
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
-                                placeholder={configured ? '•••••••• (replace to update)' : provider.placeholder}
+                                placeholder={
+                                    configured
+                                        ? '•••••••• (replace to update)'
+                                        : provider.placeholder
+                                }
                                 className="h-8 pr-8 font-mono text-xs"
                                 autoComplete="off"
                             />

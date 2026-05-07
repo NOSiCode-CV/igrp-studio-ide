@@ -10,7 +10,11 @@ import {
 
 export type MarkItDownConvertResult =
     | { ok: true; markdown: string; durationMs: number }
-    | { ok: false; error: string; code?: 'unsupported' | 'too-large' | 'not-found' | 'timeout' | 'spawn' | 'runtime' }
+    | {
+          ok: false
+          error: string
+          code?: 'unsupported' | 'too-large' | 'not-found' | 'timeout' | 'spawn' | 'runtime'
+      }
 
 interface ExecutableSpec {
     command: string
@@ -20,11 +24,7 @@ interface ExecutableSpec {
 function resolveExecutable(): ExecutableSpec {
     if (app.isPackaged) {
         const platformDir =
-            process.platform === 'darwin'
-                ? 'mac'
-                : process.platform === 'win32'
-                  ? 'win'
-                  : 'linux'
+            process.platform === 'darwin' ? 'mac' : process.platform === 'win32' ? 'win' : 'linux'
         const binaryName = process.platform === 'win32' ? 'markitdown.exe' : 'markitdown'
         const binary = path.join(process.resourcesPath, 'markitdown-bin', platformDir, binaryName)
         return { command: binary, baseArgs: [] }

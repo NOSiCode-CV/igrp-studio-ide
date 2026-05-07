@@ -96,9 +96,7 @@ export function ProcessStudioClientProvider({
 export function useProcessStudioClient(): ProcessStudioClientContextValue {
     const ctx = useContext(ProcessStudioClientContext)
     if (!ctx) {
-        throw new Error(
-            'useProcessStudioClient must be used inside <ProcessStudioClientProvider>'
-        )
+        throw new Error('useProcessStudioClient must be used inside <ProcessStudioClientProvider>')
     }
     return ctx
 }

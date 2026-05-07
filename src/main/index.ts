@@ -14,6 +14,7 @@ import {
 } from 'electron'
 import fs from 'fs'
 import * as os from 'os'
+import dns from 'node:dns'
 import path, { join } from 'path'
 import * as pty from 'node-pty'
 import icon from '../../resources/icon.png?asset'
@@ -44,6 +45,7 @@ import './handlers/git-handler'
 import './handlers/app-logic-handlers'
 import './handlers/docker-handler'
 import './handlers/global-handler'
+import './handlers/graphql/graphql-manifest.handler'
 import './handlers/markitdown-handler'
 import './handlers/spec-kb-handler'
 import './handlers/spec-doc-handler'
@@ -87,6 +89,16 @@ initMainSentryEarly()
 process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error)
     void sendErrorReport(error, { errorType: 'uncaughtException' })
+})
+
+process.on('warning', (warning) => {
+    const warningWithCode = warning as Error & { code?: string }
+    // Silence known Node deprecation noise from transitive deps on startup.
+    if (warningWithCode.name === 'DeprecationWarning' && warningWithCode.code === 'DEP0169') {
+        return
+    }
+
+    console.warn(warningWithCode)
 })
 
 function createWindow(): void {
@@ -400,11 +412,31 @@ app.on('window-all-closed', () => {
 })
 
 ipcMain.on('open-external-url', (_event, url) => {
-    if (url) {
-        // Open the provided URL in the default browser
-        shell.openExternal(url)
-    } else {
+    if (!url) {
         console.error('No URL provided')
+        return
+    }
+
+    try {
+        const parsed = new URL(url)
+        const host = parsed.hostname
+        if (host === 'localhost' || host === '127.0.0.1') {
+            shell.openExternal(url)
+            return
+        }
+
+        dns.lookup(host, (err) => {
+            if (!err) {
+                shell.openExternal(url)
+                return
+            }
+
+            const fallback = new URL(url)
+            fallback.hostname = 'localhost'
+            shell.openExternal(fallback.toString())
+        })
+    } catch {
+        shell.openExternal(url)
     }
 })
 
@@ -479,6 +511,7 @@ ipcMain.handle(
 ipcMain.handle(
     'igrp-studio:get-json-content',
     async (_event, filePath: string): Promise<unknown> => {
+        if (!filePath) return null
         return await getJsonContent(filePath)
     }
 )

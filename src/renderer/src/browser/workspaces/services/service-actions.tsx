@@ -30,16 +30,16 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
         actions: { removeService }
     } = useWorkspace()
 
-    const { getServiceUrl, stopService, restartService } = useDocker({
+    const { getServiceUrl, stopService, restartService, startContainers } = useDocker({
         workspace
     })
 
     const { t } = useTranslation()
+    const serviceUrl = getServiceUrl(service)
 
     const handleServiceUrl = () => {
-        const url = getServiceUrl(service)
-        if (url) {
-            window.electron.ipcRenderer.send(t('openExternalUrl'), url)
+        if (serviceUrl) {
+            window.electron.ipcRenderer.send('open-external-url', serviceUrl)
         }
     }
 
@@ -73,8 +73,12 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                         </IGRPDropdownMenuItemPrimitive>
                     ) : (
                         <IGRPDropdownMenuItemPrimitive
-                            onClick={() => {
-                                restartService([service.name], 300)
+                            onClick={async () => {
+                                try {
+                                    await restartService([service.name], 300)
+                                } catch {
+                                    await startContainers()
+                                }
                             }}
                             className="text-green-600 focus:text-green-600 focus:bg-green-50"
                         >
@@ -93,12 +97,13 @@ export const ServiceActions = ({ service, services }: ServiceActionsProps) => {
                         {t('editService')}
                     </IGRPDropdownMenuItemPrimitive>
 
-                    {getServiceUrl(service) && (
-                        <IGRPDropdownMenuItemPrimitive onClick={handleServiceUrl}>
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                            {t('openInBrowser')}
-                        </IGRPDropdownMenuItemPrimitive>
-                    )}
+                    <IGRPDropdownMenuItemPrimitive
+                        onClick={handleServiceUrl}
+                        disabled={!serviceUrl}
+                    >
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        {t('openInBrowser')}
+                    </IGRPDropdownMenuItemPrimitive>
 
                     {service.labels?.uuid && (
                         <IGRPDropdownMenuItemPrimitive

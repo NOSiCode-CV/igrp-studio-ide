@@ -67,9 +67,9 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
     const [showDuplicateModal, setShowDuplicateModal] = useState<boolean>(false)
     const [showMoveModal, setShowMoveModal] = useState<boolean>(false)
     const [pageToMove, setPageToMove] = useState<PageDefinition | undefined>(undefined)
-    const [scopedComponentTarget, setScopedComponentTarget] = useState<
-        PageDefinition | undefined
-    >(undefined)
+    const [scopedComponentTarget, setScopedComponentTarget] = useState<PageDefinition | undefined>(
+        undefined
+    )
     const [deleteModal, setDeleteModal] = useState<boolean>(false)
     const [loadingTable, isLoadingTable] = useState<boolean>(true)
     const [searchTerm, setSearchTerm] = useState('')

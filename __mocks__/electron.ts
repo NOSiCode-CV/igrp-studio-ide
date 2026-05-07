@@ -1,3 +1,5 @@
+const handlers = new Map<string, Function>()
+
 export const app = {
     isPackaged: false,
     getPath: (_name: string): string => '/tmp/igrp-studio-test',
@@ -6,8 +8,12 @@ export const app = {
 
 export const ipcMain = {
     on: (): void => undefined,
-    handle: (): void => undefined,
-    removeAllListeners: (): void => undefined
+    handle: jest.fn((channel: string, handler: Function) => {
+        handlers.set(channel, handler)
+    }),
+    removeAllListeners: (): void => undefined,
+    getHandler: (channel: string) => handlers.get(channel),
+    clearHandlers: () => handlers.clear()
 }
 
 export const ipcRenderer = {

@@ -109,11 +109,7 @@ export function EntityFormModal({
                     >
                         {t('cancel')}
                     </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={submitting}
-                    >
+                    <IGRPButtonPrimitive type="button" onClick={handleSubmit} disabled={submitting}>
                         {submitting ? t('saving') : t('save')}
                     </IGRPButtonPrimitive>
                 </IGRPDialogFooterPrimitive>

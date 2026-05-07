@@ -1,4 +1,5 @@
 import {
+    Braces,
     Compass,
     Database,
     FileArchive,
@@ -15,6 +16,7 @@ import type { JSX } from 'react'
 const serviceColorMap: Record<string, string> = {
     database: 'bg-amber-500',
     web: 'bg-blue-500',
+    api: 'bg-blue-700',
     cache: 'bg-purple-500',
     storage: 'bg-orange-500',
     file: 'bg-red-500',
@@ -29,6 +31,8 @@ export const getServiceIcon = (type: string): JSX.Element => {
             return <Database className="h-4 w-4" />
         case 'web':
             return <Globe className="h-4 w-4" />
+        case 'api':
+            return <Braces className="h-4 w-4" />
         case 'cache':
             return <Server className="h-4 w-4" />
         case 'storage':

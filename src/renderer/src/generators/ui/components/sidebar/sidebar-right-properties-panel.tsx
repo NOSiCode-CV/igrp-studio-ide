@@ -21,11 +21,7 @@ interface PropertiesPanelProps {
     columnsOptions: (IGRPOptionsProps & { type?: 'column' | 'pageParam' })[]
     onComponentPropertyChange: (fieldPath: string, value: string | boolean) => void
     onChildPropertyChange: (fieldPath: string, value: string | boolean) => void
-    onSelectState: (
-        field: string,
-        state: State | undefined,
-        value: DataValue | undefined
-    ) => void
+    onSelectState: (field: string, state: State | undefined, value: DataValue | undefined) => void
 }
 
 const PropertiesPanel = memo(function PropertiesPanel({
@@ -44,18 +40,9 @@ const PropertiesPanel = memo(function PropertiesPanel({
     const tag = tempEditingComponent.tag || ''
 
     return (
-        <IGRPAccordionPrimitive
-            type="single"
-            collapsible
-            className="w-full"
-            defaultValue="item-1"
-        >
+        <IGRPAccordionPrimitive type="single" collapsible className="w-full" defaultValue="item-1">
             <IGRPAccordionItemPrimitive value="item-1">
-                <IGRPAccordionTriggerPrimitive
-                    iconName="ChevronDown"
-                    showIcon
-                    iconPlacement="end"
-                >
+                <IGRPAccordionTriggerPrimitive iconName="ChevronDown" showIcon iconPlacement="end">
                     {t('properties')}
                 </IGRPAccordionTriggerPrimitive>
                 <IGRPAccordionContentPrimitive className="space-y-2">

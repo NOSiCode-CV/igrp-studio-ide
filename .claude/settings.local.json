@@ -1,0 +1,9 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(git add *)",
+            "Bash(git commit -m 'feat: implement Phase 4 GraphQL schema generation and sidebar fixes *)",
+            "Bash(python3)"
+        ]
+    }
+}

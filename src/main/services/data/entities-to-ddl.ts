@@ -18,8 +18,8 @@ const PG_TYPE_MAP: Record<FieldType, string> = {
     date: 'DATE',
     datetime: 'TIMESTAMP',
     json: 'JSONB',
-    enum: 'TEXT',          // emitted with a CHECK when enumValues set
-    reference: 'TEXT'      // resolved per-target below
+    enum: 'TEXT', // emitted with a CHECK when enumValues set
+    reference: 'TEXT' // resolved per-target below
 }
 
 const MYSQL_TYPE_MAP: Record<FieldType, string> = {
@@ -30,7 +30,7 @@ const MYSQL_TYPE_MAP: Record<FieldType, string> = {
     date: 'DATE',
     datetime: 'DATETIME',
     json: 'JSON',
-    enum: 'VARCHAR(64)',   // emitted as ENUM(...) when enumValues set
+    enum: 'VARCHAR(64)', // emitted as ENUM(...) when enumValues set
     reference: 'VARCHAR(255)'
 }
 

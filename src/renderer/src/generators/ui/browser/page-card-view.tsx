@@ -9,7 +9,10 @@ import {
     IGRPCollapsibleTriggerPrimitive,
     IGRPSeparatorPrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import { PageActionMenu, PageTypeIcon } from '@renderer/generators/ui/browser/components/page-actions'
+import {
+    PageActionMenu,
+    PageTypeIcon
+} from '@renderer/generators/ui/browser/components/page-actions'
 import { cn } from '@renderer/lib/utils'
 import { ChevronRight, ComponentIcon } from 'lucide-react'
 import { useState } from 'react'

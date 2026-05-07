@@ -101,7 +101,15 @@ describe('markitdown/history', () => {
         fs.writeFileSync(
             storeFile,
             JSON.stringify([
-                { id: 'ok', fileName: 'a', filePath: 'x', sizeBytes: 1, markdown: 'x', convertedAt: 1, durationMs: 1 },
+                {
+                    id: 'ok',
+                    fileName: 'a',
+                    filePath: 'x',
+                    sizeBytes: 1,
+                    markdown: 'x',
+                    convertedAt: 1,
+                    durationMs: 1
+                },
                 { id: 'bad-no-markdown' },
                 'not-an-object'
             ])

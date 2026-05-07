@@ -14,9 +14,7 @@ import StartupGate from './startup-gate'
 
 const GeneratorUI = React.lazy(() => import('@renderer/generators/ui'))
 const GeneratorAPI = React.lazy(() => import('@renderer/generators/api'))
-const GeneratorSpecification = React.lazy(
-    () => import('@renderer/generators/specification')
-)
+const GeneratorSpecification = React.lazy(() => import('@renderer/generators/specification'))
 
 const allRoutes = [
     {

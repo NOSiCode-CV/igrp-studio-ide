@@ -71,13 +71,7 @@ export function useSidebarRightState({ comp, parentComp, path }: UseSidebarRight
 
     const currentPath = path || editingComponentParams?.path || ''
 
-    const {
-        label,
-        data,
-        componentName,
-        childProperties = {},
-        id: componentId
-    } = currentComp || {}
+    const { label, data, componentName, childProperties = {}, id: componentId } = currentComp || {}
 
     const [tempEditingComponent, setTempEditingComponent] = useState<
         StructuredComponent | undefined
@@ -169,10 +163,7 @@ export function useSidebarRightState({ comp, parentComp, path }: UseSidebarRight
                         if (config.type === 'object' && config.properties) {
                             acc[key] = Object.entries(config.properties).reduce(
                                 (objAcc, [propKey, propConfig]: [string, any]) => {
-                                    if (
-                                        propConfig.default !== undefined ||
-                                        propConfig.required
-                                    ) {
+                                    if (propConfig.default !== undefined || propConfig.required) {
                                         objAcc[propKey] = propConfig.default
                                     }
                                     return objAcc
@@ -246,9 +237,7 @@ export function useSidebarRightState({ comp, parentComp, path }: UseSidebarRight
         const loadProps = async () => {
             try {
                 const childProps = await getChildPropertiesComponent(currentPath, componentName)
-                setPropsComponentChild(
-                    childProps && !Array.isArray(childProps) ? childProps : {}
-                )
+                setPropsComponentChild(childProps && !Array.isArray(childProps) ? childProps : {})
 
                 const initialValues = Object.entries(childProps ?? {}).reduce(
                     (acc, [key, config]) => {

@@ -40,9 +40,7 @@ function regenerateIds<T extends { id?: string; children?: T[] }>(node: T): T {
     return {
         ...node,
         id: getUUID(),
-        ...(Array.isArray(node.children)
-            ? { children: node.children.map(regenerateIds) }
-            : {})
+        ...(Array.isArray(node.children) ? { children: node.children.map(regenerateIds) } : {})
     }
 }
 
@@ -198,7 +196,10 @@ export function ImportJsonSchemaModal({
                                 onValueChange={(v) => setMode(v as ImportMode)}
                             >
                                 <label className="flex items-center gap-2 cursor-pointer text-sm">
-                                    <IGRPRadioGroupItemPrimitive value="replace" id="mode-replace" />
+                                    <IGRPRadioGroupItemPrimitive
+                                        value="replace"
+                                        id="mode-replace"
+                                    />
                                     <span>{t('import_schema_mode_replace')}</span>
                                 </label>
                                 <label className="flex items-center gap-2 cursor-pointer text-sm">

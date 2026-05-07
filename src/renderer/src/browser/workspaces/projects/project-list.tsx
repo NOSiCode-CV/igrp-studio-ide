@@ -48,15 +48,16 @@ export function ProjectList({ projects, services }: ProjectListProps) {
                     </IGRPTableRowPrimitive>
                 </IGRPTableHeaderPrimitive>
                 <IGRPTableBodyPrimitive>
-                    {projects.map((project) => (
-                        <IGRPTableRowPrimitive
-                            key={project.id}
-                            className="hover:bg-muted/50 group cursor-pointer"
-                            onClick={() => handleProjectClick(project)}
-                        >
+                    {projects.map((project) => {
+                        return (
+                            <IGRPTableRowPrimitive
+                                key={project.id}
+                                className="hover:bg-muted/50 group cursor-pointer"
+                                onClick={() => handleProjectClick(project)}
+                            >
                             <IGRPTableCellPrimitive className="font-medium">
                                 <div className="flex items-center gap-1.5">
-                                    <ProjectIcon project={project} workspacePath={workspace.path} />
+                                    <ProjectIcon project={project} workspacePath={workspace?.path || ''} />
                                     <div>
                                         <div className="text-xs">{project.name}</div>
                                         <div className="text-xs text-muted-foreground">
@@ -81,12 +82,13 @@ export function ProjectList({ projects, services }: ProjectListProps) {
                                 <ProjectActions
                                     project={project}
                                     projects={projects}
-                                    basePath={workspace.path}
+                                    basePath={workspace?.path || ''}
                                     services={services}
                                 />
                             </IGRPTableCellPrimitive>
-                        </IGRPTableRowPrimitive>
-                    ))}
+                            </IGRPTableRowPrimitive>
+                        )
+                    })}
                 </IGRPTableBodyPrimitive>
             </IGRPTablePrimitive>
         </div>

@@ -79,8 +79,7 @@ export function DataChatPanel({
             chatBackend={{
                 kind: 'data',
                 basePath,
-                onTurnEvent: (action) =>
-                    dispatch(action as { type: string; payload?: unknown })
+                onTurnEvent: (action) => dispatch(action as { type: string; payload?: unknown })
             }}
             contextProvider={contextProvider}
             className={className}

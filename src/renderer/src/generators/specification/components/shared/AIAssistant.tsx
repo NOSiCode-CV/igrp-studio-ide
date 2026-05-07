@@ -277,9 +277,7 @@ export function AIAssistant({
                 // Default selection: prefer Claude Sonnet 4.5 on OpenRouter, then first available.
                 const preferred =
                     flat.find(
-                        (m) =>
-                            m.providerId === 'openrouter' &&
-                            /claude.*sonnet/i.test(m.modelId)
+                        (m) => m.providerId === 'openrouter' && /claude.*sonnet/i.test(m.modelId)
                     ) ?? flat[0]
                 if (preferred) setSelected(preferred)
             } catch (err) {
@@ -747,11 +745,7 @@ export function AIAssistant({
                     </span>
                 ) : (
                     <select
-                        value={
-                            selected
-                                ? `${selected.providerId}::${selected.modelId}`
-                                : ''
-                        }
+                        value={selected ? `${selected.providerId}::${selected.modelId}` : ''}
                         onChange={(e) => {
                             const [providerId, modelId] = e.target.value.split('::')
                             const m = models.find(
@@ -824,9 +818,7 @@ export function AIAssistant({
             {/* Composer — Claude-Code-style textarea: Enter sends, Shift+Enter
                 inserts a newline, Cmd/Ctrl+Enter sends from anywhere. */}
             <form onSubmit={handleSubmit} className="border-t p-3">
-                {ctxLabel && (
-                    <p className="mb-1.5 text-[10px] text-muted-foreground">{ctxLabel}</p>
-                )}
+                {ctxLabel && <p className="mb-1.5 text-[10px] text-muted-foreground">{ctxLabel}</p>}
 
                 <div
                     className={cn(
@@ -1009,28 +1001,31 @@ function MessageBubble({
                     </p>
                 )}
 
-                {message.prototype && (message.prototype.applied > 0 || message.prototype.failed > 0 || message.prototype.commitSha) && (
-                    <div className="mt-2 rounded-md border bg-background/60 p-2 text-[10px]">
-                        <div className="flex items-center justify-between">
-                            <span className="font-medium text-foreground">
-                                {message.prototype.summary ?? 'Build turn'}
-                            </span>
-                            {message.prototype.commitSha && (
-                                <span className="font-mono text-muted-foreground">
-                                    {message.prototype.commitSha.slice(0, 7)}
+                {message.prototype &&
+                    (message.prototype.applied > 0 ||
+                        message.prototype.failed > 0 ||
+                        message.prototype.commitSha) && (
+                        <div className="mt-2 rounded-md border bg-background/60 p-2 text-[10px]">
+                            <div className="flex items-center justify-between">
+                                <span className="font-medium text-foreground">
+                                    {message.prototype.summary ?? 'Build turn'}
                                 </span>
-                            )}
+                                {message.prototype.commitSha && (
+                                    <span className="font-mono text-muted-foreground">
+                                        {message.prototype.commitSha.slice(0, 7)}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="mt-1 flex gap-3 text-muted-foreground">
+                                <span>{message.prototype.applied} applied</span>
+                                {message.prototype.failed > 0 && (
+                                    <span className="text-red-500">
+                                        {message.prototype.failed} failed
+                                    </span>
+                                )}
+                            </div>
                         </div>
-                        <div className="mt-1 flex gap-3 text-muted-foreground">
-                            <span>{message.prototype.applied} applied</span>
-                            {message.prototype.failed > 0 && (
-                                <span className="text-red-500">
-                                    {message.prototype.failed} failed
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                )}
+                    )}
 
                 {message.data && (message.data.applied > 0 || message.data.failed > 0) && (
                     <div className="mt-2 rounded-md border bg-background/60 p-2 text-[10px]">
@@ -1040,9 +1035,7 @@ function MessageBubble({
                         <div className="mt-1 flex gap-3 text-muted-foreground">
                             <span>{message.data.applied} applied</span>
                             {message.data.failed > 0 && (
-                                <span className="text-red-500">
-                                    {message.data.failed} failed
-                                </span>
+                                <span className="text-red-500">{message.data.failed} failed</span>
                             )}
                         </div>
                     </div>
@@ -1277,10 +1270,7 @@ function BubbleAction({
     )
 }
 
-function groupBy<T, K extends string>(
-    items: T[],
-    keyFn: (item: T) => K
-): Record<K, T[]> {
+function groupBy<T, K extends string>(items: T[], keyFn: (item: T) => K): Record<K, T[]> {
     const out = {} as Record<K, T[]>
     for (const item of items) {
         const k = keyFn(item)

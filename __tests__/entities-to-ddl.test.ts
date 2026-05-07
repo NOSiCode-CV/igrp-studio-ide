@@ -83,7 +83,7 @@ describe('entitiesToDdl', () => {
             expect(sql).toContain('CREATE TABLE "order"')
             expect(sql).toContain('"id" INTEGER NOT NULL')
             expect(sql).toContain('"email" TEXT NOT NULL UNIQUE')
-            expect(sql).toContain("DEFAULT TRUE")
+            expect(sql).toContain('DEFAULT TRUE')
             expect(sql).toContain('PRIMARY KEY ("id")')
             // FK
             expect(sql).toContain(

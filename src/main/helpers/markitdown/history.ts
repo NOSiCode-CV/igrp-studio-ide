@@ -21,7 +21,10 @@ export interface HistoryStore {
     clear(): Promise<void>
 }
 
-export function createHistoryStore(filePath: string, maxEntries = HISTORY_MAX_ENTRIES): HistoryStore {
+export function createHistoryStore(
+    filePath: string,
+    maxEntries = HISTORY_MAX_ENTRIES
+): HistoryStore {
     const read = async (): Promise<MarkItDownHistoryEntry[]> => {
         try {
             const raw = await fs.promises.readFile(filePath, 'utf-8')

@@ -333,8 +333,8 @@ export function ConfigurationDialog({
 
         // Process volumes
         const _volumes: Volume[] = volumes.map((volumeStr) => {
-            const [name, path, driver] = volumeStr.split(':')
-            return { name, path, driver: driver || 'none' }
+            const [host, container] = volumeStr.split(':')
+            return { host: host || '', container: container || '' }
         })
 
         // Process labels - merge template labels with new ones

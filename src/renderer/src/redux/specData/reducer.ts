@@ -72,32 +72,20 @@ const slice = createSlice({
                 state.changedEntityIds.push(id)
             }
         },
-        dataTurnFailed(
-            state,
-            action: PayloadAction<{ requestId: string; op: SpecDataFailedOp }>
-        ) {
+        dataTurnFailed(state, action: PayloadAction<{ requestId: string; op: SpecDataFailedOp }>) {
             const turn = state.turns[action.payload.requestId]
             if (!turn) return
             turn.failed.push(action.payload.op)
         },
-        dataTurnSummary(
-            state,
-            action: PayloadAction<{ requestId: string; summary: string }>
-        ) {
+        dataTurnSummary(state, action: PayloadAction<{ requestId: string; summary: string }>) {
             const turn = state.turns[action.payload.requestId]
             if (turn) turn.summary = action.payload.summary
         },
-        dataTurnParseError(
-            state,
-            action: PayloadAction<{ requestId: string; message: string }>
-        ) {
+        dataTurnParseError(state, action: PayloadAction<{ requestId: string; message: string }>) {
             const turn = state.turns[action.payload.requestId]
             if (turn) turn.parseError = action.payload.message
         },
-        dataTurnError(
-            state,
-            action: PayloadAction<{ requestId: string; message: string }>
-        ) {
+        dataTurnError(state, action: PayloadAction<{ requestId: string; message: string }>) {
             const turn = state.turns[action.payload.requestId]
             if (turn) turn.error = action.payload.message
         },

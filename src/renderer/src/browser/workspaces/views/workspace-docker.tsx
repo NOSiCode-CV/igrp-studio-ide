@@ -12,10 +12,10 @@ import {
 import MonacoEditor from '@renderer/components/monaco-editor'
 import { useDocker } from '@renderer/hooks/use-docker'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
-import { Copy, RefreshCw, Save } from 'lucide-react'
+import { CheckCircle2, Copy, RefreshCw, Save } from 'lucide-react'
 import { type JSX, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { IWorkspace } from 'src/main/types'
+import type { IWorkspace, OptionalStacksStatus } from 'src/main/types'
 
 interface WorkspaceConfigProps {
     workspace: IWorkspace
@@ -23,12 +23,17 @@ interface WorkspaceConfigProps {
 
 export function WorkspaceDocker({ workspace }: WorkspaceConfigProps): JSX.Element {
     const [copied, setCopied] = useState(false)
+    const [installingStack, setInstallingStack] = useState<'monitoring' | 'process' | null>(null)
+    const [optionalStacksStatus, setOptionalStacksStatus] = useState<OptionalStacksStatus>({
+        monitoringInstalled: false,
+        processInstalled: false
+    })
 
     const { fileContent, services, loadComposeFile } = useDocker({ workspace })
     const [content, setContent] = useState(fileContent)
 
     const {
-        actions: { saveCustomWorkspaceComposeFile }
+        actions: { saveCustomWorkspaceComposeFile, installOptionalStacks, getOptionalStacksStatus }
     } = useWorkspace()
 
     const { t } = useTranslation()
@@ -46,16 +51,101 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps): JSX.Elemen
         }
     }
 
+    const loadOptionalStacksStatus = async (): Promise<void> => {
+        const status = await getOptionalStacksStatus()
+        setOptionalStacksStatus(status)
+    }
+
+    const handleInstallOptionalStack = async (stack: 'monitoring' | 'process'): Promise<void> => {
+        setInstallingStack(stack)
+        try {
+            const response = await installOptionalStacks({
+                installMonitoringStack: stack === 'monitoring',
+                installProcessStack: stack === 'process'
+            })
+            if (!response?.error) {
+                await loadOptionalStacksStatus()
+            }
+        } finally {
+            setInstallingStack(null)
+        }
+    }
+
     useEffect(() => {
         setContent(fileContent)
     }, [fileContent])
 
     useEffect(() => {
         loadComposeFile(workspace.path)
+        loadOptionalStacksStatus()
     }, [workspace])
 
     return (
         <div className="space-y-4">
+            <IGRPCard>
+                <IGRPCardHeader className="compact-card-header">
+                    <IGRPCardTitle className="text-sm">Optional Stacks</IGRPCardTitle>
+                    <IGRPCardDescription className="text-xs">
+                        Install optional compose stacks inside this workspace.
+                    </IGRPCardDescription>
+                </IGRPCardHeader>
+                <IGRPCardContent className="compact-card-content space-y-3">
+                    <div className="flex items-center justify-between rounded-md border p-3">
+                        <div>
+                            <div className="text-sm font-medium">Monitoring Stack</div>
+                            <div className="text-xs text-muted-foreground">
+                                Installs <code>compose-monitoring.yaml</code> from demo template.
+                            </div>
+                        </div>
+                        {optionalStacksStatus.monitoringInstalled ? (
+                            <span className="inline-flex items-center gap-1 text-xs text-emerald-600">
+                                <CheckCircle2 className="h-4 w-4" />
+                                Installed
+                            </span>
+                        ) : (
+                            <IGRPButtonPrimitive
+                                size="sm"
+                                variant="outline"
+                                onClick={() => void handleInstallOptionalStack('monitoring')}
+                                disabled={installingStack !== null}
+                            >
+                                {installingStack === 'monitoring' ? (
+                                    <RefreshCw className="h-3.5 w-3.5 mr-1 animate-spin" />
+                                ) : null}
+                                Install
+                            </IGRPButtonPrimitive>
+                        )}
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-md border p-3">
+                        <div>
+                            <div className="text-sm font-medium">Process Stack</div>
+                            <div className="text-xs text-muted-foreground">
+                                Installs <code>compose-process.yaml</code> from demo template.
+                            </div>
+                        </div>
+                        {optionalStacksStatus.processInstalled ? (
+                            <span className="inline-flex items-center gap-1 text-xs text-emerald-600">
+                                <CheckCircle2 className="h-4 w-4" />
+                                Installed
+                            </span>
+                        ) : (
+                            <IGRPButtonPrimitive
+                                size="sm"
+                                variant="outline"
+                                onClick={() => void handleInstallOptionalStack('process')}
+                                disabled={installingStack !== null}
+                            >
+                                {installingStack === 'process' ? (
+                                    <RefreshCw className="h-3.5 w-3.5 mr-1 animate-spin" />
+                                ) : null}
+                                Install
+                            </IGRPButtonPrimitive>
+                        )}
+                    </div>
+                </IGRPCardContent>
+            </IGRPCard>
+
             <IGRPCard>
                 <IGRPCardHeader className="compact-card-header">
                     <IGRPCardTitle className="text-sm">

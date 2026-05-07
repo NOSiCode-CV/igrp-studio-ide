@@ -54,8 +54,12 @@ export function chunkMarkdown(
 
     const blocks = splitByBlankLines(markdown)
     const headingStack: string[] = []
-    const rawChunks: Array<{ text: string; charStart: number; charEnd: number; headings: string[] }> =
-        []
+    const rawChunks: Array<{
+        text: string
+        charStart: number
+        charEnd: number
+        headings: string[]
+    }> = []
 
     let buffer = ''
     let bufferStart = 0
@@ -122,7 +126,11 @@ export function chunkMarkdown(
     const merged: typeof rawChunks = []
     for (const chunk of rawChunks) {
         const last = merged[merged.length - 1]
-        if (last && last.text.length < opts.minSize && last.text.length + chunk.text.length <= opts.maxSize) {
+        if (
+            last &&
+            last.text.length < opts.minSize &&
+            last.text.length + chunk.text.length <= opts.maxSize
+        ) {
             last.text = `${last.text}\n\n${chunk.text}`
             last.charEnd = chunk.charEnd
         } else {

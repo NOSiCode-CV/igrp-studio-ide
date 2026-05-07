@@ -32,9 +32,7 @@ class SpecDocExportService {
             webPreferences: { sandbox: true, javascript: false }
         })
         try {
-            await window.loadURL(
-                `data:text/html;charset=UTF-8,${encodeURIComponent(html)}`
-            )
+            await window.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(html)}`)
             const pdf = await window.webContents.printToPDF({
                 printBackground: true,
                 margins: { top: 0.6, right: 0.6, bottom: 0.6, left: 0.6 },

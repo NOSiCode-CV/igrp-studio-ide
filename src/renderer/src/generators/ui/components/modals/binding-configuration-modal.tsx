@@ -107,9 +107,7 @@ function normalizeFieldType<T extends { type: string; isList?: boolean; fields?:
     if (!mapped && !nested) return field
     return {
         ...field,
-        ...(mapped
-            ? { type: mapped.type, isList: mapped.isList ?? field.isList }
-            : {}),
+        ...(mapped ? { type: mapped.type, isList: mapped.isList ?? field.isList } : {}),
         ...(nested ? { fields: nested } : {})
     }
 }
@@ -359,8 +357,8 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                             key: 'isList',
                             name: 'IsList?',
                             type: 'checkbox'
-                        },
-                       /*  {
+                        }
+                        /*  {
                             key: 'isKey',
                             name: 'Key?',
                             type: 'checkbox'
@@ -614,14 +612,14 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                         >
                                             <option value="auto">{t('definitionTypeAuto')}</option>
                                             {/*
-                                              * Hidden until the engine ships a working type.liquid
-                                              * branching on definitionType. The wiring (R6 inputs +
-                                              * persisted shape) is in place — re-enable these
-                                              * options when the engine template is fixed.
-                                              *
-                                              * <option value="zod-object">Zod object</option>
-                                              * <option value="json-schema">JSON Schema</option>
-                                              */}
+                                             * Hidden until the engine ships a working type.liquid
+                                             * branching on definitionType. The wiring (R6 inputs +
+                                             * persisted shape) is in place — re-enable these
+                                             * options when the engine template is fixed.
+                                             *
+                                             * <option value="zod-object">Zod object</option>
+                                             * <option value="json-schema">JSON Schema</option>
+                                             */}
                                         </select>
                                     </div>
                                 </div>
@@ -657,10 +655,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                 </summary>
                                 <div className="space-y-3 px-3 pb-3 pt-1">
                                     <div className="space-y-1">
-                                        <IGRPLabelPrimitive
-                                            htmlFor="tags"
-                                            className="text-sm"
-                                        >
+                                        <IGRPLabelPrimitive htmlFor="tags" className="text-sm">
                                             {t('typeTags')}
                                         </IGRPLabelPrimitive>
                                         <input
@@ -714,9 +709,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                                             e.target.value
                                                         )
                                                     }
-                                                    placeholder={t(
-                                                        'customInstanceNamePlaceholder'
-                                                    )}
+                                                    placeholder={t('customInstanceNamePlaceholder')}
                                                     className="h-9 w-full rounded-md border bg-background px-3 text-sm font-mono"
                                                 />
                                             </div>
