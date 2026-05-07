@@ -1,6 +1,6 @@
 import useToast from '@renderer/hooks/useToast'
 import yaml from 'js-yaml'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import path from 'path'
 import type { IDocker } from 'src/main/interfaces'
 import type { DockerComposeConfig, IWorkspace, ProjectData, ServiceInfo } from 'src/main/types'
@@ -362,13 +362,18 @@ export function useDocker({
         setComposeConfig(composeConfig)
     }, [])
 
+    const dockerOpRef = useRef(handleDockerOperation)
+    useEffect(() => {
+        dockerOpRef.current = handleDockerOperation
+    }, [handleDockerOperation])
+
     useEffect(() => {
         if (!workspace?.path) return
 
         const refreshOnce = async (): Promise<void> => {
             try {
                 if (document.visibilityState === 'hidden') return
-                await handleDockerOperation('status')
+                await dockerOpRef.current('status')
             } catch {
                 // non-blocking
             }
@@ -376,7 +381,7 @@ export function useDocker({
 
         void refreshOnce()
         return
-    }, [workspace?.path, handleDockerOperation])
+    }, [workspace?.path])
 
     useEffect(() => {
         if (!workspace?.path || !changeStatus) return
@@ -388,7 +393,7 @@ export function useDocker({
             if (inFlight || document.visibilityState === 'hidden') return
             inFlight = true
             try {
-                await handleDockerOperation('status')
+                await dockerOpRef.current('status')
             } finally {
                 inFlight = false
             }
@@ -404,7 +409,7 @@ export function useDocker({
                 window.clearInterval(intervalId)
             }
         }
-    }, [workspace?.path, changeStatus, handleDockerOperation])
+    }, [workspace?.path, changeStatus])
 
     useEffect(() => {
         if (!workspace?.path) return

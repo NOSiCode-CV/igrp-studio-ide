@@ -22,7 +22,7 @@ import { useWorkspace } from '@renderer/hooks/use-workspace'
 import { cn } from '@renderer/lib/utils'
 import CreateWorkspace from '@renderer/browser/workspaces/components/create-workspace'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { EllipsisVertical, FolderKanban, FolderOpen, Pin, Plus, RefreshCw } from 'lucide-react'
+import { EllipsisVertical, FolderKanban, FolderOpen, Pin, Plus } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -54,7 +54,7 @@ export const WorkspaceSwitcher = ({
 
     const {
         workspaces,
-        actions: { updateWorkspace, openWorkspace, refreshWorkspaces }
+        actions: { updateWorkspace, openWorkspace }
     } = useWorkspace()
 
     const loadPinnedWorkspace = useCallback((): void => {
@@ -197,20 +197,6 @@ export const WorkspaceSwitcher = ({
                                     </IGRPDropdownMenuItemPrimitive>
                                 ))}
                                 <IGRPDropdownMenuSeparatorPrimitive />
-                                <IGRPDropdownMenuItemPrimitive
-                                    className="gap-2 p-2"
-                                    onSelect={(e) => {
-                                        e.preventDefault()
-                                        void refreshWorkspaces()
-                                    }}
-                                >
-                                    <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                                        <RefreshCw className="size-4" />
-                                    </div>
-                                    <div className="font-medium text-muted-foreground">
-                                        {t('reload')}
-                                    </div>
-                                </IGRPDropdownMenuItemPrimitive>
                                 <IGRPDropdownMenuItemPrimitive
                                     className="gap-2 p-2"
                                     onSelect={(e) => {

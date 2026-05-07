@@ -132,7 +132,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
 
     useEffect(() => {
         void refreshContainers()
-    }, [workspaceId, changeStatus])
+    }, [workspaceId])
 
     const allServices = useMemo(() => {
         return services
