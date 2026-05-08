@@ -144,32 +144,27 @@ export const GraphQLOperationEditor = ({
                                     />
                                 </div>
                             </div>
+
+                            {isMutation && (
+                                <>
+                                    <IGRPSeparator orientation="horizontal" className="my-4" />
+                                    <SelectInput
+                                        id="inputType"
+                                        label="Input Type Reference"
+                                        value={formik.values.inputType}
+                                        options={inputTypeOptions}
+                                        onChange={(value) =>
+                                            formik.setFieldValue('inputType', value)
+                                        }
+                                        isRequired
+                                        error={formik.errors.inputType}
+                                        isTouched={Boolean(formik.touched.inputType)}
+                                    />
+                                </>
+                            )}
                         </div>
                     </IGRPCardContentPrimitive>
                 </IGRPCardPrimitive>
-
-                {isMutation && (
-                    <IGRPCardPrimitive>
-                        <IGRPCardHeaderPrimitive>
-                            <IGRPCardTitlePrimitive>Input Type</IGRPCardTitlePrimitive>
-                            <IGRPCardDescriptionPrimitive>
-                                Define the complex input object for this mutation.
-                            </IGRPCardDescriptionPrimitive>
-                        </IGRPCardHeaderPrimitive>
-                        <IGRPCardContentPrimitive>
-                            <SelectInput
-                                id="inputType"
-                                label="Input Type Reference"
-                                value={formik.values.inputType}
-                                options={inputTypeOptions}
-                                onChange={(value) => formik.setFieldValue('inputType', value)}
-                                isRequired
-                                error={formik.errors.inputType}
-                                isTouched={Boolean(formik.touched.inputType)}
-                            />
-                        </IGRPCardContentPrimitive>
-                    </IGRPCardPrimitive>
-                )}
 
                 {isSubscription && (
                     <IGRPCardPrimitive>

@@ -138,23 +138,22 @@ export const GraphQLOverviewLayout = ({ currentItem }: GraphQLPageProps) => {
 
     return (
         <div className="space-y-6 p-6">
-            <IGRPCardPrimitive className="border-0 bg-[#0f1b33] text-white overflow-hidden">
+            <IGRPCardPrimitive>
                 <IGRPCardHeaderPrimitive>
                     <div className="flex items-start justify-between gap-4">
                         <div className="space-y-2">
-                            <p className="text-xs uppercase tracking-[0.3em] text-cyan-300">
+                            <p className="text-xs uppercase tracking-[0.3em] text-primary">
                                 Graph Management
                             </p>
                             <IGRPCardTitlePrimitive className="text-4xl font-bold">
                                 GraphQL API
                             </IGRPCardTitlePrimitive>
-                            <IGRPCardDescriptionPrimitive className="text-slate-300 max-w-2xl">
+                            <IGRPCardDescriptionPrimitive className="max-w-2xl">
                                 Define queries, mutations, and subscriptions for module{' '}
-                                <strong>{moduleName}</strong>. Changes are persisted into
-                                `graphql.json`.
+                                <strong>{moduleName}</strong>.
                             </IGRPCardDescriptionPrimitive>
                         </div>
-                        <Cable className="h-12 w-12 text-slate-400" />
+                        <Cable className="h-12 w-12 text-primary" />
                     </div>
                 </IGRPCardHeaderPrimitive>
             </IGRPCardPrimitive>
