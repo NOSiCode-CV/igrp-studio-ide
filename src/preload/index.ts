@@ -686,6 +686,8 @@ const specPrototype = {
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.LIST_FILES, { basePath }),
     readFile: (basePath: string, path: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.READ_FILE, { basePath, path }),
+    readFileAt: (basePath: string, ref: string, path: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.READ_FILE_AT, { basePath, ref, path }),
     startDev: (basePath: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.START_DEV, { basePath }),
     stopDev: (basePath: string) => ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.STOP_DEV, { basePath }),
@@ -697,8 +699,13 @@ const specPrototype = {
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.LIST_SNAPSHOTS, { basePath }),
     restoreSnapshot: (basePath: string, sha: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.RESTORE_SNAPSHOT, { basePath, sha }),
-    export: (basePath: string) => ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.EXPORT, { basePath }),
-    onChunk: (callback: (payload: { requestId: string; chunk: any }) => void): (() => void) => {
+    export: (basePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.EXPORT, { basePath }),
+    openFolder: (basePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.OPEN_FOLDER, { basePath }),
+    onChunk: (
+        callback: (payload: { requestId: string; chunk: any }) => void
+    ): (() => void) => {
         const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
         ipcRenderer.on(EVENTS.SPEC_PROTOTYPE.GENERATE_CHUNK, sub)
         return () => ipcRenderer.removeListener(EVENTS.SPEC_PROTOTYPE.GENERATE_CHUNK, sub)

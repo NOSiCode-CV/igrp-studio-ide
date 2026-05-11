@@ -191,6 +191,7 @@ export const EVENTS = {
         APPLY_OPS: 'spec:prototype:apply-ops',
         LIST_FILES: 'spec:prototype:list-files',
         READ_FILE: 'spec:prototype:read-file',
+        READ_FILE_AT: 'spec:prototype:read-file-at',
         START_DEV: 'spec:prototype:start-dev',
         STOP_DEV: 'spec:prototype:stop-dev',
         DEV_STATUS: 'spec:prototype:dev-status',
@@ -199,6 +200,7 @@ export const EVENTS = {
         LIST_SNAPSHOTS: 'spec:prototype:list-snapshots',
         RESTORE_SNAPSHOT: 'spec:prototype:restore-snapshot',
         EXPORT: 'spec:prototype:export',
+        OPEN_FOLDER: 'spec:prototype:open-folder',
         TREE_CHANGED: 'spec:prototype:tree-changed'
     },
     ERROR: 'error',

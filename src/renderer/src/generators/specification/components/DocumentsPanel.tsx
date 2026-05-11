@@ -42,13 +42,8 @@ import { type JSX, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import { useDispatch, useSelector, useStore } from 'react-redux'
 import { Group, Panel, Separator } from 'react-resizable-panels'
 import type { editor as monacoEditorNs } from 'monaco-editor'
-import { useSpecification } from '../contexts/SpecificationContext'
 import { usePreviewToEditorScrollSync } from '../hooks/useDocScrollSync'
-import {
-    applyEdits,
-    summariseEdits,
-    type SREdit
-} from '../utils/searchReplaceParser'
+import { applyEdits, summariseEdits, type SREdit } from '../utils/searchReplaceParser'
 import { DocAttachPicker } from './documents/DocAttachPicker'
 import { DocDiffPreview } from './documents/DocDiffPreview'
 import { DocEditor } from './documents/DocEditor'
@@ -308,8 +303,8 @@ const EmptyState = (): JSX.Element => (
         <FileText className="mb-4 text-muted-foreground/30" size={48} />
         <h3 className="mb-1 text-sm font-semibold">No document open</h3>
         <p className="max-w-[260px] text-xs text-muted-foreground">
-            Pick a file from the explorer or create a new one to start writing. Open documents
-            keep their state — edits, chat, and pending diffs — across tab switches.
+            Pick a file from the explorer or create a new one to start writing. Open documents keep
+            their state — edits, chat, and pending diffs — across tab switches.
         </p>
     </div>
 )
@@ -330,7 +325,6 @@ interface DocTabPaneProps {
  */
 const DocTabPane = ({ docId, basePath }: DocTabPaneProps): JSX.Element | null => {
     const dispatch = useDispatch<any>()
-    const { setActiveTab: setRailTab } = useSpecification()
 
     const nodes = useSelector(selectDocNodes)
     const buffer = useSelector(selectDocBuffer(docId))
@@ -406,9 +400,7 @@ const DocTabPane = ({ docId, basePath }: DocTabPaneProps): JSX.Element | null =>
 
     const handleProposalEditToggle = useCallback(
         (messageId: string, editIndex: number) => {
-            dispatch(
-                docProposalEditToggled({ id: docId, messageId, editIndex })
-            )
+            dispatch(docProposalEditToggled({ id: docId, messageId, editIndex }))
         },
         [dispatch, docId]
     )
@@ -520,10 +512,7 @@ const DocTabPane = ({ docId, basePath }: DocTabPaneProps): JSX.Element | null =>
                         if (typeof content !== 'string') {
                             try {
                                 if (basePath) {
-                                    const result = await window.specDoc.read(
-                                        basePath,
-                                        id
-                                    )
+                                    const result = await window.specDoc.read(basePath, id)
                                     content = result?.content ?? ''
                                 }
                             } catch {
@@ -650,9 +639,8 @@ const DocTabPane = ({ docId, basePath }: DocTabPaneProps): JSX.Element | null =>
                 label = `${baseLabel} · ${linked.length} KB linked (KB off)`
             }
 
-            const attachLabel = attachedDocIds.length > 0
-                ? ` · ${attachedDocIds.length} attached`
-                : ''
+            const attachLabel =
+                attachedDocIds.length > 0 ? ` · ${attachedDocIds.length} attached` : ''
             return {
                 systemPrompt: sections.join('\n\n'),
                 contextLabel: label + attachLabel
@@ -685,17 +673,10 @@ const DocTabPane = ({ docId, basePath }: DocTabPaneProps): JSX.Element | null =>
     // a proposal review, breaking the ref).
     const editorRef = useRef<monacoEditorNs.IStandaloneCodeEditor | null>(null)
     const previewRef = useRef<HTMLDivElement | null>(null)
-    const handleEditorMount = useCallback(
-        (instance: monacoEditorNs.IStandaloneCodeEditor) => {
-            editorRef.current = instance
-        },
-        []
-    )
-    usePreviewToEditorScrollSync(
-        previewRef,
-        editorRef,
-        viewMode === 'split' && !pendingProposal
-    )
+    const handleEditorMount = useCallback((instance: monacoEditorNs.IStandaloneCodeEditor) => {
+        editorRef.current = instance
+    }, [])
+    usePreviewToEditorScrollSync(previewRef, editorRef, viewMode === 'split' && !pendingProposal)
 
     const onResizeRight = useCallback(
         (size: { inPixels: number }) => {
@@ -765,9 +746,7 @@ const DocTabPane = ({ docId, basePath }: DocTabPaneProps): JSX.Element | null =>
                 breadcrumbs={breadcrumbs}
                 docName={node.name}
                 viewMode={viewMode}
-                onViewModeChange={(mode) =>
-                    dispatch(docViewModeChanged({ id: docId, mode }))
-                }
+                onViewModeChange={(mode) => dispatch(docViewModeChanged({ id: docId, mode }))}
                 paneOpen={rightPane !== null}
                 onTogglePane={onTogglePane}
                 canExport={Boolean(basePath)}
@@ -848,8 +827,7 @@ const DocTabPane = ({ docId, basePath }: DocTabPaneProps): JSX.Element | null =>
                             selectedKBRefs={node.kbRefs ?? []}
                             kbItems={kbItems}
                             onToggleKBRef={(kbItemId) =>
-                                basePath &&
-                                dispatch(toggleDocKBRef(basePath, node.id, kbItemId))
+                                basePath && dispatch(toggleDocKBRef(basePath, node.id, kbItemId))
                             }
                             onAddKBFile={async () => {
                                 if (!basePath) return
@@ -861,7 +839,6 @@ const DocTabPane = ({ docId, basePath }: DocTabPaneProps): JSX.Element | null =>
                                 const isYoutube = /youtube\.com|youtu\.be/.test(url)
                                 dispatch(addKBUrl(basePath, url, isYoutube))
                             }}
-                            onUseInPrototype={() => setRailTab('prototype')}
                         />
                     )}
                 </DocRightPane>

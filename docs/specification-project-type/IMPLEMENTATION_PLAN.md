@@ -227,10 +227,10 @@ export class PrototypeGeneratorService {
 - [x] `NewNodeDialog` com **template picker** (Blank, PRD, User Stories, Architecture, API Spec, Data Model).
 - [x] Inspector com ToC parser (ignora code fences) + **lista de KB items com checkbox** (toggle linka ao doc via `kbRefs`).
 - [x] **KB inline em Documents:** `+ file` / `🔗 URL` no Inspector adicionam directo à KB sem mudar de tab; itens em ingestão aparecem com spinner.
-- [x] `Use in Prototype` button no Inspector (placeholder; activa em M4).
+- [x] ~~`Use in Prototype` button no Inspector~~ — **descontinuado em M4.12** (substituído pelo spec picker no chat do Prototype, ver M4.29). A remover do `DocInspector.tsx`.
 - [x] Eager-load de KB e Docs em `SpecificationLayout` para que Documents tenha sempre KB items disponíveis.
 
-### M2D.18 — Multi-doc tabs 🚧
+### M2D.18 — Multi-doc tabs ✅
 
 > **Motivação:** abrir vários documentos em simultâneo, cada um com o seu próprio buffer, AI chat, diff pendente e KB linked. Substitui o modelo single-doc onde trocar de ficheiro fazia flush do buffer e perdia o histórico do chat.
 
@@ -260,7 +260,7 @@ export class PrototypeGeneratorService {
 - **MOD** `src/renderer/src/generators/specification/utils/searchReplaceParser.ts` — `ProposalStatus` movido para cá (canonical home). `AIAssistant` re-exporta para back-compat.
 - **MOD** `src/renderer/src/generators/specification/components/shared/AIAssistant.tsx` — import de `ProposalStatus` do utils + re-export.
 
-### M2D.19 — Resizable right pane (Chat | Inspector tabs) 🚧
+### M2D.19 — Resizable right pane (Chat | Inspector tabs) ✅
 
 > **Motivação:** o chat estava preso a 360px enquanto o inspector ocupava ~22% à direita; juntos comiam metade do ecrã com o md content esmagado no meio. Utilizador quer chat maior + ajustar a largura à mão.
 
@@ -284,7 +284,7 @@ export class PrototypeGeneratorService {
 - **MOD** `src/renderer/src/generators/specification/components/documents/DocFooter.tsx` — drop do botão `onToggleInspector`.
 - **MOD** `src/renderer/src/generators/specification/components/documents/DocInspector.tsx` — drop do `<aside>` chrome e do header "Inspector"; passa a `<div className="flex h-full flex-col">`.
 
-### M2D.20 — Sync scroll Preview → Editor 🚧
+### M2D.20 — Sync scroll Preview → Editor ✅
 
 > **Motivação:** no `viewMode='split'`, scroll na preview agora segue para a linha equivalente no editor Monaco. Direcção única (preview → editor) — pedido explícito do utilizador. Editor → preview pode vir depois se útil.
 
@@ -305,7 +305,7 @@ export class PrototypeGeneratorService {
 - **NEW** `src/renderer/src/generators/specification/hooks/useDocScrollSync.ts` — hook isolado, rAF-throttled, no-op quando `enabled=false`.
 - **MOD** `src/renderer/src/generators/specification/components/DocumentsPanel.tsx` (`DocTabPane`) — refs + `usePreviewToEditorScrollSync(previewRef, editorRef, viewMode === 'split' && !pendingProposal)`.
 
-### M2D.21 — Chat doc attachments 🚧
+### M2D.21 — Chat doc attachments ✅
 
 > **Motivação:** o utilizador quer anexar outro doc do mesmo spec ao chat actual como input read-only ("baseado no PRD, gera User Stories"). Antes a única forma era enviar para a KB — workflow indirecto e com staleness. Agora há um botão `@ Attach` no composer.
 
@@ -372,21 +372,71 @@ export class PrototypeGeneratorService {
 - [x] **History** — empty state card + 1 sample snapshot opaco como referência visual (Restore button disabled).
 - [x] Layout: `SpecificationLayout` esconde o secondary panel quando `activeTab === 'prototype'`.
 
-**M4.1+ — Backend (pendente):**
-- [ ] **M4.1** `port-pool` + `prototype-dev-server` — `next dev` spawn por projeto, log streaming, auto-recover.
-- [ ] **M4.2** `file-ops` schema + parser tolerante + sandboxed applier (paths confinados em `<basePath>/prototype/`).
-- [ ] **M4.3** `prototype-generator-service` — LLM stream → parse ops → write + `git add && git commit` por turn.
-- [ ] **M4.4** IPC `spec:prototype:*` (generate-start/cancel/chunk, list-files, read-file, start-dev, stop-dev, dev-log, list-snapshots, restore-snapshot, export).
-- [ ] **M4.5** Preload `window.specPrototype` + tipos.
-- [ ] **M4.6** Slice `redux/specPrototype` (sessions, files tree, logs, snapshots).
-- [ ] **M4.7** Preview real com `<webview>` apontando para `localhost:<port>`.
-- [x] **M4.8** Files com tree dinâmico + diff viewer ✅ — `<MonacoEditor>` read-only com `languageFromExt` (ts/tsx, js, json, md, css, html, yaml, sh, sql, py, rb, go, rs); badges new/modified/deleted no header alimentadas por `state.changedPaths`; toggle "View diff" só visível em ficheiros modified, abre `<DiffEditor>` HEAD vs HEAD~1 via novo IPC `spec:prototype:read-file-at` (`git show HEAD~1:<path>`, sandbox-validated com regex `[A-Za-z0-9_/.~^-]` no ref).
-- [ ] **M4.9** Logs em streaming real (xterm-style).
-- [ ] **M4.10** History com `git log` real + restore (`git reset --hard <sha>`).
-- [ ] **M4.11** Snapshot card no chat (cada turn) com restore inline.
-- [ ] **M4.12** "Use in Prototype" do Doc Inspector dispara o pipeline com spec + KB context.
-- [ ] **M4.13** Export prototype (zip ou copy folder via `dialog.showSaveDialog`).
-- [ ] **M4.14** Tests: file-ops parser + sandbox + git snapshots.
+**M4.1–M4.6 — Backend ✅ (concluído pré-MVP)**
+- [x] **M4.1** `port-pool` + `prototype-dev-server` — spawn `next dev`, log streaming (ring buffer 500 linhas), auto-recover 2× com backoff exponencial, auto-`npm install` no first boot.
+- [x] **M4.2** `file-ops` schema + parser tolerante (fenced JSON → balanced-brace fallback → raw) + sandboxed applier (rejeita abs paths e `..`, confinado em `<basePath>/prototype/`, per-op isolation).
+- [x] **M4.3** `prototype-generator-service` — LLM stream → parse ops → write + `git add && git commit` por turn (lazy `git init`; tree listing capped a 200 entries).
+- [x] **M4.4** IPC `spec:prototype:*` (15 channels: generate-start/cancel, apply-ops, list-files, read-file, start-dev, stop-dev, dev-status, get-dev-log-buffer, list-snapshots, restore-snapshot, export + 4 events).
+- [x] **M4.5** Preload `window.specPrototype` (12 invokes + 4 listeners) + tipos.
+- [x] **M4.6** Slice `redux/specPrototype` (devStatus, logs, files, snapshots, turns por requestId, changedPaths) + 11 reducers + 7 thunks.
+
+#### M4 — Plano alargado (Prototype loop completo)
+
+A backend foundation está sólida; o trabalho restante é **fechar o loop visível**, polir UX e adicionar features de paridade com v0/Lovable/Bolt. Reorganizado em 4 fases:
+
+##### Fase 1 — Fechar o loop visível (MVP de aceitação §11) — ~7–9h
+> Sem isto, o utilizador vê o backend a funcionar mas não tem feedback útil.
+
+- [x] **M4.7** Preview real ✅ — `<webview src={url}>` bound a `devStatus.url`; loading/installing/error overlays; **auto-reload em `tree-changed`** (chama `webview.reload()` no callback); **toggle DevTools** via `webview.openDevTools()/closeDevTools()`; "Open in external browser" via `window.open(url)`.
+- [x] **M4.8** File viewer Monaco read-only ✅ — `<MonacoEditor>` read-only + `languageFromExt` (14 ext: ts/tsx, js/jsx, json, md, css, scss, html, yaml, sh, sql, py, rb, go, rs); badges new/modified/deleted no header (cores emerald/blue/red); toggle "View diff" só visível em ficheiros modified, abre `<DiffEditor>` (inline) HEAD vs HEAD~1 via novo IPC `spec:prototype:read-file-at` → `GitService.showFileAtCommit` (`git show HEAD~1:<path>`, sandbox-validated com `..`-rejection no path e regex `[A-Za-z0-9_/.~^-]` no ref).
+- [x] **M4.9** Logs streaming UI ✅ — render real de `state.logs[]` com auto-scroll + **pause-on-hover** (chip "paused" amarelo); filtros tri-state (`all` / `warns+errors` / `errors`) com counts ao lado; **search** que filtra por substring na linha; **clear** dispatcha `protoLogsReplaced([])`; **copy** põe os filtrados na clipboard com timestamp ISO + level. Empty state distingue "no logs" de "no matches".
+- [x] **M4.10** History real ✅ — render dos snapshots do `git log` (hash + message + author + date), Restore wired com confirmação destrutiva.
+- [ ] **M4.11** Snapshot card inline no chat — cada turn rende um card abaixo da bubble assistant: `✓ N files · M updated · K deleted`, paths colapsáveis, Restore inline, link para tab Files com filtro.
+- [x] **M4.13** Footer wired ✅ — Export via `dialog.showOpenDialog` + `copyDir`; **Open folder** via novo `spec:prototype:open-folder` IPC + `shell.openPath`; Reset com confirmação + stop dev + `protoReset`.
+- [x] **M4.30** **Resizable chat ↔ main pane** (paridade com M2D.19) ✅ — `react-resizable-panels` Group/Panel/Separator no `PrototypePanel`; chat min 320 / default 480 / max 50%; persistência em `localStorage` (`spec.prototype.chatWidth`). — hoje o `PrototypePanel` tem `chat 360px fixed | main flex-1`, o que é mau quando o preview tem layout largo (tablet/monitor) ou quando o utilizador quer concentrar-se no chat.
+  - Reutilizar `react-resizable-panels` v4 (já em deps, já usado em M2D.19) — `<Group>` + `<Panel id="chat">` + `<Separator>` + `<Panel id="main">`.
+  - Constraints: chat min 320px, max 50% viewport, default 480px (subir do 360 actual). Main fica flex.
+  - **Collapse-to-icon do chat** — botão `PanelLeftClose / PanelLeftOpen` no header do chat; quando colapsado, restam só ícones (+ unread badge se a chegar streaming durante colapso).
+  - **Persistência**: largura em `localStorage` (key `spec.prototype.chatWidth`) — global, não per-projecto (paridade com `spec.docs.rightPaneWidth` do M2D.19).
+  - **Body completo**: o `Group` ocupa toda a área entre o rail e o footer; tabs internas do main (Preview/Files/Logs/History) continuam a ocupar 100% do `Panel` direito.
+  - Edge case: quando `<webview>` recebe resize event, o iframe interno do Next dev server faz reflow — bom para multi-viewport.
+- [x] **M4.27** **Preview com fake data** ✅ (parcial — directiva no system prompt) — `contextProvider` do `PrototypePanel` injecta agora "When generating components that need data, create a deterministic mock layer (e.g. `prototype/lib/mock-data.ts`) so the preview renders something useful without a backend." **Toggle "Use mock data / real data" no footer** ainda pendente (real fica placeholder até backend integration existir).
+
+##### Fase 2 — Loop agradável de usar — ~6–8h
+> Transforma a feature de "demonstrável" em "usável diariamente".
+
+- [ ] ~~**M4.12** "Use in Prototype" do Doc Inspector~~ — **DESCONTINUADO** (decisão 2026-05). O caminho implícito (botão no Inspector que muda de tab e usa o doc activo como contexto) é substituído pelo M4.29. Acção concreta: **remover** o botão "Use in Prototype" do `DocInspector.tsx` e a prop `onUseInPrototype` do `DocumentsPanel.tsx`.
+- [x] **M4.29** **Spec picker no chat do Prototype** ✅ — `DocAttachPicker` reutilizado no composer do `PrototypePanel`; `attachedDocIds` per-tab + persistência por projecto em `localStorage` (`spec.prototype.attachedSpecIds.<basePath>`); auto-seed com `selectedId` na primeira abertura; auto-clean orphans; `contextProvider` reescrito com role "Reference specification"; KB items derivam da união dos `kbRefs` dos docs anexados. **Removidos** o botão "Use in Prototype" do `DocInspector` e a prop `onUseInPrototype` (M4.12 descontinuado). — **reutiliza directamente** a infra entregue no M2D.21 (`DocAttachPicker`, tipo `ChatAttachment`, prop `composerSlot` e prop `attachments` do `AIAssistant`). Sem componente novo.
+  - **No `PrototypePanel`**: replicar o pattern do `DocTabPane` — `useState attachedDocIds: string[]`, `useStore` para leitura buffer-first do `specDocs.byDoc[id]?.buffer` (fallback `window.specDoc.read` quando não aberto), derivação de `chatAttachments: ChatAttachment[]`, auto-clean de orphans via `useEffect([nodes])`.
+  - **Composer**: passar `<DocAttachPicker excludeDocId={undefined} ...>` no `composerSlot` do `AIAssistant`; `attachments` + `onRemoveAttachment` ligados ao state local.
+  - **System prompt**: secção "Document roles — STRICT" adaptada a `mode='prototype'`: docs anexados são "Reference specifications (read-only inputs that drive the prototype generation)"; nenhum é "active" (não há SEARCH/REPLACE no Prototype).
+  - **Auto-seed** na primeira abertura: se `attachedDocIds` vazio e existir `lastFocusedDocId` no `specDocs`, pré-selecciona-o (utilizador pode desmarcar livremente). Sem fixar.
+  - **Persistência**: `localStorage` key `spec.prototype.attachedSpecIds.<projectId>` para sobreviver a reload.
+  - **Remove** o caminho implícito actual `selectedDocId / activeDoc → contextProvider` no `PrototypePanel`. A escolha de spec passa a ser sempre explícita via picker, reutilizando a UI já familiar do Documents chat.
+- [ ] **M4.15** Stop / Retry mid-stream — botão **Stop** durante geração (`generate-cancel` já existe); **Retry on parse-error** com erro do parser anexado como user message ("the JSON had X — please fix and resend").
+- [ ] **M4.16** Progresso por turn — chip "applying 3/8 ops" durante eventos `op-applied`; toast/banner final `✓ 8 files · 1.2s · commit <sha>` clicável (foca tab History).
+- [ ] **M4.17** Erros visíveis no chat — parse-errors e apply-errors renderizam como mensagem do sistema com botão "Ask AI to fix" (re-fire turn com erro como prompt).
+- [ ] **M4.18** First-run UX — detectar `node_modules` ausente: toast "Installing dependencies (~30s)"; auto-foco na tab Logs durante `npm install`; barra de progresso indeterminada.
+- [ ] **M4.19** Multi-viewport real — já existe CSS-only (Monitor/Tablet/Mobile); expor largura no URL bar; permitir **custom width input** + persistência em `localStorage`.
+- [ ] **M4.28** **Drag-drop component palette** — sidebar colapsável à esquerda do main area com paleta de componentes (shadcn/ui: Card, Table, Form, Chart, Dialog, Sidebar, Tabs, etc., agrupados por categoria; ícones + preview tooltip).
+  - **Drop em ficheiro aberto** (Files tab) → prompt no chat "Add `<Component>` to `<path>`?" → AIAssistant emite op de update com import + insertion point inferido.
+  - **Drop no Preview** (avançado, opcional) → coordinate-aware: pega no element selector via `webview.executeJavaScript('document.elementFromPoint(x,y)')` e usa como anchor para o LLM ("insert after this section").
+  - **Drop directamente no chat** → adiciona chip "📦 Card" ao composer; próximo turn pede para usar esse componente.
+  - Paleta extensível: começa com shadcn registry (já no template); futuro permite custom registry per-projecto.
+
+##### Fase 3 — Power user / parity — ~7–11h (pós-MVP, opcional)
+- [ ] **M4.20** Console + network capture do webview — `<webview>.getWebContents().debugger` para `Network.responseReceived` e `Console.messageAdded`; tab inline "DevTools" com console + network filtros.
+- [ ] **M4.21** Cost & token tracking — input+output tokens + modelo + custo estimado por turn; agregação na sessão; banner colapsável no topo do chat.
+- [ ] **M4.22** Starter templates — 3 presets ao criar projeto Specification: Next.js minimal, Next.js + shadcn + Tailwind, Next.js + Prisma + tRPC; copiados para `<basePath>/prototype/` no first turn.
+- [ ] **M4.23** Branch isolation por sessão de chat — git branch por chat session (`spec/chat-<sessionId>`); merge para main em "Confirm" ou abandonar; paraleliza experimentos.
+- [ ] **M4.24** Hot-reload feedback — detectar fast-refresh nos logs do dev-server, badge "🔄 reloaded em 230ms" no Preview.
+
+##### Fase 4 — Hardening & tests — ~4–5h (paralelo às fases anteriores)
+- [ ] **M4.14** Tests file-ops — parser (happy + balanced-brace fallback + malformed); applier sandbox (rejeita `..`, abs paths, symlinks); generator-service com mock LLM stream → parse → apply → commit; redux thunks com IPC mocks.
+- [ ] **M4.25** Crash recovery — dev-server crash mid-stream: auto-restore último snapshot + flag visível no chat ("Server crashed; reverted to <sha>").
+- [ ] **M4.26** Sandbox fuzzing — property-based test (fast-check) para path traversal, encoding tricks, null bytes.
+
+**Total:** Fase 1+2 ≈ 13–17h (entrega MVP §11 + UX competitivo). Fase 3 opcional. Fase 4 em paralelo.
 
 ### M5 — Polish — pendente
 - [ ] Empty/loading/error states completos em todos os panels (parcialmente feito em KB e Documents).
@@ -457,7 +507,8 @@ Bloqueadores:
 | **v1 — Auto-apply silencioso** (M2D.10/11) | Intent picker `Ask / Append / Replace`. Em Append/Replace o reply (bloco \`\`\`markdown) era aplicado automaticamente ao buffer. | Sem revisão humana; replaces destruíam edições. |
 | **v2 — DiffCard inline na bolha** (M2D.16) | Mesma base de Append/Replace, mas em vez de auto-apply mostrava um `DiffCard` dentro da bolha do chat com Apply/Reject. | Diff no chat era pequeno, fora do contexto do editor; user feedback: "queria a interação no próprio documento, tal como Claude Code edita ficheiros". |
 | **v3 — DocDiffPreview no editor** (M2D.16.b) | DiffCard movido para fora do chat: `pendingProposal` no host troca o `DocEditor` por `Monaco DiffEditor` inline com toolbar Apply/Reject. | Continuava limitado a Append (concatena no fim) ou Replace (todo o doc). Não permitia "corrigir o início e adicionar no fim na mesma resposta", nem edits surgical. |
-| **v4 — SEARCH/REPLACE blocks** (**M2D.17, atual**) | Resposta do LLM contém um ou mais blocos `<<<<<<< SEARCH … ======= … >>>>>>> REPLACE`. Host parseia + aplica em ordem sobre snapshot; resultado vai para `DocDiffPreview`. Múltiplas edições por turno, surgical, com fallback fuzzy quando o whitespace não bate certo. | — |
+| **v4 — SEARCH/REPLACE blocks** (M2D.17) | Resposta do LLM contém um ou mais blocos `<<<<<<< SEARCH … ======= … >>>>>>> REPLACE`. Host parseia + aplica em ordem sobre snapshot; resultado vai para `DocDiffPreview`. Múltiplas edições por turno, surgical, com fallback fuzzy quando o whitespace não bate certo. | "Apply tudo de uma vez" obrigava o user a escolher entre aceitar todas ou rejeitar todas. |
+| **v4.1 — Per-edit selection** (**M2D.17.b, atual**) | Cada edit ganha checkbox no checklist da bolha; toggle re-corre `applyEdits` no reducer e o `DocDiffPreview` reflecte em tempo real. Toolbar mostra `Apply N/M`. Failed edits ficam disabled (não podem ser marcados). | — |
 
 ### Por que SEARCH/REPLACE (e não alternativas)
 
@@ -486,21 +537,31 @@ O `contextProvider` em `DocumentsPanel.tsx` injecta no system prompt um bloco qu
   3. Se 0 matches ou >1 match (ambíguo) → marca op como `failed` com motivo, mas continua com os outros edits.
 - Resultado expõe `{ result, ops: [{kind, ok, ...}] }` para a UI mostrar resumo + falhas.
 
-### UI
+### UI (estilo Claude Code)
 
 - **Intent picker removido** em modo `docs` — uma única caixa de chat. O modelo decide se é conversa ou edição pelo conteúdo da resposta.
-- **Bolha do chat** mostra resumo compacto: "3 edições propostas — review no editor" (ou status `applied` / `rejected` / `stale` quando histórico).
-- **DocDiffPreview** continua a usar Monaco DiffEditor inline; toolbar mostra agora "N edições · M falhas" em vez de Append/Replace.
-- **Falhas parciais** (blocos que não fizeram match) ficam listadas num accordion na toolbar; o user pode aplicar o resto e voltar a pedir ajuda no chat para os que falharam.
+- **Composer multi-line** estilo Claude Code: `<textarea>` auto-grow (cap 180px ≈ 8 linhas), `Enter` envia, `Shift+Enter` quebra linha, `Cmd/Ctrl+Enter` também envia, IME composition respeitado (acentos não disparam send).
+- **Bolha do assistant não tem fundo** — guideline subtil à esquerda (`border-l-2 border-primary/30`); só mensagens do user mantêm chip primary à direita. Mensagens separadas por `divide-y divide-border/40`.
+- **`ProposalChecklist`** (em `AIAssistant.tsx`) substitui o conteúdo bruto na bolha do chat por um *tool-use card colapsável* à Claude Code:
+  - Header sempre visível com o trigger `▸ Edit document  ✓ N/M  ✗ K  PENDING`. Click expande/colapsa. Default aberto enquanto pending; auto-fecha após `applied`/`rejected`.
+  - Cada edit é uma linha — quando o proposal está activo (pending), as linhas têm `<input type="checkbox">` interactivos e a linha inteira é clicável; quando histórico, são read-only com ícones ✓/✗.
+  - "Select all" / "Unselect all" inline para alternar todos os ok edits.
+  - **Sem markup SR cru** — o user nunca vê os `<<<<<<< SEARCH …`. Durante o stream, mostra um placeholder `Drafting edits…` em vez de mostrar os delimitadores parciais.
+- **Labels do checklist** derivados via `describeEdit` (markdown-aware, ver §"Extensibilidade futura"): `Added section: <heading>` / `Edited section: <heading>` / `Removed: "<truncated>"` / `Replaced "<truncated>"`. Edits *fuzzy* mostram `Matched with whitespace tolerance`.
+- **DocDiffPreview** (Monaco DiffEditor inline, modo unified):
+  - Quando há `selected[]`, toolbar mostra `2 of 3 selected — review and apply.` e o botão `Apply 2/3`. Sem `selected[]`, fallback para `summariseOps` antigo.
+  - Toggle no checklist da bolha re-corre `applyEdits` no reducer → `applied` recalcula → DiffEditor refresca em tempo real.
+- **Falhas parciais** (blocos sem match) ficam listadas num accordion na toolbar do DiffPreview; o user pode aplicar o resto e voltar a pedir ajuda no chat para os que falharam.
 
 ### Ficheiros impactados
 
-- **NEW** `src/renderer/src/generators/specification/utils/searchReplaceParser.ts` — parser + applier puro (testável).
-- **MOD** `components/shared/AIAssistant.tsx` — remove intent picker e `applyOnDone`; useEffect de staging passa a chamar `parseSearchReplaceBlocks` e fire `onProposeChange(messageId, edits)`.
-- **MOD** `components/DocumentsPanel.tsx` — `pendingProposal` carrega `{messageId, edits, snapshot, applied, ops}`; `contextProvider` injecta o prompt SEARCH/REPLACE.
-- **MOD** `components/documents/DocDiffPreview.tsx` — drop prop `mode`, aceita `ops` para o resumo.
-- **DEL** `components/shared/DiffCard.tsx` (já apagado em v3).
-- **CLEANUP** `package.json` — remover deps `diff` + `@types/diff` (não usadas após v4; Monaco DiffEditor faz o diff visual).
+- **NEW** `src/renderer/src/generators/specification/utils/searchReplaceParser.ts` — parser + applier puro (testável). Exporta também `summariseEdits`, `describeEdit`, `ProposalSummary`, `ProposalStatus` para a UI e o Redux.
+- **MOD** `redux/specDocs/reducer.ts` — `PendingProposal` carrega `{messageId, edits, snapshot, selected, applied, ops}` e `proposalSummaries: Record<msgId, ProposalSummary[]>` por doc. Actions: `docProposalStaged`, `docProposalEditToggled` (recomputa `applied` via `applyEdits` em cima da selecção), `docProposalResolved`.
+- **MOD** `components/shared/AIAssistant.tsx` — sem intent picker, sem `applyOnDone`. Composer é `<textarea>` multi-line. `useEffect` de staging chama `parseSearchReplaceBlocks` e fire `onProposeChange(messageId, edits)`. Bolha do assistant sem fundo (guideline esquerda); bolha do user mantém-se. Renderiza `ProposalChecklist` (tool-use card colapsável com checkboxes) em vez do conteúdo cru.
+- **MOD** `components/DocumentsPanel.tsx` — usa selectors da Redux slice. `handleProposeChange` faz `applyEdits` + `summariseEdits` e dispatcha `docProposalStaged`. Novo `handleProposalEditToggle` para o flow per-edit. `contextProvider` injecta o prompt SEARCH/REPLACE com regras + 2 exemplos.
+- **MOD** `components/documents/DocDiffPreview.tsx` — drop prop `mode`. Aceita `ops` (toolbar `summariseOps`) e `selected` (toolbar `Apply N/M`). Accordion de falhas inalterado.
+- **DEL** `components/shared/DiffCard.tsx` (apagado em v3).
+- **CLEANUP** `package.json` — removidas deps `diff` + `@types/diff` (não usadas; Monaco faz o diff visual).
 
 ### Extensibilidade futura — reuso do AIAssistant fora de markdown
 
@@ -526,29 +587,56 @@ Pendente de refactor. Adiar até existir o **segundo consumidor** (provavelmente
 |---|---|---|
 | M1 — Foundations | ✅ | Engine + wizard + sidebar-09 layout + navegação automática + rail alinhado ao Studio |
 | M2D — Documents | ✅ | Monaco + react-markdown + GFM + drop + templates + ToC + KB inline + kbRefs |
-| M2D.17 — Edição interativa SEARCH/REPLACE | 🚧 | Parser + applier + system prompt + UI sem intent picker · ver §12.bis |
+| M2D.17 — Edição interativa SEARCH/REPLACE | ✅ | Parser + applier + system prompt + UI sem intent picker · ver §12.bis (commit `417085a8`) |
+| M2D.17.b — Per-edit selection + Claude-Code-style UI | ✅ | Checkbox por edit no `ProposalChecklist` colapsável; `selected[]` na Redux slice + `docProposalEditToggled` recomputa `applied` em tempo real; `Apply N/M` na toolbar do `DocDiffPreview`; composer multi-line `<textarea>` (Enter envia, Shift+Enter quebra linha); bolha do assistant sem fundo (guideline esquerda) — ver §12.bis. |
+| M2D.18 — Multi-doc tabs | ✅ | `TabContext` reutilizado, `byDoc` map, AIAssistant per-tab (commit `10d9a763`) |
+| M2D.19 — Resizable right pane (Chat \| Inspector) | ✅ | `react-resizable-panels`, largura persistida em localStorage |
+| M2D.20 — Sync scroll Preview → Editor | ✅ | Mapeamento via remark AST + `data-source-line`, hook rAF-throttled |
+| M2D.21 — Chat doc attachments | ✅ | `@ Attach` no composer, buffer-first read, 3 papéis no system prompt |
 | M2L — LLM Stack | ✅ | OpenRouter SSE + Claude Code CLI (auto-probe nvm/login-shell) + Settings UI (AI Providers + Local CLIs) + AIAssistant com intent picker + Retry + action bar |
 | M3 — KB + RAG | ✅ | LanceDB + chunker sha1 + OpenAI/stub embeddings + UI completa + **RAG real** (search-by-refs + KB toggle no AIAssistant + chunks no system prompt) |
 | M4.0 — Prototype UI shell | ✅ | Chat + Tabs (Preview multi-viewport / Files / Logs / History) + Footer placeholders |
+| M4.1–M4.6 — Prototype backend foundation | ✅ | port-pool + dev-server (auto-recover, log streaming) + file-ops (sandbox) + generator-service (LLM→parse→apply→git commit) + 15 IPC + preload + slice + 7 thunks |
 
 ### Pendente
 | Item | Esforço | Prioridade |
 |---|---|---|
-| **M4.1–M4.14** Prototype backend | Pesado (~8–12h) | ⭐⭐⭐ Alta — fecha KB→Spec→Prototype |
+| **M4 Fase 1** — Fechar loop visível (M4.8 viewer+diff, M4.9 logs filters, M4.11 snapshot card; **M4.7 ✅**, **M4.10 ✅**, **M4.13 ✅**, **M4.27 ✅** parcial, **M4.30 ✅**) | ~3–5h | ⭐⭐⭐ Alta — entrega MVP §11 |
+| **M4 Fase 2** — Loop usável (M4.15–M4.19, M4.28 drag-drop; **M4.29 ✅**, M4.12 descontinuado) | ~4–6h | ⭐⭐⭐ Alta — UX competitivo |
+| **M4 Fase 3** — Power user (M4.20–M4.24) | ~7–11h | ⭐ Opcional pós-MVP |
+| **M4 Fase 4** — Tests & hardening (M4.14, M4.25, M4.26) | ~4–5h | ⭐⭐ Média (paralelo) |
 | Tests M2D.16 + M3.13 | ~2h | ⭐⭐ Média |
 | M5 — Polish | ~3–4h | ⭐ Baixa até M4 estar feito |
+
+### Parqueado para revisitar (sub-projectos paralelos)
+
+Estes pilares foram esboçados como tabs adicionais no rail da Specification mas estão **fora do scope do MVP actual** — serão revisitados depois de M4/M5 fecharem. Os planos próprios continuam vivos e devem ser actualizados quando reactivados.
+
+| Sub-projecto | Plano | Estado | Notas |
+|---|---|---|---|
+| **Process Integration** (BPMN authoring, rail tab `processes`) | [`process-integration/IMPLEMENTATION_PLAN.md`](../process-integration/IMPLEMENTATION_PLAN.md) | Parqueado | Scaffold inicial existe; auth service, `features/bpmn/`, ProcessEditor pendentes. Reutilizará `safeStorage` e `SpecificationContext` definidos aqui. |
+| **Data Models** (entities, ERD, AIAssistant `mode='data'`, rail tab `data`) | [`data-models-integration/IMPLEMENTATION_PLAN.md`](../data-models-integration/IMPLEMENTATION_PLAN.md) | Parqueado — parcialmente implementado (commits `c551c846`, `6ca5ac56`, `7574d35a`: ConnectionForm/Manager, TablePicker, ReactFlow ERD). | Plano original mencionava gojs; implementação adoptou ReactFlow — actualizar plano ao reactivar. M7.4b (entity-ops) deve copiar o pattern do `file-ops` que sairá do M4.2/M4.3. |
+
+**Ao reactivar:** decidir rail order canónica (proposta: `Knowledge → Documents → Data → Processes → Prototype`) e coordenar PRs que toquem `SpecificationLayout.tsx` e `SpecificationContext` para evitar conflitos.
 
 ### Decisões importantes registadas
 - **Fluxo de dados unidireccional:** KB → Documents → Prototype. Documents linka KB via `kbRefs[]`, não envia para KB.
 - **Rail order** reflecte o data flow: **Knowledge → Documents → Prototype**.
 - **Output contract do AIAssistant em Documents (M2D.16, descontinuado)** — versão original forçava bloco \`\`\`markdown e auto-apply em Append/Replace. **Substituído em M2D.17** (ver abaixo) por edits SEARCH/REPLACE com diff inline no editor.
-- **Edição interativa do Documents (M2D.17, ✅ adoptado 2026-05)** — o AIAssistant deixa de devolver "o documento todo"/"um fragmento" e passa a emitir blocos `<<<<<<< SEARCH … ======= … >>>>>>> REPLACE` (formato Aider). O host parseia, aplica em ordem sobre um snapshot do buffer, e mostra o resultado num **Monaco DiffEditor** que substitui o `DocEditor` enquanto há proposta pendente. **Apply** consolida tudo de uma vez no buffer; **Reject** descarta. Cobre insert/replace/delete/full-rewrite com uma só primitiva, é multi-edit por turno, não exige function-calling no LLM (funciona em qualquer modelo via prompt). Ver "Decisões de design — edição interativa de Documents" mais abaixo.
+- **Edição interativa do Documents (M2D.17, ✅ adoptado 2026-05)** — o AIAssistant deixa de devolver "o documento todo"/"um fragmento" e passa a emitir blocos `<<<<<<< SEARCH … ======= … >>>>>>> REPLACE` (formato Aider). O host parseia, aplica em ordem sobre um snapshot do buffer, e mostra o resultado num **Monaco DiffEditor** que substitui o `DocEditor` enquanto há proposta pendente. Cobre insert/replace/delete/full-rewrite com uma só primitiva, é multi-edit por turno, não exige function-calling no LLM (funciona em qualquer modelo via prompt). Ver "Decisões de design — edição interativa de Documents" mais abaixo.
+- **Per-edit selection (M2D.17.b, ✅ adoptado 2026-05)** — em vez do "Apply tudo ou Reject tudo" inicial, cada edit ganha checkbox no `ProposalChecklist` (estilo tool-use card colapsável do Claude Code). Toggle dispatcha `docProposalEditToggled` no reducer, que re-corre `applyEdits(snapshot, edits.filter(selected))` e actualiza o `applied` que alimenta o `DocDiffPreview` — refresh em tempo real. Toolbar passa a `Apply N/M`. Failed edits (no-match / multiple-matches) ficam com checkbox disabled. Default selecção: ok→true, failed→false.
+- **UI estilo Claude Code (M2D.17.b)** — composer com `<textarea>` multi-line (`Enter` envia, `Shift+Enter` quebra linha, `Cmd/Ctrl+Enter` também envia, IME respeitado); bolha do assistant sem fundo (guideline esquerda fina), só user mantém chip primary à direita; mensagens separadas por divisores subtis (`divide-y`); `ProposalChecklist` esconde os blocos `<<<<<<< SEARCH …` crus do chat e mostra um header colapsável `▸ Edit document  ✓ N/M  status`; durante o stream, mostra `Drafting edits…` em vez dos delimitadores parciais.
 - **RAG ground rule:** AIAssistant cita `[KB: <item name>]` quando consulta chunks reais; quando não encontra, declara explicitamente em vez de inventar.
 - **Embeddings em dev:** auto-fallback para stub determinístico quando não há key OpenAI; sem precisar de env flag.
 - **CLI detection:** cascade override → PATH → login shell (`zsh -lic`) → known paths (incluindo nvm versions). Resolve o problema do Electron lançado do Finder não ter PATH do `.zshrc`.
 - **Storage layout** por projeto: `<basePath>/{docs,kb,vectors,chats,prototype}/`.
 - **Settings:** secrets via `safeStorage` (`spec-secrets.bin`); preferences em JSON (`spec-settings.json`); ENV vars sobrepõem para dev.
 - **Layout adaptativo:** `SpecificationLayout` esconde o secondary panel para a tab Prototype (que tem layout próprio chat + main).
+- **Multi-doc tabs (M2D.18):** `byDoc: Record<docId, DocPerState>` no slice; padrão `tabs-mounted-hidden` (estado preservado em troca de tab); `AIAssistant` continua local-state (chat preservado naturalmente); selectors **sempre** `docId`-scoped — nunca `useSelector(s => s.specDocs.byDoc)`.
+- **Right pane mutuamente exclusivo (M2D.19):** Chat e Inspector partilham o mesmo painel à direita; trigger único na toolbar (padrão shadcn `SidebarTrigger`); largura persistida em `localStorage` (key `spec.docs.rightPaneWidth`); `useState lastPane` no `DocTabPane` lembra o último modo entre colapsos.
+- **Sync scroll preview → editor (M2D.20):** unidireccional, mapeamento via `node.position.start.line` injectado como `data-source-line`; hook `usePreviewToEditorScrollSync` rAF-throttled; activo só em `viewMode='split' && !pendingProposal`.
+- **Chat doc attachments (M2D.21):** anexos vivem com a chat session (state local em `useState` no DocTabPane), não no slice. Regra para o user: **externos → KB; produzidos no spec → chat attach**. System prompt explicita 3 papéis (Active editável / Reference read-only / KB external) + citações `[Doc: <name>]` e `[KB: <name>]`. Buffer-first read via `useStore().getState()` para não subscrever o `DocTabPane` ao `byDoc` inteiro.
+- **Hooks-order rule (lesson learned do M2D.21 bug):** **TODOS os hooks têm de ser declarados antes de qualquer early return**. O `DocTabPane` apresentou "Rendered fewer hooks than expected" quando se apagava um doc com a tab aberta, porque havia `if (!node) return ...` no meio dos hooks. Padrão correcto: hooks primeiro, depois render guards. Comentário inline no `DocTabPane` lembra a regra para evitar regressão.
 
 ### Dependências externas adicionadas
 - `@lancedb/lancedb` (vector DB embarcado)

@@ -11,7 +11,7 @@ import { execFile } from 'node:child_process'
 import fs from 'node:fs'
 import { promises as fsp } from 'node:fs'
 import { promisify } from 'node:util'
-import { BrowserWindow, dialog, ipcMain } from 'electron'
+import { BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import { join, relative } from 'node:path'
 import { EVENTS } from '../constants/events'
 import { GitService } from '../services/git-service'
@@ -151,6 +151,26 @@ ipcMain.handle(
 )
 
 ipcMain.handle(
+    EVENTS.SPEC_PROTOTYPE.READ_FILE_AT,
+    async (
+        _event,
+        { basePath, ref, path }: { basePath: string; ref: string; path: string }
+    ): Promise<{ content: string | null }> => {
+        // Sandbox the path against the prototype root so the IPC can't be
+        // tricked into reading arbitrary files via `..` traversal. We resolve
+        // the join result and require it to land inside the root.
+        const root = join(basePath, PROTOTYPE_SUBDIR)
+        const target = join(root, path)
+        const rel = relative(root, target)
+        if (rel.startsWith('..') || rel === '') return { content: null }
+        // Refs are constrained to a small alphabet to keep them out of the
+        // shell — `git show` accepts SHAs, branch names, `HEAD`, `HEAD~N`.
+        if (!/^[A-Za-z0-9_/.~^-]+$/.test(ref)) return { content: null }
+        return GitService.showFileAtCommit(root, ref, rel)
+    }
+)
+
+ipcMain.handle(
     EVENTS.SPEC_PROTOTYPE.START_DEV,
     async (_event, { basePath }: { basePath: string }) => {
         return prototypeDevServer.start(basePath)
@@ -232,6 +252,21 @@ ipcMain.handle(
         const target = join(result.filePaths[0], 'prototype-export')
         await copyDir(root, target)
         return { ok: true, path: target }
+    }
+)
+
+ipcMain.handle(
+    EVENTS.SPEC_PROTOTYPE.OPEN_FOLDER,
+    async (
+        _event,
+        { basePath }: { basePath: string }
+    ): Promise<{ ok: boolean; error?: string }> => {
+        const root = join(basePath, PROTOTYPE_SUBDIR)
+        if (!fs.existsSync(root)) {
+            return { ok: false, error: 'Prototype folder does not exist yet.' }
+        }
+        const errMsg = await shell.openPath(root)
+        return errMsg ? { ok: false, error: errMsg } : { ok: true }
     }
 )
 

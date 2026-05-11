@@ -313,7 +313,16 @@ interface SpecPrototypeBridge {
         raw: string
     ) => Promise<{ summary: string; applied: number; failed: number }>
     listFiles: (basePath: string) => Promise<SpecPrototypeFileEntry[]>
-    readFile: (basePath: string, path: string) => Promise<{ content: string } | null>
+    readFile: (
+        basePath: string,
+        path: string
+    ) => Promise<{ content: string } | null>
+    readFileAt: (
+        basePath: string,
+        ref: string,
+        path: string
+    ) => Promise<{ content: string | null }>
+    openFolder: (basePath: string) => Promise<{ ok: boolean; error?: string }>
     startDev: (basePath: string) => Promise<SpecPrototypeDevStatus>
     stopDev: (basePath: string) => Promise<SpecPrototypeDevStatus>
     devStatus: (basePath: string) => Promise<SpecPrototypeDevStatus>
@@ -325,6 +334,7 @@ interface SpecPrototypeBridge {
         path?: string
         cancelled?: boolean
     }>
+    openFolder: (basePath: string) => Promise<{ ok: boolean; error?: string }>
     onChunk: (
         callback: (payload: { requestId: string; chunk: SpecPrototypeChunk }) => void
     ) => () => void

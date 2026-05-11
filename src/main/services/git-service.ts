@@ -526,6 +526,29 @@ export const GitService = {
         }
     },
 
+    /**
+     * Read the contents of a file as it existed at a given commit/ref.
+     * Returns `null` when the file did not exist at that ref (new file —
+     * a "modified" badge against HEAD~1 means the previous commit had no
+     * such path) or when the ref itself does not resolve (e.g. the very
+     * first commit has no HEAD~1).
+     */
+    async showFileAtCommit(
+        projectPath: string,
+        ref: string,
+        relPath: string
+    ): Promise<{ content: string | null }> {
+        try {
+            const { stdout } = await execAsync(`git show ${ref}:${relPath}`, {
+                cwd: projectPath,
+                maxBuffer: 10 * 1024 * 1024
+            })
+            return { content: stdout }
+        } catch {
+            return { content: null }
+        }
+    },
+
     async getContributors(projectPath: string): Promise<{ name: string; email: string }[]> {
         try {
             const { stdout } = await execAsync('git shortlog -sne --all', {

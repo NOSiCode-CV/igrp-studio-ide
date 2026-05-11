@@ -23,14 +23,12 @@ import {
     startPrototypeDev,
     stopPrototypeDev
 } from '@renderer/redux/specPrototype/thunks'
-import {
-    selectDocBuffer,
-    selectDocNodes,
-    selectSelectedDocId
-} from '@renderer/redux/specDocs/reducer'
+import { selectDocNodes, selectSelectedDocId } from '@renderer/redux/specDocs/reducer'
 import {
     AlertCircle,
+    Bug,
     CheckCircle2,
+    Copy,
     Download,
     ExternalLink,
     FileCode,
@@ -42,13 +40,17 @@ import {
     Play,
     RefreshCw,
     RotateCcw,
+    Search,
     Smartphone,
     Tablet,
-    Terminal
+    Terminal,
+    Trash2
 } from 'lucide-react'
 import { type JSX, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { AIAssistant } from './shared/AIAssistant'
+import { useDispatch, useSelector, useStore } from 'react-redux'
+import { Group, Panel, Separator } from 'react-resizable-panels'
+import { AIAssistant, type ChatAttachment } from './shared/AIAssistant'
+import { DocAttachPicker } from './documents/DocAttachPicker'
 
 interface PanelProps {
     basePath?: string
@@ -66,6 +68,50 @@ const TABS: { id: PrototypeTab; label: string }[] = [
     { id: 'history', label: 'History' }
 ]
 
+// ─── Persistence helpers ──────────────────────────────────────────────────
+//
+// Chat width is global (all projects share the same comfortable size).
+// Attached spec ids are per-project (each spec has its own picks).
+
+const CHAT_WIDTH_KEY = 'spec.prototype.chatWidth'
+const DEFAULT_CHAT_WIDTH = 480
+const MIN_CHAT_WIDTH = 320
+
+const readPersistedChatWidth = (): number => {
+    if (typeof window === 'undefined') return DEFAULT_CHAT_WIDTH
+    try {
+        const raw = window.localStorage?.getItem(CHAT_WIDTH_KEY)
+        const parsed = raw ? Number(raw) : NaN
+        return Number.isFinite(parsed) && parsed >= MIN_CHAT_WIDTH ? parsed : DEFAULT_CHAT_WIDTH
+    } catch {
+        return DEFAULT_CHAT_WIDTH
+    }
+}
+
+const attachedIdsKey = (basePath?: string): string =>
+    basePath ? `spec.prototype.attachedSpecIds.${basePath}` : ''
+
+const readPersistedAttachedIds = (basePath?: string): string[] => {
+    if (!basePath || typeof window === 'undefined') return []
+    try {
+        const raw = window.localStorage?.getItem(attachedIdsKey(basePath))
+        if (!raw) return []
+        const parsed = JSON.parse(raw)
+        return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : []
+    } catch {
+        return []
+    }
+}
+
+const writePersistedAttachedIds = (basePath: string | undefined, ids: string[]): void => {
+    if (!basePath || typeof window === 'undefined') return
+    try {
+        window.localStorage?.setItem(attachedIdsKey(basePath), JSON.stringify(ids))
+    } catch {
+        // noop — private mode etc.
+    }
+}
+
 // ─── List variant — placeholder; the rail hides the secondary panel here. ─
 
 const ListVariant = (): JSX.Element => (
@@ -78,9 +124,9 @@ const ListVariant = (): JSX.Element => (
 
 const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
     const dispatch = useDispatch<any>()
+    const store = useStore<RootState>()
     const docs = useSelector(selectDocNodes)
     const selectedId = useSelector(selectSelectedDocId)
-    const buffer = useSelector(selectDocBuffer(selectedId))
     const kbItems = useSelector((s: RootState) => s.specKB.items)
     const devStatus = useSelector((s: RootState) => s.specPrototype.devStatus)
     const lastTurnId = useSelector((s: RootState) => s.specPrototype.lastTurnId)
@@ -89,15 +135,92 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
     const [activeTab, setActiveTab] = useState<PrototypeTab>('preview')
     const [device, setDevice] = useState<DeviceFrame>('desktop')
 
-    const activeDoc = useMemo(
-        () => docs.find((d) => d.id === selectedId) ?? null,
-        [docs, selectedId]
+    // Spec attachments — explicit picker drives chat context (M4.29).
+    // No more implicit "active doc" path. Persisted per-project.
+    const [attachedDocIds, setAttachedDocIds] = useState<string[]>(() =>
+        readPersistedAttachedIds(basePath)
     )
-    const linkedKb = useMemo(
-        () => kbItems.filter((k) => activeDoc?.kbRefs?.includes(k.id)),
-        [activeDoc, kbItems]
-    )
+
     const lastTurn = lastTurnId ? turns[lastTurnId] : null
+
+    // Auto-seed once per (basePath, nodes-arrived). If the user has nothing
+    // saved AND there's a doc currently selected in the Documents rail, use
+    // it as a hint — but they remain free to remove it. We guard with a ref
+    // so re-renders don't re-seed after the user explicitly empties the list.
+    const seededRef = useRef(false)
+    useEffect(() => {
+        if (seededRef.current) return
+        if (!basePath) return
+        if (docs.length === 0) return
+        seededRef.current = true
+        const persisted = readPersistedAttachedIds(basePath)
+        const validPersisted = persisted.filter((id) => docs.some((d) => d.id === id))
+        if (validPersisted.length > 0) {
+            setAttachedDocIds(validPersisted)
+            return
+        }
+        if (selectedId && docs.some((d) => d.id === selectedId)) {
+            setAttachedDocIds([selectedId])
+        }
+    }, [basePath, docs, selectedId])
+
+    // Persist any change to attached ids.
+    useEffect(() => {
+        writePersistedAttachedIds(basePath, attachedDocIds)
+    }, [attachedDocIds, basePath])
+
+    // Auto-clean orphans (attached doc was deleted from disk).
+    useEffect(() => {
+        const validIds = new Set(docs.map((n) => n.id))
+        setAttachedDocIds((prev) => {
+            const next = prev.filter((id) => validIds.has(id))
+            return next.length === prev.length ? prev : next
+        })
+    }, [docs])
+
+    const toggleAttachedDoc = useCallback((id: string) => {
+        setAttachedDocIds((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        )
+    }, [])
+
+    const removeAttachedDoc = useCallback((id: string) => {
+        setAttachedDocIds((prev) => prev.filter((x) => x !== id))
+    }, [])
+
+    const chatAttachments = useMemo<ChatAttachment[]>(() => {
+        const out: ChatAttachment[] = []
+        for (const id of attachedDocIds) {
+            const ref = docs.find((n) => n.id === id)
+            if (!ref) continue
+            const dirty = Boolean(store.getState().specDocs.byDoc[id]?.dirty)
+            out.push({ id, name: ref.name, kind: 'doc', dirty })
+        }
+        return out
+        // store is a stable ref — read inside; recompute when ids/docs change.
+    }, [attachedDocIds, docs, store])
+
+    const estimateAttachmentTokens = useCallback(
+        (id: string): number | null => {
+            const buf = store.getState().specDocs.byDoc[id]?.buffer
+            if (typeof buf !== 'string') return null
+            return Math.ceil(buf.length / 4)
+        },
+        [store]
+    )
+
+    // Chat width — resizable left pane (M4.30). Persisted globally.
+    const [chatWidth, setChatWidth] = useState<number>(() => readPersistedChatWidth())
+    const onResizeChat = useCallback((size: { inPixels: number }) => {
+        if (size.inPixels >= MIN_CHAT_WIDTH) {
+            setChatWidth(size.inPixels)
+            try {
+                window.localStorage?.setItem(CHAT_WIDTH_KEY, String(Math.round(size.inPixels)))
+            } catch {
+                // noop
+            }
+        }
+    }, [])
 
     // Initial loads when basePath becomes available.
     useEffect(() => {
@@ -119,124 +242,246 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
         dispatch(startPrototypeDev(basePath))
     }, [activeTab, basePath, devStatus.running, dispatch])
 
-    // Tree refresh when the main process reports a generation finished.
+    // Tree refresh + preview reload when the main process reports a turn
+    // finished. The webview reload is best-effort: if the user is on another
+    // tab the element is not mounted, so we just skip and the next time they
+    // come back to Preview they'll see the latest state via the `src`.
     useEffect(() => {
         if (!basePath) return
         const off = window.specPrototype.onTreeChanged((payload) => {
-            if (payload.basePath === basePath) {
-                dispatch(loadPrototypeFiles(basePath))
-                dispatch(loadPrototypeSnapshots(basePath))
-            }
+            if (payload.basePath !== basePath) return
+            dispatch(loadPrototypeFiles(basePath))
+            dispatch(loadPrototypeSnapshots(basePath))
+            const view = document.querySelector(
+                'webview.spec-prototype-preview'
+            ) as { reload?: () => void } | null
+            view?.reload?.()
         })
         return off
     }, [basePath, dispatch])
 
-    return (
-        <div className="flex h-full">
-            {/* Build chat */}
-            <aside className="flex w-[360px] shrink-0 flex-col border-r bg-card/30">
-                <AIAssistant
-                    mode="prototype"
-                    title="Prototype builder"
-                    placeholder="Describe a feature or change…"
-                    submitLabel="Build"
-                    supportsKB
-                    chatBackend={
-                        basePath
-                            ? {
-                                  kind: 'prototype',
-                                  basePath,
-                                  onTurnEvent: (event) => dispatch(event)
-                              }
-                            : undefined
+    const contextProvider = useCallback(
+        async ({ userMessage, useKB }: { userMessage: string; useKB: boolean }) => {
+            void userMessage
+
+            // ─── Read attached specs (buffer-first, IPC fallback) ───────
+            const storeState = store.getState()
+            const attachedSections: string[] = []
+            for (const id of attachedDocIds) {
+                const refNode = docs.find((n) => n.id === id)
+                if (!refNode) continue
+                const liveBuffer = storeState.specDocs.byDoc[id]?.buffer
+                const dirty = Boolean(storeState.specDocs.byDoc[id]?.dirty)
+                let content = liveBuffer
+                if (typeof content !== 'string') {
+                    try {
+                        if (basePath) {
+                            const result = await window.specDoc.read(basePath, id)
+                            content = result?.content ?? ''
+                        }
+                    } catch {
+                        content = ''
                     }
-                    contextProvider={async ({ userMessage, useKB }) => {
-                        void userMessage
-                        const sections: string[] = []
-                        if (activeDoc) {
-                            sections.push(
-                                `### Active spec document: ${activeDoc.name}\n\n${buffer || '(empty)'}`
-                            )
-                        } else {
-                            sections.push(
-                                '_No active spec document — open one in the Documents tab to ground the build in a real spec._'
-                            )
+                }
+                const tag = dirty ? ' (unsaved buffer)' : ''
+                attachedSections.push(
+                    `### Spec: ${refNode.name}${tag}\n\n\`\`\`markdown\n${content ?? ''}\n\`\`\``
+                )
+            }
+
+            // KB items: union of kbRefs across all attached specs.
+            const linkedKbIds = new Set<string>()
+            for (const id of attachedDocIds) {
+                const ref = docs.find((n) => n.id === id)
+                ref?.kbRefs?.forEach((kbId) => linkedKbIds.add(kbId))
+            }
+            const linkedKb = kbItems.filter((k) => linkedKbIds.has(k.id))
+
+            const sections: string[] = []
+
+            sections.push(
+                [
+                    'You are the Prototype Builder of an IGRP Studio "Specification" project. Your job is to translate the attached spec(s) into a working Next.js prototype by emitting file-ops (create/update/delete) that the host applies inside `<basePath>/prototype/`.',
+                    '',
+                    '## Document roles — STRICT',
+                    '',
+                    '- **Reference specifications** (`## Reference specifications`) — markdown docs the user pinned to this chat. Treat them as authoritative source material for what to build. Preserve their terminology when naming components, routes, and copy. Cite information from them inline as `[Spec: <name>]` when justifying a design choice.',
+                    '- **Knowledge Base** (`## Knowledge Base context`) — external reference (PDFs, URLs). Lower authority than the specs. Cite as `[KB: <item name>]`.',
+                    '',
+                    'If no spec is attached, ask the user to attach at least one before generating substantial code — otherwise produce a small, generic placeholder and call out the gap.',
+                    '',
+                    'When generating components that need data, create a deterministic mock layer (e.g. `prototype/lib/mock-data.ts`) so the preview renders something useful without a backend.'
+                ].join('\n')
+            )
+
+            if (attachedSections.length > 0) {
+                sections.push(
+                    `## Reference specifications (${attachedSections.length})\n\n${attachedSections.join('\n\n')}`
+                )
+            } else {
+                sections.push(
+                    '## Reference specifications\n_None attached. Ask the user to attach a spec via the @Attach button before generating substantial code._'
+                )
+            }
+
+            // KB block — search only when the user explicitly enables KB and
+            // there are linked items to scope the search by.
+            if (useKB && linkedKb.length > 0 && userMessage.trim() && basePath) {
+                try {
+                    const hits = await window.specKB.search(basePath, userMessage, 6, {
+                        kbItemIds: linkedKb.map((k) => k.id)
+                    })
+                    if (hits.length > 0) {
+                        const lookup = new Map(linkedKb.map((k) => [k.id, k.name]))
+                        const formatted = hits
+                            .map((h, idx) => {
+                                const ownerId = h.metadata?.kbItemId as string | undefined
+                                const ownerName = ownerId
+                                    ? (lookup.get(ownerId) ?? ownerId)
+                                    : 'Unknown'
+                                return `### Chunk ${idx + 1} · score ${h.score.toFixed(3)} · from "${ownerName}"\n\n${h.text}`
+                            })
+                            .join('\n\n---\n\n')
+                        sections.push(
+                            `## Knowledge Base context (top ${hits.length} chunks, retrieved from linked items)\n\n${formatted}`
+                        )
+                    }
+                } catch {
+                    // Swallow — search failure shouldn't block generation.
+                }
+            }
+
+            if (linkedKb.length > 0) {
+                const names = linkedKb.map((k) => `- ${k.name}`).join('\n')
+                sections.push(`## Linked Knowledge Base items (${linkedKb.length})\n${names}`)
+            }
+
+            if (lastTurn?.summary) {
+                sections.push(
+                    `## Previous turn\n- ${lastTurn.summary}${lastTurn.sha ? ` (${lastTurn.sha.slice(0, 7)})` : ''}`
+                )
+            }
+
+            // Label for the composer footer.
+            let label: string
+            if (attachedDocIds.length === 0) {
+                label = 'No spec attached'
+            } else if (attachedDocIds.length === 1) {
+                const only = docs.find((d) => d.id === attachedDocIds[0])
+                label = `Spec: ${only?.name ?? 'attached'}`
+            } else {
+                label = `${attachedDocIds.length} specs attached`
+            }
+            if (linkedKb.length > 0) {
+                label += ` · ${linkedKb.length} KB linked${useKB ? '' : ' (KB off)'}`
+            }
+
+            return {
+                systemPrompt: sections.join('\n\n'),
+                contextLabel: label
+            }
+        },
+        [attachedDocIds, basePath, docs, kbItems, lastTurn, store]
+    )
+
+    return (
+        <Group orientation="horizontal" className="flex h-full w-full">
+            {/* Build chat (resizable) */}
+            <Panel
+                id="proto-chat"
+                defaultSize={`${chatWidth}px`}
+                minSize="320px"
+                maxSize="50%"
+                onResize={onResizeChat}
+            >
+                <aside className="flex h-full w-full flex-col border-r bg-card/30">
+                    <AIAssistant
+                        mode="prototype"
+                        title="Prototype builder"
+                        placeholder="Describe a feature or change…"
+                        submitLabel="Build"
+                        supportsKB
+                        chatBackend={
+                            basePath
+                                ? {
+                                      kind: 'prototype',
+                                      basePath,
+                                      onTurnEvent: (event) => dispatch(event)
+                                  }
+                                : undefined
                         }
-                        if (linkedKb.length > 0) {
-                            sections.push(
-                                `### Linked KB items (${linkedKb.length})\n${linkedKb.map((k) => `- ${k.name}`).join('\n')}`
-                            )
+                        attachments={chatAttachments}
+                        onRemoveAttachment={removeAttachedDoc}
+                        composerSlot={
+                            <DocAttachPicker
+                                nodes={docs}
+                                attachedIds={attachedDocIds}
+                                onToggle={toggleAttachedDoc}
+                                estimateTokens={estimateAttachmentTokens}
+                            />
                         }
-                        if (lastTurn?.summary) {
-                            sections.push(
-                                `### Previous turn\n- ${lastTurn.summary}${lastTurn.sha ? ` (${lastTurn.sha.slice(0, 7)})` : ''}`
-                            )
-                        }
-                        const label = activeDoc
-                            ? `Spec: ${activeDoc.name} · ${linkedKb.length} KB linked${useKB ? '' : ' (KB off)'}`
-                            : 'No active doc — open Documents to start'
-                        return {
-                            systemPrompt: sections.join('\n\n'),
-                            contextLabel: label
-                        }
-                    }}
-                />
-            </aside>
+                        contextProvider={contextProvider}
+                    />
+                </aside>
+            </Panel>
+            <Separator className="w-px cursor-col-resize bg-border transition-colors hover:bg-primary/40" />
 
             {/* Main */}
-            <main className="flex flex-1 flex-col bg-card/10">
-                <header className="flex h-12 shrink-0 items-center justify-between border-b bg-background px-4">
-                    <div className="flex items-center gap-1 rounded-md bg-accent/40 p-1">
-                        {TABS.map((t) => (
-                            <button
-                                key={t.id}
-                                type="button"
-                                onClick={() => setActiveTab(t.id)}
-                                className={cn(
-                                    'rounded px-2.5 py-1 text-[11px] font-medium transition-colors',
-                                    activeTab === t.id
-                                        ? 'bg-secondary text-secondary-foreground'
-                                        : 'text-muted-foreground hover:bg-accent'
-                                )}
-                            >
-                                {t.label}
-                            </button>
-                        ))}
+            <Panel id="proto-main" minSize="40%">
+                <main className="flex h-full w-full flex-col bg-card/10">
+                    <header className="flex h-12 shrink-0 items-center justify-between border-b bg-background px-4">
+                        <div className="flex items-center gap-1 rounded-md bg-accent/40 p-1">
+                            {TABS.map((t) => (
+                                <button
+                                    key={t.id}
+                                    type="button"
+                                    onClick={() => setActiveTab(t.id)}
+                                    className={cn(
+                                        'rounded px-2.5 py-1 text-[11px] font-medium transition-colors',
+                                        activeTab === t.id
+                                            ? 'bg-secondary text-secondary-foreground'
+                                            : 'text-muted-foreground hover:bg-accent'
+                                    )}
+                                >
+                                    {t.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {activeTab === 'preview' && (
+                            <PreviewToolbar
+                                device={device}
+                                onChangeDevice={setDevice}
+                                url={devStatus.url}
+                                running={devStatus.running}
+                                onToggleDev={() => {
+                                    if (!basePath) return
+                                    if (devStatus.running) dispatch(stopPrototypeDev(basePath))
+                                    else dispatch(startPrototypeDev(basePath))
+                                }}
+                            />
+                        )}
+                    </header>
+
+                    <div className="relative flex-1 overflow-hidden p-6">
+                        {activeTab === 'preview' && (
+                            <PreviewPane
+                                device={device}
+                                url={devStatus.url}
+                                running={devStatus.running}
+                                installing={devStatus.installing}
+                                onSwitchToLogs={() => setActiveTab('logs')}
+                            />
+                        )}
+                        {activeTab === 'files' && <FilesPane basePath={basePath} />}
+                        {activeTab === 'logs' && <LogsPane />}
+                        {activeTab === 'history' && <HistoryPane basePath={basePath} />}
                     </div>
 
-                    {activeTab === 'preview' && (
-                        <PreviewToolbar
-                            device={device}
-                            onChangeDevice={setDevice}
-                            url={devStatus.url}
-                            running={devStatus.running}
-                            onToggleDev={() => {
-                                if (!basePath) return
-                                if (devStatus.running) dispatch(stopPrototypeDev(basePath))
-                                else dispatch(startPrototypeDev(basePath))
-                            }}
-                        />
-                    )}
-                </header>
-
-                <div className="relative flex-1 overflow-hidden p-6">
-                    {activeTab === 'preview' && (
-                        <PreviewPane
-                            device={device}
-                            url={devStatus.url}
-                            running={devStatus.running}
-                            installing={devStatus.installing}
-                            onSwitchToLogs={() => setActiveTab('logs')}
-                        />
-                    )}
-                    {activeTab === 'files' && <FilesPane basePath={basePath} />}
-                    {activeTab === 'logs' && <LogsPane />}
-                    {activeTab === 'history' && <HistoryPane basePath={basePath} />}
-                </div>
-
-                <PrototypeFooter basePath={basePath} />
-            </main>
-        </div>
+                    <PrototypeFooter basePath={basePath} />
+                </main>
+            </Panel>
+        </Group>
     )
 }
 
@@ -260,6 +505,19 @@ const PreviewToolbar = ({
             reload?: () => void
         } | null
         view?.reload?.()
+    }
+    const toggleDevTools = () => {
+        // Each Electron <webview> has its own DevTools, decoupled from the
+        // host window's DevTools. Useful when debugging the running prototype
+        // without leaving the Studio.
+        const view = document.querySelector('webview.spec-prototype-preview') as {
+            isDevToolsOpened?: () => boolean
+            openDevTools?: () => void
+            closeDevTools?: () => void
+        } | null
+        if (!view) return
+        if (view.isDevToolsOpened?.()) view.closeDevTools?.()
+        else view.openDevTools?.()
     }
     return (
         <div className="flex items-center gap-2">
@@ -307,6 +565,16 @@ const PreviewToolbar = ({
                 title={running ? 'Stop dev server' : 'Start dev server'}
             >
                 {running ? <Pause size={14} /> : <Play size={14} />}
+            </IGRPButtonPrimitive>
+            <IGRPButtonPrimitive
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={toggleDevTools}
+                disabled={!running}
+                title="Toggle DevTools for the preview"
+            >
+                <Bug size={14} />
             </IGRPButtonPrimitive>
             <IGRPButtonPrimitive
                 variant="ghost"
@@ -1100,6 +1368,20 @@ const PrototypeFooter = ({ basePath }: { basePath?: string }): JSX.Element => {
         }
     }, [basePath])
 
+    const handleOpenFolder = useCallback(async () => {
+        if (!basePath) return
+        try {
+            const result = await window.specPrototype.openFolder(basePath)
+            if (!result.ok && result.error) {
+                window.alert(`Open folder failed: ${result.error}`)
+            }
+        } catch (err) {
+            window.alert(
+                `Open folder failed: ${err instanceof Error ? err.message : String(err)}`
+            )
+        }
+    }, [basePath])
+
     const handleReset = useCallback(async () => {
         if (!basePath) return
         if (!window.confirm('Stop the dev server and clear local prototype state?')) return
@@ -1118,6 +1400,16 @@ const PrototypeFooter = ({ basePath }: { basePath?: string }): JSX.Element => {
                     disabled={!basePath}
                 >
                     <Download size={14} /> Export project…
+                </IGRPButtonPrimitive>
+                <IGRPButtonPrimitive
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-2 text-xs"
+                    onClick={handleOpenFolder}
+                    disabled={!basePath}
+                    title="Open the prototype folder in your file manager"
+                >
+                    <FolderOpen size={14} /> Open folder
                 </IGRPButtonPrimitive>
                 <span className="ml-2 truncate text-[10px] text-muted-foreground">
                     {basePath ?? '—'}

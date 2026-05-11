@@ -14,7 +14,6 @@ import {
     Plus,
     RefreshCw,
     Search,
-    Sparkles,
     Youtube
 } from 'lucide-react'
 import { type FormEvent, type JSX, useMemo, useState } from 'react'
@@ -30,7 +29,6 @@ interface DocInspectorProps {
     /** Add a file to the KB without leaving the doc. Opens an OS picker upstream. */
     onAddKBFile: () => void
     onAddKBUrl: (url: string) => void
-    onUseInPrototype: () => void
 }
 
 interface Heading {
@@ -86,8 +84,7 @@ export function DocInspector({
     kbItems,
     onToggleKBRef,
     onAddKBFile,
-    onAddKBUrl,
-    onUseInPrototype
+    onAddKBUrl
 }: DocInspectorProps): JSX.Element {
     const [filter, setFilter] = useState('')
     const [urlInputOpen, setUrlInputOpen] = useState(false)
@@ -281,16 +278,6 @@ export function DocInspector({
                         </>
                     )}
                 </section>
-
-                <IGRPButtonPrimitive
-                    variant="outline"
-                    className="w-full justify-start gap-2 border-blue-500/20 bg-blue-500/5 py-5 text-xs hover:bg-blue-500/10"
-                    onClick={onUseInPrototype}
-                    title="Generate or update the prototype using this spec + selected KB"
-                >
-                    <Sparkles size={14} className="text-blue-500" />
-                    Use in Prototype
-                </IGRPButtonPrimitive>
             </div>
         </div>
     )
