@@ -48,13 +48,25 @@ class ProtoTypePortPool {
     }
 }
 
+/**
+ * Probe a port across the same address families Next.js uses. We test
+ * IPv6 dual-stack (`::`) AND IPv4 (`0.0.0.0`) — the previous version only
+ * checked `127.0.0.1`, which misses zombie processes bound to `::` (the
+ * default for `next dev`). Both must succeed for the port to be reusable.
+ */
 async function isPortFree(port: number): Promise<boolean> {
-    return new Promise((resolve) => {
-        const probe = createServer()
-        probe.once('error', () => resolve(false))
-        probe.once('listening', () => probe.close(() => resolve(true)))
-        probe.listen(port, '127.0.0.1')
-    })
+    const tryBind = (host: string): Promise<boolean> =>
+        new Promise((resolve) => {
+            const probe = createServer()
+            probe.once('error', () => resolve(false))
+            probe.once('listening', () => probe.close(() => resolve(true)))
+            probe.listen(port, host)
+        })
+    // Order matters slightly: probe IPv6 first because that's where Next.js
+    // tends to bind, so a hot zombie there is detected fastest.
+    if (!(await tryBind('::'))) return false
+    if (!(await tryBind('0.0.0.0'))) return false
+    return true
 }
 
 async function findFreePort(): Promise<number> {

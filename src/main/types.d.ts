@@ -520,6 +520,20 @@ export interface BPMNProjectProcessDefinition {
     deploymentDate?: string
     bpmFileContent?: string
     processArtifacts?: BPMNProjectArtifact[]
+    createdBy?: BPMNAuditUser | string
+    createdDate?: string
+    lastModifiedBy?: BPMNAuditUser | string
+    lastModifiedDate?: string
+}
+
+export interface BPMNAuditUser {
+    id?: string
+    username?: string
+    email?: string
+    firstName?: string
+    lastName?: string
+    fullName?: string
+    sub?: string
 }
 
 export interface BPMNProject {

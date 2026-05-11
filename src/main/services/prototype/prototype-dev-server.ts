@@ -256,12 +256,53 @@ class PrototypeDevServerService {
 
         banner('[install] node_modules missing — running `npm install` (first run only)…')
 
+        // Ensure the prototype has access to the IGRP private registry so
+        // `@igrp/*` packages resolve. AI-generated `package.json` files often
+        // pin internal scoped packages (e.g. `@igrp/framework-next`) that npm
+        // can't find on the public registry. Without a local `.npmrc` the
+        // install fails with `ENOTARGET`. We write a minimal one (registry
+        // URL only — no auth tokens) so the prototype is self-contained even
+        // when later exported and installed outside the Studio.
+        try {
+            const npmrcPath = join(cwd, '.npmrc')
+            if (!fs.existsSync(npmrcPath)) {
+                fs.writeFileSync(
+                    npmrcPath,
+                    '@igrp:registry=https://sonatype.nosi.cv/repository/igrp/\n',
+                    'utf-8'
+                )
+                banner('[install] wrote .npmrc with @igrp registry')
+            }
+        } catch (err) {
+            banner(
+                `[install] failed to write .npmrc: ${err instanceof Error ? err.message : String(err)}`,
+                'warn'
+            )
+        }
+
+        // `--legacy-peer-deps` is intentional: AI-generated `package.json`
+        // files routinely ship slightly mismatched peer ranges (a hookform
+        // resolver wanting `^7.55` while the project pins `^7.71`, etc.) that
+        // would block `npm 7+` strict ERESOLVE even though the install would
+        // work fine. The prototype is throwaway scaffolding — we trade strict
+        // peer correctness for a reliable first boot. Real apps export and
+        // run their own `npm install` later.
         return new Promise((resolve, reject) => {
-            const proc = spawn(npm, ['install', '--no-audit', '--no-fund', '--prefer-offline'], {
-                cwd,
-                env: { ...process.env, FORCE_COLOR: '0', npm_config_progress: 'false' },
-                shell: false
-            })
+            const proc = spawn(
+                npm,
+                [
+                    'install',
+                    '--no-audit',
+                    '--no-fund',
+                    '--prefer-offline',
+                    '--legacy-peer-deps'
+                ],
+                {
+                    cwd,
+                    env: { ...process.env, FORCE_COLOR: '0', npm_config_progress: 'false' },
+                    shell: false
+                }
+            )
 
             const consume = (level: DevLogLevel) => (chunk: Buffer) => {
                 chunk

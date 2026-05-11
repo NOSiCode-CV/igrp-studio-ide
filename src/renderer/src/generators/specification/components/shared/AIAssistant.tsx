@@ -11,7 +11,9 @@ import {
     Loader2,
     MessageSquare,
     RefreshCw,
+    RotateCcw,
     Send,
+    Sparkles,
     Square,
     Trash2,
     X
@@ -64,6 +66,12 @@ export interface AIAssistantContext {
  * show a small badge.
  */
 
+export interface PrototypeMessageOp {
+    op: 'create' | 'update' | 'delete'
+    path: string
+    failed?: boolean
+}
+
 interface ChatMessage {
     id: string
     role: 'user' | 'assistant'
@@ -76,6 +84,12 @@ interface ChatMessage {
         failed: number
         commitSha?: string | null
         summary?: string
+        /**
+         * Per-file ops applied/failed in this turn. Used by the snapshot
+         * card to give the user a precise view of what changed without
+         * leaving the chat.
+         */
+        ops?: PrototypeMessageOp[]
     }
     /** Data-models-only summary surfaced after an entity-ops turn finishes. */
     data?: {
@@ -173,6 +187,19 @@ interface AIAssistantProps {
      * this component.
      */
     composerSlot?: ReactNode
+    /**
+     * Restore a prototype build snapshot inline from a chat bubble's snapshot
+     * card. The host owns the destructive `git reset --hard <sha>` thunk —
+     * the assistant only fires the intent. Required when `mode === 'prototype'`
+     * to enable the Restore button in the snapshot card.
+     */
+    onPrototypeRestore?: (sha: string) => void
+    /**
+     * Click handler when the user opens a path from a snapshot card. The host
+     * typically switches to the Files tab and selects the file. When omitted
+     * the path becomes plain text (no link affordance).
+     */
+    onPrototypeOpenFile?: (path: string) => void
     className?: string
 }
 
@@ -184,8 +211,8 @@ interface AIAssistantProps {
 export interface ChatAttachment {
     id: string
     name: string
-    /** Visual hint in the chip — currently only 'doc'. */
-    kind: 'doc'
+    /** Visual hint in the chip: spec doc or UI component pinned to the turn. */
+    kind: 'doc' | 'component'
     /** True when the attached doc has unsaved edits in another tab. */
     dirty?: boolean
 }
@@ -220,6 +247,8 @@ export function AIAssistant({
     attachments,
     onRemoveAttachment,
     composerSlot,
+    onPrototypeRestore,
+    onPrototypeOpenFile,
     className
 }: AIAssistantProps): JSX.Element {
     const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -344,6 +373,10 @@ export function AIAssistant({
                         break
                     case 'op-applied':
                         target.prototype.applied += 1
+                        target.prototype.ops = [
+                            ...(target.prototype.ops ?? []),
+                            { op: chunk.op.op, path: chunk.op.path }
+                        ]
                         dispatcher?.({
                             type: 'specPrototype/protoTurnApplied',
                             payload: {
@@ -355,6 +388,10 @@ export function AIAssistant({
                         break
                     case 'op-failed':
                         target.prototype.failed += 1
+                        target.prototype.ops = [
+                            ...(target.prototype.ops ?? []),
+                            { op: chunk.op.op, path: chunk.op.path, failed: true }
+                        ]
                         dispatcher?.({
                             type: 'specPrototype/protoTurnFailed',
                             payload: {
@@ -662,6 +699,45 @@ export function AIAssistant({
         [dispatchChat, messages, streaming]
     )
 
+    /**
+     * Smarter retry for prototype/data turns: re-fire the chat but inject
+     * a synthetic user message describing the parse/apply error so the LLM
+     * has the context needed to fix its own output. Used by the "Ask AI to
+     * fix" button on bubbles that failed mid-pipeline (vs. transient errors
+     * where plain Retry suffices).
+     */
+    const handleAskAIToFix = useCallback(
+        (failedMessageId: string) => {
+            if (streaming) return
+            const idx = messages.findIndex((m) => m.id === failedMessageId)
+            if (idx < 0) return
+            const failed = messages[idx]
+            const errText = failed.error ?? ''
+            const failedOps =
+                failed.prototype?.ops?.filter((o) => o.failed) ??
+                ([] as PrototypeMessageOp[])
+            const lines: string[] = []
+            if (errText) lines.push(`The previous attempt failed: ${errText}`)
+            if (failedOps.length > 0) {
+                lines.push(
+                    `Failed ops:\n${failedOps.map((o) => `  - ${o.op} ${o.path}`).join('\n')}`
+                )
+            }
+            lines.push(
+                'Please diagnose the cause and resend a corrected response in the same format.'
+            )
+            const fixId = `fix-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+            const synthetic: ChatMessage = {
+                id: fixId,
+                role: 'user',
+                content: lines.join('\n\n')
+            }
+            const history = [...messages.slice(0, idx), synthetic]
+            dispatchChat(history)
+        },
+        [dispatchChat, messages, streaming]
+    )
+
     const handleCancel = useCallback(() => {
         if (!activeRequestId) return
         if (chatBackend.kind === 'prototype') {
@@ -795,9 +871,19 @@ export function AIAssistant({
                     <MessageBubble
                         key={m.id}
                         message={m}
+                        streaming={streaming}
                         onRetry={
                             m.role === 'assistant' && m.error && !streaming
                                 ? () => handleRetry(m.id)
+                                : undefined
+                        }
+                        onAskAIToFix={
+                            m.role === 'assistant' &&
+                            !streaming &&
+                            (m.error || (m.prototype?.failed ?? 0) > 0) &&
+                            (chatBackend.kind === 'prototype' ||
+                                chatBackend.kind === 'data')
+                                ? () => handleAskAIToFix(m.id)
                                 : undefined
                         }
                         proposalStatus={proposalStatus?.[m.id]}
@@ -811,6 +897,8 @@ export function AIAssistant({
                                   }
                                 : undefined
                         }
+                        onPrototypeRestore={onPrototypeRestore}
+                        onPrototypeOpenFile={onPrototypeOpenFile}
                     />
                 ))}
             </div>
@@ -835,7 +923,9 @@ export function AIAssistant({
                                     className="inline-flex items-center gap-1 rounded border bg-muted/40 px-1.5 py-0.5 text-[10px]"
                                     title={att.dirty ? `${att.name} (unsaved)` : att.name}
                                 >
-                                    <span className="text-muted-foreground">@</span>
+                                    <span className="text-muted-foreground">
+                                        {att.kind === 'component' ? '◾' : '@'}
+                                    </span>
                                     <span className="max-w-[140px] truncate">
                                         {att.name}
                                         {att.dirty && (
@@ -912,13 +1002,21 @@ export function AIAssistant({
 
 function MessageBubble({
     message,
+    streaming,
     onRetry,
+    onAskAIToFix,
     proposalStatus,
     proposalSummary,
-    editToggles
+    editToggles,
+    onPrototypeRestore,
+    onPrototypeOpenFile
 }: {
     message: ChatMessage
+    /** Global streaming flag — used to show "applying…" spinners only on the active turn. */
+    streaming?: boolean
     onRetry?: () => void
+    /** Smarter retry that ships the previous error as a follow-up user message. */
+    onAskAIToFix?: () => void
     proposalStatus?: ProposalStatus
     proposalSummary?: ProposalSummary[]
     /** When set, the checklist renders interactive checkboxes wired to this. */
@@ -926,6 +1024,8 @@ function MessageBubble({
         selected: boolean[]
         onToggle: (editIndex: number) => void
     }
+    onPrototypeRestore?: (sha: string) => void
+    onPrototypeOpenFile?: (path: string) => void
 }): JSX.Element {
     const [copied, setCopied] = useState(false)
     const isUser = message.role === 'user'
@@ -1005,26 +1105,13 @@ function MessageBubble({
                     (message.prototype.applied > 0 ||
                         message.prototype.failed > 0 ||
                         message.prototype.commitSha) && (
-                        <div className="mt-2 rounded-md border bg-background/60 p-2 text-[10px]">
-                            <div className="flex items-center justify-between">
-                                <span className="font-medium text-foreground">
-                                    {message.prototype.summary ?? 'Build turn'}
-                                </span>
-                                {message.prototype.commitSha && (
-                                    <span className="font-mono text-muted-foreground">
-                                        {message.prototype.commitSha.slice(0, 7)}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="mt-1 flex gap-3 text-muted-foreground">
-                                <span>{message.prototype.applied} applied</span>
-                                {message.prototype.failed > 0 && (
-                                    <span className="text-red-500">
-                                        {message.prototype.failed} failed
-                                    </span>
-                                )}
-                            </div>
-                        </div>
+                        <PrototypeSnapshotCard
+                            data={message.prototype}
+                            streaming={Boolean(message.streaming)}
+                            globalStreaming={Boolean(streaming)}
+                            onRestore={onPrototypeRestore}
+                            onOpenFile={onPrototypeOpenFile}
+                        />
                     )}
 
                 {message.data && (message.data.applied > 0 || message.data.failed > 0) && (
@@ -1051,21 +1138,35 @@ function MessageBubble({
                     </div>
                 )}
 
-                {message.error && (
+                {(message.error || (message.prototype?.failed ?? 0) > 0) && (
                     <div className="mt-2 space-y-1.5">
-                        <p className="flex items-start gap-1 text-[10px] text-red-500">
-                            <AlertCircle size={10} className="mt-0.5 shrink-0" />
-                            <span className="break-words">{message.error}</span>
-                        </p>
-                        {onRetry && (
-                            <button
-                                type="button"
-                                onClick={onRetry}
-                                className="flex items-center gap-1 rounded-md border border-red-500/30 bg-red-500/5 px-2 py-1 text-[10px] font-medium text-red-500 hover:bg-red-500/10"
-                            >
-                                <RefreshCw size={10} /> Retry
-                            </button>
+                        {message.error && (
+                            <p className="flex items-start gap-1 text-[10px] text-red-500">
+                                <AlertCircle size={10} className="mt-0.5 shrink-0" />
+                                <span className="break-words">{message.error}</span>
+                            </p>
                         )}
+                        <div className="flex flex-wrap gap-1">
+                            {onRetry && (
+                                <button
+                                    type="button"
+                                    onClick={onRetry}
+                                    className="flex items-center gap-1 rounded-md border border-red-500/30 bg-red-500/5 px-2 py-1 text-[10px] font-medium text-red-500 hover:bg-red-500/10"
+                                >
+                                    <RefreshCw size={10} /> Retry
+                                </button>
+                            )}
+                            {onAskAIToFix && (
+                                <button
+                                    type="button"
+                                    onClick={onAskAIToFix}
+                                    className="flex items-center gap-1 rounded-md border border-amber-500/30 bg-amber-500/5 px-2 py-1 text-[10px] font-medium text-amber-500 hover:bg-amber-500/10"
+                                    title="Re-fire the turn with the failure as context so the AI can self-correct"
+                                >
+                                    <Sparkles size={10} /> Ask AI to fix
+                                </button>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
@@ -1278,4 +1379,143 @@ function groupBy<T, K extends string>(items: T[], keyFn: (item: T) => K): Record
         out[k].push(item)
     }
     return out
+}
+
+// ─── Prototype snapshot card (M4.11) ─────────────────────────────────────
+//
+// Inline summary of a single build turn: counts per op kind, collapsible
+// path list, and an inline Restore button (host owns the destructive thunk).
+
+const opKindLabel: Record<'create' | 'update' | 'delete', string> = {
+    create: 'created',
+    update: 'updated',
+    delete: 'deleted'
+}
+
+const opKindClass: Record<'create' | 'update' | 'delete', string> = {
+    create: 'text-emerald-500',
+    update: 'text-blue-500',
+    delete: 'text-red-500'
+}
+
+function PrototypeSnapshotCard({
+    data,
+    streaming,
+    globalStreaming,
+    onRestore,
+    onOpenFile
+}: {
+    data: NonNullable<ChatMessage['prototype']>
+    /** This message is the one currently being streamed. */
+    streaming?: boolean
+    /** Any chat message is streaming — disables Restore to avoid races. */
+    globalStreaming?: boolean
+    onRestore?: (sha: string) => void
+    onOpenFile?: (path: string) => void
+}): JSX.Element {
+    const [expanded, setExpanded] = useState(false)
+    const ops = data.ops ?? []
+    const created = ops.filter((o) => o.op === 'create' && !o.failed)
+    const updated = ops.filter((o) => o.op === 'update' && !o.failed)
+    const deleted = ops.filter((o) => o.op === 'delete' && !o.failed)
+    const failed = ops.filter((o) => o.failed)
+
+    const summaryBits: string[] = []
+    if (created.length) summaryBits.push(`${created.length} created`)
+    if (updated.length) summaryBits.push(`${updated.length} updated`)
+    if (deleted.length) summaryBits.push(`${deleted.length} deleted`)
+    if (failed.length) summaryBits.push(`${failed.length} failed`)
+
+    const sha = data.commitSha ?? null
+
+    return (
+        <div className="mt-2 overflow-hidden rounded-md border bg-background/60 text-[10px]">
+            <button
+                type="button"
+                onClick={() => setExpanded((v) => !v)}
+                disabled={ops.length === 0}
+                className="flex w-full items-center gap-2 px-2 py-1.5 text-left transition-colors hover:bg-accent/40 disabled:cursor-default disabled:hover:bg-transparent"
+            >
+                {ops.length > 0 ? (
+                    expanded ? (
+                        <ChevronDown size={11} className="shrink-0 text-muted-foreground" />
+                    ) : (
+                        <ChevronRight size={11} className="shrink-0 text-muted-foreground" />
+                    )
+                ) : (
+                    <span className="w-[11px] shrink-0" />
+                )}
+                <span className="flex-1 truncate font-medium text-foreground">
+                    {data.summary ?? 'Build turn'}
+                </span>
+                {streaming && (
+                    <span className="flex shrink-0 items-center gap-1 text-amber-500">
+                        <Loader2 size={10} className="animate-spin" />
+                        <span>applying {data.applied}…</span>
+                    </span>
+                )}
+                {!streaming && summaryBits.length > 0 && (
+                    <span className="shrink-0 text-muted-foreground">
+                        {summaryBits.join(' · ')}
+                    </span>
+                )}
+                {sha && (
+                    <span className="shrink-0 font-mono text-muted-foreground">
+                        {sha.slice(0, 7)}
+                    </span>
+                )}
+            </button>
+            {expanded && ops.length > 0 && (
+                <ul className="border-t bg-card/40 p-2">
+                    {ops.map((op, idx) => (
+                        <li
+                            key={`${op.path}-${idx}`}
+                            className={cn(
+                                'flex items-center gap-2 rounded px-1.5 py-0.5',
+                                onOpenFile && !op.failed && 'cursor-pointer hover:bg-accent'
+                            )}
+                            onClick={
+                                onOpenFile && !op.failed
+                                    ? () => onOpenFile(op.path)
+                                    : undefined
+                            }
+                            role={onOpenFile && !op.failed ? 'button' : undefined}
+                        >
+                            <span
+                                className={cn(
+                                    'w-14 shrink-0 font-medium uppercase tracking-wide',
+                                    op.failed ? 'text-red-500' : opKindClass[op.op]
+                                )}
+                            >
+                                {op.failed ? 'failed' : opKindLabel[op.op]}
+                            </span>
+                            <span className="flex-1 truncate font-mono text-foreground">
+                                {op.path}
+                            </span>
+                        </li>
+                    ))}
+                </ul>
+            )}
+            {sha && onRestore && !globalStreaming && (
+                <div className="flex justify-end border-t bg-card/40 px-2 py-1">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (
+                                window.confirm(
+                                    `Restore prototype to commit ${sha.slice(0, 7)}? Uncommitted changes will be lost.`
+                                )
+                            ) {
+                                onRestore(sha)
+                            }
+                        }}
+                        className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                    >
+                        <RotateCcw size={10} />
+                        Restore this turn
+                    </button>
+                </div>
+            )}
+        </div>
+    )
 }

@@ -1,7 +1,7 @@
 import type React from 'react'
 import type { DragEvent } from 'react'
 import { createContext, useCallback, useContext, useState } from 'react'
-import type { DragEndResult, DropZone, LayoutMode, StructuredComponent } from './types'
+import type { DraggableItem, DragEndResult, DropZone, LayoutMode } from './types'
 
 interface DragOverParams {
     e: DragEvent<HTMLDivElement>
@@ -11,41 +11,44 @@ interface DragOverParams {
     countItems: number
 }
 
+/**
+ * Generic DnD context. Items only need an `id` here; concrete generators
+ * pin a richer type in their adapter. `setComponents` accepts the minimal
+ * `DraggableItem[]` so callers using `StructuredComponent[]` (which
+ * extends `{ id }`) remain assignable.
+ */
 interface DragDropContextType {
     // State
-    draggingItem: any
+    draggingItem: unknown
     draggedId: string | null
     activeDropZone: DropZone | null
 
     // Methods
-    setComponents: React.Dispatch<React.SetStateAction<StructuredComponent[]>>
+    setComponents: React.Dispatch<React.SetStateAction<DraggableItem[]>>
     setLayoutMode: React.Dispatch<React.SetStateAction<LayoutMode>>
 
     // Event handlers
     onDragEnd: () => void
-    onDragStart: (item: any) => void
+    onDragStart: (item: unknown) => void
     handleDrop: (e: DragEvent<HTMLDivElement>, targetId?: string) => DragEndResult
     handleDragOver: (params: DragOverParams) => void
     handleDragLeave: (e: DragEvent<HTMLDivElement>) => void
     handleDragStartComponent: (_e: DragEvent<HTMLDivElement>, id: string) => void
 }
 
-// Create the Context
 const DragDropContext = createContext<DragDropContextType | undefined>(undefined)
 
 export const DragProvider = ({ children }: { children: React.ReactNode }) => {
     const [layoutMode, setLayoutMode] = useState<LayoutMode>('vertical')
-    const [components, setComponents] = useState<StructuredComponent[]>([])
-    const [draggingItem, setDraggingItem] = useState(null)
+    const [components, setComponents] = useState<DraggableItem[]>([])
+    const [draggingItem, setDraggingItem] = useState<unknown>(null)
     const [draggedId, setDraggedId] = useState<string | null>(null)
     const [activeDropZone, setActiveDropZone] = useState<DropZone | null>(null)
 
-    // Start dragging
-    const onDragStart = useCallback((item: any) => {
+    const onDragStart = useCallback((item: unknown) => {
         setDraggingItem(item)
     }, [])
 
-    // End dragging
     const onDragEnd = useCallback(() => {
         setDraggingItem(null)
     }, [])
@@ -54,12 +57,10 @@ export const DragProvider = ({ children }: { children: React.ReactNode }) => {
         setDraggedId(id)
     }
 
-    // Handle drop - core functionality
-    const handleDrop = (e: DragEvent<HTMLDivElement>, targetId?: string) => {
+    const handleDrop = (e: DragEvent<HTMLDivElement>, targetId?: string): DragEndResult => {
         e.preventDefault()
         e.stopPropagation()
 
-        // Just collect the data and set state, business logic removed
         const droppedItem = JSON.parse(e.dataTransfer.getData('text/plain'))
         const type = JSON.parse(e.dataTransfer.getData('type'))
         const mode = JSON.parse(e.dataTransfer.getData('mode'))
@@ -73,11 +74,6 @@ export const DragProvider = ({ children }: { children: React.ReactNode }) => {
             activeDropZone?.position || (layoutMode === 'vertical' ? 'bottom' : 'right')
 
         const targetIndex = activeDropZone?.cellIndex || 0
-
-        /*const moveIndex =
-            (position === 'top' || position === 'left') && targetIndex > 1
-                ? targetIndex - 1
-                : targetIndex; */
 
         const newIndex =
             activeDropZone?.position === 'right'
@@ -99,14 +95,13 @@ export const DragProvider = ({ children }: { children: React.ReactNode }) => {
             position,
             destination: {
                 droppableId: targetId || '',
-                index: newIndex // mode === 'MOVE' ? moveIndex : targetIndex,
+                index: newIndex
             },
             type,
             mode
         }
     }
 
-    // Handle drag over - core functionality
     const handleDragOver = ({ e, id, cellIndex, dropTargetId, countItems }: DragOverParams) => {
         e.preventDefault()
         e.stopPropagation()
@@ -145,7 +140,6 @@ export const DragProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }
 
-    // Helper function to determine drop position
     const getDropPosition = (
         e: DragEvent<HTMLDivElement>,
         targetRect: DOMRect,
@@ -183,7 +177,6 @@ export const DragProvider = ({ children }: { children: React.ReactNode }) => {
     return <DragDropContext.Provider value={contextValue}>{children}</DragDropContext.Provider>
 }
 
-// Custom Hook to use DragDropContext
 export const useDragDrop = () => {
     const context = useContext(DragDropContext)
     if (context === undefined) {

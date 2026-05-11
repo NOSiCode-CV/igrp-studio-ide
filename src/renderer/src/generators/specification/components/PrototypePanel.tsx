@@ -27,6 +27,7 @@ import { selectDocNodes, selectSelectedDocId } from '@renderer/redux/specDocs/re
 import {
     AlertCircle,
     Bug,
+    Check,
     CheckCircle2,
     Copy,
     Download,
@@ -35,7 +36,11 @@ import {
     FolderOpen,
     History,
     Layout as LayoutIcon,
+    LayoutGrid,
+    Loader2,
+    MessageSquare,
     Monitor,
+    MoveHorizontal,
     Pause,
     Play,
     RefreshCw,
@@ -46,11 +51,26 @@ import {
     Terminal,
     Trash2
 } from 'lucide-react'
-import { type JSX, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+    type CSSProperties,
+    type JSX,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState
+} from 'react'
 import { useDispatch, useSelector, useStore } from 'react-redux'
 import { Group, Panel, Separator } from 'react-resizable-panels'
 import { AIAssistant, type ChatAttachment } from './shared/AIAssistant'
-import { DocAttachPicker } from './documents/DocAttachPicker'
+import { DocAttachPicker } from '@renderer/features/spec-attachments'
+import {
+    PALETTE,
+    PALETTE_BY_ID,
+    type PaletteComponent,
+    readPersistedComponentIds,
+    writePersistedComponentIds
+} from '@renderer/features/component-palette'
 
 interface PanelProps {
     basePath?: string
@@ -58,7 +78,7 @@ interface PanelProps {
     variant?: 'list' | 'content'
 }
 
-type DeviceFrame = 'desktop' | 'tablet' | 'mobile'
+type DeviceFrame = 'desktop' | 'tablet' | 'mobile' | 'custom'
 type PrototypeTab = 'preview' | 'files' | 'logs' | 'history'
 
 const TABS: { id: PrototypeTab; label: string }[] = [
@@ -67,6 +87,8 @@ const TABS: { id: PrototypeTab; label: string }[] = [
     { id: 'logs', label: 'Logs' },
     { id: 'history', label: 'History' }
 ]
+
+type ChatPanelMode = 'chat' | 'palette'
 
 // ─── Persistence helpers ──────────────────────────────────────────────────
 //
@@ -112,6 +134,35 @@ const writePersistedAttachedIds = (basePath: string | undefined, ids: string[]):
     }
 }
 
+// Pinned palette components (M4.28) live in `features/component-palette` so
+// the persistence shape can be reused by future generators that want their
+// own pinned-component vocabulary. We pass `namespace: 'prototype'` here.
+const PALETTE_NAMESPACE = { namespace: 'prototype' as const }
+
+// Custom viewport width (M4.19) — global preference, not per-project.
+const CUSTOM_VIEWPORT_KEY = 'spec.prototype.customViewportWidth'
+const DEFAULT_CUSTOM_VIEWPORT = 1024
+const MIN_CUSTOM_VIEWPORT = 240
+const MAX_CUSTOM_VIEWPORT = 2560
+
+const readPersistedCustomViewport = (): number => {
+    if (typeof window === 'undefined') return DEFAULT_CUSTOM_VIEWPORT
+    try {
+        const raw = window.localStorage?.getItem(CUSTOM_VIEWPORT_KEY)
+        const parsed = raw ? Number(raw) : NaN
+        if (
+            Number.isFinite(parsed) &&
+            parsed >= MIN_CUSTOM_VIEWPORT &&
+            parsed <= MAX_CUSTOM_VIEWPORT
+        ) {
+            return parsed
+        }
+        return DEFAULT_CUSTOM_VIEWPORT
+    } catch {
+        return DEFAULT_CUSTOM_VIEWPORT
+    }
+}
+
 // ─── List variant — placeholder; the rail hides the secondary panel here. ─
 
 const ListVariant = (): JSX.Element => (
@@ -134,11 +185,50 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
 
     const [activeTab, setActiveTab] = useState<PrototypeTab>('preview')
     const [device, setDevice] = useState<DeviceFrame>('desktop')
+    const [customWidth, setCustomWidth] = useState<number>(() => readPersistedCustomViewport())
+    const handleChangeCustomWidth = useCallback((next: number) => {
+        const clamped = Math.max(MIN_CUSTOM_VIEWPORT, Math.min(MAX_CUSTOM_VIEWPORT, next))
+        setCustomWidth(clamped)
+        try {
+            window.localStorage?.setItem(CUSTOM_VIEWPORT_KEY, String(Math.round(clamped)))
+        } catch {
+            // noop — private mode etc.
+        }
+    }, [])
 
     // Spec attachments — explicit picker drives chat context (M4.29).
     // No more implicit "active doc" path. Persisted per-project.
     const [attachedDocIds, setAttachedDocIds] = useState<string[]>(() =>
         readPersistedAttachedIds(basePath)
+    )
+
+    // Component palette pins (M4.28) — same shape as spec attachments.
+    const [chatPanelMode, setChatPanelMode] = useState<ChatPanelMode>('chat')
+    const [attachedComponentIds, setAttachedComponentIds] = useState<string[]>(() =>
+        readPersistedComponentIds(basePath, PALETTE_NAMESPACE)
+    )
+
+    // Persist any change to component pins.
+    useEffect(() => {
+        writePersistedComponentIds(basePath, attachedComponentIds, PALETTE_NAMESPACE)
+    }, [attachedComponentIds, basePath])
+
+    const toggleAttachedComponent = useCallback((id: string) => {
+        setAttachedComponentIds((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        )
+    }, [])
+
+    const removeAttachedComponent = useCallback((id: string) => {
+        setAttachedComponentIds((prev) => prev.filter((x) => x !== id))
+    }, [])
+
+    const attachedComponents = useMemo<PaletteComponent[]>(
+        () =>
+            attachedComponentIds
+                .map((id) => PALETTE_BY_ID.get(id))
+                .filter((c): c is PaletteComponent => Boolean(c)),
+        [attachedComponentIds]
     )
 
     const lastTurn = lastTurnId ? turns[lastTurnId] : null
@@ -194,11 +284,28 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
             const ref = docs.find((n) => n.id === id)
             if (!ref) continue
             const dirty = Boolean(store.getState().specDocs.byDoc[id]?.dirty)
-            out.push({ id, name: ref.name, kind: 'doc', dirty })
+            out.push({ id: `doc:${id}`, name: ref.name, kind: 'doc', dirty })
+        }
+        for (const comp of attachedComponents) {
+            out.push({ id: `comp:${comp.id}`, name: comp.name, kind: 'component' })
         }
         return out
         // store is a stable ref — read inside; recompute when ids/docs change.
-    }, [attachedDocIds, docs, store])
+    }, [attachedDocIds, attachedComponents, docs, store])
+
+    // Single removal entry-point — chips don't know whether they back a doc
+    // or a palette component, so we route by the `kind:` prefix we encoded
+    // when building the chip list above.
+    const handleRemoveAttachment = useCallback(
+        (chipId: string) => {
+            if (chipId.startsWith('doc:')) {
+                removeAttachedDoc(chipId.slice(4))
+            } else if (chipId.startsWith('comp:')) {
+                removeAttachedComponent(chipId.slice(5))
+            }
+        },
+        [removeAttachedDoc, removeAttachedComponent]
+    )
 
     const estimateAttachmentTokens = useCallback(
         (id: string): number | null => {
@@ -241,6 +348,21 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
         devStartedRef.current = true
         dispatch(startPrototypeDev(basePath))
     }, [activeTab, basePath, devStatus.running, dispatch])
+
+    // First-run UX (M4.18) — when `npm install` starts (`installing` flips
+    // false→true), auto-switch to the Logs tab so the user sees the live
+    // download progress instead of a frozen Preview placeholder. Only on
+    // the rising edge: if the user navigates away while installing, we
+    // don't snap them back.
+    const wasInstallingRef = useRef(false)
+    useEffect(() => {
+        if (devStatus.installing && !wasInstallingRef.current) {
+            wasInstallingRef.current = true
+            setActiveTab('logs')
+        } else if (!devStatus.installing) {
+            wasInstallingRef.current = false
+        }
+    }, [devStatus.installing])
 
     // Tree refresh + preview reload when the main process reports a turn
     // finished. The webview reload is best-effort: if the user is on another
@@ -324,6 +446,20 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                 )
             }
 
+            // M4.28 — palette-pinned components: directive-only injection.
+            // We don't ship the LLM the full shadcn registry; the model knows
+            // shadcn already. We just say "use these as your building blocks
+            // for this turn" so the user's clicks in the palette steer the
+            // generator without spelling it out in prose every time.
+            if (attachedComponents.length > 0) {
+                const lines = attachedComponents
+                    .map((c) => `- **${c.name}** (${c.category}) — ${c.hint}`)
+                    .join('\n')
+                sections.push(
+                    `## UI components to use (pinned by user)\nWhen generating UI, prefer these components as the primary building blocks; pick others only when these don't fit. Don't dump every pinned component on every page — use them where they earn their place.\n\n${lines}`
+                )
+            }
+
             // KB block — search only when the user explicitly enables KB and
             // there are linked items to scope the search by.
             if (useKB && linkedKb.length > 0 && userMessage.trim() && basePath) {
@@ -381,7 +517,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                 contextLabel: label
             }
         },
-        [attachedDocIds, basePath, docs, kbItems, lastTurn, store]
+        [attachedDocIds, attachedComponents, basePath, docs, kbItems, lastTurn, store]
     )
 
     return (
@@ -395,33 +531,78 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                 onResize={onResizeChat}
             >
                 <aside className="flex h-full w-full flex-col border-r bg-card/30">
-                    <AIAssistant
-                        mode="prototype"
-                        title="Prototype builder"
-                        placeholder="Describe a feature or change…"
-                        submitLabel="Build"
-                        supportsKB
-                        chatBackend={
-                            basePath
-                                ? {
-                                      kind: 'prototype',
-                                      basePath,
-                                      onTurnEvent: (event) => dispatch(event)
-                                  }
-                                : undefined
-                        }
-                        attachments={chatAttachments}
-                        onRemoveAttachment={removeAttachedDoc}
-                        composerSlot={
-                            <DocAttachPicker
-                                nodes={docs}
-                                attachedIds={attachedDocIds}
-                                onToggle={toggleAttachedDoc}
-                                estimateTokens={estimateAttachmentTokens}
-                            />
-                        }
-                        contextProvider={contextProvider}
+                    <ChatPanelTabs
+                        mode={chatPanelMode}
+                        onChangeMode={setChatPanelMode}
+                        pinnedCount={attachedComponentIds.length}
                     />
+                    {/* Palette is overlaid on top while active so the chat
+                        stays mounted (display:none); message history and
+                        streaming state survive tab switches. */}
+                    <div className="relative min-h-0 flex-1">
+                        {/* Both panes are absolute-positioned over the same
+                            relative slot so the AIAssistant and palette
+                            mount once and toggle visibility — chat history,
+                            streaming, and composer draft survive tab swaps.
+                            `flex flex-col` ensures the inner pane stretches
+                            to fill the panel width when the user resizes
+                            the chat ↔ main divider. */}
+                        <div
+                            className={cn(
+                                'absolute inset-0 flex-col',
+                                chatPanelMode === 'chat' ? 'flex' : 'hidden'
+                            )}
+                        >
+                            <AIAssistant
+                                className="h-full w-full"
+                                mode="prototype"
+                                title="Prototype builder"
+                                placeholder="Describe a feature or change…"
+                                submitLabel="Build"
+                                supportsKB
+                                chatBackend={
+                                    basePath
+                                        ? {
+                                              kind: 'prototype',
+                                              basePath,
+                                              onTurnEvent: (event) => dispatch(event)
+                                          }
+                                        : undefined
+                                }
+                                attachments={chatAttachments}
+                                onRemoveAttachment={handleRemoveAttachment}
+                                composerSlot={
+                                    <DocAttachPicker
+                                        nodes={docs}
+                                        attachedIds={attachedDocIds}
+                                        onToggle={toggleAttachedDoc}
+                                        estimateTokens={estimateAttachmentTokens}
+                                    />
+                                }
+                                onPrototypeRestore={(sha) => {
+                                    if (!basePath) return
+                                    dispatch(restorePrototypeSnapshot(basePath, sha))
+                                }}
+                                onPrototypeOpenFile={(path) => {
+                                    if (!basePath) return
+                                    setActiveTab('files')
+                                    dispatch(openPrototypeFile(basePath, path))
+                                }}
+                                contextProvider={contextProvider}
+                            />
+                        </div>
+                        <div
+                            className={cn(
+                                'absolute inset-0 flex-col',
+                                chatPanelMode === 'palette' ? 'flex' : 'hidden'
+                            )}
+                        >
+                            <ComponentPalettePane
+                                attachedIds={attachedComponentIds}
+                                onToggle={toggleAttachedComponent}
+                            />
+                        </div>
+                    </div>
                 </aside>
             </Panel>
             <Separator className="w-px cursor-col-resize bg-border transition-colors hover:bg-primary/40" />
@@ -429,6 +610,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
             {/* Main */}
             <Panel id="proto-main" minSize="40%">
                 <main className="flex h-full w-full flex-col bg-card/10">
+                    {devStatus.installing && <FirstRunBanner />}
                     <header className="flex h-12 shrink-0 items-center justify-between border-b bg-background px-4">
                         <div className="flex items-center gap-1 rounded-md bg-accent/40 p-1">
                             {TABS.map((t) => (
@@ -452,6 +634,8 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                             <PreviewToolbar
                                 device={device}
                                 onChangeDevice={setDevice}
+                                customWidth={customWidth}
+                                onChangeCustomWidth={handleChangeCustomWidth}
                                 url={devStatus.url}
                                 running={devStatus.running}
                                 onToggleDev={() => {
@@ -467,6 +651,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                         {activeTab === 'preview' && (
                             <PreviewPane
                                 device={device}
+                                customWidth={customWidth}
                                 url={devStatus.url}
                                 running={devStatus.running}
                                 installing={devStatus.installing}
@@ -485,17 +670,218 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
     )
 }
 
+// ─── First-run banner (M4.18) ─────────────────────────────────────────────
+//
+// Indeterminate progress bar shown while `npm install` runs the very first
+// time the dev server is started for a project. The Logs tab is auto-focused
+// in parallel so the user sees the actual download stream — this banner is
+// just a thin reminder of what's happening so it stays out of the way.
+
+// ─── Chat panel tabs (M4.28) ──────────────────────────────────────────────
+//
+// Two-way switch in the left panel header. Mounts both the chat and the
+// palette but toggles `display`, so the AIAssistant's local state (message
+// history, streaming chunks, composer draft) survives jumps between modes.
+
+const ChatPanelTabs = ({
+    mode,
+    onChangeMode,
+    pinnedCount
+}: {
+    mode: ChatPanelMode
+    onChangeMode: (next: ChatPanelMode) => void
+    pinnedCount: number
+}): JSX.Element => (
+    // Stronger contrast against the panel's `bg-card/30` so the tab row reads
+    // as a control surface (not decoration). Solid background + thicker
+    // bottom border + slightly taller (40px) makes it the first thing the
+    // eye lands on when scanning the panel.
+    <div className="flex h-10 shrink-0 items-center gap-1 border-b border-border/80 bg-background/60 px-2">
+        <ChatPanelTabButton
+            active={mode === 'chat'}
+            onClick={() => onChangeMode('chat')}
+            icon={<MessageSquare size={13} />}
+            label="Chat"
+        />
+        <ChatPanelTabButton
+            active={mode === 'palette'}
+            onClick={() => onChangeMode('palette')}
+            icon={<LayoutGrid size={13} />}
+            label="Palette"
+            badge={pinnedCount > 0 ? pinnedCount : undefined}
+        />
+    </div>
+)
+
+const ChatPanelTabButton = ({
+    active,
+    onClick,
+    icon,
+    label,
+    badge
+}: {
+    active: boolean
+    onClick: () => void
+    icon: JSX.Element
+    label: string
+    badge?: number
+}): JSX.Element => (
+    <button
+        type="button"
+        onClick={onClick}
+        className={cn(
+            'flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-medium transition-colors',
+            active
+                ? 'bg-primary/10 text-primary ring-1 ring-primary/20'
+                : 'text-muted-foreground hover:bg-accent'
+        )}
+    >
+        {icon}
+        {label}
+        {badge !== undefined && (
+            <span
+                className={cn(
+                    'rounded-full px-1.5 py-px text-[9px] font-semibold',
+                    active ? 'bg-primary/20 text-primary' : 'bg-muted-foreground/20'
+                )}
+            >
+                {badge}
+            </span>
+        )}
+    </button>
+)
+
+// ─── Component palette pane (M4.28) ───────────────────────────────────────
+
+const ComponentPalettePane = ({
+    attachedIds,
+    onToggle
+}: {
+    attachedIds: string[]
+    onToggle: (id: string) => void
+}): JSX.Element => {
+    const [query, setQuery] = useState('')
+    const filtered = useMemo(() => {
+        const needle = query.trim().toLowerCase()
+        if (!needle) return PALETTE
+        return PALETTE.filter(
+            (c) =>
+                c.name.toLowerCase().includes(needle) ||
+                c.category.toLowerCase().includes(needle) ||
+                c.hint.toLowerCase().includes(needle)
+        )
+    }, [query])
+    const grouped = useMemo(() => {
+        const out = new Map<PaletteComponent['category'], PaletteComponent[]>()
+        for (const c of filtered) {
+            const list = out.get(c.category) ?? []
+            list.push(c)
+            out.set(c.category, list)
+        }
+        return out
+    }, [filtered])
+    const attachedSet = useMemo(() => new Set(attachedIds), [attachedIds])
+
+    return (
+        <div className="flex h-full w-full flex-col">
+            <div className="border-b px-3 py-2">
+                <div className="relative">
+                    <Search
+                        size={11}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
+                    <IGRPInputPrimitive
+                        placeholder="Find a component…"
+                        className="h-7 pl-7 text-[11px]"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                    />
+                </div>
+                <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">
+                    Click to pin · remove via chip in chat
+                    {attachedIds.length > 0 && (
+                        <span className="ml-1 font-medium text-primary">
+                            · {attachedIds.length} pinned
+                        </span>
+                    )}
+                </p>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2">
+                {filtered.length === 0 ? (
+                    <p className="px-2 py-3 text-[11px] italic text-muted-foreground">
+                        No components match "{query}".
+                    </p>
+                ) : (
+                    Array.from(grouped.entries()).map(([category, items]) => (
+                        <section key={category} className="mb-3">
+                            <h4 className="mb-1.5 px-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                                {category}
+                            </h4>
+                            <div className="grid grid-cols-2 gap-1.5">
+                                {items.map((c) => (
+                                    <button
+                                        key={c.id}
+                                        type="button"
+                                        onClick={() => onToggle(c.id)}
+                                        title={c.hint}
+                                        className={cn(
+                                            'flex flex-col items-start gap-0.5 rounded-md border px-2 py-1.5 text-left transition-colors',
+                                            attachedSet.has(c.id)
+                                                ? 'border-primary/40 bg-primary/5'
+                                                : 'border-border bg-card hover:bg-accent'
+                                        )}
+                                    >
+                                        <div className="flex w-full items-center justify-between">
+                                            <span className="text-[11px] font-medium">
+                                                {c.name}
+                                            </span>
+                                            {attachedSet.has(c.id) && (
+                                                <Check size={10} className="text-primary" />
+                                            )}
+                                        </div>
+                                        <span className="line-clamp-2 text-[9px] leading-tight text-muted-foreground">
+                                            {c.hint}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        </section>
+                    ))
+                )}
+            </div>
+        </div>
+    )
+}
+
+const FirstRunBanner = (): JSX.Element => (
+    <div className="relative overflow-hidden border-b bg-amber-500/5 px-4 py-2 text-[11px] text-amber-700 dark:text-amber-400">
+        <div className="flex items-center gap-2">
+            <Loader2 size={12} className="animate-spin" />
+            <span className="font-medium">Installing dependencies…</span>
+            <span className="text-muted-foreground">
+                first-time setup, ~30s. Live progress in the Logs tab.
+            </span>
+        </div>
+        <div className="absolute bottom-0 left-0 h-0.5 w-1/3 animate-[firstrun_1.4s_linear_infinite] bg-amber-500/60" />
+        <style>{`@keyframes firstrun{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}`}</style>
+    </div>
+)
+
 // ─── Preview ──────────────────────────────────────────────────────────────
 
 const PreviewToolbar = ({
     device,
     onChangeDevice,
+    customWidth,
+    onChangeCustomWidth,
     url,
     running,
     onToggleDev
 }: {
     device: DeviceFrame
     onChangeDevice: (d: DeviceFrame) => void
+    customWidth: number
+    onChangeCustomWidth: (next: number) => void
     url: string | null
     running: boolean
     onToggleDev: () => void
@@ -540,7 +926,29 @@ const PreviewToolbar = ({
                     icon={<Smartphone size={13} />}
                     title="Mobile"
                 />
+                <DeviceButton
+                    active={device === 'custom'}
+                    onClick={() => onChangeDevice('custom')}
+                    icon={<MoveHorizontal size={13} />}
+                    title="Custom width"
+                />
             </div>
+            {device === 'custom' && (
+                <div className="flex items-center gap-1 rounded-md border bg-card px-2 py-1 text-[11px]">
+                    <input
+                        type="number"
+                        value={customWidth}
+                        min={MIN_CUSTOM_VIEWPORT}
+                        max={MAX_CUSTOM_VIEWPORT}
+                        onChange={(e) => {
+                            const next = Number(e.target.value)
+                            if (Number.isFinite(next)) onChangeCustomWidth(next)
+                        }}
+                        className="w-16 bg-transparent text-right outline-none"
+                    />
+                    <span className="text-muted-foreground">px</span>
+                </div>
+            )}
             <div
                 className="flex h-8 w-56 items-center truncate rounded-md bg-muted px-3 text-[11px] text-muted-foreground"
                 title={url ?? 'dev server stopped'}
@@ -618,12 +1026,14 @@ const DeviceButton = ({
 
 const PreviewPane = ({
     device,
+    customWidth,
     url,
     running,
     installing,
     onSwitchToLogs
 }: {
     device: DeviceFrame
+    customWidth: number
     url: string | null
     running: boolean
     installing: boolean
@@ -638,14 +1048,20 @@ const PreviewPane = ({
         }
         return null
     })
-    const widthClass =
-        device === 'desktop' ? 'w-full' : device === 'tablet' ? 'w-[768px]' : 'w-[375px]'
+    const widthStyle: CSSProperties =
+        device === 'desktop'
+            ? { width: '100%' }
+            : device === 'tablet'
+              ? { width: 768 }
+              : device === 'mobile'
+                ? { width: 375 }
+                : { width: customWidth, maxWidth: '100%' }
     return (
         <div className="flex h-full items-center justify-center">
             <div
+                style={widthStyle}
                 className={cn(
-                    'relative h-full overflow-hidden rounded-xl border bg-white shadow-2xl transition-all duration-300',
-                    widthClass
+                    'relative h-full overflow-hidden rounded-xl border bg-white shadow-2xl transition-[width] duration-300'
                 )}
             >
                 <div className="flex h-8 items-center gap-1.5 border-b bg-gray-100 px-4">
