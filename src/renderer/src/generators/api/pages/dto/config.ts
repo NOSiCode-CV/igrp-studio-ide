@@ -42,7 +42,7 @@ export const TemplateOptions = [
 ]
 
 export const KIND_OPTIONS: { label: string; value: DTOConfig['type'] }[] = [
-    { label: 'DTO', value: 'dto' },
+    { label: 'Data Transfer Object', value: 'dto' },
     { label: 'GraphQL Type', value: 'graphqlType' },
     { label: 'GraphQL Input', value: 'graphqlInput' }
 ]

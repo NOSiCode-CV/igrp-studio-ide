@@ -142,27 +142,31 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                                     error={formik.errors.extends}
                                     isTouched={formik.touched.extends}
                                 />
-                                <div className="flex flex-1 space-x-2">
-                                    <IGRPLabelPrimitive htmlFor="enableCustonValidation">
-                                        {t('enableCustonValidation')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPCheckboxPrimitive
-                                        id="enableCustonValidation"
-                                        onCheckedChange={(checked: boolean) =>
-                                            formik.setFieldValue('enableCustonValidation', checked)
-                                        }
-                                        checked={formik.values.enableCustonValidation}
-                                    />
-                                    <IGRPLabelPrimitive htmlFor="enableCustonValidation">
-                                        {t('readOnly')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPCheckboxPrimitive
-                                        id="readOnly"
-                                        onCheckedChange={(checked: boolean) =>
-                                            formik.setFieldValue('readOnly', checked)
-                                        }
-                                        checked={formik.values.readOnly}
-                                    />
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center space-x-2">
+                                        <IGRPCheckboxPrimitive
+                                            id="enableCustonValidation"
+                                            onCheckedChange={(checked: boolean) =>
+                                                formik.setFieldValue('enableCustonValidation', checked)
+                                            }
+                                            checked={formik.values.enableCustonValidation}
+                                        />
+                                        <IGRPLabelPrimitive htmlFor="enableCustonValidation" className="whitespace-nowrap">
+                                            {t('enableCustonValidation')}
+                                        </IGRPLabelPrimitive>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <IGRPCheckboxPrimitive
+                                            id="readOnly"
+                                            onCheckedChange={(checked: boolean) =>
+                                                formik.setFieldValue('readOnly', checked)
+                                            }
+                                            checked={formik.values.readOnly}
+                                        />
+                                        <IGRPLabelPrimitive htmlFor="readOnly" className="whitespace-nowrap">
+                                            {t('readOnly')}
+                                        </IGRPLabelPrimitive>
+                                    </div>
                                 </div>
                             </div>
                             {TabList.map(({ value }) => (
