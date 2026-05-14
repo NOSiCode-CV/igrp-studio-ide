@@ -36,7 +36,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
     const [isConst, setIsConst] = useState(false)
     const [isEnum, setIsEnum] = useState(false)
 
-    const { enumTypes } = options
+    const { enumTypes, collectionTypes } = options
 
     useEffect(() => {
         setIsInteger(row?.['type'] === 'integer' || row?.['type'] === 'long')
@@ -98,6 +98,19 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                             ))}
                         </div>
                         <IGRPSeparator orientation="horizontal" />
+                        {collectionTypes && collectionTypes.length > 0 && (
+                            <div className="flex items-center gap-4">
+                                <IGRPLabelPrimitive htmlFor="collectionType">
+                                    {t('collectionType')}
+                                </IGRPLabelPrimitive>
+                                <IGRPCombobox
+                                    className="h-8"
+                                    value={row?.['collectionType'] || ''}
+                                    onChange={(ev) => changeValue('collectionType', ev)}
+                                    options={collectionTypes}
+                                />
+                            </div>
+                        )}
                         {!isBoolean && (
                             <div className="flex flex-1 gap-2">
                                 {['enum', 'const'].map((field: string) => (
