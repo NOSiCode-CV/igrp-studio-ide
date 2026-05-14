@@ -5,6 +5,7 @@ import { Provider } from 'react-redux'
 import { ActiveThemeProvider } from './components/active-theme-provider'
 import { ThemeProvider } from './components/theme-provider'
 import { ProcessStudioClientProvider } from './features/bpmn'
+import { EngineCatalogProvider } from './features/engine-catalog'
 import rootReducer from './redux'
 import { subscribeToSpecDataChunks } from './redux/specData/thunks'
 import { subscribeDocsChanged } from './redux/specDocs/thunks'
@@ -72,14 +73,16 @@ const App = (): JSX.Element => {
         <Provider store={store}>
             <QueryClientProvider client={queryClient}>
                 <ProcessStudioClientProvider>
-                    <React.Fragment>
-                        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-                            <ActiveThemeProvider initialTheme={activeThemeValue}>
-                                <IGRPToasterPrimitive richColors closeButton expand />
-                                <AppRoutes />
-                            </ActiveThemeProvider>
-                        </ThemeProvider>
-                    </React.Fragment>
+                    <EngineCatalogProvider>
+                        <React.Fragment>
+                            <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+                                <ActiveThemeProvider initialTheme={activeThemeValue}>
+                                    <IGRPToasterPrimitive richColors closeButton expand />
+                                    <AppRoutes />
+                                </ActiveThemeProvider>
+                            </ThemeProvider>
+                        </React.Fragment>
+                    </EngineCatalogProvider>
                 </ProcessStudioClientProvider>
             </QueryClientProvider>
         </Provider>

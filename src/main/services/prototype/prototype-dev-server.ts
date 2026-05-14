@@ -120,6 +120,17 @@ class PrototypeDevServerService {
             }
         }
 
+        // Seed `.env.local` before the dev server boots. The IGRP
+        // `@igrp/framework-next` template hard-fails if it can't find a
+        // Keycloak config (`KEYCLOAK_CLIENT_ID/SECRET/ISSUER`); for prototype
+        // previews we never want a real Keycloak round-trip, so we copy the
+        // shipped `.env.example` to `.env.local` (Next loads `.env.local`
+        // ahead of `.env`, and `.env.local` is gitignored — good) and set
+        // `IGRP_PREVIEW_MODE=true` which the runtime checks to bypass the
+        // auth env var requirement. Idempotent: re-running is a no-op if
+        // the preview flag is already in place.
+        this.ensurePreviewEnv(basePath, cwd)
+
         const port = await prototypePortPool.acquire(basePath)
         const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm'
 
@@ -243,6 +254,57 @@ class PrototypeDevServerService {
     }
 
     /**
+     * Make sure the prototype has a `.env.local` with `IGRP_PREVIEW_MODE=true`
+     * before booting `next dev`. The `@igrp/framework-next` runtime throws
+     * "Missing required authentication environment variables for keycloak"
+     * unless this flag is set; in preview mode we never want a real Keycloak
+     * round-trip, so we hard-set it for every prototype.
+     *
+     * Strategy:
+     *   1. If `.env.example` ships in the prototype and `.env.local` is
+     *      missing, copy `.env.example` → `.env.local` (preserves any
+     *      well-chosen defaults the template authored).
+     *   2. Read `.env.local` (whatever its origin), append
+     *      `IGRP_PREVIEW_MODE=true` when not already present.
+     *   3. Idempotent — re-running on subsequent boots only touches the file
+     *      if something is missing.
+     *
+     * Failures here are surfaced as warnings (not fatal) — the user can still
+     * configure auth manually if they need a real Keycloak in the prototype.
+     */
+    private ensurePreviewEnv(basePath: string, cwd: string): void {
+        const banner = (line: string, level: DevLogLevel = 'info'): void => {
+            const entry: DevLogEntry = { timestamp: Date.now(), level, line }
+            broadcast(EVENTS.SPEC_PROTOTYPE.DEV_LOG, { basePath, entry })
+        }
+        try {
+            const examplePath = join(cwd, '.env.example')
+            const targetPath = join(cwd, '.env.local')
+            const previewLine = 'IGRP_PREVIEW_MODE=true'
+
+            let content = ''
+            if (fs.existsSync(targetPath)) {
+                content = fs.readFileSync(targetPath, 'utf-8')
+            } else if (fs.existsSync(examplePath)) {
+                content = fs.readFileSync(examplePath, 'utf-8')
+                banner('[env] seeded .env.local from .env.example')
+            }
+
+            if (!/^\s*IGRP_PREVIEW_MODE\s*=/m.test(content)) {
+                const sep = content.length > 0 && !content.endsWith('\n') ? '\n' : ''
+                content = `${content}${sep}${previewLine}\n`
+                fs.writeFileSync(targetPath, content, 'utf-8')
+                banner('[env] set IGRP_PREVIEW_MODE=true in .env.local')
+            }
+        } catch (err) {
+            banner(
+                `[env] could not configure .env.local: ${err instanceof Error ? err.message : String(err)}`,
+                'warn'
+            )
+        }
+    }
+
+    /**
      * Runs `npm install` inside the prototype folder and streams progress to
      * the Logs tab. Resolves when install finishes (success), rejects with a
      * descriptive error on failure so the caller can surface it.
@@ -255,6 +317,28 @@ class PrototypeDevServerService {
         }
 
         banner('[install] node_modules missing — running `npm install` (first run only)…')
+
+        // Pre-flight cleanup: remove non-npm lockfiles. The user may have run
+        // `pnpm install` or `yarn` manually at some point, leaving stale
+        // lockfiles that (a) confuse turbopack's workspace-root inference,
+        // and (b) drift away from the npm-managed `package-lock.json` we're
+        // about to (re)create. We standardise on npm because that's the
+        // package manager the install step uses; mixing PMs in the same
+        // prototype folder breaks reproducibility.
+        for (const stale of ['pnpm-lock.yaml', 'yarn.lock']) {
+            const p = join(cwd, stale)
+            if (fs.existsSync(p)) {
+                try {
+                    fs.unlinkSync(p)
+                    banner(`[install] removed stale ${stale} (npm is the active PM)`)
+                } catch (err) {
+                    banner(
+                        `[install] could not remove ${stale}: ${err instanceof Error ? err.message : String(err)}`,
+                        'warn'
+                    )
+                }
+            }
+        }
 
         // Ensure the prototype has access to the IGRP private registry so
         // `@igrp/*` packages resolve. AI-generated `package.json` files often

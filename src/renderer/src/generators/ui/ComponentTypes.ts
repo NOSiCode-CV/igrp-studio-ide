@@ -52,90 +52,7 @@ import {
     IGRPVerticalBarChart,
     IGRPVideoEmbed
 } from '@igrp/igrp-framework-react-design-system'
-import {
-    Activity,
-    AlignLeft,
-    AreaChart,
-    Badge,
-    BarChart2,
-    Bell,
-    Bell as BellIcon,
-    Donut as ButtonIcon,
-    Calendar,
-    CalendarDays,
-    Calendar as CalendarIcon,
-    CaseSensitive,
-    ChartBarBig,
-    ChartColumnBig,
-    CheckCircle,
-    CheckSquare,
-    ChevronDown,
-    ChevronsUpDown,
-    CircleDot,
-    CircleUser,
-    Clock,
-    Code,
-    Columns2,
-    Copy,
-    CreditCard,
-    DollarSign,
-    Dot,
-    Edit3,
-    Ellipsis,
-    Eye,
-    EyeOff,
-    FileText,
-    Fingerprint,
-    FormInput as Form,
-    FormInput,
-    Frame,
-    Gauge,
-    GitMerge,
-    Grid,
-    Hash,
-    Heading,
-    Heading1,
-    Heart,
-    Image,
-    Info,
-    Layout,
-    LayoutList,
-    LineChart,
-    Link,
-    Link2,
-    List,
-    ListCollapse,
-    List as ListIcon,
-    Map,
-    Menu,
-    MessageCircle,
-    MoveRight,
-    Palette,
-    Phone,
-    PieChart,
-    Play,
-    RadarIcon,
-    Ratio,
-    RectangleHorizontal,
-    Search,
-    SeparatorHorizontal,
-    Sliders,
-    Square,
-    SquareMousePointer,
-    Star,
-    Table,
-    Table2,
-    Table as Tabs,
-    Text,
-    TextCursorInput,
-    Text as TextIcon,
-    ToggleLeft,
-    TrendingUp,
-    Upload,
-    Video,
-    WrapText
-} from 'lucide-react'
-import type React from 'react'
+// Lucide imports for ICON_MAP moved to `@renderer/features/component-icons`.
 import IGRPStudioAccordion from './renderers/components/Accordion'
 import IGRPStudioAlert from './renderers/components/Alert'
 import IGRPStudioCard from './renderers/components/Card'
@@ -167,20 +84,9 @@ import IGRPStudioTable from './renderers/components/Table'
 import IGRPStudioTabs from './renderers/components/Tabs'
 import IGRPStudioTextList from './renderers/components/TextList'
 
-// Component Categories
-export const GROUP_COMPONET: Record<string, string> = {
-    structure: 'Structure',
-    containers: 'Containers',
-    formElements: 'Form Elements',
-    basicElements: 'Basic Elements',
-    dataDisplay: 'Data Display',
-    layout: 'Layout',
-    widget: 'Widgets',
-    advanced: 'Advanced',
-    typography: 'Typography',
-    customComponents: 'Custom Components',
-    appComponents: 'Application Components'
-} as const
+// Group label map moved to `@renderer/features/component-palette/groups`.
+// Re-export the legacy name so any existing import keeps working.
+export { GROUP_COMPONET } from '@renderer/features/component-palette'
 
 export const COMPONENT: Record<string, string> = {
     ComponentContent: 'component',
@@ -315,130 +221,11 @@ export const COMPONENT: Record<string, string> = {
     CardDetails: 'cardDetails'
 } as const
 
-// Icon Mapping
-export const ICON_MAP: Record<string, React.ElementType> = {
-    [COMPONENT.Input]: TextCursorInput,
-    [COMPONENT.InputText]: TextCursorInput,
-    [COMPONENT.AddOn]: FormInput,
-    [COMPONENT.Number]: Hash,
-    [COMPONENT.Label]: CaseSensitive,
-    [COMPONENT.Hidden]: EyeOff,
-    [COMPONENT.Date]: Calendar,
-    [COMPONENT.DatePicker]: Calendar,
-    [COMPONENT.InputDatePicker]: Calendar,
-    [COMPONENT.TimePicker]: Clock,
-    [COMPONENT.Password]: Eye,
-    [COMPONENT.ColorPicker]: Palette,
-    [COMPONENT.Textarea]: AlignLeft,
-    [COMPONENT.Phone]: Phone,
-    [COMPONENT.FileUpload]: Upload,
-    [COMPONENT.Select]: ChevronsUpDown,
-    [COMPONENT.Combobox]: List,
-    [COMPONENT.Checkbox]: CheckSquare,
-    [COMPONENT.Radio]: CircleDot,
-    [COMPONENT.Switch]: ToggleLeft,
-    [COMPONENT.RangeSlider]: Sliders,
-    [COMPONENT.Link]: Link2,
-    [COMPONENT.Button]: SquareMousePointer,
-    [COMPONENT.Text]: Text,
-    [COMPONENT.Image]: Image,
-    [COMPONENT.RichTextEditor]: Edit3,
-    [COMPONENT.InputUrl]: Link,
-    [COMPONENT.Table]: Table,
-    [COMPONENT.Chart]: BarChart2,
-    [COMPONENT.Maps]: Map,
-    [COMPONENT.Carousel]: Play,
-    [COMPONENT.Fingerprint]: Fingerprint,
-    [COMPONENT.DatePickerRange]: Calendar,
-
-    [COMPONENT.Panel]: Layout,
-    [COMPONENT.Card]: CreditCard,
-    [COMPONENT.Tabs]: Tabs,
-    [COMPONENT.List]: ListIcon,
-    [COMPONENT.iFrame]: Frame,
-    [COMPONENT.InfoPanel]: Info,
-    [COMPONENT.Calendar]: CalendarIcon,
-    [COMPONENT.Alerts]: Bell,
-    [COMPONENT.Badge]: Badge,
-    [COMPONENT.Ratings]: Star,
-    [COMPONENT.EmbedVideo]: Video,
-    [COMPONENT.Progress]: Activity,
-    [COMPONENT.CalendarSingle]: CalendarDays,
-    [COMPONENT.CalendarSingleTime]: CalendarDays,
-    [COMPONENT.CalendarRange]: CalendarDays,
-    [COMPONENT.CalendarRangeTime]: CalendarDays,
-    [COMPONENT.CalendarMultiple]: CalendarDays,
-    [COMPONENT.CalendarMultipleTime]: CalendarDays,
-    [COMPONENT.DatePickerSingle]: Calendar,
-    [COMPONENT.DatePickerMultiple]: Calendar,
-    [COMPONENT.InputDatePickerSingle]: Calendar,
-    // Chaves que não existem em COMPONENT permanecem iguais
-
-    [COMPONENT.Form]: Form,
-    [COMPONENT.Container]: Square,
-    [COMPONENT.Grid]: Grid,
-    [COMPONENT.Flex]: MoveRight,
-    [COMPONENT.Columns]: Columns2,
-    [COMPONENT.Column]: Columns2,
-    [COMPONENT.Headline]: Heading1,
-    [COMPONENT.Dropdown]: Ellipsis,
-    [COMPONENT.Icon]: Heart,
-
-    [COMPONENT.Piechart]: PieChart,
-    [COMPONENT.Areachart]: AreaChart,
-    [COMPONENT.Linechart]: LineChart,
-    [COMPONENT.HorizontalBarchart]: ChartBarBig,
-    [COMPONENT.VerticalBarchart]: ChartColumnBig,
-    [COMPONENT.RadialBarchart]: Gauge,
-    [COMPONENT.Radarchart]: RadarIcon,
-
-    [COMPONENT.Chat]: MessageCircle,
-    [COMPONENT.Search]: Search,
-    [COMPONENT.StatsCard]: TrendingUp,
-    [COMPONENT.Separator]: SeparatorHorizontal,
-    [COMPONENT.ModalDialog]: CheckCircle,
-    [COMPONENT.AlertDialog]: Info,
-    [COMPONENT.Aspect]: Ratio,
-    [COMPONENT.MenuNavigation]: Menu,
-    [COMPONENT.Alert]: Dot,
-
-    [COMPONENT.PageHeader]: Heading,
-    [COMPONENT.Fragment]: Code,
-    [COMPONENT.Paragraph]: WrapText,
-    [COMPONENT.TextList]: WrapText,
-    [COMPONENT.RepetitiveList]: LayoutList,
-    [COMPONENT.FormList]: LayoutList,
-    [COMPONENT.InfoCard]: CreditCard,
-    [COMPONENT.PdfViewer]: FileText,
-    [COMPONENT.StatusBanner]: Bell,
-
-    [COMPONENT.Span]: TextIcon,
-    [COMPONENT.Section]: RectangleHorizontal,
-
-    [COMPONENT.Accordion]: AlignLeft,
-    [COMPONENT.TreeView]: GitMerge,
-
-    [COMPONENT.Notifications]: BellIcon,
-
-    [COMPONENT.Stack]: Table2,
-
-    [COMPONENT.TableDateFilter]: CalendarIcon,
-    [COMPONENT.TableTextFilter]: FormInput,
-    [COMPONENT.TableNumberFilter]: Sliders,
-    [COMPONENT.TableCheckboxFilter]: CheckSquare,
-    [COMPONENT.TableSelectFilter]: List,
-    [COMPONENT.TableActionListCell]: ButtonIcon,
-    [COMPONENT.TableAmountCell]: DollarSign,
-    [COMPONENT.TableCheckboxCell]: CheckSquare,
-    [COMPONENT.TableDateCell]: CalendarIcon,
-    [COMPONENT.TableTextCell]: FormInput,
-    [COMPONENT.TableExpanderCell]: ChevronDown,
-    [COMPONENT.TableBadgeCell]: Badge,
-    [COMPONENT.CopyToClipboard]: Copy,
-    [COMPONENT.Avatar]: CircleUser,
-    [COMPONENT.Accordion]: ListCollapse,
-    [COMPONENT.CardDetails]: ListCollapse
-} as const
+// Icon mapping is the source-of-truth for `componentName → lucide icon`.
+// Lifted to `@renderer/features/component-icons` so non-UI-gen surfaces
+// (Prototype palette, future generators) can use it without taking a
+// dependency on this module. Re-export keeps existing consumers stable.
+export { ICON_MAP, resolveIcon } from '@renderer/features/component-icons'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const COMPONENT_MAP: Record<string, any> = {

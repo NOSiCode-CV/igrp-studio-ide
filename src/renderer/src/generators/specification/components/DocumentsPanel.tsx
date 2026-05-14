@@ -801,6 +801,9 @@ const DocTabPane = ({ docId, basePath }: DocTabPaneProps): JSX.Element | null =>
                         <AIAssistant
                             mode="docs"
                             supportsKB
+                            persistenceKey={
+                                basePath ? `docs:${basePath}:${docId}` : undefined
+                            }
                             onProposeChange={handleProposeChange}
                             proposalStatus={proposalStatus}
                             proposalSummaries={proposalSummaries}

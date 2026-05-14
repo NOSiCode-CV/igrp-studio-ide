@@ -2,7 +2,7 @@ import type { ComponentDef } from '@igrp/igrp-studio-nextjs-engine/types'
 import { EngineService } from '@renderer/services/EngineService'
 import { useEffect } from 'react'
 import type { FileTree } from 'src/main/types'
-import { useComponentsContext } from '../contexts/ComponentsContext'
+import { useComponentsContext } from '@renderer/features/engine-catalog'
 import type { PageDefinition } from '../browser/page-manager'
 
 interface ComponentRegistrationProps {

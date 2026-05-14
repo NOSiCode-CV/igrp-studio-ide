@@ -5,8 +5,6 @@
  * same key shape and validation.
  */
 
-import { PALETTE_BY_ID } from './catalog'
-
 const componentsKey = (basePath: string, namespace: string): string =>
     `spec.${namespace}.attachedComponentIds.${basePath}`
 
@@ -16,9 +14,10 @@ export interface ComponentPersistenceOptions {
 }
 
 /**
- * Read pinned component ids from localStorage. Validates each id against
- * the static `PALETTE` so a stale entry from an older catalog version
- * gets quietly dropped.
+ * Read pinned component ids from localStorage. Only validates shape
+ * (string + array). Catalog membership is validated downstream by the
+ * surface that owns the live catalog — engine catalog ids change between
+ * sessions, so we'd otherwise drop legitimate values here.
  */
 export function readPersistedComponentIds(
     basePath: string | undefined,
@@ -30,9 +29,7 @@ export function readPersistedComponentIds(
         if (!raw) return []
         const parsed = JSON.parse(raw)
         return Array.isArray(parsed)
-            ? parsed.filter(
-                  (x): x is string => typeof x === 'string' && PALETTE_BY_ID.has(x)
-              )
+            ? parsed.filter((x): x is string => typeof x === 'string')
             : []
     } catch {
         return []

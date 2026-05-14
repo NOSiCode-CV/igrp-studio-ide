@@ -1,18 +1,38 @@
+/**
+ * Loads the IGRP component catalog from the Next.js engine
+ * (`window.engine.getComponent(ENV_TYPES.NEXTJS)`) once per session and
+ * makes it available to any surface that needs it — UI generator palette,
+ * Prototype palette, future generators.
+ *
+ * Lifted from `generators/ui/contexts/ComponentsContext.tsx` so the catalog
+ * is no longer owned by a single generator; renamed for semantic clarity
+ * (we load the *engine's* catalog of components, not arbitrary components).
+ * Back-compat aliases live in `./index.ts`.
+ */
+
 import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import type React from 'react'
 import { createContext, type ReactNode, useCallback, useContext, useState } from 'react'
 
-interface ComponentsContextType {
+export interface EngineCatalogContextType {
+    /**
+     * Full catalog of components registered with the Next.js engine. Each
+     * entry is the engine-native `ComponentRegisterConfig` so consumers can
+     * read properties, interactions, childrenTypes, etc. Adapters live in
+     * downstream modules (e.g. `features/component-palette` projects this
+     * onto a leaner palette shape).
+     */
     componentsRegistered: ComponentRegisterConfig[]
     setComponentsRegistered: (components: ComponentRegisterConfig[]) => void
+    /** Fetches the catalog from the engine; idempotent across calls. */
     loadRegistryComponent: () => Promise<ComponentRegisterConfig[]>
     isLoading: boolean
 }
 
-const ComponentsContext = createContext<ComponentsContextType | undefined>(undefined)
+const EngineCatalogContext = createContext<EngineCatalogContextType | undefined>(undefined)
 
-export const ComponentsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const EngineCatalogProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [componentsRegistered, setComponentsRegistered] = useState<ComponentRegisterConfig[]>([])
     const [isLoading, setIsLoading] = useState(false)
 
@@ -36,7 +56,7 @@ export const ComponentsProvider: React.FC<{ children: ReactNode }> = ({ children
             })
             return components
         } catch (error) {
-            console.error('[Debug] ComponentsContext: Failed to load components:', error)
+            console.error('[EngineCatalog] failed to load components:', error)
             return []
         } finally {
             setIsLoading(false)
@@ -44,7 +64,7 @@ export const ComponentsProvider: React.FC<{ children: ReactNode }> = ({ children
     }, [])
 
     return (
-        <ComponentsContext.Provider
+        <EngineCatalogContext.Provider
             value={{
                 componentsRegistered,
                 setComponentsRegistered,
@@ -53,14 +73,14 @@ export const ComponentsProvider: React.FC<{ children: ReactNode }> = ({ children
             }}
         >
             {children}
-        </ComponentsContext.Provider>
+        </EngineCatalogContext.Provider>
     )
 }
 
-export const useComponentsContext = () => {
-    const context = useContext(ComponentsContext)
+export const useEngineCatalog = (): EngineCatalogContextType => {
+    const context = useContext(EngineCatalogContext)
     if (context === undefined) {
-        throw new Error('useComponentsContext must be used within a ComponentsProvider')
+        throw new Error('useEngineCatalog must be used within an EngineCatalogProvider')
     }
     return context
 }

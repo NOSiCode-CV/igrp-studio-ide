@@ -20,7 +20,7 @@ import useToast from '@renderer/hooks/useToast'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { capitalize, getId } from '@renderer/utils'
 import { useFormik } from 'formik'
-import { camelCase } from 'lodash-es'
+import { camelCase } from '@renderer/utils'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import type { JSX } from 'react/jsx-runtime'
@@ -517,7 +517,17 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
 
             const mergedField: LabeledElementField = {
                 ...field,
-                ...currentField
+                ...currentField,
+                // Prefer the freshly derived name when the persisted
+                // value is empty (legacy data saved before
+                // deriveFieldName fell back through label) — otherwise
+                // keep whatever the user typed manually.
+                name:
+                    (currentField?.name && String(currentField.name).trim()) ||
+                    field.name,
+                label:
+                    (currentField?.label && String(currentField.label).trim()) ||
+                    field.label
             }
 
             if (field.fields && currentField?.fields) {

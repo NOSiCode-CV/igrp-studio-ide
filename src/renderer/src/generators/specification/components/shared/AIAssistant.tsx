@@ -188,6 +188,17 @@ interface AIAssistantProps {
      */
     composerSlot?: ReactNode
     /**
+     * When set, the message history is persisted to `localStorage` under
+     * `spec.aiChat.<persistenceKey>` and reloaded on mount. Use it for
+     * surfaces that get unmounted/remounted by parent navigation (rail
+     * tabs in the Specification layout) — without this the chat resets to
+     * empty whenever the user switches tabs and comes back.
+     *
+     * The key should include enough context to scope per-project so two
+     * specs don't share chats (e.g. `prototype:<basePath>`).
+     */
+    persistenceKey?: string
+    /**
      * Restore a prototype build snapshot inline from a chat bubble's snapshot
      * card. The host owns the destructive `git reset --hard <sha>` thunk —
      * the assistant only fires the intent. Required when `mode === 'prototype'`
@@ -247,15 +258,39 @@ export function AIAssistant({
     attachments,
     onRemoveAttachment,
     composerSlot,
+    persistenceKey,
     onPrototypeRestore,
     onPrototypeOpenFile,
     className
 }: AIAssistantProps): JSX.Element {
-    const [messages, setMessages] = useState<ChatMessage[]>([])
+    // Restore persisted message history when `persistenceKey` is provided.
+    // Lazy init keeps the read off the render path. We treat parse failures
+    // as "no history" — corrupt entries shouldn't break the chat surface.
+    const [messages, setMessages] = useState<ChatMessage[]>(() =>
+        readPersistedMessages(persistenceKey)
+    )
     const [input, setInput] = useState('')
     const [streaming, setStreaming] = useState(false)
     const [activeRequestId, setActiveRequestId] = useState<string | null>(null)
     const [useKB, setUseKB] = useState<boolean>(supportsKB)
+
+    // Persist message history to localStorage so the chat survives rail-tab
+    // remounts (SpecificationLayout conditionally mounts each panel). We
+    // skip persisting in-flight `streaming` flags on messages because they
+    // refer to live requests that won't survive a remount anyway.
+    useEffect(() => {
+        if (!persistenceKey) return
+        writePersistedMessages(persistenceKey, messages)
+    }, [messages, persistenceKey])
+
+    // When the host changes `persistenceKey` (different basePath after a
+    // project switch), reload the relevant history for the new scope.
+    const lastPersistenceKeyRef = useRef(persistenceKey)
+    useEffect(() => {
+        if (lastPersistenceKeyRef.current === persistenceKey) return
+        lastPersistenceKeyRef.current = persistenceKey
+        setMessages(readPersistedMessages(persistenceKey))
+    }, [persistenceKey])
 
     const [models, setModels] = useState<ProviderModel[]>([])
     const [selected, setSelected] = useState<ProviderModel | null>(null)
@@ -371,6 +406,30 @@ export function AIAssistant({
                     case 'delta':
                         target.content = (target.content || '') + chunk.content
                         break
+                    // M6 manifest-parsed: the JSON is valid and the engine
+                    // is about to write code. UI shows "Applying…".
+                    case 'manifest-parsed':
+                        target.prototype.summary = `${chunk.manifest.pageName} · ${chunk.manifest.componentCount} components`
+                        target.prototype.ops = [
+                            ...(target.prototype.ops ?? []),
+                            {
+                                op: 'create',
+                                path: chunk.manifest.outputPath
+                            }
+                        ]
+                        break
+                    // M6 manifest-applied: engine.createPage returned cleanly.
+                    case 'manifest-applied':
+                        target.prototype.applied += 1
+                        dispatcher?.({
+                            type: 'specPrototype/protoTurnApplied',
+                            payload: {
+                                requestId,
+                                op: 'create',
+                                path: chunk.manifest.outputPath
+                            }
+                        })
+                        break
                     case 'op-applied':
                         target.prototype.applied += 1
                         target.prototype.ops = [
@@ -419,6 +478,39 @@ export function AIAssistant({
                             type: 'specPrototype/protoTurnParseError',
                             payload: { requestId, message: chunk.message }
                         })
+                        break
+                    // M8 auto-retry — informational. The delta separator
+                    // already streamed into the bubble; this dispatch
+                    // is just for telemetry / future Redux integration.
+                    case 'retry-attempt':
+                        target.prototype.summary =
+                            `attempt ${chunk.attempt}/${chunk.maxAttempts}`
+                        break
+                    // M7 preview seeding — informational only, no Redux
+                    // dispatch. The ops list grows so the user sees that
+                    // the Studio did seed (or skipped) automatically.
+                    case 'mock-seeding':
+                        target.prototype.summary =
+                            (target.prototype.summary ?? '') + ' · seeding preview…'
+                        break
+                    case 'mock-seeded':
+                        target.prototype.ops = [
+                            ...(target.prototype.ops ?? []),
+                            { op: 'create', path: chunk.mockJsonPath },
+                            { op: 'create', path: chunk.previewTsPath }
+                        ]
+                        target.prototype.summary =
+                            (target.prototype.summary ?? '').replace(
+                                ' · seeding preview…',
+                                ''
+                            ) + ` · seeded ${chunk.rowCount} rows`
+                        break
+                    case 'mock-skipped':
+                        target.prototype.summary =
+                            (target.prototype.summary ?? '').replace(
+                                ' · seeding preview…',
+                                ''
+                            ) + ' · no seed needed'
                         break
                     case 'error':
                         target.error = chunk.message
@@ -1518,4 +1610,59 @@ function PrototypeSnapshotCard({
             )}
         </div>
     )
+}
+
+// ─── chat history persistence helpers ───────────────────────────────────
+//
+// Persist only fields that make sense on remount. `streaming` is reset to
+// false (an in-flight request from a previous session is unreachable from
+// the new AIAssistant instance). `error` is preserved so the user still
+// sees what went wrong before they navigated away.
+
+const PERSIST_PREFIX = 'spec.aiChat.'
+const MAX_PERSISTED_MESSAGES = 200
+
+function persistenceStorageKey(key: string): string {
+    return `${PERSIST_PREFIX}${key}`
+}
+
+function readPersistedMessages(key: string | undefined): ChatMessage[] {
+    if (!key || typeof window === 'undefined') return []
+    try {
+        const raw = window.localStorage?.getItem(persistenceStorageKey(key))
+        if (!raw) return []
+        const parsed = JSON.parse(raw)
+        if (!Array.isArray(parsed)) return []
+        return parsed
+            .filter(
+                (m: unknown): m is ChatMessage =>
+                    Boolean(m) &&
+                    typeof m === 'object' &&
+                    typeof (m as ChatMessage).id === 'string' &&
+                    typeof (m as ChatMessage).role === 'string' &&
+                    typeof (m as ChatMessage).content === 'string'
+            )
+            .map((m) => ({ ...m, streaming: false }))
+    } catch {
+        return []
+    }
+}
+
+function writePersistedMessages(key: string, messages: ChatMessage[]): void {
+    if (typeof window === 'undefined') return
+    try {
+        // Trim oldest first if the chat ran for a long time — localStorage
+        // quota is shared per origin (~5MB Chromium), and a single chat
+        // shouldn't dominate that budget.
+        const trimmed = messages.slice(-MAX_PERSISTED_MESSAGES)
+        // Strip transient flags before persisting.
+        const persistable = trimmed.map((m) => ({ ...m, streaming: false }))
+        window.localStorage?.setItem(
+            persistenceStorageKey(key),
+            JSON.stringify(persistable)
+        )
+    } catch {
+        // localStorage may be full or unavailable; failing silently keeps
+        // the chat alive in memory for the current session.
+    }
 }

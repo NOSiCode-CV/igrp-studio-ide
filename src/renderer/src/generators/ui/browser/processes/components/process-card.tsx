@@ -11,7 +11,11 @@ import {
 } from '@igrp/igrp-framework-react-design-system'
 import { Calendar, Info, UserCog } from 'lucide-react'
 import type { JSX } from 'react/jsx-runtime'
-import type { BPMNAuditUser, BPMNProjectProcessDefinition } from 'src/main/types'
+import type {
+    BPMNAuditUser,
+    BPMNDateLike,
+    BPMNProjectProcessDefinition
+} from 'src/main/types'
 
 interface ProcessCardProps {
     process: BPMNProjectProcessDefinition
@@ -19,10 +23,27 @@ interface ProcessCardProps {
     onSelectProcess: (process: BPMNProjectProcessDefinition) => void
 }
 
-function formatDate(value?: string): string {
-    if (!value) return '—'
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return value
+/**
+ * Process API serialises timestamps as Java `LocalDateTime` arrays
+ * (`[year, month, day, hour, minute, second, nanos]`). Some endpoints still
+ * return ISO strings — handle both gracefully.
+ */
+function toDate(value: BPMNDateLike | undefined): Date | null {
+    if (value == null) return null
+    if (Array.isArray(value)) {
+        if (value.length < 3) return null
+        const [year, month, day, hour = 0, minute = 0, second = 0, nanos = 0] = value
+        const ms = Math.floor(Number(nanos) / 1_000_000)
+        const d = new Date(year, (month ?? 1) - 1, day, hour, minute, second, ms)
+        return Number.isNaN(d.getTime()) ? null : d
+    }
+    const d = new Date(value)
+    return Number.isNaN(d.getTime()) ? null : d
+}
+
+function formatDate(value: BPMNDateLike | undefined): string {
+    const date = toDate(value)
+    if (!date) return '—'
     return date.toLocaleString(undefined, {
         year: 'numeric',
         month: 'short',
@@ -54,15 +75,15 @@ function resolveAuditUser(
         by.username && by.username !== composed
             ? by.username
             : by.email && by.email !== composed
-              ? by.email
-              : undefined
+                ? by.email
+                : undefined
     return { name: composed || '—', secondary }
 }
 
 interface AuditPair {
     label: string
     by?: BPMNAuditUser | string
-    at?: string
+    at?: BPMNDateLike
 }
 
 function AuditRow({ label, by, at }: AuditPair): JSX.Element {
@@ -88,16 +109,15 @@ export const ProcessCard = ({
 }: ProcessCardProps): JSX.Element => {
     const hasAudit = Boolean(
         process.createdBy ||
-            process.createdDate ||
-            process.lastModifiedBy ||
-            process.lastModifiedDate
+        process.createdDate ||
+        process.lastModifiedBy ||
+        process.lastModifiedDate
     )
 
     return (
         <IGRPCardPrimitive
-            className={`hover:shadow-md transition-all cursor-pointer ${
-                isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
-            }`}
+            className={`hover:shadow-md transition-all cursor-pointer ${isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
+                }`}
             onClick={() => {
                 onSelectProcess(process)
             }}
@@ -111,14 +131,12 @@ export const ProcessCard = ({
                         <IGRPCardDescriptionPrimitive>
                             {process.processKey}
                         </IGRPCardDescriptionPrimitive>
-                        <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
-                            <Calendar className="w-4 h-4" />
-                            {process.deploymentDate && (
-                                <span>
-                                    {`Deployed on ${process.deploymentDate ? process.deploymentDate : 'N/A'}`}
-                                </span>
-                            )}
-                        </div>
+                        {process.deploymentDate && (
+                            <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
+                                <Calendar className="w-4 h-4" />
+                                <span>{`Deployed on ${formatDate(process.deploymentDate)}`}</span>
+                            </div>
+                        )}
                         <div className="flex items-center space-x-2 mt-1 text-sm text-muted-foreground">
                             <UserCog className="w-4 h-4" />
                             <span>{process.processArtifacts?.length || 0} artifacts</span>

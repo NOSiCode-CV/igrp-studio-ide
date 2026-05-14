@@ -703,6 +703,24 @@ const specPrototype = {
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.EXPORT, { basePath }),
     openFolder: (basePath: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.OPEN_FOLDER, { basePath }),
+    readManifest: (basePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.READ_MANIFEST, { basePath }),
+    applyManifest: (basePath: string, manifest: Record<string, unknown>) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.APPLY_MANIFEST, { basePath, manifest }),
+    listSkills: (basePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.LIST_SKILLS, { basePath }),
+    readSkillFile: (basePath: string, skillName: string, filename: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.READ_SKILL_FILE, {
+            basePath,
+            skillName,
+            filename
+        }),
+    installSkill: (basePath: string, skillName: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.INSTALL_SKILL, { basePath, skillName }),
+    checkSkillUpdates: (basePath: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.CHECK_SKILL_UPDATES, { basePath }),
+    updateSkill: (basePath: string, skillName: string) =>
+        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.UPDATE_SKILL, { basePath, skillName }),
     onChunk: (
         callback: (payload: { requestId: string; chunk: any }) => void
     ): (() => void) => {

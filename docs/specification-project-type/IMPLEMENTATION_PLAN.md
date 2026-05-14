@@ -501,6 +501,91 @@ Bloqueadores:
 4. **Tests** — `M2D.16` (docs CRUD) + `M3.13` (chunker determinismo + KB pipeline E2E) podem correr em paralelo a M4.
 5. **M5** — Polish (estados especiais, command palette `Cmd/Ctrl+K`, i18n completa, docs utilizador, testes E2E mínimos).
 
+## 12.ter Skill — consumo do registry `@igrp/skills` pela Studio
+
+### Estado existente (não inventar de novo)
+
+O ecosystem IGRP **já tem skill infrastructure** entregue, separada do âmbito deste plano:
+
+| Peça | Localização | Estado |
+|---|---|---|
+| **Source dos skills** | `studio/_skills/` neste repo | ✅ Existe — contém `igrp-studio-metadata/` (5 ficheiros companheiros + `skill.json`) e `spring-boot-ai-agent-skills/`. |
+| **Registry HTTPS** | `https://sonatype.nosi.cv/repository/igrp-templates/@igrp/skills/` | ✅ Em uso pelo CLI. |
+| **CLI** | `studio/packages/cli` — `igrp skill add/list/remove/update/search/info/init` | ✅ Implementado e documentado em [`studio/packages/cli/README.md`](../../../packages/cli/README.md). |
+| **Project layout** | `<project>/.agents/skills/<name>/` + `.agents/skills/.installed.json` | ✅ Convenção estabelecida. |
+| **Formato** | `SKILL.md` (frontmatter `name`+`description`) + companion `.md` files + `skill.json` (registry manifest) | ✅ Estabelecido. Dimensão `framework: nextjs|spring|dotnet|process|meta`. |
+
+O skill canónico relevante para o Prototype builder é **`igrp-studio-metadata`** (`studio/_skills/igrp-studio-metadata/`). Tem:
+- `SKILL.md` — declara quando o agente deve invocar (criar/editar páginas, components, process steps).
+- `patterns.md` — templates JSON para list pages, forms, modais, filter blocks, stats cards.
+- `component-reference.md` — catálogo completo com `componentName` + properties válidos.
+- `process-steps.md` — contrato dos `processStep` JSONs.
+- `troubleshooting.md` — diagnóstico de erros para causas no JSON.
+- `project-conventions.md` — hooks, helpers, status colours, path conventions.
+
+Este corpus é exactamente o que o Studio Prototype Builder precisa para emitir manifests válidos. **Não criamos novo corpus** — consumimos o existente.
+
+### O que falta — integração no Studio Prototype Builder
+
+**O que está hoje (Phase 0):** `GOLDEN_LIST_PAGE_EXAMPLE` embedded inline no `PrototypePanel.contextProvider`, extraído manualmente do `inss-sisgb-core-mono-frontend/.igrpstudio/pages/contribuintes.json`. Hard-coded no Studio bundle.
+
+**Limitações actuais:**
+- Um único exemplo (lista-com-tabela). Form-create / detail-view / dashboard ficam sem cobertura.
+- Manifest engineering evolui → exemplo embedded fica stale.
+- Não aproveita `patterns.md`, `component-reference.md`, `troubleshooting.md` que já existem em `igrp-studio-metadata`.
+
+### Plano de integração — consumir o skill ao gerar
+
+**Fase 1 — Discovery e load on-demand (~3-4h):**
+- Studio scan de `<basePath>/.agents/skills/*/SKILL.md` na primeira interacção com o Prototype.
+- Para `igrp-studio-metadata`, fazer parse do `SKILL.md` frontmatter + body.
+- `SKILL.md` declara quais companion files carregar e **quando**:
+  > Load `patterns.md` when starting a new page
+  > Load `component-reference.md` when choosing which component to use
+  > Load `troubleshooting.md` when fixing an error
+- `PrototypePanel.contextProvider` ganha heurística simples baseada na user message:
+  - Contém "create"/"new"/"add" → injecta `patterns.md` (form-create + list patterns).
+  - Contém "list"/"table"/"grid" → injecta `patterns.md` (list pattern subset).
+  - Contém nome de componente desconhecido → injecta `component-reference.md`.
+  - Detecta erro do engine no histórico → injecta `troubleshooting.md`.
+- `GOLDEN_LIST_PAGE_EXAMPLE` inline torna-se fallback para quando o skill não está instalado.
+
+**Fase 2 — Bootstrap auto (~1h):**
+- Quando o user abre um prototype sem `.agents/skills/igrp-studio-metadata/`, mostrar banner: "Install the `igrp-studio-metadata` skill to improve generation quality. [Install]"
+- Click → spawna `igrp skill add igrp-studio-metadata --project <basePath>` via child_process.
+- O CLI cuida do registry fetch + install. Studio só consome o output.
+
+**Fase 3 — Companion file streaming (~2h):**
+- Vez de injectar `patterns.md` inteiro no system prompt (pode ser grande), fazer scan de section headers e injectar só a secção relevante.
+- Ex: user pede "list page" → grep em `patterns.md` por `## List page` → injecta só essa subsecção.
+
+**Fase 4 — RAG over skill content (futuro):**
+- Se o corpus crescer demasiado, indexar todas as companion files em LanceDB (infra existe para KB).
+- Per-turn retrieval top-K dos chunks mais relevantes ao user message.
+- Substitui a heurística keyword-based por embeddings.
+
+### Riscos & mitigações
+
+| Risco | Mitigação |
+|---|---|
+| Skill `igrp-studio-metadata` não instalado → Studio degrada | Fallback ao `GOLDEN_LIST_PAGE_EXAMPLE` inline; banner de install one-click |
+| Companion files muito grandes → prompt size explode | Fase 3 (section-level injection) + Fase 4 (RAG) |
+| Skill content drift quando engine evolui | Versionar via `skill.json` semver; `igrp skill update` periódico |
+| Múltiplas versões de skills incompatíveis | `igrp skill update` resolve via semver; `.installed.json` é fonte de verdade |
+
+### Próximos passos práticos
+
+1. **Validar Phase 0** — gerar a `User Management — Dashboard Page` (spec demo) com o `GOLDEN_LIST_PAGE_EXAMPLE` inline. Se passa engine validation: bom para esse tipo de página.
+2. **Inicial integração com skill (Fase 1)** — ler `.agents/skills/igrp-studio-metadata/SKILL.md` se existir; injectar `patterns.md` no system prompt quando user pede novo page. Substitui o inline golden quando o skill cobre o caso.
+3. **Bootstrap UX (Fase 2)** — banner "Install skill" quando ausente; spawn do CLI para o user.
+4. **Optimização** — Fases 3/4 só se prompt size se tornar problema mensurável.
+
+### Convenção registada
+
+Studio Prototype Builder **consome** o registry `@igrp/skills` via `.agents/skills/<name>/` mantido pelo CLI. **Não duplica** o corpus em `studio/igrp-studio-ide/resources/`. O CLI é o canal único para install/update; a Studio apenas lê.
+
+---
+
 ## 12.bis Decisões de design — edição interativa de Documents
 
 ### Histórico
@@ -607,16 +692,63 @@ Pendente de refactor. Adiar até existir o **segundo consumidor** (provavelmente
 | `features/dnd/` — DnD primitives partilhadas | ✅ | Extraído de `lib/dnd/`. Genéricos parametrizáveis (`<T extends DraggableItem>`); `Droppable` aceita `emptyState?: ({isHovered}) => ReactNode` em vez de importar `GenNoInfoComp`. `lib/dnd/` mantido como façade pinada a `StructuredComponent` (zero churn nos 57 imports do UI generator). UI generator passa `<GenNoInfoComp>` via prop no `lib/dnd/Droppable.tsx`. Pronto para Specification reusar com `<PaletteComponent>` ou outro tipo próprio. |
 | `features/spec-attachments/` — `DocAttachPicker` | ✅ | Movido de `generators/specification/components/documents/`. Imports actualizados em `DocumentsPanel.tsx` e `PrototypePanel.tsx`. |
 | `features/component-palette/` — catálogo + persistência | ✅ | Catálogo de 20 componentes shadcn (`PALETTE`, `PALETTE_BY_ID`, `PaletteComponent`, `PaletteCategory`) + helpers `readPersistedComponentIds(basePath, {namespace})` / `writePersistedComponentIds(...)` com chave `spec.<namespace>.attachedComponentIds.<basePath>`. `PrototypePanel` usa `namespace: 'prototype'`; futuros generators usam outros namespaces sem colisão. |
+| `features/component-icons/` — `ICON_MAP` + `resolveIcon` | ✅ | Extraído de `generators/ui/ComponentTypes.ts` (120+ linhas de mapping + 100+ imports lucide). Keys passam a ser string literais (`'card'`, `'inputText'`, …) decoupling do enum `COMPONENT` que continua no UI gen. `ComponentTypes.ts` re-exporta `ICON_MAP` para back-compat dos 4 consumers (`useConfigData`, `add-components-popover`, `add-components-modal`, `CustomComponent`). |
+| `features/engine-catalog/` — `EngineCatalogProvider` + `useEngineCatalog` | ✅ | Movido de `generators/ui/contexts/ComponentsContext.tsx`. Renomeado semanticamente (carrega o *catálogo do engine*, não componentes arbitrários). Aliases back-compat `ComponentsProvider` / `useComponentsContext` para zero churn em 4 importadores. **Provider montado no `App.tsx` root** (em vez de só no UI gen) para que o Specification Prototype consiga ler o mesmo catálogo. |
+| `features/component-palette/` — engine integration | ✅ | `useEnginePalette(components)` projecta `ComponentRegisterConfig[]` em `EnginePaletteComponent` (id, name, groupKey, groupLabel, icon, deprecated). `GROUP_LABELS` + `HIDDEN_COMPONENT_NAMES` extraídos para `groups.ts` (UI gen `useConfigData` passa a consumir daí; bonus: removido `console.log` ruidoso). `PaletteComponentCard` extraído do `sidebar-left.tsx` para uso partilhado. **`PrototypePanel.ComponentPalettePane` agora consome o engine catalog ao vivo** em vez do `PALETTE` estático — paridade total com UI gen sidebar. Pinned ids antigos do catálogo estático que não coincidam com nomes do engine são silenciosamente droppados via `attachedComponents` orphan-filter. Static `PALETTE` mantido em `catalog.ts` como fallback / referência futura. |
+
+### Estado actual
+| Item | Estado | Notas |
+|---|---|---|
+| **M4 Fase 1** — Fechar loop visível | ✅ **Completa** | M4.7 webview + auto-reload + DevTools; M4.8 Monaco viewer + DiffEditor HEAD vs HEAD~1; M4.9 logs filters/search/clear/copy/pause-on-hover; M4.10 history real; M4.11 snapshot card inline com ops list + Restore; M4.13 footer wired (Export + Open folder + Reset); M4.27 fake data via system prompt (parcial — toggle no footer adiado); M4.30 resizable chat ↔ main. |
+| **M4 Fase 2** — Loop usável | ✅ **Completa** | M4.15 Stop/Retry; M4.16 progresso por turn; M4.17 erros visíveis + Ask AI to fix; M4.18 first-run UX + auto-switch Logs; M4.19 custom viewport width; M4.28 component palette tab switch + **engine catalog ao vivo**; M4.29 spec picker. M4.12 descontinuado. |
+
+### 🎯 Direcção arquitectural (decidida 2026-05-08)
+
+**Modelo Y — manifest-first.** O Prototype vai pivotar de "LLM emite file-ops sobre código TSX livre" para **"LLM emite `PageConfig` JSON; engine gera o código"** — alinhado com a filosofia do CLAUDE.md ("manifest is authoritative; UI should not bypass persistence contracts") e com o fluxo que o utilizador já faz manualmente hoje em Claude Code (spec → chat → JSON → cola no Page Builder → Save).
+
+**Fluxo alvo:**
+
+```
+spec.md (attached) + chat user message
+  → LLM emits PageConfig JSON (StructuredComponent tree)
+  → Studio validates + persists em <basePath>/.igrpstudio/prototype/page.json
+  → window.engine.createPage(config, 'nextjs', join(basePath, 'prototype'))
+  → @igrp/igrp-studio-nextjs-engine.newPage() writes <prototype>/app/pages/<pageName>/page.tsx
+  → next dev hot-reload → <webview> preview
+  → (futuro) user DnD/props no preview → muta manifest directamente → engine re-gera
+```
+
+**O que isto destrava:**
+- Output deliverable é JSON manifest **abrível na Page Builder existente** — refinamento visual sem fricção.
+- Sem env vars / Keycloak crashes (engine só gera o que sabe gerar).
+- Reuso total do pipeline NextjsEngine.
+- DnD/props futuro acontece directamente no manifest (sem round-trip LLM).
+
+**Decisões anexas:**
+- **Manifest-replace** no MVP (LLM emite árvore completa por turn) → migra para manifest-ops cirúrgicas depois.
+- **Uma única página** no MVP (`app/page.tsx`) → multi-rota depois.
+- **Engine catalog subset** no system prompt (~15 always-included + pinned components da palette) para controlar prompt size.
+- **Big-bang migration** — substitui o file-ops actual (que estava a causar dor: Keycloak, env vars, peer-deps).
 
 ### Pendente
 | Item | Esforço | Prioridade |
 |---|---|---|
-| **M4 Fase 1** — Fechar loop visível (M4.8 viewer+diff, M4.9 logs filters, M4.11 snapshot card; **M4.7 ✅**, **M4.10 ✅**, **M4.13 ✅**, **M4.27 ✅** parcial, **M4.30 ✅**) | ~3–5h | ⭐⭐⭐ Alta — entrega MVP §11 |
-| **M4 Fase 2** — Loop usável (M4.15–M4.19, M4.28 drag-drop; **M4.29 ✅**, M4.12 descontinuado) | ~4–6h | ⭐⭐⭐ Alta — UX competitivo |
-| **M4 Fase 3** — Power user (M4.20–M4.24) | ~7–11h | ⭐ Opcional pós-MVP |
-| **M4 Fase 4** — Tests & hardening (M4.14, M4.25, M4.26) | ~4–5h | ⭐⭐ Média (paralelo) |
-| Tests M2D.16 + M3.13 | ~2h | ⭐⭐ Média |
-| M5 — Polish | ~3–4h | ⭐ Baixa até M4 estar feito |
+| **M7 — Skill corpus (interim + Phase 1 + 2)** | ~3-5h interim; ~6-8h Phase 1; ~8-10h Phase 2 | ⭐⭐⭐ **CRÍTICA — bloqueio actual.** Engine rejeita manifests do LLM (`additionalProperties`, route-pattern regexes). Sem golden examples no prompt, o LLM não atinge taxa de sucesso útil. Ver §12.ter para detalhes. **Fonte primária:** `inss-sisgb-core-mono-frontend`. |
+| **M6 — Manifest-first transition** (NOVO cluster — substitui file-ops) | ~7–8h | ⭐⭐⭐ Entregue parcialmente (M6.1–M6.3 ✅) — falta robustez do output |
+| ↳ **M6.1** System prompt reescrito (emit `PageConfig` JSON; engine catalog subset; spec context) | ~1.5h | |
+| ↳ **M6.2** Stream handler colhe deltas, parseia JSON no `done`, valida shape | ~2h | |
+| ↳ **M6.3** Novo IPC `spec:prototype:apply-manifest` (delega a `EngineFactory.getEngine('nextjs').createPage` + git snapshot) | ~1.5h | |
+| ↳ **M6.4** Persistência do raw manifest em `<basePath>/.igrpstudio/prototype/page.json` | ~1h | |
+| ↳ **M6.5** Validação (Zod básico — discriminator + identifier; engine trata o resto) | ~1h | |
+| ↳ **M6.6** Snapshot card adaptado (mostra `pageName` + componentes top-level em vez de file paths) | incluído | |
+| ~~**CLI `igrp generate page\|component\|process-step`**~~ | ✅ entregue | Implementado em `studio/packages/cli` (cmd `igrp`). Studio continua a chamar `window.engine.createPage` directo (in-process, zero subprocess overhead, sem depender de `@igrp/cli` instalado globalmente). Paridade real garantida porque ambos chamam `newPage` do mesmo `@igrp/igrp-studio-nextjs-engine`. Futuro: opt-in `Use external CLI for codegen` em Settings se houver demanda de paridade literal (CI / terminal A/B). |
+| **M4 Fase 4** — Tests & hardening (M4.14 file-ops parser tests, M4.25 crash recovery, M4.26 sandbox fuzzing) | ~4–5h | ⭐⭐ Média — relevância reduzida com M6 (file-ops deixa de ser o pipeline activo); M4.25 ainda útil; M4.26 baixa prioridade pós-M6 |
+| **Tests M2D.16 + M3.13** | ~2h | ⭐⭐ Média |
+| **Templates + env vars** (NOVO cluster — `minimal` / `with-auth`, env vars panel, system prompt steering ✅ feito) | ~5–7h | ⭐ Reduzida com M6 — manifest-mode não emite env vars / auth por construção. Mantém-se útil para quando o user explicitamente pedir auth real. |
+| **M4 Fase 3** — Power user (M4.20 devtools webview, M4.21 cost tracking, M4.23 branch isolation, M4.24 hot-reload feedback; M4.22 starter templates absorvido no cluster Templates acima) | ~6–9h | ⭐ Opcional pós-MVP |
+| **Custom hints overrides** em `features/component-palette/hints.ts` | ~1h | ⭐ Baixa — avaliar após M6 quando virmos qualidade do LLM com engine `groupLabel + id` apenas |
+| **Engine catalog deprecation** — remover `PALETTE` estático (dead code) | 15 min | ⭐ Baixa — depois de M6 validar engine catalog em produção |
+| **M5 — Polish** | ~3–4h | ⭐ Baixa até M6 estar feito |
 
 ### Parqueado para revisitar (sub-projectos paralelos)
 
@@ -647,6 +779,9 @@ Estes pilares foram esboçados como tabs adicionais no rail da Specification mas
 - **Sync scroll preview → editor (M2D.20):** unidireccional, mapeamento via `node.position.start.line` injectado como `data-source-line`; hook `usePreviewToEditorScrollSync` rAF-throttled; activo só em `viewMode='split' && !pendingProposal`.
 - **Chat doc attachments (M2D.21):** anexos vivem com a chat session (state local em `useState` no DocTabPane), não no slice. Regra para o user: **externos → KB; produzidos no spec → chat attach**. System prompt explicita 3 papéis (Active editável / Reference read-only / KB external) + citações `[Doc: <name>]` e `[KB: <name>]`. Buffer-first read via `useStore().getState()` para não subscrever o `DocTabPane` ao `byDoc` inteiro.
 - **Hooks-order rule (lesson learned do M2D.21 bug):** **TODOS os hooks têm de ser declarados antes de qualquer early return**. O `DocTabPane` apresentou "Rendered fewer hooks than expected" quando se apagava um doc com a tab aberta, porque havia `if (!node) return ...` no meio dos hooks. Padrão correcto: hooks primeiro, depois render guards. Comentário inline no `DocTabPane` lembra a regra para evitar regressão.
+- **Pivot manifest-first (M6, decidido 2026-05-08):** o Prototype deixa de emitir file-ops sobre código TSX livre e passa a emitir **`PageConfig` JSON** que o `@igrp/igrp-studio-nextjs-engine.newPage` converte em código. Razões: (a) alinha com a regra "manifest is authoritative" do CLAUDE.md; (b) elimina classes inteiras de bugs (env vars, Keycloak, peer-deps geradas pelo LLM); (c) o output é abrível na Page Builder existente — refinement visual sem fricção; (d) o user já fazia isto manualmente em Claude Code (spec → chat → JSON → cola no Studio → Save). Engine accessibility confirmada via `window.engine.createPage(config, 'nextjs', basePath)` — sem necessidade de novo engine code. Migração big-bang (substitui file-ops); MVP usa manifest-replace (LLM emite árvore completa por turn), uma única página, engine catalog subset (~15 always-included + pinned palette) no system prompt.
+- **CLI `igrp generate` (✅ entregue 2026-05-08, em `studio/packages/cli`):** mesma função de geração de código exposta como comando terminal — `igrp generate page --manifest page.json --project ./app`. Wrapper sobre o mesmo `newPage`/`newComponent`/`newProcessStep` do `@igrp/igrp-studio-nextjs-engine`. Studio continua a usar `window.engine.createPage` directo no main process (in-process, sem subprocess overhead, sem depender de `@igrp/cli` instalado globalmente). **Paridade real** garantida porque ambos chamam o mesmo `newPage` do engine package — o CLI é um wrapper terminal sobre a mesma função. Studio pode opcionalmente spawn o CLI no futuro via setting opt-in se houver demanda de paridade literal (CI / terminal A/B).
+  - **Instalação (terminal/CI):** `npm install -g @igrp/cli --registry=https://sonatype.nosi.cv/repository/npm-group/`
 
 ### Dependências externas adicionadas
 - `@lancedb/lancedb` (vector DB embarcado)

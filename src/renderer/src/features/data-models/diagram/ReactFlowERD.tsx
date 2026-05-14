@@ -26,8 +26,8 @@ import {
     ReactFlowProvider,
     useEdgesState,
     useNodesState
-} from 'reactflow'
-import 'reactflow/dist/style.css'
+} from '@xyflow/react'
+import '@xyflow/react/dist/style.css'
 import { useEntities } from '../hooks/useEntities'
 import type { Entity, RelationKind } from '../types/entity'
 

@@ -151,3 +151,31 @@ export const getLocale = () => {
             return enUS
     }
 }
+
+/**
+ * Lightweight camelCase implementation — replaces lodash-es#camelCase for the
+ * limited usage we have (page/component names). Splits on non-alphanumerics
+ * and on lower-to-upper boundaries, then joins as `firstWordLower + Pascal`.
+ *
+ * Examples:
+ *   camelCase('hello world')   -> 'helloWorld'
+ *   camelCase('my-page-name')  -> 'myPageName'
+ *   camelCase('My_File.Name')  -> 'myFileName'
+ *   camelCase('XMLHttpRequest')-> 'xmlHttpRequest'
+ */
+export function camelCase(input: string): string {
+    if (!input) return ''
+    const words = String(input)
+        .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+        .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+        .split(/[^a-zA-Z0-9]+/)
+        .filter(Boolean)
+    if (words.length === 0) return ''
+    return words
+        .map((w, i) =>
+            i === 0
+                ? w.toLowerCase()
+                : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+        )
+        .join('')
+}

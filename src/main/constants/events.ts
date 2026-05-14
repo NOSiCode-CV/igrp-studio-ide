@@ -201,6 +201,13 @@ export const EVENTS = {
         RESTORE_SNAPSHOT: 'spec:prototype:restore-snapshot',
         EXPORT: 'spec:prototype:export',
         OPEN_FOLDER: 'spec:prototype:open-folder',
+        READ_MANIFEST: 'spec:prototype:read-manifest',
+        APPLY_MANIFEST: 'spec:prototype:apply-manifest',
+        LIST_SKILLS: 'spec:prototype:list-skills',
+        READ_SKILL_FILE: 'spec:prototype:read-skill-file',
+        INSTALL_SKILL: 'spec:prototype:install-skill',
+        CHECK_SKILL_UPDATES: 'spec:prototype:check-skill-updates',
+        UPDATE_SKILL: 'spec:prototype:update-skill',
         TREE_CHANGED: 'spec:prototype:tree-changed'
     },
     ERROR: 'error',

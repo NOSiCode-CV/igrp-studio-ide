@@ -517,14 +517,21 @@ export interface BPMNProjectProcessDefinition {
     status: string
     statusDesc: string
     deploymentId?: string
-    deploymentDate?: string
+    deploymentDate?: BPMNDateLike
     bpmFileContent?: string
     processArtifacts?: BPMNProjectArtifact[]
     createdBy?: BPMNAuditUser | string
-    createdDate?: string
+    createdDate?: BPMNDateLike
     lastModifiedBy?: BPMNAuditUser | string
-    lastModifiedDate?: string
+    lastModifiedDate?: BPMNDateLike
 }
+
+/**
+ * Process Studio API serializes timestamps as Java `LocalDateTime` arrays
+ * `[year, month, day, hour, minute, second, nanos]`. Some endpoints / older
+ * deployments may still return ISO strings — accept either.
+ */
+export type BPMNDateLike = string | number[]
 
 export interface BPMNAuditUser {
     id?: string

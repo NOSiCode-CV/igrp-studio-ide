@@ -23,20 +23,23 @@ import {
     startPrototypeDev,
     stopPrototypeDev
 } from '@renderer/redux/specPrototype/thunks'
+import { loadManifest } from '@renderer/redux/specPrototypeManifest/thunks'
 import { selectDocNodes, selectSelectedDocId } from '@renderer/redux/specDocs/reducer'
 import {
     AlertCircle,
     Bug,
-    Check,
     CheckCircle2,
+    ChevronDown,
     Copy,
     Download,
+    Edit3,
     ExternalLink,
     FileCode,
     FolderOpen,
     History,
     Layout as LayoutIcon,
     LayoutGrid,
+    Library,
     Loader2,
     MessageSquare,
     Monitor,
@@ -63,14 +66,22 @@ import {
 import { useDispatch, useSelector, useStore } from 'react-redux'
 import { Group, Panel, Separator } from 'react-resizable-panels'
 import { AIAssistant, type ChatAttachment } from './shared/AIAssistant'
+import { EditCanvas } from './prototype/EditCanvas'
 import { DocAttachPicker } from '@renderer/features/spec-attachments'
 import {
-    PALETTE,
-    PALETTE_BY_ID,
-    type PaletteComponent,
+    PaletteComponentCard,
     readPersistedComponentIds,
-    writePersistedComponentIds
+    writePersistedComponentIds,
+    useEnginePalette,
+    type EnginePaletteComponent
 } from '@renderer/features/component-palette'
+import { useEngineCatalog } from '@renderer/features/engine-catalog'
+import {
+    pickSkillHints,
+    usePrototypeSkills,
+    type InstalledSkillSummary,
+    type SkillUpdateSummary
+} from '../hooks/usePrototypeSkills'
 
 interface PanelProps {
     basePath?: string
@@ -79,6 +90,14 @@ interface PanelProps {
 }
 
 type DeviceFrame = 'desktop' | 'tablet' | 'mobile' | 'custom'
+
+/**
+ * Preview tab has two interaction modes — runtime preview (next dev served
+ * inside the webview) and the edit canvas (low-fi wireframe of the manifest
+ * tree, mutated locally and re-applied via `engine.createPage`). The toggle
+ * lives in the PreviewToolbar so both modes share the same surface.
+ */
+type PreviewMode = 'live' | 'edit'
 type PrototypeTab = 'preview' | 'files' | 'logs' | 'history'
 
 const TABS: { id: PrototypeTab; label: string }[] = [
@@ -96,15 +115,23 @@ type ChatPanelMode = 'chat' | 'palette'
 // Attached spec ids are per-project (each spec has its own picks).
 
 const CHAT_WIDTH_KEY = 'spec.prototype.chatWidth'
-const DEFAULT_CHAT_WIDTH = 480
-const MIN_CHAT_WIDTH = 320
+// Default chosen to fit the AI composer comfortably without dominating the
+// main pane. Previous default (480) felt oversized once the palette tab
+// landed; sticking to ~33% of a 1280-wide window feels balanced.
+const DEFAULT_CHAT_WIDTH = 380
+const MIN_CHAT_WIDTH = 300
+// Upper guard for the persisted value. localStorage can carry over from
+// earlier builds when the user dragged way too wide; clamp on read so a
+// stale 800px doesn't follow them forever.
+const MAX_PERSISTED_CHAT_WIDTH = 560
 
 const readPersistedChatWidth = (): number => {
     if (typeof window === 'undefined') return DEFAULT_CHAT_WIDTH
     try {
         const raw = window.localStorage?.getItem(CHAT_WIDTH_KEY)
         const parsed = raw ? Number(raw) : NaN
-        return Number.isFinite(parsed) && parsed >= MIN_CHAT_WIDTH ? parsed : DEFAULT_CHAT_WIDTH
+        if (!Number.isFinite(parsed) || parsed < MIN_CHAT_WIDTH) return DEFAULT_CHAT_WIDTH
+        return Math.min(parsed, MAX_PERSISTED_CHAT_WIDTH)
     } catch {
         return DEFAULT_CHAT_WIDTH
     }
@@ -138,6 +165,492 @@ const writePersistedAttachedIds = (basePath: string | undefined, ids: string[]):
 // the persistence shape can be reused by future generators that want their
 // own pinned-component vocabulary. We pass `namespace: 'prototype'` here.
 const PALETTE_NAMESPACE = { namespace: 'prototype' as const }
+
+// M6.1 — engine-catalog block builder for the manifest-first system prompt.
+//
+// The full engine catalog can be ~100 components × dozens of properties each
+// — too large to inline in every chat turn. We pick a curated set of
+// always-included "structural" components (containers, common form fields,
+// headlines) plus whatever the user pinned via the palette. Property names
+// are listed but not their value schemas; the LLM has enough signal from
+// labels + property keys + the spec context to produce a valid manifest.
+
+/**
+ * Translate a manifest's `path` field into a concrete URL the dev server
+ * can serve. Two transformations matter:
+ *   - **Route groups** like `(parametrizacao)/categorias` → strip the
+ *     `(parametrizacao)/` segment. Route groups are organisational; they
+ *     don't appear in the URL.
+ *   - **Dynamic segments** like `caixa/dias/[uuid]/atendedores/novo` →
+ *     replace `[uuid]` (and friends) with the literal `"preview"` so the
+ *     URL resolves to a concrete route.
+ *
+ * The IGRP framework template wraps engine-generated pages in
+ * `src/app/(igrp)/(generated)/<name>/page.tsx`. Both `(igrp)` and
+ * `(generated)` are route groups, so they don't appear in the URL —
+ * `users` page is served at `/users`, not `/generated/users`. No prefix
+ * needed in the computed URL.
+ */
+function computePreviewUrl(
+    devUrl: string | null,
+    manifest: { pageName?: string; path?: string } | null | undefined
+): string | null {
+    if (!devUrl || !manifest) return null
+    // Prefer `path` when it has actual segments; fall back to `pageName`.
+    const rawPath =
+        typeof manifest.path === 'string' && manifest.path.trim().length > 0
+            ? manifest.path
+            : manifest.pageName
+    if (!rawPath) return null
+    const normalised = rawPath
+        .replace(/\([^)]*\)\//g, '') // strip route groups
+        .replace(/\[\[\.\.\.[^\]]*\]\]/g, 'preview') // optional catch-alls
+        .replace(/\[\.\.\.[^\]]*\]/g, 'preview') // catch-alls
+        .replace(/\[[^\]]*\]/g, 'preview') // dynamic segments
+        .replace(/^\/+/, '') // belt-and-braces strip leading slash
+    const base = devUrl.replace(/\/+$/, '')
+    return `${base}/${normalised}`
+}
+
+// M7 — golden anatomy embedded in the system prompt so the LLM sees the
+// real shape it has to emit (engine `additionalProperties: false` + Next.js
+// route-segment regex on `path` are unforgiving when the LLM extrapolates
+// from training data). Built from an anonymised version of a real validated
+// manifest (`inss-sisgb-core-mono-frontend/.igrpstudio/pages/contribuintes.json`).
+// Demonstrates: `page` → `section` → `pageHeader`, `grid` of `statsCard`,
+// filter strip (`container` + `inputSearch` + `flex` + `button`), `separator`
+// gated by visibility rule, `grid` of `combobox` + `datePickerRange`, and a
+// `table` with `tableColumns` cells + `tableActionListCell` actions.
+const GOLDEN_LIST_PAGE_EXAMPLE = JSON.stringify(
+    {
+        type: 'page',
+        pageName: 'entities',
+        path: 'entities',
+        description: 'List of entities',
+        forceDynamic: false,
+        id: 'page_entities',
+        args: [],
+        types: [],
+        states: [
+            { id: 'state_showFilter', name: 'showFilter', type: 'boolean', defaultValue: 'false', imports: [] },
+            { id: 'state_searchValue', name: 'searchValue', type: 'string', defaultValue: "''", imports: [] }
+        ],
+        functions: [],
+        imports: [],
+        components: {
+            id: 'page_root',
+            componentName: 'page',
+            tag: 'page1',
+            label: 'page',
+            properties: { variant: 'default', commonProperties: {} },
+            interactions: {},
+            data: {},
+            children: [
+                {
+                    id: 'section_main',
+                    componentName: 'section',
+                    tag: 'section1',
+                    label: 'section',
+                    properties: { spaceX: '3', spaceY: '6', commonProperties: {} },
+                    interactions: {},
+                    data: {},
+                    children: [
+                        {
+                            id: 'pageheader_main',
+                            componentName: 'pageHeader',
+                            tag: 'pageHeader1',
+                            label: 'Page Header',
+                            type: 'group',
+                            allowTypes: false,
+                            properties: {
+                                title: 'Entities',
+                                description: 'Manage entities in the system',
+                                variant: 'h3',
+                                commonProperties: { generateReference: false }
+                            },
+                            interactions: {},
+                            data: {},
+                            children: [],
+                            childProperties: {}
+                        },
+                        {
+                            id: 'container_filter',
+                            componentName: 'container',
+                            tag: 'container1',
+                            label: 'Container',
+                            type: 'group',
+                            allowTypes: false,
+                            properties: { className: 'px-4 pt-2 space-y-3', commonProperties: {} },
+                            interactions: {},
+                            data: {},
+                            children: [
+                                {
+                                    id: 'inputsearch_main',
+                                    componentName: 'inputSearch',
+                                    tag: 'inputSearch1',
+                                    label: 'Input Search',
+                                    type: 'group',
+                                    allowTypes: false,
+                                    properties: {
+                                        label: '',
+                                        placeholder: 'Search by name…',
+                                        required: false,
+                                        showSubmitButton: true,
+                                        submitButtonLabel: 'Search',
+                                        iconProperties: { showStartIcon: true, startIcon: 'Search' },
+                                        commonProperties: { generateReference: false }
+                                    },
+                                    interactions: {},
+                                    data: {},
+                                    children: [],
+                                    childProperties: {}
+                                }
+                            ],
+                            childProperties: {}
+                        },
+                        {
+                            id: 'table_entities',
+                            componentName: 'table',
+                            tag: 'table1',
+                            label: 'Table',
+                            type: 'group',
+                            allowTypes: true,
+                            dataType: 'entityRow',
+                            properties: {
+                                showFilter: true,
+                                showPagination: true,
+                                commonProperties: { generateReference: false }
+                            },
+                            interactions: {},
+                            data: {},
+                            childProperties: {},
+                            children: [
+                                {
+                                    id: 'tablecolumns_main',
+                                    componentName: 'tableColumns',
+                                    tag: 'tableColumns1',
+                                    label: 'Table Column',
+                                    properties: { commonProperties: {} },
+                                    interactions: {},
+                                    data: {},
+                                    childProperties: {},
+                                    children: [
+                                        {
+                                            id: 'tabletextcell_name',
+                                            componentName: 'tableTextCell',
+                                            tag: 'name',
+                                            label: 'Text Column',
+                                            type: '',
+                                            allowTypes: false,
+                                            properties: {
+                                                headerTitle: 'Name',
+                                                variant: 'default',
+                                                headerType: 'sortToggle',
+                                                commonProperties: { generateReference: false }
+                                            },
+                                            interactions: {},
+                                            data: {},
+                                            children: [],
+                                            childProperties: {}
+                                        },
+                                        {
+                                            id: 'tablebadgecell_status',
+                                            componentName: 'tableBadgeCell',
+                                            tag: 'status',
+                                            label: 'Badge Column',
+                                            type: '',
+                                            allowTypes: false,
+                                            properties: {
+                                                headerTitle: 'Status',
+                                                variant: 'soft',
+                                                commonProperties: { generateReference: false }
+                                            },
+                                            interactions: {},
+                                            data: {},
+                                            children: [],
+                                            childProperties: {}
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    childProperties: {}
+                }
+            ],
+            childProperties: {}
+        }
+    },
+    null,
+    2
+)
+
+const ALWAYS_INCLUDED_COMPONENTS: ReadonlyArray<string> = [
+    // Structure
+    'section',
+    'container',
+    'grid',
+    'flex',
+    'columns',
+    // Layout / display
+    'card',
+    'panel',
+    'tabs',
+    'accordion',
+    'separator',
+    // Typography / atoms
+    'pageHeader',
+    'headline',
+    'paragraph',
+    'text',
+    'span',
+    'badge',
+    // Forms
+    'form',
+    'input',
+    'inputText',
+    'inputNumber',
+    'inputDatePicker',
+    'inputPassword',
+    'inputTextarea',
+    'select',
+    'combobox',
+    'checkbox',
+    'radio',
+    'switch',
+    'button',
+    // Data display
+    'table',
+    'list',
+    'infoCard',
+    // Feedback / nav
+    'alert',
+    'modalDialog',
+    'menuNavigation',
+    'breadcrumb'
+] as const
+
+/**
+ * Build the `## Skill — <name>` block from the most relevant companion
+ * sections for the current user message. Returns `null` when no skill is
+ * installed OR when the heuristic finds no matching section — caller falls
+ * back to the embedded golden anatomy.
+ *
+ * Token budget: cap at ~6KB total to keep prompt size predictable. When
+ * multiple hints would exceed the cap, we trim in selection order (most
+ * specific first).
+ */
+// Raised from 6000 → 10000 when the baseline list grew to 4 always-on
+// sections (naming, children rules, variants, type shape). Each baseline
+// is ~600–1200 bytes; reserving 4–5KB for them leaves enough room for the
+// turn-specific patterns.md hint without truncation. Claude's context is
+// huge — the budget exists mostly to keep the prompt focused, not to save
+// tokens.
+const SKILL_BLOCK_MAX_BYTES = 10000
+/**
+ * Headings (substring-match, case-insensitive) that we ALWAYS extract from
+ * SKILL.md regardless of the user message. These describe engine contracts
+ * that the LLM gets wrong silently — e.g. the naming/description character
+ * class — and the failure mode is a generic "must only contain letters"
+ * error with no useful guidance. Keep this list short; every entry is paid
+ * on every turn.
+ */
+const ALWAYS_INJECT_SKILL_SECTIONS: ReadonlyArray<{ filename: string; heading: string }> = [
+    { filename: 'SKILL.md', heading: 'Engine naming constraints' },
+    { filename: 'SKILL.md', heading: 'Component children rules' },
+    { filename: 'SKILL.md', heading: 'Component variant gotchas' },
+    { filename: 'SKILL.md', heading: 'Engine type-definition shape' }
+]
+
+async function buildSkillContextBlock(
+    userMessage: string,
+    skills: InstalledSkillSummary[],
+    readSection: (
+        skillName: string,
+        filename: string,
+        sectionHeading: string
+    ) => Promise<string | null>
+): Promise<string | null> {
+    if (!skills || skills.length === 0) return null
+    const studio = skills.find((s) => s.name === 'igrp-studio-metadata')
+
+    // 1. Always-on baseline sections — engine rules that apply to every
+    //    generation. We pull them from SKILL.md (or companions) by exact
+    //    heading. If the installed skill is older than the version that
+    //    introduced the heading, `readSection` returns null and we skip
+    //    silently (no broken-link noise in the prompt).
+    const baseline: string[] = []
+    let usedBytes = 0
+    if (studio) {
+        for (const item of ALWAYS_INJECT_SKILL_SECTIONS) {
+            if (usedBytes >= SKILL_BLOCK_MAX_BYTES) break
+            // `readSection` is wired to the renderer hook's
+            // `readCompanionSection`, which for `SKILL.md` reads the same
+            // body that listSkills already cached. That's fine — the IPC
+            // round-trip is short and the hook caches by `${name}/${file}`.
+            const content = await readSection(studio.name, item.filename, item.heading)
+            if (!content) continue
+            const remaining = SKILL_BLOCK_MAX_BYTES - usedBytes
+            const slice =
+                content.length > remaining ? `${content.slice(0, remaining)}\n…(truncated)` : content
+            baseline.push(
+                [
+                    `### Baseline — ${studio.name}/${item.filename} § "${item.heading}"`,
+                    slice
+                ].join('\n')
+            )
+            usedBytes += slice.length
+        }
+    }
+
+    // 2. Turn-specific hints — `pickSkillHints` selects companion sections
+    //    matching keywords in the user message (list/form/modal/etc).
+    const hints = pickSkillHints(skills, userMessage)
+
+    if (hints.length === 0) {
+        // No hint matched. If we have at least a baseline, ship it alone.
+        if (baseline.length > 0) {
+            return ['## Skill — relevant patterns for this turn', '', ...baseline].join('\n\n')
+        }
+        // Otherwise fall back to dumping SKILL.md body so the LLM at least
+        // sees the corpus map + "when to invoke" guidance.
+        if (!studio) return null
+        return [
+            `## Skill — ${studio.frontmatter.name ?? studio.name}`,
+            '',
+            (studio.frontmatter.description ?? '').trim(),
+            '',
+            studio.skillMdBody.trim().slice(0, SKILL_BLOCK_MAX_BYTES)
+        ].join('\n')
+    }
+
+    const sections: string[] = []
+    for (const hint of hints) {
+        if (usedBytes >= SKILL_BLOCK_MAX_BYTES) break
+        const content = hint.sectionHeading
+            ? await readSection(hint.skillName, hint.filename, hint.sectionHeading)
+            : await readSection(hint.skillName, hint.filename, '')
+        if (!content) continue
+        const remaining = SKILL_BLOCK_MAX_BYTES - usedBytes
+        const slice = content.length > remaining ? `${content.slice(0, remaining)}\n…(truncated)` : content
+        sections.push(
+            [
+                `### From ${hint.skillName}/${hint.filename}${hint.sectionHeading ? ` — section "${hint.sectionHeading}"` : ''}`,
+                slice
+            ].join('\n')
+        )
+        usedBytes += slice.length
+    }
+    if (sections.length === 0 && baseline.length === 0) return null
+    return [
+        '## Skill — relevant patterns for this turn',
+        '',
+        ...baseline,
+        ...sections
+    ].join('\n\n')
+}
+
+function buildEngineCatalogBlock(
+    componentsRegistered: ReadonlyArray<{
+        name: string
+        label?: string
+        group?: string
+        properties?: unknown
+        deprecated?: boolean
+    }>,
+    pinned: ReadonlyArray<{ id: string; name: string; groupLabel: string }>
+): string {
+    if (componentsRegistered.length === 0) {
+        // Engine catalog hasn't loaded yet (or is empty). Fall back to a hint
+        // so the LLM doesn't fabricate component names from training data.
+        return [
+            '## Engine catalog',
+            '',
+            '_Catalog not loaded yet — emit a minimal placeholder page using `section` + `paragraph` only._'
+        ].join('\n')
+    }
+
+    const wantedNames = new Set<string>(ALWAYS_INCLUDED_COMPONENTS)
+    for (const p of pinned) wantedNames.add(p.id)
+
+    type Entry = {
+        name: string
+        label: string
+        group: string
+        propertyKeys: string[]
+        deprecated: boolean
+    }
+
+    const entriesByGroup = new Map<string, Entry[]>()
+    for (const c of componentsRegistered) {
+        if (!wantedNames.has(c.name)) continue
+        const props =
+            c.properties && typeof c.properties === 'object'
+                ? Object.keys(c.properties as Record<string, unknown>)
+                : []
+        const group = c.group || 'others'
+        const entry: Entry = {
+            name: c.name,
+            label: c.label || c.name,
+            group,
+            propertyKeys: props.slice(0, 8), // cap to keep prompt tight
+            deprecated: Boolean(c.deprecated)
+        }
+        const list = entriesByGroup.get(group) ?? []
+        list.push(entry)
+        entriesByGroup.set(group, list)
+    }
+
+    const lines: string[] = ['## Engine catalog (allowed `componentName` values)', '']
+    lines.push(
+        'Use these — and only these — values for the `componentName` field of each `StructuredComponent`. Names are listed under their engine group. Property keys after the dash are the recognised props for that component (omit any prop you don\'t need).',
+        ''
+    )
+
+    // Stable group order: prefer the curated `GROUP_LABELS` insertion order,
+    // then anything else alphabetical.
+    const groupOrder = [
+        'structure',
+        'containers',
+        'layout',
+        'typography',
+        'formElements',
+        'basicElements',
+        'dataDisplay',
+        'widget',
+        'advanced',
+        'appComponents',
+        'customComponents'
+    ]
+    const orderedGroups = Array.from(entriesByGroup.keys()).sort((a, b) => {
+        const ia = groupOrder.indexOf(a)
+        const ib = groupOrder.indexOf(b)
+        if (ia === -1 && ib === -1) return a.localeCompare(b)
+        if (ia === -1) return 1
+        if (ib === -1) return -1
+        return ia - ib
+    })
+
+    for (const group of orderedGroups) {
+        const entries = entriesByGroup.get(group)
+        if (!entries || entries.length === 0) continue
+        lines.push(`### ${group}`)
+        for (const e of entries) {
+            const propsHint =
+                e.propertyKeys.length > 0 ? ` — props: ${e.propertyKeys.join(', ')}` : ''
+            const depHint = e.deprecated ? ' _(deprecated — avoid unless requested)_' : ''
+            lines.push(`- \`${e.name}\` (${e.label})${propsHint}${depHint}`)
+        }
+        lines.push('')
+    }
+
+    if (pinned.length > 0) {
+        lines.push('### Pinned by user (prioritise these for this turn)')
+        for (const p of pinned) lines.push(`- \`${p.id}\` (${p.name}, ${p.groupLabel})`)
+    }
+
+    return lines.join('\n')
+}
 
 // Custom viewport width (M4.19) — global preference, not per-project.
 const CUSTOM_VIEWPORT_KEY = 'spec.prototype.customViewportWidth'
@@ -182,9 +695,34 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
     const devStatus = useSelector((s: RootState) => s.specPrototype.devStatus)
     const lastTurnId = useSelector((s: RootState) => s.specPrototype.lastTurnId)
     const turns = useSelector((s: RootState) => s.specPrototype.turns)
+    // Engine component catalog — same source the UI generator uses. We read
+    // it here so the chat-level chip rendering and the system-prompt
+    // "UI components to use" section reference the live catalog rather than
+    // a stale static list. Trigger the fetch eagerly so pinned chips render
+    // correctly even before the user opens the Palette tab.
+    const { componentsRegistered, loadRegistryComponent } = useEngineCatalog()
+    useEffect(() => {
+        if (componentsRegistered.length === 0) {
+            void loadRegistryComponent()
+        }
+    }, [componentsRegistered.length, loadRegistryComponent])
+
+    // M-Skill — installed skill discovery + companion file IO. Used by
+    // `contextProvider` to inject relevant skill sections into the system
+    // prompt at turn time. Ref'd via mutable refs so the closure that
+    // `useCallback(contextProvider)` captures always sees the latest data
+    // without forcing the callback to re-create on every skill refresh.
+    const skillsCtx = usePrototypeSkills(basePath)
+    const skillsRef = useRef(skillsCtx.skills)
+    const readCompanionSectionRef = useRef(skillsCtx.readCompanionSection)
+    useEffect(() => {
+        skillsRef.current = skillsCtx.skills
+        readCompanionSectionRef.current = skillsCtx.readCompanionSection
+    }, [skillsCtx.skills, skillsCtx.readCompanionSection])
 
     const [activeTab, setActiveTab] = useState<PrototypeTab>('preview')
     const [device, setDevice] = useState<DeviceFrame>('desktop')
+    const [previewMode, setPreviewMode] = useState<PreviewMode>('live')
     const [customWidth, setCustomWidth] = useState<number>(() => readPersistedCustomViewport())
     const handleChangeCustomWidth = useCallback((next: number) => {
         const clamped = Math.max(MIN_CUSTOM_VIEWPORT, Math.min(MAX_CUSTOM_VIEWPORT, next))
@@ -223,12 +761,23 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
         setAttachedComponentIds((prev) => prev.filter((x) => x !== id))
     }, [])
 
-    const attachedComponents = useMemo<PaletteComponent[]>(
+    // Resolve pinned ids against the live engine palette. Anything not in the
+    // current catalog gets dropped — handles stale persisted ids from an
+    // earlier static-catalog session. The lookup also keeps the chip name
+    // and group label in sync with whatever the engine reports now.
+    const enginePalette = useEnginePalette(componentsRegistered)
+    const enginePaletteById = useMemo(() => {
+        const map = new Map<string, EnginePaletteComponent>()
+        for (const item of enginePalette.all) map.set(item.id, item)
+        return map
+    }, [enginePalette.all])
+
+    const attachedComponents = useMemo<EnginePaletteComponent[]>(
         () =>
             attachedComponentIds
-                .map((id) => PALETTE_BY_ID.get(id))
-                .filter((c): c is PaletteComponent => Boolean(c)),
-        [attachedComponentIds]
+                .map((id) => enginePaletteById.get(id))
+                .filter((c): c is EnginePaletteComponent => Boolean(c)),
+        [attachedComponentIds, enginePaletteById]
     )
 
     const lastTurn = lastTurnId ? turns[lastTurnId] : null
@@ -364,23 +913,38 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
         }
     }, [devStatus.installing])
 
-    // Tree refresh + preview reload when the main process reports a turn
-    // finished. The webview reload is best-effort: if the user is on another
-    // tab the element is not mounted, so we just skip and the next time they
-    // come back to Preview they'll see the latest state via the `src`.
+    // Tree refresh + preview navigation when the main process reports a
+    // turn finished. The engine writes to `app/pages/<pageName>/page.tsx`
+    // which Next.js routes at `/pages/<pageName>` — but the webview is
+    // probably still pointing at `/`. We pull the freshly-written manifest
+    // and navigate the webview to the new route so the user sees their
+    // generated page without manual URL fiddling.
     useEffect(() => {
         if (!basePath) return
-        const off = window.specPrototype.onTreeChanged((payload) => {
+        const off = window.specPrototype.onTreeChanged(async (payload) => {
             if (payload.basePath !== basePath) return
             dispatch(loadPrototypeFiles(basePath))
             dispatch(loadPrototypeSnapshots(basePath))
+            const manifest = await dispatch(loadManifest(basePath))
             const view = document.querySelector(
                 'webview.spec-prototype-preview'
-            ) as { reload?: () => void } | null
-            view?.reload?.()
+            ) as
+                | {
+                      reload?: () => void
+                      loadURL?: (url: string) => void
+                      getURL?: () => string
+                  }
+                | null
+            if (!view) return
+            const targetUrl = computePreviewUrl(devStatus.url, manifest)
+            if (targetUrl && view.loadURL && view.getURL?.() !== targetUrl) {
+                view.loadURL(targetUrl)
+            } else {
+                view.reload?.()
+            }
         })
         return off
-    }, [basePath, dispatch])
+    }, [basePath, dispatch, devStatus.url])
 
     const contextProvider = useCallback(
         async ({ userMessage, useKB }: { userMessage: string; useKB: boolean }) => {
@@ -421,18 +985,176 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
 
             const sections: string[] = []
 
+            // M6.1 — manifest-first prompt. The LLM emits a `PageConfig` JSON
+            // (StructuredComponent tree) that the host validates and feeds to
+            // `window.engine.createPage(config, 'nextjs', join(basePath, 'prototype'))`,
+            // which is the same engine entry point the Page Builder uses on
+            // Save. Removes the file-ops path entirely — no LLM-generated TSX,
+            // no env vars, no auth providers, no lockfile drift. The engine
+            // package owns the compile-to-code step.
+            const catalogBlock = buildEngineCatalogBlock(
+                componentsRegistered,
+                attachedComponents
+            )
+
+            // M-Skill Fase 1/3 — when the `igrp-studio-metadata` skill is
+            // installed, pull the most relevant companion sections into the
+            // prompt instead of relying solely on the embedded golden example.
+            // The skill corpus is richer (full patterns / catalog / process
+            // steps / troubleshooting) and updated independently of Studio
+            // builds via `igrp skill update`.
+            const skillBlock = await buildSkillContextBlock(
+                userMessage,
+                skillsRef.current,
+                readCompanionSectionRef.current
+            )
+
             sections.push(
                 [
-                    'You are the Prototype Builder of an IGRP Studio "Specification" project. Your job is to translate the attached spec(s) into a working Next.js prototype by emitting file-ops (create/update/delete) that the host applies inside `<basePath>/prototype/`.',
+                    'You are the Prototype Builder of an IGRP Studio "Specification" project. You translate the attached spec(s) into a **PageConfig JSON manifest** that the IGRP Next.js engine compiles into a working page. **You do not write TSX or any code yourself** — you describe the page declaratively in JSON and the engine handles the rest.',
+                    '',
+                    '## Output contract — STRICT',
+                    '',
+                    'Reply with **exactly one** fenced JSON block whose body is a single `PageConfig` object. Nothing before, nothing after. No prose, no explanations. The host parses the block, validates it, and feeds it to `engine.createPage(...)`.',
+                    '',
+                    '```json',
+                    '{ /* PageConfig — see anatomy below */ }',
+                    '```',
+                    '',
+                    'If the user asks a question (e.g. "what components are available?"), reply in prose **outside** any fenced block — no JSON gets applied.',
+                    '',
+                    '## PageConfig anatomy — STRICT (engine-validated)',
+                    '',
+                    '### Top-level fields',
+                    '```ts',
+                    'interface PageConfig {',
+                    '  type: "page"                       // literal "page"',
+                    '  pageName: string                   // identifier — alphanumeric + dash/underscore, leading letter (e.g. "contribuintes", "abrirCaixa")',
+                    '  path: string                       // Next.js route segments WITHOUT leading slash — examples below',
+                    '  description?: string               // human-readable subtitle',
+                    '  forceDynamic?: boolean             // false unless the spec needs `export const dynamic = "force-dynamic"`',
+                    '  id: string                         // engine-internal id, kebab/camel mix (e.g. "page_contribuintes")',
+                    '  args?: Array<{ id, name, type, isList, isOptional, isInterface, isFunction, isState }>',
+                    '                                     // declare each `[uuid]` / `[id]` route segment here as a string arg',
+                    '  parentName?: string                // when the page lives under another route, e.g. "caixaAtendedores"',
+                    '  components: StructuredComponent    // SINGLE root, must be { componentName: "page", … }',
+                    '  types: TypeDef[]                   // [] when no data shapes',
+                    '  states: State[]                    // [] when no useState',
+                    '  functions: CustomFunctionConfig[]  // [] when no page-level fns',
+                    '  imports: Import[]                  // [] for engine-only deps',
+                    '}',
+                    '```',
+                    '',
+                    '### `path` — Next.js App Router segments, NO leading slash',
+                    'Valid examples:',
+                    '- `"contribuintes"` — simple route',
+                    '- `"caixa/dias/[uuid]/atendedores/novo"` — dynamic `[uuid]` segment (declare as `args` entry)',
+                    '- `"(parametrizacao)/categorias"` — route group `(parametrizacao)` for layout grouping',
+                    '- `"users/[[...slug]]"` — optional catch-all (rare)',
+                    '',
+                    'INVALID:',
+                    '- `"/contribuintes"` ❌ leading slash — engine regex rejects',
+                    '- `"contribuintes/list"` when `list` is non-routable — pick `pageName: "contribuintesList", path: "contribuintes/list"`',
+                    '',
+                    '### `StructuredComponent` shape (every node)',
+                    '```ts',
+                    'interface StructuredComponent {',
+                    '  id: string                                  // unique within page — short, role-hint, e.g. "section_main", "table_contribuintes"',
+                    '  componentName: string                       // MUST be drawn from the catalog below',
+                    '  tag: string                                 // short reference tag, used by other nodes (e.g. "section1", "pageHeader1", "totalGeral")',
+                    '  label: string                               // human-readable, defaults to a Title Case form of componentName',
+                    '  type?: "group" | "" | undefined             // "group" for containers; "" for table cells; omit otherwise',
+                    '  allowTypes?: boolean                        // true ONLY on table containers (binds rows to a TypeDef)',
+                    '  children: StructuredComponent[]             // [] for atoms (button, inputText, badge)',
+                    '  interactions: Record<string, unknown>       // {} unless wired. Shape: { onClick: { type:"function", function:{ type:"function", fnCustomSet?, fnCustomCode? }, action?:{} } }',
+                    '  data: Record<string, unknown>               // {} unless bound. Each binding key has shape { state?: {...}, value?: {...}, options?: {...} }',
+                    '  properties: {                               // component-specific UI props. ALWAYS include `commonProperties`.',
+                    '    commonProperties: { generateReference?: boolean } | {}',
+                    '    [key: string]: any                        // className, content, title, variant, iconProperties, dataProperties, ...',
+                    '  }',
+                    '  childProperties?: Record<string, unknown>   // {} or { className: "..." } — props applied to children wrapper',
+                    '  style?: { layout?: { type, flex?, grid?, block? } } // ONLY on flex / grid containers',
+                    '  rules?: Array<{ type: "visibility", condition: "..." }> // conditional render based on state',
+                    '  dataType?: string                           // ONLY on tables, references TypeDef.name',
+                    '}',
+                    '```',
+                    '',
+                    '## Rules — STRICT',
+                    '',
+                    '1. **No extra top-level fields.** The engine validates with `additionalProperties: false`. Only emit fields listed in the schema above.',
+                    '2. **Root component MUST be `componentName: "page"`** with `properties.commonProperties = {}` (or `{ generateReference: false }`) and one or more `section` children.',
+                    '3. **Every node needs `tag`** — short reference like `section1`, `pageHeader1`, `totalGeral`. NOT optional even when no other node references it.',
+                    '4. **Every node needs `properties.commonProperties`** — `{}` or `{ generateReference: false }`. Empty object suffices; omitting fails validation.',
+                    '5. **`interactions: {}` and `data: {}`** when not wired. They are NOT optional fields; emit empty objects.',
+                    '6. **`componentName` MUST be drawn from the catalog below.** Inventing a name fails the build.',
+                    '7. **Custom components from the user\'s project** (e.g. `Dashboard`, `LoadingPage`) are NOT in the catalog and MUST NOT be emitted in a fresh prototype. Compose from primitives instead.',
+                    '8. **`path` without leading slash.** Use Next.js App Router segments. Declare `[uuid]`-style segments under `args`.',
+                    '9. **`id` and `tag` MUST be unique** within the page tree. Short snake-case or camelCase. Examples: `page_root`, `section_main`, `pageheader_users`, `table_users`, `tabletextcell_name`.',
+                    '10. **Use the spec\'s terminology verbatim** for `properties.title`, `properties.placeholder`, `properties.label`. Portuguese stays Portuguese.',
+                    '11. **`types`, `states`, `functions`, `imports` default to `[]`** unless the spec mandates real state. Forms without a real backend = `[]` (engine still generates the form fine).',
+                    '12. **The manifest is the handoff artifact — keep it clean.** Devs in other Studios will reuse this `page.json` and wire it to a real backend. For list/table pages, DO declare the `states` array (`tableData: Invoice[]`, defaultValue `"[]"`) AND the `data.data.state` binding on the table, BUT in `onLoad.fnCode` write **only a commented stub** pointing at the production hook — DO NOT inline mock arrays. The Studio runs a separate post-engine step to seed preview data into a sibling file; that step needs the binding to exist but reads the values from `<pageName>.mock.json`, not from the manifest.',
+                    '13. **Never emit a component name that is not in the catalog.** When uncertain about an action component (e.g. an "view details" row action), use `tableLinkAction` inside a `tableActionListCell` — same shape as the golden anatomy. Inventing names like `tableActionView` produces an `Unsupported Component` placeholder in the generated code, which then crashes the runtime via `React.Children.only`.',
+                    '14. **`pageHeader` without action button:** omit `children` entirely (or use `[]`) AND do NOT emit `properties.actions`/related action-slot props. When the header has nothing in the action slot, the engine wraps the empty children in `<div class="flex items-center gap-2"></div>` which is fine; problems arise when the LLM tries to invent action props or wraps phantom content.',
+                    '',
+                    // Prefer the skill-driven block when available; fall back
+                    // to the inline golden anatomy when the skill isn't
+                    // installed (Studio works either way).
+                    skillBlock ||
+                        [
+                            '## Golden anatomy example (list page with header + filter + table)',
+                            '',
+                            'Reference for shape only — adapt to the user\'s spec. Every field shown is required at that nesting level.',
+                            '',
+                            '```json',
+                            GOLDEN_LIST_PAGE_EXAMPLE,
+                            '```'
+                        ].join('\n'),
+                    '',
+                    '## List/table state shape — REQUIRED',
+                    '',
+                    'For every `<table>` (or list with `dataType`), emit these THREE pieces so the preview-seeding step can populate rows AND the dev gets a clean handoff:',
+                    '',
+                    '**A. One state per table** — array typed to the row type:',
+                    '```json',
+                    '"states": [',
+                    '  { "id": "state_td", "name": "tableData", "type": "Invoice", "defaultValue": "[]", "imports": [], "isArray": true, "isOptional": false }',
+                    ']',
+                    '```',
+                    '',
+                    '**B. Bind the table to that state** — `data.data.state.name` matches the state `name`:',
+                    '```json',
+                    '"data": {',
+                    '  "data": { "state": { "id": "", "name": "tableData", "type": "", "imports": [], "generate": false } }',
+                    '}',
+                    '```',
+                    '',
+                    '**C. `onLoad` with a COMMENTED hook stub** — show the dev where the real backend call goes. NEVER inline mock arrays here; the Studio writes a separate `<pageName>.mock.json` after generation. Example:',
+                    '```json',
+                    '"interactions": {',
+                    '  "onLoad": {',
+                    '    "type": "function",',
+                    '    "function": {',
+                    '      "type": "function",',
+                    '      "fnCustomCode": { "imports": [] },',
+                    '      "fnCode": "// Wire to the real backend in production:\\n// const { data } = useInvoicesQuery();\\n// useEffect(() => { if (data) setTableData(data) }, [data]);"',
+                    '    },',
+                    '    "action": {}',
+                    '  }',
+                    '}',
+                    '```',
+                    '',
+                    'For stat tiles (`infoCard`/`statsCard` showing counts), declare matching number states (`totalCount`, `paidCount`, …) with `defaultValue: "0"`. The seeding step will compute them from the seeded `tableData` and emit `setTotalCount(seed.filter(...).length)`-style calls in the preview-only sibling.',
+                    '',
+                    'For non-list pages (forms, dashboards without tables), no special state shape is needed — the form will simply render empty fields and the seeding step is a no-op.',
                     '',
                     '## Document roles — STRICT',
                     '',
-                    '- **Reference specifications** (`## Reference specifications`) — markdown docs the user pinned to this chat. Treat them as authoritative source material for what to build. Preserve their terminology when naming components, routes, and copy. Cite information from them inline as `[Spec: <name>]` when justifying a design choice.',
-                    '- **Knowledge Base** (`## Knowledge Base context`) — external reference (PDFs, URLs). Lower authority than the specs. Cite as `[KB: <item name>]`.',
+                    '- **Reference specifications** (`## Reference specifications`) — markdown docs the user pinned to this chat. Authoritative source material; preserve their terminology and structure.',
+                    '- **Knowledge Base** (`## Knowledge Base context`) — external reference (PDFs, URLs). Lower authority than the specs.',
                     '',
-                    'If no spec is attached, ask the user to attach at least one before generating substantial code — otherwise produce a small, generic placeholder and call out the gap.',
+                    'If no spec is attached, produce a minimal placeholder page with a single `pageHeader` inside `section` inside `page`, with title "Attach a spec to begin". Do NOT improvise a full app.',
                     '',
-                    'When generating components that need data, create a deterministic mock layer (e.g. `prototype/lib/mock-data.ts`) so the preview renders something useful without a backend.'
+                    catalogBlock
                 ].join('\n')
             )
 
@@ -447,13 +1169,14 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
             }
 
             // M4.28 — palette-pinned components: directive-only injection.
-            // We don't ship the LLM the full shadcn registry; the model knows
-            // shadcn already. We just say "use these as your building blocks
-            // for this turn" so the user's clicks in the palette steer the
-            // generator without spelling it out in prose every time.
+            // We don't ship the LLM the full IGRP catalog; the model just gets
+            // the component names + their engine group so it can map each to
+            // a concrete shadcn/IGRP component. Group label gives enough
+            // semantic hint (e.g. "Form Elements") without us authoring per-
+            // component prose.
             if (attachedComponents.length > 0) {
                 const lines = attachedComponents
-                    .map((c) => `- **${c.name}** (${c.category}) — ${c.hint}`)
+                    .map((c) => `- **${c.name}** (${c.groupLabel}, id: \`${c.id}\`)`)
                     .join('\n')
                 sections.push(
                     `## UI components to use (pinned by user)\nWhen generating UI, prefer these components as the primary building blocks; pick others only when these don't fit. Don't dump every pinned component on every page — use them where they earn their place.\n\n${lines}`
@@ -560,6 +1283,9 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                                 placeholder="Describe a feature or change…"
                                 submitLabel="Build"
                                 supportsKB
+                                persistenceKey={
+                                    basePath ? `prototype:${basePath}` : undefined
+                                }
                                 chatBackend={
                                     basePath
                                         ? {
@@ -611,6 +1337,25 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
             <Panel id="proto-main" minSize="40%">
                 <main className="flex h-full w-full flex-col bg-card/10">
                     {devStatus.installing && <FirstRunBanner />}
+                    {/* Recommend the `igrp-studio-metadata` skill when it
+                        isn't installed yet — generation quality drops
+                        noticeably without the patterns/component-reference
+                        corpus, so we surface it upfront. Dismissable. */}
+                    <SkillInstallBanner
+                        basePath={basePath}
+                        skills={skillsCtx.skills}
+                        installSkill={skillsCtx.installSkill}
+                    />
+                    {/* When the registry has a newer version of any
+                        installed skill, surface an amber banner with
+                        installed→latest + an Update button that spawns
+                        `igrp skill update`. Dismiss is per-version so a
+                        future release pops it again. */}
+                    <SkillUpdateBanner
+                        basePath={basePath}
+                        updates={skillsCtx.updates}
+                        updateSkill={skillsCtx.updateSkill}
+                    />
                     <header className="flex h-12 shrink-0 items-center justify-between border-b bg-background px-4">
                         <div className="flex items-center gap-1 rounded-md bg-accent/40 p-1">
                             {TABS.map((t) => (
@@ -632,6 +1377,8 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
 
                         {activeTab === 'preview' && (
                             <PreviewToolbar
+                                previewMode={previewMode}
+                                onChangePreviewMode={setPreviewMode}
                                 device={device}
                                 onChangeDevice={setDevice}
                                 customWidth={customWidth}
@@ -643,12 +1390,13 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                                     if (devStatus.running) dispatch(stopPrototypeDev(basePath))
                                     else dispatch(startPrototypeDev(basePath))
                                 }}
+                                basePath={basePath}
                             />
                         )}
                     </header>
 
                     <div className="relative flex-1 overflow-hidden p-6">
-                        {activeTab === 'preview' && (
+                        {activeTab === 'preview' && previewMode === 'live' && (
                             <PreviewPane
                                 device={device}
                                 customWidth={customWidth}
@@ -657,6 +1405,9 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                                 installing={devStatus.installing}
                                 onSwitchToLogs={() => setActiveTab('logs')}
                             />
+                        )}
+                        {activeTab === 'preview' && previewMode === 'edit' && (
+                            <EditCanvas basePath={basePath} />
                         )}
                         {activeTab === 'files' && <FilesPane basePath={basePath} />}
                         {activeTab === 'logs' && <LogsPane />}
@@ -761,26 +1512,40 @@ const ComponentPalettePane = ({
     onToggle: (id: string) => void
 }): JSX.Element => {
     const [query, setQuery] = useState('')
-    const filtered = useMemo(() => {
-        const needle = query.trim().toLowerCase()
-        if (!needle) return PALETTE
-        return PALETTE.filter(
-            (c) =>
-                c.name.toLowerCase().includes(needle) ||
-                c.category.toLowerCase().includes(needle) ||
-                c.hint.toLowerCase().includes(needle)
-        )
-    }, [query])
-    const grouped = useMemo(() => {
-        const out = new Map<PaletteComponent['category'], PaletteComponent[]>()
-        for (const c of filtered) {
-            const list = out.get(c.category) ?? []
-            list.push(c)
-            out.set(c.category, list)
+
+    // Pull the engine's component catalog (`window.engine.getComponent(NEXTJS)`)
+    // — the same source the UI generator's visual palette uses, so the
+    // Prototype design intent stays in sync with what the engine actually
+    // knows how to generate. The provider lives at App root, so it's safe to
+    // call from here even before the UI generator is mounted.
+    const { componentsRegistered, loadRegistryComponent, isLoading } = useEngineCatalog()
+    useEffect(() => {
+        if (componentsRegistered.length === 0) {
+            void loadRegistryComponent()
         }
-        return out
-    }, [filtered])
+    }, [componentsRegistered.length, loadRegistryComponent])
+
+    const palette = useEnginePalette(componentsRegistered)
+
+    const filteredGroups = useMemo(() => {
+        const needle = query.trim().toLowerCase()
+        if (!needle) return palette.groups
+        return palette.groups
+            .map((g) => ({
+                ...g,
+                items: g.items.filter(
+                    (c) =>
+                        c.name.toLowerCase().includes(needle) ||
+                        c.id.toLowerCase().includes(needle) ||
+                        g.label.toLowerCase().includes(needle)
+                )
+            }))
+            .filter((g) => g.items.length > 0)
+    }, [palette.groups, query])
+
     const attachedSet = useMemo(() => new Set(attachedIds), [attachedIds])
+    const empty = componentsRegistered.length === 0
+    const noMatch = !empty && filteredGroups.length === 0
 
     return (
         <div className="flex h-full w-full flex-col">
@@ -807,48 +1572,261 @@ const ComponentPalettePane = ({
                 </p>
             </div>
             <div className="flex-1 overflow-y-auto p-2">
-                {filtered.length === 0 ? (
+                {empty ? (
+                    <p className="px-2 py-3 text-[11px] italic text-muted-foreground">
+                        {isLoading
+                            ? 'Loading engine catalog…'
+                            : 'No components available — engine catalog is empty.'}
+                    </p>
+                ) : noMatch ? (
                     <p className="px-2 py-3 text-[11px] italic text-muted-foreground">
                         No components match "{query}".
                     </p>
                 ) : (
-                    Array.from(grouped.entries()).map(([category, items]) => (
-                        <section key={category} className="mb-3">
+                    filteredGroups.map((group) => (
+                        <section key={group.key} className="mb-3">
                             <h4 className="mb-1.5 px-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-                                {category}
+                                {group.label}
                             </h4>
                             <div className="grid grid-cols-2 gap-1.5">
-                                {items.map((c) => (
-                                    <button
+                                {group.items.map((c) => (
+                                    <PaletteComponentCard
                                         key={c.id}
-                                        type="button"
+                                        icon={c.icon}
+                                        label={c.name}
+                                        deprecated={c.deprecated}
+                                        active={attachedSet.has(c.id)}
+                                        showGripHint={false}
                                         onClick={() => onToggle(c.id)}
-                                        title={c.hint}
-                                        className={cn(
-                                            'flex flex-col items-start gap-0.5 rounded-md border px-2 py-1.5 text-left transition-colors',
-                                            attachedSet.has(c.id)
-                                                ? 'border-primary/40 bg-primary/5'
-                                                : 'border-border bg-card hover:bg-accent'
-                                        )}
-                                    >
-                                        <div className="flex w-full items-center justify-between">
-                                            <span className="text-[11px] font-medium">
-                                                {c.name}
-                                            </span>
-                                            {attachedSet.has(c.id) && (
-                                                <Check size={10} className="text-primary" />
-                                            )}
-                                        </div>
-                                        <span className="line-clamp-2 text-[9px] leading-tight text-muted-foreground">
-                                            {c.hint}
-                                        </span>
-                                    </button>
+                                    />
                                 ))}
                             </div>
                         </section>
                     ))
                 )}
             </div>
+        </div>
+    )
+}
+
+// ─── Skill install banner (M-Skill Fase 2) ──────────────────────────────
+//
+// Surfaces a one-click install for the canonical Prototype skill when it
+// isn't present in `.agents/skills/`. Stays out of the way once dismissed
+// (per-project, localStorage). Install spawns the CLI via IPC and refreshes
+// the local skill list on success.
+
+const SKILL_BANNER_DISMISS_KEY_PREFIX = 'spec.prototype.skillBanner.dismissed.'
+const SKILL_UPDATE_DISMISS_KEY_PREFIX = 'spec.prototype.skillUpdate.dismissed.'
+const CANONICAL_SKILL = 'igrp-studio-metadata'
+
+const SkillInstallBanner = ({
+    basePath,
+    skills,
+    installSkill
+}: {
+    basePath: string | undefined
+    skills: InstalledSkillSummary[]
+    installSkill: (name: string) => Promise<{ ok: boolean; error?: string }>
+}): JSX.Element | null => {
+    const [installing, setInstalling] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const dismissKey = basePath
+        ? `${SKILL_BANNER_DISMISS_KEY_PREFIX}${basePath}`
+        : null
+    const [dismissed, setDismissed] = useState<boolean>(() => {
+        if (!dismissKey || typeof window === 'undefined') return false
+        try {
+            return window.localStorage?.getItem(dismissKey) === '1'
+        } catch {
+            return false
+        }
+    })
+
+    const installed = useMemo(
+        () => skills.some((s) => s.name === CANONICAL_SKILL),
+        [skills]
+    )
+
+    if (!basePath || installed || dismissed) return null
+
+    const dismiss = () => {
+        setDismissed(true)
+        if (!dismissKey) return
+        try {
+            window.localStorage?.setItem(dismissKey, '1')
+        } catch {
+            // noop — private mode etc.
+        }
+    }
+
+    const handleInstall = async () => {
+        setInstalling(true)
+        setError(null)
+        const result = await installSkill(CANONICAL_SKILL)
+        setInstalling(false)
+        if (!result.ok) {
+            setError(result.error ?? 'Install failed.')
+        }
+    }
+
+    return (
+        <div className="flex items-center gap-3 border-b bg-blue-500/5 px-4 py-2 text-[11px]">
+            <Library size={14} className="text-blue-500" />
+            <div className="flex-1">
+                <span className="font-medium">Recommended:</span> install the{' '}
+                <code className="rounded bg-muted px-1 py-0.5 font-mono">
+                    {CANONICAL_SKILL}
+                </code>{' '}
+                skill for better generation quality.
+                {error && (
+                    <span className="ml-2 text-red-500" title={error}>
+                        — {error.length > 80 ? `${error.slice(0, 80)}…` : error}
+                    </span>
+                )}
+            </div>
+            <button
+                type="button"
+                onClick={handleInstall}
+                disabled={installing}
+                className={cn(
+                    'flex items-center gap-1 rounded-md border px-2 py-1 text-[10.5px] font-medium transition-colors',
+                    installing
+                        ? 'border-border bg-card text-muted-foreground'
+                        : 'border-blue-500/30 bg-blue-500/10 text-blue-600 hover:bg-blue-500/15'
+                )}
+            >
+                {installing ? (
+                    <Loader2 size={11} className="animate-spin" />
+                ) : (
+                    <Download size={11} />
+                )}
+                {installing ? 'Installing…' : 'Install'}
+            </button>
+            <button
+                type="button"
+                onClick={dismiss}
+                className="text-[10.5px] text-muted-foreground hover:text-foreground"
+                title="Dismiss"
+            >
+                ✕
+            </button>
+        </div>
+    )
+}
+
+// Update banner — same visual language as install, in amber, surfaces ONE
+// skill at a time (the first with `hasUpdate`). Dismiss is per
+// `${basePath}:${name}:${latest}` so a new version pops the banner again,
+// while clicking ✕ on 1.0.2 doesn't keep silencing 1.0.3.
+const SkillUpdateBanner = ({
+    basePath,
+    updates,
+    updateSkill
+}: {
+    basePath: string | undefined
+    updates: SkillUpdateSummary[]
+    updateSkill: (name: string) => Promise<{ ok: boolean; error?: string }>
+}): JSX.Element | null => {
+    const [updating, setUpdating] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const [dismissedKeys, setDismissedKeys] = useState<Set<string>>(() => {
+        if (typeof window === 'undefined' || !basePath) return new Set()
+        try {
+            const raw = window.localStorage?.getItem(
+                `${SKILL_UPDATE_DISMISS_KEY_PREFIX}${basePath}`
+            )
+            return raw ? new Set(JSON.parse(raw) as string[]) : new Set()
+        } catch {
+            return new Set()
+        }
+    })
+
+    // First update that isn't dismissed for its (name, latest) tuple.
+    const candidate = useMemo(() => {
+        return (
+            updates.find(
+                (u) =>
+                    u.hasUpdate &&
+                    u.latest &&
+                    !dismissedKeys.has(`${u.name}:${u.latest}`)
+            ) ?? null
+        )
+    }, [updates, dismissedKeys])
+
+    if (!basePath || !candidate) return null
+
+    const dismiss = () => {
+        if (!candidate.latest) return
+        const key = `${candidate.name}:${candidate.latest}`
+        const next = new Set(dismissedKeys)
+        next.add(key)
+        setDismissedKeys(next)
+        try {
+            window.localStorage?.setItem(
+                `${SKILL_UPDATE_DISMISS_KEY_PREFIX}${basePath}`,
+                JSON.stringify(Array.from(next))
+            )
+        } catch {
+            // noop — private mode etc.
+        }
+    }
+
+    const handleUpdate = async () => {
+        setUpdating(true)
+        setError(null)
+        const result = await updateSkill(candidate.name)
+        setUpdating(false)
+        if (!result.ok) {
+            setError(result.error ?? 'Update failed.')
+        }
+        // On success the hook re-checks; the banner will hide itself
+        // when `hasUpdate` flips to false (installed === latest).
+    }
+
+    return (
+        <div className="flex items-center gap-3 border-b bg-amber-500/5 px-4 py-2 text-[11px]">
+            <RefreshCw size={14} className="text-amber-500" />
+            <div className="flex-1">
+                <span className="font-medium">Update available:</span>{' '}
+                <code className="rounded bg-muted px-1 py-0.5 font-mono">
+                    {candidate.name}
+                </code>{' '}
+                <span className="text-muted-foreground">
+                    {candidate.installed ?? '?'} → {candidate.latest}
+                </span>
+                {error && (
+                    <span className="ml-2 text-red-500" title={error}>
+                        — {error.length > 80 ? `${error.slice(0, 80)}…` : error}
+                    </span>
+                )}
+            </div>
+            <button
+                type="button"
+                onClick={handleUpdate}
+                disabled={updating}
+                className={cn(
+                    'flex items-center gap-1 rounded-md border px-2 py-1 text-[10.5px] font-medium transition-colors',
+                    updating
+                        ? 'border-border bg-card text-muted-foreground'
+                        : 'border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-400'
+                )}
+            >
+                {updating ? (
+                    <Loader2 size={11} className="animate-spin" />
+                ) : (
+                    <Download size={11} />
+                )}
+                {updating ? 'Updating…' : 'Update'}
+            </button>
+            <button
+                type="button"
+                onClick={dismiss}
+                className="text-[10.5px] text-muted-foreground hover:text-foreground"
+                title="Dismiss until next version"
+            >
+                ✕
+            </button>
         </div>
     )
 }
@@ -870,14 +1848,19 @@ const FirstRunBanner = (): JSX.Element => (
 // ─── Preview ──────────────────────────────────────────────────────────────
 
 const PreviewToolbar = ({
+    previewMode,
+    onChangePreviewMode,
     device,
     onChangeDevice,
     customWidth,
     onChangeCustomWidth,
     url,
     running,
-    onToggleDev
+    onToggleDev,
+    basePath
 }: {
+    previewMode: PreviewMode
+    onChangePreviewMode: (mode: PreviewMode) => void
     device: DeviceFrame
     onChangeDevice: (d: DeviceFrame) => void
     customWidth: number
@@ -885,6 +1868,7 @@ const PreviewToolbar = ({
     url: string | null
     running: boolean
     onToggleDev: () => void
+    basePath: string | undefined
 }): JSX.Element => {
     const reload = () => {
         const view = document.querySelector('webview.spec-prototype-preview') as {
@@ -907,7 +1891,30 @@ const PreviewToolbar = ({
     }
     return (
         <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 rounded-md border bg-card p-1">
+            {/* Preview ⇄ Edit toggle — primary affordance for the right-side
+                main area. In `edit` mode the device picker becomes irrelevant
+                (we render the manifest wireframe, not the running app), so
+                we visually de-emphasise it. */}
+            <div className="flex items-center gap-0.5 rounded-md border bg-card p-0.5">
+                <PreviewModeButton
+                    active={previewMode === 'live'}
+                    onClick={() => onChangePreviewMode('live')}
+                    icon={<Play size={11} />}
+                    label="Preview"
+                />
+                <PreviewModeButton
+                    active={previewMode === 'edit'}
+                    onClick={() => onChangePreviewMode('edit')}
+                    icon={<Edit3 size={11} />}
+                    label="Edit"
+                />
+            </div>
+            <div
+                className={cn(
+                    'flex items-center gap-1 rounded-md border bg-card p-1 transition-opacity',
+                    previewMode === 'edit' && 'opacity-50'
+                )}
+            >
                 <DeviceButton
                     active={device === 'desktop'}
                     onClick={() => onChangeDevice('desktop')}
@@ -949,12 +1956,8 @@ const PreviewToolbar = ({
                     <span className="text-muted-foreground">px</span>
                 </div>
             )}
-            <div
-                className="flex h-8 w-56 items-center truncate rounded-md bg-muted px-3 text-[11px] text-muted-foreground"
-                title={url ?? 'dev server stopped'}
-            >
-                {url ?? 'dev server stopped'}
-            </div>
+            <PreviewUrlBar url={url} />
+            <PagesDropdown devUrl={url} basePath={basePath} />
             <IGRPButtonPrimitive
                 variant="ghost"
                 size="icon"
@@ -998,6 +2001,215 @@ const PreviewToolbar = ({
     )
 }
 
+// ─── URL bar (editable) ────────────────────────────────────────────────
+//
+// Read-only display in M4.7 became a friction point as soon as the user
+// generated a second page — the engine wrote `app/pages/<name>/page.tsx`
+// but the webview stayed at `/`. The user had no way to type a URL or
+// pick a page. Now: editable input + a `Pages ▾` dropdown (computed from
+// the prototype file tree).
+
+const PreviewUrlBar = ({ url }: { url: string | null }): JSX.Element => {
+    const [draft, setDraft] = useState<string>(url ?? '')
+    const lastUrlRef = useRef(url)
+    // Sync external URL updates (auto-navigate after generation, reload,
+    // user picks from Pages dropdown). Don't clobber a draft the user is
+    // actively typing: we only re-sync when the external URL changed AND
+    // it doesn't match the current draft.
+    useEffect(() => {
+        if (url !== lastUrlRef.current) {
+            lastUrlRef.current = url
+            setDraft(url ?? '')
+        }
+    }, [url])
+
+    const navigate = useCallback((target: string) => {
+        const view = document.querySelector('webview.spec-prototype-preview') as
+            | { loadURL?: (u: string) => void }
+            | null
+        view?.loadURL?.(target)
+    }, [])
+
+    return (
+        <form
+            onSubmit={(e) => {
+                e.preventDefault()
+                if (!draft.trim()) return
+                navigate(draft.trim())
+            }}
+            className="flex h-8 w-72 items-center rounded-md bg-muted px-2 text-[11px]"
+        >
+            <input
+                type="text"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder="dev server stopped"
+                disabled={!url}
+                spellCheck={false}
+                className="flex-1 bg-transparent font-mono text-[10.5px] text-muted-foreground outline-none disabled:cursor-not-allowed"
+                title={url ?? 'dev server stopped'}
+            />
+        </form>
+    )
+}
+
+// ─── Pages dropdown ─────────────────────────────────────────────────────
+//
+// Lists every `app/pages/<name>/page.tsx` the engine has generated in this
+// prototype. Click → loads the corresponding URL in the webview. Picks up
+// changes automatically because `state.specPrototype.files` is refreshed on
+// every `tree-changed` event.
+
+// IGRP framework template writes pages under
+//   `src/app/(igrp)/(generated)/<name>/page.tsx`
+// (route groups `(igrp)` and `(generated)` are organisational and don't
+// appear in the URL). We also accept a few looser shapes so the dropdown
+// stays populated if the engine ever emits a different layout:
+//   - `src/app/(group1)/(group2)/<name>/page.tsx`   (current template)
+//   - `src/app/<name>/page.tsx`                    (no groups)
+//   - `app/pages/<name>/page.tsx`                  (legacy / non-`src`)
+const PAGE_ROUTE_RE =
+    /^(?:src\/)?app\/(?:pages\/)?(?:\([^)]+\)\/)*([^/]+)\/page\.tsx$/
+
+const PagesDropdown = ({
+    devUrl,
+    basePath
+}: {
+    devUrl: string | null
+    basePath: string | undefined
+}): JSX.Element => {
+    const dispatch = useDispatch<any>()
+    const files = useSelector((s: RootState) => s.specPrototype.files)
+    const [open, setOpen] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null)
+
+    const pages = useMemo(() => {
+        const seen = new Set<string>()
+        const out: string[] = []
+        for (const f of files) {
+            const match = f.path.match(PAGE_ROUTE_RE)
+            if (!match) continue
+            const name = match[1]
+            // Skip the root-level `app/page.tsx` (Next.js index) — only
+            // care about distinct page folders.
+            if (name === 'page.tsx') continue
+            if (seen.has(name)) continue
+            seen.add(name)
+            out.push(name)
+        }
+        return out.sort()
+    }, [files])
+
+    useEffect(() => {
+        if (!open) return
+        const onClick = (e: MouseEvent) => {
+            if (!containerRef.current?.contains(e.target as Node)) setOpen(false)
+        }
+        document.addEventListener('mousedown', onClick)
+        return () => document.removeEventListener('mousedown', onClick)
+    }, [open])
+
+    const navigate = useCallback(
+        (pageName: string) => {
+            if (!devUrl) return
+            const view = document.querySelector('webview.spec-prototype-preview') as
+                | { loadURL?: (u: string) => void }
+                | null
+            // Route groups in the engine path (`(igrp)`, `(generated)`) do
+            // NOT appear in the URL — Next.js serves the page at the
+            // segment name directly. So `users` page lives at `/users`,
+            // not `/pages/users`.
+            view?.loadURL?.(`${devUrl.replace(/\/+$/, '')}/${pageName}`)
+            setOpen(false)
+        },
+        [devUrl]
+    )
+
+    const refresh = useCallback(() => {
+        if (basePath) dispatch(loadPrototypeFiles(basePath))
+    }, [basePath, dispatch])
+
+    // Dropdown is *always* openable now — empty / no-server states surface
+    // as messages inside the popover instead of a dead button. Refresh
+    // file tree on open so a freshly-generated page lands quickly.
+    const handleToggle = () => {
+        if (!open) refresh()
+        setOpen((v) => !v)
+    }
+
+    const reason = !devUrl
+        ? 'Dev server not running — start it from the Preview toolbar.'
+        : pages.length === 0
+          ? 'No pages found yet. Ask the chat to generate one.'
+          : null
+
+    return (
+        <div ref={containerRef} className="relative">
+            <button
+                type="button"
+                onClick={handleToggle}
+                className={cn(
+                    'flex h-8 items-center gap-1 rounded-md border bg-card px-2 text-[10.5px] transition-colors hover:bg-accent'
+                )}
+                title={reason ?? `${pages.length} page${pages.length === 1 ? '' : 's'} — click to switch`}
+            >
+                Pages
+                <span
+                    className={cn(
+                        'rounded px-1 text-[9px] font-semibold',
+                        pages.length > 0
+                            ? 'bg-primary/15 text-primary'
+                            : 'bg-muted text-muted-foreground'
+                    )}
+                >
+                    {pages.length}
+                </span>
+                <ChevronDown size={10} />
+            </button>
+            {open && (
+                <div className="absolute right-0 top-9 z-30 max-h-72 w-52 overflow-y-auto rounded-md border bg-popover p-1 shadow-lg">
+                    {reason ? (
+                        <p className="px-2 py-1.5 text-[10.5px] italic text-muted-foreground">
+                            {reason}
+                        </p>
+                    ) : (
+                        pages.map((name) => (
+                            <button
+                                key={name}
+                                type="button"
+                                onClick={() => navigate(name)}
+                                disabled={!devUrl}
+                                className={cn(
+                                    'flex w-full items-center justify-between rounded px-2 py-1 text-left text-[11px]',
+                                    devUrl
+                                        ? 'hover:bg-accent'
+                                        : 'cursor-not-allowed opacity-50'
+                                )}
+                            >
+                                <span className="font-mono">{name}</span>
+                                <ExternalLink
+                                    size={10}
+                                    className="text-muted-foreground/60"
+                                />
+                            </button>
+                        ))
+                    )}
+                    <div className="mt-1 border-t pt-1">
+                        <button
+                            type="button"
+                            onClick={refresh}
+                            className="flex w-full items-center justify-center gap-1 rounded px-2 py-1 text-[10px] text-muted-foreground hover:bg-accent hover:text-foreground"
+                        >
+                            <RefreshCw size={9} />
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+}
+
 const DeviceButton = ({
     active,
     onClick,
@@ -1021,6 +2233,32 @@ const DeviceButton = ({
         )}
     >
         {icon}
+    </button>
+)
+
+const PreviewModeButton = ({
+    active,
+    onClick,
+    icon,
+    label
+}: {
+    active: boolean
+    onClick: () => void
+    icon: JSX.Element
+    label: string
+}): JSX.Element => (
+    <button
+        type="button"
+        onClick={onClick}
+        className={cn(
+            'flex items-center gap-1.5 rounded px-2 py-1 text-[11px] font-medium transition-colors',
+            active
+                ? 'bg-primary/10 text-primary ring-1 ring-primary/20'
+                : 'text-muted-foreground hover:bg-accent'
+        )}
+    >
+        {icon}
+        {label}
     </button>
 )
 

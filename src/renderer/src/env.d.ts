@@ -261,8 +261,38 @@ interface SpecPrototypeFailedOp {
     error: string
 }
 
+interface SpecPrototypeAppliedManifest {
+    pageName: string
+    path: string
+    outputPath: string
+    componentCount: number
+}
+
 type SpecPrototypeChunk =
     | { type: 'delta'; content: string }
+    // M6 manifest-first chunks
+    | { type: 'manifest-parsed'; manifest: SpecPrototypeAppliedManifest }
+    | { type: 'manifest-applied'; manifest: SpecPrototypeAppliedManifest }
+    // M8 auto-retry — fired BEFORE re-streaming on attempt 2+. Carries
+    // the prior failure so the chat can show "Attempt N — fixing X".
+    | {
+          type: 'retry-attempt'
+          attempt: number
+          maxAttempts: number
+          reason: string
+      }
+    // M7 preview seeding chunks — non-fatal stage that runs between
+    // manifest-applied and commit. Mirror of `PrototypeChunk` in main.
+    | { type: 'mock-seeding' }
+    | {
+          type: 'mock-seeded'
+          mockJsonPath: string
+          previewTsPath: string
+          rowCount: number
+      }
+    | { type: 'mock-skipped'; reason: string }
+    // Legacy file-ops chunks — preserved so the existing snapshot-card UI
+    // keeps compiling during the transition window.
     | { type: 'op-applied'; op: SpecPrototypeAppliedOp }
     | { type: 'op-failed'; op: SpecPrototypeFailedOp['op']; error: string }
     | { type: 'commit'; sha: string | null; summary: string }
@@ -322,7 +352,6 @@ interface SpecPrototypeBridge {
         ref: string,
         path: string
     ) => Promise<{ content: string | null }>
-    openFolder: (basePath: string) => Promise<{ ok: boolean; error?: string }>
     startDev: (basePath: string) => Promise<SpecPrototypeDevStatus>
     stopDev: (basePath: string) => Promise<SpecPrototypeDevStatus>
     devStatus: (basePath: string) => Promise<SpecPrototypeDevStatus>
@@ -335,6 +364,51 @@ interface SpecPrototypeBridge {
         cancelled?: boolean
     }>
     openFolder: (basePath: string) => Promise<{ ok: boolean; error?: string }>
+    readManifest: (basePath: string) => Promise<{
+        manifest: Record<string, unknown> | null
+        error?: string
+    }>
+    applyManifest: (
+        basePath: string,
+        manifest: Record<string, unknown>
+    ) => Promise<{
+        ok: boolean
+        sha?: string | null
+        pageName?: string
+        error?: string
+    }>
+    listSkills: (basePath: string) => Promise<{
+        skills: Array<{
+            name: string
+            folderPath: string
+            frontmatter: { name?: string; description?: string }
+            skillMdBody: string
+            companions: Array<{ filename: string; size: number }>
+            version: string | null
+        }>
+    }>
+    readSkillFile: (
+        basePath: string,
+        skillName: string,
+        filename: string
+    ) => Promise<{ content: string | null; error?: string }>
+    installSkill: (
+        basePath: string,
+        skillName: string
+    ) => Promise<{ ok: boolean; error?: string }>
+    checkSkillUpdates: (basePath: string) => Promise<{
+        updates: Array<{
+            name: string
+            installed: string | null
+            latest: string | null
+            hasUpdate: boolean
+            error?: string
+        }>
+    }>
+    updateSkill: (
+        basePath: string,
+        skillName: string
+    ) => Promise<{ ok: boolean; error?: string }>
     onChunk: (
         callback: (payload: { requestId: string; chunk: SpecPrototypeChunk }) => void
     ) => () => void

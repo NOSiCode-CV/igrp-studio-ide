@@ -12,9 +12,16 @@
  */
 import { promises as fsp } from 'node:fs'
 import { BrowserWindow } from 'electron'
-import { marked } from 'marked'
+import MarkdownIt from 'markdown-it'
 import HtmlToDocx from 'html-to-docx'
 import { specDocService } from './spec-doc-service'
+
+const md = new MarkdownIt({
+    html: false,
+    linkify: true,
+    typographer: false,
+    breaks: false
+})
 
 export type DocExportFormat = 'pdf' | 'docx'
 
@@ -74,7 +81,7 @@ class SpecDocExportService {
         const result = await specDocService.read(basePath, docId)
         if (!result) throw new Error(`Document ${docId} not found`)
         const { node, content } = result
-        const body = await marked.parse(content || '', { gfm: true, breaks: false })
+        const body = md.render(content || '')
         const safeTitle = escapeHtml(node.name.replace(/\.md$/i, ''))
 
         return `<!doctype html>

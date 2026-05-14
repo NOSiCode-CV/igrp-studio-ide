@@ -12,9 +12,17 @@ import fs from 'node:fs'
 import { promises as fsp } from 'node:fs'
 import { promisify } from 'node:util'
 import { BrowserWindow, dialog, ipcMain, shell } from 'electron'
-import { join, relative } from 'node:path'
+import { dirname, join, relative } from 'node:path'
 import { EVENTS } from '../constants/events'
+import { EngineFactory } from '../engines/EngineFactory'
 import { GitService } from '../services/git-service'
+import {
+    checkSkillUpdates,
+    installSkill,
+    listInstalledSkills,
+    readSkillCompanion,
+    updateSkill
+} from '../services/prototype/skill-discovery'
 import { applyFileOps, parseFileOps } from '../services/prototype/file-ops'
 import { prototypeDevServer } from '../services/prototype/prototype-dev-server'
 import {
@@ -267,6 +275,283 @@ ipcMain.handle(
         }
         const errMsg = await shell.openPath(root)
         return errMsg ? { ok: false, error: errMsg } : { ok: true }
+    }
+)
+
+// ─── manifest CRUD (M6 — Etapa A) ──────────────────────────────────────
+//
+// `<basePath>/.igrpstudio/prototype/page.json` is the source-of-truth
+// PageConfig for the prototype. The LLM-driven turn (M6.2) writes it on
+// success; the canvas/edit tab (future) reads + mutates it directly.
+
+const MANIFEST_RELATIVE = '.igrpstudio/prototype/page.json'
+
+ipcMain.handle(
+    EVENTS.SPEC_PROTOTYPE.READ_MANIFEST,
+    async (
+        _event,
+        { basePath }: { basePath: string }
+    ): Promise<{ manifest: unknown | null; error?: string }> => {
+        try {
+            const manifestPath = join(basePath, MANIFEST_RELATIVE)
+            if (!fs.existsSync(manifestPath)) return { manifest: null }
+            const raw = await fsp.readFile(manifestPath, 'utf-8')
+            const manifest = JSON.parse(raw)
+            return { manifest }
+        } catch (err) {
+            return {
+                manifest: null,
+                error: err instanceof Error ? err.message : String(err)
+            }
+        }
+    }
+)
+
+/**
+ * Apply a PageConfig manifest *directly* (no LLM in the loop). Used by the
+ * Edit canvas after the user mutates the tree visually. Mirrors the tail
+ * of `prototypeGeneratorService.generate` from M6.3 but skips the streaming
+ * and the LLM call — just persist + engine.createPage + git commit.
+ */
+ipcMain.handle(
+    EVENTS.SPEC_PROTOTYPE.APPLY_MANIFEST,
+    async (
+        event,
+        {
+            basePath,
+            manifest
+        }: { basePath: string; manifest: Record<string, unknown> }
+    ): Promise<{
+        ok: boolean
+        sha?: string | null
+        pageName?: string
+        error?: string
+    }> => {
+        const prototypeRoot = join(basePath, PROTOTYPE_SUBDIR)
+        try {
+            if (!fs.existsSync(prototypeRoot)) {
+                await fsp.mkdir(prototypeRoot, { recursive: true })
+            }
+
+            // Minimal validation — engine handles deeper shape errors.
+            if (!manifest || typeof manifest !== 'object') {
+                return { ok: false, error: 'Manifest must be an object.' }
+            }
+            if (manifest.type !== 'page') {
+                return { ok: false, error: 'Manifest `type` must be "page".' }
+            }
+            const pageName = typeof manifest.pageName === 'string' ? manifest.pageName : ''
+            if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(pageName)) {
+                return { ok: false, error: 'Manifest `pageName` is invalid.' }
+            }
+
+            // Persist raw manifest before code gen so a crash mid-write
+            // doesn't leave us with code but no source-of-truth JSON.
+            const manifestPath = join(basePath, MANIFEST_RELATIVE)
+            await fsp.mkdir(dirname(manifestPath), { recursive: true })
+            await fsp.writeFile(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8')
+
+            // Code gen via the same engine entry the Page Builder uses.
+            const engine = EngineFactory.getEngine('nextjs')
+            await engine.createPage?.(manifest, prototypeRoot)
+
+            // Git snapshot — same pattern as the LLM-driven turn.
+            let sha: string | null = null
+            try {
+                if (!fs.existsSync(join(prototypeRoot, '.git'))) {
+                    await execFileAsync('git', ['init', '-b', 'main'], { cwd: prototypeRoot })
+                    await execFileAsync('git', ['add', '-A'], {
+                        cwd: prototypeRoot
+                    }).catch(() => undefined)
+                    await execFileAsync('git', ['commit', '--allow-empty', '-m', 'init'], {
+                        cwd: prototypeRoot
+                    }).catch(() => undefined)
+                }
+                const summary = `edit: ${pageName} (canvas edit)`
+                const committed = await GitService.createCommit(prototypeRoot, summary)
+                if (committed) {
+                    const { stdout } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
+                        cwd: prototypeRoot
+                    })
+                    sha = stdout.trim() || null
+                }
+            } catch {
+                // Non-fatal — code was written, git just didn't snapshot.
+            }
+
+            // Notify the renderer so the file tree + webview refresh.
+            event.sender.send(EVENTS.SPEC_PROTOTYPE.TREE_CHANGED, { basePath })
+
+            return { ok: true, sha, pageName }
+        } catch (err) {
+            // Engine may throw arrays of Zod-like issues — format them
+            // properly so the canvas header shows actionable detail instead
+            // of `[object Object],[object Object]`.
+            return {
+                ok: false,
+                error: formatEngineError(err)
+            }
+        }
+    }
+)
+
+/** Mirrors `formatEngineError` from the generator service. Kept inline here
+ *  because the canvas's manual apply path lives in this handler and we don't
+ *  want to leak a private helper across module boundaries.
+ */
+function formatEngineError(err: unknown): string {
+    if (!err) return 'Unknown engine error.'
+    if (err instanceof Error) return err.message
+    if (Array.isArray(err)) {
+        return err.map(formatEngineIssue).join('\n')
+    }
+    if (typeof err === 'object') {
+        const obj = err as Record<string, unknown>
+        if (Array.isArray(obj.errors)) {
+            return (obj.errors as unknown[]).map(formatEngineIssue).join('\n')
+        }
+        if (Array.isArray(obj.issues)) {
+            return (obj.issues as unknown[]).map(formatEngineIssue).join('\n')
+        }
+        if (typeof obj.message === 'string') return obj.message as string
+        try {
+            const json = JSON.stringify(obj, null, 2)
+            return json.length > 800 ? `${json.slice(0, 800)}…` : json
+        } catch {
+            return '[unserializable engine error]'
+        }
+    }
+    return String(err)
+}
+
+function formatEngineIssue(issue: unknown): string {
+    if (typeof issue === 'string') return `- ${issue}`
+    if (!issue || typeof issue !== 'object') return `- ${String(issue)}`
+    const obj = issue as Record<string, unknown>
+    // Engine mixes Zod (`path: string[]`) and AJV (`instancePath` / legacy
+    // `dataPath`). Look at all three so nested issues like
+    // `/types/0/path: must have required property` actually reach the chat.
+    let path = ''
+    if (Array.isArray(obj.path)) path = (obj.path as unknown[]).join('.')
+    else if (typeof obj.path === 'string') path = obj.path
+    else if (typeof obj.instancePath === 'string' && obj.instancePath !== '') path = obj.instancePath
+    else if (typeof obj.dataPath === 'string' && obj.dataPath !== '') path = obj.dataPath
+    if (
+        path &&
+        obj.params &&
+        typeof obj.params === 'object' &&
+        typeof (obj.params as Record<string, unknown>).missingProperty === 'string'
+    ) {
+        path = `${path}/${(obj.params as { missingProperty: string }).missingProperty}`
+    }
+    const message =
+        typeof obj.message === 'string'
+            ? (obj.message as string)
+            : typeof obj.code === 'string'
+              ? (obj.code as string)
+              : JSON.stringify(obj)
+    return path ? `- ${path}: ${message}` : `- ${message}`
+}
+
+// ─── Skill discovery (M-Skill Fase 1/2) ────────────────────────────────
+//
+// The Prototype Builder consumes Anthropic-style skill capsules installed
+// at `<basePath>/.agents/skills/<name>/` by the `igrp skill` CLI. Three
+// IPCs cover the renderer's needs:
+//
+//   - LIST_SKILLS:      scan `.agents/skills/` and return parsed metadata
+//                       (frontmatter + companion file names).
+//   - READ_SKILL_FILE:  fetch the body of a specific companion `.md` so
+//                       the contextProvider can inject the relevant section
+//                       into the system prompt on demand.
+//   - INSTALL_SKILL:    spawn `igrp skill add <name> --project <basePath>`
+//                       and stream the install log back to the renderer
+//                       via dev-log events (same channel the npm-install
+//                       progress uses, so the user sees it in the Logs tab).
+
+ipcMain.handle(
+    EVENTS.SPEC_PROTOTYPE.LIST_SKILLS,
+    async (_event, { basePath }: { basePath: string }) => {
+        const skills = await listInstalledSkills(basePath)
+        return { skills }
+    }
+)
+
+ipcMain.handle(
+    EVENTS.SPEC_PROTOTYPE.READ_SKILL_FILE,
+    async (
+        _event,
+        {
+            basePath,
+            skillName,
+            filename
+        }: { basePath: string; skillName: string; filename: string }
+    ) => {
+        return readSkillCompanion(basePath, skillName, filename)
+    }
+)
+
+ipcMain.handle(
+    EVENTS.SPEC_PROTOTYPE.INSTALL_SKILL,
+    async (
+        event,
+        { basePath, skillName }: { basePath: string; skillName: string }
+    ): Promise<{ ok: boolean; error?: string }> => {
+        const broadcastLog = (line: string, level: 'info' | 'warn' | 'error') => {
+            event.sender.send(EVENTS.SPEC_PROTOTYPE.DEV_LOG, {
+                basePath,
+                entry: { timestamp: Date.now(), level, line: `[skill] ${line}` }
+            })
+        }
+        broadcastLog(`installing ${skillName}…`, 'info')
+        const result = await installSkill(basePath, skillName, broadcastLog)
+        if (result.ok) {
+            broadcastLog(`installed ${skillName}`, 'info')
+            // Skill landed on disk — tell the renderer to re-scan files +
+            // the prototype tree so the next turn sees the new corpus.
+            event.sender.send(EVENTS.SPEC_PROTOTYPE.TREE_CHANGED, { basePath })
+        } else if (result.error) {
+            broadcastLog(result.error, 'error')
+        }
+        return result
+    }
+)
+
+// CHECK_SKILL_UPDATES: read-only registry probe — no spawn, no side effects.
+// Returns one entry per installed skill, including those with no update so
+// the renderer can render a "last checked at" line.
+ipcMain.handle(
+    EVENTS.SPEC_PROTOTYPE.CHECK_SKILL_UPDATES,
+    async (_event, { basePath }: { basePath: string }) => {
+        const updates = await checkSkillUpdates(basePath)
+        return { updates }
+    }
+)
+
+// UPDATE_SKILL: spawns `igrp skill update <name>`, mirrors INSTALL_SKILL's
+// log + TREE_CHANGED contract so the existing refresh path picks up the
+// new file contents.
+ipcMain.handle(
+    EVENTS.SPEC_PROTOTYPE.UPDATE_SKILL,
+    async (
+        event,
+        { basePath, skillName }: { basePath: string; skillName: string }
+    ): Promise<{ ok: boolean; error?: string }> => {
+        const broadcastLog = (line: string, level: 'info' | 'warn' | 'error') => {
+            event.sender.send(EVENTS.SPEC_PROTOTYPE.DEV_LOG, {
+                basePath,
+                entry: { timestamp: Date.now(), level, line: `[skill] ${line}` }
+            })
+        }
+        broadcastLog(`updating ${skillName}…`, 'info')
+        const result = await updateSkill(basePath, skillName, broadcastLog)
+        if (result.ok) {
+            broadcastLog(`updated ${skillName}`, 'info')
+            event.sender.send(EVENTS.SPEC_PROTOTYPE.TREE_CHANGED, { basePath })
+        } else if (result.error) {
+            broadcastLog(result.error, 'error')
+        }
+        return result
     }
 )
 
