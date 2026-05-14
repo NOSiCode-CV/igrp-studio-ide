@@ -55,14 +55,17 @@ const EDGE_MARKERS: Record<
     }
 }
 
-interface EntityNodeData {
+// `@xyflow/react` v12 requires Node data to satisfy `Record<string, unknown>`.
+// Use a type alias with intersection so the constraint is met without losing
+// the named fields.
+type EntityNodeData = {
     entity: Entity
     readOnly?: boolean
     onAddField?: (entityId: string) => void
     onDelete?: (entityId: string) => void
     onRename?: (entityId: string) => void
     onOpen?: (entityId: string) => void
-}
+} & Record<string, unknown>
 
 const EntityNode: FC<{ data: EntityNodeData; selected: boolean }> = memo(({ data, selected }) => {
     const { entity, readOnly, onAddField, onDelete, onRename, onOpen } = data
@@ -320,8 +323,8 @@ function ReactFlowERDInner({
         [entities, idToName]
     )
 
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+    const [nodes, setNodes, onNodesChange] = useNodesState<Node<EntityNodeData>>(initialNodes)
+    const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(initialEdges)
 
     // Re-sync when underlying data changes (broadcasts, refresh, etc.).
     useEffect(() => {
@@ -347,7 +350,7 @@ function ReactFlowERDInner({
     }, [basePath, writeable])
 
     const handleNodesChange = useCallback(
-        (changes: NodeChange[]) => {
+        (changes: NodeChange<Node<EntityNodeData>>[]) => {
             onNodesChange(changes)
             if (!writeable) return
             for (const change of changes) {

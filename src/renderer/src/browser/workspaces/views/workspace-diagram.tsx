@@ -61,7 +61,8 @@ import type { IWorkspace, ServiceInfo } from 'src/main/types'
 import { ConfigurationDialog } from '../components/configuration-dialog'
 
 // Custom Node Components
-interface ServiceNodeData {
+// `@xyflow/react` v12 requires Node data to satisfy `Record<string, unknown>`.
+type ServiceNodeData = {
     service: ServiceInfo
     serviceUrl?: string | null
     onAction: (action: string, serviceName: string) => void
@@ -69,12 +70,14 @@ interface ServiceNodeData {
     onEditService: (service: ServiceInfo) => void
     onDeleteService: (service: ServiceInfo) => void
     onOpenInBrowser: (service: ServiceInfo) => void
-}
+} & Record<string, unknown>
 
-interface GroupLabelNodeData {
+type GroupLabelNodeData = {
     label: string
     colorClass: string
-}
+} & Record<string, unknown>
+
+type DiagramNode = Node<ServiceNodeData> | Node<GroupLabelNodeData>
 
 type DiagramServiceStatus =
     | 'healthy'
@@ -378,8 +381,8 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
         restartService,
         getServiceUrl
     } = useDocker({ workspace, changeStatus })
-    const [nodes, setNodes, onNodesChange] = useNodesState([])
-    const [edges, setEdges, onEdgesChange] = useEdgesState([])
+    const [nodes, setNodes, onNodesChange] = useNodesState<DiagramNode>([])
+    const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
     const [selectedNode, setSelectedNode] = useState<string | null>(null)
     const servicesRef = useRef<ServiceInfo[]>(services)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -517,7 +520,7 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
         }
 
         // Create a hierarchical layout based on dependencies
-        const newNodes: Node[] = []
+        const newNodes: DiagramNode[] = []
         const nodeHeight = 150
         const margin = 40
         const levelSpacing = 350
@@ -745,7 +748,7 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
         await refreshContainers()
     }
 
-    const handleContextMenu = useCallback((event: React.MouseEvent) => {
+    const handleContextMenu = useCallback((event: MouseEvent | React.MouseEvent) => {
         event.preventDefault()
         setContextMenu({
             x: event.clientX,
@@ -869,7 +872,8 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                 <Controls />
                 <MiniMap
                     nodeColor={(node) => {
-                        const service = node.data?.service
+                        const service = (node.data as Partial<ServiceNodeData> | undefined)
+                            ?.service
                         switch (resolveDiagramStatus(service)) {
                             case 'healthy':
                                 return '#10b981'
