@@ -20,6 +20,7 @@ import useToast from '@renderer/hooks/useToast'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { capitalize, getId } from '@renderer/utils'
 import { useFormik } from 'formik'
+import { camelCase } from 'lodash-es'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import type { JSX } from 'react/jsx-runtime'
@@ -97,6 +98,25 @@ const LEGACY_TYPE_MAP: Record<string, { type: string; isList?: boolean }> = {
     // 'object' is intentionally NOT mapped — extractValidFields uses it
     // as an internal marker for nested struct (FormList) entries, and
     // the engine treats fields[] presence as the actual struct signal.
+}
+
+/**
+ * Pick a usable identifier-style name for a field. Dropped components
+ * sometimes carry a label but no `tag` (e.g. when imported or built
+ * via a path that skips generateTag). Falling through to the label
+ * keeps the Name column populated and gives the codegen a meaningful
+ * key instead of an empty string.
+ */
+function deriveFieldName(child: StructuredComponent): string {
+    const tag = child.tag?.trim()
+    if (tag) return tag
+    const label =
+        (child.properties?.label as string | undefined)?.trim() ??
+        (child.properties?.headerTitle as string | undefined)?.trim() ??
+        (child.label as string | undefined)?.trim() ??
+        ''
+    if (label) return camelCase(label)
+    return child.id ?? ''
 }
 
 function normalizeFieldType<T extends { type: string; isList?: boolean; fields?: any[] }>(
@@ -428,7 +448,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                     if (nestedShouldInclude) {
                         nestedFields.push({
                             ...defaultFieldType,
-                            name: nestedChild.tag,
+                            name: deriveFieldName(nestedChild),
                             componentId: nestedChild.id,
                             label: nestedChild.properties.label ?? nestedChild.label
                         })
@@ -445,7 +465,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                 // Only add the repeater field if it hasn't been added yet
                 fields.push({
                     ...defaultFieldType,
-                    name: child.tag,
+                    name: deriveFieldName(child),
                     componentId: child.id,
                     label: child.properties.label ?? child.properties.headerTitle ?? child.label,
                     isList: true,
@@ -467,7 +487,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             if (shouldInclude && !parentIsRepeater) {
                 fields.push({
                     ...defaultFieldType,
-                    name: child.tag,
+                    name: deriveFieldName(child),
                     componentId: child.id,
                     label: child.properties.label ?? child.properties.headerTitle ?? child.label,
                     // Include type if available
