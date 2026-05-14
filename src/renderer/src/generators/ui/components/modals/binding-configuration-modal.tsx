@@ -222,7 +222,6 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
         initialValues: {
             componentId,
             path: '',
-            fields: [],
             isEnum: false,
             isMainType: false,
             definitionType: 'auto' as 'zod-object' | 'json-schema' | 'auto',
@@ -238,7 +237,13 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                 (compType?.name && String(compType.name).trim()) ||
                 (tag && String(tag).trim()) ||
                 comp.componentName ||
-                ''
+                '',
+            // Always start with an empty `fields` array so the
+            // auto-extract effect can populate it from the live
+            // component tree (with deriveFieldName) without fighting
+            // enableReinitialize. Persisted fields with empty names
+            // would otherwise win each render cycle.
+            fields: [] as LabeledElementField[]
         },
         onSubmit: async (values, actions) => {
             actions.setSubmitting(false)
