@@ -47,7 +47,7 @@ interface LabeledElementField {
 const defaultFieldType: LabeledElementField = {
     componentId: '',
     name: '',
-    type: 'text',
+    type: 'string',
     required: false,
     defaultValue: undefined,
     label: '',
@@ -88,11 +88,11 @@ const FIELD_TYPES: SchemaTypeItem[] = [
  * so unknown values stay visible (rather than silently swallowed).
  */
 const LEGACY_TYPE_MAP: Record<string, { type: string; isList?: boolean }> = {
-    string: { type: 'text' },
+    string: { type: 'string' },
     boolean: { type: 'checkbox' },
-    email: { type: 'text' },
-    url: { type: 'text' },
-    array: { type: 'text', isList: true },
+    email: { type: 'string' },
+    url: { type: 'string' },
+    array: { type: 'string', isList: true },
     integer: { type: 'number' }
     // 'object' is intentionally NOT mapped — extractValidFields uses it
     // as an internal marker for nested struct (FormList) entries, and
@@ -182,7 +182,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             case 'date':
             case 'time':
                 return 'new Date()'
-            case 'text':
+            case 'string':
             case 'password':
             case 'tel':
             case 'color':
@@ -201,7 +201,6 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
         enableReinitialize: true,
         initialValues: {
             componentId,
-            name: tag,
             path: '',
             fields: [],
             isEnum: false,
@@ -210,7 +209,16 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             tags: [] as string[],
             customInstanceName: '',
             customInitInstanceName: '',
-            ...compType
+            ...compType,
+            // Resolve `name` AFTER the spread so an empty or missing
+            // compType.name does not overwrite the component's tag.
+            // Falls back to the component name (e.g. 'form', 'table')
+            // so the field is never blank when the modal opens.
+            name:
+                (compType?.name && String(compType.name).trim()) ||
+                (tag && String(tag).trim()) ||
+                comp.componentName ||
+                ''
         },
         onSubmit: async (values, actions) => {
             actions.setSubmitting(false)
@@ -317,13 +325,13 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
      */
     const columns = isEnum
         ? [
-              { key: 'name', name: t('enumCaseName'), type: 'text' },
-              { key: 'defaultValue', name: t('enumCaseValue'), type: 'text' },
-              { key: 'label', name: t('label'), type: 'text' }
+              { key: 'name', name: t('enumCaseName'), type: 'string' },
+              { key: 'defaultValue', name: t('enumCaseValue'), type: 'string' },
+              { key: 'label', name: t('label'), type: 'string' }
           ]
         : [
               { key: 'label', name: t('label'), type: 'label' },
-              { key: 'name', name: t('name'), type: 'text', readonly: !newBinding },
+              { key: 'name', name: t('name'), type: 'string', readonly: !newBinding },
               ...(!newBinding
                   ? [
                         {
@@ -365,7 +373,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                         } */
                     ]
                   : []),
-              { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
+              { key: 'defaultValue', name: t('defaultValue'), type: 'string' },
               {
                   key: 'group',
                   name: '',
@@ -552,7 +560,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                         </IGRPDialogHeaderPrimitive>
                         <form onSubmit={formik.handleSubmit} className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <div className="relative flex rounded-lg border bg-muted p-0.5 text-sm space-x-2">
+                                <div className="relative flex rounded-lg border bg-muted p-0.5 string-sm space-x-2">
                                     <IGRPButtonPrimitive
                                         type="button"
                                         variant={newBinding ? 'outline' : 'ghost'}
@@ -577,7 +585,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                         <div className="flex items-center gap-2">
                                             <IGRPLabelPrimitive
                                                 htmlFor="isEnum"
-                                                className="text-sm cursor-pointer"
+                                                className="string-sm cursor-pointer"
                                             >
                                                 {t('enumType')}
                                             </IGRPLabelPrimitive>
@@ -593,7 +601,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                     <div className="flex items-center gap-2">
                                         <IGRPLabelPrimitive
                                             htmlFor="definitionType"
-                                            className="text-sm whitespace-nowrap"
+                                            className="string-sm whitespace-nowrap"
                                         >
                                             {t('definitionType')}
                                         </IGRPLabelPrimitive>
@@ -608,7 +616,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                                     e.target.value
                                                 )
                                             }
-                                            className="h-8 rounded-md border bg-background px-2 text-sm"
+                                            className="h-8 rounded-md border bg-background px-2 string-sm"
                                         >
                                             <option value="auto">{t('definitionTypeAuto')}</option>
                                             {/*
@@ -650,12 +658,12 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                             )}
 
                             <details className="rounded-md border bg-muted/20 hidden">
-                                <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium">
+                                <summary className="cursor-pointer select-none px-3 py-2 string-sm font-medium">
                                     {t('advancedOptions')}
                                 </summary>
                                 <div className="space-y-3 px-3 pb-3 pt-1">
                                     <div className="space-y-1">
-                                        <IGRPLabelPrimitive htmlFor="tags" className="text-sm">
+                                        <IGRPLabelPrimitive htmlFor="tags" className="string-sm">
                                             {t('typeTags')}
                                         </IGRPLabelPrimitive>
                                         <input
@@ -671,7 +679,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                                 )
                                             }
                                             placeholder={t('typeTagsPlaceholder')}
-                                            className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+                                            className="h-9 w-full rounded-md border bg-background px-3 string-sm"
                                         />
                                     </div>
 
@@ -685,7 +693,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                         />
                                         <IGRPLabelPrimitive
                                             htmlFor="isMainType"
-                                            className="text-sm cursor-pointer"
+                                            className="string-sm cursor-pointer"
                                         >
                                             {t('mainType')}
                                         </IGRPLabelPrimitive>
@@ -696,7 +704,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                             <div className="space-y-1">
                                                 <IGRPLabelPrimitive
                                                     htmlFor="customInstanceName"
-                                                    className="text-sm"
+                                                    className="string-sm"
                                                 >
                                                     {t('customInstanceName')}
                                                 </IGRPLabelPrimitive>
@@ -710,13 +718,13 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                                         )
                                                     }
                                                     placeholder={t('customInstanceNamePlaceholder')}
-                                                    className="h-9 w-full rounded-md border bg-background px-3 text-sm font-mono"
+                                                    className="h-9 w-full rounded-md border bg-background px-3 string-sm font-mono"
                                                 />
                                             </div>
                                             <div className="space-y-1">
                                                 <IGRPLabelPrimitive
                                                     htmlFor="customInitInstanceName"
-                                                    className="text-sm"
+                                                    className="string-sm"
                                                 >
                                                     {t('customInitInstanceName')}
                                                 </IGRPLabelPrimitive>
@@ -734,7 +742,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                                     placeholder={t(
                                                         'customInitInstanceNamePlaceholder'
                                                     )}
-                                                    className="h-9 w-full rounded-md border bg-background px-3 text-sm font-mono"
+                                                    className="h-9 w-full rounded-md border bg-background px-3 string-sm font-mono"
                                                 />
                                             </div>
                                         </>
