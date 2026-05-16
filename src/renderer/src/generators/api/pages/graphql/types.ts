@@ -6,6 +6,7 @@ export interface GraphQLArgumentFormValue {
     name: string
     type: string
     required: boolean
+    primaryKey?: boolean
     defaultValue?: unknown
     description?: string
 }
@@ -27,6 +28,7 @@ export interface GraphQLArgumentPayload {
     name: string
     type: string
     required: boolean
+    primaryKey?: boolean
     defaultValue?: unknown
     description?: string
 }

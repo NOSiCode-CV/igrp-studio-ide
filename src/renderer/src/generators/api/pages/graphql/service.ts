@@ -35,7 +35,7 @@ function buildSchemaConfig(
             objectType: (PRIMITIVES.has(a.type) ? 'java' : 'graphqlInput') as
                 | 'java'
                 | 'graphqlInput',
-            type: GQL_TO_ENGINE_TYPE[a.type] ?? a.type,
+            type: a.primaryKey ? 'uuid' : (GQL_TO_ENGINE_TYPE[a.type] ?? a.type),
             required: a.required
         }))
 
@@ -134,7 +134,11 @@ export const GraphQLService = {
         for (const schemaName of uniqueReturnTypes) {
             const schemaOps = allOps.filter((op) => op.returnType === schemaName)
             const config = buildSchemaConfig(moduleName, schemaName, schemaOps)
-            await window.engine.createGraphqlSchema(config, ENV_TYPES.SPRING, basePath)
+            const result = await window.engine.createGraphqlSchema(config, ENV_TYPES.SPRING, basePath)
+            if (result?.error) {
+                const detail = typeof result.error === 'string' ? result.error : JSON.stringify(result.error)
+                throw new Error(`Schema generation failed for "${schemaName}": ${detail}`)
+            }
         }
     },
 

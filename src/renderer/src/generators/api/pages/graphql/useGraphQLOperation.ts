@@ -38,6 +38,7 @@ const buildInitialValues = (currentItem: any): GraphQLOperationFormValues => {
         name: '',
         type: 'string',
         required: false,
+        primaryKey: false,
         defaultValue: '',
         description: ''
     }
@@ -46,6 +47,7 @@ const buildInitialValues = (currentItem: any): GraphQLOperationFormValues => {
               name: argument.name,
               type: argument.type,
               required: argument.required,
+              primaryKey: argument.primaryKey ?? false,
               defaultValue: argument.defaultValue ?? '',
               description: argument.description || ''
           })) ?? [])
@@ -127,7 +129,8 @@ export const useGraphQLOperation = ({
             try {
                 const validationErrors = await validateGraphQLOperation(values, {
                     operations: cachedOperations,
-                    availableTypeValues: returnTypeOptions.map((option) => option.value)
+                    availableTypeValues: returnTypeOptions.map((option) => option.value),
+                    availableInputTypeValues: inputTypeOptions.map((option) => option.value)
                 })
 
                 if (Object.keys(validationErrors).length > 0) {
@@ -227,15 +230,17 @@ export const useGraphQLOperation = ({
     }, [sharedTypeOptions, graphqlTypes])
 
     const inputTypeOptions = useMemo(() => {
-        const graphqlInputOptions = graphqlInputs.map(({ name }) => ({ label: name, value: name }))
-
+        const fromDto = dto
+            .filter((item: any) => item.content?.type === 'graphqlInput')
+            .map((item: any) => ({
+                label: item.content?.name || item.name,
+                value: item.content?.name || item.name
+            }))
+        const fromTree = graphqlInputs.map(({ name }) => ({ label: name, value: name }))
         const unique = new Map<string, { label: string; value: string }>()
-        ;[...sharedTypeOptions, ...graphqlInputOptions].forEach((option) => {
-            unique.set(option.value, option)
-        })
-
+        ;[...fromDto, ...fromTree].forEach((option) => unique.set(option.value, option))
         return Array.from(unique.values())
-    }, [sharedTypeOptions, graphqlInputs])
+    }, [dto, graphqlInputs])
 
     const changeArgValue = (element: string, position: number, value: any) => {
         formik.setFieldValue(`args.${position}.${element}`, value)

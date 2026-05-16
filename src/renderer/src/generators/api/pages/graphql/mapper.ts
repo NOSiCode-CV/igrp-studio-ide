@@ -25,6 +25,7 @@ const sanitizeArgument = (argument: GraphQLArgumentFormValue) => {
         name: trimToUndefined(argument.name) || '',
         type: trimToUndefined(argument.type) || '',
         required: argument.required,
+        ...(argument.primaryKey ? { primaryKey: true } : {}),
         ...(argument.defaultValue !== undefined ? { defaultValue: argument.defaultValue } : {}),
         ...(trimToUndefined(argument.description)
             ? { description: trimToUndefined(argument.description) }
