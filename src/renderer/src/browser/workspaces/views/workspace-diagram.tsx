@@ -115,7 +115,7 @@ const resolveDiagramStatus = (service?: ServiceInfo): DiagramServiceStatus => {
 
 const resolveDiagramStack = (service?: ServiceInfo): DiagramStackId => {
     if (!service) return 'main'
-    if (service.labels?.is_project === true || service.labels?.is_project === 'true') return 'project'
+    if (service.labels?.is_project === 'true') return 'project'
     const composeFile = (service.composeFile || '').toLowerCase()
     if (composeFile.includes('igrp-monitoring-compose.yaml') || composeFile.includes('compose-monitoring.yaml')) {
         return 'monitoring'
@@ -407,7 +407,6 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
     const {
         actions: { removeService }
     } = useWorkspace()
-    const { t } = useTranslation()
 
     // Memoize fitViewOptions to prevent ReactFlow warnings
     const fitViewOptions = useMemo(

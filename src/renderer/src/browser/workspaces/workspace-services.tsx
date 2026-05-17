@@ -73,7 +73,7 @@ const serviceSubgroupBlocks: ServiceSubgroupBlock[] = [
 ]
 
 const resolveServiceStack = (service: ServiceInfo): StackId => {
-    if (service.labels?.is_project === true || service.labels?.is_project === 'true') {
+    if (service.labels?.is_project === 'true') {
         return 'project'
     }
 
