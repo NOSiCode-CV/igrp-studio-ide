@@ -56,11 +56,11 @@ Identificadas no segundo passe (incluindo `src/main` + configs):
 - `markdown-it` continuaria necessário no main process — não desaparece.
 - **Adiar** para PR dedicado quando consolidarmos toda a UI markdown em `react-markdown`.
 
-### 2.3 Validar drivers de BD ⏸️ DECISÃO DA EQUIPA
+### 2.3 Validar drivers de BD 🚫 CONGELADO
 - Drivers presentes: `pg` (6 usos diretos), `mysql2` (dinâmico via Knex), `oracledb` (dinâmico via Knex).
 - UI [ConnectionForm.tsx](src/renderer/src/features/data-models/connection/ConnectionForm.tsx) lista 6 opções: `postgres`, `mysql`, `mongodb`, `sqlite`, `oracle`, `mssql`.
 - **Bug latente:** `mongodb`, `sqlite`, `mssql` na UI sem driver instalado → crash em runtime se escolhidos.
-- **Decisão do utilizador:** "manter o BD por agora". Reabrir quando houver decisão de produto sobre quais SGBDs suportar.
+- **Não mexer por agora** (decisão do utilizador). Não abrir PR sem nova diretiva.
 
 ### 2.4 Cache de servidor: RTK Query vs React Query ✅ AUDITADO
 - Auditoria: `@tanstack/react-query` em 4 ficheiros (BPMN externo HTTP), Redux Toolkit em 7 slices + 5 thunks (estado UI + sincronização IPC). **Sem duplicação.**
@@ -153,8 +153,8 @@ Estratégia:
 
 ## Decisões abertas
 
-- **2.3 / 4.2 — SGBDs suportados oficialmente:** quais ficam? Remover `oracledb` poupa ~100MB no instalador.
-- **3.1 — completar fix dos erros TS do xyflow v12** (pré-existentes): atribuir a quem fez a migração de imports.
+- **2.3 / 4.2 — SGBDs suportados oficialmente:** 🚫 **Congelado por instrução do utilizador.** Não retomar sem nova diretiva. Quando reabrir: decidir se `oracledb` fica (poupa ~100MB), e remover opções da UI sem driver.
+- ~~3.1 — completar fix dos erros TS do xyflow v12~~ ✅ resolvido em `9b811c5e`.
 
 ## Lições
 
