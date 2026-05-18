@@ -20,14 +20,14 @@ import type { ModuleConfig } from '@igrp/igrp-studio-springboot-engine/types'
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
+import { errorMessage, useZodForm } from '@renderer/lib/form'
 import { cn } from '@renderer/lib/utils'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
-import { useFormik } from 'formik'
 import { Plus } from 'lucide-react'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import * as Yup from 'yup'
+import { z } from 'zod'
 
 interface CreateModuleDialogProps {
     basePath: string
@@ -43,61 +43,52 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
 
     const { t } = useTranslation()
     const { createGitCommit } = useGit()
-
     const dispatch: any = useDispatch()
-
     const { showErrorToast, showSuccessToast } = useToast()
 
-    const validationSchema = Yup.object({
-        name: Yup.string()
-            .required(t('thisFieldRequired', { name: 'Name' }))
-            .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet'))
-            .max(20, t('maxLengthExceeded', { max: 20 }))
-    })
+    const schema = React.useMemo(
+        () =>
+            z
+                .object({
+                    name: z
+                        .string()
+                        .min(1, t('thisFieldRequired', { name: 'Name' }))
+                        .regex(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet'))
+                        .max(20, t('maxLengthExceeded', { max: 20 }))
+                })
+                .passthrough() as unknown as z.ZodType<ModuleConfig, unknown>,
+        [t]
+    )
 
-    const formik: any = useFormik({
-        enableReinitialize: true,
-        initialValues,
-        validationSchema,
-        onSubmit: (_values, actions) => {
-            actions.setSubmitting(false)
-            handleCreateModule()
-        }
-    })
-
-    const handleCreateModule = () => {
-        onCreateModule()
-        formik.resetForm()
-        setIsOpen(false)
-    }
+    const form = useZodForm<ModuleConfig>({ schema, defaultValues: initialValues })
+    const { register, handleSubmit, reset, formState, getValues } = form
+    const { errors, touchedFields } = formState
+    const nameError = errorMessage(errors.name as never)
 
     const onCreateModule = async (): Promise<void> => {
         try {
-            const { error } = await window.engine.createModule(
-                formik.values,
-                ENV_TYPES.SPRING,
-                basePath
-            )
+            const values = getValues()
+            const { error } = await window.engine.createModule(values, ENV_TYPES.SPRING, basePath)
 
             if (error) {
                 showErrorToast(error)
                 return
             }
 
-            formik.resetForm()
-
-            createGitCommit(basePath, `${t('addModule')} ${formik.values.name}`)
-
+            reset(initialValues)
+            createGitCommit(basePath, `${t('addModule')} ${values.name}`)
             dispatch(onSetChangeStatus(true))
-
-            showSuccessToast(
-                t('moduleAdded', { name: formik.values.name })
-                // `Module ${formik.values.name} have been successfully added.`
-            )
+            showSuccessToast(t('moduleAdded', { name: values.name }))
         } catch (error) {
             showErrorToast(error)
         }
     }
+
+    const onSubmit = handleSubmit(async () => {
+        await onCreateModule()
+        reset(initialValues)
+        setIsOpen(false)
+    })
 
     return (
         <IGRPTooltipProviderPrimitive>
@@ -124,12 +115,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                             {t('dialogDescription')}
                         </IGRPDialogDescriptionPrimitive>
                     </IGRPDialogHeaderPrimitive>
-                    <form
-                        onSubmit={(e) => {
-                            e.preventDefault()
-                            formik.handleSubmit()
-                        }}
-                    >
+                    <form onSubmit={onSubmit}>
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <IGRPLabelPrimitive htmlFor="name" className="text-right">
@@ -138,18 +124,13 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                                 <div className="col-span-3">
                                     <IGRPInputPrimitive
                                         id="name"
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.name || ''}
+                                        {...register('name')}
                                         className={cn(
-                                            '',
-                                            formik.touched.name && formik.errors.name
-                                                ? 'border-red-500'
-                                                : ''
+                                            touchedFields.name && nameError ? 'border-red-500' : ''
                                         )}
                                     />
-                                    {formik.errors.name && (
-                                        <p className="text-sm text-red-600">{formik.errors.name}</p>
+                                    {nameError && (
+                                        <p className="text-sm text-red-600">{nameError}</p>
                                     )}
                                 </div>
                             </div>
