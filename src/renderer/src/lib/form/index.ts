@@ -19,6 +19,7 @@
  *     `form.setValue('x', y, { shouldValidate: true })`.
  */
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRef } from 'react'
 import {
     type DefaultValues,
     type FieldError,
@@ -205,7 +206,25 @@ export function useFormikCompat<TValues extends FieldValues>(
     form: UseFormReturn<TValues>,
     onSubmit: (values: TValues) => void | Promise<void>
 ): FormikCompat<TValues> {
-    const values = form.watch() as TValues
+    // RHF's `watch()` returns a fresh object every render, which causes the
+    // legacy Formik callers (which feed `formik.values` into `useEffect`
+    // dependency arrays) to ping-pong renders forever. Stabilise the
+    // reference by keeping the previous object when the JSON snapshot is
+    // unchanged. Cost: a JSON.stringify per render, negligible for our forms.
+    const rawValues = form.watch() as TValues
+    const stableValuesRef = useRef<TValues>(rawValues)
+    const lastKeyRef = useRef<string>('')
+    let key = ''
+    try {
+        key = JSON.stringify(rawValues)
+    } catch {
+        key = String(Date.now())
+    }
+    if (key !== lastKeyRef.current) {
+        stableValuesRef.current = rawValues
+        lastKeyRef.current = key
+    }
+    const values = stableValuesRef.current
     const errors = flattenErrorsForFormik(form.formState.errors)
     const touched = form.formState.touchedFields as Record<string, unknown>
 
