@@ -100,8 +100,19 @@ Identificadas no segundo passe (incluindo `src/main` + configs):
 
 ## Fase 4 — Migração de longo prazo
 
-### 4.1 Formik + Yup → React Hook Form + Zod ⏳ FUTURO
-Estado atual (re-grep mais amplo): Formik em **37 ficheiros**, Yup em **15**, Zod em **4**.
+### 4.1 Formik + Yup → React Hook Form + Zod ⏳ EM CURSO (setup feito)
+
+**Etapa 0 — Setup ✅ FEITO**
+- Instalado `react-hook-form ^7.76.0` e `@hookform/resolvers ^5.2.2`.
+- Criado helper [src/renderer/src/lib/form/index.ts](src/renderer/src/lib/form/index.ts) com:
+  - `useZodForm({ schema, defaultValues, mode })` — wrapper sobre `useForm` com `zodResolver` cablado e `mode: 'onBlur'` por defeito (paridade com Formik).
+  - `errorMessage(error)` — extrai `string` do `FieldError` para alimentar os shared inputs existentes (`TextInput`, etc., que esperam `error?: string`).
+  - `isTouched(form, name)` — açúcar sobre `formState.touchedFields`.
+  - Re-exports de `Controller`, `FormProvider`, `useFormContext`, `useWatch` e tipos.
+- **Nota técnica:** `zodResolver(schema as any)` é necessário porque o `@hookform/resolvers 5.x` ainda tipa contra a forma estática do Zod v3, e este projeto usa Zod 4. Runtime intacto; é apenas um escape estático.
+
+**Etapa 1 — Schemas Yup → Zod (pendente)**
+Estado atual (re-grep mais amplo): Formik em **22 ficheiros**, Yup em **15**, Zod em **4** + 1 helper.
 Motivos:
 - Formik em modo manutenção.
 - RHF: ~50% menos re-renders, bundle menor.
