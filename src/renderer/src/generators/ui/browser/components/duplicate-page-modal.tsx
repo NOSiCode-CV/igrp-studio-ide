@@ -12,12 +12,11 @@ import { TextInput } from '@renderer/generators/api/components/inputs-form'
 import type { PageDefinition } from '@renderer/generators/ui/browser/page-manager'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
-import { getId } from '@renderer/utils'
-import { useFormik } from 'formik'
-import { camelCase } from '@renderer/utils'
-import type { FocusEvent } from 'react'
+import { camelCase, getId } from '@renderer/utils'
+import { errorMessage, useZodForm } from '@renderer/lib/form'
+import { type FocusEvent, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import * as Yup from 'yup'
+import { z } from 'zod'
 
 interface DuplicatePageModalProps {
     isOpen: boolean
@@ -44,6 +43,16 @@ const deepCopy = (obj: any): any => {
     return obj
 }
 
+interface DuplicateFormValues {
+    description: string
+    name: string
+    path: string
+    pageName: string
+    pagePath: string
+    // Any other properties carried over from the original component config.
+    [key: string]: unknown
+}
+
 export function DuplicatePageModal({
     isOpen,
     basePath,
@@ -58,106 +67,128 @@ export function DuplicatePageModal({
     const isPage = pageToDuplicate?.isPage
 
     // Create a deep copy of the original content
-    const originalContent = deepCopy(pageToDuplicate?.content || {})
+    const originalContent = useMemo(
+        () => deepCopy(pageToDuplicate?.content || {}),
+        [pageToDuplicate]
+    )
 
-    const initialValues = {
-        // Copy any other properties that might exist
-        ...originalContent,
-        description: originalContent?.description ? `${originalContent.description} Copy` : '',
-        name: originalContent?.pageName ? `${originalContent.pageName}Copy` : '',
-        path: originalContent?.path ? `${originalContent.path}-copy` : '',
-        pagePath: originalContent?.pagePath || '',
-        pageName: originalContent?.pageName ? `${originalContent.pageName}Copy` : ''
-    }
+    const defaultValues = useMemo<DuplicateFormValues>(
+        () => ({
+            ...originalContent,
+            description: originalContent?.description ? `${originalContent.description} Copy` : '',
+            name: originalContent?.pageName ? `${originalContent.pageName}Copy` : '',
+            path: originalContent?.path ? `${originalContent.path}-copy` : '',
+            pagePath: originalContent?.pagePath || '',
+            pageName: originalContent?.pageName ? `${originalContent.pageName}Copy` : ''
+        }),
+        [originalContent]
+    )
 
-    const validationSchema = Yup.object({
-        description: Yup.string().required(
-            t('thisFieldRequired', {
-                name: isPage ? t('pageTitle') : t('componentTitle')
-            })
-        ),
-        name: Yup.string()
-            .required(t('thisFieldRequired', { name: t('name') }))
-            .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet')),
-        ...(isPage && {
-            path: Yup.string()
-                .required(t('thisFieldRequired', { name: t('path') }))
-                .matches(
-                    PATTERNS.VALID_SEGMENT_PATTERN,
-                    'Invalid Next.js path format. Examples: /about, /[id], /[[...slug]]'
-                )
+    // Schema is rebuilt when the page/component flag flips so the localized
+    // messages and the conditional `path` rule stay in sync.
+    const schema = useMemo(() => {
+        const base = z.object({
+            description: z
+                .string()
+                .min(
+                    1,
+                    t('thisFieldRequired', {
+                        name: isPage ? t('pageTitle') : t('componentTitle')
+                    })
+                ),
+            name: z
+                .string()
+                .min(1, t('thisFieldRequired', { name: t('name') }))
+                .regex(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet')),
+            path: isPage
+                ? z
+                      .string()
+                      .min(1, t('thisFieldRequired', { name: t('path') }))
+                      .regex(
+                          PATTERNS.VALID_SEGMENT_PATTERN,
+                          'Invalid Next.js path format. Examples: /about, /[id], /[[...slug]]'
+                      )
+                : z.string().optional().default('')
         })
+        // Accept any other passthrough fields from the original content.
+        return base.passthrough() as unknown as z.ZodType<DuplicateFormValues, unknown>
+    }, [isPage, t])
+
+    const form = useZodForm<DuplicateFormValues>({
+        schema,
+        defaultValues
     })
 
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues,
-        validationSchema,
-        onSubmit: async (values, actions) => {
-            try {
-                const config = isPage
-                    ? ({
-                          // Include all other properties from original
-                          ...originalContent,
-                          type: 'page',
-                          pageName: values.name,
-                          path: values.path,
-                          description: values.description,
-                          id: getId()
-                      } as PageConfig)
-                    : ({
-                          // Include all other properties from original
-                          ...originalContent,
-                          description: values.description,
-                          name: values.name,
-                          id: getId()
-                      } as ComponentConfig)
+    const { register, setValue, watch, reset, handleSubmit, formState } = form
+    const { errors, touchedFields, isSubmitting } = formState
 
-                console.log(config)
+    // Reinitialise the form whenever the modal is reopened on a different
+    // page/component, mirroring Formik's `enableReinitialize: true`.
+    useEffect(() => {
+        if (isOpen) reset(defaultValues)
+    }, [isOpen, defaultValues, reset])
 
-                const { error } = await window.engine.createPage(config, ENV_TYPES.NEXTJS, basePath)
+    const descriptionField = register('description', {
+        onBlur: async (e: FocusEvent<HTMLInputElement>) => {
+            if (watch('name')) return
+            const generatedName = camelCase(e.target.value)
+            setValue('name', generatedName, { shouldValidate: true, shouldTouch: true })
 
-                if (error) {
-                    showErrorToast(error)
-                    return
-                }
-
-                showSuccessToast(
-                    `${isPage ? 'Page' : 'Component'} ${values.name} has been successfully duplicated.`
-                )
-
-                createGitCommit(basePath, 'Added Form Validation and page duplicate')
-
-                onConfirm()
-                formik.resetForm()
-            } catch (error) {
-                showErrorToast(error)
-            } finally {
-                actions.setSubmitting(false)
+            if (isPage) {
+                const generatedPath = e.target.value.toLowerCase().replace(/\s+/g, '-')
+                setValue('path', generatedPath, { shouldValidate: true, shouldTouch: true })
             }
         }
     })
 
-    const handleDescriptionBlur = async (e: FocusEvent<HTMLInputElement>): Promise<void> => {
-        formik.handleBlur(e)
-
-        if (formik.values.name) return
-        const generatedName = `${camelCase(e.target.value)}`
-        formik.setFieldValue('name', generatedName)
-
-        if (isPage) {
-            const generatedPath = `${e.target.value.toLowerCase().replace(/\s+/g, '-')}`
-            formik.setFieldValue('path', generatedPath)
+    const nameField = register('name', {
+        onBlur: async (e: FocusEvent<HTMLInputElement>) => {
+            if (!isPage) return
+            if (watch('path')) return
+            const generatedPath = e.target.value.toLowerCase().replace(/\s+/g, '-')
+            setValue('path', generatedPath, { shouldValidate: true, shouldTouch: true })
         }
-    }
+    })
 
-    const handleNameBlur = async (e: FocusEvent<HTMLInputElement>): Promise<void> => {
-        formik.handleBlur(e)
+    const pathField = register('path')
 
-        if (formik.values.path) return
-        const generatedPath = `${e.target.value.toLowerCase().replace(/\s+/g, '-')}`
-        formik.setFieldValue('path', generatedPath)
-    }
+    const onSubmit = handleSubmit(async (values) => {
+        try {
+            const config = isPage
+                ? ({
+                      ...originalContent,
+                      type: 'page',
+                      pageName: values.name,
+                      path: values.path,
+                      description: values.description,
+                      id: getId()
+                  } as PageConfig)
+                : ({
+                      ...originalContent,
+                      description: values.description,
+                      name: values.name,
+                      id: getId()
+                  } as ComponentConfig)
+
+            const { error } = await window.engine.createPage(config, ENV_TYPES.NEXTJS, basePath)
+
+            if (error) {
+                showErrorToast(error)
+                return
+            }
+
+            showSuccessToast(
+                `${isPage ? 'Page' : 'Component'} ${values.name} has been successfully duplicated.`
+            )
+
+            createGitCommit(basePath, 'Added Form Validation and page duplicate')
+
+            onConfirm()
+            reset(defaultValues)
+        } catch (error) {
+            showErrorToast(error)
+        }
+    })
 
     return (
         <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
@@ -173,33 +204,23 @@ export function DuplicatePageModal({
                         type: isPage ? 'page' : 'component'
                     })}
                 </IGRPDialogDescriptionPrimitive>
-                <form
-                    className="needs-validation space-y-4"
-                    onSubmit={(e) => {
-                        e.preventDefault()
-                        formik.handleSubmit()
-                    }}
-                >
+                <form className="needs-validation space-y-4" onSubmit={onSubmit}>
                     <div className="grid grid-cols-1 gap-4">
                         <TextInput
                             id="description"
                             label={isPage ? t('pageTitle') : t('componentTitle')}
-                            onChange={formik.handleChange}
-                            onBlur={handleDescriptionBlur}
-                            value={formik.values.description || ''}
-                            isTouched={!!formik.touched.description}
-                            error={formik.errors.description as string}
+                            {...descriptionField}
+                            isTouched={!!touchedFields.description}
+                            error={errorMessage(errors.description as never)}
                             placeholder={isPage ? 'Todo List (Copy)' : 'Todo Item (Copy)'}
                             isRequired
                         />
                         <TextInput
                             id="name"
                             label={t('name')}
-                            onChange={formik.handleChange}
-                            onBlur={isPage ? handleNameBlur : formik.handleBlur}
-                            value={formik.values.name || ''}
-                            isTouched={!!formik.touched.name}
-                            error={formik.errors.name as string}
+                            {...nameField}
+                            isTouched={!!touchedFields.name}
+                            error={errorMessage(errors.name as never)}
                             placeholder={isPage ? 'TodoListCopy' : 'TodoItemCopy'}
                             isRequired
                         />
@@ -208,11 +229,9 @@ export function DuplicatePageModal({
                                 id="path"
                                 label="Path"
                                 placeholder="e.g. todo-list-copy"
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.path || ''}
-                                isTouched={!!formik.touched.path}
-                                error={formik.errors.path as string}
+                                {...pathField}
+                                isTouched={!!touchedFields.path}
+                                error={errorMessage(errors.path as never)}
                                 isRequired
                             />
                         )}
@@ -223,10 +242,10 @@ export function DuplicatePageModal({
                         </IGRPButtonPrimitive>
                         <IGRPButtonPrimitive
                             type="submit"
-                            disabled={formik.isSubmitting}
+                            disabled={isSubmitting}
                             color="primary"
                         >
-                            {formik.isSubmitting ? t('duplicating') : t('duplicate')}
+                            {isSubmitting ? t('duplicating') : t('duplicate')}
                         </IGRPButtonPrimitive>
                     </IGRPDialogFooterPrimitive>
                 </form>

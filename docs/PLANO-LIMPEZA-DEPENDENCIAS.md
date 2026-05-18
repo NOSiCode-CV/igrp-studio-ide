@@ -111,8 +111,20 @@ Identificadas no segundo passe (incluindo `src/main` + configs):
   - Re-exports de `Controller`, `FormProvider`, `useFormContext`, `useWatch` e tipos.
 - **Nota técnica:** `zodResolver(schema as any)` é necessário porque o `@hookform/resolvers 5.x` ainda tipa contra a forma estática do Zod v3, e este projeto usa Zod 4. Runtime intacto; é apenas um escape estático.
 
-**Etapa 1 — Schemas Yup → Zod (pendente)**
-Estado atual (re-grep mais amplo): Formik em **22 ficheiros**, Yup em **15**, Zod em **4** + 1 helper.
+**Estratégia revista:** migrar **schema + componente em conjunto, por feature**. Migrar schemas Yup→Zod em isolado quebraria os Formik existentes (Formik não aceita Zod nativamente).
+
+**Etapa 1 — Prova de conceito ✅ FEITO**
+- Migrado [duplicate-page-modal.tsx](src/renderer/src/generators/ui/browser/components/duplicate-page-modal.tsx) como padrão de referência:
+  - `Yup.object({ ... })` → `z.object({ ... }).passthrough()` (passthrough porque o form aceita props extra do conteúdo original).
+  - `useFormik({ initialValues, validationSchema, onSubmit, enableReinitialize })` → `useZodForm({ schema, defaultValues })` + `useEffect(() => isOpen && reset(defaultValues), [...])`.
+  - `formik.handleChange`/`handleBlur` → `register('name', { onBlur })` (RHF passa o blur custom como segunda opção, evitando o boilerplate Formik).
+  - `formik.errors.x as string` → `errorMessage(errors.x)` (helper que extrai a string do `FieldError`).
+  - `formik.touched.x` → `touchedFields.x`.
+  - `formik.setFieldValue('p', v)` → `setValue('p', v, { shouldValidate: true, shouldTouch: true })`.
+  - `formik.isSubmitting` → `formState.isSubmitting`.
+- Typecheck limpo. Padrão estabelecido para replicar nos restantes 21 ficheiros.
+
+**Estado atual:** Formik em **21 ficheiros**, Yup em **14**, Zod em **5** + 1 helper.
 Motivos:
 - Formik em modo manutenção.
 - RHF: ~50% menos re-renders, bundle menor.
