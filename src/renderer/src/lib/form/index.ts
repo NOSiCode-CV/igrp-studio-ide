@@ -147,6 +147,62 @@ export function toRowFormAdapter<TValues extends FieldValues>(
  */
 type AnyEvent = React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
 
+/**
+ * Mirror an errors tree as a "touched" tree (same shape, every leaf is
+ * `true`). Used to flip touched for submitted forms so the page-level
+ * `errors.x && touched.x` gate fires after a failed submit.
+ */
+function touchedFromErrors(errors: unknown): Record<string, unknown> {
+    const out: Record<string, unknown> = {}
+    if (!errors || typeof errors !== 'object') return out
+    for (const [key, value] of Object.entries(errors as Record<string, unknown>)) {
+        if (!value) continue
+        if (typeof value === 'object' && 'message' in (value as Record<string, unknown>)) {
+            out[key] = true
+        } else if (Array.isArray(value)) {
+            out[key] = value.map((item) => touchedFromErrors(item))
+        } else if (typeof value === 'object') {
+            out[key] = touchedFromErrors(value)
+        }
+    }
+    return out
+}
+
+/**
+ * Deep-merge two arbitrarily nested objects, with `true` wins. Used to
+ * fold the synthetic "touched-from-errors" map into the real touched
+ * state so blurred and submit-driven touches coexist.
+ */
+function deepUnion(a: Record<string, unknown>, b: Record<string, unknown>): Record<string, unknown> {
+    const out: Record<string, unknown> = { ...a }
+    for (const [key, bv] of Object.entries(b)) {
+        const av = a?.[key]
+        if (av === true || bv === true) {
+            out[key] = true
+        } else if (Array.isArray(av) && Array.isArray(bv)) {
+            const maxLen = Math.max(av.length, bv.length)
+            out[key] = Array.from({ length: maxLen }, (_, i) =>
+                deepUnion(
+                    (av[i] as Record<string, unknown>) ?? {},
+                    (bv[i] as Record<string, unknown>) ?? {}
+                )
+            )
+        } else if (
+            av &&
+            bv &&
+            typeof av === 'object' &&
+            typeof bv === 'object' &&
+            !Array.isArray(av) &&
+            !Array.isArray(bv)
+        ) {
+            out[key] = deepUnion(av as Record<string, unknown>, bv as Record<string, unknown>)
+        } else if (bv !== undefined) {
+            out[key] = bv
+        }
+    }
+    return out
+}
+
 function flattenErrorsForFormik(errors: unknown): Record<string, unknown> {
     const out: Record<string, unknown> = {}
     if (!errors || typeof errors !== 'object') return out
@@ -226,7 +282,17 @@ export function useFormikCompat<TValues extends FieldValues>(
     }
     const values = stableValuesRef.current
     const errors = flattenErrorsForFormik(form.formState.errors)
-    const touched = form.formState.touchedFields as Record<string, unknown>
+
+    // Formik's `handleSubmit` marks every field touched before running the
+    // validator so a failed submit immediately renders the error messages.
+    // RHF leaves `touchedFields` alone in that flow, so we union the real
+    // touched bag with a synthetic one derived from `errors` whenever the
+    // form has been submitted at least once. Pages keep their existing
+    // `formik.errors.x && formik.touched.x` gate intact.
+    const realTouched = form.formState.touchedFields as Record<string, unknown>
+    const touched = form.formState.isSubmitted
+        ? deepUnion(realTouched, touchedFromErrors(form.formState.errors))
+        : realTouched
 
     const submit = form.handleSubmit(async (vals) => {
         await onSubmit(vals as TValues)
