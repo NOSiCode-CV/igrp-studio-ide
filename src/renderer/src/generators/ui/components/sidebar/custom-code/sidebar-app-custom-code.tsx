@@ -30,11 +30,11 @@ import AlertIGRPDialogPrimitiveDelete from '@renderer/components/alert-dialog-de
 import { EmptyList } from '@renderer/components/empty-list'
 import MonacoEditor from '@renderer/components/monaco-editor'
 import { PATTERNS } from '@renderer/constants/appConstants'
-import { type FormikProps, useFormik } from 'formik'
+import { useFormikCompat, useZodForm } from '@renderer/lib/form'
 import { ChevronRight, FunctionSquare, Loader, Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
-import { type JSX, useEffect, useRef, useState } from 'react'
+import { type JSX, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import * as Yup from 'yup'
+import { z } from 'zod'
 import { useDroppedComponents } from '../../../contexts/EditorContext'
 import useCustomCode from '../../../hooks/useCustomCode'
 import { ImportComponent } from './custom-code-imports'
@@ -290,59 +290,64 @@ const FncComponent = ({
     const codeRef = useRef<string>('')
     const { t } = useTranslation()
 
-    // Define return type options
-    // Add this validation schema outside your component
-    const functionValidationSchema = Yup.object().shape({
-        name: Yup.string()
-            .required(t('fieldRequired', { name: t('Function name') }))
-            .matches(PATTERNS.SPECIAL_CHARACTERS, t('msgSpecialCharactersRegex')),
-        returnValue: Yup.object().shape({
-            type: Yup.string().required(t('fieldRequired', { name: t('Return type') })),
-            isNullable: Yup.boolean(),
-            isList: Yup.boolean()
-        })
-    })
+    const functionValidationSchema = useMemo(
+        () =>
+            z
+                .object({
+                    name: z
+                        .string()
+                        .min(1, t('fieldRequired', { name: t('Function name') }))
+                        .regex(PATTERNS.SPECIAL_CHARACTERS, t('msgSpecialCharactersRegex')),
+                    returnValue: z
+                        .object({
+                            type: z.string().min(1, t('fieldRequired', { name: t('Return type') })),
+                            isNullable: z.boolean().optional(),
+                            isList: z.boolean().optional()
+                        })
+                        .passthrough()
+                })
+                .passthrough(),
+        [t]
+    )
 
-    const formik: FormikProps<CustomFunctionConfig> = useFormik<CustomFunctionConfig>({
-        enableReinitialize: true,
-        initialValues: {
-            id: '',
-            name: '',
-            code: '',
-            returnValue: {
-                type: 'void',
-                isNullable: false,
-                isList: false
-            },
-            imports: [],
-            arguments: [],
-            isAsync: false,
-            ...funct
+    const defaultFunctionValues = {
+        id: '',
+        name: '',
+        code: '',
+        returnValue: {
+            type: 'void',
+            isNullable: false,
+            isList: false
         },
-        validationSchema: functionValidationSchema,
-        onSubmit: (values, actions) => {
-            try {
-                const fncData: CustomFunctionConfig = {
-                    ...values,
-                    code: codeRef.current,
-                    arguments: values.arguments || []
-                }
-
-                if (fncData.id === '') {
-                    addFunction({
-                        ...fncData,
-                        id: `fnc_${nanoid(6).replace(/-/g, '')}`
-                    })
-                } else {
-                    updateFunction(fncData.id, fncData)
-                }
-
-                setOpen(false)
-            } catch (error) {
-                console.error('Submission failed:', error)
-            } finally {
-                actions.setSubmitting(false)
+        imports: [],
+        arguments: [],
+        isAsync: false,
+        ...funct
+    } as CustomFunctionConfig
+    const rhfForm = useZodForm<CustomFunctionConfig>({
+        schema: functionValidationSchema as never,
+        defaultValues: defaultFunctionValues
+    })
+    const formik = useFormikCompat<CustomFunctionConfig>(rhfForm, (values) => {
+        try {
+            const fncData: CustomFunctionConfig = {
+                ...values,
+                code: codeRef.current,
+                arguments: values.arguments || []
             }
+
+            if (fncData.id === '') {
+                addFunction({
+                    ...fncData,
+                    id: `fnc_${nanoid(6).replace(/-/g, '')}`
+                })
+            } else {
+                updateFunction(fncData.id, fncData)
+            }
+
+            setOpen(false)
+        } catch (error) {
+            console.error('Submission failed:', error)
         }
     })
 

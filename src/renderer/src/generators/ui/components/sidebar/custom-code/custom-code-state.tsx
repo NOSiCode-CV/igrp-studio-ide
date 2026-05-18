@@ -19,11 +19,12 @@ import {
 import { useDroppedComponents } from '@renderer/generators/ui/contexts/EditorContext'
 import useCustomCode from '@renderer/generators/ui/hooks/useCustomCode'
 import { getId } from '@renderer/utils'
-import { type FormikProps, useFormik } from 'formik'
+import { useFormikCompat, useZodForm } from '@renderer/lib/form'
 import { Loader2 } from 'lucide-react'
+import { useMemo } from 'react'
 import type { JSX } from 'react/jsx-runtime'
 import { useTranslation } from 'react-i18next'
-import * as Yup from 'yup'
+import { z } from 'zod'
 import { ImportComponent } from './custom-code-imports'
 
 interface StateComponentProps {
@@ -37,17 +38,24 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps): JSX.Elem
     const { t } = useTranslation()
     const { typesOptions } = useCustomCode()
 
-    const stateValidationSchema = Yup.object().shape({
-        name: Yup.string()
-            .required(t('fieldRequired', { name: t('State name') }))
-            .matches(PATTERNS.SPECIAL_CHARACTERS, t('msgSpecialCharactersRegex')),
-        type: Yup.string().required(t('fieldRequired', { name: t('State type') })),
-        defaultValue: Yup.string()
-    })
+    const stateValidationSchema = useMemo(
+        () =>
+            z
+                .object({
+                    name: z
+                        .string()
+                        .min(1, t('fieldRequired', { name: t('State name') }))
+                        .regex(PATTERNS.SPECIAL_CHARACTERS, t('msgSpecialCharactersRegex')),
+                    type: z.string().min(1, t('fieldRequired', { name: t('State type') })),
+                    defaultValue: z.string().optional()
+                })
+                .passthrough(),
+        [t]
+    )
 
-    const formik: FormikProps<State> = useFormik({
-        enableReinitialize: true,
-        initialValues: state || {
+    const rhfForm = useZodForm<State>({
+        schema: stateValidationSchema as never,
+        defaultValues: (state || {
             id: '',
             name: '',
             type: 'string',
@@ -55,30 +63,27 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps): JSX.Elem
             imports: [],
             isArray: false,
             isOptional: false
-        },
-        validationSchema: stateValidationSchema,
-        onSubmit: (values, actions) => {
-            try {
-                const stateData = {
-                    ...values,
-                    defaultValue: values.defaultValue?.toString()
-                }
-
-                if (stateData.id === '') {
-                    addState({
-                        ...stateData,
-                        id: `state_${nanoid(6).replace(/-/g, '')}`
-                    })
-                } else {
-                    updateState(stateData.id, stateData)
-                }
-
-                setOpen(false)
-            } catch (error) {
-                console.error('Submission failed:', error)
-            } finally {
-                actions.setSubmitting(false)
+        }) as State
+    })
+    const formik = useFormikCompat<State>(rhfForm, (values) => {
+        try {
+            const stateData = {
+                ...values,
+                defaultValue: values.defaultValue?.toString()
             }
+
+            if (stateData.id === '') {
+                addState({
+                    ...stateData,
+                    id: `state_${nanoid(6).replace(/-/g, '')}`
+                })
+            } else {
+                updateState(stateData.id, stateData)
+            }
+
+            setOpen(false)
+        } catch (error) {
+            console.error('Submission failed:', error)
         }
     })
 

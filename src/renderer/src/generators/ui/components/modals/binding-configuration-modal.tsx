@@ -19,7 +19,8 @@ import useStudio from '@renderer/hooks/use-studio'
 import useToast from '@renderer/hooks/useToast'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { capitalize, getId } from '@renderer/utils'
-import { useFormik } from 'formik'
+import { useFormikCompat, useZodForm } from '@renderer/lib/form'
+import { z } from 'zod'
 import { camelCase } from '@renderer/utils'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -109,6 +110,7 @@ const LEGACY_TYPE_MAP: Record<string, { type: string; isList?: boolean }> = {
  */
 function deriveFieldName(child: StructuredComponent): string {
     const tag = child.tag?.trim()
+
     if (tag) return tag
     const label =
         (child.properties?.label as string | undefined)?.trim() ??
@@ -217,33 +219,33 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
         }
     }
 
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues: {
-            componentId,
-            path: '',
-            fields: [],
-            isEnum: false,
-            isMainType: false,
-            definitionType: 'auto' as 'zod-object' | 'json-schema' | 'auto',
-            tags: [] as string[],
-            customInstanceName: '',
-            customInitInstanceName: '',
-            ...compType,
-            // Resolve `name` AFTER the spread so an empty or missing
-            // compType.name does not overwrite the component's tag.
-            // Falls back to the component name (e.g. 'form', 'table')
-            // so the field is never blank when the modal opens.
-            name:
-                (compType?.name && String(compType.name).trim()) ||
-                (tag && String(tag).trim()) ||
-                comp.componentName ||
-                ''
-        },
-        onSubmit: async (values, actions) => {
-            actions.setSubmitting(false)
-
-            if (!validate() || !componentId) return
+    const initialValues: any = {
+        componentId,
+        path: '',
+        fields: [],
+        isEnum: false,
+        isMainType: false,
+        definitionType: 'auto' as 'zod-object' | 'json-schema' | 'auto',
+        tags: [] as string[],
+        customInstanceName: '',
+        customInitInstanceName: '',
+        ...compType,
+        // Resolve `name` AFTER the spread so an empty or missing
+        // compType.name does not overwrite the component's tag.
+        // Falls back to the component name (e.g. 'form', 'table')
+        // so the field is never blank when the modal opens.
+        name:
+            (compType?.name && String(compType.name).trim()) ||
+            (tag && String(tag).trim()) ||
+            comp.componentName ||
+            ''
+    }
+    const rhfForm = useZodForm<any>({
+        schema: z.object({}).passthrough() as never,
+        defaultValues: initialValues
+    })
+    const formik = useFormikCompat<any>(rhfForm, async (values) => {
+        if (!validate() || !componentId) return
 
             const updatedComponent = {
                 ...values,
@@ -331,8 +333,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                 }
             })
 
-            setOpen(false)
-        }
+        setOpen(false)
     })
 
     const isEnum = !!formik.values.isEnum
@@ -351,7 +352,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
           ]
         : [
               { key: 'label', name: t('label'), type: 'label' },
-              { key: 'name', name: t('name'), type: 'string', readonly: !newBinding },
+              { key: 'name', name: t('name'), type: 'text', readonly: !newBinding },
               ...(!newBinding
                   ? [
                         {

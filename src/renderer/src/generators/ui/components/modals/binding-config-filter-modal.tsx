@@ -11,11 +11,12 @@ import {
     IGRPScrollAreaPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { handleChangeValueObject } from '@renderer/generators/api/helpers'
+import { useFormikCompat, useZodForm } from '@renderer/lib/form'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
-import { type FormikProps, useFormik } from 'formik'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { z } from 'zod'
 import BindingFormList from './binding-form-list'
 import { useDroppedComponents } from '../../contexts/EditorContext'
 
@@ -72,37 +73,36 @@ export const BindingConfigurationFilterModal = ({
         }
     ]
 
-    const formik: FormikProps<any> = useFormik({
-        enableReinitialize: true,
-        initialValues: {
-            componentId,
-            name: tag,
-            path: '',
-            fields: [],
-            ...compType
-        },
-        onSubmit: (values, actions) => {
-            actions.setSubmitting(false)
-
-            if (componentId) {
-                values.fields.forEach((field: any) => {
-                    const id = field.componentId
-                    const columnId = field.columnId
-                    const component = componentMap.get(id)
-                    if (component && columnId) {
-                        handleUpdateChildComponent(id, {
-                            ...component,
-                            properties: {
-                                ...component.properties,
-                                columnId
-                            }
-                        })
-                    }
-                })
-            }
-
-            setOpen(false)
+    const defaultValues = {
+        componentId,
+        name: tag,
+        path: '',
+        fields: [] as Array<any>,
+        ...compType
+    }
+    const rhfForm = useZodForm<any>({
+        schema: z.object({}).passthrough() as never,
+        defaultValues
+    })
+    const formik = useFormikCompat<any>(rhfForm, (values) => {
+        if (componentId) {
+            values.fields.forEach((field: any) => {
+                const id = field.componentId
+                const columnId = field.columnId
+                const component = componentMap.get(id)
+                if (component && columnId) {
+                    handleUpdateChildComponent(id, {
+                        ...component,
+                        properties: {
+                            ...component.properties,
+                            columnId
+                        }
+                    })
+                }
+            })
         }
+
+        setOpen(false)
     })
 
     useEffect(() => {

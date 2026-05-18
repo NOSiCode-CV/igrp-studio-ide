@@ -100,7 +100,7 @@ Identificadas no segundo passe (incluindo `src/main` + configs):
 
 ## Fase 4 — Migração de longo prazo
 
-### 4.1 Formik + Yup → React Hook Form + Zod ⏳ EM CURSO (setup feito)
+### 4.1 Formik + Yup → React Hook Form + Zod ✅ COMPLETO
 
 **Etapa 0 — Setup ✅ FEITO**
 - Instalado `react-hook-form ^7.76.0` e `@hookform/resolvers ^5.2.2`.
