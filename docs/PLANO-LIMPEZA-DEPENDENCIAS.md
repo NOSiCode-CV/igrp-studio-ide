@@ -124,7 +124,12 @@ Identificadas no segundo passe (incluindo `src/main` + configs):
   - `formik.isSubmitting` → `formState.isSubmitting`.
 - Typecheck limpo. Padrão estabelecido para replicar nos restantes 21 ficheiros.
 
-**Estado atual:** Formik em **21 ficheiros**, Yup em **14**, Zod em **5** + 1 helper.
+**Etapa 2 — Modais simples ⏳ EM CURSO**
+- [x] [duplicate-page-modal.tsx](src/renderer/src/generators/ui/browser/components/duplicate-page-modal.tsx) — POC
+- [x] [create-page-modal.tsx](src/renderer/src/generators/ui/browser/components/create-page-modal.tsx) — adicionou padrão para `Controller` (checkboxes), `watch()`/`reset()` para auto-derive de paths e auto-args.
+- [x] [create-component-modal.tsx](src/renderer/src/generators/ui/browser/components/create-component-modal.tsx) — adicionou padrão para `setValue` cross-field (combobox que define 3 props) via `reset({ ...getValues(), ... })`.
+
+**Estado atual:** Formik em **19 ficheiros**, Yup em **13**, Zod em **7** + 1 helper.
 Motivos:
 - Formik em modo manutenção.
 - RHF: ~50% menos re-renders, bundle menor.

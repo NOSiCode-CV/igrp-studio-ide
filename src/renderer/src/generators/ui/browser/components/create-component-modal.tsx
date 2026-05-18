@@ -17,17 +17,16 @@ import type { Arguments, ComponentConfig } from '@igrp/igrp-studio-nextjs-engine
 import IconBrowser from '@renderer/components/icon/icon-browser'
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
 import { TextInput } from '@renderer/generators/api/components/inputs-form'
-import { FunctionArguments } from '@renderer/generators/ui/components/sidebar/custom-code/functions-settings'
 import type { PageDefinition } from '@renderer/generators/ui/browser/page-manager'
+import { FunctionArguments } from '@renderer/generators/ui/components/sidebar/custom-code/functions-settings'
 import { RETURN_TYPE_OPTIONS } from '@renderer/generators/ui/utils/contants'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
-import { getId } from '@renderer/utils'
-import { useFormik } from 'formik'
-import { camelCase } from '@renderer/utils'
-import { type FocusEvent, type JSX, useEffect, useState } from 'react'
+import { errorMessage, useZodForm } from '@renderer/lib/form'
+import { camelCase, getId } from '@renderer/utils'
+import { type FocusEvent, type JSX, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import * as Yup from 'yup'
+import { z } from 'zod'
 
 const initialValues: ComponentConfig = {
     type: 'component',
@@ -66,36 +65,49 @@ export function CreateComponentModal({
     lockedPage
 }: CreateComponentModalProps): JSX.Element {
     const { t } = useTranslation()
-
     const { createGitCommit } = useGit()
-
     const { showErrorToast, showSuccessToast } = useToast()
 
     const [arguments_, setArguments] = useState<Arguments[]>([])
     const [formInitialValues, setFormInitialValues] = useState<ComponentConfig>(initialValues)
+
+    // Only description + name are validated; the rest of ComponentConfig
+    // (scope, pagePath, args, icon, …) passes through.
+    const schema = useMemo(
+        () =>
+            z
+                .object({
+                    description: z
+                        .string()
+                        .min(1, t('thisFieldRequired', { name: t('componentTitle') })),
+                    name: z
+                        .string()
+                        .min(1, t('thisFieldRequired', { name: t('name') }))
+                        .regex(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet'))
+                })
+                .passthrough() as unknown as z.ZodType<ComponentConfig, unknown>,
+        [t]
+    )
+
+    const form = useZodForm<ComponentConfig>({
+        schema,
+        defaultValues: formInitialValues
+    })
+    const { register, setValue, watch, reset, handleSubmit, formState, getValues } = form
+    const { errors, touchedFields, isSubmitting } = formState
 
     useEffect(() => {
         const loadCurrentData = async () => {
             if (currentComponent?.path) {
                 try {
                     const currentData = await window.api.getJsonContent(currentComponent.path)
-                    setFormInitialValues({
-                        ...initialValues,
-                        ...currentData
-                    })
+                    setFormInitialValues({ ...initialValues, ...currentData })
                 } catch (error) {
                     console.warn('Failed to load current component data:', error)
-                    // Fallback to currentComponent.content if API call fails
-                    setFormInitialValues({
-                        ...initialValues,
-                        ...currentComponent.content
-                    })
+                    setFormInitialValues({ ...initialValues, ...currentComponent.content })
                 }
             } else if (currentComponent?.content) {
-                setFormInitialValues({
-                    ...initialValues,
-                    ...currentComponent.content
-                })
+                setFormInitialValues({ ...initialValues, ...currentComponent.content })
             } else if (lockedPage) {
                 // Scoped-component flow: pre-fill the page binding so the
                 // user only has to provide the component name & icon.
@@ -114,8 +126,14 @@ export function CreateComponentModal({
     }, [currentComponent, isOpen, lockedPage])
 
     useEffect(() => {
-        formik.resetForm()
-    }, [isOpen])
+        reset(formInitialValues)
+    }, [formInitialValues, reset])
+
+    // Mirror `formik.resetForm()` on close so reopening the dialog starts
+    // clean instead of carrying the last submission state.
+    useEffect(() => {
+        if (!isOpen) reset(initialValues)
+    }, [isOpen, reset])
 
     const handleConfirm = async (pageConfig: ComponentConfig): Promise<void> => {
         try {
@@ -125,54 +143,45 @@ export function CreateComponentModal({
                 basePath
             )
 
-            console.log(pageConfig)
-
             if (error) {
                 showErrorToast(error)
                 return
             }
 
             showSuccessToast(`Component ${pageConfig.name} has been successfully added.`)
-            // commit after creating the page
             createGitCommit(basePath, t('addComponent', { name: pageConfig.name }))
             onConfirm?.()
 
-            formik.resetForm()
+            reset(initialValues)
         } catch (error) {
             console.log(error)
             showErrorToast(error)
         }
     }
 
-    const validationSchema = Yup.object({
-        description: Yup.string().required(t('thisFieldRequired', { name: t('componentTitle') })),
-        name: Yup.string()
-            .required(t('thisFieldRequired', { name: t('name') }))
-            .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet'))
+    const onSubmit = handleSubmit(async (values) => {
+        await handleConfirm(values)
     })
 
-    const formik = useFormik<ComponentConfig>({
-        enableReinitialize: true,
-        initialValues: formInitialValues,
-        validationSchema,
-        onSubmit: (values, actions) => {
-            actions.setSubmitting(false)
-            console.log(values)
-            handleConfirm(values)
+    const descriptionField = register('description', {
+        onBlur: (e: FocusEvent<HTMLInputElement>) => {
+            if (watch('name')) return
+            const generatedName = camelCase(e.target.value)
+            setValue('name', generatedName, { shouldValidate: true, shouldTouch: true })
         }
     })
 
-    const handleDescriptionBlur = async (e: FocusEvent<HTMLInputElement>): Promise<void> => {
-        formik.handleBlur(e)
+    const nameField = register('name')
 
-        if (formik.values.name) return
-        const generatedPath = `${camelCase(e.target.value)}`
-        formik.setFieldValue('name', generatedPath)
-    }
-
+    // Sync the function-arguments side panel into the form values.
     useEffect(() => {
-        formik.setFieldValue('args', arguments_)
-    }, [arguments_])
+        setValue('args' as never, arguments_ as never)
+    }, [arguments_, setValue])
+
+    // Watching the whole form here keeps the generated signature preview in
+    // sync with any field change — equivalent of reading `formik.values`.
+    const values = watch()
+    const args = (values as any).args as Arguments[] | undefined
 
     return (
         <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
@@ -181,23 +190,15 @@ export function CreateComponentModal({
                 <IGRPDialogDescriptionPrimitive>
                     {t('comonDialogtDescription', { name: 'Component' })}
                 </IGRPDialogDescriptionPrimitive>
-                <form
-                    className="needs-validation"
-                    onSubmit={(e) => {
-                        e.preventDefault()
-                        formik.handleSubmit()
-                    }}
-                >
+                <form className="needs-validation" onSubmit={onSubmit}>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col space-y-3">
                             <TextInput
                                 id="description"
                                 label={t('componentTitle')}
-                                onChange={formik.handleChange}
-                                onBlur={handleDescriptionBlur}
-                                value={formik.values.description || ''}
-                                isTouched={formik.touched.description}
-                                error={formik.errors.description}
+                                {...descriptionField}
+                                isTouched={!!touchedFields.description}
+                                error={errorMessage(errors.description as never)}
                                 placeholder="Todo Item"
                                 isRequired
                             />
@@ -205,9 +206,9 @@ export function CreateComponentModal({
                                 id="name"
                                 label={t('componentName')}
                                 className="col-span-3"
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.name || ''}
+                                {...nameField}
+                                isTouched={!!touchedFields.name}
+                                error={errorMessage(errors.name as never)}
                                 placeholder="TodoItem"
                             />
                             <div className="grid grid-cols-1 items-center gap-3">
@@ -224,7 +225,7 @@ export function CreateComponentModal({
                                     <IGRPCombobox
                                         name="pagePath"
                                         className="col-span-3"
-                                        value={formik.values.pagePath || ''}
+                                        value={values.pagePath || ''}
                                         options={pageOptions}
                                         placeholder="Select page"
                                         helperText={t('componentAssociation')}
@@ -233,9 +234,10 @@ export function CreateComponentModal({
                                                 (opt) => opt.value === selectedValue
                                             )
 
-                                            // Update all fields at once to avoid double-click issue
-                                            formik.setValues({
-                                                ...formik.values,
+                                            // Push all three derived fields at once to avoid the
+                                            // double-render Formik used to bridge with `setValues`.
+                                            reset({
+                                                ...getValues(),
                                                 pagePath: selected?.path || undefined,
                                                 pageName: selected?.value || undefined,
                                                 scope: selectedValue ? 'page' : 'app'
@@ -247,9 +249,9 @@ export function CreateComponentModal({
                             <div className="flex-1 overflow-hidden">
                                 <IconBrowser
                                     onSelectedIcon={(icon) => {
-                                        formik.setFieldValue('icon', icon)
+                                        setValue('icon', icon, { shouldDirty: true })
                                     }}
-                                    selectedIcon={formik.values.icon || ''}
+                                    selectedIcon={values.icon || ''}
                                 />
                             </div>
 
@@ -263,7 +265,7 @@ export function CreateComponentModal({
                                     <pre className="p-4 rounded-lg text-sm overflow-x-auto">
                                         <code>
                                             {`export default function  myComponent(`}
-                                            {(formik.values.args || [])
+                                            {(args || [])
                                                 .map((arg, index) => {
                                                     let paramStr = arg.name || `param${index + 1}`
 
@@ -271,12 +273,7 @@ export function CreateComponentModal({
 
                                                     paramStr += ': '
 
-                                                    /*  if (arg.isState) {
-                                                        // Handle state setter
-                                                        paramStr += `(${arg.stateParameterType}: ${arg.stateParameterName}) => void`;
-                                                    } else  */
                                                     if (arg.isFunction) {
-                                                        // Handle regular function
                                                         const params =
                                                             arg?.functionParameters &&
                                                             arg.functionParameters
@@ -287,7 +284,6 @@ export function CreateComponentModal({
                                                                 .join(', ')
                                                         paramStr += `(${params}) => ${arg.type}`
                                                     } else {
-                                                        // Handle regular parameter
                                                         paramStr += arg.type
                                                     }
 
@@ -309,7 +305,7 @@ export function CreateComponentModal({
                                 <IGRPSeparator orientation="vertical" />
                                 <div className="w-full flex-1">
                                     <FunctionArguments
-                                        value={formik.values?.args || []}
+                                        value={args || []}
                                         onChange={setArguments}
                                         returnTypeOptions={RETURN_TYPE_OPTIONS}
                                     />
@@ -323,10 +319,10 @@ export function CreateComponentModal({
                         </IGRPButtonPrimitive>
                         <IGRPButtonPrimitive
                             type="submit"
-                            disabled={formik.isSubmitting}
+                            disabled={isSubmitting}
                             color="primary"
                         >
-                            {formik.isSubmitting ? t('saving') : t('save')}
+                            {isSubmitting ? t('saving') : t('save')}
                         </IGRPButtonPrimitive>
                     </IGRPDialogFooterPrimitive>
                 </form>

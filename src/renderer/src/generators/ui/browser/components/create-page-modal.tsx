@@ -12,12 +12,11 @@ import { CheckboxInput, TextInput } from '@renderer/generators/api/components/in
 import { getDynamicSegments } from '@renderer/generators/ui/components/settings/properties/route-parser'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
-import { getId } from '@renderer/utils'
-import { useFormik } from 'formik'
-import { camelCase } from '@renderer/utils'
-import { type FocusEvent, useEffect, useState } from 'react'
+import { Controller, errorMessage, useZodForm } from '@renderer/lib/form'
+import { camelCase, getId } from '@renderer/utils'
+import { type FocusEvent, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import * as Yup from 'yup'
+import { z } from 'zod'
 import type { PageDefinition } from '../page-manager'
 
 const initialValues: PageConfig = {
@@ -53,13 +52,44 @@ export function CreatePageModal({
     currentComponent
 }: CreatePageModalProps): React.JSX.Element {
     const { t } = useTranslation()
-
     const { createGitCommit } = useGit()
-
     const { showErrorToast, showSuccessToast } = useToast()
 
     const [formInitialValues, setFormInitialValues] = useState<PageConfig>(initialValues)
 
+    // Schema validates the three text fields; the other PageConfig props
+    // (forceDynamic, useClient, args, types, …) pass through untouched.
+    const schema = useMemo(
+        () =>
+            z
+                .object({
+                    description: z
+                        .string()
+                        .min(1, t('thisFieldRequired', { name: t('pageTitle') })),
+                    pageName: z
+                        .string()
+                        .min(1, t('thisFieldRequired', { name: t('pageName') }))
+                        .regex(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet')),
+                    path: z
+                        .string()
+                        .min(1, t('thisFieldRequired', { name: t('path') }))
+                        .regex(
+                            PATTERNS.VALID_SEGMENT_PATTERN,
+                            'Invalid Next.js path format. Examples: /about, /[id], /[[...slug]]'
+                        )
+                })
+                .passthrough() as unknown as z.ZodType<PageConfig, unknown>,
+        [t]
+    )
+
+    const form = useZodForm<PageConfig>({
+        schema,
+        defaultValues: formInitialValues
+    })
+    const { register, setValue, watch, reset, control, handleSubmit, formState } = form
+    const { errors, touchedFields, isSubmitting } = formState
+
+    // Refresh defaultValues when the source page/component changes.
     useEffect(() => {
         const loadCurrentData = async (): Promise<void> => {
             // For sub-page creation, don't pre-fill the form with parent data
@@ -72,23 +102,14 @@ export function CreatePageModal({
             if (currentComponent?.path) {
                 try {
                     const currentData = await window.api.getJsonContent(currentComponent.path)
-                    setFormInitialValues({
-                        ...initialValues,
-                        ...currentData
-                    })
+                    setFormInitialValues({ ...initialValues, ...currentData })
                 } catch (error) {
                     console.warn('Failed to load current data:', error)
                     // Fallback to currentComponent.content if API call fails
-                    setFormInitialValues({
-                        ...initialValues,
-                        ...currentComponent.content
-                    })
+                    setFormInitialValues({ ...initialValues, ...currentComponent.content })
                 }
             } else if (currentComponent?.content) {
-                setFormInitialValues({
-                    ...initialValues,
-                    ...currentComponent.content
-                })
+                setFormInitialValues({ ...initialValues, ...currentComponent.content })
             } else {
                 setFormInitialValues(initialValues)
             }
@@ -107,6 +128,12 @@ export function CreatePageModal({
         }
     }, [isOpen])
 
+    // Push fresh defaults into RHF whenever the source changes
+    // (`enableReinitialize: true` equivalent).
+    useEffect(() => {
+        reset(formInitialValues)
+    }, [formInitialValues, reset])
+
     const handleConfirm = async (pageConfig: PageConfig): Promise<void> => {
         try {
             // Auto-generate args based on path
@@ -123,7 +150,6 @@ export function CreatePageModal({
                     isState: false
                 }))
 
-                // Add args to pageConfig (we'll need to extend the interface)
                 ;(pageConfig as unknown as PageConfig).args = generatedArgs
             }
 
@@ -139,10 +165,8 @@ export function CreatePageModal({
             }
 
             showSuccessToast(`Page ${pageConfig.pageName} has been successfully added.`)
-            // commit after creating the page
             createGitCommit(basePath, `Add page ${pageConfig.pageName}`)
 
-            // Create a PageDefinition object for the newly created page
             const createdPage: PageDefinition = {
                 id: pageConfig.id,
                 type: pageConfig.type as 'page' | 'component',
@@ -158,97 +182,74 @@ export function CreatePageModal({
             }
 
             onConfirm?.(createdPage)
-
-            formik.resetForm()
+            reset(initialValues)
         } catch (error) {
             showErrorToast(error)
         }
     }
 
-    const validationSchema = Yup.object({
-        description: Yup.string().required(t('thisFieldRequired', { name: t('pageTitle') })),
-        pageName: Yup.string()
-            .required(t('thisFieldRequired', { name: t('pageName') }))
-            .matches(PATTERNS.NO_SPACE_AND_HYPHEN, t('msgInfoAccpet')),
+    const onSubmit = handleSubmit(async (values) => {
+        const newValues = isSubPage
+            ? {
+                  ...values,
+                  path: `${currentComponent?.content?.path}/${values.path}`,
+                  parentName: currentComponent?.content?.pageName
+              }
+            : values
 
-        path: Yup.string()
-            .required(t('thisFieldRequired', { name: t('path') }))
-            .matches(
-                PATTERNS.VALID_SEGMENT_PATTERN,
-                'Invalid Next.js path format. Examples: /about, /[id], /[[...slug]]'
-            )
+        newValues.id = newValues.id || getId()
+        await handleConfirm(newValues)
     })
 
-    const formik = useFormik<PageConfig>({
-        enableReinitialize: true,
-        initialValues: formInitialValues,
-        validationSchema,
-        onSubmit: async (values, actions) => {
-            const newValues = isSubPage
-                ? {
-                      ...values,
-                      path: `${currentComponent?.content?.path}/${values.path}`,
-                      parentName: currentComponent?.content?.pageName
-                  }
-                : values
-
-            newValues.id = newValues.id || getId()
-
-            console.log(newValues)
-
-            actions.setSubmitting(false)
-            handleConfirm(newValues)
+    const descriptionField = register('description', {
+        onBlur: (e: FocusEvent<HTMLInputElement>) => {
+            if (watch('pageName')) return
+            const generatedName = camelCase(e.target.value)
+            setValue('pageName', generatedName, { shouldValidate: true, shouldTouch: true })
         }
     })
 
-    const handleNameBlur = async (e: FocusEvent<HTMLInputElement>): Promise<void> => {
-        formik.handleBlur(e)
+    const pageNameField = register('pageName', {
+        onBlur: () => {
+            if (watch('path')) return
+            const generatedPath = watch('pageName').toLowerCase().replace(/\s+/g, '-')
+            setValue('path', generatedPath, { shouldValidate: true, shouldTouch: true })
+        }
+    })
 
-        if (formik.values.path) return
-        const generatedPath = `${formik.values.pageName.toLowerCase().replace(/\s+/g, '-')}`
-        formik.setFieldValue('path', generatedPath)
-    }
+    const pathField = register('path')
 
-    const handleDescriptionBlur = async (e: FocusEvent<HTMLInputElement>): Promise<void> => {
-        formik.handleBlur(e)
-
-        if (formik.values.pageName) return
-        const generatedPath = `${camelCase(e.target.value)}`
-        formik.setFieldValue('pageName', generatedPath)
-    }
-
-    // Auto-generate args when path changes
+    // Auto-generate args when path changes — kept on the renderer side so the
+    // dynamic-segment chips can preview before submit.
+    const watchedPath = watch('path')
     useEffect(() => {
-        const path = formik.values.path
-        if (path) {
-            const dynamicSegments = getDynamicSegments(path)
-            if (dynamicSegments.length > 0) {
-                const generatedArgs = dynamicSegments.map((segment) => ({
-                    id: getId(),
-                    type: 'string', // Default type for dynamic segments
-                    name: segment.name,
-                    isList: false,
-                    isOptional: segment.type === 'optional-catch-all',
-                    isInterface: false,
-                    isFunction: false,
-                    isState: false
-                }))
+        if (!watchedPath) return
+        const dynamicSegments = getDynamicSegments(watchedPath)
+        const currentArgs = (form.getValues() as any).args ?? []
 
-                // Only update if args are different from current ones
-                const currentArgNames = (formik.values as any).args?.map((a: any) => a.name) || []
-                const newArgNames = generatedArgs.map((a) => a.name)
+        if (dynamicSegments.length > 0) {
+            const generatedArgs = dynamicSegments.map((segment) => ({
+                id: getId(),
+                type: 'string',
+                name: segment.name,
+                isList: false,
+                isOptional: segment.type === 'optional-catch-all',
+                isInterface: false,
+                isFunction: false,
+                isState: false
+            }))
 
-                if (JSON.stringify(currentArgNames.sort()) !== JSON.stringify(newArgNames.sort())) {
-                    formik.setFieldValue('args', generatedArgs)
-                }
-            } else {
-                // Clear args if no dynamic segments found
-                if ((formik.values as any).args && (formik.values as any).args.length > 0) {
-                    formik.setFieldValue('args', [])
-                }
+            const currentArgNames = currentArgs.map((a: any) => a.name)
+            const newArgNames = generatedArgs.map((a) => a.name)
+            if (JSON.stringify(currentArgNames.sort()) !== JSON.stringify(newArgNames.sort())) {
+                setValue('args' as never, generatedArgs as never)
             }
+        } else if (currentArgs.length > 0) {
+            setValue('args' as never, [] as never)
         }
-    }, [formik.values.path])
+    }, [watchedPath, setValue, form])
+
+    const args = (watch() as any).args as Array<{ name: string; type: string; isOptional: boolean }> | undefined
 
     return (
         <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
@@ -263,33 +264,23 @@ export function CreatePageModal({
                 <IGRPDialogDescriptionPrimitive>
                     {t('comonDialogtDescription', { name: 'Page' })}
                 </IGRPDialogDescriptionPrimitive>
-                <form
-                    className="needs-validation space-y-4"
-                    onSubmit={(e) => {
-                        e.preventDefault()
-                        formik.handleSubmit()
-                    }}
-                >
+                <form className="needs-validation space-y-4" onSubmit={onSubmit}>
                     <div className="grid grid-cols-1 gap-4">
                         <TextInput
                             id="description"
                             label={t('pageTitle')}
-                            onChange={formik.handleChange}
-                            onBlur={handleDescriptionBlur}
-                            value={formik.values.description || ''}
-                            isTouched={formik.touched.description}
-                            error={formik.errors.description}
+                            {...descriptionField}
+                            isTouched={!!touchedFields.description}
+                            error={errorMessage(errors.description as never)}
                             placeholder="Todo List"
                             isRequired
                         />
                         <TextInput
                             id="pageName"
                             label={t('pageName')}
-                            onChange={formik.handleChange}
-                            onBlur={handleNameBlur}
-                            value={formik.values.pageName || ''}
-                            isTouched={formik.touched.pageName}
-                            error={formik.errors.pageName}
+                            {...pageNameField}
+                            isTouched={!!touchedFields.pageName}
+                            error={errorMessage(errors.pageName as never)}
                             placeholder="TodoList"
                             isRequired
                         />
@@ -297,22 +288,20 @@ export function CreatePageModal({
                             id="path"
                             label="Path"
                             placeholder="e.g. docs/[[...slug]] or /(auth)/todo-list"
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            value={formik.values.path || ''}
-                            isTouched={formik.touched.path}
-                            error={formik.errors.path}
+                            {...pathField}
+                            isTouched={!!touchedFields.path}
+                            error={errorMessage(errors.path as never)}
                             isRequired
                         />
 
                         {/* Show generated dynamic args */}
-                        {(formik.values as any).args && (formik.values as any).args.length > 0 && (
+                        {args && args.length > 0 && (
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-foreground">
                                     Dynamic Arguments (Auto-generated)
                                 </label>
                                 <div className="flex flex-wrap gap-2 p-3 bg-muted rounded-lg">
-                                    {(formik.values as any).args.map((arg: any, index: number) => (
+                                    {args.map((arg, index) => (
                                         <div
                                             key={index}
                                             className="px-2 py-1 bg-primary/10 text-primary text-xs rounded border"
@@ -330,19 +319,31 @@ export function CreatePageModal({
                         )}
 
                         <div className="flex justify-start gap-2">
-                            <CheckboxInput
-                                id="forceDynamic"
-                                label={t('forceDynamic')}
-                                onChange={formik.handleChange}
-                                value={formik.values.forceDynamic}
+                            <Controller
+                                control={control}
+                                name={'forceDynamic' as never}
+                                render={({ field }) => (
+                                    <CheckboxInput
+                                        id="forceDynamic"
+                                        label={t('forceDynamic')}
+                                        value={!!field.value}
+                                        onChange={field.onChange}
+                                    />
+                                )}
                             />
 
-                            <CheckboxInput
-                                id="useClient"
-                                label={t('useClient')}
-                                onChange={formik.handleChange}
-                                value={formik.values.useClient}
-                                info={t('useClientInfo')}
+                            <Controller
+                                control={control}
+                                name={'useClient' as never}
+                                render={({ field }) => (
+                                    <CheckboxInput
+                                        id="useClient"
+                                        label={t('useClient')}
+                                        value={!!field.value}
+                                        onChange={field.onChange}
+                                        info={t('useClientInfo')}
+                                    />
+                                )}
                             />
                         </div>
                     </div>
@@ -352,10 +353,10 @@ export function CreatePageModal({
                         </IGRPButtonPrimitive>
                         <IGRPButtonPrimitive
                             type="submit"
-                            disabled={formik.isSubmitting}
+                            disabled={isSubmitting}
                             color="primary"
                         >
-                            {formik.isSubmitting ? t('saving') : t('save')}
+                            {isSubmitting ? t('saving') : t('save')}
                         </IGRPButtonPrimitive>
                     </IGRPDialogFooterPrimitive>
                 </form>
