@@ -98,6 +98,32 @@ export function isTouched<TValues extends FieldValues>(
 }
 
 /**
+ * Adapt an RHF form so legacy helpers and sub-components written against
+ * Formik (and typed against `{ values, setFieldValue }`) keep working. The
+ * adapter watches the form to materialise `.values`, and routes
+ * `.setFieldValue(name, value)` through `setValue(..., { shouldValidate, shouldDirty, shouldTouch })`.
+ *
+ * Use this anywhere phase 4.1 hasn't (yet) refactored a helper or
+ * downstream component out of the Formik-shaped interface — typically
+ * `api/helpers/index.ts` (addNewRow/removeRow/changeValue/handleChangeValueObject)
+ * and `BindingFormList`.
+ */
+export function toRowFormAdapter<TValues extends FieldValues>(
+    form: UseFormReturn<TValues>
+): { values: TValues; setFieldValue: (field: string, value: unknown) => void } {
+    return {
+        values: form.watch() as TValues,
+        setFieldValue: (field, value) => {
+            form.setValue(field as never, value as never, {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true
+            })
+        }
+    }
+}
+
+/**
  * Re-export the common types so feature modules can import everything from
  * `@renderer/lib/form` instead of mixing `react-hook-form` imports.
  */
