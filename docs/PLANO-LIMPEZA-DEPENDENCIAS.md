@@ -124,12 +124,58 @@ Identificadas no segundo passe (incluindo `src/main` + configs):
   - `formik.isSubmitting` → `formState.isSubmitting`.
 - Typecheck limpo. Padrão estabelecido para replicar nos restantes 21 ficheiros.
 
-**Etapa 2 — Modais simples ⏳ EM CURSO**
+**Etapa 2 — Modais simples ✅ FEITO**
 - [x] [duplicate-page-modal.tsx](src/renderer/src/generators/ui/browser/components/duplicate-page-modal.tsx) — POC
-- [x] [create-page-modal.tsx](src/renderer/src/generators/ui/browser/components/create-page-modal.tsx) — adicionou padrão para `Controller` (checkboxes), `watch()`/`reset()` para auto-derive de paths e auto-args.
-- [x] [create-component-modal.tsx](src/renderer/src/generators/ui/browser/components/create-component-modal.tsx) — adicionou padrão para `setValue` cross-field (combobox que define 3 props) via `reset({ ...getValues(), ... })`.
+- [x] [create-page-modal.tsx](src/renderer/src/generators/ui/browser/components/create-page-modal.tsx) — padrão `Controller` (checkboxes), `watch()`/`setValue` para auto-derive de paths e auto-args.
+- [x] [create-component-modal.tsx](src/renderer/src/generators/ui/browser/components/create-component-modal.tsx) — padrão `setValue` cross-field via `reset({ ...getValues(), ... })`.
 
-**Estado atual:** Formik em **19 ficheiros**, Yup em **13**, Zod em **7** + 1 helper.
+**Etapa 3a — Diálogos API ✅ FEITO**
+- [x] [create-module-dialog.tsx](src/renderer/src/generators/api/components/create-module-dialog.tsx) — sync com `IGRPInputPrimitive` raw (não usa `TextInput`).
+- [x] [create-endpoint-dialog.tsx](src/renderer/src/generators/api/pages/controller/create-endpoint-dialog.tsx) — sync de prop externa via `useEffect(() => setValue(...), [prop])`.
+
+**Etapa 3b — Hooks API ⛔ BLOQUEADO (precisa PRs maiores)**
+
+Os hooks abaixo **devolvem o objeto `formik` inteiro** ao chamador (página `index.tsx`), que o usa por toda a UI:
+
+| Hook | Páginas consumidoras |
+|---|---|
+| `useDto` | `generators/api/pages/dto/index.tsx` |
+| `useEnum` | `generators/api/pages/enum/index.tsx` |
+| `useResponse` | `generators/api/pages/response/index.tsx` |
+| `useModel` | `generators/api/pages/model/index.tsx` |
+| `useController` | `generators/api/pages/controller/index.tsx` |
+| `useGraphQLOperation` | `generators/api/pages/graphql/operation-editor.tsx` |
+
+Cada migração tem de ser feita **com a página acoplada** — não dá para migrar só o hook. Ficheiros associados:
+- 6 ficheiros `validation.ts` (Yup → Zod, simples)
+- 6 hooks + 6 páginas (refactor médio cada)
+
+**Etapa 4 — Custom code + binding-config-filter ⛔ BLOQUEADO**
+
+Todos os modais nesta família passam `formik` para sub-componentes ou helpers que o tipam:
+- [api/helpers/index.ts](src/renderer/src/generators/api/helpers/index.ts) — funções `addNewRow`, `removeRow`, `changeValue`, `handleChangeValueObject` recebem `FormikValues`.
+- `BindingFormList` — recebe `formik: FormikProps<any>`.
+- `binding-config-filter-modal.tsx`, `custom-code-state.tsx`, `sidebar-app-custom-code.tsx`, `binding-configuration-modal.tsx` — passam formik para baixo.
+
+A migração tem de incluir os helpers e `BindingFormList` no mesmo PR.
+
+**Etapa 5 — Forms grandes ⛔ BLOQUEADO**
+- `project-form.tsx` ↔ `dotnet-config.tsx` (recebe `FormikErrors<ProjectData>` por prop) — migração acoplada.
+- `edit-project-modal.tsx`, `ConnectionForm.tsx` — possivelmente autónomos (auditar antes de iniciar).
+- `binding-configuration-modal.tsx` — depende dos helpers da etapa 4.
+
+**Estado atual:** Formik em **17 ficheiros**, Yup em **11**, Zod em **9** + 1 helper.
+
+### Caminho proposto para concluir 4.1
+
+PRs sugeridos para a equipa abrir, por ordem de dependência:
+
+1. **PR 4.1-A: helpers + BindingFormList** — refactorar `api/helpers/index.ts` e `BindingFormList` para receberem um shape genérico (`{ values, setValue }`) em vez de `FormikValues`. Desbloqueia etapas 4 e parte de 5.
+2. **PR 4.1-B: edit-project-modal + ConnectionForm** — autónomos, podem avançar em paralelo.
+3. **PR 4.1-C: dotnet-config + project-form** — par acoplado.
+4. **PR 4.1-D: cada hook + sua página** — 6 PRs paralelos (`useDto`, `useEnum`, …), 1 por feature.
+5. **PR 4.1-E: binding-configuration-modal** — depois do PR-A.
+6. **PR 4.1-F: cleanup** — remover `formik` e `yup` do `package.json` quando `grep` der zero.
 Motivos:
 - Formik em modo manutenção.
 - RHF: ~50% menos re-renders, bundle menor.
