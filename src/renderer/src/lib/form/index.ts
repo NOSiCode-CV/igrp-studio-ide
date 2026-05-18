@@ -124,6 +124,184 @@ export function toRowFormAdapter<TValues extends FieldValues>(
 }
 
 /**
+ * Compatibility wrapper that exposes the legacy Formik-shaped surface on
+ * top of a React Hook Form instance. Used during phase 4.1 of the cleanup
+ * so the API hooks (useDto, useEnum, useResponse, useModel, useController,
+ * useGraphQLOperation) can switch their internals to RHF without forcing
+ * their consuming pages — which still read `formik.values`,
+ * `formik.errors`, `formik.touched`, `formik.handleSubmit`, etc. — to
+ * change at the same time.
+ *
+ * What we cover:
+ *   - `values` / `touched` / `errors` / `isSubmitting` reads
+ *   - `setFieldValue(field, value)` writes
+ *   - `setValues(values)` (mapped to `reset`)
+ *   - `resetForm(opts?)`
+ *   - `handleSubmit` exposed as a React event handler
+ *   - `handleChange` / `handleBlur` for raw `<input name="...">` bindings
+ *   - `validateForm()` (mapped to `trigger()`)
+ *
+ * Errors are flattened from RHF's `{ field: { message } }` structure into
+ * Formik's `{ field: string }` so the existing pages keep working.
+ */
+type AnyEvent = React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+
+function flattenErrorsForFormik(errors: unknown): Record<string, unknown> {
+    const out: Record<string, unknown> = {}
+    if (!errors || typeof errors !== 'object') return out
+    for (const [key, value] of Object.entries(errors as Record<string, unknown>)) {
+        if (!value) continue
+        if (typeof value === 'object' && 'message' in (value as Record<string, unknown>)) {
+            const msg = (value as { message?: unknown }).message
+            if (typeof msg === 'string') out[key] = msg
+            else out[key] = flattenErrorsForFormik(value)
+        } else if (Array.isArray(value)) {
+            out[key] = value.map((item) => flattenErrorsForFormik(item))
+        } else if (typeof value === 'object') {
+            out[key] = flattenErrorsForFormik(value)
+        }
+    }
+    return out
+}
+
+// Loosely typed Formik-shaped surface. Keeping `errors`, `touched` and
+// `handleBlur` as `any` mirrors Formik's runtime behaviour (`errors.name`
+// can be a string or a nested object; handleBlur accepts a DOM event OR a
+// bare value) without forcing each caller to discriminate.
+// biome-ignore lint/suspicious/noExplicitAny: see above
+export type FormikCompatErrors = any
+// biome-ignore lint/suspicious/noExplicitAny: see above
+export type FormikCompatTouched = any
+export interface FormikCompat<TValues> {
+    values: TValues
+    errors: FormikCompatErrors
+    touched: FormikCompatTouched
+    isSubmitting: boolean
+    isValid: boolean
+    setFieldValue: (field: string, value: unknown) => void
+    setValues: (values: Partial<TValues>) => void
+    resetForm: (opts?: { values?: Partial<TValues> }) => void
+    handleChange: (e: AnyEvent) => void
+    // biome-ignore lint/suspicious/noExplicitAny: see above
+    handleBlur: any
+    handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>
+    validateForm: () => Promise<Record<string, unknown>>
+    /**
+     * Manually mark fields as touched. Mirrors Formik's `setTouched` —
+     * accepts the touched shape that `buildGraphQLOperationTouched` (and
+     * similar helpers) emit. We don't try to recurse into nested arrays
+     * here; the compat is best-effort for the migration window.
+     */
+    setTouched: (touched: Record<string, unknown>, shouldValidate?: boolean) => Promise<void>
+    /**
+     * Inject errors from a custom validator (e.g. the GraphQL operation
+     * validator) so they surface through `errors.*` exactly like the Yup
+     * pipeline did.
+     */
+    setErrors: (errors: Record<string, unknown>) => void
+}
+
+export function useFormikCompat<TValues extends FieldValues>(
+    form: UseFormReturn<TValues>,
+    onSubmit: (values: TValues) => void | Promise<void>
+): FormikCompat<TValues> {
+    const values = form.watch() as TValues
+    const errors = flattenErrorsForFormik(form.formState.errors)
+    const touched = form.formState.touchedFields as Record<string, unknown>
+
+    const submit = form.handleSubmit(async (vals) => {
+        await onSubmit(vals as TValues)
+    })
+
+    return {
+        values,
+        errors,
+        touched,
+        isSubmitting: form.formState.isSubmitting,
+        isValid: form.formState.isValid,
+        setFieldValue: (field, value) => {
+            form.setValue(field as never, value as never, {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true
+            })
+        },
+        setValues: (vals) => {
+            form.reset({ ...form.getValues(), ...(vals as object) } as TValues)
+        },
+        resetForm: (opts) => {
+            form.reset((opts?.values ?? undefined) as TValues | undefined)
+        },
+        handleChange: (e) => {
+            const target = e.target as HTMLInputElement
+            const name = target.name
+            if (!name) return
+            const raw: unknown =
+                target.type === 'checkbox'
+                    ? (target as HTMLInputElement).checked
+                    : target.type === 'number'
+                      ? Number(target.value)
+                      : target.value
+            form.setValue(name as never, raw as never, {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true
+            })
+        },
+        handleBlur: (e) => {
+            const name = (e.target as HTMLInputElement).name
+            if (!name) return
+            form.trigger(name as never)
+        },
+        handleSubmit: submit,
+        validateForm: async () => {
+            await form.trigger()
+            return flattenErrorsForFormik(form.formState.errors)
+        },
+        setTouched: async (touched, shouldValidate) => {
+            // RHF lacks a direct "set touched" hook, so we mark every keyed
+            // field as touched by re-setting its current value with the
+            // `shouldTouch: true` flag. Best-effort for nested arrays.
+            const visit = (prefix: string, node: unknown): void => {
+                if (!node || typeof node !== 'object') return
+                for (const [k, v] of Object.entries(node as Record<string, unknown>)) {
+                    const path = prefix ? `${prefix}.${k}` : k
+                    if (v === true) {
+                        const current = form.getValues(path as never)
+                        form.setValue(path as never, current as never, {
+                            shouldTouch: true,
+                            shouldDirty: false
+                        })
+                    } else if (Array.isArray(v)) {
+                        v.forEach((item, idx) => visit(`${path}.${idx}`, item))
+                    } else if (typeof v === 'object') {
+                        visit(path, v)
+                    }
+                }
+            }
+            visit('', touched)
+            if (shouldValidate) await form.trigger()
+        },
+        setErrors: (errors) => {
+            const visit = (prefix: string, node: unknown): void => {
+                if (!node || typeof node !== 'object') return
+                for (const [k, v] of Object.entries(node as Record<string, unknown>)) {
+                    const path = prefix ? `${prefix}.${k}` : k
+                    if (typeof v === 'string') {
+                        form.setError(path as never, { type: 'manual', message: v })
+                    } else if (Array.isArray(v)) {
+                        v.forEach((item, idx) => visit(`${path}.${idx}`, item))
+                    } else if (typeof v === 'object') {
+                        visit(path, v)
+                    }
+                }
+            }
+            visit('', errors)
+        }
+    }
+}
+
+/**
  * Re-export the common types so feature modules can import everything from
  * `@renderer/lib/form` instead of mixing `react-hook-form` imports.
  */

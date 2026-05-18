@@ -1,24 +1,32 @@
 import { PATTERNS } from '@renderer/constants/appConstants'
-import * as Yup from 'yup'
+import { z } from 'zod'
 
 export function useModelValidation({ t }: { t: any }) {
-    const validationSchema = Yup.object({
-        name: Yup.string()
-            .required('Name is required')
-            .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
-            .max(30, t('maxLengthExceeded', { max: 30 })),
-        tableName: Yup.string().required('Table name is required'),
-        attributes: Yup.array().of(
-            Yup.object().shape({
-                name: Yup.string().required('Name is required'),
-                type: Yup.string().required('Type is required')
-            })
-        ),
-        indexes: Yup.array().of(Yup.object().shape({})),
-        contraint: Yup.object().shape({
-            compoundUnique: Yup.array().of(Yup.object().shape({}))
+    return z
+        .object({
+            name: z
+                .string()
+                .min(1, 'Name is required')
+                .regex(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
+                .max(30, t('maxLengthExceeded', { max: 30 })),
+            tableName: z.string().min(1, 'Table name is required'),
+            attributes: z
+                .array(
+                    z
+                        .object({
+                            name: z.string().min(1, 'Name is required'),
+                            type: z.string().min(1, 'Type is required')
+                        })
+                        .passthrough()
+                )
+                .default([]),
+            indexes: z.array(z.object({}).passthrough()).default([]),
+            contraint: z
+                .object({
+                    compoundUnique: z.array(z.object({}).passthrough()).default([])
+                })
+                .passthrough()
+                .optional()
         })
-    })
-
-    return validationSchema
+        .passthrough()
 }
