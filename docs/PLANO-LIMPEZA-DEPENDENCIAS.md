@@ -84,10 +84,11 @@ Identificadas no segundo passe (incluindo `src/main` + configs):
 - `--env-file` do Node não passa via `electron-vite dev`; `process.loadEnvFile()` é experimental no Node 20.
 - `dotenv` é ~5kb, estável. **Manter.**
 
-### 3.4 `html-to-docx` → `docx` ⏳ ADIADO (alto esforço)
-- Único uso em [spec-doc-export-service.ts](src/main/services/spec-doc-export-service.ts).
-- `docx` exige construir o documento programaticamente (perde-se o pipeline `markdown → HTML → docx`).
-- Reescrita significativa (~1-2 dias). PR dedicado.
+### 3.4 `html-to-docx` → `docx` ✅ FEITO
+- Substituído por `docx ^9.6.1` (mantido ativamente).
+- Pipeline reescrito em [markdown-to-docx.ts](src/main/services/markdown-to-docx.ts): walker do token-stream de `markdown-it` que mapeia headings, parágrafos, listas, código (fenced + inline), blockquotes, GFM tables, links e HRs para `Paragraph`/`Table`/`TextRun`/`ExternalHyperlink` nativos.
+- [spec-doc-export-service.ts](src/main/services/spec-doc-export-service.ts) `exportDocx` agora usa `Packer.toBuffer(doc)` direto, sem HTML intermediário.
+- Remove `html-to-docx` (sem manutenção) e o seu pipeline de normalização Buffer/Blob/ArrayBuffer.
 
 ### 3.5 `lodash-es` → utilities locais ✅ WORKING TREE
 - [x] Identificado: 4 ficheiros, todos importam apenas `camelCase`.
@@ -131,7 +132,7 @@ Estratégia:
 | 3.1 | ⏳ working tree (incompleto) | `reactflow` → `@xyflow/react` |
 | 3.2 | ❌ adiado (ligado a 2.2) | 0 |
 | 3.3 | ❌ não compensa | 0 |
-| 3.4 | ⏳ adiado | -1 quando feito |
+| 3.4 | ✅ feito | -1 dep (`html-to-docx`), +1 dep (`docx`, manutenção ativa) |
 | 3.5 | ⏳ working tree | -1 dep + 1 devDep (`lodash-es`, `@types/lodash-es`) |
 | 4.1 | ⏳ futuro longo | -2 deps eventuais |
 

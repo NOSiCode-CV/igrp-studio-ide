@@ -4,8 +4,10 @@
  *  - PDF: render markdown → HTML → load into a hidden BrowserWindow →
  *    `webContents.printToPDF()`. No extra dependency on the renderer side and
  *    fidelity is good (CSS works, GFM renders).
- *  - DOCX: same HTML pipeline → `html-to-docx` produces a buffer we drop on
- *    disk. Works with the same styled HTML, so PDF and Word stay close.
+ *  - DOCX: walk the `markdown-it` token stream and build a native `docx`
+ *    document (`Packer.toBuffer`). No HTML intermediate, no external
+ *    converter — keeps the dependency surface small and lets us style
+ *    headings, code blocks and tables the way Word expects.
  *
  * The renderer never sees the export details — it just calls IPC with a
  * target path picked via `dialog.showSaveDialog`.
@@ -13,7 +15,8 @@
 import { promises as fsp } from 'node:fs'
 import { BrowserWindow } from 'electron'
 import MarkdownIt from 'markdown-it'
-import HtmlToDocx from 'html-to-docx'
+import { Document, Packer } from 'docx'
+import { markdownToDocxBlocks, metaLine, titleHeading } from './markdown-to-docx'
 import { specDocService } from './spec-doc-service'
 
 const md = new MarkdownIt({
@@ -52,24 +55,31 @@ class SpecDocExportService {
     }
 
     async exportDocx({ basePath, docId, targetPath }: ExportInput): Promise<void> {
-        const html = await this.renderHtml(basePath, docId)
-        const buffer = (await HtmlToDocx(html, undefined, {
-            table: { row: { cantSplit: true } },
-            footer: false,
-            pageNumber: false
-        })) as Buffer | Blob | ArrayBuffer
+        const result = await specDocService.read(basePath, docId)
+        if (!result) throw new Error(`Document ${docId} not found`)
+        const { node, content } = result
+        const title = node.name.replace(/\.md$/i, '')
+        const meta = `Exported from IGRP Studio · ${new Date().toLocaleString()}`
 
-        // html-to-docx returns Buffer in Node, Blob in browser, ArrayBuffer in
-        // some bundlers. Normalise to a Node Buffer before writing.
-        let outBuffer: Buffer
-        if (Buffer.isBuffer(buffer)) outBuffer = buffer
-        else if (buffer instanceof ArrayBuffer) outBuffer = Buffer.from(buffer)
-        else if (typeof (buffer as Blob).arrayBuffer === 'function') {
-            outBuffer = Buffer.from(await (buffer as Blob).arrayBuffer())
-        } else {
-            throw new Error('Unexpected return type from html-to-docx')
-        }
-        await fsp.writeFile(targetPath, outBuffer)
+        const doc = new Document({
+            creator: 'IGRP Studio',
+            title,
+            styles: {
+                default: {
+                    document: {
+                        run: { font: 'Calibri', size: 22 }
+                    }
+                }
+            },
+            sections: [
+                {
+                    children: [titleHeading(title), metaLine(meta), ...markdownToDocxBlocks(content || '')]
+                }
+            ]
+        })
+
+        const buffer = await Packer.toBuffer(doc)
+        await fsp.writeFile(targetPath, buffer)
     }
 
     /**
