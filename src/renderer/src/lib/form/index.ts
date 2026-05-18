@@ -239,10 +239,17 @@ export function useFormikCompat<TValues extends FieldValues>(
         isSubmitting: form.formState.isSubmitting,
         isValid: form.formState.isValid,
         setFieldValue: (field, value) => {
+            // Formik's `setFieldValue` validates by default but never marks
+            // the field touched — touched is only flipped via `handleBlur`
+            // or an explicit `setTouched`. Mirror that so programmatic
+            // population (e.g. `formik.setFieldValue('attributes', data)`
+            // inside a useEffect when loading the persisted model) doesn't
+            // light up "field is required" messages before the user has
+            // even interacted with the form.
             form.setValue(field as never, value as never, {
                 shouldValidate: true,
                 shouldDirty: true,
-                shouldTouch: true
+                shouldTouch: false
             })
         },
         setValues: (vals) => {
@@ -259,18 +266,27 @@ export function useFormikCompat<TValues extends FieldValues>(
                 target.type === 'checkbox'
                     ? (target as HTMLInputElement).checked
                     : target.type === 'number'
-                      ? Number(target.value)
-                      : target.value
+                        ? Number(target.value)
+                        : target.value
+            // Same rationale as `setFieldValue`: Formik leaves `touched`
+            // alone on change; the blur handler is what flips it.
             form.setValue(name as never, raw as never, {
                 shouldValidate: true,
                 shouldDirty: true,
-                shouldTouch: true
+                shouldTouch: false
             })
         },
         handleBlur: (e) => {
             const name = (e.target as HTMLInputElement).name
             if (!name) return
-            form.trigger(name as never)
+            // Mark touched (so the page's `formik.touched.field && formik.errors.field`
+            // gate flips on) and then revalidate the field.
+            const current = form.getValues(name as never)
+            form.setValue(name as never, current as never, {
+                shouldTouch: true,
+                shouldDirty: false,
+                shouldValidate: true
+            })
         },
         handleSubmit: submit,
         validateForm: async () => {
