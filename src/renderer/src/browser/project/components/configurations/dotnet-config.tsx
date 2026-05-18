@@ -11,13 +11,18 @@ import {
 } from '@igrp/igrp-framework-react-design-system'
 import { LabelRequired } from '@renderer/components/label-required'
 import { DatabaseOptions } from '@renderer/constants/appConstants'
-import type { FormikErrors } from 'formik'
 import { useTranslation } from 'react-i18next'
-import type { DotNetConfigData, ProjectData } from 'src/main/types'
+import type { DotNetConfigData } from 'src/main/types'
 
 interface DotNetConfigProps {
     data: DotNetConfigData
-    errors?: FormikErrors<ProjectData>
+    /**
+     * Flattened error bag passed from the parent wizard. The shape matches
+     * what the sibling configs (next/spring/specification) already read:
+     * `errors.config.<field>` is a string. The parent translates the
+     * RHF error object into this shape before handing it down.
+     */
+    errors?: { config?: Record<string, string | undefined> }
     onChange: (data: DotNetConfigData) => void
 }
 
