@@ -326,8 +326,12 @@ export function useFormikCompat<TValues extends FieldValues>(
         },
         handleChange: (e) => {
             const target = e.target as HTMLInputElement
-            const name = target.name
-            if (!name) return
+            // Match Formik's fallback chain: `name` first, then `id`. Many of
+            // the shared inputs (TextInput in particular) only forward `id`
+            // to the underlying primitive, so without this fallback every
+            // such field becomes read-only under the compat shim.
+            const fieldName = target.name || target.id
+            if (!fieldName) return
             const raw: unknown =
                 target.type === 'checkbox'
                     ? (target as HTMLInputElement).checked
@@ -336,19 +340,20 @@ export function useFormikCompat<TValues extends FieldValues>(
                         : target.value
             // Same rationale as `setFieldValue`: Formik leaves `touched`
             // alone on change; the blur handler is what flips it.
-            form.setValue(name as never, raw as never, {
+            form.setValue(fieldName as never, raw as never, {
                 shouldValidate: true,
                 shouldDirty: true,
                 shouldTouch: false
             })
         },
         handleBlur: (e) => {
-            const name = (e.target as HTMLInputElement).name
-            if (!name) return
+            const target = e.target as HTMLInputElement
+            const fieldName = target.name || target.id
+            if (!fieldName) return
             // Mark touched (so the page's `formik.touched.field && formik.errors.field`
             // gate flips on) and then revalidate the field.
-            const current = form.getValues(name as never)
-            form.setValue(name as never, current as never, {
+            const current = form.getValues(fieldName as never)
+            form.setValue(fieldName as never, current as never, {
                 shouldTouch: true,
                 shouldDirty: false,
                 shouldValidate: true
