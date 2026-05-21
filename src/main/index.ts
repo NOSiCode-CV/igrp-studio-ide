@@ -43,6 +43,7 @@ import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
 import dotenv from 'dotenv'
 import { autoUpdater } from 'electron-updater'
 import { mainBindings } from 'i18next-electron-fs-backend'
+import { DotNetEngine } from './engines/DotNetEngine'
 import { NextjsEngine } from './engines/NextjsEngine'
 import { SpringEngine } from './engines/SpringEngine'
 import AppUpdater, { applyUpdateChannelConfig } from './helpers/electron-updater'
@@ -250,6 +251,8 @@ app.whenReady().then(async () => {
     new NextjsEngine().registry()
 
     new SpringEngine().registry()
+
+    new DotNetEngine().registry()
 
     new WorkspaceRepository().initialize()
 

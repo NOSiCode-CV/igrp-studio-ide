@@ -8,6 +8,7 @@ import {
     addResponse,
     serializeElement as createElement,
     deleteElement,
+    engineTypes as springEngineTypes,
     getSpringDependencies,
     loadEngineConfiguration,
     newApi,
@@ -122,5 +123,9 @@ export class SpringEngine implements BaseEngine {
         })
 
         loadEngineConfiguration()
+    }
+
+    async engineTypes(module: string, basePath: string): Promise<any> {
+        return await springEngineTypes(module, basePath)
     }
 }

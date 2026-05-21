@@ -97,6 +97,14 @@ export interface BaseEngine {
     serializeElement?: (data: any, basePath: string) => Promise<void>
     createPermission?: (data: any, basePath: string) => Promise<void>
 
+    /**
+     * Fetch the engine-specific selector universe (type names, MIME types,
+     * HTTP methods, etc.) for the generators API UI. Originally exposed only
+     * by the Spring engine; now part of the BaseEngine surface so callers
+     * route via `EngineFactory.getEngine(framework).engineTypes(...)`.
+     */
+    engineTypes?: (module: string, basePath: string) => Promise<any>
+
     createPage?(pageConfig: PageConfig, basePath: string): Promise<void>
 
     registry?(): Promise<void>
