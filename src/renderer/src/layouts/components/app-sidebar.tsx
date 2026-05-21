@@ -17,7 +17,7 @@ import {
     SidebarMenuSub,
     SidebarTrigger
 } from '@renderer/components/ui/sidebar'
-import { useIGRPSidebar } from '@igrp/igrp-framework-react-design-system'
+import { useSidebar } from '@renderer/components/ui/sidebar'
 import FileExplorerIGRPSidebar from '@renderer/components/fileExplorer'
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits'
 import { cn } from '@renderer/lib/utils'
@@ -47,8 +47,8 @@ export function AppIGRPSidebar({
     header
 }: AppIGRPSidebarProps): React.ReactNode {
     const { t } = useTranslation()
-    const { setOpen } = useIGRPSidebar()
-    const { state: sidebarState } = useIGRPSidebar()
+    const { setOpen } = useSidebar()
+    const { state: sidebarState } = useSidebar()
     const [searchQuery, setSearchQuery] = useState('')
     const [activeItem, setActiveItem] = useState('')
 
