@@ -1,16 +1,16 @@
+import { Button } from '@renderer/components/ui/button'
+import { Checkbox } from '@renderer/components/ui/checkbox'
 import {
-    IGRPButtonPrimitive,
-    IGRPCheckboxPrimitive,
-    IGRPCombobox,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPLabelPrimitive,
-    IGRPScrollAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Label } from '@renderer/components/ui/label'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import { Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -127,29 +127,23 @@ export function ImportFromDbWizard({
     }
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={onOpenChange}>
-            <IGRPDialogContentPrimitive className="max-w-2xl sm:max-w-2xl md:max-w-3xl max-h-[80vh] flex flex-col overflow-hidden">
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('import_from_db')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        {t('import_from_db_description')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-2xl sm:max-w-2xl md:max-w-3xl max-h-[80vh] flex flex-col overflow-hidden">
+                <DialogHeader>
+                    <DialogTitle>{t('import_from_db')}</DialogTitle>
+                    <DialogDescription>{t('import_from_db_description')}</DialogDescription>
+                </DialogHeader>
 
                 {error && <p className="text-sm text-destructive px-1">{error}</p>}
 
                 {step === 'connection' && (
                     <div className="space-y-2 py-2">
                         <div className="flex items-end justify-between gap-2">
-                            <IGRPLabelPrimitive>{t('select_connection')}</IGRPLabelPrimitive>
-                            <IGRPButtonPrimitive
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => setNewConnOpen(true)}
-                            >
+                            <Label>{t('select_connection')}</Label>
+                            <Button size="sm" variant="ghost" onClick={() => setNewConnOpen(true)}>
                                 <Plus className="h-3.5 w-3.5 mr-1" />
                                 {t('add_new_connection')}
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </div>
                         {loadingConnections ? (
                             <p className="text-xs text-muted-foreground">{t('loading')}</p>
@@ -175,9 +169,9 @@ export function ImportFromDbWizard({
                 {step === 'tables' && (
                     <div className="space-y-2 py-2">
                         <div className="flex items-center justify-between">
-                            <IGRPLabelPrimitive>
+                            <Label>
                                 {t('tables_in_connection', { connection: connectionName })}
-                            </IGRPLabelPrimitive>
+                            </Label>
                             <button
                                 type="button"
                                 onClick={toggleAll}
@@ -188,12 +182,12 @@ export function ImportFromDbWizard({
                                     : t('select_all')}
                             </button>
                         </div>
-                        <IGRPScrollAreaPrimitive className="h-[320px] border rounded p-2">
+                        <ScrollArea className="h-[320px] border rounded p-2">
                             <ul className="space-y-1">
                                 {tables.map((tbl) => (
                                     <li key={tbl}>
                                         <label className="flex items-center gap-2 text-sm cursor-pointer">
-                                            <IGRPCheckboxPrimitive
+                                            <Checkbox
                                                 checked={selectedTables.has(tbl)}
                                                 onCheckedChange={() => toggleTable(tbl)}
                                             />
@@ -202,7 +196,7 @@ export function ImportFromDbWizard({
                                     </li>
                                 ))}
                             </ul>
-                        </IGRPScrollAreaPrimitive>
+                        </ScrollArea>
                         <p className="text-xs text-muted-foreground">
                             {t('tables_selected_count', { count: selectedTables.size })}
                         </p>
@@ -230,53 +224,49 @@ export function ImportFromDbWizard({
 
                 {step === 'committing' && <p className="py-4 text-sm">{t('importing')}</p>}
 
-                <IGRPDialogFooterPrimitive>
+                <DialogFooter>
                     {step !== 'connection' && step !== 'committing' && (
-                        <IGRPButtonPrimitive
+                        <Button
                             type="button"
                             variant="secondary"
                             onClick={() => setStep(step === 'preview' ? 'tables' : 'connection')}
                         >
                             {t('back')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     )}
-                    <IGRPButtonPrimitive
+                    <Button
                         type="button"
                         variant="secondary"
                         onClick={() => onOpenChange(false)}
                         disabled={step === 'committing'}
                     >
                         {t('cancel')}
-                    </IGRPButtonPrimitive>
+                    </Button>
                     {step === 'tables' && (
-                        <IGRPButtonPrimitive
+                        <Button
                             type="button"
                             onClick={() => setStep('preview')}
                             disabled={selectedTables.size === 0}
                         >
                             {t('next')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     )}
                     {step === 'preview' && (
-                        <IGRPButtonPrimitive type="button" onClick={handleCommit}>
+                        <Button type="button" onClick={handleCommit}>
                             {t('import')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     )}
-                </IGRPDialogFooterPrimitive>
-            </IGRPDialogContentPrimitive>
+                </DialogFooter>
+            </DialogContent>
 
             {/* Inline "create connection" — saves via the global connection
                 IPC, refreshes the list, then auto-selects the new entry. */}
-            <IGRPDialogPrimitive open={newConnOpen} onOpenChange={setNewConnOpen}>
-                <IGRPDialogContentPrimitive className="max-w-2xl sm:max-w-2xl md:max-w-3xl max-h-[85vh] overflow-auto">
-                    <IGRPDialogHeaderPrimitive>
-                        <IGRPDialogTitlePrimitive>
-                            {t('add_new_connection')}
-                        </IGRPDialogTitlePrimitive>
-                        <IGRPDialogDescriptionPrimitive>
-                            {t('fill_details_to_add_connection')}
-                        </IGRPDialogDescriptionPrimitive>
-                    </IGRPDialogHeaderPrimitive>
+            <Dialog open={newConnOpen} onOpenChange={setNewConnOpen}>
+                <DialogContent className="max-w-2xl sm:max-w-2xl md:max-w-3xl max-h-[85vh] overflow-auto">
+                    <DialogHeader>
+                        <DialogTitle>{t('add_new_connection')}</DialogTitle>
+                        <DialogDescription>{t('fill_details_to_add_connection')}</DialogDescription>
+                    </DialogHeader>
                     <ConnectionForm
                         connection={EMPTY_CONNECTION}
                         onSubmit={async (values: Connection) => {
@@ -288,8 +278,8 @@ export function ImportFromDbWizard({
                         }}
                         onCancel={() => setNewConnOpen(false)}
                     />
-                </IGRPDialogContentPrimitive>
-            </IGRPDialogPrimitive>
-        </IGRPDialogPrimitive>
+                </DialogContent>
+            </Dialog>
+        </Dialog>
     )
 }

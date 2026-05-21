@@ -1,15 +1,15 @@
 import { faker } from '@faker-js/faker'
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
+import { Checkbox } from '@renderer/components/ui/checkbox'
 import {
-    IGRPBadgePrimitive,
-    IGRPButtonPrimitive,
-    IGRPCheckboxPrimitive,
-    IGRPTableBodyPrimitive,
-    IGRPTableCellPrimitive,
-    IGRPTableHeaderPrimitive,
-    IGRPTableHeadPrimitive,
-    IGRPTablePrimitive,
-    IGRPTableRowPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@renderer/components/ui/table'
 import Draggable from '@renderer/lib/dnd/Draggable'
 import Droppable from '@renderer/lib/dnd/Droppable'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
@@ -59,7 +59,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                 const path = `${componentName}/${compName}`
 
                 return (
-                    <IGRPTableHeadPrimitive key={child.id}>
+                    <TableHead key={child.id}>
                         <Draggable
                             item={child}
                             index={index}
@@ -80,7 +80,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                                 <span>{headerTitle || label}</span>
                             </BoxField>
                         </Draggable>
-                    </IGRPTableHeadPrimitive>
+                    </TableHead>
                 )
             })
         },
@@ -90,28 +90,23 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     // Render table rows
     const renderTableRows = useMemo(() => {
         return getDataTableFake(columns).map((row, rowIndex) => (
-            <IGRPTableRowPrimitive key={rowIndex}>
+            <TableRow key={rowIndex}>
                 {columns.map((child) => (
-                    <IGRPTableCellPrimitive key={child.id}>
+                    <TableCell key={child.id}>
                         {child.componentName === COMPONENT.TableCheckboxCell ? (
-                            <IGRPCheckboxPrimitive
-                                id={child.id}
-                                checked={row[child.id] as boolean}
-                            />
+                            <Checkbox id={child.id} checked={row[child.id] as boolean} />
                         ) : child.componentName === COMPONENT.TableableBadgeCell ? (
-                            <IGRPBadgePrimitive variant="outline">
-                                {faker.lorem.words(1)}
-                            </IGRPBadgePrimitive>
+                            <Badge variant="outline">{faker.lorem.words(1)}</Badge>
                         ) : child.componentName === COMPONENT.TableActionListCell ? (
-                            <IGRPButtonPrimitive variant="secondary" size="icon">
+                            <Button variant="secondary" size="icon">
                                 <Ellipsis />
-                            </IGRPButtonPrimitive>
+                            </Button>
                         ) : (
                             row[child.id]
                         )}
-                    </IGRPTableCellPrimitive>
+                    </TableCell>
                 ))}
-            </IGRPTableRowPrimitive>
+            </TableRow>
         ))
     }, [columns, getDataTableFake])
 
@@ -211,16 +206,14 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                         >
                             {columns.length > 0 && (
                                 <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                                    <IGRPTablePrimitive className="w-full text-sm text-left rtl:text-right table-fixed">
-                                        <IGRPTableHeaderPrimitive>
-                                            <IGRPTableRowPrimitive>
+                                    <Table className="w-full text-sm text-left rtl:text-right table-fixed">
+                                        <TableHeader>
+                                            <TableRow>
                                                 {renderTableHeaders(compName, id, tableComp)}
-                                            </IGRPTableRowPrimitive>
-                                        </IGRPTableHeaderPrimitive>
-                                        <IGRPTableBodyPrimitive>
-                                            {renderTableRows}
-                                        </IGRPTableBodyPrimitive>
-                                    </IGRPTablePrimitive>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>{renderTableRows}</TableBody>
+                                    </Table>
                                 </div>
                             )}
                         </Droppable>

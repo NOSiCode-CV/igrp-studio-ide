@@ -1,4 +1,4 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
 import { cn } from '@renderer/lib/utils'
 import {
     AlertCircle,
@@ -483,8 +483,7 @@ export function AIAssistant({
                     // already streamed into the bubble; this dispatch
                     // is just for telemetry / future Redux integration.
                     case 'retry-attempt':
-                        target.prototype.summary =
-                            `attempt ${chunk.attempt}/${chunk.maxAttempts}`
+                        target.prototype.summary = `attempt ${chunk.attempt}/${chunk.maxAttempts}`
                         break
                     // M7 preview seeding — informational only, no Redux
                     // dispatch. The ops list grows so the user sees that
@@ -500,17 +499,13 @@ export function AIAssistant({
                             { op: 'create', path: chunk.previewTsPath }
                         ]
                         target.prototype.summary =
-                            (target.prototype.summary ?? '').replace(
-                                ' · seeding preview…',
-                                ''
-                            ) + ` · seeded ${chunk.rowCount} rows`
+                            (target.prototype.summary ?? '').replace(' · seeding preview…', '') +
+                            ` · seeded ${chunk.rowCount} rows`
                         break
                     case 'mock-skipped':
                         target.prototype.summary =
-                            (target.prototype.summary ?? '').replace(
-                                ' · seeding preview…',
-                                ''
-                            ) + ' · no seed needed'
+                            (target.prototype.summary ?? '').replace(' · seeding preview…', '') +
+                            ' · no seed needed'
                         break
                     case 'error':
                         target.error = chunk.message
@@ -696,8 +691,7 @@ export function AIAssistant({
                     .generateStart({
                         requestId,
                         basePath: chatBackend.basePath,
-                        userMessage:
-                            lastUser?.content ?? '',
+                        userMessage: lastUser?.content ?? '',
                         specContext: ctx.systemPrompt,
                         providerId: selected.providerId,
                         model: selected.modelId
@@ -712,8 +706,7 @@ export function AIAssistant({
                     .generateStart({
                         requestId,
                         basePath: chatBackend.basePath,
-                        userMessage:
-                            lastUser?.content ?? '',
+                        userMessage: lastUser?.content ?? '',
                         specContext: ctx.systemPrompt,
                         providerId: selected.providerId,
                         model: selected.modelId
@@ -755,19 +748,17 @@ export function AIAssistant({
      * Cmd/Ctrl+Enter also sends (handy when the cursor is mid-line). IME
      * composition is respected so accents on macOS don't fire a send.
      */
-    const handleComposerKeyDown = useCallback(
-        (event: KeyboardEvent<HTMLTextAreaElement>) => {
-            if (event.nativeEvent.isComposing) return
-            const send = (event.key === 'Enter' && !event.shiftKey) ||
-                (event.key === 'Enter' && (event.metaKey || event.ctrlKey))
-            if (!send) return
-            event.preventDefault()
-            // Reuse the form submit path so guard logic stays in one place.
-            const form = event.currentTarget.form
-            form?.requestSubmit()
-        },
-        []
-    )
+    const handleComposerKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.nativeEvent.isComposing) return
+        const send =
+            (event.key === 'Enter' && !event.shiftKey) ||
+            (event.key === 'Enter' && (event.metaKey || event.ctrlKey))
+        if (!send) return
+        event.preventDefault()
+        // Reuse the form submit path so guard logic stays in one place.
+        const form = event.currentTarget.form
+        form?.requestSubmit()
+    }, [])
 
     /**
      * Drops the failed assistant message and re-fires the chat with the same
@@ -806,8 +797,7 @@ export function AIAssistant({
             const failed = messages[idx]
             const errText = failed.error ?? ''
             const failedOps =
-                failed.prototype?.ops?.filter((o) => o.failed) ??
-                ([] as PrototypeMessageOp[])
+                failed.prototype?.ops?.filter((o) => o.failed) ?? ([] as PrototypeMessageOp[])
             const lines: string[] = []
             if (errText) lines.push(`The previous attempt failed: ${errText}`)
             if (failedOps.length > 0) {
@@ -942,10 +932,7 @@ export function AIAssistant({
             </div>
 
             {/* Messages */}
-            <div
-                ref={scrollRef}
-                className="flex-1 divide-y divide-border/40 overflow-y-auto px-3"
-            >
+            <div ref={scrollRef} className="flex-1 divide-y divide-border/40 overflow-y-auto px-3">
                 {loadError && (
                     <div className="flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/5 p-2 text-[11px] text-red-500">
                         <AlertCircle size={12} className="mt-0.5 shrink-0" />
@@ -973,8 +960,7 @@ export function AIAssistant({
                             m.role === 'assistant' &&
                             !streaming &&
                             (m.error || (m.prototype?.failed ?? 0) > 0) &&
-                            (chatBackend.kind === 'prototype' ||
-                                chatBackend.kind === 'data')
+                            (chatBackend.kind === 'prototype' || chatBackend.kind === 'data')
                                 ? () => handleAskAIToFix(m.id)
                                 : undefined
                         }
@@ -984,8 +970,7 @@ export function AIAssistant({
                             pendingMessageId === m.id && pendingSelected && onProposalEditToggle
                                 ? {
                                       selected: pendingSelected,
-                                      onToggle: (idx) =>
-                                          onProposalEditToggle(m.id, idx)
+                                      onToggle: (idx) => onProposalEditToggle(m.id, idx)
                                   }
                                 : undefined
                         }
@@ -1064,7 +1049,7 @@ export function AIAssistant({
                             </span>
                         </div>
                         {streaming ? (
-                            <IGRPButtonPrimitive
+                            <Button
                                 type="button"
                                 size="sm"
                                 variant="outline"
@@ -1073,9 +1058,9 @@ export function AIAssistant({
                                 title="Stop"
                             >
                                 <Square size={11} /> Stop
-                            </IGRPButtonPrimitive>
+                            </Button>
                         ) : (
-                            <IGRPButtonPrimitive
+                            <Button
                                 type="submit"
                                 size="sm"
                                 className="h-7 gap-1 text-[11px]"
@@ -1083,7 +1068,7 @@ export function AIAssistant({
                             >
                                 <Send size={11} />
                                 {submitLabel}
-                            </IGRPButtonPrimitive>
+                            </Button>
                         )}
                     </div>
                 </div>
@@ -1126,8 +1111,7 @@ function MessageBubble({
     // While streaming, the partial reply may contain raw SEARCH/REPLACE
     // markup; show a clean placeholder so the user doesn't see ugly
     // delimiters mid-stream.
-    const looksLikeEdits =
-        !isUser && /<{5,}\s*SEARCH/.test(message.content)
+    const looksLikeEdits = !isUser && /<{5,}\s*SEARCH/.test(message.content)
     const showChecklist = !isUser && proposalSummary && proposalSummary.length > 0
 
     const handleCopy = async () => {
@@ -1170,9 +1154,7 @@ function MessageBubble({
                     <div className="flex items-center gap-2 text-muted-foreground">
                         <Loader2 size={12} className="animate-spin" />
                         <span className="text-[11px] italic">
-                            {message.streaming
-                                ? 'Drafting edits…'
-                                : 'Parsing edits…'}
+                            {message.streaming ? 'Drafting edits…' : 'Parsing edits…'}
                         </span>
                     </div>
                 ) : (
@@ -1290,11 +1272,7 @@ function ProposalChecklist({
     // Active proposals have selected[]; show "selected of total ok" so the
     // user knows the impact of toggling.
     const selectedOk = editToggles
-        ? items.reduce(
-              (acc, item, idx) =>
-                  acc + (item.ok && editToggles.selected[idx] ? 1 : 0),
-              0
-          )
+        ? items.reduce((acc, item, idx) => acc + (item.ok && editToggles.selected[idx] ? 1 : 0), 0)
         : ok
     const [expanded, setExpanded] = useState(status === 'pending' || !status)
 
@@ -1307,9 +1285,7 @@ function ProposalChecklist({
                 ? { text: 'stale', tone: 'text-muted-foreground bg-muted/40' }
                 : { text: 'pending', tone: 'text-primary bg-primary/10' }
 
-    const allOn =
-        editToggles &&
-        items.every((item, idx) => !item.ok || editToggles.selected[idx])
+    const allOn = editToggles && items.every((item, idx) => !item.ok || editToggles.selected[idx])
     const handleToggleAll = () => {
         if (!editToggles) return
         // If everything is on, toggling means unselect all; else select all ok.
@@ -1338,9 +1314,7 @@ function ProposalChecklist({
                         </span>
                     )}
                     {ok > 0 && failed > 0 && ' · '}
-                    {failed > 0 && (
-                        <span className="text-amber-600">✗ {failed}</span>
-                    )}
+                    {failed > 0 && <span className="text-amber-600">✗ {failed}</span>}
                 </span>
                 <span
                     className={cn(
@@ -1376,13 +1350,10 @@ function ProposalChecklist({
                                     key={idx}
                                     className={cn(
                                         'flex items-start gap-1.5 px-2 py-0.5 text-[11px]',
-                                        interactive &&
-                                            'cursor-pointer hover:bg-muted/30'
+                                        interactive && 'cursor-pointer hover:bg-muted/30'
                                     )}
                                     onClick={
-                                        interactive
-                                            ? () => editToggles!.onToggle(idx)
-                                            : undefined
+                                        interactive ? () => editToggles!.onToggle(idx) : undefined
                                     }
                                 >
                                     {editToggles ? (
@@ -1390,9 +1361,7 @@ function ProposalChecklist({
                                             type="checkbox"
                                             checked={checked}
                                             disabled={!item.ok}
-                                            onChange={() =>
-                                                editToggles.onToggle(idx)
-                                            }
+                                            onChange={() => editToggles.onToggle(idx)}
                                             onClick={(e) => e.stopPropagation()}
                                             className="mt-0.5 h-3 w-3 shrink-0 cursor-pointer accent-primary disabled:cursor-not-allowed disabled:opacity-50"
                                         />
@@ -1400,24 +1369,16 @@ function ProposalChecklist({
                                         <span
                                             className={cn(
                                                 'mt-0.5 shrink-0',
-                                                item.ok
-                                                    ? 'text-emerald-600'
-                                                    : 'text-amber-600'
+                                                item.ok ? 'text-emerald-600' : 'text-amber-600'
                                             )}
                                         >
-                                            {item.ok ? (
-                                                <Check size={10} />
-                                            ) : (
-                                                <X size={10} />
-                                            )}
+                                            {item.ok ? <Check size={10} /> : <X size={10} />}
                                         </span>
                                     )}
                                     <div
                                         className={cn(
                                             'min-w-0 flex-1 leading-snug',
-                                            interactive &&
-                                                !checked &&
-                                                'opacity-50'
+                                            interactive && !checked && 'opacity-50'
                                         )}
                                     >
                                         <div className="break-words text-foreground">
@@ -1567,9 +1528,7 @@ function PrototypeSnapshotCard({
                                 onOpenFile && !op.failed && 'cursor-pointer hover:bg-accent'
                             )}
                             onClick={
-                                onOpenFile && !op.failed
-                                    ? () => onOpenFile(op.path)
-                                    : undefined
+                                onOpenFile && !op.failed ? () => onOpenFile(op.path) : undefined
                             }
                             role={onOpenFile && !op.failed ? 'button' : undefined}
                         >
@@ -1657,10 +1616,7 @@ function writePersistedMessages(key: string, messages: ChatMessage[]): void {
         const trimmed = messages.slice(-MAX_PERSISTED_MESSAGES)
         // Strip transient flags before persisting.
         const persistable = trimmed.map((m) => ({ ...m, streaming: false }))
-        window.localStorage?.setItem(
-            persistenceStorageKey(key),
-            JSON.stringify(persistable)
-        )
+        window.localStorage?.setItem(persistenceStorageKey(key), JSON.stringify(persistable))
     } catch {
         // localStorage may be full or unavailable; failing silently keeps
         // the chat alive in memory for the current session.

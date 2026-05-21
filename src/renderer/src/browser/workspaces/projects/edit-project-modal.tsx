@@ -1,17 +1,17 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPTextAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Textarea } from '@renderer/components/ui/textarea'
 import { LabelRequired } from '@renderer/components/label-required'
 import { ProjectIcon } from '@renderer/components/shared-ui'
 import { PATTERNS } from '@renderer/constants/appConstants'
@@ -178,20 +178,18 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
     }, [values.name, isOpen])
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
-            <IGRPDialogContentPrimitive className="overflow-hidden max-h-[80svh] sm:max-w-[700px] lg:max-w-[800px] max-w-4xl">
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('editProject')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        {t('editProjectDescription')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="overflow-hidden max-h-[80svh] sm:max-w-[700px] lg:max-w-[800px] max-w-4xl">
+                <DialogHeader>
+                    <DialogTitle>{t('editProject')}</DialogTitle>
+                    <DialogDescription>{t('editProjectDescription')}</DialogDescription>
+                </DialogHeader>
 
                 <form onSubmit={onSubmit} className="space-y-6">
                     <div className="space-y-4">
                         {/* Project Icon */}
                         <div className="space-y-2">
-                            <IGRPLabelPrimitive>{t('projectIcon')}</IGRPLabelPrimitive>
+                            <Label>{t('projectIcon')}</Label>
                             <div className="flex items-center space-x-4">
                                 <div className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
                                     {values.icon ? (
@@ -213,7 +211,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                         onChange={handleIconUpload}
                                         className="hidden"
                                     />
-                                    <IGRPButtonPrimitive
+                                    <Button
                                         type="button"
                                         variant="outline"
                                         size="sm"
@@ -222,9 +220,9 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                     >
                                         <Upload className="w-4 h-4 mr-2" />
                                         {t('uploadIcon')}
-                                    </IGRPButtonPrimitive>
+                                    </Button>
                                     {values.icon && (
-                                        <IGRPButtonPrimitive
+                                        <Button
                                             type="button"
                                             variant="outline"
                                             size="sm"
@@ -233,7 +231,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                         >
                                             <X className="w-4 h-4 mr-2" />
                                             {t('removeIcon')}
-                                        </IGRPButtonPrimitive>
+                                        </Button>
                                     )}
                                 </div>
                             </div>
@@ -242,7 +240,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                         {/* Project Name */}
                         <div className="space-y-2">
                             <LabelRequired>{t('projectName')}</LabelRequired>
-                            <IGRPInputPrimitive
+                            <Input
                                 {...nameRegister}
                                 ref={nameRefHandler}
                                 id="project-name"
@@ -256,10 +254,8 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
 
                         {/* Project Description */}
                         <div className="space-y-2">
-                            <IGRPLabelPrimitive htmlFor="description">
-                                {t('description')}
-                            </IGRPLabelPrimitive>
-                            <IGRPTextAreaPrimitive
+                            <Label htmlFor="description">{t('description')}</Label>
+                            <Textarea
                                 id="description"
                                 value={values.config.description}
                                 onChange={(e) =>
@@ -280,9 +276,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
 
                         {/* Theme Color */}
                         <div className="space-y-2">
-                            <IGRPLabelPrimitive htmlFor="themeColor">
-                                {t('themeColor')}
-                            </IGRPLabelPrimitive>
+                            <Label htmlFor="themeColor">{t('themeColor')}</Label>
                             <div className="flex items-center space-x-2">
                                 <input
                                     type="color"
@@ -295,7 +289,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                     }
                                     className="w-12 h-8 border border-gray-300 rounded cursor-pointer"
                                 />
-                                <IGRPInputPrimitive
+                                <Input
                                     value={values.themeColor}
                                     onChange={(e) =>
                                         setValue('themeColor', e.target.value, {
@@ -309,21 +303,21 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                         </div>
                     </div>
 
-                    <IGRPDialogFooterPrimitive>
-                        <IGRPButtonPrimitive
+                    <DialogFooter>
+                        <Button
                             type="button"
                             variant="outline"
                             onClick={onClose}
                             disabled={isSubmitting}
                         >
                             {t('cancel')}
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive type="submit" disabled={isSubmitting || !isValid}>
+                        </Button>
+                        <Button type="submit" disabled={isSubmitting || !isValid}>
                             {isSubmitting ? t('saving') : t('saveChanges')}
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogFooterPrimitive>
+                        </Button>
+                    </DialogFooter>
                 </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

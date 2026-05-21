@@ -1,4 +1,5 @@
-import { IGRPBadgePrimitive, IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
 import { Check, ChevronLeft, Loader2, Save } from 'lucide-react'
 import type { JSX } from 'react'
 import { cn } from '../../../../lib/utils'
@@ -30,42 +31,42 @@ interface StatusPillProps {
 function StatusPill({ isSaving, isDirty, lastSavedAt }: StatusPillProps): JSX.Element {
     if (isSaving) {
         return (
-            <IGRPBadgePrimitive
+            <Badge
                 variant="secondary"
                 className="gap-1.5 border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300"
             >
                 <Loader2 className="h-3 w-3 animate-spin" />
                 Saving…
-            </IGRPBadgePrimitive>
+            </Badge>
         )
     }
     if (isDirty) {
         return (
-            <IGRPBadgePrimitive
+            <Badge
                 variant="outline"
                 className="gap-1.5 border-amber-500/40 text-amber-700 dark:text-amber-300"
             >
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                 Unsaved changes
-            </IGRPBadgePrimitive>
+            </Badge>
         )
     }
     if (lastSavedAt) {
         return (
-            <IGRPBadgePrimitive
+            <Badge
                 variant="secondary"
                 className="gap-1.5 border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
             >
                 <Check className="h-3 w-3" />
                 Saved {formatRelative(lastSavedAt)}
-            </IGRPBadgePrimitive>
+            </Badge>
         )
     }
     return (
-        <IGRPBadgePrimitive variant="outline" className="gap-1.5 text-muted-foreground">
+        <Badge variant="outline" className="gap-1.5 text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/40" />
             No changes
-        </IGRPBadgePrimitive>
+        </Badge>
     )
 }
 
@@ -80,7 +81,7 @@ export function EditorHeader({
         <div className="flex items-center justify-between gap-4 border-b px-4 py-2">
             <div className="flex items-center gap-2">
                 {onClose && (
-                    <IGRPButtonPrimitive
+                    <Button
                         variant="ghost"
                         size="sm"
                         onClick={onClose}
@@ -89,12 +90,12 @@ export function EditorHeader({
                     >
                         <ChevronLeft className="h-4 w-4" />
                         Back
-                    </IGRPButtonPrimitive>
+                    </Button>
                 )}
             </div>
             <div className="flex shrink-0 items-center gap-3">
                 <StatusPill isSaving={isSaving} isDirty={isDirty} lastSavedAt={lastSavedAt} />
-                <IGRPButtonPrimitive
+                <Button
                     size="sm"
                     variant={isDirty ? 'default' : 'secondary'}
                     onClick={onSave}
@@ -112,7 +113,7 @@ export function EditorHeader({
                         <Check className="h-4 w-4" />
                     )}
                     {isSaving ? 'Saving…' : isDirty ? 'Save' : 'Saved'}
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
         </div>
     )

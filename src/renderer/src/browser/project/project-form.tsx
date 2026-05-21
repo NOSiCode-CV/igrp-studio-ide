@@ -1,17 +1,16 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDialogTriggerPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPRadioGroupItemPrimitive,
-    IGRPRadioGroupPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@renderer/components/ui/radio-group'
 import { FrameworkIcon } from '@renderer/components/framework-icon'
 import { LabelRequired } from '@renderer/components/label-required'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
@@ -83,9 +82,9 @@ export const ProjectConfigForm = ({
  * `{ config: { name, group, artifact, database } }` shape the per-framework
  * config components have read since the Formik days.
  */
-function flattenConfigErrors(
-    errors: FieldErrors<ProjectData>
-): { config?: Record<string, string | undefined> } {
+function flattenConfigErrors(errors: FieldErrors<ProjectData>): {
+    config?: Record<string, string | undefined>
+} {
     const config = errors.config as Record<string, { message?: string }> | undefined
     if (!config) return {}
     const out: Record<string, string | undefined> = {}
@@ -325,7 +324,14 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         if (values.path !== targetPath) {
             setValue('path', targetPath, { shouldValidate: false })
         }
-    }, [setValue, values?.config?.name, values.name, values.path, values.storageMode, workspace.path])
+    }, [
+        setValue,
+        values?.config?.name,
+        values.name,
+        values.path,
+        values.storageMode,
+        workspace.path
+    ])
 
     // Update icon preview.
     React.useEffect(() => {
@@ -366,7 +372,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         <div className="space-y-4">
             <div className="space-y-2">
                 <LabelRequired>{t('projectName')}</LabelRequired>
-                <IGRPInputPrimitive
+                <Input
                     {...nameRegister}
                     ref={nameRefHandler}
                     id="name"
@@ -382,7 +388,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
             {/* Project Icon Upload with Preview */}
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('projectIcon')}</IGRPLabelPrimitive>
+                <Label>{t('projectIcon')}</Label>
                 <input
                     ref={iconUploadRef}
                     type="file"
@@ -413,14 +419,14 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         {t('recommendedSize')}
                                     </div>
                                 </div>
-                                <IGRPButtonPrimitive
+                                <Button
                                     variant="outline"
                                     size="sm"
                                     type="button"
                                     onClick={() => iconUploadRef.current?.click()}
                                 >
                                     {t('upload')}...
-                                </IGRPButtonPrimitive>
+                                </Button>
                             </>
                         )}
                     </div>
@@ -428,8 +434,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             </div>
 
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('projectType')}</IGRPLabelPrimitive>
-                <IGRPRadioGroupPrimitive
+                <Label>{t('projectType')}</Label>
+                <RadioGroup
                     name="type"
                     value={values.type}
                     onValueChange={(value) => handleChangeType(value)}
@@ -440,12 +446,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             values.type === 'frontend' ? 'border-primary' : ''
                         }`}
                     >
-                        <IGRPRadioGroupItemPrimitive
-                            value="frontend"
-                            id="frontend"
-                            className="sr-only"
-                        />
-                        <IGRPLabelPrimitive
+                        <RadioGroupItem value="frontend" id="frontend" className="sr-only" />
+                        <Label
                             htmlFor="frontend"
                             className="flex items-center gap-2 cursor-pointer"
                         >
@@ -456,22 +458,15 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     {t('frontendDescription')}
                                 </div>
                             </div>
-                        </IGRPLabelPrimitive>
+                        </Label>
                     </div>
                     <div
                         className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
                             values.type === 'backend' ? 'border-primary' : ''
                         }`}
                     >
-                        <IGRPRadioGroupItemPrimitive
-                            value="backend"
-                            id="backend"
-                            className="sr-only"
-                        />
-                        <IGRPLabelPrimitive
-                            htmlFor="backend"
-                            className="flex items-center gap-2 cursor-pointer"
-                        >
+                        <RadioGroupItem value="backend" id="backend" className="sr-only" />
+                        <Label htmlFor="backend" className="flex items-center gap-2 cursor-pointer">
                             <Server className="w-5 h-5" />
                             <div>
                                 <div>{t('backend')}</div>
@@ -479,19 +474,19 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     {t('backendDescription')}
                                 </div>
                             </div>
-                        </IGRPLabelPrimitive>
+                        </Label>
                     </div>
                     <div
                         className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
                             values.type === 'specification' ? 'border-primary' : ''
                         }`}
                     >
-                        <IGRPRadioGroupItemPrimitive
+                        <RadioGroupItem
                             value="specification"
                             id="specification"
                             className="sr-only"
                         />
-                        <IGRPLabelPrimitive
+                        <Label
                             htmlFor="specification"
                             className="flex items-center gap-2 cursor-pointer"
                         >
@@ -504,9 +499,9 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     })}
                                 </div>
                             </div>
-                        </IGRPLabelPrimitive>
+                        </Label>
                     </div>
-                </IGRPRadioGroupPrimitive>
+                </RadioGroup>
                 {touchedFields.type && typeError && (
                     <p className="text-xs text-destructive">{typeError}</p>
                 )}
@@ -516,8 +511,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
     const renderStep2 = () => (
         <div className="space-y-4">
-            <IGRPLabelPrimitive>{t('selectFramework')}</IGRPLabelPrimitive>
-            <IGRPRadioGroupPrimitive
+            <Label>{t('selectFramework')}</Label>
+            <RadioGroup
                 name="framework"
                 value={values.framework}
                 onValueChange={(value) => handleChangeFramework(value)}
@@ -531,13 +526,13 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 values.framework === fw.id ? 'border-primary' : ''
                             } ${!fw.availableSupport ? 'pointer-events-none opacity-75' : ''}`}
                         >
-                            <IGRPRadioGroupItemPrimitive
+                            <RadioGroupItem
                                 value={fw.id}
                                 id={fw.id}
                                 className="sr-only"
                                 disabled={!fw.availableSupport}
                             />
-                            <IGRPLabelPrimitive
+                            <Label
                                 htmlFor={fw.id}
                                 className="flex items-center gap-4 cursor-pointer"
                             >
@@ -560,11 +555,11 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         </span>
                                     )}
                                 </div>
-                            </IGRPLabelPrimitive>
+                            </Label>
                         </div>
                     )
                 })}
-            </IGRPRadioGroupPrimitive>
+            </RadioGroup>
             {touchedFields.framework && frameworkError && (
                 <p className="text-xs text-destructive">{frameworkError}</p>
             )}
@@ -575,7 +570,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         <div className="space-y-4">
             {SelectedComponent ? (
                 <>
-                    <IGRPLabelPrimitive>{t('frameworkConfiguration')}</IGRPLabelPrimitive>
+                    <Label>{t('frameworkConfiguration')}</Label>
                     <div className="mt-3">
                         <ProjectConfigForm
                             type={values.framework ?? ''}
@@ -605,16 +600,16 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         <div className="rounded-lg border p-4 space-y-6">
             <div className="space-y-4">
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive htmlFor="name">{t('projectName')}</IGRPLabelPrimitive>
-                    <IGRPInputPrimitive {...nameRegister} ref={nameRefHandler} id="name" />
+                    <Label htmlFor="name">{t('projectName')}</Label>
+                    <Input {...nameRegister} ref={nameRefHandler} id="name" />
                     {touchedFields.name && nameError && (
                         <p className="text-xs text-destructive">{nameError}</p>
                     )}
                 </div>
 
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive>{t('projectLocation')}</IGRPLabelPrimitive>
-                    <IGRPRadioGroupPrimitive
+                    <Label>{t('projectLocation')}</Label>
+                    <RadioGroup
                         value={values.storageMode ?? 'managed'}
                         onValueChange={(value) => {
                             setValue('storageMode', value as ProjectData['storageMode'], {
@@ -630,7 +625,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         className="grid grid-cols-2 gap-2"
                     >
                         <label className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40">
-                            <IGRPRadioGroupItemPrimitive value="managed" id="storage-managed" />
+                            <RadioGroupItem value="managed" id="storage-managed" />
                             <div className="space-y-0.5">
                                 <p className="text-sm font-medium">{t('projectLocationManaged')}</p>
                                 <p className="text-xs text-muted-foreground">
@@ -639,7 +634,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             </div>
                         </label>
                         <label className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40">
-                            <IGRPRadioGroupItemPrimitive value="linked" id="storage-linked" />
+                            <RadioGroupItem value="linked" id="storage-linked" />
                             <div className="space-y-0.5">
                                 <p className="text-sm font-medium">{t('projectLocationLinked')}</p>
                                 <p className="text-xs text-muted-foreground">
@@ -647,19 +642,19 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 </p>
                             </div>
                         </label>
-                    </IGRPRadioGroupPrimitive>
+                    </RadioGroup>
                 </div>
 
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive htmlFor="path">{t('projectDirectory')}</IGRPLabelPrimitive>
+                    <Label htmlFor="path">{t('projectDirectory')}</Label>
                     <div className="flex gap-2">
-                        <IGRPInputPrimitive
+                        <Input
                             {...pathRegister}
                             id="path"
                             placeholder={t('enterProjectDirectory')}
                             readOnly={values.storageMode !== 'linked'}
                         />
-                        <IGRPButtonPrimitive
+                        <Button
                             variant="outline"
                             size="icon"
                             type="button"
@@ -670,7 +665,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             disabled={values.storageMode !== 'linked'}
                         >
                             <FolderOpen className="h-4 w-4" />
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                     {touchedFields.path && pathError && (
                         <p className="text-xs text-destructive">{pathError}</p>
@@ -679,7 +674,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
                 {isFrontend && (
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive>{t('themeColor')}</IGRPLabelPrimitive>
+                        <Label>{t('themeColor')}</Label>
                         <div className="grid grid-cols-12 gap-2 mt-2">
                             {THEME_COLORS.map((color) => (
                                 <button
@@ -719,18 +714,18 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     }
 
     return (
-        <IGRPDialogPrimitive>
-            <IGRPDialogTriggerPrimitive asChild>
+        <Dialog>
+            <DialogTrigger asChild>
                 {children ? (
                     children
                 ) : (
-                    <IGRPButtonPrimitive>
+                    <Button>
                         <PlusCircle className="w-4 h-4" />
                         {t('createNewProject')}
-                    </IGRPButtonPrimitive>
+                    </Button>
                 )}
-            </IGRPDialogTriggerPrimitive>
-            <IGRPDialogContentPrimitive
+            </DialogTrigger>
+            <DialogContent
                 className="flex min-h-0 max-h-[min(90vh,calc(100dvh-2rem))] w-[calc(100vw-2rem)] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:max-w-[700px] lg:max-w-[800px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
@@ -743,12 +738,10 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         </div>
                     </div>
                 )}
-                <IGRPDialogHeaderPrimitive className="shrink-0 border-b border-border px-4 py-3 sm:px-6">
-                    <IGRPDialogTitlePrimitive>{t('newProject')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        {t('newProject')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+                <DialogHeader className="shrink-0 border-b border-border px-4 py-3 sm:px-6">
+                    <DialogTitle>{t('newProject')}</DialogTitle>
+                    <DialogDescription>{t('newProject')}</DialogDescription>
+                </DialogHeader>
                 <form onSubmit={onFormSubmit} className="flex min-h-0 flex-1 flex-col">
                     <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-4 sm:px-6">
                         <div className="relative mb-6">
@@ -770,10 +763,10 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         <div className="pb-2">{renderStepContent()}</div>
                     </div>
 
-                    <IGRPDialogFooterPrimitive className="mt-0 shrink-0 border-t border-border bg-background px-4 py-3 sm:px-6">
+                    <DialogFooter className="mt-0 shrink-0 border-t border-border bg-background px-4 py-3 sm:px-6">
                         <div className="flex w-full justify-between gap-2">
                             {step > 1 ? (
-                                <IGRPButtonPrimitive
+                                <Button
                                     type="button"
                                     variant="outline"
                                     onClick={handleBack}
@@ -781,12 +774,12 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 >
                                     <ArrowLeft className="w-4 h-4 mr-2" />
                                     {t('back')}
-                                </IGRPButtonPrimitive>
+                                </Button>
                             ) : (
                                 <div />
                             )}
                             {step < STEPS.length ? (
-                                <IGRPButtonPrimitive
+                                <Button
                                     type="button"
                                     onClick={(e) => {
                                         e.preventDefault()
@@ -796,22 +789,19 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 >
                                     {t('next')}
                                     <ArrowRight className="w-4 h-4 ml-2" />
-                                </IGRPButtonPrimitive>
+                                </Button>
                             ) : (
-                                <IGRPButtonPrimitive
-                                    type="submit"
-                                    disabled={isSubmitting || isCreatingProject}
-                                >
+                                <Button type="submit" disabled={isSubmitting || isCreatingProject}>
                                     {(isSubmitting || isCreatingProject) && (
                                         <Loader2 className="animate-spin" />
                                     )}
                                     {isCreatingProject ? 'A criar...' : t('createProject')}
-                                </IGRPButtonPrimitive>
+                                </Button>
                             )}
                         </div>
-                    </IGRPDialogFooterPrimitive>
+                    </DialogFooter>
                 </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

@@ -1,15 +1,17 @@
 import {
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuLabelPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuSeparatorPrimitive,
-    IGRPDropdownMenuTriggerPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
 import { LayoutGrid } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -38,31 +40,27 @@ const StructureDropdown = ({ onClickStructure }: StructureDropdownProps) => {
     ]
 
     return (
-        <IGRPTooltipProviderPrimitive>
-            <IGRPDropdownMenuPrimitive open={dropdownOpen} onOpenChange={setDropdownOpen}>
-                <IGRPTooltipPrimitive>
-                    <IGRPTooltipTriggerPrimitive>
-                        <IGRPDropdownMenuTriggerPrimitive asChild>
+        <TooltipProvider>
+            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <DropdownMenuTrigger asChild>
                             <a
                                 className="flex items-center p-1 space-x-2 hover:bg-gray-700 rounded"
                                 href="#"
                             >
                                 <LayoutGrid className="h-4 w-4" />
                             </a>
-                        </IGRPDropdownMenuTriggerPrimitive>
-                    </IGRPTooltipTriggerPrimitive>
-                    <IGRPTooltipContentPrimitive>
-                        {t('columnsSettings')}
-                    </IGRPTooltipContentPrimitive>
-                </IGRPTooltipPrimitive>
-                <IGRPDropdownMenuContentPrimitive className="w-56" onPointerLeave={closeDropdown}>
-                    <IGRPDropdownMenuLabelPrimitive>
-                        {t('columnsSettings')}
-                    </IGRPDropdownMenuLabelPrimitive>
-                    <IGRPDropdownMenuSeparatorPrimitive />
+                        </DropdownMenuTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>{t('columnsSettings')}</TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent className="w-56" onPointerLeave={closeDropdown}>
+                    <DropdownMenuLabel>{t('columnsSettings')}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
                     <div className="grid grid-cols-3 gap-2 p-2">
                         {gridStructures.map((structure, index) => (
-                            <IGRPDropdownMenuItemPrimitive
+                            <DropdownMenuItem
                                 key={index}
                                 onSelect={() => onClickStructure(structure.join(','))}
                                 className="p-0 focus:bg-transparent"
@@ -79,12 +77,12 @@ const StructureDropdown = ({ onClickStructure }: StructureDropdownProps) => {
                                         ></div>
                                     ))}
                                 </div>
-                            </IGRPDropdownMenuItemPrimitive>
+                            </DropdownMenuItem>
                         ))}
                     </div>
-                </IGRPDropdownMenuContentPrimitive>
-            </IGRPDropdownMenuPrimitive>
-        </IGRPTooltipProviderPrimitive>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </TooltipProvider>
     )
 }
 

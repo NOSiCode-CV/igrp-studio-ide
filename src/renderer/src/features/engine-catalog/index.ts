@@ -11,10 +11,7 @@
  * work without an import rewrite at every call site.
  */
 
-import {
-    EngineCatalogProvider,
-    useEngineCatalog
-} from './EngineCatalogProvider'
+import { EngineCatalogProvider, useEngineCatalog } from './EngineCatalogProvider'
 
 export {
     EngineCatalogProvider,

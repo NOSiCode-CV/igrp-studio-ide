@@ -11,10 +11,7 @@
 
 import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { useMemo } from 'react'
-import {
-    GROUP_LABELS,
-    HIDDEN_COMPONENT_NAMES
-} from '@renderer/features/component-palette'
+import { GROUP_LABELS, HIDDEN_COMPONENT_NAMES } from '@renderer/features/component-palette'
 import { ICON_MAP } from '@renderer/features/component-icons'
 
 const useConfigdata = (components: ComponentRegisterConfig[]) => {
@@ -22,7 +19,10 @@ const useConfigdata = (components: ComponentRegisterConfig[]) => {
         if (!components || components.length === 0) return []
 
         const groupedComponents = components.reduce(
-            (acc: Record<string, ComponentRegisterConfig[]>, component: ComponentRegisterConfig) => {
+            (
+                acc: Record<string, ComponentRegisterConfig[]>,
+                component: ComponentRegisterConfig
+            ) => {
                 const group = component.group || 'Others'
                 if (!acc[group]) {
                     acc[group] = []

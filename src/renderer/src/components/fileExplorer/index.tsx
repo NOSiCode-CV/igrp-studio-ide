@@ -1,13 +1,15 @@
 import {
-    IGRPCollapsibleContentPrimitive,
-    IGRPCollapsiblePrimitive,
-    IGRPCollapsibleTriggerPrimitive,
-    IGRPScrollAreaPrimitive,
-    IGRPSidebarMenuButtonPrimitive,
-    IGRPSidebarMenuItemPrimitive,
-    IGRPSidebarMenuPrimitive,
-    IGRPSidebarMenuSubPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger
+} from '@renderer/components/ui/collapsible'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import {
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub
+} from '@renderer/components/ui/sidebar'
 import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { setCurrentItem as onSetCurrentItem } from '@renderer/redux/thunks'
 import { ChevronRight, File, Folder } from 'lucide-react'
@@ -68,11 +70,11 @@ const FileExplorerSidebar: React.FC<FileExplorerSidebarProps> = ({ basePath, sea
     const renderTree = (tree: FileTree[]) => {
         const filteredTree = searchTerm ? filterTree(tree, searchTerm) : tree
         return filteredTree.map((item) => (
-            <IGRPSidebarMenuItemPrimitive key={item.path}>
+            <SidebarMenuItem key={item.path}>
                 {item.isDirectory ? (
-                    <IGRPCollapsiblePrimitive>
-                        <IGRPCollapsibleTriggerPrimitive asChild>
-                            <IGRPSidebarMenuButtonPrimitive
+                    <Collapsible>
+                        <CollapsibleTrigger asChild>
+                            <SidebarMenuButton
                                 className="justify-between"
                                 onClick={() => {
                                     if (!item.isDirectory) {
@@ -88,30 +90,30 @@ const FileExplorerSidebar: React.FC<FileExplorerSidebarProps> = ({ basePath, sea
                                     {/* Ícone de pasta */}
                                     <span>{item.name}</span>
                                 </div>
-                            </IGRPSidebarMenuButtonPrimitive>
-                        </IGRPCollapsibleTriggerPrimitive>
-                        <IGRPCollapsibleContentPrimitive>
-                            <IGRPSidebarMenuSubPrimitive>
+                            </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                            <SidebarMenuSub>
                                 {item.children && renderTree(item.children)}
-                            </IGRPSidebarMenuSubPrimitive>
-                        </IGRPCollapsibleContentPrimitive>
-                    </IGRPCollapsiblePrimitive>
+                            </SidebarMenuSub>
+                        </CollapsibleContent>
+                    </Collapsible>
                 ) : (
-                    <IGRPSidebarMenuButtonPrimitive onClick={() => handleFileSelect(item)}>
+                    <SidebarMenuButton onClick={() => handleFileSelect(item)}>
                         <div className="flex items-center gap-2">
                             <File className="w-4 h-4" />
                             <span>{item.name}</span>
                         </div>
-                    </IGRPSidebarMenuButtonPrimitive>
+                    </SidebarMenuButton>
                 )}
-            </IGRPSidebarMenuItemPrimitive>
+            </SidebarMenuItem>
         ))
     }
 
     return (
-        <IGRPScrollAreaPrimitive className="flex-1 p-2 overflow-auto">
-            <IGRPSidebarMenuPrimitive>{renderTree(fileTree)}</IGRPSidebarMenuPrimitive>
-        </IGRPScrollAreaPrimitive>
+        <ScrollArea className="flex-1 p-2 overflow-auto">
+            <SidebarMenu>{renderTree(fileTree)}</SidebarMenu>
+        </ScrollArea>
     )
 }
 

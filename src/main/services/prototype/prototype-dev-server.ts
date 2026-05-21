@@ -374,13 +374,7 @@ class PrototypeDevServerService {
         return new Promise((resolve, reject) => {
             const proc = spawn(
                 npm,
-                [
-                    'install',
-                    '--no-audit',
-                    '--no-fund',
-                    '--prefer-offline',
-                    '--legacy-peer-deps'
-                ],
+                ['install', '--no-audit', '--no-fund', '--prefer-offline', '--legacy-peer-deps'],
                 {
                     cwd,
                     env: { ...process.env, FORCE_COLOR: '0', npm_config_progress: 'false' },

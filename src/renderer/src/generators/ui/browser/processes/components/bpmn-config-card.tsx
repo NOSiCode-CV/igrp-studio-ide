@@ -1,18 +1,20 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import { Label } from '@renderer/components/ui/label'
+import { Switch } from '@renderer/components/ui/switch'
+import {
     IGRPCard,
     IGRPCardContent,
     IGRPCardDescription,
     IGRPCardFooter,
     IGRPCardHeader,
-    IGRPCardTitle,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuSeparatorPrimitive,
-    IGRPDropdownMenuTriggerPrimitive,
-    IGRPLabelPrimitive,
-    IGRPSwitchPrimitive
+    IGRPCardTitle
 } from '@igrp/igrp-framework-react-design-system'
 import {
     Calendar,
@@ -87,51 +89,47 @@ export const BPMNConfigCard: React.FC<BPMNConfigCardProps> = ({
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="flex items-center space-x-2">
-                            <IGRPSwitchPrimitive
+                            <Switch
                                 id={`active-${config.id}`}
                                 checked={isActive}
                                 onCheckedChange={handleToggleActive}
                                 disabled={isToggling}
                             />
-                            <IGRPLabelPrimitive htmlFor={`active-${config.id}`} className="text-xs">
+                            <Label htmlFor={`active-${config.id}`} className="text-xs">
                                 Active
-                            </IGRPLabelPrimitive>
+                            </Label>
                         </div>
-                        <IGRPDropdownMenuPrimitive>
-                            <IGRPDropdownMenuTriggerPrimitive asChild>
-                                <IGRPButtonPrimitive
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                >
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
                                     <MoreHorizontal className="h-4 w-4" />
-                                </IGRPButtonPrimitive>
-                            </IGRPDropdownMenuTriggerPrimitive>
-                            <IGRPDropdownMenuContentPrimitive align="end" className="min-w-40">
-                                <IGRPDropdownMenuItemPrimitive onClick={() => onEdit(config)}>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="min-w-40">
+                                <DropdownMenuItem onClick={() => onEdit(config)}>
                                     <Edit className="h-3 w-3 mr-2" /> Edit
-                                </IGRPDropdownMenuItemPrimitive>
-                                <IGRPDropdownMenuItemPrimitive
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
                                     onClick={handleTestConnection}
                                     disabled={isTesting}
                                 >
                                     <TestTube className="h-3 w-3 mr-2" />{' '}
                                     {isTesting ? 'Testing...' : 'Test'}
-                                </IGRPDropdownMenuItemPrimitive>
-                                <IGRPDropdownMenuSeparatorPrimitive />
-                                <IGRPDropdownMenuItemPrimitive
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
                                     onClick={() => window.open(config.apiUrl, '_blank')}
                                 >
                                     <ExternalLink className="h-3 w-3 mr-2" /> Open
-                                </IGRPDropdownMenuItemPrimitive>
-                                <IGRPDropdownMenuItemPrimitive
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
                                     onClick={() => onDelete(config.id)}
                                     className="text-destructive focus:text-destructive"
                                 >
                                     <Trash2 className="h-3 w-3 mr-2" /> Delete
-                                </IGRPDropdownMenuItemPrimitive>
-                            </IGRPDropdownMenuContentPrimitive>
-                        </IGRPDropdownMenuPrimitive>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
                 {config.description && (

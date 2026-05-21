@@ -1,10 +1,10 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
 import { APRESENTATION } from '@renderer/constants/appConstants'
 import type React from 'react'
 import { useState } from 'react'
@@ -38,50 +38,44 @@ const NavigationBar = ({
     }
 
     return (
-        <IGRPTooltipProviderPrimitive>
+        <TooltipProvider>
             <div className="flex flex-1 justify-end items-center space-x-2">
                 <div className="relative flex rounded-lg border bg-muted p-0.5 text-sm space-x-2">
-                    <IGRPButtonPrimitive
+                    <Button
                         size="sm"
                         variant={activePresentation === APRESENTATION.CODE ? 'outline' : 'ghost'}
                         onClick={() => onSwitch(APRESENTATION.CODE)}
                         className="h-7"
                     >
                         Code
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
+                    </Button>
+                    <Button
                         size="sm"
                         onClick={() => onSwitch(APRESENTATION.DESIGN)}
                         variant={activePresentation === APRESENTATION.DESIGN ? 'outline' : 'ghost'}
                         className="h-7"
                     >
                         Design
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
+                    </Button>
+                    <Button
                         size="sm"
                         onClick={() => onSwitch(APRESENTATION.JSON)}
                         variant={activePresentation === APRESENTATION.JSON ? 'outline' : 'ghost'}
                         className="h-7"
                     >
                         Json
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
-                <IGRPTooltipPrimitive>
-                    <IGRPTooltipTriggerPrimitive asChild>
-                        <IGRPButtonPrimitive
-                            size="sm"
-                            onClick={handleSaveClick}
-                            disabled={isSubmitting}
-                        >
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button size="sm" onClick={handleSaveClick} disabled={isSubmitting}>
                             {isSubmitting ? t('saving') : t('save')}
-                        </IGRPButtonPrimitive>
-                    </IGRPTooltipTriggerPrimitive>
-                    <IGRPTooltipContentPrimitive>
-                        {'Add Components to Page'}
-                    </IGRPTooltipContentPrimitive>
-                </IGRPTooltipPrimitive>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{'Add Components to Page'}</TooltipContent>
+                </Tooltip>
             </div>
-        </IGRPTooltipProviderPrimitive>
+        </TooltipProvider>
     )
 }
 

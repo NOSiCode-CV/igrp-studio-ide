@@ -31,8 +31,7 @@ export const loadDocs = (basePath: string) => async (dispatch: Dispatch) => {
  * any in-memory edits).
  */
 export const selectDoc =
-    (basePath: string, docId: string | null) =>
-    async (dispatch: Dispatch, getState: () => any) => {
+    (basePath: string, docId: string | null) => async (dispatch: Dispatch, getState: () => any) => {
         if (!basePath || !docId) {
             dispatch(docSelected({ id: null, content: '' }))
             return

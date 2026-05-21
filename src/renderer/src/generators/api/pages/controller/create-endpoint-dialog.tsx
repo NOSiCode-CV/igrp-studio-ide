@@ -1,12 +1,12 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
 import type { ControllerConfig } from '@igrp/igrp-studio-springboot-engine/types'
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
 import useToast from '@renderer/hooks/useToast'
@@ -129,14 +129,12 @@ export function CreateEndpointDialog({
     })
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
-            <IGRPDialogContentPrimitive>
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('createNewEndpoint')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        {t('endpointDescription')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{t('createNewEndpoint')}</DialogTitle>
+                    <DialogDescription>{t('endpointDescription')}</DialogDescription>
+                </DialogHeader>
                 <form onSubmit={onSubmit}>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-1 items-center gap-4">
@@ -190,11 +188,11 @@ export function CreateEndpointDialog({
                             </div>
                         </div>
                     </div>
-                    <IGRPDialogFooterPrimitive>
-                        <IGRPButtonPrimitive type="submit">{t('save')}</IGRPButtonPrimitive>
-                    </IGRPDialogFooterPrimitive>
+                    <DialogFooter>
+                        <Button type="submit">{t('save')}</Button>
+                    </DialogFooter>
                 </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

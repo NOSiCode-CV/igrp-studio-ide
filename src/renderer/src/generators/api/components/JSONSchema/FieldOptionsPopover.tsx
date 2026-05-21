@@ -1,17 +1,10 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPPopoverContentPrimitive,
-    IGRPPopoverPrimitive,
-    IGRPPopoverTriggerPrimitive,
-    IGRPSeparator,
-    IGRPSwitchPrimitive,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { Switch } from '@renderer/components/ui/switch'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import MonacoEditor from '@renderer/components/monaco-editor'
 import { PackageCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -41,9 +34,9 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
     const handleChangeEditor = (_: any) => {}
 
     return (
-        <IGRPPopoverPrimitive>
-            <IGRPPopoverTriggerPrimitive asChild>
-                <IGRPButtonPrimitive
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button
                     variant="ghost"
                     className="flex items-center h-6 w-6"
                     size={'icon'}
@@ -51,30 +44,26 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                 >
                     <PackageCheck className="w-4 h-4" /> {/* Settings icon */}
                     <span className="sr-only">{t('Advanced')}</span>
-                </IGRPButtonPrimitive>
-            </IGRPPopoverTriggerPrimitive>
-            <IGRPPopoverContentPrimitive className="w-[425px]">
-                <IGRPTabsPrimitive defaultValue="dataType">
-                    <IGRPTabsListPrimitive className="grid w-full grid-cols-2">
-                        <IGRPTabsTriggerPrimitive value="dataType">
-                            {t('Data Type')}
-                        </IGRPTabsTriggerPrimitive>
-                        <IGRPTabsTriggerPrimitive value="jsonSchema">
-                            {t('JSON Schema')}
-                        </IGRPTabsTriggerPrimitive>
-                    </IGRPTabsListPrimitive>
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[425px]">
+                <Tabs defaultValue="dataType">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="dataType">{t('Data Type')}</TabsTrigger>
+                        <TabsTrigger value="jsonSchema">{t('JSON Schema')}</TabsTrigger>
+                    </TabsList>
 
-                    <IGRPTabsContentPrimitive value="dataType" className="space-y-4">
+                    <TabsContent value="dataType" className="space-y-4">
                         <p className="text-sm text-muted-foreground">
                             {t('configureFieldOptions')}
                         </p>
                         <div className="grid grid-cols-2 gap-2">
                             <div className="grid grid-cols-3 gap-2 col-span-2">
                                 <div className="flex items-center space-x-2">
-                                    <IGRPLabelPrimitive htmlFor="required" className="text-sm">
+                                    <Label htmlFor="required" className="text-sm">
                                         {t('required')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPSwitchPrimitive
+                                    </Label>
+                                    <Switch
                                         id="required"
                                         checked={localField.required || false}
                                         onCheckedChange={(checked) =>
@@ -83,10 +72,10 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                                     />
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <IGRPLabelPrimitive htmlFor="nullable" className="text-sm">
+                                    <Label htmlFor="nullable" className="text-sm">
                                         {t('nullable')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPSwitchPrimitive
+                                    </Label>
+                                    <Switch
                                         id="nullable"
                                         checked={localField.nullable || false}
                                         onCheckedChange={(checked) =>
@@ -95,10 +84,10 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                                     />
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <IGRPLabelPrimitive htmlFor="deprecated" className="text-sm">
+                                    <Label htmlFor="deprecated" className="text-sm">
                                         {t('deprecated')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPSwitchPrimitive
+                                    </Label>
+                                    <Switch
                                         id="deprecated"
                                         checked={localField.deprecated || false}
                                         onCheckedChange={(checked) =>
@@ -114,10 +103,10 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                                 <>
                                     <div className="grid grid-cols-3 gap-2 col-span-2">
                                         <div className="items-center space-x-2">
-                                            <IGRPLabelPrimitive htmlFor="enum" className="text-sm">
+                                            <Label htmlFor="enum" className="text-sm">
                                                 {t('enum')}
-                                            </IGRPLabelPrimitive>
-                                            <IGRPSwitchPrimitive
+                                            </Label>
+                                            <Switch
                                                 id="enum"
                                                 value={localField.enum?.join(',') || ''}
                                                 className="h-6 text-sm"
@@ -127,10 +116,10 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                                             />
                                         </div>
                                         <div className="items-center space-x-2">
-                                            <IGRPLabelPrimitive htmlFor="const" className="text-sm">
+                                            <Label htmlFor="const" className="text-sm">
                                                 {t('const')}
-                                            </IGRPLabelPrimitive>
-                                            <IGRPSwitchPrimitive
+                                            </Label>
+                                            <Switch
                                                 id="const"
                                                 value={localField.const || ''}
                                                 className="col-span-2 h-6 text-sm"
@@ -141,10 +130,10 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                                         </div>
                                     </div>
                                     <div className="items-center gap-4">
-                                        <IGRPLabelPrimitive htmlFor="format" className="text-sm">
+                                        <Label htmlFor="format" className="text-sm">
                                             {t('format')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
+                                        </Label>
+                                        <Input
                                             id="format"
                                             value={localField.format || ''}
                                             className="col-span-2 h-6 text-sm"
@@ -152,10 +141,10 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                                         />
                                     </div>
                                     <div className="items-center gap-4">
-                                        <IGRPLabelPrimitive htmlFor="default" className="text-sm">
+                                        <Label htmlFor="default" className="text-sm">
                                             {t('default')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
+                                        </Label>
+                                        <Input
                                             id="default"
                                             value={localField.default || ''}
                                             className="col-span-2 h-6 text-sm"
@@ -165,10 +154,10 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                                         />
                                     </div>
                                     <div className="items-center gap-4 col-span-2">
-                                        <IGRPLabelPrimitive htmlFor="examples" className="text-sm">
+                                        <Label htmlFor="examples" className="text-sm">
                                             {t('examples')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
+                                        </Label>
+                                        <Input
                                             id="examples"
                                             value={localField.examples?.join(',') || ''}
                                             className="col-span-2 h-6 text-sm"
@@ -187,10 +176,10 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                             {(localField.type === 'number' || localField.type === 'integer') && (
                                 <>
                                     <div className="items-center gap-4">
-                                        <IGRPLabelPrimitive htmlFor="minimum" className="text-sm">
+                                        <Label htmlFor="minimum" className="text-sm">
                                             {t('minimum')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
+                                        </Label>
+                                        <Input
                                             id="minimum"
                                             type="number"
                                             value={localField.minimum || ''}
@@ -201,10 +190,10 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                                         />
                                     </div>
                                     <div className="items-center gap-4">
-                                        <IGRPLabelPrimitive htmlFor="maximum" className="text-sm">
+                                        <Label htmlFor="maximum" className="text-sm">
                                             {t('maximum')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
+                                        </Label>
+                                        <Input
                                             id="maximum"
                                             type="number"
                                             value={localField.maximum || ''}
@@ -215,13 +204,10 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                                         />
                                     </div>
                                     <div className="items-center gap-4">
-                                        <IGRPLabelPrimitive
-                                            htmlFor="multipleOf"
-                                            className="text-sm"
-                                        >
+                                        <Label htmlFor="multipleOf" className="text-sm">
                                             {t('multipleOf')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
+                                        </Label>
+                                        <Input
                                             id="multipleOf"
                                             type="number"
                                             value={localField.multipleOf || ''}
@@ -237,8 +223,8 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                                 </>
                             )}
                             <div className="col-span-2 items-center gap-4">
-                                <IGRPLabelPrimitive className="text-sm">Title</IGRPLabelPrimitive>
-                                <IGRPInputPrimitive
+                                <Label className="text-sm">Title</Label>
+                                <Input
                                     id="title"
                                     value={localField.title || ''}
                                     className=" h-6 text-sm"
@@ -246,15 +232,15 @@ export function FieldOptionsPopover({ field, onUpdate }: FieldOptionsPopoverProp
                                 />
                             </div>
                         </div>
-                    </IGRPTabsContentPrimitive>
-                    <IGRPTabsContentPrimitive value="jsonSchema">
+                    </TabsContent>
+                    <TabsContent value="jsonSchema">
                         <MonacoEditor
                             content={JSON.stringify(field, null, 2)}
                             onChange={handleChangeEditor}
                         />
-                    </IGRPTabsContentPrimitive>
-                </IGRPTabsPrimitive>
-            </IGRPPopoverContentPrimitive>
-        </IGRPPopoverPrimitive>
+                    </TabsContent>
+                </Tabs>
+            </PopoverContent>
+        </Popover>
     )
 }

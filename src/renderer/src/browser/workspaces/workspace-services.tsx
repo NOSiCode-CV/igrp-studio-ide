@@ -1,18 +1,19 @@
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPBadgePrimitive,
-    IGRPButtonPrimitive,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@renderer/components/ui/select'
+import { ToggleGroup, ToggleGroupItem } from '@renderer/components/ui/toggle-group'
+import {
     IGRPCard,
     IGRPCardContent,
     IGRPCardDescription,
     IGRPCardHeader,
-    IGRPCardTitle,
-    IGRPSelectContentPrimitive,
-    IGRPSelectItemPrimitive,
-    IGRPSelectPrimitive,
-    IGRPSelectTriggerPrimitive,
-    IGRPSelectValuePrimitive,
-    IGRPToggleGroupItemPrimitive,
-    IGRPToggleGroupPrimitive
+    IGRPCardTitle
 } from '@igrp/igrp-framework-react-design-system'
 import { SearchInput, SubHeadline } from '@renderer/components/shared-ui'
 import { useDocker } from '@renderer/hooks/use-docker'
@@ -78,10 +79,16 @@ const resolveServiceStack = (service: ServiceInfo): StackId => {
     }
 
     const composeFile = service.composeFile?.toLowerCase() || ''
-    if (composeFile.includes('igrp-monitoring-compose.yaml') || composeFile.includes('compose-monitoring.yaml')) {
+    if (
+        composeFile.includes('igrp-monitoring-compose.yaml') ||
+        composeFile.includes('compose-monitoring.yaml')
+    ) {
         return 'monitoring'
     }
-    if (composeFile.includes('igrp-process-compose.yaml') || composeFile.includes('compose-process.yaml')) {
+    if (
+        composeFile.includes('igrp-process-compose.yaml') ||
+        composeFile.includes('compose-process.yaml')
+    ) {
         return 'process'
     }
     if (composeFile.includes('igrp-compose.yaml')) {
@@ -125,10 +132,12 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
         state: { changeStatus }
     } = useWorkspace()
 
-    const { services, refreshContainers, restartService, stopService, startContainers } = useDocker({
-        workspace: workspace!,
-        changeStatus
-    })
+    const { services, refreshContainers, restartService, stopService, startContainers } = useDocker(
+        {
+            workspace: workspace!,
+            changeStatus
+        }
+    )
 
     useEffect(() => {
         void refreshContainers()
@@ -214,7 +223,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                         description={`${filteredServices.length} services`}
                     />
                     <ConfigurationDialog services={allServices} isNew={true}>
-                        <IGRPButtonPrimitive>{t('newService')}</IGRPButtonPrimitive>
+                        <Button>{t('newService')}</Button>
                     </ConfigurationDialog>
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -225,35 +234,33 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                             onChange={setServiceSearchQuery}
                             className="lg:w-[250px]"
                         />
-                        <IGRPToggleGroupPrimitive
+                        <ToggleGroup
                             type="single"
                             value={serviceViewMode}
                             onValueChange={(value) =>
                                 value && setServiceViewMode(value as ViewMode)
                             }
                         >
-                            <IGRPToggleGroupItemPrimitive value="grid" size="sm" className="h-8 w-8">
+                            <ToggleGroupItem value="grid" size="sm" className="h-8 w-8">
                                 <LayoutGrid className="h-3.5 w-3.5" />
-                            </IGRPToggleGroupItemPrimitive>
-                            <IGRPToggleGroupItemPrimitive value="list" size="sm" className="h-8 w-8">
+                            </ToggleGroupItem>
+                            <ToggleGroupItem value="list" size="sm" className="h-8 w-8">
                                 <List className="h-3.5 w-3.5" />
-                            </IGRPToggleGroupItemPrimitive>
-                        </IGRPToggleGroupPrimitive>
+                            </ToggleGroupItem>
+                        </ToggleGroup>
                     </div>
                     <div className="flex items-center gap-2">
                         <span>{t('sortBy')}</span>
-                        <IGRPSelectPrimitive value={sortOrderService} onValueChange={setSortOrderService}>
-                            <IGRPSelectTriggerPrimitive className="w-[180px] !h-7">
-                                <IGRPSelectValuePrimitive placeholder={t('orderBy')} />
-                            </IGRPSelectTriggerPrimitive>
-                            <IGRPSelectContentPrimitive>
-                                <IGRPSelectItemPrimitive value="lastModified">
-                                    {t('lastModified')}
-                                </IGRPSelectItemPrimitive>
-                                <IGRPSelectItemPrimitive value="name">{t('name')}</IGRPSelectItemPrimitive>
-                                <IGRPSelectItemPrimitive value="type">{t('type')}</IGRPSelectItemPrimitive>
-                            </IGRPSelectContentPrimitive>
-                        </IGRPSelectPrimitive>
+                        <Select value={sortOrderService} onValueChange={setSortOrderService}>
+                            <SelectTrigger className="w-[180px] !h-7">
+                                <SelectValue placeholder={t('orderBy')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="lastModified">{t('lastModified')}</SelectItem>
+                                <SelectItem value="name">{t('name')}</SelectItem>
+                                <SelectItem value="type">{t('type')}</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
                 <div className="space-y-6">
@@ -276,7 +283,9 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                         for (const service of stackItems) {
                             subgroupedStackItems[resolveServiceSubgroup(service)].push(service)
                         }
-                        const running = currentServices.filter((service) => service.status === 'running')
+                        const running = currentServices.filter(
+                            (service) => service.status === 'running'
+                        )
                         const isBusy = runningActionStack === stack.id
 
                         return (
@@ -287,9 +296,9 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                 <IGRPCardHeader className="compact-card-header bg-white border-b">
                                     <IGRPCardTitle className="text-sm flex items-center justify-between">
                                         <span>{stack.title}</span>
-                                        <IGRPBadgePrimitive variant="outline" className="text-xs">
+                                        <Badge variant="outline" className="text-xs">
                                             {running.length}/{currentServices.length}
-                                        </IGRPBadgePrimitive>
+                                        </Badge>
                                     </IGRPCardTitle>
                                     <IGRPCardDescription className="text-xs">
                                         {stack.description}
@@ -297,7 +306,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                 </IGRPCardHeader>
                                 <IGRPCardContent className="compact-card-content space-y-3">
                                     <div className="flex gap-2">
-                                        <IGRPButtonPrimitive
+                                        <Button
                                             size="sm"
                                             variant="outline"
                                             className="h-7"
@@ -310,8 +319,8 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                 <Play className="h-3.5 w-3.5 mr-1" />
                                             )}
                                             Start
-                                        </IGRPButtonPrimitive>
-                                        <IGRPButtonPrimitive
+                                        </Button>
+                                        <Button
                                             size="sm"
                                             variant="outline"
                                             className="h-7"
@@ -320,10 +329,10 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                         >
                                             <Square className="h-3.5 w-3.5 mr-1" />
                                             Stop
-                                        </IGRPButtonPrimitive>
-                                        <IGRPBadgePrimitive variant="outline" className="text-xs ml-auto">
+                                        </Button>
+                                        <Badge variant="outline" className="text-xs ml-auto">
                                             {stackItems.length} shown
-                                        </IGRPBadgePrimitive>
+                                        </Badge>
                                     </div>
 
                                     {stackItems.length === 0 ? (
@@ -333,7 +342,8 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                     ) : (
                                         <div className="space-y-4">
                                             {serviceSubgroupBlocks.map((subgroup) => {
-                                                const subgroupItems = subgroupedStackItems[subgroup.id]
+                                                const subgroupItems =
+                                                    subgroupedStackItems[subgroup.id]
                                                 if (!subgroupItems.length) return null
                                                 return (
                                                     <div
@@ -344,12 +354,12 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                             <div className="text-xs font-semibold uppercase tracking-wide text-foreground/80">
                                                                 {subgroup.title}
                                                             </div>
-                                                            <IGRPBadgePrimitive
+                                                            <Badge
                                                                 variant="outline"
                                                                 className="text-[10px]"
                                                             >
                                                                 {subgroupItems.length}
-                                                            </IGRPBadgePrimitive>
+                                                            </Badge>
                                                         </div>
                                                         {serviceViewMode === 'grid' ? (
                                                             <ServiceGrid

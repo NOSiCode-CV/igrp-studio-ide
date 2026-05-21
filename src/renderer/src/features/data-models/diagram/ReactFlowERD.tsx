@@ -1,12 +1,12 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
 import { Database, KeyRound, MoreVertical, Plus, Trash2 } from 'lucide-react'
 import { type FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -98,8 +98,8 @@ const EntityNode: FC<{ data: EntityNodeData; selected: boolean }> = memo(({ data
                     <span className="text-sm font-semibold truncate">{entity.name}</span>
                 </div>
                 {!readOnly && (
-                    <IGRPDropdownMenuPrimitive>
-                        <IGRPDropdownMenuTriggerPrimitive asChild>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
                             <button
                                 type="button"
                                 className="p-0.5 rounded hover:bg-muted"
@@ -107,27 +107,27 @@ const EntityNode: FC<{ data: EntityNodeData; selected: boolean }> = memo(({ data
                             >
                                 <MoreVertical className="h-3.5 w-3.5" />
                             </button>
-                        </IGRPDropdownMenuTriggerPrimitive>
-                        <IGRPDropdownMenuContentPrimitive align="end">
-                            <IGRPDropdownMenuItemPrimitive onClick={() => onOpen?.(entity.id)}>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => onOpen?.(entity.id)}>
                                 {t('open_in_editor')}
-                            </IGRPDropdownMenuItemPrimitive>
-                            <IGRPDropdownMenuItemPrimitive onClick={() => onAddField?.(entity.id)}>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onAddField?.(entity.id)}>
                                 <Plus className="h-3.5 w-3.5 mr-2" />
                                 {t('add_field')}
-                            </IGRPDropdownMenuItemPrimitive>
-                            <IGRPDropdownMenuItemPrimitive onClick={() => onRename?.(entity.id)}>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onRename?.(entity.id)}>
                                 {t('rename_entity')}
-                            </IGRPDropdownMenuItemPrimitive>
-                            <IGRPDropdownMenuItemPrimitive
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
                                 onClick={() => onDelete?.(entity.id)}
                                 className="text-destructive"
                             >
                                 <Trash2 className="h-3.5 w-3.5 mr-2" />
                                 {t('delete_entity')}
-                            </IGRPDropdownMenuItemPrimitive>
-                        </IGRPDropdownMenuContentPrimitive>
-                    </IGRPDropdownMenuPrimitive>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 )}
             </div>
             <ul className="divide-y text-xs">
@@ -393,10 +393,10 @@ function ReactFlowERDInner({
                 <Controls />
                 {onNewEntity && (
                     <div className="absolute top-2 left-2 z-10">
-                        <IGRPButtonPrimitive size="sm" onClick={onNewEntity}>
+                        <Button size="sm" onClick={onNewEntity}>
                             <Plus className="h-4 w-4 mr-1" />
                             {t('new_entity')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                 )}
             </ReactFlow>

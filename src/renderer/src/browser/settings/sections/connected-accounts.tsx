@@ -1,8 +1,6 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
 import { nanoid } from '@reduxjs/toolkit'
 import useGithubAuth from '@renderer/hooks/use-git-auth'
 import useToast from '@renderer/hooks/useToast'
@@ -101,10 +99,8 @@ function ProviderConfigForm({
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <IGRPLabelPrimitive>
-                    {isGitHub ? t('custom_github_name') : t('custom_gitlab_name')}
-                </IGRPLabelPrimitive>
-                <IGRPInputPrimitive
+                <Label>{isGitHub ? t('custom_github_name') : t('custom_gitlab_name')}</Label>
+                <Input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -118,10 +114,8 @@ function ProviderConfigForm({
                 {showError('name') && <p className="text-xs text-red-600">{showError('name')}</p>}
             </div>
             <div className="space-y-2">
-                <IGRPLabelPrimitive>
-                    {isGitHub ? t('github_base_url') : t('gitlab_base_url')}
-                </IGRPLabelPrimitive>
-                <IGRPInputPrimitive
+                <Label>{isGitHub ? t('github_base_url') : t('gitlab_base_url')}</Label>
+                <Input
                     type="text"
                     value={baseUrl}
                     onChange={(e) => setBaseUrl(e.target.value)}
@@ -135,8 +129,8 @@ function ProviderConfigForm({
                 )}
             </div>
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('client_id')}</IGRPLabelPrimitive>
-                <IGRPInputPrimitive
+                <Label>{t('client_id')}</Label>
+                <Input
                     type="text"
                     value={clientId}
                     onChange={(e) => setClientId(e.target.value)}
@@ -147,8 +141,8 @@ function ProviderConfigForm({
                 )}
             </div>
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('client_secret')}</IGRPLabelPrimitive>
-                <IGRPInputPrimitive
+                <Label>{t('client_secret')}</Label>
+                <Input
                     type="password"
                     value={clientSecret}
                     onChange={(e) => setClientSecret(e.target.value)}
@@ -159,12 +153,10 @@ function ProviderConfigForm({
                 )}
             </div>
             <div className="flex space-x-2">
-                <IGRPButtonPrimitive onClick={handleSave}>
-                    {t('save_configuration')}
-                </IGRPButtonPrimitive>
-                <IGRPButtonPrimitive variant="outline" onClick={onCancel}>
+                <Button onClick={handleSave}>{t('save_configuration')}</Button>
+                <Button variant="outline" onClick={onCancel}>
                     {t('cancel')}
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
         </div>
     )
@@ -225,30 +217,30 @@ function Account({
 
             <div className="flex items-center space-x-2">
                 {!isActive && connected && (
-                    <IGRPButtonPrimitive variant="outline" size="sm" onClick={onActivate}>
+                    <Button variant="outline" size="sm" onClick={onActivate}>
                         {t('activate')}
-                    </IGRPButtonPrimitive>
+                    </Button>
                 )}
 
                 {!isDefault && onEdit && (
-                    <IGRPButtonPrimitive variant="outline" size="sm" onClick={onEdit}>
+                    <Button variant="outline" size="sm" onClick={onEdit}>
                         <Settings size={16} />
-                    </IGRPButtonPrimitive>
+                    </Button>
                 )}
 
                 {!isDefault && onDelete && (
-                    <IGRPButtonPrimitive variant="outline" size="sm" onClick={onDelete}>
+                    <Button variant="outline" size="sm" onClick={onDelete}>
                         <Trash2 size={16} />
-                    </IGRPButtonPrimitive>
+                    </Button>
                 )}
 
-                <IGRPButtonPrimitive
+                <Button
                     variant={connected ? 'outline' : 'default'}
                     onClick={handleClick}
                     disabled={isDefault && !isConfigured}
                 >
                     {connected ? t('disconnect') : t('connect')}
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
         </div>
     )
@@ -467,14 +459,14 @@ export function ConnectedAccountsSettings(): React.ReactNode {
 
                 {/* Add Provider Buttons */}
                 <div className="pt-2 flex flex-wrap gap-2">
-                    <IGRPButtonPrimitive variant="outline" onClick={() => openAddForm('github')}>
+                    <Button variant="outline" onClick={() => openAddForm('github')}>
                         <Plus size={16} className="mr-2" />
                         {t('add_github')}
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive variant="outline" onClick={() => openAddForm('gitlab')}>
+                    </Button>
+                    <Button variant="outline" onClick={() => openAddForm('gitlab')}>
                         <Plus size={16} className="mr-2" />
                         {t('add_gitlab')}
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
             </div>
         </div>

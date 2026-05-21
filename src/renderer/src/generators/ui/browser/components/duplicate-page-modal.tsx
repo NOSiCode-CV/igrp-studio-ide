@@ -1,11 +1,11 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
 import type { ComponentConfig, PageConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
 import { TextInput } from '@renderer/generators/api/components/inputs-form'
@@ -88,14 +88,12 @@ export function DuplicatePageModal({
     // messages and the conditional `path` rule stay in sync.
     const schema = useMemo(() => {
         const base = z.object({
-            description: z
-                .string()
-                .min(
-                    1,
-                    t('thisFieldRequired', {
-                        name: isPage ? t('pageTitle') : t('componentTitle')
-                    })
-                ),
+            description: z.string().min(
+                1,
+                t('thisFieldRequired', {
+                    name: isPage ? t('pageTitle') : t('componentTitle')
+                })
+            ),
             name: z
                 .string()
                 .min(1, t('thisFieldRequired', { name: t('name') }))
@@ -191,19 +189,19 @@ export function DuplicatePageModal({
     })
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
-            <IGRPDialogContentPrimitive>
-                <IGRPDialogTitlePrimitive>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogTitle>
                     {t('duplicateItem', {
                         type: isPage ? 'page' : 'component',
                         name: pageToDuplicate?.description || pageToDuplicate?.pageName
                     })}
-                </IGRPDialogTitlePrimitive>
-                <IGRPDialogDescriptionPrimitive>
+                </DialogTitle>
+                <DialogDescription>
                     {t('duplicateItemDescription', {
                         type: isPage ? 'page' : 'component'
                     })}
-                </IGRPDialogDescriptionPrimitive>
+                </DialogDescription>
                 <form className="needs-validation space-y-4" onSubmit={onSubmit}>
                     <div className="grid grid-cols-1 gap-4">
                         <TextInput
@@ -236,20 +234,16 @@ export function DuplicatePageModal({
                             />
                         )}
                     </div>
-                    <IGRPDialogFooterPrimitive className="flex justify-between">
-                        <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
+                    <DialogFooter className="flex justify-between">
+                        <Button type="button" variant="ghost" onClick={onClose}>
                             {t('cancel')}
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive
-                            type="submit"
-                            disabled={isSubmitting}
-                            color="primary"
-                        >
+                        </Button>
+                        <Button type="submit" disabled={isSubmitting} color="primary">
                             {isSubmitting ? t('duplicating') : t('duplicate')}
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogFooterPrimitive>
+                        </Button>
+                    </DialogFooter>
                 </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

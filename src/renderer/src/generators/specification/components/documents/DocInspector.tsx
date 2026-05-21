@@ -1,4 +1,5 @@
-import { IGRPButtonPrimitive, IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
 import { cn } from '@renderer/lib/utils'
 import type { KBItem } from '@renderer/redux/specKB/reducer'
 import {
@@ -179,20 +180,16 @@ export function DocInspector({
 
                     {urlInputOpen && (
                         <form onSubmit={handleSubmitUrl} className="mb-2 flex gap-1.5">
-                            <IGRPInputPrimitive
+                            <Input
                                 autoFocus
                                 placeholder="https://… or youtube.com/…"
                                 value={urlValue}
                                 onChange={(e) => setUrlValue(e.target.value)}
                                 className="h-7 text-[11px]"
                             />
-                            <IGRPButtonPrimitive
-                                type="submit"
-                                size="sm"
-                                className="h-7 px-2 text-[10px]"
-                            >
+                            <Button type="submit" size="sm" className="h-7 px-2 text-[10px]">
                                 Add
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </form>
                     )}
 
@@ -224,7 +221,7 @@ export function DocInspector({
                                 <>
                                     <div className="relative mb-2">
                                         <Search className="absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
-                                        <IGRPInputPrimitive
+                                        <Input
                                             placeholder="Filter KB…"
                                             value={filter}
                                             onChange={(e) => setFilter(e.target.value)}

@@ -1,13 +1,8 @@
-import {
-    IGRPBadgePrimitive,
-    IGRPCombobox,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Badge } from '@renderer/components/ui/badge'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import MonacoEditor from '@renderer/components/monaco-editor'
 import type React from 'react'
 import { useEffect, useState } from 'react'
@@ -202,7 +197,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     const RenderFields = (): React.ReactNode => (
         <>
             <div className="flex flex-col gap-2 w-full">
-                <IGRPLabelPrimitive>{t('collectionType')}</IGRPLabelPrimitive>
+                <Label>{t('collectionType')}</Label>
                 <IGRPCombobox
                     options={collectionTypes}
                     value={collectionType}
@@ -214,12 +209,8 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                 />
             </div>
             <div className="flex flex-col gap-2">
-                <IGRPLabelPrimitive>{t('name')}</IGRPLabelPrimitive>
-                <IGRPInputPrimitive
-                    name={t('name')}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
+                <Label>{t('name')}</Label>
+                <Input name={t('name')} value={name} onChange={(e) => setName(e.target.value)} />
             </div>
         </>
     )
@@ -227,7 +218,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
     return (
         <div className="flex flex-col gap-4 mt-4">
             <div className="flex space-x-4 text-sm">
-                <IGRPBadgePrimitive
+                <Badge
                     onClick={() => {
                         setBodyType('none')
                         formik.setFieldValue(routeFormData, undefined)
@@ -240,15 +231,15 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                     className="cursor-pointer"
                 >
                     {t('none')}
-                </IGRPBadgePrimitive>
-                <IGRPBadgePrimitive
+                </Badge>
+                <Badge
                     onClick={() => setBodyType('multipart/form-data')}
                     variant={bodyType === 'multipart/form-data' ? 'default' : 'outline'}
                     className="cursor-pointer"
                 >
                     {t('formData')}
-                </IGRPBadgePrimitive>
-                <IGRPBadgePrimitive
+                </Badge>
+                <Badge
                     onClick={() => setBodyType('application/json')}
                     variant={
                         bodyType === 'multipart/form-data' || bodyType === 'none'
@@ -258,7 +249,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                     className="cursor-pointer"
                 >
                     {t('json')}
-                </IGRPBadgePrimitive>
+                </Badge>
             </div>
             {bodyType === 'none' ? (
                 <div className="text-center rounded p-8 border">
@@ -290,7 +281,7 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                 <div className="space-y-3">
                     <div className="grid grid-cols-3 gap-3">
                         <div className="flex flex-col gap-2">
-                            <IGRPLabelPrimitive>{t('contentType')}</IGRPLabelPrimitive>
+                            <Label>{t('contentType')}</Label>
                             <IGRPCombobox
                                 value={bodyType}
                                 placeholder={t('selectContentType')}
@@ -302,16 +293,12 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                         </div>
                         {RenderFields()}
                     </div>
-                    <IGRPTabsPrimitive defaultValue="schema">
-                        <IGRPTabsListPrimitive>
-                            <IGRPTabsTriggerPrimitive value="value">
-                                {t('value')}
-                            </IGRPTabsTriggerPrimitive>
-                            <IGRPTabsTriggerPrimitive value="schema">
-                                {t('dataSchema')}
-                            </IGRPTabsTriggerPrimitive>
-                        </IGRPTabsListPrimitive>
-                        <IGRPTabsContentPrimitive value="value">
+                    <Tabs defaultValue="schema">
+                        <TabsList>
+                            <TabsTrigger value="value">{t('value')}</TabsTrigger>
+                            <TabsTrigger value="schema">{t('dataSchema')}</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="value">
                             <MonacoEditor
                                 content={JSON.stringify(localSchema, null, 2)}
                                 filePath=""
@@ -319,8 +306,8 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                                 height="20vh"
                                 language="json"
                             />
-                        </IGRPTabsContentPrimitive>
-                        <IGRPTabsContentPrimitive value="schema">
+                        </TabsContent>
+                        <TabsContent value="schema">
                             <div className="border rounded">
                                 <JSONSchemaBuilder
                                     schemaTypes={schemaTypes}
@@ -328,8 +315,8 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
                                     onSchemaChange={handleSchemaChange}
                                 />
                             </div>
-                        </IGRPTabsContentPrimitive>
-                    </IGRPTabsPrimitive>
+                        </TabsContent>
+                    </Tabs>
                 </div>
             )}
         </div>

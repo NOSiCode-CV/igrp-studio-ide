@@ -1,4 +1,4 @@
-import { IGRPSidebarInsetPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { SidebarInset } from '@renderer/components/ui/sidebar'
 import Loader from '@renderer/components/loader'
 import { APRESENTATION } from '@renderer/constants/appConstants'
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left'
@@ -229,11 +229,11 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
         return (
             <div className="flex flex-1 overflow-hidden">
                 <AppSidebar data={menuItems} basePath={basePath} />
-                <IGRPSidebarInsetPrimitive>
+                <SidebarInset>
                     <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>{renderContent}</ContainerScrollArea>
                     </div>
-                </IGRPSidebarInsetPrimitive>
+                </SidebarInset>
             </div>
         )
     }

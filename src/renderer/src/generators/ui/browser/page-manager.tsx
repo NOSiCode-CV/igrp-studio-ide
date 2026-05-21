@@ -1,17 +1,13 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuTriggerPrimitive,
-    IGRPPageHeader,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive,
-    IGRPToggleGroupItemPrimitive,
-    IGRPToggleGroupPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
+import { ToggleGroup, ToggleGroupItem } from '@renderer/components/ui/toggle-group'
+import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system'
 import type { DeleteConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
 import { EmptyList } from '@renderer/components/empty-list'
@@ -265,22 +261,22 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                 changelogContent={nextjsEngineChangelog}
             />
 
-            <IGRPTabsPrimitive value={activeTab} onValueChange={setActiveTab}>
-                <IGRPTabsListPrimitive>
-                    <IGRPTabsTriggerPrimitive value="pages">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList>
+                    <TabsTrigger value="pages">
                         <FileCode className="h-4 w-4 mr-2" />
                         {t('pages')}
-                    </IGRPTabsTriggerPrimitive>
-                    <IGRPTabsTriggerPrimitive value="bpmn">
+                    </TabsTrigger>
+                    <TabsTrigger value="bpmn">
                         <Workflow className="h-4 w-4 mr-2" />
                         BPMN
-                    </IGRPTabsTriggerPrimitive>
-                    <IGRPTabsTriggerPrimitive value="settings">
+                    </TabsTrigger>
+                    <TabsTrigger value="settings">
                         <Settings className="h-4 w-4 mr-2" />
                         {t('settings')}
-                    </IGRPTabsTriggerPrimitive>
-                </IGRPTabsListPrimitive>
-                <IGRPTabsContentPrimitive value="pages" className="space-y-4 pt-3 group">
+                    </TabsTrigger>
+                </TabsList>
+                <TabsContent value="pages" className="space-y-4 pt-3 group">
                     <>
                         <div className="flex justify-between">
                             <SubHeadline
@@ -299,53 +295,53 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                                     onChange={(value) => setSearchTerm(value)}
                                     className="lg:w-[250px]"
                                 />
-                                <IGRPToggleGroupPrimitive
+                                <ToggleGroup
                                     type="single"
                                     value={viewMode}
                                     onValueChange={(value) =>
                                         value && setViewMode(value as 'table' | 'card')
                                     }
                                 >
-                                    <IGRPToggleGroupItemPrimitive
+                                    <ToggleGroupItem
                                         value="card"
                                         aria-label="Card view"
                                         className="h-8 w-8"
                                     >
                                         <LayoutGrid className="h-3.5 w-3.5" />
-                                    </IGRPToggleGroupItemPrimitive>
-                                    <IGRPToggleGroupItemPrimitive
+                                    </ToggleGroupItem>
+                                    <ToggleGroupItem
                                         value="table"
                                         aria-label="Table view"
                                         className="h-8 w-8"
                                     >
                                         <TableIcon className="h-3.5 w-3.5" />
-                                    </IGRPToggleGroupItemPrimitive>
-                                </IGRPToggleGroupPrimitive>
-                                <IGRPDropdownMenuPrimitive>
-                                    <IGRPDropdownMenuTriggerPrimitive asChild>
-                                        <IGRPButtonPrimitive size="sm" variant="default">
+                                    </ToggleGroupItem>
+                                </ToggleGroup>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button size="sm" variant="default">
                                             <Plus className="h-4 w-4" />
                                             {t('add')}
-                                        </IGRPButtonPrimitive>
-                                    </IGRPDropdownMenuTriggerPrimitive>
-                                    <IGRPDropdownMenuContentPrimitive>
-                                        <IGRPDropdownMenuItemPrimitive
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem
                                             onSelect={() => {
                                                 openDialogNewPage(undefined, false)
                                             }}
                                         >
                                             {t('createNewPage')}
-                                        </IGRPDropdownMenuItemPrimitive>
-                                        <IGRPDropdownMenuItemPrimitive
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
                                             onSelect={() => {
                                                 setFormComponent(true)
                                                 setCurrentComponent(undefined)
                                             }}
                                         >
                                             {t('createNewComponent')}
-                                        </IGRPDropdownMenuItemPrimitive>
-                                    </IGRPDropdownMenuContentPrimitive>
-                                </IGRPDropdownMenuPrimitive>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
 
@@ -397,22 +393,22 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                             />
                         )}
                     </>
-                </IGRPTabsContentPrimitive>
-                <IGRPTabsContentPrimitive value="bpmn" className="space-y-4 pt-3">
+                </TabsContent>
+                <TabsContent value="bpmn" className="space-y-4 pt-3">
                     <BPMNManager
                         onPageClick={handleAddComponents}
                         bpmnProcesses={bpmnProcesses}
                         basePath={basePath}
                     />
-                </IGRPTabsContentPrimitive>
-                <IGRPTabsContentPrimitive value="settings" className="space-y-4">
+                </TabsContent>
+                <TabsContent value="settings" className="space-y-4">
                     <ProjectSettings
                         hasTitle={false}
                         project={project}
                         className="max-w-screen px-0"
                     />
-                </IGRPTabsContentPrimitive>
-            </IGRPTabsPrimitive>
+                </TabsContent>
+            </Tabs>
             <CreatePageModal
                 basePath={basePath}
                 isOpen={showformPage}

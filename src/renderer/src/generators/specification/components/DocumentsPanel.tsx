@@ -1,4 +1,5 @@
-import { IGRPButtonPrimitive, IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
 import { TAB_DEFAULT, useTabs } from '@renderer/components/navigation/TabContext'
 import TabsNavigation from '@renderer/components/navigation/tabs-navigation'
 import { cn } from '@renderer/lib/utils'
@@ -157,7 +158,7 @@ const ListVariant = ({ basePath }: PanelProps): JSX.Element => {
             <div className="flex flex-col gap-3 border-b p-3">
                 <div className="flex items-center gap-2">
                     <h2 className="flex-1 text-sm font-semibold">Explorer</h2>
-                    <IGRPButtonPrimitive
+                    <Button
                         size="icon"
                         variant="ghost"
                         className="h-7 w-7"
@@ -166,8 +167,8 @@ const ListVariant = ({ basePath }: PanelProps): JSX.Element => {
                         disabled={!basePath}
                     >
                         <Plus size={14} />
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
+                    </Button>
+                    <Button
                         size="icon"
                         variant="ghost"
                         className="h-7 w-7"
@@ -176,11 +177,11 @@ const ListVariant = ({ basePath }: PanelProps): JSX.Element => {
                         disabled={!basePath}
                     >
                         <FolderPlus size={14} />
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
                 <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-3 w-3 text-muted-foreground" />
-                    <IGRPInputPrimitive
+                    <Input
                         placeholder="Find docs…"
                         className="h-8 pl-8 text-[11px]"
                         value={search}
@@ -801,9 +802,7 @@ const DocTabPane = ({ docId, basePath }: DocTabPaneProps): JSX.Element | null =>
                         <AIAssistant
                             mode="docs"
                             supportsKB
-                            persistenceKey={
-                                basePath ? `docs:${basePath}:${docId}` : undefined
-                            }
+                            persistenceKey={basePath ? `docs:${basePath}:${docId}` : undefined}
                             onProposeChange={handleProposeChange}
                             proposalStatus={proposalStatus}
                             proposalSummaries={proposalSummaries}

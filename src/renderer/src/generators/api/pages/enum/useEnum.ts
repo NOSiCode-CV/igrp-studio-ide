@@ -33,7 +33,10 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
         () =>
             z
                 .object({
-                    name: z.string().min(1, t('requiredField')).max(50, t('maxLength', { max: 50 }))
+                    name: z
+                        .string()
+                        .min(1, t('requiredField'))
+                        .max(50, t('maxLength', { max: 50 }))
                 })
                 .passthrough(),
         [t]

@@ -1,18 +1,14 @@
+import { Button } from '@renderer/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import {
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPCombobox,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPLabelPrimitive,
-    IGRPSeparator
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Label } from '@renderer/components/ui/label'
+import { IGRPCombobox, IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import type { Arguments, ComponentConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import IconBrowser from '@renderer/components/icon/icon-browser'
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
@@ -184,12 +180,12 @@ export function CreateComponentModal({
     const args = (values as any).args as Arguments[] | undefined
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
-            <IGRPDialogContentPrimitive className="w-full sm:max-w-[800px] lg:max-w-[60vw] max-w-[70vw]">
-                <IGRPDialogTitlePrimitive>{t('createNewComponent')}</IGRPDialogTitlePrimitive>
-                <IGRPDialogDescriptionPrimitive>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="w-full sm:max-w-[800px] lg:max-w-[60vw] max-w-[70vw]">
+                <DialogTitle>{t('createNewComponent')}</DialogTitle>
+                <DialogDescription>
                     {t('comonDialogtDescription', { name: 'Component' })}
-                </IGRPDialogDescriptionPrimitive>
+                </DialogDescription>
                 <form className="needs-validation" onSubmit={onSubmit}>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col space-y-3">
@@ -212,9 +208,7 @@ export function CreateComponentModal({
                                 placeholder="TodoItem"
                             />
                             <div className="grid grid-cols-1 items-center gap-3">
-                                <IGRPLabelPrimitive htmlFor="Associar">
-                                    {t('pages')}
-                                </IGRPLabelPrimitive>
+                                <Label htmlFor="Associar">{t('pages')}</Label>
                                 {lockedPage ? (
                                     <p className="text-sm text-muted-foreground border rounded px-3 py-2 bg-muted/40">
                                         {t('scoped_to_page', {
@@ -255,13 +249,11 @@ export function CreateComponentModal({
                                 />
                             </div>
 
-                            <IGRPCardPrimitive>
-                                <IGRPCardHeaderPrimitive>
-                                    <IGRPCardTitlePrimitive>
-                                        Generated Component Signature
-                                    </IGRPCardTitlePrimitive>
-                                </IGRPCardHeaderPrimitive>
-                                <IGRPCardContentPrimitive>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Generated Component Signature</CardTitle>
+                                </CardHeader>
+                                <CardContent>
                                     <pre className="p-4 rounded-lg text-sm overflow-x-auto">
                                         <code>
                                             {`export default function  myComponent(`}
@@ -297,8 +289,8 @@ export function CreateComponentModal({
 }`}
                                         </code>
                                     </pre>
-                                </IGRPCardContentPrimitive>
-                            </IGRPCardPrimitive>
+                                </CardContent>
+                            </Card>
                         </div>
                         <div className="col-span-1 py-4">
                             <div className="flex flex-row space-x-3 w-full h-full">
@@ -313,20 +305,16 @@ export function CreateComponentModal({
                             </div>
                         </div>
                     </div>
-                    <IGRPDialogFooterPrimitive className="flex justify-between">
-                        <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
+                    <DialogFooter className="flex justify-between">
+                        <Button type="button" variant="ghost" onClick={onClose}>
                             {t('cancel')}
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive
-                            type="submit"
-                            disabled={isSubmitting}
-                            color="primary"
-                        >
+                        </Button>
+                        <Button type="submit" disabled={isSubmitting} color="primary">
                             {isSubmitting ? t('saving') : t('save')}
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogFooterPrimitive>
+                        </Button>
+                    </DialogFooter>
                 </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

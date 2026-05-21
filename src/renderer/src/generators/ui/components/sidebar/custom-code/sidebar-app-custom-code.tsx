@@ -1,24 +1,28 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuTriggerPrimitive,
-    IGRPLabelPrimitive,
-    IGRPSidebarGroupPrimitive,
-    IGRPSidebarInsetPrimitive,
-    IGRPSidebarMenuButtonPrimitive,
-    IGRPSidebarMenuItemPrimitive,
-    IGRPSidebarMenuPrimitive,
-    IGRPSidebarMenuSubButtonPrimitive,
-    IGRPSidebarMenuSubItemPrimitive,
-    IGRPSidebarMenuSubPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import { Label } from '@renderer/components/ui/label'
+import {
+    SidebarGroup,
+    SidebarInset,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem
+} from '@renderer/components/ui/sidebar'
 import type {
     CodeSnippetsRegisterConfig,
     CustomFunctionConfig,
@@ -26,7 +30,7 @@ import type {
     State
 } from '@igrp/igrp-studio-nextjs-engine/types'
 import { nanoid } from '@reduxjs/toolkit'
-import AlertIGRPDialogPrimitiveDelete from '@renderer/components/alert-dialog-delete'
+import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
 import { EmptyList } from '@renderer/components/empty-list'
 import MonacoEditor from '@renderer/components/monaco-editor'
 import { PATTERNS } from '@renderer/constants/appConstants'
@@ -174,13 +178,13 @@ const ResourceList = <
         <>
             {filteredItems.length > 0 && (
                 <>
-                    <IGRPSidebarGroupPrimitive>
-                        <IGRPSidebarMenuPrimitive>
-                            <IGRPSidebarMenuItemPrimitive key={title}>
-                                <IGRPSidebarMenuButtonPrimitive asChild>
+                    <SidebarGroup>
+                        <SidebarMenu>
+                            <SidebarMenuItem key={title}>
+                                <SidebarMenuButton asChild>
                                     <span className="font-medium">{title}</span>
-                                </IGRPSidebarMenuButtonPrimitive>
-                                <IGRPSidebarMenuSubPrimitive>
+                                </SidebarMenuButton>
+                                <SidebarMenuSub>
                                     {filteredItems.map((item, index) => {
                                         const hasDelete = item.actions
                                             ? item.actions.deletable
@@ -191,25 +195,25 @@ const ResourceList = <
                                             : !!item.id
 
                                         return (
-                                            <IGRPSidebarMenuSubItemPrimitive key={index}>
-                                                <IGRPSidebarMenuSubButtonPrimitive asChild>
+                                            <SidebarMenuSubItem key={index}>
+                                                <SidebarMenuSubButton asChild>
                                                     <div className="flex items-center justify-between w-full group/item relative">
                                                         <span className="">
                                                             {renderItemName(item)}
                                                         </span>
                                                         <div className="absolute right-2 top-1/2 -translate-y-1/2  opacity-0 group-hover/item:opacity-100">
                                                             {hasEdit && (
-                                                                <IGRPButtonPrimitive
+                                                                <Button
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     className="h-6 w-6"
                                                                     onClick={() => onEdit(item)}
                                                                 >
                                                                     <Pencil className="h-3 w-3" />
-                                                                </IGRPButtonPrimitive>
+                                                                </Button>
                                                             )}
                                                             {hasDelete && (
-                                                                <IGRPButtonPrimitive
+                                                                <Button
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     className="h-6 w-6 text-destructive hover:text-destructive"
@@ -219,22 +223,22 @@ const ResourceList = <
                                                                     }}
                                                                 >
                                                                     <Trash2 className="h-3 w-3" />
-                                                                </IGRPButtonPrimitive>
+                                                                </Button>
                                                             )}
                                                         </div>
                                                     </div>
-                                                </IGRPSidebarMenuSubButtonPrimitive>
-                                            </IGRPSidebarMenuSubItemPrimitive>
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
                                         )
                                     })}
-                                </IGRPSidebarMenuSubPrimitive>
-                            </IGRPSidebarMenuItemPrimitive>
-                        </IGRPSidebarMenuPrimitive>
-                    </IGRPSidebarGroupPrimitive>
+                                </SidebarMenuSub>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroup>
                 </>
             )}
             {editModal}
-            <AlertIGRPDialogPrimitiveDelete
+            <AlertDialogDelete
                 isOpen={isDelete}
                 onClose={() => setIsDelete(false)}
                 onConfirm={() => currentItem && onDelete?.(currentItem)}
@@ -250,27 +254,27 @@ const CustomCodeMenu = (): React.ReactNode => {
 
     return (
         <>
-            <IGRPDropdownMenuPrimitive>
-                <IGRPDropdownMenuTriggerPrimitive asChild>
-                    <IGRPButtonPrimitive variant={'outline'} size={'icon'}>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant={'outline'} size={'icon'}>
                         <Plus />
-                    </IGRPButtonPrimitive>
-                </IGRPDropdownMenuTriggerPrimitive>
-                <IGRPDropdownMenuContentPrimitive className="w-48">
-                    <IGRPDropdownMenuItemPrimitive onClick={() => setOpenFnc(true)}>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48">
+                    <DropdownMenuItem onClick={() => setOpenFnc(true)}>
                         <div className="flex flex-1 justify-between items-center">
                             <span>Function</span>
                             <ChevronRight className="w-8 h-8" />
                         </div>
-                    </IGRPDropdownMenuItemPrimitive>
-                    <IGRPDropdownMenuItemPrimitive onClick={() => setOpenState(true)}>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setOpenState(true)}>
                         <div className="flex flex-1 justify-between items-center">
                             <span>State</span>
                             <ChevronRight className="w-8 h-8" />
                         </div>
-                    </IGRPDropdownMenuItemPrimitive>
-                </IGRPDropdownMenuContentPrimitive>
-            </IGRPDropdownMenuPrimitive>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
             {openfnc && <FncComponent open={openfnc} setOpen={setOpenFnc} />}
             {openState && <StateComponent open={openState} setOpen={setOpenState} />}
         </>
@@ -364,12 +368,12 @@ const FncComponent = ({
     const editorRef = useRef<any>(null)
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-            <IGRPDialogContentPrimitive className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw]">
-                <IGRPSidebarInsetPrimitive>
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw]">
+                <SidebarInset>
                     <form onSubmit={formik.handleSubmit} className="space-y-4 p-4">
-                        <IGRPDialogHeaderPrimitive>
-                            <IGRPDialogTitlePrimitive>
+                        <DialogHeader>
+                            <DialogTitle>
                                 <div className="flex items-center gap-2 justify-between">
                                     <div>
                                         {funct ? 'Edit Function' : 'Create Function'}{' '}
@@ -377,7 +381,7 @@ const FncComponent = ({
                                             {funct ? funct.name : ''}
                                         </span>
                                     </div>
-                                    <IGRPButtonPrimitive
+                                    <Button
                                         type="submit"
                                         disabled={formik.isSubmitting || !formik.isValid}
                                         className="relative"
@@ -393,11 +397,11 @@ const FncComponent = ({
                                         ) : (
                                             'Create Function'
                                         )}
-                                    </IGRPButtonPrimitive>
+                                    </Button>
                                 </div>
-                            </IGRPDialogTitlePrimitive>
-                            <IGRPDialogDescriptionPrimitive />
-                        </IGRPDialogHeaderPrimitive>
+                            </DialogTitle>
+                            <DialogDescription />
+                        </DialogHeader>
 
                         <ImportComponent
                             initialImports={formik.values?.imports || []}
@@ -405,9 +409,9 @@ const FncComponent = ({
                         />
 
                         <div className="flex-1 border rounded">
-                            <IGRPLabelPrimitive className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                            <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                                 {t('Function body')}
-                            </IGRPLabelPrimitive>
+                            </Label>
 
                             {/* Function Preview */}
                             <div className="border-b bg-background p-3  font-mono text-sm">
@@ -448,7 +452,7 @@ const FncComponent = ({
                             />
                         </div>
                     </form>
-                </IGRPSidebarInsetPrimitive>
+                </SidebarInset>
                 <FunctionSettingsSidebar
                     formik={formik}
                     editorRef={editorRef}
@@ -456,8 +460,8 @@ const FncComponent = ({
                     componentTag={''}
                     onInsertImport={(importObj) => handleChangeImport(importObj)}
                 />
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }
 

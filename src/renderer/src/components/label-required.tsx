@@ -1,10 +1,9 @@
-import { IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system'
-
+import { Label } from '@renderer/components/ui/label'
 export const LabelRequired = ({ children }: { children: React.ReactNode }) => {
     return (
-        <IGRPLabelPrimitive>
+        <Label>
             {children}
             <span className="text-red-500"> *</span>
-        </IGRPLabelPrimitive>
+        </Label>
     )
 }

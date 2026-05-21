@@ -51,14 +51,7 @@ import {
     Save,
     Trash2
 } from 'lucide-react'
-import {
-    type ChangeEvent,
-    type JSX,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState
-} from 'react'
+import { type ChangeEvent, type JSX, useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 
@@ -77,9 +70,7 @@ export const EditCanvas = ({ basePath }: EditCanvasProps): JSX.Element => {
     const saving = useSelector(selectManifestSaving)
     const lastSavedAt = useSelector(selectManifestLastSavedAt)
     const selectedId = useSelector(selectSelectedNodeId)
-    const loadedBasePath = useSelector(
-        (s: RootState) => s.specPrototypeManifest.basePath
-    )
+    const loadedBasePath = useSelector((s: RootState) => s.specPrototypeManifest.basePath)
 
     // Load the manifest from disk when entering Edit mode (or when basePath
     // changes). The slice tracks `basePath` so we don't re-fetch for the
@@ -120,9 +111,7 @@ export const EditCanvas = ({ basePath }: EditCanvasProps): JSX.Element => {
         return () => window.removeEventListener('keydown', onKey)
     }, [dispatch, manifest, selectedId])
 
-    const root = manifest && isStructuredComponent(manifest.components)
-        ? manifest.components
-        : null
+    const root = manifest && isStructuredComponent(manifest.components) ? manifest.components : null
 
     return (
         <div className="flex h-full flex-col overflow-hidden rounded-xl border bg-card/30">
@@ -249,8 +238,8 @@ const EmptyState = (): JSX.Element => (
         <div className="max-w-xs space-y-1">
             <p className="text-sm font-medium text-foreground">No page yet</p>
             <p className="text-[11px]">
-                Generate one from the chat first — attach a spec, ask the AI to build a
-                page. The manifest will land here, ready for visual editing.
+                Generate one from the chat first — attach a spec, ask the AI to build a page. The
+                manifest will land here, ready for visual editing.
             </p>
         </div>
     </div>
@@ -266,13 +255,7 @@ interface NodeRowProps {
     onSelect: (id: string) => void
 }
 
-const NodeRow = ({
-    node,
-    depth,
-    selectedId,
-    isRoot,
-    onSelect
-}: NodeRowProps): JSX.Element => {
+const NodeRow = ({ node, depth, selectedId, isRoot, onSelect }: NodeRowProps): JSX.Element => {
     const hasChildren = Array.isArray(node.children) && node.children.length > 0
     const [open, setOpen] = useState(depth < 2 || isRoot)
     const isSelected = selectedId === node.id
@@ -284,9 +267,7 @@ const NodeRow = ({
             <div
                 className={cn(
                     'group flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[12px] transition-colors',
-                    isSelected
-                        ? 'bg-primary/10 ring-1 ring-primary/30'
-                        : 'hover:bg-accent/50'
+                    isSelected ? 'bg-primary/10 ring-1 ring-primary/30' : 'hover:bg-accent/50'
                 )}
                 style={{ paddingLeft: `${depth * 14 + 8}px` }}
                 onClick={(e) => {
@@ -426,11 +407,7 @@ const SelectionPanel = ({ manifest, selectedId }: SelectionPanelProps): JSX.Elem
                 ) : (
                     <div className="space-y-3">
                         <ReadOnlyField label="id" value={node.id} mono />
-                        <ReadOnlyField
-                            label="componentName"
-                            value={node.componentName}
-                            mono
-                        />
+                        <ReadOnlyField label="componentName" value={node.componentName} mono />
                         <LabelField value={node.label ?? ''} onChange={onLabelChange} />
 
                         {propertyKeys.length > 0 && (
@@ -445,9 +422,11 @@ const SelectionPanel = ({ manifest, selectedId }: SelectionPanelProps): JSX.Elem
                                             propKey={key}
                                             currentValue={node.properties?.[key]}
                                             defaultValue={
-                                                (engineConfig?.properties as
-                                                    | Record<string, unknown>
-                                                    | undefined)?.[key]
+                                                (
+                                                    engineConfig?.properties as
+                                                        | Record<string, unknown>
+                                                        | undefined
+                                                )?.[key]
                                             }
                                             custom={custom}
                                             onChange={(v) => onPropertyChange(key, v)}
@@ -502,9 +481,7 @@ const ReadOnlyField = ({
         <div className="text-[9.5px] font-bold uppercase tracking-wide text-muted-foreground">
             {label}
         </div>
-        <div className={cn('mt-0.5 truncate', mono && 'font-mono text-[11px]')}>
-            {value}
-        </div>
+        <div className={cn('mt-0.5 truncate', mono && 'font-mono text-[11px]')}>{value}</div>
     </div>
 )
 
@@ -559,9 +536,7 @@ const PropertyField = ({
             <div className="mb-1 flex items-baseline gap-1.5">
                 <span className="font-mono text-[10.5px] text-foreground">{propKey}</span>
                 {custom && (
-                    <span className="text-[9px] italic text-muted-foreground">
-                        (custom)
-                    </span>
+                    <span className="text-[9px] italic text-muted-foreground">(custom)</span>
                 )}
             </div>
             {fieldType === 'boolean' ? (
@@ -592,9 +567,7 @@ const PropertyField = ({
                     value={typeof value === 'string' ? value : ''}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={
-                        typeof defaultValue === 'string' && defaultValue
-                            ? defaultValue
-                            : '(empty)'
+                        typeof defaultValue === 'string' && defaultValue ? defaultValue : '(empty)'
                     }
                     className="w-full rounded-md border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20"
                 />
@@ -650,9 +623,7 @@ const JsonField = ({
                 )}
                 spellCheck={false}
             />
-            {parseError && (
-                <p className="mt-0.5 text-[9.5px] text-red-600">{parseError}</p>
-            )}
+            {parseError && <p className="mt-0.5 text-[9.5px] text-red-600">{parseError}</p>}
         </div>
     )
 }
@@ -694,10 +665,7 @@ function isStructuredComponent(node: unknown): node is StructuredComponent {
     return Boolean(node) && typeof node === 'object' && 'id' in (node as object)
 }
 
-function findNodeById(
-    root: StructuredComponent,
-    id: string
-): StructuredComponent | null {
+function findNodeById(root: StructuredComponent, id: string): StructuredComponent | null {
     if (root.id === id) return root
     if (Array.isArray(root.children)) {
         for (const child of root.children) {

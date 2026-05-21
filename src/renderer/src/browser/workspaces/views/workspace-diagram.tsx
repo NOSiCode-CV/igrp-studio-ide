@@ -20,17 +20,14 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
+import { Button } from '@renderer/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import {
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
 import { useDocker } from '@renderer/hooks/use-docker'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
@@ -107,7 +104,12 @@ const resolveDiagramStatus = (service?: ServiceInfo): DiagramServiceStatus => {
 
     if (status === 'exited') return 'exited'
     if (status === 'error') return 'error'
-    if (status === 'stopped' || status === 'created' || status === 'dead' || status === 'removing') {
+    if (
+        status === 'stopped' ||
+        status === 'created' ||
+        status === 'dead' ||
+        status === 'removing'
+    ) {
         return 'stopped'
     }
     return 'unknown'
@@ -117,13 +119,22 @@ const resolveDiagramStack = (service?: ServiceInfo): DiagramStackId => {
     if (!service) return 'main'
     if (service.labels?.is_project === 'true') return 'project'
     const composeFile = (service.composeFile || '').toLowerCase()
-    if (composeFile.includes('igrp-monitoring-compose.yaml') || composeFile.includes('compose-monitoring.yaml')) {
+    if (
+        composeFile.includes('igrp-monitoring-compose.yaml') ||
+        composeFile.includes('compose-monitoring.yaml')
+    ) {
         return 'monitoring'
     }
-    if (composeFile.includes('igrp-process-compose.yaml') || composeFile.includes('compose-process.yaml')) {
+    if (
+        composeFile.includes('igrp-process-compose.yaml') ||
+        composeFile.includes('compose-process.yaml')
+    ) {
         return 'process'
     }
-    if (composeFile.includes('igrp-projects-compose.yml') || composeFile.includes('igrp-projects-compose.yaml')) {
+    if (
+        composeFile.includes('igrp-projects-compose.yml') ||
+        composeFile.includes('igrp-projects-compose.yaml')
+    ) {
         return 'project'
     }
     return (service.stack as DiagramStackId) || 'main'
@@ -226,15 +237,15 @@ const ServiceNode: React.FC<{
                 </div>
                 <div className="flex items-center gap-1">
                     {getStatusIcon()}
-                    <IGRPDropdownMenuPrimitive>
-                        <IGRPDropdownMenuTriggerPrimitive asChild>
-                            <IGRPButtonPrimitive variant="ghost" size="icon" className="h-6 w-6">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
                                 <MoreVertical className="h-3 w-3" />
-                            </IGRPButtonPrimitive>
-                        </IGRPDropdownMenuTriggerPrimitive>
-                        <IGRPDropdownMenuContentPrimitive align="end" className="w-48">
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
                             {service.status === 'running' ? (
-                                <IGRPDropdownMenuItemPrimitive
+                                <DropdownMenuItem
                                     onClick={() => {
                                         onAction('stop', service.name)
                                     }}
@@ -242,9 +253,9 @@ const ServiceNode: React.FC<{
                                 >
                                     <Square className="mr-2 h-4 w-4 text-red-600" />
                                     {t('stopService')}
-                                </IGRPDropdownMenuItemPrimitive>
+                                </DropdownMenuItem>
                             ) : (
-                                <IGRPDropdownMenuItemPrimitive
+                                <DropdownMenuItem
                                     onClick={() => {
                                         onAction('start', service.name)
                                     }}
@@ -252,10 +263,10 @@ const ServiceNode: React.FC<{
                                 >
                                     <Play className="mr-2 h-4 w-4 text-green-600" />
                                     {t('startService')}
-                                </IGRPDropdownMenuItemPrimitive>
+                                </DropdownMenuItem>
                             )}
 
-                            <IGRPDropdownMenuItemPrimitive
+                            <DropdownMenuItem
                                 className="focus:bg-accent"
                                 onClick={() => {
                                     onEditService(service)
@@ -263,19 +274,17 @@ const ServiceNode: React.FC<{
                             >
                                 <Edit className="mr-2 h-4 w-4" />
                                 {t('editService')}
-                            </IGRPDropdownMenuItemPrimitive>
+                            </DropdownMenuItem>
 
                             {serviceUrl && (
-                                <IGRPDropdownMenuItemPrimitive
-                                    onClick={() => onOpenInBrowser(service)}
-                                >
+                                <DropdownMenuItem onClick={() => onOpenInBrowser(service)}>
                                     <ExternalLink className="mr-2 h-4 w-4" />
                                     {t('openInBrowser')}
-                                </IGRPDropdownMenuItemPrimitive>
+                                </DropdownMenuItem>
                             )}
 
                             {service.labels?.uuid && (
-                                <IGRPDropdownMenuItemPrimitive
+                                <DropdownMenuItem
                                     className="text-red-600 focus:text-red-600 focus:bg-red-50"
                                     onClick={() => {
                                         onDeleteService(service)
@@ -283,10 +292,10 @@ const ServiceNode: React.FC<{
                                 >
                                     <Trash className="mr-2 h-4 w-4 text-red-600" />
                                     {t('removeService')}
-                                </IGRPDropdownMenuItemPrimitive>
+                                </DropdownMenuItem>
                             )}
-                        </IGRPDropdownMenuContentPrimitive>
-                    </IGRPDropdownMenuPrimitive>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
 
@@ -310,7 +319,7 @@ const ServiceNode: React.FC<{
             </div>
 
             <div className="flex gap-1 mt-2">
-                <IGRPButtonPrimitive
+                <Button
                     size="sm"
                     variant="outline"
                     className="h-6 px-2 text-xs"
@@ -319,8 +328,8 @@ const ServiceNode: React.FC<{
                 >
                     <Play className="h-3 w-3 mr-1" />
                     Start
-                </IGRPButtonPrimitive>
-                <IGRPButtonPrimitive
+                </Button>
+                <Button
                     size="sm"
                     variant="outline"
                     className="h-6 px-2 text-xs"
@@ -329,8 +338,8 @@ const ServiceNode: React.FC<{
                 >
                     <Square className="h-3 w-3 mr-1" />
                     Stop
-                </IGRPButtonPrimitive>
-                <IGRPButtonPrimitive
+                </Button>
+                <Button
                     size="sm"
                     variant="outline"
                     className="h-6 px-2 text-xs"
@@ -338,7 +347,7 @@ const ServiceNode: React.FC<{
                 >
                     <RotateCcw className="h-3 w-3 mr-1" />
                     Restart
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
         </div>
     )
@@ -669,9 +678,7 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                         }
                         const depStack = resolveDiagramStack(dependencyService)
                         const edgeColor =
-                            service.status === 'running'
-                                ? stackColorMap[depStack]
-                                : '#6b7280'
+                            service.status === 'running' ? stackColorMap[depStack] : '#6b7280'
                         newEdges.push({
                             id: `${dependencyName}-${service.name}`,
                             source: dependencyName,
@@ -792,28 +799,24 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
     if (error) {
         return (
             <div className="flex items-center justify-center h-96">
-                <IGRPCardPrimitive className="w-96">
-                    <IGRPCardHeaderPrimitive>
-                        <IGRPCardTitlePrimitive className="flex items-center gap-2">
+                <Card className="w-96">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
                             <AlertCircle className="h-5 w-5 text-orange-500" />
                             Docker Error
-                        </IGRPCardTitlePrimitive>
-                    </IGRPCardHeaderPrimitive>
-                    <IGRPCardContentPrimitive>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                         <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                             {error.message ||
                                 'Docker daemon is not running. Please start Docker to view the workspace diagram.'}
                         </p>
-                        <IGRPButtonPrimitive
-                            onClick={handleRefresh}
-                            variant="outline"
-                            className="w-full"
-                        >
+                        <Button onClick={handleRefresh} variant="outline" className="w-full">
                             <RefreshCw className="h-4 w-4 mr-2" />
                             Retry
-                        </IGRPButtonPrimitive>
-                    </IGRPCardContentPrimitive>
-                </IGRPCardPrimitive>
+                        </Button>
+                    </CardContent>
+                </Card>
             </div>
         )
     }
@@ -832,20 +835,20 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
     if (services.length === 0) {
         return (
             <div className="flex items-center justify-center h-96">
-                <IGRPCardPrimitive className="w-96">
-                    <IGRPCardHeaderPrimitive>
-                        <IGRPCardTitlePrimitive className="flex items-center gap-2">
+                <Card className="w-96">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
                             <Container className="h-5 w-5" />
                             No Services Found
-                        </IGRPCardTitlePrimitive>
-                    </IGRPCardHeaderPrimitive>
-                    <IGRPCardContentPrimitive>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                         <p className="text-sm text-gray-600">
                             No Docker services found in this workspace. Add services to see them in
                             the diagram.
                         </p>
-                    </IGRPCardContentPrimitive>
-                </IGRPCardPrimitive>
+                    </CardContent>
+                </Card>
             </div>
         )
     }
@@ -871,8 +874,7 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                 <Controls />
                 <MiniMap
                     nodeColor={(node) => {
-                        const service = (node.data as Partial<ServiceNodeData> | undefined)
-                            ?.service
+                        const service = (node.data as Partial<ServiceNodeData> | undefined)?.service
                         switch (resolveDiagramStatus(service)) {
                             case 'healthy':
                                 return '#10b981'
@@ -907,15 +909,10 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                                 Workspace Diagram
                             </span>
                         </div>
-                        <IGRPButtonPrimitive
-                            size="sm"
-                            variant="outline"
-                            onClick={handleRefresh}
-                            className="h-8"
-                        >
+                        <Button size="sm" variant="outline" onClick={handleRefresh} className="h-8">
                             <RefreshCw className="h-3 w-3 mr-1" />
                             Refresh
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-600 dark:text-gray-300">
                         <div className="flex items-center gap-1">
@@ -932,7 +929,11 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                         </div>
                         <div className="flex items-center gap-1">
                             <AlertCircle className="h-3 w-3 text-orange-500" />
-                            <span>{totalServices - (healthyServices + startingServices + runningServices)} other</span>
+                            <span>
+                                {totalServices -
+                                    (healthyServices + startingServices + runningServices)}{' '}
+                                other
+                            </span>
                         </div>
                         <div className="flex items-center gap-1">
                             <Container className="h-3 w-3 text-blue-500" />

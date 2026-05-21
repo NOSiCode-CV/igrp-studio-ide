@@ -1,15 +1,12 @@
 import {
-    IGRPCardContentPrimitive,
-    IGRPCardDescriptionPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPInputAddOn,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@renderer/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
+import { IGRPInputAddOn } from '@igrp/igrp-framework-react-design-system'
 import { httpMethods } from '@renderer/constants/appConstants'
 import { cn } from '@renderer/lib/utils'
 import type React from 'react'
@@ -91,14 +88,12 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                 onClose={() => setIsModalOpen(false)}
             />
             <div className="space-y-4 p-4">
-                <IGRPCardPrimitive>
-                    <IGRPCardHeaderPrimitive>
-                        <IGRPCardTitlePrimitive>{t('definition')}</IGRPCardTitlePrimitive>
-                        <IGRPCardDescriptionPrimitive>
-                            {t('controllerDefinition')}
-                        </IGRPCardDescriptionPrimitive>
-                    </IGRPCardHeaderPrimitive>
-                    <IGRPCardContentPrimitive>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('definition')}</CardTitle>
+                        <CardDescription>{t('controllerDefinition')}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
                         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                             <div className="flex flex-col gap-3 md:col-span-2 space-y-2">
                                 <IGRPInputAddOn
@@ -139,17 +134,17 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                                 isRequired
                             />
                         </div>
-                    </IGRPCardContentPrimitive>
-                </IGRPCardPrimitive>
-                <IGRPTabsPrimitive defaultValue={'request'}>
-                    <IGRPTabsListPrimitive className="grid w-full grid-cols-3">
+                    </CardContent>
+                </Card>
+                <Tabs defaultValue={'request'}>
+                    <TabsList className="grid w-full grid-cols-3">
                         {TabList.map(({ label, tabId }, key) => (
-                            <IGRPTabsTriggerPrimitive key={key} value={tabId}>
+                            <TabsTrigger key={key} value={tabId}>
                                 {label}
-                            </IGRPTabsTriggerPrimitive>
+                            </TabsTrigger>
                         ))}
-                    </IGRPTabsListPrimitive>
-                    <IGRPTabsContentPrimitive value={'request'}>
+                    </TabsList>
+                    <TabsContent value={'request'}>
                         <TabRequest
                             formik={formik}
                             tablesColumns={tablesColumns}
@@ -157,8 +152,8 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                             schemaTypes={schemaTypes}
                             collectionTypes={collectionType}
                         />
-                    </IGRPTabsContentPrimitive>
-                    <IGRPTabsContentPrimitive value={'response'}>
+                    </TabsContent>
+                    <TabsContent value={'response'}>
                         <TabResponse
                             formik={formik}
                             schemaTypes={schemaTypes}
@@ -167,15 +162,15 @@ export const ControllerLayout: React.FC<ControllerProps> = ({
                             enumTypes={enumTypes}
                             collectionTypes={collectionType}
                         />
-                    </IGRPTabsContentPrimitive>
-                    <IGRPTabsContentPrimitive value={'security'}>
+                    </TabsContent>
+                    <TabsContent value={'security'}>
                         <TabSecurity
                             formik={formik}
                             basePath={basePath}
                             module={controller.module}
                         />
-                    </IGRPTabsContentPrimitive>
-                </IGRPTabsPrimitive>
+                    </TabsContent>
+                </Tabs>
             </div>
         </form>
     )

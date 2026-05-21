@@ -1,15 +1,15 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
 import {
-    IGRPButtonPrimitive,
     IGRPCard,
     IGRPCardContent,
     IGRPCardDescription,
     IGRPCardFooter,
     IGRPCardHeader,
     IGRPCardTitle,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
     IGRPModalDialog,
     IGRPModalDialogContent,
     IGRPModalDialogDescription,
@@ -100,15 +100,15 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                 </IGRPCardHeader>
                 <IGRPCardContent className="compact-card-content space-y-3">
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive>{t('workspaceId')}</IGRPLabelPrimitive>
+                        <Label>{t('workspaceId')}</Label>
                         <div className="flex space-x-2">
-                            <IGRPInputPrimitive
+                            <Input
                                 id="workspace-id"
                                 value={workspace.id}
                                 readOnly
                                 className="h-8 text-xs font-mono bg-muted/50 flex-1 rounded-r-none"
                             />
-                            <IGRPButtonPrimitive
+                            <Button
                                 variant="outline"
                                 size="sm"
                                 className="h-8 rounded-l-none border-l-0"
@@ -119,7 +119,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 ) : (
                                     <Copy className="h-3.5 w-3.5" />
                                 )}
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
                             {t('workspaceIdDescription')}
@@ -127,10 +127,8 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive htmlFor="workspace-name">
-                            {t('nameDescription')}
-                        </IGRPLabelPrimitive>
-                        <IGRPInputPrimitive
+                        <Label htmlFor="workspace-name">{t('nameDescription')}</Label>
+                        <Input
                             id="workspace-name"
                             value={workspaceName}
                             onChange={(e) => setWorkspaceName(e.target.value)}
@@ -139,9 +137,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive htmlFor="workspace-description">
-                            {t('description')}
-                        </IGRPLabelPrimitive>
+                        <Label htmlFor="workspace-description">{t('description')}</Label>
                         <IGRPTextarea
                             name="workspace-description"
                             id="workspace-description"
@@ -162,7 +158,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                             })}
                         </div>
                     )}
-                    <IGRPButtonPrimitive
+                    <Button
                         size="sm"
                         className="h-7"
                         onClick={handleSaveWorkspace}
@@ -173,7 +169,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                         }
                     >
                         {isSaving ? t('saving') : t('saveChanges')}
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </IGRPCardFooter>
             </IGRPCard>
 
@@ -238,14 +234,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                             </div>
                             <IGRPModalDialog>
                                 <IGRPModalDialogTrigger asChild>
-                                    <IGRPButtonPrimitive
-                                        variant="destructive"
-                                        size="sm"
-                                        className="h-7"
-                                    >
+                                    <Button variant="destructive" size="sm" className="h-7">
                                         <Trash2 className="h-3.5 w-3.5 mr-1" />
                                         <span>{t('delete')}</span>
-                                    </IGRPButtonPrimitive>
+                                    </Button>
                                 </IGRPModalDialogTrigger>
                                 <IGRPModalDialogContent className="compact-dialog">
                                     <IGRPModalDialogHeader className="compact-dialog-header">
@@ -276,18 +268,15 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                         </div>
                                     </div>
                                     <IGRPModalDialogFooter className="compact-dialog-footer flex flex-1 items-center ">
-                                        <IGRPButtonPrimitive
-                                            variant="outline"
-                                            className="h-7 text-xs"
-                                        >
+                                        <Button variant="outline" className="h-7 text-xs">
                                             {t('cancel')}
-                                        </IGRPButtonPrimitive>
-                                        <IGRPButtonPrimitive
+                                        </Button>
+                                        <Button
                                             className="h-7 text-xs bg-destructive hover:bg-destructive/90"
                                             onClick={handleDeleteWorkspace}
                                         >
                                             {isDeleting ? t('deleting') : t('deleteWorkspace')}
-                                        </IGRPButtonPrimitive>
+                                        </Button>
                                     </IGRPModalDialogFooter>
                                 </IGRPModalDialogContent>
                             </IGRPModalDialog>

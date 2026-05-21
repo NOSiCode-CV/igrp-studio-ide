@@ -1,4 +1,5 @@
-import { IGRPButtonPrimitive, IGRPCardPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Card } from '@renderer/components/ui/card'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import { GitFork } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -58,10 +59,7 @@ export function CardGitProject({
     }
 
     return (
-        <IGRPCardPrimitive
-            key={repo.id}
-            className="border rounded-lg p-4 hover:shadow-lg transition"
-        >
+        <Card key={repo.id} className="border rounded-lg p-4 hover:shadow-lg transition">
             <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-lg">{repo.name}</h3>
                 {repo.private && (
@@ -73,19 +71,15 @@ export function CardGitProject({
             <p className="text-gray-600 text-sm mb-4">{repo.description || t('noDescription')}</p>
             <div className="flex justify-end space-x-2">
                 <div className="mt-4 flex justify-between gap-2 items-center">
-                    <IGRPButtonPrimitive
-                        size="sm"
-                        variant="outline"
-                        onClick={() => window.open(repo.html_url)}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => window.open(repo.html_url)}>
                         {t('view')}
-                    </IGRPButtonPrimitive>
+                    </Button>
                     {isCloned ? (
-                        <IGRPButtonPrimitive size="sm" variant="outline" onClick={handleOpen}>
+                        <Button size="sm" variant="outline" onClick={handleOpen}>
                             {t('open')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     ) : (
-                        <IGRPButtonPrimitive
+                        <Button
                             size="sm"
                             variant="outline"
                             onClick={() => handleClone(repo)}
@@ -93,10 +87,10 @@ export function CardGitProject({
                         >
                             <GitFork className="w-4 h-4 mr-2" />
                             {isCloning ? t('cloning') : t('clone')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     )}
                 </div>
             </div>
-        </IGRPCardPrimitive>
+        </Card>
     )
 }

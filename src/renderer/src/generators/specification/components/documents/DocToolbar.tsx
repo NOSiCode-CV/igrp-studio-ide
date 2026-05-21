@@ -1,4 +1,4 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
 import { cn } from '@renderer/lib/utils'
 import type { DocViewMode } from '@renderer/redux/specDocs/reducer'
 import {
@@ -74,7 +74,7 @@ export function DocToolbar({
                     />
                 </div>
                 <ExportMenu onExport={onExport} disabled={!onExport || !canExport} />
-                <IGRPButtonPrimitive
+                <Button
                     variant={paneOpen ? 'secondary' : 'ghost'}
                     size="sm"
                     className="h-8 w-8 p-0"
@@ -87,7 +87,7 @@ export function DocToolbar({
                     ) : (
                         <PanelRightOpen size={14} />
                     )}
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
         </div>
     )
@@ -126,7 +126,7 @@ function ExportMenu({
 
     return (
         <div ref={ref} className="relative">
-            <IGRPButtonPrimitive
+            <Button
                 variant="ghost"
                 size="sm"
                 className="h-8 gap-2 text-xs"
@@ -136,7 +136,7 @@ function ExportMenu({
             >
                 {busy ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
                 Export
-            </IGRPButtonPrimitive>
+            </Button>
             {open && (
                 <div className="absolute right-0 top-9 z-30 w-44 rounded-md border bg-popover p-1 shadow-md">
                     <button

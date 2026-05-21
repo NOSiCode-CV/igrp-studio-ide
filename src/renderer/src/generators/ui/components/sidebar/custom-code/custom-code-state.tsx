@@ -1,13 +1,13 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogClosePrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
 import type { State } from '@igrp/igrp-studio-nextjs-engine/types'
 import { nanoid } from '@reduxjs/toolkit'
 import { PATTERNS } from '@renderer/constants/appConstants'
@@ -103,10 +103,10 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps): JSX.Elem
     }
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-            <IGRPDialogContentPrimitive className="overflow-hidden sm:max-w-[800px] lg:max-w-[900px] max-w-[90vw] w-full">
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="overflow-hidden sm:max-w-[800px] lg:max-w-[900px] max-w-[90vw] w-full">
+                <DialogHeader>
+                    <DialogTitle>
                         <div className="flex items-center gap-2 justify-between">
                             <div>
                                 {state ? 'Edit State' : 'Create State'}{' '}
@@ -115,11 +115,11 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps): JSX.Elem
                                 </span>
                             </div>
                         </div>
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
+                    </DialogTitle>
+                    <DialogDescription>
                         {state ? 'Edit your state configuration' : 'Define a new state variable'}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+                    </DialogDescription>
+                </DialogHeader>
                 <form onSubmit={formik.handleSubmit} className="space-y-4">
                     <TextInput
                         label={t('Name')}
@@ -179,16 +179,16 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps): JSX.Elem
                         onChange={(imports) => formik.setFieldValue('imports', imports)}
                     />
 
-                    <IGRPDialogFooterPrimitive className="space-x-2">
-                        <IGRPDialogClosePrimitive>Close</IGRPDialogClosePrimitive>
-                        <IGRPButtonPrimitive type="submit" disabled={formik.isSubmitting}>
+                    <DialogFooter className="space-x-2">
+                        <DialogClose>Close</DialogClose>
+                        <Button type="submit" disabled={formik.isSubmitting}>
                             {formik.isSubmitting && <Loader2 className="animate-spin" />}
                             Save changes
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogFooterPrimitive>
+                        </Button>
+                    </DialogFooter>
                 </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }
 

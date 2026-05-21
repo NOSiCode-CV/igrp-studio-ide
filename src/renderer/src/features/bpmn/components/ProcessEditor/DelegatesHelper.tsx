@@ -1,15 +1,13 @@
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPBadgePrimitive,
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardDescriptionPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPIcon,
-    type IGRPIconName,
-    useIGRPToast
-} from '@igrp/igrp-framework-react-design-system'
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@renderer/components/ui/card'
+import { IGRPIcon, type IGRPIconName, useIGRPToast } from '@igrp/igrp-framework-react-design-system'
 import { type JSX, useState } from 'react'
 
 interface DelegateParameter {
@@ -154,48 +152,44 @@ export function DelegatesHelper(): JSX.Element {
 
     return (
         <div className="space-y-6">
-            <IGRPCardPrimitive>
-                <IGRPCardHeaderPrimitive>
-                    <IGRPCardTitlePrimitive>Available Delegates</IGRPCardTitlePrimitive>
-                    <IGRPCardDescriptionPrimitive>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Available Delegates</CardTitle>
+                    <CardDescription>
                         Delegates allow you to integrate custom logic or external services directly
                         into BPMN process workflows. Use them in Service Tasks by setting the
                         Implementation Type to{' '}
-                        <IGRPBadgePrimitive variant="secondary">
-                            Delegate Expression
-                        </IGRPBadgePrimitive>
-                    </IGRPCardDescriptionPrimitive>
-                </IGRPCardHeaderPrimitive>
-            </IGRPCardPrimitive>
+                        <Badge variant="secondary">Delegate Expression</Badge>
+                    </CardDescription>
+                </CardHeader>
+            </Card>
 
             <div className="grid gap-6">
                 {delegates.map((delegate) => (
-                    <IGRPCardPrimitive key={delegate.name}>
-                        <IGRPCardHeaderPrimitive>
+                    <Card key={delegate.name}>
+                        <CardHeader>
                             <div className="flex items-center gap-3">
                                 <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                     <IGRPIcon iconName={delegate.icon as IGRPIconName} />
                                 </div>
                                 <div>
-                                    <IGRPCardTitlePrimitive className="text-xl">
-                                        {delegate.name}
-                                    </IGRPCardTitlePrimitive>
-                                    <IGRPBadgePrimitive variant="outline" className="mt-1">
+                                    <CardTitle className="text-xl">{delegate.name}</CardTitle>
+                                    <Badge variant="outline" className="mt-1">
                                         {delegate.category}
-                                    </IGRPBadgePrimitive>
+                                    </Badge>
                                 </div>
                             </div>
-                            <IGRPCardDescriptionPrimitive className="mt-3">
+                            <CardDescription className="mt-3">
                                 {delegate.description}
-                            </IGRPCardDescriptionPrimitive>
-                        </IGRPCardHeaderPrimitive>
-                        <IGRPCardContentPrimitive className="space-y-4">
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
                             <div>
                                 <div className="flex items-center justify-between mb-2">
                                     <h4 className="text-sm font-semibold text-foreground">
                                         Delegate Expression Syntax
                                     </h4>
-                                    <IGRPButtonPrimitive
+                                    <Button
                                         variant="ghost"
                                         size="sm"
                                         onClick={() =>
@@ -212,7 +206,7 @@ export function DelegatesHelper(): JSX.Element {
                                             <IGRPIcon iconName="Copy" />
                                         )}
                                         Copy Syntax
-                                    </IGRPButtonPrimitive>
+                                    </Button>
                                 </div>
                                 <div className="bg-muted rounded-lg p-3 font-mono text-sm">
                                     {delegate.syntax}
@@ -230,16 +224,16 @@ export function DelegatesHelper(): JSX.Element {
                                                 key={param.name}
                                                 className="flex items-center gap-3 text-sm group"
                                             >
-                                                <IGRPBadgePrimitive
+                                                <Badge
                                                     variant="secondary"
                                                     className="font-mono shrink-0"
                                                 >
                                                     {param.name}
-                                                </IGRPBadgePrimitive>
+                                                </Badge>
                                                 <span className="text-muted-foreground flex-1">
                                                     {param.description}
                                                 </span>
-                                                <IGRPButtonPrimitive
+                                                <Button
                                                     variant="ghost"
                                                     size="sm"
                                                     className="size-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -263,7 +257,7 @@ export function DelegatesHelper(): JSX.Element {
                                                             className="size-3.5"
                                                         />
                                                     )}
-                                                </IGRPButtonPrimitive>
+                                                </Button>
                                             </div>
                                         ))}
                                     </div>
@@ -282,8 +276,8 @@ export function DelegatesHelper(): JSX.Element {
                                     </pre>
                                 </div>
                             </div>
-                        </IGRPCardContentPrimitive>
-                    </IGRPCardPrimitive>
+                        </CardContent>
+                    </Card>
                 ))}
             </div>
         </div>

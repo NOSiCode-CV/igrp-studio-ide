@@ -1,11 +1,9 @@
 'use client'
 
-import {
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPTextAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Textarea } from '@renderer/components/ui/textarea'
 import type React from 'react'
 import { useState } from 'react'
 import type { AppLogicEnvironment } from 'src/main/types'
@@ -56,8 +54,8 @@ export function EnvironmentForm({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive htmlFor="name">Environment Name *</IGRPLabelPrimitive>
-                        <IGRPInputPrimitive
+                        <Label htmlFor="name">Environment Name *</Label>
+                        <Input
                             id="name"
                             value={formData.name}
                             onChange={(e) =>
@@ -72,8 +70,8 @@ export function EnvironmentForm({
                     </div>
 
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive htmlFor="url">Base URL *</IGRPLabelPrimitive>
-                        <IGRPInputPrimitive
+                        <Label htmlFor="url">Base URL *</Label>
+                        <Input
                             id="url"
                             type="url"
                             value={formData.url}
@@ -90,8 +88,8 @@ export function EnvironmentForm({
                 </div>
 
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive htmlFor="description">Description</IGRPLabelPrimitive>
-                    <IGRPTextAreaPrimitive
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
                         id="description"
                         value={formData.description}
                         onChange={(e) =>
@@ -106,8 +104,8 @@ export function EnvironmentForm({
                 </div>
 
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive htmlFor="apiKey">API Key *</IGRPLabelPrimitive>
-                    <IGRPInputPrimitive
+                    <Label htmlFor="apiKey">API Key *</Label>
+                    <Input
                         id="apiKey"
                         type="password"
                         value={formData.apiKey}
@@ -146,16 +144,16 @@ export function EnvironmentForm({
             )}
 
             <div className="flex justify-end gap-2 pt-4 border-t">
-                <IGRPButtonPrimitive type="button" variant="outline" onClick={onCancel}>
+                <Button type="button" variant="outline" onClick={onCancel}>
                     Cancel
-                </IGRPButtonPrimitive>
-                <IGRPButtonPrimitive type="submit" disabled={loading}>
+                </Button>
+                <Button type="submit" disabled={loading}>
                     {loading
                         ? 'Saving...'
                         : environment
                           ? 'Update Environment'
                           : 'Create Environment'}
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
         </form>
     )

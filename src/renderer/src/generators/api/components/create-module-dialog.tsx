@@ -1,21 +1,23 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDialogTriggerPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
 import type { ModuleConfig } from '@igrp/igrp-studio-springboot-engine/types'
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
 import { useGit } from '@renderer/hooks/use-git'
@@ -91,38 +93,36 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
     })
 
     return (
-        <IGRPTooltipProviderPrimitive>
-            <IGRPDialogPrimitive open={isOpen} onOpenChange={setIsOpen}>
-                <IGRPTooltipPrimitive>
-                    <IGRPTooltipTriggerPrimitive asChild>
-                        <IGRPDialogTriggerPrimitive asChild>
-                            <IGRPButtonPrimitive
+        <TooltipProvider>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <DialogTrigger asChild>
+                            <Button
                                 size="icon"
                                 className="ml-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-200"
                             >
                                 <Plus className="h-4 w-4" />
-                            </IGRPButtonPrimitive>
-                        </IGRPDialogTriggerPrimitive>
-                    </IGRPTooltipTriggerPrimitive>
-                    <IGRPTooltipContentPrimitive>
+                            </Button>
+                        </DialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
                         <p>{t('createNewModule')}</p>
-                    </IGRPTooltipContentPrimitive>
-                </IGRPTooltipPrimitive>
-                <IGRPDialogContentPrimitive className="max-w-[425px]">
-                    <IGRPDialogHeaderPrimitive>
-                        <IGRPDialogTitlePrimitive>{t('createNewModule')}</IGRPDialogTitlePrimitive>
-                        <IGRPDialogDescriptionPrimitive>
-                            {t('dialogDescription')}
-                        </IGRPDialogDescriptionPrimitive>
-                    </IGRPDialogHeaderPrimitive>
+                    </TooltipContent>
+                </Tooltip>
+                <DialogContent className="max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>{t('createNewModule')}</DialogTitle>
+                        <DialogDescription>{t('dialogDescription')}</DialogDescription>
+                    </DialogHeader>
                     <form onSubmit={onSubmit}>
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <IGRPLabelPrimitive htmlFor="name" className="text-right">
+                                <Label htmlFor="name" className="text-right">
                                     {t('moduleName')}
-                                </IGRPLabelPrimitive>
+                                </Label>
                                 <div className="col-span-3">
-                                    <IGRPInputPrimitive
+                                    <Input
                                         id="name"
                                         {...register('name')}
                                         className={cn(
@@ -135,14 +135,12 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
                                 </div>
                             </div>
                         </div>
-                        <IGRPDialogFooterPrimitive>
-                            <IGRPButtonPrimitive type="submit">
-                                {t('saveModule')}
-                            </IGRPButtonPrimitive>
-                        </IGRPDialogFooterPrimitive>
+                        <DialogFooter>
+                            <Button type="submit">{t('saveModule')}</Button>
+                        </DialogFooter>
                     </form>
-                </IGRPDialogContentPrimitive>
-            </IGRPDialogPrimitive>
-        </IGRPTooltipProviderPrimitive>
+                </DialogContent>
+            </Dialog>
+        </TooltipProvider>
     )
 }

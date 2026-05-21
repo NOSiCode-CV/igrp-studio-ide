@@ -1,17 +1,19 @@
+import { Checkbox } from '@renderer/components/ui/checkbox'
+import { Label } from '@renderer/components/ui/label'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import {
-    type ColumnDef,
-    IGRPCheckboxPrimitive,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@renderer/components/ui/table'
+import {
     IGRPCombobox,
     IGRPDataTable,
-    IGRPLabelPrimitive,
-    IGRPScrollAreaPrimitive,
     IGRPSeparator,
-    IGRPTableBodyPrimitive,
-    IGRPTableCellPrimitive,
-    IGRPTableHeaderPrimitive,
-    IGRPTableHeadPrimitive,
-    IGRPTablePrimitive,
-    IGRPTableRowPrimitive
+    type ColumnDef
 } from '@igrp/igrp-framework-react-design-system'
 import useToast from '@renderer/hooks/useToast'
 import { toFullCamelCaseFromSnakeCase } from '@renderer/utils'
@@ -147,7 +149,7 @@ export function TablePicker({
             id: 'select',
             accessorKey: 'tableName',
             header: ({ table }) => (
-                <IGRPCheckboxPrimitive
+                <Checkbox
                     checked={
                         table.getIsAllPageRowsSelected() ||
                         (table.getIsSomePageRowsSelected() && 'indeterminate')
@@ -160,7 +162,7 @@ export function TablePicker({
                 />
             ),
             cell: ({ row }) => (
-                <IGRPCheckboxPrimitive
+                <Checkbox
                     checked={row.getIsSelected()}
                     onCheckedChange={(value) => {
                         row.toggleSelected(!!value)
@@ -192,7 +194,7 @@ export function TablePicker({
         <>
             <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive>{t('databaseConnections')}</IGRPLabelPrimitive>
+                    <Label>{t('databaseConnections')}</Label>
                     <IGRPCombobox
                         value={selectedConnection}
                         onChange={(selected) => {
@@ -204,9 +206,7 @@ export function TablePicker({
                     />
                 </div>
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive className="text-xs">
-                        {t('whileMatchingSchema')}
-                    </IGRPLabelPrimitive>
+                    <Label className="text-xs">{t('whileMatchingSchema')}</Label>
                     <IGRPCombobox
                         value={action}
                         onChange={(value) => setAction(value as string)}
@@ -221,13 +221,13 @@ export function TablePicker({
                     <div className="rounded border">
                         <h4 className="p-2 text-sm">{t('databaseTable')}</h4>
                         <IGRPSeparator />
-                        <IGRPScrollAreaPrimitive className="h-[450px] w-full px-2">
+                        <ScrollArea className="h-[450px] w-full px-2">
                             {isLoading ? (
                                 <div className="text-center">{t('loadingTables')}</div>
                             ) : (
                                 <IGRPDataTable columns={columns} data={tables} />
                             )}
-                        </IGRPScrollAreaPrimitive>
+                        </ScrollArea>
                     </div>
                 </div>
                 <div className="space-y-3">
@@ -238,39 +238,29 @@ export function TablePicker({
                                     tableName: selectedTable
                                 })}
                             </h3>
-                            <IGRPScrollAreaPrimitive className="h-[450px] rounded-md border">
-                                <IGRPTablePrimitive>
-                                    <IGRPTableHeaderPrimitive>
-                                        <IGRPTableRowPrimitive>
-                                            <IGRPTableHeadPrimitive>
-                                                {t('column')}
-                                            </IGRPTableHeadPrimitive>
-                                            <IGRPTableHeadPrimitive>
-                                                {t('dataType')}
-                                            </IGRPTableHeadPrimitive>
-                                            <IGRPTableHeadPrimitive>
-                                                {t('isNullable')}
-                                            </IGRPTableHeadPrimitive>
-                                        </IGRPTableRowPrimitive>
-                                    </IGRPTableHeaderPrimitive>
-                                    <IGRPTableBodyPrimitive>
+                            <ScrollArea className="h-[450px] rounded-md border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>{t('column')}</TableHead>
+                                            <TableHead>{t('dataType')}</TableHead>
+                                            <TableHead>{t('isNullable')}</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
                                         {previewColumns &&
                                             previewColumns.map((column, key) => (
-                                                <IGRPTableRowPrimitive key={key}>
-                                                    <IGRPTableCellPrimitive>
-                                                        {column?.name}
-                                                    </IGRPTableCellPrimitive>
-                                                    <IGRPTableCellPrimitive>
-                                                        {column?.data_type}
-                                                    </IGRPTableCellPrimitive>
-                                                    <IGRPTableCellPrimitive>
+                                                <TableRow key={key}>
+                                                    <TableCell>{column?.name}</TableCell>
+                                                    <TableCell>{column?.data_type}</TableCell>
+                                                    <TableCell>
                                                         {column?.is_nullable ? t('yes') : t('no')}
-                                                    </IGRPTableCellPrimitive>
-                                                </IGRPTableRowPrimitive>
+                                                    </TableCell>
+                                                </TableRow>
                                             ))}
-                                    </IGRPTableBodyPrimitive>
-                                </IGRPTablePrimitive>
-                            </IGRPScrollAreaPrimitive>
+                                    </TableBody>
+                                </Table>
+                            </ScrollArea>
                         </>
                     ) : (
                         <div className="h-[500px] flex items-center justify-center text-muted-foreground text-sm">

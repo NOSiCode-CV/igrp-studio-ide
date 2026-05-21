@@ -1,10 +1,5 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { Database } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -68,30 +63,22 @@ export function DataModelsPanel({
                 />
             </aside>
             <main className="flex-1 flex flex-col min-w-0">
-                <IGRPTabsPrimitive
+                <Tabs
                     value={view}
                     onValueChange={(v) => setView(v as 'entities' | 'erd')}
                     className="flex-1 flex flex-col"
                 >
                     <div className="flex items-center justify-between border-b px-3 py-1.5">
-                        <IGRPTabsListPrimitive>
-                            <IGRPTabsTriggerPrimitive value="erd">
-                                {t('erd')}
-                            </IGRPTabsTriggerPrimitive>
-                            <IGRPTabsTriggerPrimitive value="entities">
-                                {t('entities')}
-                            </IGRPTabsTriggerPrimitive>
-                        </IGRPTabsListPrimitive>
-                        <IGRPButtonPrimitive
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setImportOpen(true)}
-                        >
+                        <TabsList>
+                            <TabsTrigger value="erd">{t('erd')}</TabsTrigger>
+                            <TabsTrigger value="entities">{t('entities')}</TabsTrigger>
+                        </TabsList>
+                        <Button size="sm" variant="ghost" onClick={() => setImportOpen(true)}>
                             <Database className="h-4 w-4 mr-1" />
                             {t('import_from_db')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
-                    <IGRPTabsContentPrimitive value="entities" className="flex-1 flex min-h-0">
+                    <TabsContent value="entities" className="flex-1 flex min-h-0">
                         <div className="w-[260px] border-r overflow-hidden">
                             <EntityList
                                 basePath={basePath}
@@ -113,8 +100,8 @@ export function DataModelsPanel({
                                 </div>
                             )}
                         </div>
-                    </IGRPTabsContentPrimitive>
-                    <IGRPTabsContentPrimitive value="erd" className="flex-1 min-h-0">
+                    </TabsContent>
+                    <TabsContent value="erd" className="flex-1 min-h-0">
                         <ReactFlowERD
                             basePath={basePath}
                             onEntityClick={(id) => {
@@ -123,8 +110,8 @@ export function DataModelsPanel({
                             }}
                             onNewEntity={() => setNewEntityOpen(true)}
                         />
-                    </IGRPTabsContentPrimitive>
-                </IGRPTabsPrimitive>
+                    </TabsContent>
+                </Tabs>
             </main>
             <ImportFromDbWizard
                 open={importOpen}

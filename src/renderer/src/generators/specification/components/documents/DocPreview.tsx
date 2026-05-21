@@ -29,36 +29,30 @@ const SOURCE_LINE_COMPONENTS: Components = {
     p: ({ node, ...rest }) => <p {...sourceLineAttr(node)} {...rest} />,
     ul: ({ node, ...rest }) => <ul {...sourceLineAttr(node)} {...rest} />,
     ol: ({ node, ...rest }) => <ol {...sourceLineAttr(node)} {...rest} />,
-    blockquote: ({ node, ...rest }) => (
-        <blockquote {...sourceLineAttr(node)} {...rest} />
-    ),
+    blockquote: ({ node, ...rest }) => <blockquote {...sourceLineAttr(node)} {...rest} />,
     pre: ({ node, ...rest }) => <pre {...sourceLineAttr(node)} {...rest} />,
     table: ({ node, ...rest }) => <table {...sourceLineAttr(node)} {...rest} />,
     hr: ({ node, ...rest }) => <hr {...sourceLineAttr(node)} {...rest} />
 }
 
-export const DocPreview = forwardRef<HTMLDivElement, DocPreviewProps>(
-    function DocPreview({ content }, ref): JSX.Element {
-        if (!content.trim()) {
-            return (
-                <div ref={ref} className="flex h-full items-center justify-center p-8">
-                    <p className="text-xs italic text-muted-foreground">
-                        No content to preview.
-                    </p>
-                </div>
-            )
-        }
+export const DocPreview = forwardRef<HTMLDivElement, DocPreviewProps>(function DocPreview(
+    { content },
+    ref
+): JSX.Element {
+    if (!content.trim()) {
         return (
-            <div ref={ref} className="h-full overflow-y-auto bg-card/10">
-                <div className="markdown-body prose prose-sm mx-auto max-w-2xl p-12 dark:prose-invert">
-                    <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={SOURCE_LINE_COMPONENTS}
-                    >
-                        {content}
-                    </ReactMarkdown>
-                </div>
+            <div ref={ref} className="flex h-full items-center justify-center p-8">
+                <p className="text-xs italic text-muted-foreground">No content to preview.</p>
             </div>
         )
     }
-)
+    return (
+        <div ref={ref} className="h-full overflow-y-auto bg-card/10">
+            <div className="markdown-body prose prose-sm mx-auto max-w-2xl p-12 dark:prose-invert">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={SOURCE_LINE_COMPONENTS}>
+                    {content}
+                </ReactMarkdown>
+            </div>
+        </div>
+    )
+})

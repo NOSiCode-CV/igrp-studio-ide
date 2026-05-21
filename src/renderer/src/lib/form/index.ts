@@ -173,7 +173,10 @@ function touchedFromErrors(errors: unknown): Record<string, unknown> {
  * fold the synthetic "touched-from-errors" map into the real touched
  * state so blurred and submit-driven touches coexist.
  */
-function deepUnion(a: Record<string, unknown>, b: Record<string, unknown>): Record<string, unknown> {
+function deepUnion(
+    a: Record<string, unknown>,
+    b: Record<string, unknown>
+): Record<string, unknown> {
     const out: Record<string, unknown> = { ...a }
     for (const [key, bv] of Object.entries(b)) {
         const av = a?.[key]
@@ -336,8 +339,8 @@ export function useFormikCompat<TValues extends FieldValues>(
                 target.type === 'checkbox'
                     ? (target as HTMLInputElement).checked
                     : target.type === 'number'
-                        ? Number(target.value)
-                        : target.value
+                      ? Number(target.value)
+                      : target.value
             // Same rationale as `setFieldValue`: Formik leaves `touched`
             // alone on change; the blur handler is what flips it.
             form.setValue(fieldName as never, raw as never, {

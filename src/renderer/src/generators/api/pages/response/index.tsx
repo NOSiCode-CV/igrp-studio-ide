@@ -1,10 +1,5 @@
-import {
-    IGRPCardContentPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPInputPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
+import { Input } from '@renderer/components/ui/input'
 import { LabelRequired } from '@renderer/components/label-required'
 import { httpStatusCodes } from '@renderer/constants/appConstants'
 import { useTranslation } from 'react-i18next'
@@ -46,7 +41,7 @@ export const ResponseLayout = ({ currentItem, selectors, onCloseTab }: ResponseP
                 showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
-                <IGRPCardPrimitive className="rounded-sm p-6">
+                <Card className="rounded-sm p-6">
                     <div className="flex flex-col gap-4">
                         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                             <SelectInput
@@ -80,11 +75,7 @@ export const ResponseLayout = ({ currentItem, selectors, onCloseTab }: ResponseP
                             />
                             <div className="flex flex-col gap-3">
                                 <LabelRequired>{t('contentType')}</LabelRequired>
-                                <IGRPInputPrimitive
-                                    name="contentType"
-                                    value={'application/json'}
-                                    readOnly
-                                />
+                                <Input name="contentType" value={'application/json'} readOnly />
                             </div>
                         </div>
                         <TextInput
@@ -99,20 +90,20 @@ export const ResponseLayout = ({ currentItem, selectors, onCloseTab }: ResponseP
                             placeholder={t('description')}
                             className="w-full"
                         />
-                        <IGRPCardPrimitive>
-                            <IGRPCardHeaderPrimitive>
-                                <IGRPCardTitlePrimitive>{t('dataSchema')}</IGRPCardTitlePrimitive>
-                            </IGRPCardHeaderPrimitive>
-                            <IGRPCardContentPrimitive>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>{t('dataSchema')}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
                                 <JSONSchemaBuilder
                                     schemaTypes={schemaTypes}
                                     initialSchema={dataSchema}
                                     onSchemaChange={handleSchemaChange}
                                 />
-                            </IGRPCardContentPrimitive>
-                        </IGRPCardPrimitive>
+                            </CardContent>
+                        </Card>
                     </div>
-                </IGRPCardPrimitive>
+                </Card>
             </div>
         </form>
     )

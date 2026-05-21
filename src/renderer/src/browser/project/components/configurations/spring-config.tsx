@@ -1,11 +1,8 @@
-import {
-    IGRPCheckboxPrimitive,
-    IGRPCombobox,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPSeparator,
-    IGRPTextAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Checkbox } from '@renderer/components/ui/checkbox'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Textarea } from '@renderer/components/ui/textarea'
+import { IGRPCombobox, IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import DependencySelector from '@renderer/components/dependency-selector'
 import { LabelRequired } from '@renderer/components/label-required'
 import { DatabaseOptions, projectStructureStyle } from '@renderer/constants/appConstants'
@@ -60,7 +57,7 @@ export function SpringConfig({
         <div className="rounded-lg border p-4  space-y-6">
             <div className="flex flex-col gap-3">
                 <LabelRequired>{t('projectName')}</LabelRequired>
-                <IGRPInputPrimitive
+                <Input
                     id="name"
                     value={data.name}
                     onChange={(e) => onChange({ ...data, name: e.target.value })}
@@ -73,8 +70,8 @@ export function SpringConfig({
             </div>
 
             <div className="flex flex-col gap-3">
-                <IGRPLabelPrimitive htmlFor="description">{t('description')}</IGRPLabelPrimitive>
-                <IGRPTextAreaPrimitive
+                <Label htmlFor="description">{t('description')}</Label>
+                <Textarea
                     id="description"
                     value={data.description}
                     onChange={(e) => onChange({ ...data, description: e.target.value })}
@@ -85,7 +82,7 @@ export function SpringConfig({
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-3">
                     <LabelRequired>{t('group')}</LabelRequired>
-                    <IGRPInputPrimitive
+                    <Input
                         id="group"
                         value={data.group}
                         onChange={(e) => onChange({ ...data, group: e.target.value })}
@@ -99,7 +96,7 @@ export function SpringConfig({
 
                 <div className="flex flex-col gap-3">
                     <LabelRequired>{t('artifact')}</LabelRequired>
-                    <IGRPInputPrimitive
+                    <Input
                         id="artifact"
                         value={data.artifact}
                         onChange={(e) => onChange({ ...data, artifact: e.target.value })}
@@ -155,7 +152,7 @@ export function SpringConfig({
 
                 <div className="flex flex-col gap-3">
                     <div className="flex items-center space-x-2">
-                        <IGRPCheckboxPrimitive
+                        <Checkbox
                             id="observability"
                             checked={data.enableObservability}
                             onCheckedChange={(checked) =>
@@ -165,12 +162,10 @@ export function SpringConfig({
                                 })
                             }
                         />
-                        <IGRPLabelPrimitive htmlFor="observability">
-                            {t('enableObservability')}
-                        </IGRPLabelPrimitive>
+                        <Label htmlFor="observability">{t('enableObservability')}</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <IGRPCheckboxPrimitive
+                        <Checkbox
                             id="enableEntityRevision"
                             checked={data.enableEntityRevision}
                             onCheckedChange={(checked) =>
@@ -180,12 +175,10 @@ export function SpringConfig({
                                 })
                             }
                         />
-                        <IGRPLabelPrimitive htmlFor="enableEntityRevision">
-                            {t('enableEntityRevision')}
-                        </IGRPLabelPrimitive>
+                        <Label htmlFor="enableEntityRevision">{t('enableEntityRevision')}</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <IGRPCheckboxPrimitive
+                        <Checkbox
                             id="enableGraalVm"
                             checked={data.enableGraalVm}
                             onCheckedChange={(checked) =>
@@ -195,9 +188,7 @@ export function SpringConfig({
                                 })
                             }
                         />
-                        <IGRPLabelPrimitive htmlFor="enableGraalVm">
-                            {t('enableGraalVm')}
-                        </IGRPLabelPrimitive>
+                        <Label htmlFor="enableGraalVm">{t('enableGraalVm')}</Label>
                     </div>
                 </div>
             </div>

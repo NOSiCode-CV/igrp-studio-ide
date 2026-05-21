@@ -1,13 +1,13 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
 import { cn } from '@renderer/lib/utils'
 import { type FormEvent, type JSX, useEffect, useRef, useState } from 'react'
 import { DOC_TEMPLATES, findTemplate, type DocTemplate } from './templates'
@@ -76,15 +76,15 @@ export function NewNodeDialog({ open, mode, onConfirm, onClose }: NewNodeDialogP
     }
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={(o) => !o && onClose()}>
-            <IGRPDialogContentPrimitive className="w-[480px] max-w-[calc(100vw-2rem)] sm:max-w-[520px]">
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{title}</IGRPDialogTitlePrimitive>
-                </IGRPDialogHeaderPrimitive>
+        <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+            <DialogContent className="w-[480px] max-w-[calc(100vw-2rem)] sm:max-w-[520px]">
+                <DialogHeader>
+                    <DialogTitle>{title}</DialogTitle>
+                </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 px-1">
                     {isCreatingFile && (
                         <div className="space-y-2">
-                            <IGRPLabelPrimitive>Template</IGRPLabelPrimitive>
+                            <Label>Template</Label>
                             <div className="grid max-h-[260px] grid-cols-2 gap-2 overflow-y-auto pr-1">
                                 {DOC_TEMPLATES.map((tpl) => (
                                     <button
@@ -108,8 +108,8 @@ export function NewNodeDialog({ open, mode, onConfirm, onClose }: NewNodeDialogP
                         </div>
                     )}
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive>Name</IGRPLabelPrimitive>
-                        <IGRPInputPrimitive
+                        <Label>Name</Label>
+                        <Input
                             ref={inputRef}
                             value={value}
                             onChange={(e) => setValue(e.target.value)}
@@ -121,16 +121,16 @@ export function NewNodeDialog({ open, mode, onConfirm, onClose }: NewNodeDialogP
                             maxLength={120}
                         />
                     </div>
-                    <IGRPDialogFooterPrimitive>
-                        <IGRPButtonPrimitive type="button" variant="outline" onClick={onClose}>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={onClose}>
                             Cancel
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive type="submit" disabled={!value.trim() || submitting}>
+                        </Button>
+                        <Button type="submit" disabled={!value.trim() || submitting}>
                             {submitting ? 'Saving…' : title.replace('New ', 'Create ')}
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogFooterPrimitive>
+                        </Button>
+                    </DialogFooter>
                 </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

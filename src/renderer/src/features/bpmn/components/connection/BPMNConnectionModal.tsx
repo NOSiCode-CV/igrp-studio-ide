@@ -1,17 +1,17 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPSwitchPrimitive,
-    IGRPTextAreaPrimitive,
-    useIGRPToast
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Switch } from '@renderer/components/ui/switch'
+import { Textarea } from '@renderer/components/ui/textarea'
+import { useIGRPToast } from '@igrp/igrp-framework-react-design-system'
 import { type JSX, useEffect, useState } from 'react'
 import type { BPMNConfig } from 'src/main/types'
 import { v4 as uuidv4 } from 'uuid'
@@ -182,25 +182,23 @@ export function BPMNConnectionModal({
     }
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={handleClose}>
-            <IGRPDialogContentPrimitive
+        <Dialog open={isOpen} onOpenChange={handleClose}>
+            <DialogContent
                 key={`${config?.id || 'new'}-${renderKey}`}
                 className="max-w-[500px] w-[95vw] mx-auto"
             >
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>
+                <DialogHeader>
+                    <DialogTitle>
                         {config ? 'Edit BPMN API Configuration' : 'BPMN API Configuration'}
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
+                    </DialogTitle>
+                    <DialogDescription>
                         Configure connection to your BPMN REST API (Camunda, Flowable, etc.)
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+                    </DialogDescription>
+                </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                        <IGRPLabelPrimitive htmlFor="bpmn-name">
-                            Configuration Name *
-                        </IGRPLabelPrimitive>
-                        <IGRPInputPrimitive
+                        <Label htmlFor="bpmn-name">Configuration Name *</Label>
+                        <Input
                             id="bpmn-name"
                             value={formData.name || ''}
                             onChange={(e) => handleInputChange('name', e.target.value)}
@@ -208,8 +206,8 @@ export function BPMNConnectionModal({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabelPrimitive htmlFor="bpmn-apiUrl">API URL *</IGRPLabelPrimitive>
-                        <IGRPInputPrimitive
+                        <Label htmlFor="bpmn-apiUrl">API URL *</Label>
+                        <Input
                             id="bpmn-apiUrl"
                             value={formData.apiUrl || ''}
                             onChange={(e) => handleInputChange('apiUrl', e.target.value)}
@@ -217,8 +215,8 @@ export function BPMNConnectionModal({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabelPrimitive htmlFor="bpmn-basePath">Base Path</IGRPLabelPrimitive>
-                        <IGRPInputPrimitive
+                        <Label htmlFor="bpmn-basePath">Base Path</Label>
+                        <Input
                             id="bpmn-basePath"
                             value={formData.basePath || ''}
                             onChange={(e) => handleInputChange('basePath', e.target.value)}
@@ -226,10 +224,8 @@ export function BPMNConnectionModal({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabelPrimitive htmlFor="bpmn-token">
-                            Access Token (Optional)
-                        </IGRPLabelPrimitive>
-                        <IGRPInputPrimitive
+                        <Label htmlFor="bpmn-token">Access Token (Optional)</Label>
+                        <Input
                             id="bpmn-token"
                             type="password"
                             value={formData.token || ''}
@@ -238,10 +234,8 @@ export function BPMNConnectionModal({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <IGRPLabelPrimitive htmlFor="bpmn-description">
-                            Description
-                        </IGRPLabelPrimitive>
-                        <IGRPTextAreaPrimitive
+                        <Label htmlFor="bpmn-description">Description</Label>
+                        <Textarea
                             id="bpmn-description"
                             value={formData.description || ''}
                             onChange={(e) => handleInputChange('description', e.target.value)}
@@ -250,36 +244,32 @@ export function BPMNConnectionModal({
                         />
                     </div>
                     <div className="flex items-center space-x-2">
-                        <IGRPSwitchPrimitive
+                        <Switch
                             id="bpmn-isActive"
                             checked={formData.isActive ?? true}
-                            onCheckedChange={(checked) =>
-                                handleInputChange('isActive', checked)
-                            }
+                            onCheckedChange={(checked) => handleInputChange('isActive', checked)}
                         />
-                        <IGRPLabelPrimitive htmlFor="bpmn-isActive">
-                            Active Configuration
-                        </IGRPLabelPrimitive>
+                        <Label htmlFor="bpmn-isActive">Active Configuration</Label>
                     </div>
                 </div>
-                <IGRPDialogFooterPrimitive className="flex justify-between">
-                    <IGRPButtonPrimitive
+                <DialogFooter className="flex justify-between">
+                    <Button
                         variant="outline"
                         onClick={handleTestConnection}
                         disabled={isTesting || !formData.apiUrl}
                     >
                         {isTesting ? 'Testing…' : 'Test Connection'}
-                    </IGRPButtonPrimitive>
+                    </Button>
                     <div className="flex gap-2">
-                        <IGRPButtonPrimitive variant="outline" onClick={handleClose}>
+                        <Button variant="outline" onClick={handleClose}>
                             Cancel
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive onClick={handleSave} disabled={isLoading}>
+                        </Button>
+                        <Button onClick={handleSave} disabled={isLoading}>
                             {isLoading ? 'Saving…' : config ? 'Update' : 'Save'}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
-                </IGRPDialogFooterPrimitive>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }

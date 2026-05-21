@@ -1,7 +1,5 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPScrollAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { cn } from '@renderer/lib/utils'
 import { Clock, Trash2, X } from 'lucide-react'
 import { type JSX, useMemo, useState } from 'react'
@@ -59,14 +57,14 @@ const HistoryList = ({
                         History
                     </div>
                     {entries.length > 0 && (
-                        <IGRPButtonPrimitive
+                        <Button
                             size="sm"
                             variant="ghost"
                             className="h-6 px-2 text-xs"
                             onClick={onClear}
                         >
                             <Trash2 className="h-3 w-3" />
-                        </IGRPButtonPrimitive>
+                        </Button>
                     )}
                 </div>
                 <SearchInput
@@ -75,7 +73,7 @@ const HistoryList = ({
                     onChange={(v) => setSearch(v)}
                 />
             </div>
-            <IGRPScrollAreaPrimitive className="flex-1">
+            <ScrollArea className="flex-1">
                 {filtered.length === 0 ? (
                     <div className="p-4 text-xs text-muted-foreground">
                         {entries.length === 0 ? 'No conversions yet.' : 'No matches.'}
@@ -131,7 +129,7 @@ const HistoryList = ({
                         })}
                     </ul>
                 )}
-            </IGRPScrollAreaPrimitive>
+            </ScrollArea>
         </aside>
     )
 }

@@ -144,7 +144,10 @@ class TokenWalker {
         const out: Paragraph[] = []
         this.i++ // list_open
         let counter = 0
-        while (!this.done && this.tokens[this.i].type !== (ordered ? 'ordered_list_close' : 'bullet_list_close')) {
+        while (
+            !this.done &&
+            this.tokens[this.i].type !== (ordered ? 'ordered_list_close' : 'bullet_list_close')
+        ) {
             const tk = this.tokens[this.i]
             if (tk.type === 'list_item_open') {
                 counter++

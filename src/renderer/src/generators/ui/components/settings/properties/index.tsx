@@ -1,21 +1,21 @@
 import {
-    IGRPAccordionContentPrimitive,
-    IGRPAccordionItemPrimitive,
-    IGRPAccordionPrimitive,
-    IGRPAccordionTriggerPrimitive,
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger
+} from '@renderer/components/ui/accordion'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import {
     IGRPBadge,
-    IGRPButtonPrimitive,
     IGRPCombobox,
     IGRPDatePickerSingle,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    type IGRPOptionsProps,
-    IGRPPopoverContentPrimitive,
-    IGRPPopoverPrimitive,
-    IGRPPopoverTriggerPrimitive,
     IGRPRadioGroup,
     IGRPSeparator,
-    IGRPSwitch
+    IGRPSwitch,
+    type IGRPOptionsProps
 } from '@igrp/igrp-framework-react-design-system'
 import type { Segment, State } from '@igrp/igrp-studio-nextjs-engine/types'
 import DynamicKeyValueForm from '@renderer/components/domain-form'
@@ -143,7 +143,7 @@ const ControlledInput = ({
     }
 
     return (
-        <IGRPInputPrimitive
+        <Input
             id={id}
             type={type}
             name={name}
@@ -189,16 +189,16 @@ const RenderPropsConfig = ({
         else if (fieldConfig.type === 'object' && fieldConfig.properties) {
             const props = fieldConfig.properties
             return (
-                <IGRPAccordionPrimitive type="single" collapsible className="w-full">
-                    <IGRPAccordionItemPrimitive key={key} value={key}>
-                        <IGRPAccordionTriggerPrimitive
+                <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem key={key} value={key}>
+                        <AccordionTrigger
                             iconName="ChevronDown"
                             showIcon={true}
                             iconPlacement="end"
                         >
                             {xMetaLabel}
-                        </IGRPAccordionTriggerPrimitive>
-                        <IGRPAccordionContentPrimitive className="space-y-3">
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-3">
                             {Object.keys(props).map((nestedKey) =>
                                 renderField(
                                     nestedKey,
@@ -206,14 +206,14 @@ const RenderPropsConfig = ({
                                     parentKey ? `${parentKey}.${key}` : key
                                 )
                             )}
-                        </IGRPAccordionContentPrimitive>
-                    </IGRPAccordionItemPrimitive>
-                </IGRPAccordionPrimitive>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
             )
         } else if (key === 'iconName' || xUiWidget === 'icon') {
             return (
                 <div className="group space-y-2">
-                    <IGRPLabelPrimitive htmlFor={key} className="flex justify-between ">
+                    <Label htmlFor={key} className="flex justify-between ">
                         <span>{xMetaLabel}</span>
                         <FieldActions
                             field={key}
@@ -225,7 +225,7 @@ const RenderPropsConfig = ({
                             onSelectState={onSelectState}
                             dataProperties={dataProperties}
                         />
-                    </IGRPLabelPrimitive>
+                    </Label>
                     <IconBrowser
                         selectedIcon={value}
                         onSelectedIcon={(icon: string) => {
@@ -237,7 +237,7 @@ const RenderPropsConfig = ({
         } else if (xUiWidget === 'chips') {
             return (
                 <div className="group space-y-2">
-                    <IGRPLabelPrimitive htmlFor={key} className="flex justify-between ">
+                    <Label htmlFor={key} className="flex justify-between ">
                         <span>{xMetaLabel}</span>
                         <FieldActions
                             field={key}
@@ -249,9 +249,9 @@ const RenderPropsConfig = ({
                             onSelectState={onSelectState}
                             dataProperties={dataProperties}
                         />
-                    </IGRPLabelPrimitive>
+                    </Label>
 
-                    <IGRPInputPrimitive
+                    <Input
                         value={value}
                         onChange={(e) => {
                             const inputValue = e.target.value.trim()
@@ -284,7 +284,7 @@ const RenderPropsConfig = ({
             return (
                 <>
                     <div className=" group space-y-2">
-                        <IGRPLabelPrimitive htmlFor={key} className="flex justify-between ">
+                        <Label htmlFor={key} className="flex justify-between ">
                             <span>{xMetaLabel}</span>
                             <FieldActions
                                 field={key}
@@ -296,7 +296,7 @@ const RenderPropsConfig = ({
                                 onSelectState={onSelectState}
                                 dataProperties={dataProperties}
                             />
-                        </IGRPLabelPrimitive>
+                        </Label>
 
                         <DynamicKeyValueForm
                             onAdd={(opt) => {
@@ -309,7 +309,7 @@ const RenderPropsConfig = ({
         } else if (xUiWidget === 'uri') {
             return (
                 <div className="group space-y-3">
-                    <IGRPLabelPrimitive htmlFor={key} className="flex justify-between items-center">
+                    <Label htmlFor={key} className="flex justify-between items-center">
                         <span>{xMetaLabel}</span>
                         <FieldActions
                             field={key}
@@ -321,7 +321,7 @@ const RenderPropsConfig = ({
                             onSelectState={onSelectState}
                             dataProperties={dataProperties}
                         />
-                    </IGRPLabelPrimitive>
+                    </Label>
                     <SlugBindingConfig
                         key={key}
                         label={xMetaLabel}
@@ -340,9 +340,9 @@ const RenderPropsConfig = ({
         } else if (xUiWidget === 'ref') {
             return (
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive htmlFor={key} className="flex justify-between items-center">
+                    <Label htmlFor={key} className="flex justify-between items-center">
                         <span>{xMetaLabel}</span>
-                    </IGRPLabelPrimitive>
+                    </Label>
                     <IGRPCombobox
                         value={value}
                         onChange={(value) => {
@@ -366,7 +366,7 @@ const RenderPropsConfig = ({
                 )}
                 key={key}
             >
-                <IGRPLabelPrimitive htmlFor={key} className="flex justify-between items-center">
+                <Label htmlFor={key} className="flex justify-between items-center">
                     <span>{xMetaLabel}</span>
                     {type !== 'boolean' && (
                         <FieldActions
@@ -380,7 +380,7 @@ const RenderPropsConfig = ({
                             dataProperties={dataProperties}
                         />
                     )}
-                </IGRPLabelPrimitive>
+                </Label>
 
                 {(() => {
                     switch (type) {
@@ -517,9 +517,9 @@ const FieldActions = ({
 
     return (
         <>
-            <IGRPPopoverPrimitive>
-                <IGRPPopoverTriggerPrimitive asChild>
-                    <IGRPButtonPrimitive
+            <Popover>
+                <PopoverTrigger asChild>
+                    <Button
                         variant="ghost"
                         size="sm"
                         className="p-0 opacity-0 group-hover:opacity-100 transition-opacity h-6"
@@ -530,9 +530,9 @@ const FieldActions = ({
                             </div>
                         )}
                         <MoreVertical className="w-3 h-3" />
-                    </IGRPButtonPrimitive>
-                </IGRPPopoverTriggerPrimitive>
-                <IGRPPopoverContentPrimitive align="end" className="space-y-3">
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="space-y-3">
                     <p className="text-sm text-muted-foreground">
                         Select an existing state or create a new one to bind a dynamic value.
                     </p>
@@ -590,8 +590,8 @@ const FieldActions = ({
                     <>
                         <IGRPSeparator />
                         <div className="space-y-2">
-                            <IGRPLabelPrimitive> Variable Name</IGRPLabelPrimitive>
-                            <IGRPInputPrimitive
+                            <Label> Variable Name</Label>
+                            <Input
                                 id={`${field}-variable-name`}
                                 type="text"
                                 value={inputValue}
@@ -610,7 +610,7 @@ const FieldActions = ({
                         </div>
                     </>
                     <div className="flex justify-end">
-                        <IGRPButtonPrimitive
+                        <Button
                             variant={'secondary'}
                             size={'sm'}
                             onClick={() => setOpen(!open)}
@@ -620,10 +620,10 @@ const FieldActions = ({
                                 <Plus />
                             </span>
                             Generate New State
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
-                </IGRPPopoverContentPrimitive>
-            </IGRPPopoverPrimitive>
+                </PopoverContent>
+            </Popover>
 
             <StateComponent setOpen={setOpen} open={open} state={state} />
         </>
@@ -770,7 +770,7 @@ export const PageSelectionConfig = ({
 
             {selectedPagePath && dynamicSegments.length > 0 && (
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive>Available Dynamic Segments</IGRPLabelPrimitive>
+                    <Label>Available Dynamic Segments</Label>
                     <div className="flex flex-wrap gap-2">
                         {dynamicSegments.map((segment, index) => (
                             <IGRPBadge key={index} variant="outline">
@@ -806,7 +806,7 @@ export const PageSelectionConfig = ({
 
             {showNavigationParams && (
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive>Navigation Parameters</IGRPLabelPrimitive>
+                    <Label>Navigation Parameters</Label>
 
                     <DynamicKeyValueForm
                         defaultItems={getNavigationParamsOptions()}

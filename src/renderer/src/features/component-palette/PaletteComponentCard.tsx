@@ -21,7 +21,7 @@
  *    or from a custom field on a static catalog item.
  */
 
-import { IGRPTooltipContentPrimitive, IGRPTooltipPrimitive, IGRPTooltipTriggerPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import { cn } from '@renderer/lib/utils'
 import { AlertTriangle, Check, GripHorizontal } from 'lucide-react'
 import type React from 'react'
@@ -69,33 +69,27 @@ export function PaletteComponentCard({
     const content = (
         <>
             {deprecated && (
-                <IGRPTooltipPrimitive>
-                    <IGRPTooltipTriggerPrimitive asChild>
+                <Tooltip>
+                    <TooltipTrigger asChild>
                         <span className="absolute right-2 top-2 text-amber-500">
                             <AlertTriangle className="h-4 w-4" />
                         </span>
-                    </IGRPTooltipTriggerPrimitive>
-                    <IGRPTooltipContentPrimitive>
+                    </TooltipTrigger>
+                    <TooltipContent>
                         <p>{deprecatedTooltip}</p>
-                    </IGRPTooltipContentPrimitive>
-                </IGRPTooltipPrimitive>
+                    </TooltipContent>
+                </Tooltip>
             )}
-            {topRight && (
-                <span className="absolute right-2 top-2">{topRight}</span>
-            )}
+            {topRight && <span className="absolute right-2 top-2">{topRight}</span>}
             {active && !deprecated && !topRight && showActiveCheck && (
                 <span className="absolute right-1.5 top-1.5 text-primary">
                     <Check className="h-3 w-3" />
                 </span>
             )}
-            {showGripHint && (
-                <GripHorizontal className="h-4 w-4 text-muted-foreground/50" />
-            )}
+            {showGripHint && <GripHorizontal className="h-4 w-4 text-muted-foreground/50" />}
             <div className="flex flex-col items-center gap-1.5">
                 {Icon && <Icon className="h-6 w-6" />}
-                <span className="text-center text-[11px] font-medium leading-tight">
-                    {label}
-                </span>
+                <span className="text-center text-[11px] font-medium leading-tight">{label}</span>
                 {hint && (
                     <span className="line-clamp-2 text-center text-[9px] leading-tight text-muted-foreground">
                         {hint}

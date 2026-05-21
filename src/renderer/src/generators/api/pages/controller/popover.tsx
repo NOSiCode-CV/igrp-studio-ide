@@ -1,21 +1,10 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPCombobox,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPPopoverContentPrimitive,
-    IGRPPopoverPrimitive,
-    IGRPPopoverTriggerPrimitive,
-    IGRPSeparator,
-    IGRPSwitch,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
+import { IGRPCombobox, IGRPSeparator, IGRPSwitch } from '@igrp/igrp-framework-react-design-system'
 import MonacoEditor from '@renderer/components/monaco-editor'
 import { toInitCap } from '@renderer/utils'
 import { PackageCheck } from 'lucide-react'
@@ -49,45 +38,35 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
     }
 
     return (
-        <IGRPPopoverPrimitive>
-            <IGRPTooltipPrimitive>
-                <IGRPTooltipTriggerPrimitive asChild>
-                    <IGRPPopoverTriggerPrimitive asChild>
-                        <IGRPButtonPrimitive
-                            variant="ghost"
-                            className="flex items-center"
-                            size={'icon'}
-                        >
+        <Popover>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <PopoverTrigger asChild>
+                        <Button variant="ghost" className="flex items-center" size={'icon'}>
                             <PackageCheck className="w-4 h-4" />
                             <span className="sr-only">{t('advanced')}</span>
-                        </IGRPButtonPrimitive>
-                    </IGRPPopoverTriggerPrimitive>
-                </IGRPTooltipTriggerPrimitive>
-                <IGRPTooltipContentPrimitive side="top" align="center">
+                        </Button>
+                    </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="top" align="center">
                     {t('openAdvancedSettings')}
-                </IGRPTooltipContentPrimitive>
-            </IGRPTooltipPrimitive>
-            <IGRPPopoverContentPrimitive className="w-[425px]" align="end" side="bottom">
-                <IGRPTabsPrimitive defaultValue="dataType">
-                    <IGRPTabsListPrimitive className="grid w-full grid-cols-2">
-                        <IGRPTabsTriggerPrimitive value="dataType">
-                            {t('dataType')}
-                        </IGRPTabsTriggerPrimitive>
-                        <IGRPTabsTriggerPrimitive value="jsonSchema">
-                            {t('jsonSchema')}
-                        </IGRPTabsTriggerPrimitive>
-                    </IGRPTabsListPrimitive>
+                </TooltipContent>
+            </Tooltip>
+            <PopoverContent className="w-[425px]" align="end" side="bottom">
+                <Tabs defaultValue="dataType">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="dataType">{t('dataType')}</TabsTrigger>
+                        <TabsTrigger value="jsonSchema">{t('jsonSchema')}</TabsTrigger>
+                    </TabsList>
 
-                    <IGRPTabsContentPrimitive value="dataType" className="space-y-4">
+                    <TabsContent value="dataType" className="space-y-4">
                         <p className="text-sm text-muted-foreground">
                             {t('configureFieldOptions')}
                         </p>
                         <div className="flex flex-1 gap-2">
                             {['isRequired', 'nullable', 'deprecated'].map((field: string) => (
                                 <div key={`${field}`} className="flex flex-1 items-center gap-4">
-                                    <IGRPLabelPrimitive htmlFor={`${field}`}>
-                                        {toInitCap(field)}
-                                    </IGRPLabelPrimitive>
+                                    <Label htmlFor={`${field}`}>{toInitCap(field)}</Label>
                                     <IGRPSwitch
                                         name={`${field}`}
                                         id={`${field}`}
@@ -102,9 +81,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                             <div className="flex flex-1 gap-2">
                                 {['enum', 'const'].map((field: string) => (
                                     <div key={`${field}`} className="flex items-center gap-4">
-                                        <IGRPLabelPrimitive htmlFor={`${field}`}>
-                                            {toInitCap(field)}
-                                        </IGRPLabelPrimitive>
+                                        <Label htmlFor={`${field}`}>{toInitCap(field)}</Label>
                                         <IGRPSwitch
                                             name={`${field}`}
                                             id={`${field}`}
@@ -116,7 +93,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                     </div>
                                 ))}
                                 {isConst && (
-                                    <IGRPInputPrimitive
+                                    <Input
                                         id="const"
                                         className="h-8"
                                         value={row?.['const'] || ''}
@@ -136,10 +113,8 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                         {isInteger && (
                             <div className="grid grid-cols-3 gap-2">
                                 <div className="space-y-1">
-                                    <IGRPLabelPrimitive htmlFor="minimunm">
-                                        {t('minimum')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPInputPrimitive
+                                    <Label htmlFor="minimunm">{t('minimum')}</Label>
+                                    <Input
                                         id="minimunm"
                                         type={'number'}
                                         className="h-8 w-28"
@@ -149,10 +124,8 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <IGRPLabelPrimitive htmlFor="maximum">
-                                        {t('minimum')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPInputPrimitive
+                                    <Label htmlFor="maximum">{t('minimum')}</Label>
+                                    <Input
                                         id="maximum"
                                         type={'number'}
                                         className="h-8 w-28"
@@ -162,10 +135,8 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <IGRPLabelPrimitive htmlFor="m">
-                                        {t('minimum')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPInputPrimitive
+                                    <Label htmlFor="m">{t('minimum')}</Label>
+                                    <Input
                                         id="multipleOf"
                                         placeholder=">=0"
                                         type={'multipleOf'}
@@ -182,10 +153,8 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                             {!isInteger && !isBoolean && (
                                 <>
                                     <div className="space-y-1">
-                                        <IGRPLabelPrimitive htmlFor="minLength">
-                                            {t('minLength')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
+                                        <Label htmlFor="minLength">{t('minLength')}</Label>
+                                        <Input
                                             id="minLength"
                                             className="h-8"
                                             value={row?.['minLength'] || ''}
@@ -195,10 +164,8 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <IGRPLabelPrimitive htmlFor="maxLength">
-                                            {t('maxLength')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
+                                        <Label htmlFor="maxLength">{t('maxLength')}</Label>
+                                        <Input
                                             id="maxLength"
                                             className="h-8"
                                             value={row?.['maxLength'] || ''}
@@ -210,10 +177,8 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                 </>
                             )}
                             <div className="space-y-1">
-                                <IGRPLabelPrimitive htmlFor="default">
-                                    {t('default')}
-                                </IGRPLabelPrimitive>
-                                <IGRPInputPrimitive
+                                <Label htmlFor="default">{t('default')}</Label>
+                                <Input
                                     id="default"
                                     className="h-8"
                                     value={row?.['default'] || ''}
@@ -223,10 +188,8 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                             {!isBoolean && (
                                 <>
                                     <div className="space-y-1">
-                                        <IGRPLabelPrimitive htmlFor="regex">
-                                            {t('pattern')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
+                                        <Label htmlFor="regex">{t('pattern')}</Label>
+                                        <Input
                                             id="pattern"
                                             className="h-8"
                                             value={row?.['pattern'] || ''}
@@ -237,10 +200,8 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                     </div>
 
                                     <div className="col-span-2 space-y-1">
-                                        <IGRPLabelPrimitive htmlFor="examples">
-                                            {t('examples')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
+                                        <Label htmlFor="examples">{t('examples')}</Label>
+                                        <Input
                                             id="examples"
                                             className="h-8"
                                             value={row?.['examples'] || ''}
@@ -252,17 +213,17 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                                 </>
                             )}
                         </div>
-                    </IGRPTabsContentPrimitive>
-                    <IGRPTabsContentPrimitive value="jsonSchema">
+                    </TabsContent>
+                    <TabsContent value="jsonSchema">
                         <MonacoEditor
                             content={JSON.stringify(row, null, 2)}
                             filePath=""
                             onChange={() => {}}
                             height="20vh"
                         />
-                    </IGRPTabsContentPrimitive>
-                </IGRPTabsPrimitive>
-            </IGRPPopoverContentPrimitive>
-        </IGRPPopoverPrimitive>
+                    </TabsContent>
+                </Tabs>
+            </PopoverContent>
+        </Popover>
     )
 }

@@ -1,13 +1,9 @@
-import {
-    IGRPCheckboxPrimitive,
-    IGRPCombobox,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPSwitchPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Checkbox } from '@renderer/components/ui/checkbox'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Switch } from '@renderer/components/ui/switch'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import { LabelRequired } from '@renderer/components/label-required'
 import { cn } from '@renderer/lib/utils'
 import { Info } from 'lucide-react'
@@ -62,9 +58,9 @@ export const TextInput = ({
             {isRequired ? (
                 <LabelRequired>{label}</LabelRequired>
             ) : (
-                <IGRPLabelPrimitive htmlFor={id}>{label}</IGRPLabelPrimitive>
+                <Label htmlFor={id}>{label}</Label>
             )}
-            <IGRPInputPrimitive
+            <Input
                 id={id}
                 type="text"
                 className={cn('w-full', isTouched && error && 'border-destructive')}
@@ -99,9 +95,9 @@ export const SelectInput = ({
         {isRequired ? (
             <LabelRequired>{label}</LabelRequired>
         ) : (
-            <IGRPLabelPrimitive htmlFor={id} className={cn(classNameLabel)}>
+            <Label htmlFor={id} className={cn(classNameLabel)}>
                 {label}
-            </IGRPLabelPrimitive>
+            </Label>
         )}
         <IGRPCombobox
             name={id}
@@ -130,26 +126,26 @@ export const CheckboxInput = ({
 }: CheckboxProps): React.ReactNode => (
     <div className="flex flex-1 flex-col gap-2">
         <div className="flex flex-1 items-center gap-2">
-            <IGRPCheckboxPrimitive name={id} checked={value} onCheckedChange={onChange} />
+            <Checkbox name={id} checked={value} onCheckedChange={onChange} />
             {isRequired ? (
                 <LabelRequired>{label}</LabelRequired>
             ) : (
-                <IGRPLabelPrimitive htmlFor={id}>{label}</IGRPLabelPrimitive>
+                <Label htmlFor={id}>{label}</Label>
             )}
             {info != null && info !== '' && (
-                <IGRPTooltipPrimitive>
-                    <IGRPTooltipTriggerPrimitive asChild>
+                <Tooltip>
+                    <TooltipTrigger asChild>
                         <span
                             className="inline-flex cursor-help text-muted-foreground hover:text-foreground"
                             tabIndex={0}
                         >
                             <Info className="h-4 w-4" aria-hidden />
                         </span>
-                    </IGRPTooltipTriggerPrimitive>
-                    <IGRPTooltipContentPrimitive>
+                    </TooltipTrigger>
+                    <TooltipContent>
                         <p className="max-w-xs text-sm">{info}</p>
-                    </IGRPTooltipContentPrimitive>
-                </IGRPTooltipPrimitive>
+                    </TooltipContent>
+                </Tooltip>
             )}
         </div>
         {error && isTouched && <p className="text-xs text-destructive">{error}</p>}
@@ -166,12 +162,8 @@ export const SwitchInput = ({
     error
 }: CheckboxProps): React.ReactNode => (
     <div className="flex flex-1 gap-2">
-        {isRequired ? (
-            <LabelRequired>{label}</LabelRequired>
-        ) : (
-            <IGRPLabelPrimitive htmlFor={id}>{label}</IGRPLabelPrimitive>
-        )}
-        <IGRPSwitchPrimitive name={id} checked={value} onCheckedChange={onChange} />
+        {isRequired ? <LabelRequired>{label}</LabelRequired> : <Label htmlFor={id}>{label}</Label>}
+        <Switch name={id} checked={value} onCheckedChange={onChange} />
         {error && isTouched && <p className="text-xs text-destructive">{error}</p>}
     </div>
 )

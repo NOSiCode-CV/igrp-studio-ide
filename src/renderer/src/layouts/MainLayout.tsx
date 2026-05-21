@@ -1,8 +1,5 @@
-import {
-    IGRPScrollAreaPrimitive,
-    IGRPSidebarInsetPrimitive,
-    IGRPSidebarProviderPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
 import { UpdateModalBottomLeft } from '@renderer/components/update-banner'
 import { IntegratedTerminal } from '@renderer/components/integrated-terminal'
 import { useGitTokenExpiredToast } from '@renderer/hooks/use-git-token-expired-toast'
@@ -45,7 +42,7 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
 
     return (
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))]">
-            <IGRPSidebarProviderPrimitive>
+            <SidebarProvider>
                 <div className="flex flex-col w-full h-screen">
                     <Header />
 
@@ -66,17 +63,17 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
                                 <FooterSidebar />
                             </SidebarFooter>
                         </Sidebar>
-                        <IGRPSidebarInsetPrimitive className="flex-1">
-                            <IGRPScrollAreaPrimitive className="h-[calc(100svh-var(--header-height-two))]">
+                        <SidebarInset className="flex-1">
+                            <ScrollArea className="h-[calc(100svh-var(--header-height-two))]">
                                 {props.children}
-                            </IGRPScrollAreaPrimitive>
-                        </IGRPSidebarInsetPrimitive>
+                            </ScrollArea>
+                        </SidebarInset>
                     </div>
                     <Footer />
                     <IntegratedTerminal />
                     <UpdateModalBottomLeft />
                 </div>
-            </IGRPSidebarProviderPrimitive>
+            </SidebarProvider>
         </div>
     )
 }

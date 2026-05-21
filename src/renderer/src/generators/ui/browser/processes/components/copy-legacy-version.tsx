@@ -1,12 +1,12 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
 import type { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { SelectInput } from '@renderer/generators/api/components/inputs-form'
 import { Copy, Plus } from 'lucide-react'
@@ -128,17 +128,15 @@ export const CopyLegacyVersionModal: React.FC<CopyLegacyVersionModalProps> = ({
     }
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={onOpenChange}>
-            <IGRPDialogContentPrimitive>
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive className="flex items-center gap-2">
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
                         <Copy className="h-5 w-5" />
                         Copy Legacy Version
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        Copy a legacy version of a process.
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+                    </DialogTitle>
+                    <DialogDescription>Copy a legacy version of a process.</DialogDescription>
+                </DialogHeader>
 
                 <div className="space-y-6 py-4">
                     {/* Copy from Previous Version */}
@@ -177,16 +175,16 @@ export const CopyLegacyVersionModal: React.FC<CopyLegacyVersionModalProps> = ({
                     )}
                 </div>
 
-                <IGRPDialogFooterPrimitive className="gap-2">
-                    <IGRPButtonPrimitive variant="outline" onClick={handleCancel}>
+                <DialogFooter className="gap-2">
+                    <Button variant="outline" onClick={handleCancel}>
                         Cancel
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive onClick={handleConfirm} className="gap-2">
+                    </Button>
+                    <Button onClick={handleConfirm} className="gap-2">
                         <Plus className="h-4 w-4" />
                         {'Copy Step'}
-                    </IGRPButtonPrimitive>
-                </IGRPDialogFooterPrimitive>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }

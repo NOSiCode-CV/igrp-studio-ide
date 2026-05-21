@@ -1,17 +1,16 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogClosePrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPLabelPrimitive,
-    type IGRPOptionsProps,
-    IGRPScrollAreaPrimitive,
-    IGRPSwitch
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Label } from '@renderer/components/ui/label'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { IGRPSwitch, type IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system'
 import type { FieldValidation } from '@igrp/igrp-studio-nextjs-engine/types'
 import { SelectInput, TextInput } from '@renderer/generators/api/components/inputs-form'
 import { handleChangeValueObject } from '@renderer/generators/api/helpers'
@@ -247,91 +246,91 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
     const formik = useFormikCompat<any>(rhfForm, async (values) => {
         if (!validate() || !componentId) return
 
-            const updatedComponent = {
-                ...values,
-                fields: (values.fields as LabeledElementField[]).map((field) => {
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { label, ...rest } = field // Removes the 'label' property
-                    return {
-                        ...rest,
-                        type: rest.type || 'string',
-                        defaultValue: getDefaultValue(field),
-                        ...(rest.fields && {
-                            fields: rest.fields.map((field) => ({
-                                ...field,
-                                type: field.type || 'string',
-                                defaultValue: getDefaultValue(field)
-                            }))
-                        })
-                    }
-                })
-            }
-
-            createOrUpdateType({
-                ...updatedComponent,
-                isEnum: !!values.isEnum,
-                isMainType: !!values.isMainType,
-                definitionType: values.definitionType ?? 'auto',
-                tags: Array.isArray(values.tags)
-                    ? values.tags.filter((tag: string) => tag.trim().length > 0)
-                    : [],
-                customInstanceName: values.customInstanceName?.trim() || undefined,
-                customInitInstanceName: values.customInitInstanceName?.trim() || undefined,
-                path: !newBinding && typeFilePath ? typeFilePath : ''
-            })
-
-            //TODO For revisions]
-            if (comp.componentName === COMPONENT.Form) {
-                //TODOREVISAR
-                const data = formDefaultData
-                const newState = {
-                    state: {
-                        id: getId(),
-                        type:
-                            (data &&
-                                'defaultValues' in data &&
-                                data.defaultValues?.properties?.type?.default) ??
-                            'any',
-                        name: `${
-                            values.name ??
-                            (
-                                data &&
-                                    'defaultValues' in data &&
-                                    data.defaultValues?.properties?.name?.default
-                            ) ??
-                            ''
-                        }Data`,
-                        defaultValue: `init${capitalize(values.name)}`,
-                        imports:
-                            (data &&
-                                'defaultValues' in data &&
-                                data.defaultValues?.properties?.imports?.default) ??
-                            [],
-                        generate: true
-                    }
-                }
-
-                handleUpdateChildComponent(componentId, {
-                    dataType: values.name,
-                    data: {
-                        ...comp.data,
-                        defaultValues: newState
-                    }
-                })
-            } else {
-                handleUpdateChildComponent(componentId, {
-                    dataType: values.name
-                })
-            }
-
-            values.fields.forEach(({ componentId: id, name }) => {
-                const component = componentMap.get(id)
-                if (component) {
-                    handleUpdateChildComponent(id, {
-                        tag: name
+        const updatedComponent = {
+            ...values,
+            fields: (values.fields as LabeledElementField[]).map((field) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { label, ...rest } = field // Removes the 'label' property
+                return {
+                    ...rest,
+                    type: rest.type || 'string',
+                    defaultValue: getDefaultValue(field),
+                    ...(rest.fields && {
+                        fields: rest.fields.map((field) => ({
+                            ...field,
+                            type: field.type || 'string',
+                            defaultValue: getDefaultValue(field)
+                        }))
                     })
                 }
             })
+        }
+
+        createOrUpdateType({
+            ...updatedComponent,
+            isEnum: !!values.isEnum,
+            isMainType: !!values.isMainType,
+            definitionType: values.definitionType ?? 'auto',
+            tags: Array.isArray(values.tags)
+                ? values.tags.filter((tag: string) => tag.trim().length > 0)
+                : [],
+            customInstanceName: values.customInstanceName?.trim() || undefined,
+            customInitInstanceName: values.customInitInstanceName?.trim() || undefined,
+            path: !newBinding && typeFilePath ? typeFilePath : ''
+        })
+
+        //TODO For revisions]
+        if (comp.componentName === COMPONENT.Form) {
+            //TODOREVISAR
+            const data = formDefaultData
+            const newState = {
+                state: {
+                    id: getId(),
+                    type:
+                        (data &&
+                            'defaultValues' in data &&
+                            data.defaultValues?.properties?.type?.default) ??
+                        'any',
+                    name: `${
+                        values.name ??
+                        (
+                            data &&
+                                'defaultValues' in data &&
+                                data.defaultValues?.properties?.name?.default
+                        ) ??
+                        ''
+                    }Data`,
+                    defaultValue: `init${capitalize(values.name)}`,
+                    imports:
+                        (data &&
+                            'defaultValues' in data &&
+                            data.defaultValues?.properties?.imports?.default) ??
+                        [],
+                    generate: true
+                }
+            }
+
+            handleUpdateChildComponent(componentId, {
+                dataType: values.name,
+                data: {
+                    ...comp.data,
+                    defaultValues: newState
+                }
+            })
+        } else {
+            handleUpdateChildComponent(componentId, {
+                dataType: values.name
+            })
+        }
+
+        values.fields.forEach(({ componentId: id, name }) => {
+            const component = componentMap.get(id)
+            if (component) {
+                handleUpdateChildComponent(id, {
+                    tag: name
+                })
+            }
+        })
 
         setOpen(false)
     })
@@ -523,12 +522,8 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                 // value is empty (legacy data saved before
                 // deriveFieldName fell back through label) — otherwise
                 // keep whatever the user typed manually.
-                name:
-                    (currentField?.name && String(currentField.name).trim()) ||
-                    field.name,
-                label:
-                    (currentField?.label && String(currentField.label).trim()) ||
-                    field.label
+                name: (currentField?.name && String(currentField.name).trim()) || field.name,
+                label: (currentField?.label && String(currentField.label).trim()) || field.label
             }
 
             if (field.fields && currentField?.fields) {
@@ -577,22 +572,20 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
 
     return (
         <>
-            <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-                <IGRPDialogContentPrimitive className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px]! lg:max-w-[900px]! max-h-[80vh]">
-                    <IGRPScrollAreaPrimitive className="h-full p-4 max-h-[70vh] overflow-auto">
-                        <IGRPDialogHeaderPrimitive className="mb-4">
-                            <IGRPDialogTitlePrimitive>
-                                Binding Configuration
-                            </IGRPDialogTitlePrimitive>
-                            <IGRPDialogDescriptionPrimitive>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px]! lg:max-w-[900px]! max-h-[80vh]">
+                    <ScrollArea className="h-full p-4 max-h-[70vh] overflow-auto">
+                        <DialogHeader className="mb-4">
+                            <DialogTitle>Binding Configuration</DialogTitle>
+                            <DialogDescription>
                                 Make changes to your Binding Configuration here. Click save when
                                 you&apos;re done.
-                            </IGRPDialogDescriptionPrimitive>
-                        </IGRPDialogHeaderPrimitive>
+                            </DialogDescription>
+                        </DialogHeader>
                         <form onSubmit={formik.handleSubmit} className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="relative flex rounded-lg border bg-muted p-0.5 string-sm space-x-2">
-                                    <IGRPButtonPrimitive
+                                    <Button
                                         type="button"
                                         variant={newBinding ? 'outline' : 'ghost'}
                                         onClick={() => setNewBinding(true)}
@@ -600,8 +593,8 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                         size="sm"
                                     >
                                         New
-                                    </IGRPButtonPrimitive>
-                                    <IGRPButtonPrimitive
+                                    </Button>
+                                    <Button
                                         type="button"
                                         onClick={() => setNewBinding(false)}
                                         className="rounded-lg"
@@ -609,17 +602,17 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                         variant={!newBinding ? 'outline' : 'ghost'}
                                     >
                                         Existing
-                                    </IGRPButtonPrimitive>
+                                    </Button>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     {/* {newBinding && (
                                         <div className="flex items-center gap-2">
-                                            <IGRPLabelPrimitive
+                                            <Label
                                                 htmlFor="isEnum"
                                                 className="string-sm cursor-pointer"
                                             >
                                                 {t('enumType')}
-                                            </IGRPLabelPrimitive>
+                                            </Label>
                                             <IGRPSwitch
                                                 id="isEnum"
                                                 checked={isEnum}
@@ -630,12 +623,12 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                         </div>
                                     )} */}
                                     <div className="flex items-center gap-2">
-                                        <IGRPLabelPrimitive
+                                        <Label
                                             htmlFor="definitionType"
                                             className="string-sm whitespace-nowrap"
                                         >
                                             {t('definitionType')}
-                                        </IGRPLabelPrimitive>
+                                        </Label>
                                         <select
                                             id="definitionType"
                                             value={
@@ -694,9 +687,9 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                 </summary>
                                 <div className="space-y-3 px-3 pb-3 pt-1">
                                     <div className="space-y-1">
-                                        <IGRPLabelPrimitive htmlFor="tags" className="string-sm">
+                                        <Label htmlFor="tags" className="string-sm">
                                             {t('typeTags')}
-                                        </IGRPLabelPrimitive>
+                                        </Label>
                                         <input
                                             id="tags"
                                             value={(formik.values.tags ?? []).join(', ')}
@@ -722,23 +715,23 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                                 formik.setFieldValue('isMainType', checked)
                                             }
                                         />
-                                        <IGRPLabelPrimitive
+                                        <Label
                                             htmlFor="isMainType"
                                             className="string-sm cursor-pointer"
                                         >
                                             {t('mainType')}
-                                        </IGRPLabelPrimitive>
+                                        </Label>
                                     </div>
 
                                     {formik.values.definitionType !== 'auto' && (
                                         <>
                                             <div className="space-y-1">
-                                                <IGRPLabelPrimitive
+                                                <Label
                                                     htmlFor="customInstanceName"
                                                     className="string-sm"
                                                 >
                                                     {t('customInstanceName')}
-                                                </IGRPLabelPrimitive>
+                                                </Label>
                                                 <input
                                                     id="customInstanceName"
                                                     value={formik.values.customInstanceName ?? ''}
@@ -753,12 +746,12 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <IGRPLabelPrimitive
+                                                <Label
                                                     htmlFor="customInitInstanceName"
                                                     className="string-sm"
                                                 >
                                                     {t('customInitInstanceName')}
-                                                </IGRPLabelPrimitive>
+                                                </Label>
                                                 <input
                                                     id="customInitInstanceName"
                                                     value={
@@ -795,17 +788,17 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                 </div>
                             )}
 
-                            <IGRPDialogFooterPrimitive className="space-x-2">
-                                <IGRPDialogClosePrimitive>Close</IGRPDialogClosePrimitive>
-                                <IGRPButtonPrimitive type="submit" disabled={formik.isSubmitting}>
+                            <DialogFooter className="space-x-2">
+                                <DialogClose>Close</DialogClose>
+                                <Button type="submit" disabled={formik.isSubmitting}>
                                     {formik.isSubmitting && <Loader2 className="animate-spin" />}
                                     Save changes
-                                </IGRPButtonPrimitive>
-                            </IGRPDialogFooterPrimitive>
+                                </Button>
+                            </DialogFooter>
                         </form>
-                    </IGRPScrollAreaPrimitive>
-                </IGRPDialogContentPrimitive>
-            </IGRPDialogPrimitive>
+                    </ScrollArea>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }

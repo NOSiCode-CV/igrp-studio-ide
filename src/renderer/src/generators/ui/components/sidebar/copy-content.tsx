@@ -1,4 +1,5 @@
-import { IGRPButtonPrimitive, IGRPRadioGroup } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { IGRPRadioGroup } from '@igrp/igrp-framework-react-design-system'
 import { SelectInput } from '@renderer/generators/api/components/inputs-form'
 import useStudio from '@renderer/hooks/use-studio'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
@@ -290,9 +291,9 @@ const CopyContent = ({ currentComp }: CopyContentProps): JSX.Element => {
                     name="component"
                     label={t('Components')}
                 />
-                <IGRPButtonPrimitive className="mt-2" onClick={handleCopyClick}>
+                <Button className="mt-2" onClick={handleCopyClick}>
                     {t('Copy Properties')}
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
         </div>
     )

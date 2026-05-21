@@ -1,11 +1,5 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardFooterPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import { ProjectIcon } from '@renderer/components/shared-ui'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import { getLocale } from '@renderer/utils'
@@ -54,7 +48,10 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
         if (byUuid) return byUuid
 
         const projectName = (project.name || '').toLowerCase().trim()
-        const projectDirName = path.basename(project.path || '').toLowerCase().trim()
+        const projectDirName = path
+            .basename(project.path || '')
+            .toLowerCase()
+            .trim()
         const candidates = [projectName, projectDirName].filter(Boolean)
         if (candidates.length === 0) return undefined
         return services.find((service) => {
@@ -66,10 +63,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                     serviceName.endsWith(`-${candidate}`) ||
                     serviceName.includes(`-${candidate}-`)
             )
-            return (
-                composeFile.includes('igrp-projects-compose.yml') &&
-                matchesCandidate
-            )
+            return composeFile.includes('igrp-projects-compose.yml') && matchesCandidate
         })
     }
 
@@ -81,9 +75,9 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                     const dependsOn = service?.dependsOn || []
                     const ports = service?.ports || []
                     return (
-                        <IGRPCardPrimitive key={index} className="group">
-                            <IGRPCardHeaderPrimitive>
-                                <IGRPCardTitlePrimitive>
+                        <Card key={index} className="group">
+                            <CardHeader>
+                                <CardTitle>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-2">
                                             <ProjectIcon
@@ -101,9 +95,9 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                             services={services}
                                         />
                                     </div>
-                                </IGRPCardTitlePrimitive>
-                            </IGRPCardHeaderPrimitive>
-                            <IGRPCardContentPrimitive>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
                                 {project.config?.description && (
                                     <p className="text-sm text-muted-foreground">
                                         {project.config.description}
@@ -111,8 +105,8 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                 )}
                                 {ports.length > 0 && <PortsBadgeList ports={ports} />}
                                 {ports.length > 0 && <Dependency dependsOn={dependsOn} />}
-                            </IGRPCardContentPrimitive>
-                            <IGRPCardFooterPrimitive className="flex flex-wrap text-muted-foreground justify-between gap-2">
+                            </CardContent>
+                            <CardFooter className="flex flex-wrap text-muted-foreground justify-between gap-2">
                                 <div className="text-xs flex items-center">
                                     {project.updatedAt && (
                                         <>
@@ -125,7 +119,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                     )}
                                 </div>
                                 <div className="w-full grid grid-cols-1 gap-2">
-                                    <IGRPButtonPrimitive
+                                    <Button
                                         variant={'outline'}
                                         size={'sm'}
                                         className="w-full"
@@ -136,10 +130,10 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                     >
                                         <Folder />
                                         {t('open')}
-                                    </IGRPButtonPrimitive>
+                                    </Button>
                                 </div>
-                            </IGRPCardFooterPrimitive>
-                        </IGRPCardPrimitive>
+                            </CardFooter>
+                        </Card>
                     )
                 })
             )}

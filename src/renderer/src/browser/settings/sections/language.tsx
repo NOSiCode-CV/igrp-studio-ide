@@ -1,4 +1,5 @@
-import { IGRPCombobox, IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Label } from '@renderer/components/ui/label'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import { type JSX, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -35,9 +36,7 @@ export function LanguageSettings(): JSX.Element {
             </div>
             <div className="space-y-4">
                 <div className="space-y-2 flex flex-col">
-                    <IGRPLabelPrimitive htmlFor="language">
-                        {t('language_label')}
-                    </IGRPLabelPrimitive>
+                    <Label htmlFor="language">{t('language_label')}</Label>
                     <IGRPCombobox
                         value={currentLanguage}
                         options={languages}

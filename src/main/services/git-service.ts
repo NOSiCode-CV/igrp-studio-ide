@@ -262,9 +262,7 @@ export const GitService = {
             // **stdout** (not stderr) and exits non-zero. The previous version
             // only inspected stderr; widen the scan so we recognise the
             // benign no-op and return `false` instead of throwing.
-            const combined = [error.stderr, error.stdout, error.message]
-                .filter(Boolean)
-                .join('\n')
+            const combined = [error.stderr, error.stdout, error.message].filter(Boolean).join('\n')
 
             if (
                 combined.includes('nothing to commit') ||

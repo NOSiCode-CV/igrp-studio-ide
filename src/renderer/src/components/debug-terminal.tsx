@@ -1,17 +1,15 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDrawerContentPrimitive,
-    IGRPDrawerHeaderPrimitive,
-    IGRPDrawerPrimitive,
-    IGRPDrawerTitlePrimitive,
-    IGRPDrawerTriggerPrimitive,
-    IGRPScrollAreaPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Drawer,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger
+} from '@renderer/components/ui/drawer'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import { Bug, Copy, Trash } from 'lucide-react'
 import { type JSX, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -32,22 +30,22 @@ interface ConsoleMessage {
 export function DebugTerminal(): JSX.Element {
     const { t } = useTranslation()
     return (
-        <IGRPDrawerPrimitive modal={false}>
-            <IGRPTooltipPrimitive>
-                <IGRPTooltipTriggerPrimitive asChild>
-                    <IGRPDrawerTriggerPrimitive asChild>
-                        <IGRPButtonPrimitive variant="ghost" size="icon" className="h-6 w-6">
+        <Drawer modal={false}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <DrawerTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6">
                             <Bug className="h-3.5 w-3.5 text-muted-foreground" />
-                        </IGRPButtonPrimitive>
-                    </IGRPDrawerTriggerPrimitive>
-                </IGRPTooltipTriggerPrimitive>
-                <IGRPTooltipContentPrimitive>{t('debug')}</IGRPTooltipContentPrimitive>
-            </IGRPTooltipPrimitive>
-            <IGRPDrawerContentPrimitive aria-describedby={undefined} className="h-[40vh] z-40">
+                        </Button>
+                    </DrawerTrigger>
+                </TooltipTrigger>
+                <TooltipContent>{t('debug')}</TooltipContent>
+            </Tooltip>
+            <DrawerContent aria-describedby={undefined} className="h-[40vh] z-40">
                 <div className="flex h-full flex-col -mt-6">
-                    <IGRPDrawerHeaderPrimitive className="p-0">
-                        <IGRPDrawerTitlePrimitive />
-                    </IGRPDrawerHeaderPrimitive>
+                    <DrawerHeader className="p-0">
+                        <DrawerTitle />
+                    </DrawerHeader>
                     <IGRPTabs defaultValue="debug" className="flex h-full flex-col">
                         <IGRPTabsList>
                             <IGRPTabsTrigger
@@ -68,8 +66,8 @@ export function DebugTerminal(): JSX.Element {
                         </div>
                     </IGRPTabs>
                 </div>
-            </IGRPDrawerContentPrimitive>
-        </IGRPDrawerPrimitive>
+            </DrawerContent>
+        </Drawer>
     )
 }
 
@@ -165,7 +163,7 @@ function TabConsole(): JSX.Element {
                     <option value="success">Success</option>
                 </select>
 
-                <IGRPButtonPrimitive
+                <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => setLogs([])}
@@ -173,9 +171,9 @@ function TabConsole(): JSX.Element {
                     className="h-8 w-8"
                 >
                     <Trash className="h-3.5 w-3.5" />
-                </IGRPButtonPrimitive>
+                </Button>
 
-                <IGRPButtonPrimitive
+                <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => {
@@ -187,9 +185,9 @@ function TabConsole(): JSX.Element {
                     className="h-8 w-8"
                 >
                     <Copy className="h-3.5 w-3.5" />
-                </IGRPButtonPrimitive>
+                </Button>
 
-                <IGRPButtonPrimitive
+                <Button
                     variant="ghost"
                     size="icon"
                     onClick={async () => {
@@ -203,11 +201,11 @@ function TabConsole(): JSX.Element {
                     className="h-8 w-8"
                 >
                     <Bug className="h-3.5 w-3.5" />
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
 
             <div className="flex-1 relative h-full min-h-0 mb-8">
-                <IGRPScrollAreaPrimitive className="h-full w-full">
+                <ScrollArea className="h-full w-full">
                     <div
                         ref={scrollRef}
                         className="font-mono text-sm p-4 min-h-full overflow-y-auto scroll-smooth"
@@ -280,7 +278,7 @@ function TabConsole(): JSX.Element {
                             <div className="text-muted-foreground">{t('noConsoleLogs')}</div>
                         )}
                     </div>
-                </IGRPScrollAreaPrimitive>
+                </ScrollArea>
             </div>
         </div>
     )

@@ -1,7 +1,7 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
     IGRPCard,
     IGRPCardContent,
     IGRPCardDescription,
@@ -103,7 +103,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps): JSX.Elemen
                                 Installed
                             </span>
                         ) : (
-                            <IGRPButtonPrimitive
+                            <Button
                                 size="sm"
                                 variant="outline"
                                 onClick={() => void handleInstallOptionalStack('monitoring')}
@@ -113,7 +113,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps): JSX.Elemen
                                     <RefreshCw className="h-3.5 w-3.5 mr-1 animate-spin" />
                                 ) : null}
                                 Install
-                            </IGRPButtonPrimitive>
+                            </Button>
                         )}
                     </div>
 
@@ -130,7 +130,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps): JSX.Elemen
                                 Installed
                             </span>
                         ) : (
-                            <IGRPButtonPrimitive
+                            <Button
                                 size="sm"
                                 variant="outline"
                                 onClick={() => void handleInstallOptionalStack('process')}
@@ -140,7 +140,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps): JSX.Elemen
                                     <RefreshCw className="h-3.5 w-3.5 mr-1 animate-spin" />
                                 ) : null}
                                 Install
-                            </IGRPButtonPrimitive>
+                            </Button>
                         )}
                     </div>
                 </IGRPCardContent>
@@ -159,14 +159,14 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps): JSX.Elemen
                     <div className="border rounded-md overflow-hidden">
                         <div className="bg-muted/30 border-b py-1.5 flex items-center justify-between">
                             <div className="text-xs font-medium px-3">{t('igrpComposeYml')}</div>
-                            <IGRPButtonPrimitive
+                            <Button
                                 size="sm"
                                 variant="ghost"
                                 className="h-6 w-6 p-0"
                                 onClick={() => loadComposeFile(workspace.path)}
                             >
                                 <RefreshCw className="h-3.5 w-3.5" />
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </div>
                         {content && (
                             <MonacoEditor
@@ -184,7 +184,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps): JSX.Elemen
                         {t('servicesEnabled')}
                     </div>
                     <div className="flex gap-2">
-                        <IGRPButtonPrimitive
+                        <Button
                             size="sm"
                             className="h-7"
                             variant="outline"
@@ -201,8 +201,8 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps): JSX.Elemen
                                     {t('copy')}
                                 </>
                             )}
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive
+                        </Button>
+                        <Button
                             size="sm"
                             className="h-7"
                             variant="outline"
@@ -210,7 +210,7 @@ export function WorkspaceDocker({ workspace }: WorkspaceConfigProps): JSX.Elemen
                         >
                             <Save className="h-3.5 w-3.5 mr-1" />
                             {t('save')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                 </IGRPCardFooter>
             </IGRPCard>

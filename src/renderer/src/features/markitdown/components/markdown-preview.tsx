@@ -1,4 +1,4 @@
-import { IGRPScrollAreaPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { FileText } from 'lucide-react'
 import { type JSX, useMemo } from 'react'
 import { renderMarkdownToSafeHtml } from '../utils/markdown-renderer'
@@ -26,13 +26,13 @@ const MarkdownPreview = ({
 
     return (
         <div className="md-preview h-full">
-            <IGRPScrollAreaPrimitive className="h-full">
+            <ScrollArea className="h-full">
                 <article
                     className="prose prose-sm dark:prose-invert max-w-3xl mx-auto px-8 py-8"
                     // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized via DOMPurify in renderMarkdownToSafeHtml
                     dangerouslySetInnerHTML={{ __html: html }}
                 />
-            </IGRPScrollAreaPrimitive>
+            </ScrollArea>
         </div>
     )
 }

@@ -17,10 +17,7 @@ export function useDtoValidation({ t }: { t: any }) {
                             name: z
                                 .string()
                                 .min(1, 'Field name is required')
-                                .regex(
-                                    PATTERNS.NAME_VALIDATION_PATTERN,
-                                    t('msgInfoAccpetName')
-                                )
+                                .regex(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
                                 .max(30, t('maxLengthExceeded', { max: 30 })),
                             type: z.string().min(1, 'Field type is required')
                         })

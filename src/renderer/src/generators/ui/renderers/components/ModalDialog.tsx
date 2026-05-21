@@ -1,4 +1,4 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
 import Draggable from '@renderer/lib/dnd/Draggable'
 import Droppable from '@renderer/lib/dnd/Droppable'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
@@ -205,7 +205,7 @@ const IGRPStudioDialogTrigger: React.FC<CardComponentProps> = ({ comp }) => {
     const { content, ...args } = properties
     return (
         <div className="py-2">
-            <IGRPButtonPrimitive {...args}>{content}</IGRPButtonPrimitive>
+            <Button {...args}>{content}</Button>
         </div>
     )
 }

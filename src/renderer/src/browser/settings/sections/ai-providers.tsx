@@ -1,10 +1,8 @@
 'use client'
 
-import {
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
 import { cn } from '@renderer/lib/utils'
 import { CheckCircle2, Eye, EyeOff, FolderSearch, Loader2, RefreshCw, XCircle } from 'lucide-react'
 import { type FormEvent, type JSX, useEffect, useState } from 'react'
@@ -152,7 +150,7 @@ function LocalCLIsCard(): JSX.Element {
                         outside the default lookup (e.g. <code>~/.claude/local/claude</code>).
                     </p>
                 </div>
-                <IGRPButtonPrimitive
+                <Button
                     variant="outline"
                     size="sm"
                     className="h-7 gap-1.5 text-[11px]"
@@ -161,7 +159,7 @@ function LocalCLIsCard(): JSX.Element {
                 >
                     <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
                     {loading ? 'Detecting…' : 'Re-detect'}
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
 
             <div className="space-y-3">
@@ -195,7 +193,7 @@ function LocalCLIsCard(): JSX.Element {
                             )}
 
                             <div className="mt-2 flex gap-2">
-                                <IGRPInputPrimitive
+                                <Input
                                     value={draftPath[cli]}
                                     onChange={(e) =>
                                         setDraftPath((prev) => ({
@@ -206,7 +204,7 @@ function LocalCLIsCard(): JSX.Element {
                                     placeholder={`Custom path for ${cli} (optional)`}
                                     className="h-7 font-mono text-[11px]"
                                 />
-                                <IGRPButtonPrimitive
+                                <Button
                                     type="button"
                                     size="sm"
                                     variant="outline"
@@ -215,7 +213,7 @@ function LocalCLIsCard(): JSX.Element {
                                 >
                                     <FolderSearch size={12} />
                                     Save path
-                                </IGRPButtonPrimitive>
+                                </Button>
                             </div>
                         </div>
                     )
@@ -305,10 +303,10 @@ function ProviderCard({ provider, configured, onChanged }: ProviderCardProps): J
 
             <form onSubmit={handleSave} className="mt-3 space-y-3">
                 <div className="space-y-1.5">
-                    <IGRPLabelPrimitive className="text-[11px]">API key</IGRPLabelPrimitive>
+                    <Label className="text-[11px]">API key</Label>
                     <div className="flex gap-2">
                         <div className="relative flex-1">
-                            <IGRPInputPrimitive
+                            <Input
                                 type={reveal ? 'text' : 'password'}
                                 value={value}
                                 onChange={(e) => setValue(e.target.value)}
@@ -329,19 +327,19 @@ function ProviderCard({ provider, configured, onChanged }: ProviderCardProps): J
                                 {reveal ? <EyeOff size={12} /> : <Eye size={12} />}
                             </button>
                         </div>
-                        <IGRPButtonPrimitive
+                        <Button
                             type="submit"
                             size="sm"
                             disabled={!value.trim() || saving}
                             className="h-8"
                         >
                             {saving ? 'Saving…' : 'Save'}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <IGRPButtonPrimitive
+                    <Button
                         type="button"
                         variant="outline"
                         size="sm"
@@ -350,9 +348,9 @@ function ProviderCard({ provider, configured, onChanged }: ProviderCardProps): J
                         disabled={testing || !configured}
                     >
                         {testing ? 'Testing…' : 'Test connection'}
-                    </IGRPButtonPrimitive>
+                    </Button>
                     {configured && (
-                        <IGRPButtonPrimitive
+                        <Button
                             type="button"
                             variant="ghost"
                             size="sm"
@@ -361,7 +359,7 @@ function ProviderCard({ provider, configured, onChanged }: ProviderCardProps): J
                             disabled={saving}
                         >
                             Clear
-                        </IGRPButtonPrimitive>
+                        </Button>
                     )}
                     {testResult?.ok && (
                         <span className="flex items-center gap-1 text-[11px] text-emerald-600">

@@ -1,11 +1,11 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
 import type { PageConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
 import { CheckboxInput, TextInput } from '@renderer/generators/api/components/inputs-form'
@@ -249,21 +249,23 @@ export function CreatePageModal({
         }
     }, [watchedPath, setValue, form])
 
-    const args = (watch() as any).args as Array<{ name: string; type: string; isOptional: boolean }> | undefined
+    const args = (watch() as any).args as
+        | Array<{ name: string; type: string; isOptional: boolean }>
+        | undefined
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
-            <IGRPDialogContentPrimitive>
-                <IGRPDialogTitlePrimitive>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogTitle>
                     {isSubPage
                         ? t('createSubNewPage')
                         : formInitialValues.id
                           ? `Edit ${formInitialValues.pageName}`
                           : t('createNewPage')}
-                </IGRPDialogTitlePrimitive>
-                <IGRPDialogDescriptionPrimitive>
+                </DialogTitle>
+                <DialogDescription>
                     {t('comonDialogtDescription', { name: 'Page' })}
-                </IGRPDialogDescriptionPrimitive>
+                </DialogDescription>
                 <form className="needs-validation space-y-4" onSubmit={onSubmit}>
                     <div className="grid grid-cols-1 gap-4">
                         <TextInput
@@ -347,20 +349,16 @@ export function CreatePageModal({
                             />
                         </div>
                     </div>
-                    <IGRPDialogFooterPrimitive className="flex justify-between">
-                        <IGRPButtonPrimitive type="button" variant="ghost" onClick={onClose}>
+                    <DialogFooter className="flex justify-between">
+                        <Button type="button" variant="ghost" onClick={onClose}>
                             {t('cancel')}
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive
-                            type="submit"
-                            disabled={isSubmitting}
-                            color="primary"
-                        >
+                        </Button>
+                        <Button type="submit" disabled={isSubmitting} color="primary">
                             {isSubmitting ? t('saving') : t('save')}
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogFooterPrimitive>
+                        </Button>
+                    </DialogFooter>
                 </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

@@ -1,15 +1,15 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogClosePrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    type IGRPOptionsProps,
-    IGRPScrollAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { type IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system'
 import { handleChangeValueObject } from '@renderer/generators/api/helpers'
 import { useFormikCompat, useZodForm } from '@renderer/lib/form'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
@@ -171,19 +171,17 @@ export const BindingConfigurationFilterModal = ({
 
     return (
         <>
-            <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-                <IGRPDialogContentPrimitive className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max-h-[70vh]">
-                    <IGRPScrollAreaPrimitive className="h-full p-4">
-                        IGRPScrollAreaPrimitive
-                        <IGRPDialogHeaderPrimitive className="mb-4">
-                            <IGRPDialogTitlePrimitive>
-                                Binding Filter Configuration
-                            </IGRPDialogTitlePrimitive>
-                            <IGRPDialogDescriptionPrimitive>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px] lg:max-w-[900px] max-w-7xl max-h-[70vh]">
+                    <ScrollArea className="h-full p-4">
+                        ScrollArea
+                        <DialogHeader className="mb-4">
+                            <DialogTitle>Binding Filter Configuration</DialogTitle>
+                            <DialogDescription>
                                 Make changes to your Binding Configuration here. Click save when
                                 you're done.
-                            </IGRPDialogDescriptionPrimitive>
-                        </IGRPDialogHeaderPrimitive>
+                            </DialogDescription>
+                        </DialogHeader>
                         <form onSubmit={formik.handleSubmit} className="space-y-4">
                             <div className="border rounded-sm">
                                 <BindingFormList
@@ -197,17 +195,17 @@ export const BindingConfigurationFilterModal = ({
                                 />
                             </div>
 
-                            <IGRPDialogFooterPrimitive className="space-x-2">
-                                <IGRPDialogClosePrimitive>Close</IGRPDialogClosePrimitive>
-                                <IGRPButtonPrimitive type="submit" disabled={formik.isSubmitting}>
+                            <DialogFooter className="space-x-2">
+                                <DialogClose>Close</DialogClose>
+                                <Button type="submit" disabled={formik.isSubmitting}>
                                     {formik.isSubmitting && <Loader2 className="animate-spin" />}
                                     Save changes
-                                </IGRPButtonPrimitive>
-                            </IGRPDialogFooterPrimitive>
+                                </Button>
+                            </DialogFooter>
                         </form>
-                    </IGRPScrollAreaPrimitive>
-                </IGRPDialogContentPrimitive>
-            </IGRPDialogPrimitive>
+                    </ScrollArea>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }

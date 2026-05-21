@@ -73,7 +73,11 @@ class SpecDocExportService {
             },
             sections: [
                 {
-                    children: [titleHeading(title), metaLine(meta), ...markdownToDocxBlocks(content || '')]
+                    children: [
+                        titleHeading(title),
+                        metaLine(meta),
+                        ...markdownToDocxBlocks(content || '')
+                    ]
                 }
             ]
         })

@@ -1,12 +1,12 @@
 import {
-    IGRPCardContentPrimitive,
-    IGRPCardDescriptionPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPCopyTo,
-    IGRPSeparatorPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@renderer/components/ui/card'
+import { Separator } from '@renderer/components/ui/separator'
+import { IGRPCopyTo } from '@igrp/igrp-framework-react-design-system'
 import Draggable from '@renderer/lib/dnd/Draggable'
 import Droppable from '@renderer/lib/dnd/Droppable'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
@@ -39,7 +39,7 @@ const IGRPStudioCardDetails: React.FC<CardComponentProps> = ({
     }
 
     return (
-        <IGRPCardPrimitive
+        <Card
             className={cn(
                 'overflow-hidden gap-3 animate-fade-in motion-reduce:animate-none',
                 'transition-all duration-200 hover:shadow-lg hover:border-primary/20'
@@ -47,15 +47,13 @@ const IGRPStudioCardDetails: React.FC<CardComponentProps> = ({
             {...properties}
         >
             {(title || description) && (
-                <IGRPCardHeaderPrimitive className="pb-4">
-                    {title && <IGRPCardTitlePrimitive>{title}</IGRPCardTitlePrimitive>}
-                    {description && (
-                        <IGRPCardDescriptionPrimitive>{description}</IGRPCardDescriptionPrimitive>
-                    )}
-                    <IGRPSeparatorPrimitive className="mt-4" />
-                </IGRPCardHeaderPrimitive>
+                <CardHeader className="pb-4">
+                    {title && <CardTitle>{title}</CardTitle>}
+                    {description && <CardDescription>{description}</CardDescription>}
+                    <Separator className="mt-4" />
+                </CardHeader>
             )}
-            <IGRPCardContentPrimitive className={cn(contentClassName)}>
+            <CardContent className={cn(contentClassName)}>
                 <Droppable
                     className={cn('flex w-full flex-col gap-3', className)}
                     onDrop={onDragEnd}
@@ -109,8 +107,8 @@ const IGRPStudioCardDetails: React.FC<CardComponentProps> = ({
                         })}
                     </div>
                 </Droppable>
-            </IGRPCardContentPrimitive>
-        </IGRPCardPrimitive>
+            </CardContent>
+        </Card>
     )
 }
 
