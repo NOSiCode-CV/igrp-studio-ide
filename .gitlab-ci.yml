@@ -80,6 +80,7 @@ build_packagedev_windows:
 build_packagedev_linux:
   image: node:24
   stage: build
+  timeout: 2h
   only:
     - tags
   variables:
