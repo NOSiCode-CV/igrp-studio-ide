@@ -15,6 +15,10 @@ interface SpecificationConfigProps {
     onChange: (data: SpecificationConfigData) => void
 }
 
+// `defaultLLM` and `embeddings` are still persisted with sensible defaults so
+// downstream consumers (specs engine, AI services) keep working — they are
+// just no longer exposed in the wizard, since users were picking model
+// strings without enough context to make the choice meaningful here.
 const DEFAULT_SPEC_CONFIG: SpecificationConfigData = {
     name: '',
     description: '',
@@ -59,42 +63,6 @@ export function SpecificationConfig({
                 />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <IGRPLabelPrimitive htmlFor="defaultLLM">Default LLM</IGRPLabelPrimitive>
-                    <IGRPInputPrimitive
-                        id="defaultLLM"
-                        value={value.defaultLLM?.model ?? ''}
-                        onChange={(e) =>
-                            onChange({
-                                ...value,
-                                defaultLLM: {
-                                    provider: value.defaultLLM?.provider ?? 'openrouter',
-                                    model: e.target.value
-                                }
-                            })
-                        }
-                        placeholder="anthropic/claude-sonnet-4.5"
-                    />
-                </div>
-                <div className="space-y-2">
-                    <IGRPLabelPrimitive htmlFor="embeddings">Embeddings model</IGRPLabelPrimitive>
-                    <IGRPInputPrimitive
-                        id="embeddings"
-                        value={value.embeddings?.model ?? ''}
-                        onChange={(e) =>
-                            onChange({
-                                ...value,
-                                embeddings: {
-                                    provider: value.embeddings?.provider ?? 'openai',
-                                    model: e.target.value
-                                }
-                            })
-                        }
-                        placeholder="text-embedding-3-small"
-                    />
-                </div>
-            </div>
         </div>
     )
 }
