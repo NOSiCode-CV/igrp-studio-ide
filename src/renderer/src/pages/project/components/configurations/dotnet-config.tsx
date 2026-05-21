@@ -28,7 +28,10 @@ const DEFAULT_DOTNET_CONFIG: DotNetConfigData = {
     database: 'Postgresql',
     projectStructureStyle: 'technical',
     enableObservability: false,
-    version: ''
+    // Default to false; entity-revision tracking adds a non-trivial audit
+    // schema and is opt-in. Kept off the form UI per "safe defaults instead
+    // of unnecessary UI fields" until a product decision surfaces it.
+    enableEntityRevision: false
 }
 
 export function DotNetConfig({

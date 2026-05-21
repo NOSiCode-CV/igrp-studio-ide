@@ -27,7 +27,12 @@ export interface DotNetConfigData {
     projectStructureStyle: ProjectStructureStyle
     name?: string
     enableObservability: boolean
-    version: string
+    /**
+     * Whether the generated project enables IGRP entity revision/audit history.
+     * Required by `@igrp/dotnet-engine` BaseApiConfig; not surfaced in the
+     * Studio UI yet — safe-defaults to `false` in `DEFAULT_DOTNET_CONFIG`.
+     */
+    enableEntityRevision: boolean
 }
 
 export interface SpringConfigData {
