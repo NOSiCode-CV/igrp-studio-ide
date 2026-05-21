@@ -42,8 +42,8 @@ type ExtendedElectronAPI = typeof electronAPI & {
 const api = {
     reportError: (error: Error) => ipcRenderer.send('report-error', error),
 
-    fetchSelectors: (module: string, basePath: string) =>
-        ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath),
+    fetchSelectors: (module: string, basePath: string, engineType?: string) =>
+        ipcRenderer.invoke('spring-engine:fetch-selectors', module, basePath, engineType),
 
     openDirectory: (buttonLabel?: string) => ipcRenderer.invoke('open-directory', buttonLabel),
 

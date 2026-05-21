@@ -53,16 +53,22 @@ const PageWrapper = ({ onOpenNew, open, tab }: NewProps) => {
 
     const selectProperties = createSelector(selectState, (studio) => {
         return {
-            basePath: studio.basePath
+            basePath: studio.basePath,
+            framework: studio.config?.framework
         }
     })
 
-    const { basePath } = useSelector(selectProperties)
+    const { basePath, framework } = useSelector(selectProperties)
 
     useEffect(() => {
         const getAllSelectors = async () => {
             try {
-                const allSelectors = await window.api.fetchSelectors(module, basePath)
+                // Route the selector lookup through the project's own engine
+                // (`engineType` lands in `EngineFactory.getEngine`). Spring
+                // projects still resolve to springboot — explicit pass-through
+                // for clarity and so future frameworks (e.g. nextjs) don't
+                // silently inherit Spring's selector universe.
+                const allSelectors = await window.api.fetchSelectors(module, basePath, framework)
                 setSelectors(allSelectors)
             } catch (error) {
                 console.error(t('failedFetchSelectors'), error)
@@ -72,7 +78,7 @@ const PageWrapper = ({ onOpenNew, open, tab }: NewProps) => {
         if (basePath) {
             getAllSelectors()
         }
-    }, [basePath, module])
+    }, [basePath, module, framework])
 
     useEffect(() => {
         if (tab.item) setModule(tab.item.module || module)

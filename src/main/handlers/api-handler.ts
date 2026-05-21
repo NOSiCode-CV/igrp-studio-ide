@@ -6,7 +6,6 @@ import type {
     ProcessConfig,
     ProcessStepConfig
 } from '@igrp/igrp-studio-nextjs-engine/types'
-import { engineTypes } from '@igrp/igrp-studio-springboot-engine'
 import { ipcMain } from 'electron'
 import { EVENTS } from '../constants/events'
 import { EngineFactory } from '../engines/EngineFactory'
@@ -170,6 +169,14 @@ handleWithCustomErrors(
     }
 )
 
-ipcMain.handle(EVENTS.SPRING.FETCH_SELECTORS, async (_event, module: string, basePath: string) => {
-    return await engineTypes(module, basePath)
-})
+// FETCH_SELECTORS routes via EngineFactory so .NET / Spring projects get the
+// selector universe published by their own engine. `engineType` is optional
+// and defaults to 'springboot' for backwards compatibility with renderers
+// that don't yet thread the project's framework through.
+ipcMain.handle(
+    EVENTS.SPRING.FETCH_SELECTORS,
+    async (_event, module: string, basePath: string, engineType?: string) => {
+        const engine = EngineFactory.getEngine(engineType || 'springboot')
+        return await engine.engineTypes?.(module, basePath)
+    }
+)

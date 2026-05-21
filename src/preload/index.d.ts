@@ -30,7 +30,7 @@ type ExtendedElectronAPI = typeof electronAPI & {
 }
 declare const api: {
     reportError: (error: Error) => void
-    fetchSelectors: (module: string, basePath: string) => Promise<any>
+    fetchSelectors: (module: string, basePath: string, engineType?: string) => Promise<any>
     openDirectory: (buttonLabel?: string) => Promise<any>
     fetchFiles: (basePath: string) => Promise<any>
     getJsonContent: (filePath: string) => Promise<any>
