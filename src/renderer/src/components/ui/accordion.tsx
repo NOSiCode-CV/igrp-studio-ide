@@ -4,7 +4,7 @@ import * as React from 'react'
 import { ChevronDownIcon, icons as LucideIcons } from 'lucide-react'
 import { Accordion as AccordionPrimitive } from 'radix-ui'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@renderer/lib/utils'
 
 // IGRP's accordion trigger supported optional left/right icons resolved by
 // name (e.g. `iconName="Plus"`). We preserve that shape so the migrated
