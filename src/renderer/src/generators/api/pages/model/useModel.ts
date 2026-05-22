@@ -1,7 +1,8 @@
 import type { ModelConfig, RelationReference } from '@igrp/igrp-studio-springboot-engine/types'
 import { useTabs } from '@renderer/components/navigation/TabContext'
-import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants'
+import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { KeyboardKey } from '@renderer/constants/shortcut'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { useGit } from '@renderer/hooks/use-git'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useKeyPress } from '@renderer/hooks/useKeyDown'
@@ -12,7 +13,7 @@ import { type FocusEvent, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import type { IColumnsTabelProps } from '../../types/Interfaces'
-import { defaultValues, getTablesColumns, getValuesToSubmit, initialValues } from './config'
+import { defaultValues, getInitialValues, getTablesColumns, getValuesToSubmit } from './config'
 import { useModelValidation } from './validation'
 
 export const useModel = ({
@@ -30,6 +31,7 @@ export const useModel = ({
     )
     const { t } = useTranslation()
     const validationSchema = useModelValidation({ t })
+    const framework = useFramework()
     const dispatch: any = useDispatch()
 
     const [tablesColumns, setTableColumns] = useState<{
@@ -40,7 +42,11 @@ export const useModel = ({
 
     const formik: any = useFormik({
         enableReinitialize: true,
-        initialValues,
+        // Per-framework defaults: the primary-key `generationType` differs
+        // between Spring (`'IDENTITY'`) and .NET (`'Identity'`). Computed each
+        // render so the form re-seeds if the active project's framework
+        // changes (e.g. user opens a different project without remounting).
+        initialValues: getInitialValues(framework),
         validationSchema,
         onSubmit: (_values, actions) => {
             actions.setSubmitting(false)
@@ -84,6 +90,7 @@ export const useModel = ({
             models,
             currentItem,
             enums,
+            framework,
             t
         })
         setTableColumns(res)
@@ -149,7 +156,7 @@ export const useModel = ({
                 currentItem?.module || 'shared'
             )
             console.log(values)
-            const { error } = await window.engine.createModel(values, ENV_TYPES.SPRING, basePath)
+            const { error } = await window.engine.createModel(values, framework, basePath)
 
             if (error) {
                 console.log('error', error)
@@ -224,7 +231,7 @@ export const useModel = ({
 
                     const { error } = await window.engine.createModel(
                         updatedModel,
-                        ENV_TYPES.SPRING,
+                        framework,
                         basePath
                     )
 
@@ -244,7 +251,7 @@ export const useModel = ({
                 module: currentItem.module
             }
 
-            const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath)
+            const { error } = await window.engine.delete(config, framework, basePath)
             if (error) return showErrorToast(error)
 
             dispatch(onSetChangeStatus(true))

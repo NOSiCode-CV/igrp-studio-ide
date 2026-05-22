@@ -13,7 +13,7 @@ import {
 import type { SerializationConfig } from '@igrp/igrp-studio-springboot-engine/types'
 import { LabelRequired } from '@renderer/components/label-required'
 import MonacoEditor from '@renderer/components/monaco-editor'
-import { ENV_TYPES } from '@renderer/constants/appConstants'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
@@ -49,6 +49,7 @@ export default function SerializationConfigModal({
     const { showErrorToast, showSuccessToast } = useToast()
     const { t } = useTranslation()
     const dispatch: any = useDispatch()
+    const framework = useFramework()
 
     const { createGitCommit } = useGit()
 
@@ -97,7 +98,7 @@ export default function SerializationConfigModal({
             [contentType]: cleanSQL(content)
         }
 
-        const { error } = await window.engine.serializeElement(values, ENV_TYPES.SPRING, basePath)
+        const { error } = await window.engine.serializeElement(values, framework, basePath)
 
         console.log(values)
 

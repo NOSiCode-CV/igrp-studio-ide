@@ -67,7 +67,7 @@ export const backendFrameworks = [
         icon: '/placeholder.svg?height=40&width=40',
         stars: '74K',
         views: '2K',
-        availableSupport: false
+        availableSupport: true
     },
     {
         id: 'django',

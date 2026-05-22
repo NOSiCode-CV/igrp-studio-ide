@@ -7,7 +7,8 @@ import {
     IGRPDropdownMenuTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
-import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants'
+import { OPTION_TYPE } from '@renderer/constants/appConstants'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
@@ -76,6 +77,7 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
     const { showErrorToast, showSuccessToast } = useToast()
     const { t } = useTranslation()
     const dispatch: any = useDispatch()
+    const framework = useFramework()
 
     const { createGitCommit } = useGit()
 
@@ -141,7 +143,7 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                 // Save the controller with the new action
                 const { error } = await window.engine.createController(
                     updatedController,
-                    ENV_TYPES.SPRING,
+                    framework,
                     basePath
                 )
 
@@ -166,7 +168,7 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                     content: item.content
                 }
 
-                const { error } = await window.engine.duplicate(config, ENV_TYPES.SPRING, basePath)
+                const { error } = await window.engine.duplicate(config, framework, basePath)
 
                 if (error) {
                     showErrorToast(error)
@@ -209,7 +211,7 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                         type: 'controller',
                         module: item.module
                     }
-                    const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath)
+                    const { error } = await window.engine.delete(config, framework, basePath)
                     if (error) {
                         showErrorToast(error)
                         return
@@ -227,7 +229,7 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                     // Save the controller without the deleted action
                     const { error } = await window.engine.createController(
                         updatedController,
-                        ENV_TYPES.SPRING,
+                        framework,
                         basePath
                     )
                     if (error) {
@@ -249,7 +251,7 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                     module: item.module
                 }
 
-                const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath)
+                const { error } = await window.engine.delete(config, framework, basePath)
 
                 if (error) {
                     showErrorToast(error)

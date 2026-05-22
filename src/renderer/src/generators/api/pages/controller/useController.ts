@@ -1,7 +1,8 @@
 import type { ControllerAction, ControllerConfig } from '@igrp/igrp-studio-springboot-engine/types'
 import { useTabs } from '@renderer/components/navigation/TabContext'
-import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants'
+import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { KeyboardKey } from '@renderer/constants/shortcut'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { useGit } from '@renderer/hooks/use-git'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useKeyPress } from '@renderer/hooks/useKeyDown'
@@ -32,6 +33,7 @@ export const useController = ({
         currentItem?.module
     )
     const { showErrorToast, showSuccessToast } = useToast()
+    const framework = useFramework()
     const dispatch: any = useDispatch()
 
     const [id, setId] = useState('')
@@ -180,7 +182,7 @@ export const useController = ({
 
             const { error } = await window.engine.createController(
                 values,
-                ENV_TYPES.SPRING,
+                framework,
                 basePath
             )
 
@@ -219,7 +221,7 @@ export const useController = ({
                     type: 'controller',
                     module: currentItem.module
                 }
-                const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath)
+                const { error } = await window.engine.delete(config, framework, basePath)
                 if (error) return showErrorToast(error)
             } else {
                 const updatedActions = values.actions.filter(
@@ -228,7 +230,7 @@ export const useController = ({
                 const updatedValues = { ...values, actions: updatedActions }
                 const { error } = await window.engine.createController(
                     updatedValues,
-                    ENV_TYPES.SPRING,
+                    framework,
                     basePath
                 )
                 if (error) return showErrorToast(error)

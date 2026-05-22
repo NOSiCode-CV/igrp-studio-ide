@@ -193,6 +193,30 @@ export class WorkspaceRepository {
         if (!existingProject) {
             //call engine
             await addProjectToWorkspace(workspaceConfig, workspacePath)
+
+            // WORKAROUND: `@igrp/igrp-studio-nextjs-engine`'s
+            // `addProjectToWorkspace` has no `'dotnet'` branch and silently
+            // skips .NET projects, so the workspace's `igrp-compose.yaml`
+            // never gets an entry for them. The project-grid UI looks up
+            // services by `labels.uuid === project.id`, so without a compose
+            // entry the .NET project card renders without ports / depends_on.
+            //
+            // Add a minimal service entry ourselves until the nextjs-engine
+            // gains native .NET support (tracked separately). Mirrors the
+            // shape the Spring branch emits — same labels, same network,
+            // ports read from the project's own `.env` (`SERVICE_PORT`).
+            if (framework === 'dotnet') {
+                await this.addDotnetProjectToWorkspaceCompose(newProject, workspace).catch(
+                    (err) => {
+                        // Don't fail the whole project creation if compose
+                        // augmentation breaks — the .csproj is already on
+                        // disk and the engine succeeded. Surface as a warning.
+                        console.warn(
+                            `[workspace] Failed to write .NET project entry to workspace compose: ${err?.message ?? err}`
+                        )
+                    }
+                )
+            }
         } else {
             console.log(`Project "${config.name}" already exists in workspace. Skipping addition.`)
         }
@@ -205,6 +229,69 @@ export class WorkspaceRepository {
                 )
             }
         }
+    }
+
+    /**
+     * Append a .NET project's service entry to the workspace's compose file.
+     *
+     * The `@igrp/igrp-studio-nextjs-engine`'s `addServiceToWorkspace` doesn't
+     * persist services missing engine-specific fields (image etc.), so we
+     * write the YAML directly using `js-yaml`. Mirrors the Spring branch's
+     * shape: build path, container name, port from the project's `.env`
+     * (`SERVICE_PORT`, default 8090), and `labels.uuid === project.id` so
+     * the project-grid UI can resolve the service via
+     * `services.find(s => s.labels.uuid === project.id)`.
+     */
+    private async addDotnetProjectToWorkspaceCompose(
+        project: ProjectData,
+        workspace: IWorkspace
+    ): Promise<void> {
+        const projectPath = project.path
+        const projectFolder = path.basename(projectPath)
+
+        let servicePort = 8090
+        try {
+            const envContent = await readFile(path.join(projectPath, '.env'), 'utf-8')
+            const match = envContent.match(/^SERVICE_PORT\s*=\s*(\d+)/m)
+            if (match) servicePort = Number(match[1])
+        } catch {
+            // .env not yet generated — fall back to the default port
+        }
+
+        const composePath = path.join(workspace.path, 'igrp-compose.yaml')
+        let composeRaw: string
+        try {
+            composeRaw = await readFile(composePath, 'utf-8')
+        } catch {
+            // No workspace compose yet — nothing to extend, skip silently.
+            return
+        }
+
+        const yaml = await import('js-yaml')
+        const compose = (yaml.load(composeRaw) as any) ?? {}
+        compose.services = compose.services ?? {}
+
+        const serviceKey = (project.config.name as string).toLowerCase()
+        // Don't clobber an existing entry (e.g., on rename / re-create).
+        if (compose.services[serviceKey]) return
+
+        const workspaceNetwork = `${workspace.slug ?? 'my-workspace'}-network`
+        compose.services[serviceKey] = {
+            build: `./projects/${projectFolder}`,
+            container_name: serviceKey,
+            env_file: '.env',
+            ports: [`${servicePort}:${servicePort}`],
+            networks: [workspaceNetwork],
+            restart: 'unless-stopped',
+            deploy: { resources: { limits: { memory: '700m' } } },
+            labels: {
+                type: 'web',
+                is_project: true,
+                uuid: project.id
+            }
+        }
+
+        await writeFile(composePath, yaml.dump(compose, { lineWidth: 120, noRefs: true }))
     }
 
     async updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData> {

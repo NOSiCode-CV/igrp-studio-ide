@@ -11,6 +11,7 @@ import {
 } from '@igrp/igrp-framework-react-design-system'
 import type { Dependency } from '@igrp/igrp-studio-springboot-engine/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { Plus, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -21,6 +22,7 @@ export default function DependencySelector({
     onSelectedDependencies: (dependencies: Dependency[]) => void
 }) {
     const { t } = useTranslation()
+    const framework = useFramework()
     const [selectedDependencies, setSelectedDependencies] = useState<Dependency[]>([])
 
     const [open, setOpen] = useState(false)
@@ -68,16 +70,27 @@ export default function DependencySelector({
         }
     }, [])
     useEffect(() => {
+        // Skip the Spring-only dependency fetch for non-Spring projects (e.g. .NET).
+        // `window.engine.getDependencies` is wired to the Spring engine's pom.xml
+        // catalog and has no equivalent on the .NET adapter; calling it would
+        // hit a no-op handler at best.
+        if (framework !== ENV_TYPES.SPRING) return
         const laodDependencies = async () => {
             const { result } = await window.engine.getDependencies(ENV_TYPES.SPRING)
             setAvailableDependencies(result)
         }
         laodDependencies()
-    }, [])
+    }, [framework])
 
     useEffect(() => {
         onSelectedDependencies(selectedDependencies)
     }, [selectedDependencies])
+
+    // The "Further dependencies" picker is a Spring-Boot concept (Maven
+    // starters). Other backends like .NET handle their NuGet packages inside
+    // the generated `.csproj` and don't expose a runtime selector, so render
+    // nothing rather than show an empty Spring-flavoured picker.
+    if (framework !== ENV_TYPES.SPRING) return null
 
     return (
         <div className="flex flex-col space-y-3">

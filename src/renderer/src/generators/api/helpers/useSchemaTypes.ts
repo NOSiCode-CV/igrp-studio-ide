@@ -46,10 +46,17 @@ function useSchemaTypes(selectors: Selector[], dto: DTOItem[], enums: DTOItem[])
         // Atualizar o estado com os tipos completos
         setSchemaTypes(completeSchemaTypes)
 
-        // Manter a transformação para "Reference other Object" se necessário
+        // Both engines expose a "pick from existing DTOs" entry in their
+        // SCHEMA_TYPES selector, but they spell it differently:
+        //   - Spring: `"Reference other Object"`
+        //   - .NET:   `"Reference other schemas"`
+        // Rewrite either label to a `dto`-reference entry pointing at the
+        // currently-loaded DTO list. Match on the `"Reference other"` prefix
+        // so future engines using a similar phrasing are picked up too.
         setSchemaTypes((prevSchemaTypes) =>
             prevSchemaTypes.map((schemaType) =>
-                schemaType.value === 'Reference other Object'
+                typeof schemaType.value === 'string' &&
+                schemaType.value.startsWith('Reference other')
                     ? { ...schemaType, value: 'dto', items: targetDto }
                     : schemaType
             )

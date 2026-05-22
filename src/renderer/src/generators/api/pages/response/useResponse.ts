@@ -1,6 +1,7 @@
 import type { ResponseConfig } from '@igrp/igrp-studio-springboot-engine/types'
 import { useTabs } from '@renderer/components/navigation/TabContext'
-import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants'
+import { OPTION_TYPE } from '@renderer/constants/appConstants'
+import { useFramework } from '@renderer/hooks/use-framework'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import useToast from '@renderer/hooks/useToast'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
@@ -37,6 +38,7 @@ export const useResponse = ({
     const { t } = useTranslation()
     const { initializeTabFromCurrentItem, handleRenameTab } = useTabs()
     const { basePath, dto, enums, getJsonData } = useStudioAPI(currentItem?.module)
+    const framework = useFramework()
 
     const [title, setTitle] = useState('')
     const [dataSchema, setDataSchema] = useState<null | JSONSchema>(null)
@@ -106,7 +108,7 @@ export const useResponse = ({
                 id: currentItem.id
             }
 
-            const { error } = await window.engine.createResponse(values, ENV_TYPES.SPRING, basePath)
+            const { error } = await window.engine.createResponse(values, framework, basePath)
 
             if (error) return showErrorToast(error)
 
@@ -126,7 +128,7 @@ export const useResponse = ({
                 module: currentItem.module
             }
 
-            const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath)
+            const { error } = await window.engine.delete(config, framework, basePath)
 
             if (error) return showErrorToast(error)
 

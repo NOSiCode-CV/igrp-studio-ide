@@ -8,7 +8,8 @@ import {
     IGRPDialogTitlePrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import type { ControllerConfig } from '@igrp/igrp-studio-springboot-engine/types'
-import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
+import { PATTERNS } from '@renderer/constants/appConstants'
+import { useFramework } from '@renderer/hooks/use-framework'
 import useToast from '@renderer/hooks/useToast'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
 import { useFormik } from 'formik'
@@ -38,6 +39,7 @@ export function CreateEndpointDialog({
     onClose
 }: CreateEndpointDialogProps) {
     const { t } = useTranslation()
+    const framework = useFramework()
 
     const dispatch: any = useDispatch()
 
@@ -82,7 +84,7 @@ export function CreateEndpointDialog({
         try {
             const { error } = await window.engine.createController(
                 values,
-                ENV_TYPES.SPRING,
+                framework,
                 basePath
             )
             if (error) {

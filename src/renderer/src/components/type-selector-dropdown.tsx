@@ -106,7 +106,14 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                         </IGRPDropdownMenuSubContentPrimitive>
                                     </IGRPDropdownMenuSubPrimitive>
                                 ) : items && Array.isArray(items) && items.length > 0 ? (
-                                    // When items is an array (your original case)
+                                    // When items is an array. Items may be
+                                    // `{label, value, module?}` objects (the
+                                    // Spring/legacy shape) OR raw strings
+                                    // (what the .NET engine returns directly
+                                    // from `ATTRIBUTE_TYPES`). Normalise per
+                                    // entry so the dropdown renders text and
+                                    // dispatches the correct value regardless
+                                    // of which engine produced the list.
                                     <IGRPDropdownMenuSubPrimitive>
                                         <IGRPDropdownMenuSubTriggerPrimitive>
                                             {label}
@@ -114,21 +121,33 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                         <IGRPDropdownMenuSubContentPrimitive className="min-w-50">
                                             <IGRPScrollAreaPrimitive>
                                                 <div className="max-h-[60svh]">
-                                                    {items.map((subItem, key) => (
-                                                        <IGRPDropdownMenuItemPrimitive
-                                                            key={key}
-                                                            onClick={() =>
-                                                                onTypeChange({
-                                                                    type: value,
-                                                                    value: subItem.value,
-                                                                    module: subItem.module
-                                                                } as any)
-                                                            }
-                                                        >
-                                                            {renderIcon(subItem)}
-                                                            {subItem.label}
-                                                        </IGRPDropdownMenuItemPrimitive>
-                                                    ))}
+                                                    {items.map((subItem, key) => {
+                                                        const isString = typeof subItem === 'string'
+                                                        const subItemValue = isString
+                                                            ? subItem
+                                                            : subItem.value
+                                                        const subItemLabel = isString
+                                                            ? subItem
+                                                            : subItem.label
+                                                        const subItemModule = isString
+                                                            ? undefined
+                                                            : subItem.module
+                                                        return (
+                                                            <IGRPDropdownMenuItemPrimitive
+                                                                key={key}
+                                                                onClick={() =>
+                                                                    onTypeChange({
+                                                                        type: value,
+                                                                        value: subItemValue,
+                                                                        module: subItemModule
+                                                                    } as any)
+                                                                }
+                                                            >
+                                                                {!isString && renderIcon(subItem)}
+                                                                {subItemLabel}
+                                                            </IGRPDropdownMenuItemPrimitive>
+                                                        )
+                                                    })}
                                                 </div>
                                             </IGRPScrollAreaPrimitive>
                                         </IGRPDropdownMenuSubContentPrimitive>

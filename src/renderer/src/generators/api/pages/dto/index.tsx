@@ -7,9 +7,10 @@ import {
 import { useTranslation } from 'react-i18next'
 import { SelectInput, TextInput } from '../../components/inputs-form'
 import NavigationBar from '../../components/navigation-bar'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { addNewRow, getOptionsByObject, handleChangeValueObject, removeRow } from '../../helpers'
 import AttributesCard from './attributes'
-import { initialValues, TabList, TemplateOptions } from './config'
+import { getInitialValues, TabList, TemplateOptions } from './config'
 import { useDto } from './useDto'
 
 interface DtoProps {
@@ -25,12 +26,16 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
     })
 
     const { t } = useTranslation()
+    const framework = useFramework()
 
     const renderFormList = (value: string) => {
         const columns = tablesColumns?.[value]
         const data = (formik?.values as any)?.[value]
         const errors = (formik?.errors as any)?.[value]
-        const dValues = initialValues.attributes[0]
+        // Template for new rows added via the "+" button. The framework-aware
+        // bit is `objectType` (see `dto/config.ts`); the rest is identical
+        // across engines.
+        const dValues = getInitialValues(framework).attributes[0]
 
         if (columns && data) {
             return (

@@ -16,6 +16,7 @@ import { FrameworkIcon } from '@renderer/components/framework-icon'
 import { GitContributors } from '@renderer/components/git/git-contributors'
 import { VersionAlert } from '@renderer/components/version-alert'
 import { springEngineChangelog } from '@renderer/components/version-alert-resume'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { useGit } from '@renderer/hooks/use-git'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
@@ -31,6 +32,7 @@ import DashboardOverview from '../components/dashboard-overview'
 
 const Overview = () => {
     const { t } = useTranslation()
+    const framework = useFramework()
     const [copied, setCopied] = useState(false)
     const [projectId, setProjectId] = useState<string>('')
     const [repositoryUrl, setRepositoruUrl] = useState<string | null>(null)
@@ -273,7 +275,7 @@ const Overview = () => {
                                 </div>
                             )}
                             <ProjectConfigForm
-                                type={'springboot'}
+                                type={framework}
                                 data={data}
                                 errors={{}}
                                 onChange={setData}

@@ -2,6 +2,7 @@ import type { DTOConfig } from '@igrp/igrp-studio-springboot-engine/types'
 import { useTabs } from '@renderer/components/navigation/TabContext'
 import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants'
 import { KeyboardKey } from '@renderer/constants/shortcut'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { useGit } from '@renderer/hooks/use-git'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useKeyPress } from '@renderer/hooks/useKeyDown'
@@ -13,13 +14,14 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import type { IColumnsTabelProps } from '../../types/Interfaces'
-import { getTablesColumns, initialValues } from './config'
+import { getInitialValues, getTablesColumns } from './config'
 import { useDtoValidation } from './validation'
 
 export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
     const { initializeTabFromCurrentItem, handleRenameTab } = useTabs()
     const { createGitCommit } = useGit()
     const { showErrorToast, showSuccessToast } = useToast()
+    const framework = useFramework()
     const dispatch: any = useDispatch()
     const { models, basePath, dto, enums, getJsonData } = useStudioAPI(currentItem?.module)
     const { t } = useTranslation()
@@ -31,9 +33,13 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
     }>({})
 
     const validationSchema = useDtoValidation({ t })
+    // Per-framework initial form state: the first attribute's `objectType`
+    // namespace differs between Spring (`'java'`) and .NET (`'dotnet'`). The
+    // dotnet-engine's JSON-schema rejects `'java'` so seeding the right value
+    // up front avoids "objectType must be one of ..." errors on save.
     const formik = useFormik({
         enableReinitialize: true,
-        initialValues,
+        initialValues: getInitialValues(framework),
         validationSchema,
         onSubmit: async (values) => {
             await handleSave(values)
@@ -57,8 +63,8 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
         const { attributes, type } = data
 
         formik.setValues(data)
-        formik.setFieldValue('attributes', attributes || initialValues.attributes)
-        formik.setFieldValue('attributes', attributes || initialValues.attributes)
+        formik.setFieldValue('attributes', attributes || getInitialValues(framework).attributes)
+        formik.setFieldValue('attributes', attributes || getInitialValues(framework).attributes)
 
         if (type === OPTION_TYPE.MODEL) {
             setId(getId())
@@ -91,10 +97,11 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
             models,
             enums,
             current: data,
+            framework,
             t
         })
         setTableColumns(columns)
-    }, [selectors, dto, models, data])
+    }, [selectors, dto, models, data, framework])
 
     // Keyboard shortcut for save (Ctrl/Cmd + S)
     useKeyPress(() => {
@@ -103,13 +110,24 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
 
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {
-            const config = {
+            const config: any = {
                 ...newValues,
                 module: currentItem?.module || 'shared',
                 id: id || currentItem.id
             }
 
-            const { error } = await window.engine.createDto(config, ENV_TYPES.SPRING, basePath)
+            // `extends` (Java/Spring class inheritance) and `readOnly` are
+            // Spring-only fields on DTOConfig. The dotnet-engine schema is
+            // strict (`additionalProperties: false`) and rejects them with
+            // "No additional properties are allowed in the model
+            // configuration schema". Strip them before sending so the same
+            // form works for both engines without diverging the form state.
+            if (framework !== ENV_TYPES.SPRING) {
+                delete config.extends
+                delete config.readOnly
+            }
+
+            const { error } = await window.engine.createDto(config, framework, basePath)
             console.log('config', config)
 
             if (error) {
@@ -135,7 +153,7 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
                 module: currentItem.module
             }
 
-            const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath)
+            const { error } = await window.engine.delete(config, framework, basePath)
 
             if (error) return showErrorToast(error)
 

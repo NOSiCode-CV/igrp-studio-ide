@@ -17,10 +17,12 @@ import {
     IGRPTooltipPrimitive,
     IGRPTooltipTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { PackageCheck } from 'lucide-react'
 import { type ReactNode, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { TextInput } from '../../components/inputs-form'
+import { defaultPrimaryKeyGenerationType } from './config'
 
 interface PopoverProps {
     children?: ReactNode
@@ -32,9 +34,15 @@ interface PopoverProps {
 
 export function PopoverModel({ index, row, options, changeValue }: PopoverProps) {
     const { t } = useTranslation()
+    const framework = useFramework()
 
     const [isPrimary, setIsPrimary] = useState(false)
 
+    // `SEQUENCE` is a Spring/JPA-only generation strategy; .NET (EF Core)
+    // doesn't expose it, so on .NET this stays false and the sequence-name
+    // input is never shown. Left as a literal string check rather than a
+    // framework gate because the field simply won't be among `generateTypes`
+    // for non-Spring engines.
     const [isSequence, setIsSequence] = useState(false)
 
     const onChangeGenerationType = (value: string): void => {
@@ -128,7 +136,10 @@ export function PopoverModel({ index, row, options, changeValue }: PopoverProps)
                                                 <IGRPCombobox
                                                     placeholder={`Select Generation Type`}
                                                     options={options.generateTypes}
-                                                    value={row?.['generationType'] || 'IDENTITY'}
+                                                    value={
+                                                        row?.['generationType'] ||
+                                                        defaultPrimaryKeyGenerationType(framework)
+                                                    }
                                                     onChange={(value) =>
                                                         onChangeGenerationType(value as string)
                                                     }

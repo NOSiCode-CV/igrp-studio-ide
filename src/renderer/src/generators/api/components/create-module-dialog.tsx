@@ -17,7 +17,8 @@ import {
     IGRPTooltipTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import type { ModuleConfig } from '@igrp/igrp-studio-springboot-engine/types'
-import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
+import { PATTERNS } from '@renderer/constants/appConstants'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
 import { cn } from '@renderer/lib/utils'
@@ -43,6 +44,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
 
     const { t } = useTranslation()
     const { createGitCommit } = useGit()
+    const framework = useFramework()
 
     const dispatch: any = useDispatch()
 
@@ -75,7 +77,7 @@ export function CreateModuleDialog({ basePath }: CreateModuleDialogProps) {
         try {
             const { error } = await window.engine.createModule(
                 formik.values,
-                ENV_TYPES.SPRING,
+                framework,
                 basePath
             )
 

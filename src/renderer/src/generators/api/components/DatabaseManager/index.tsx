@@ -12,8 +12,9 @@ import {
     IGRPTabsPrimitive,
     IGRPTabsTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
-import { ENV_TYPES } from '@renderer/constants/appConstants'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { useGit } from '@renderer/hooks/use-git'
+import { defaultPrimaryKeyGenerationType } from '../../pages/model/config'
 import useToast from '@renderer/hooks/useToast'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
 import { getId, toFullCamelCaseFromSnakeCase } from '@renderer/utils'
@@ -63,6 +64,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
     const { showErrorToast, showSuccessToast } = useToast()
     const { t } = useTranslation()
     const { createGitCommit } = useGit()
+    const framework = useFramework()
     const dispatch: any = useDispatch()
 
     const { module } = item
@@ -115,7 +117,15 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                                 unique: column.is_unique || false,
                                 primaryKey: column.is_primary_key || false,
                                 relation, // Add the relation if it exists
-                                generationType: column.is_primary_key ? 'IDENTITY' : null
+                                // When importing tables from an existing DB,
+                                // PK columns get the framework's identity
+                                // marker (`'IDENTITY'` for Spring/JPA,
+                                // `'Identity'` for EF Core). Non-PK columns
+                                // stay `null` so the engine treats them as
+                                // "not provided".
+                                generationType: column.is_primary_key
+                                    ? defaultPrimaryKeyGenerationType(framework)
+                                    : null
                             }
                         })
 
@@ -140,7 +150,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
 
                     const { error } = await window.engine.createModel(
                         values,
-                        ENV_TYPES.SPRING,
+                        framework,
                         basePath
                     )
 

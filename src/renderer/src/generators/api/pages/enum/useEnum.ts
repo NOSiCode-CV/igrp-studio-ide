@@ -1,7 +1,8 @@
 import type { EnumValue } from '@igrp/igrp-studio-springboot-engine/types'
 import { useTabs } from '@renderer/components/navigation/TabContext'
-import { ENV_TYPES, OPTION_TYPE } from '@renderer/constants/appConstants'
+import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { KeyboardKey } from '@renderer/constants/shortcut'
+import { useFramework } from '@renderer/hooks/use-framework'
 import { useGit } from '@renderer/hooks/use-git'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useKeyPress } from '@renderer/hooks/useKeyDown'
@@ -20,6 +21,7 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
     const { showErrorToast, showSuccessToast } = useToast()
     const { t } = useTranslation()
     const { createGitCommit } = useGit()
+    const framework = useFramework()
     const { initializeTabFromCurrentItem, handleRenameTab } = useTabs()
     const { basePath } = useStudioAPI(currentItem?.module)
 
@@ -107,7 +109,7 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
                 attributes
             }
 
-            const { error } = await window.engine.createEnum(values, ENV_TYPES.SPRING, basePath)
+            const { error } = await window.engine.createEnum(values, framework, basePath)
 
             if (error) return showErrorToast(error)
 
@@ -128,7 +130,7 @@ export const useEnum = ({ currentItem }: { currentItem: any }) => {
                 module: currentItem.module
             }
 
-            const { error } = await window.engine.delete(config, ENV_TYPES.SPRING, basePath)
+            const { error } = await window.engine.delete(config, framework, basePath)
 
             if (error) return showErrorToast(error)
 

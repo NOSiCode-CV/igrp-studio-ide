@@ -1,9 +1,27 @@
 import type { DTOConfig } from '@igrp/igrp-studio-springboot-engine/types'
+import { ENV_TYPES } from '@renderer/constants/appConstants'
 import type { SchemaTypeItem } from 'src/main/types'
 import { formatMethods, getOptionsByObject } from '../../helpers'
 import type { IColumnsTabelProps } from '../../types/Interfaces'
 
-export const initialValues: DTOConfig = {
+/**
+ * Namespace value the engine schema expects for "native data types".
+ * Spring's `objectType` enum accepts `'java'`; .NET's accepts `'dotnet'`.
+ * Falls back to `'java'` so unknown frameworks keep the historical Spring
+ * behaviour. Extend the map when adding a new backend engine.
+ */
+const NATIVE_TYPE_NAMESPACE: Partial<Record<ENV_TYPES, string>> = {
+    [ENV_TYPES.SPRING]: 'java',
+    [ENV_TYPES.DOTNET]: 'dotnet'
+}
+const nativeTypeNamespace = (framework: ENV_TYPES): string =>
+    NATIVE_TYPE_NAMESPACE[framework] ?? 'java'
+
+/**
+ * Build the initial form state for a new DTO. The framework-aware bit is the
+ * first attribute's `objectType` — see `NATIVE_TYPE_NAMESPACE` below.
+ */
+export const getInitialValues = (framework: ENV_TYPES): DTOConfig => ({
     type: 'dto',
     module: '',
     name: '',
@@ -17,7 +35,7 @@ export const initialValues: DTOConfig = {
     attributes: [
         {
             name: '',
-            objectType: 'java',
+            objectType: nativeTypeNamespace(framework),
             type: 'string',
             required: false,
             before: false,
@@ -32,7 +50,13 @@ export const initialValues: DTOConfig = {
             collectionType: ''
         }
     ]
-}
+})
+
+/**
+ * @deprecated kept for backwards compatibility — call `getInitialValues(framework)` instead.
+ * Resolves to Spring defaults so legacy consumers stay on the historical behaviour.
+ */
+export const initialValues: DTOConfig = getInitialValues(ENV_TYPES.SPRING)
 
 export const TabList = [{ label: 'Fields', value: 'attributes' }]
 
@@ -47,6 +71,7 @@ export const getTablesColumns = ({
     models,
     enums,
     current,
+    framework,
     t
 }: {
     selectors: any
@@ -54,6 +79,7 @@ export const getTablesColumns = ({
     models: any
     enums: any
     current: any
+    framework: ENV_TYPES
     t: any
 }): { [value: string]: IColumnsTabelProps[] } => {
     const { name: currentDto, module } = current || {}
@@ -67,14 +93,20 @@ export const getTablesColumns = ({
         true
     )
 
-    const dataTypes =
+    // Spring's `ATTRIBUTE_TYPES` selector returns a grouped object
+    // (`{numeric: [...], text: [...], ...}`) while .NET returns a flat
+    // `string[]` (`['integer', 'string', ...]`). `TypeSelectorDropdown`'s
+    // "array" branch reads `subItem.label` and expects `{label, value}`
+    // objects, so a raw string array renders blank rows (looks like
+    // invisible text). Wrap the flat-array case so both engines produce a
+    // valid items shape for the dropdown.
+    const rawDataTypes =
         (
             selectors.find((selector: any) => 'ATTRIBUTE_TYPES' in selector) as
-                | {
-                      ATTRIBUTE_TYPES: string[]
-                  }
+                | { ATTRIBUTE_TYPES: string[] | Record<string, string[]> }
                 | undefined
         )?.ATTRIBUTE_TYPES || []
+    const dataTypes = Array.isArray(rawDataTypes) ? formatMethods(rawDataTypes) : rawDataTypes
 
     const dtos = getOptionsByObject(dto, module, currentDto)
 
@@ -85,7 +117,7 @@ export const getTablesColumns = ({
             value: 'model',
             items: getOptionsByObject(models, module, currentDto)
         },
-        { label: t('dataTypes'), value: 'java', items: dataTypes },
+        { label: t('dataTypes'), value: nativeTypeNamespace(framework), items: dataTypes },
         {
             label: t('enum'),
             value: 'enum',
