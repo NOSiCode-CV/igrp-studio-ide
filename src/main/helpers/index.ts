@@ -6,7 +6,8 @@ import type { FileTree, Handler, IOpenProject, ProjectData } from '../types'
 
 export async function openDirectory(buttonLabel?: string): Promise<IOpenProject> {
     const result = await dialog.showOpenDialog({
-        properties: ['openDirectory'],
+        // Match `open-directory-dialog` in main: allows "New Folder" / create directory in the picker (macOS; ignored where unsupported)
+        properties: ['openDirectory', 'createDirectory'],
         buttonLabel: buttonLabel ?? 'Select Destination Folder'
     })
 

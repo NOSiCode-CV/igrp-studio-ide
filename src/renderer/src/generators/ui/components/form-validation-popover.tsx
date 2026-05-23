@@ -20,6 +20,11 @@ import { AlertCircle, Shield } from 'lucide-react'
 import { type ReactNode, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+interface FieldValidationMetadata {
+    message?: string
+    validationKey: string
+}
+
 interface FormValidationPopoverProps {
     children?: ReactNode
     index: number
@@ -40,10 +45,12 @@ export function FormValidationPopover({
     const [isString, setIsString] = useState(false)
     const [isBoolean, setIsBoolean] = useState(false)
     const [isDate, setIsDate] = useState(false)
-    const [isEmail, setIsEmail] = useState(false)
     const [isFile, setIsFile] = useState(false)
 
-    const handleValidationKeyChange = (key: string, value: string | boolean | number) => {
+    const handleValidationKeyChange = (
+        key: string,
+        value: string | boolean | number | unknown[]
+    ) => {
         const currentValidation = field?.validation || {}
         const updatedValidation = {
             ...currentValidation,
@@ -52,20 +59,51 @@ export function FormValidationPopover({
         changeValue('validation', index, updatedValidation)
     }
 
+    /**
+     * Aligned with the engine's FieldTypes constant. 'string'/'integer'/
+     * 'long'/'double'/'float'/'textarea' values come from legacy data —
+     * left in the lookup so projects loaded before R1 still render the
+     * right validation options until the type is normalised.
+     */
     useEffect(() => {
-        setIsNumber(['number', 'integer', 'long', 'double', 'float'].includes(fieldType))
-        setIsString(['string', 'text', 'textarea', 'password'].includes(fieldType))
-        setIsBoolean(fieldType === 'boolean')
-        setIsDate(['date', 'datetime', 'time'].includes(fieldType))
-        setIsEmail(fieldType === 'email')
+        const numberLike = ['number', 'range', 'integer', 'long', 'double', 'float']
+        const stringLike = [
+            'text',
+            'password',
+            'tel',
+            'color',
+            'select',
+            'select2',
+            'radio',
+            'string',
+            'textarea'
+        ]
+        const booleanLike = ['checkbox', 'switch', 'boolean']
+        const dateLike = ['date', 'time', 'datetime']
+
+        setIsNumber(numberLike.includes(fieldType))
+        setIsString(stringLike.includes(fieldType))
+        setIsBoolean(booleanLike.includes(fieldType))
+        setIsDate(dateLike.includes(fieldType))
         setIsFile(fieldType === 'file')
     }, [fieldType])
+
+    /**
+     * 'isEmail' was originally tracked separately; with the engine
+     * vocabulary email is a text input + validation.email constraint,
+     * so we treat string-like fields as eligible for the email switch.
+     */
+    const isEmail = isString
 
     const shouldShowValidation = (validation: string) => {
         switch (validation) {
             case 'min':
             case 'max':
                 return isNumber || isFile
+            case 'gt':
+            case 'gte':
+            case 'lt':
+            case 'lte':
             case 'positive':
             case 'negative':
             case 'int':
@@ -109,7 +147,18 @@ export function FormValidationPopover({
             'endsWith',
             'includes'
         ]
-        const numberValidations = ['min', 'max', 'positive', 'negative', 'int', 'finite']
+        const numberValidations = [
+            'min',
+            'max',
+            'gt',
+            'gte',
+            'lt',
+            'lte',
+            'positive',
+            'negative',
+            'int',
+            'finite'
+        ]
         const dateValidations = ['minDate', 'maxDate']
         const fileValidations = ['min', 'max', 'mime']
         const booleanValidations: string[] = []
@@ -135,6 +184,35 @@ export function FormValidationPopover({
         return validations
     }
 
+    /**
+     * Custom error messages live in `field.validation.errors` as a flat
+     * array of { validationKey, message }. Setting an empty message
+     * removes the entry to keep the persisted shape minimal.
+     */
+    const getErrorMessage = (validationKey: string): string => {
+        const errors = (field?.validation?.errors as FieldValidationMetadata[] | undefined) ?? []
+        return errors.find((e) => e.validationKey === validationKey)?.message ?? ''
+    }
+
+    const setErrorMessage = (validationKey: string, message: string): void => {
+        const errors = (field?.validation?.errors as FieldValidationMetadata[] | undefined) ?? []
+        const trimmed = message.trim()
+        let next: FieldValidationMetadata[]
+        if (trimmed) {
+            const idx = errors.findIndex((e) => e.validationKey === validationKey)
+            if (idx === -1) next = [...errors, { validationKey, message: trimmed }]
+            else next = errors.map((e, i) => (i === idx ? { validationKey, message: trimmed } : e))
+        } else {
+            next = errors.filter((e) => e.validationKey !== validationKey)
+        }
+        handleValidationKeyChange('errors', next)
+    }
+
+    const isValidationActive = (validation: string): boolean => {
+        const value = field?.validation?.[validation] ?? field?.[validation]
+        return value !== undefined && value !== null && value !== '' && value !== false
+    }
+
     const renderValidationField = (validation: string) => {
         const value = field?.validation?.[validation]
 
@@ -155,6 +233,28 @@ export function FormValidationPopover({
                         onChange={(ev) => {
                             const numValue = Number(ev.target.value)
                             if (numValue >= 0) {
+                                handleValidationKeyChange(validation, numValue)
+                            }
+                        }}
+                    />
+                )
+            case 'gt':
+            case 'gte':
+            case 'lt':
+            case 'lte':
+                return (
+                    <IGRPInputPrimitive
+                        type="number"
+                        className="h-8"
+                        value={value ?? ''}
+                        onChange={(ev) => {
+                            const raw = ev.target.value
+                            if (raw === '') {
+                                handleValidationKeyChange(validation, '' as unknown as number)
+                                return
+                            }
+                            const numValue = Number(raw)
+                            if (!Number.isNaN(numValue)) {
                                 handleValidationKeyChange(validation, numValue)
                             }
                         }}
@@ -253,6 +353,12 @@ export function FormValidationPopover({
                     case 'maxLength':
                         schema += `.${validation}(${validationValue})`
                         break
+                    case 'gt':
+                    case 'gte':
+                    case 'lt':
+                    case 'lte':
+                        schema += `.${validation}(${validationValue})`
+                        break
                     case 'positive':
                         schema += '.positive()'
                         break
@@ -323,9 +429,12 @@ export function FormValidationPopover({
                 <div className="grid gap-4">
                     <div className="space-y-2">
                         <IGRPTabsPrimitive defaultValue="validations">
-                            <IGRPTabsListPrimitive className="grid w-full grid-cols-3">
+                            <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
                                 <IGRPTabsTriggerPrimitive value="validations">
                                     {t('validations')}
+                                </IGRPTabsTriggerPrimitive>
+                                <IGRPTabsTriggerPrimitive value="errors">
+                                    {t('errorMessages')}
                                 </IGRPTabsTriggerPrimitive>
                                 <IGRPTabsTriggerPrimitive value="zod">
                                     Zod Schema
@@ -371,6 +480,49 @@ export function FormValidationPopover({
                                             ))}
                                     </div>
                                 </div>
+                            </IGRPTabsContentPrimitive>
+
+                            <IGRPTabsContentPrimitive value="errors" className="space-y-4">
+                                <p className="text-sm text-muted-foreground mb-3">
+                                    {t('errorMessagesHint')}
+                                </p>
+                                {(() => {
+                                    const activeValidations = getValidationOptions()
+                                        .filter(shouldShowValidation)
+                                        .filter(isValidationActive)
+                                    if (activeValidations.length === 0) {
+                                        return (
+                                            <div className="text-xs text-muted-foreground">
+                                                {t('errorMessagesEmpty')}
+                                            </div>
+                                        )
+                                    }
+                                    return (
+                                        <div className="grid gap-3">
+                                            {activeValidations.map((validation) => (
+                                                <div
+                                                    key={`error-${validation}-${index}`}
+                                                    className="flex items-center gap-4"
+                                                >
+                                                    <IGRPLabelPrimitive className="w-24">
+                                                        {toInitCap(t(validation))}
+                                                    </IGRPLabelPrimitive>
+                                                    <IGRPInputPrimitive
+                                                        className="h-8 flex-1"
+                                                        value={getErrorMessage(validation)}
+                                                        placeholder={t('errorMessagePlaceholder')}
+                                                        onChange={(ev) =>
+                                                            setErrorMessage(
+                                                                validation,
+                                                                ev.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )
+                                })()}
                             </IGRPTabsContentPrimitive>
 
                             <IGRPTabsContentPrimitive value="zod" className="space-y-4">

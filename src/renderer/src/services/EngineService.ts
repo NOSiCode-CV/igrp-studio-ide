@@ -33,7 +33,6 @@ export const EngineService = {
         currentPage: string
         loadRegistryComponent: () => void
     }): Promise<void> {
-
         const components: ComponentRegisterConfig[] = customComponents.map(
             (component: ComponentDef) => ({
                 name: component.name,
@@ -118,8 +117,7 @@ export const EngineService = {
                 renderer: 'custom',
                 templatePath: '',
                 metadata: component.content,
-                defaultChildren: [],
-                
+                defaultChildren: []
             }))
 
         const componentsToRegister = [...components, ..._components]

@@ -35,6 +35,7 @@ export interface SidebarItemProps {
     items?: SidebarItem[] // Array of sub-items in the section
     searchActive?: boolean
     type: 'collapsible' | 'group' | 'item'
+    onClick?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement, MouseEvent>) => void
 }
 
 export interface SidebarProps extends React.ComponentProps<typeof IGRPSidebarPrimitive> {
@@ -154,7 +155,17 @@ const renderMenu = (menus: SidebarItemProps[], size: 'lg' | 'sm' | null): JSX.El
                         <IGRPSidebarMenuItemPrimitive>
                             <IGRPSidebarMenuButtonPrimitive tooltip={item.name}>
                                 {item.icon && <item.icon />}
-                                <a href={item.href ?? '#'}>{item.name}</a>
+                                <a
+                                    href={item.href ?? '#'}
+                                    onClick={(e) => {
+                                        if (item.onClick) {
+                                            e.preventDefault()
+                                            item.onClick(e)
+                                        }
+                                    }}
+                                >
+                                    {item.name}
+                                </a>
                             </IGRPSidebarMenuButtonPrimitive>
                         </IGRPSidebarMenuItemPrimitive>
                     </IGRPSidebarMenuPrimitive>

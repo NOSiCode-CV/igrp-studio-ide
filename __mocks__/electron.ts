@@ -7,25 +7,32 @@
  * as new tests touch new electron surfaces.
  */
 
+const handlers = new Map<string, Function>()
+
 export const app = {
-    getVersion: () => '0.0.0-test',
-    getPath: (_name: string) => '/tmp/test-app',
-    getName: () => 'igrp-studio-test',
-    isPackaged: false
+    isPackaged: false,
+    getPath: (_name: string): string => '/tmp/igrp-studio-test',
+    getVersion: (): string => '0.0.0-test',
+    getName: (): string => 'igrp-studio-test'
 }
 
 export const ipcMain = {
-    handle: (_channel: string, _listener: (...args: any[]) => any) => undefined,
-    on: (_channel: string, _listener: (...args: any[]) => any) => undefined,
-    removeHandler: (_channel: string) => undefined,
-    removeAllListeners: (_channel?: string) => undefined
+    on: (_channel: string, _listener: (...args: any[]) => any): void => undefined,
+    handle: jest.fn((channel: string, handler: Function) => {
+        handlers.set(channel, handler)
+    }),
+    removeHandler: (_channel: string): void => undefined,
+    removeAllListeners: (_channel?: string): void => undefined,
+    getHandler: (channel: string) => handlers.get(channel),
+    clearHandlers: () => handlers.clear()
 }
 
 export const ipcRenderer = {
-    invoke: async (_channel: string, ..._args: any[]) => undefined,
-    send: (_channel: string, ..._args: any[]) => undefined,
-    on: (_channel: string, _listener: (...args: any[]) => any) => undefined,
-    removeListener: (_channel: string, _listener: (...args: any[]) => any) => undefined
+    send: (_channel: string, ..._args: any[]): void => undefined,
+    invoke: async (_channel: string, ..._args: any[]): Promise<unknown> => undefined,
+    on: (_channel: string, _listener: (...args: any[]) => any): void => undefined,
+    removeListener: (_channel: string, _listener: (...args: any[]) => any): void => undefined,
+    removeAllListeners: (_channel?: string): void => undefined
 }
 
 export const dialog = {
@@ -73,6 +80,14 @@ export const Menu = {
 export const Notification = class {
     constructor(_opts?: any) {}
     show() { /* noop */ }
+}
+
+export const screen = {
+    getDisplayMatching: (): unknown => ({ bounds: {} })
+}
+
+export const webUtils = {
+    getPathForFile: (): string => ''
 }
 
 // Marker for `import type { IpcMainInvokeEvent } from 'electron'` consumers.

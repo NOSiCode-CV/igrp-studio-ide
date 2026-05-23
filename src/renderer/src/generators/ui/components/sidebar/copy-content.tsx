@@ -7,7 +7,7 @@ import { type JSX, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import type { FileTree } from 'src/main/types'
-import { useDroppedComponents } from '../../dnd/DroppedComponentsContext'
+import { useDroppedComponents } from '../../contexts/EditorContext'
 import { useComponents } from '../../hooks/useComponents'
 
 interface CopyContentProps {

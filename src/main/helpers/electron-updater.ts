@@ -2,14 +2,22 @@ import { app, type BrowserWindow } from 'electron'
 import log from 'electron-log'
 import type { UpdateInfo } from 'electron-updater'
 import { autoUpdater } from 'electron-updater'
+import { GitStore } from '../services/git-store'
 import { IGRPStudioSettings } from './igrp-studio-settings'
-
-/** Base URL for fetching release notes when the update feed does not include them (e.g. S3 latest.yml). */
-const RELEASE_NOTES_BASE_URL = 'https://storage-api.nosi.cv/igrp-studio/release-notes'
 
 /** GitHub repo for fetching release notes (e.g. https://github.com/NOSiCode-CV/igrp-studio-ide/releases). */
 const GITHUB_RELEASE_NOTES_REPO = 'NOSiCode-CV/igrp-studio-ide'
 const GITHUB_API_RELEASES = `https://api.github.com/repos/${GITHUB_RELEASE_NOTES_REPO}/releases`
+
+/** Resolve token for GitHub API: env (GITHUB_TOKEN / VITE_GITHUB_TOKEN) or user's OAuth token from GitStore. */
+function getGitHubApiToken(): string {
+    return (
+        process.env.GITHUB_TOKEN ||
+        process.env.VITE_GITHUB_TOKEN ||
+        GitStore.getToken('github') ||
+        ''
+    )
+}
 
 /**
  * Applies update channel (stable/beta) from IGRPStudioSettings to autoUpdater.
@@ -26,7 +34,7 @@ export function applyUpdateChannelConfig(): void {
         channel: feedChannel
     })
     autoUpdater.allowPrerelease = channel === 'beta'
-    log.info('Update channel configured', {
+    log.debug('Update channel configured', {
         channel: feedChannel,
         allowPrerelease: channel === 'beta'
     })
@@ -48,7 +56,7 @@ export default class AppUpdater {
     private updateAvailable: boolean = false
 
     constructor(win: BrowserWindow) {
-        log.info('Initializing App Updater...')
+        log.debug('Initializing App Updater...')
 
         this.win = win
 
@@ -62,7 +70,11 @@ export default class AppUpdater {
     }
 
     sendStatusToWindow(data: UpdateMessage): void {
-        log.info(data.message)
+        if (data.type === 'error') {
+            log.error(data.message, data.error || '')
+        } else {
+            log.debug(data.message)
+        }
         this.win.webContents.send('message-update', data)
     }
 
@@ -163,70 +175,35 @@ export default class AppUpdater {
     }
 
     /**
-     * Fetch release notes when the update feed does not include them.
-     * Tries: 1) GitHub Releases API (tag v{version} or {version}), 2) S3 release-notes/{version}.txt|.md
+     * Fetch release notes from GitHub Releases API when the update feed does not include them.
+     * Uses tag v{version}. See https://docs.github.com/en/rest/releases/releases#get-a-release-by-tag-name
      */
     private async fetchReleaseNotesForVersion(version: string): Promise<string> {
         const sanitized = version.replace(/[^a-zA-Z0-9.-]/g, '')
         if (!sanitized) return ''
-
-        const fromGitHub = await this.fetchReleaseNotesFromGitHub(sanitized)
-        if (fromGitHub) return fromGitHub
-
-        const fromS3 = await this.fetchReleaseNotesFromS3(sanitized)
-        if (fromS3) return fromS3
-
-        return ''
-    }
-
-    /**
-     * Fetch release notes from GitHub Releases API.
-     * Tries tag "v{version}" then "{version}" (e.g. https://github.com/NOSiCode-CV/igrp-studio-ide/releases/tag/v0.2.0-beta.10.2).
-     */
-    private async fetchReleaseNotesFromGitHub(version: string): Promise<string> {
-        const tagsToTry = [version.startsWith('v') ? version : `v${version}`, version]
-        for (const tag of tagsToTry) {
-            try {
-                const res = await fetch(`${GITHUB_API_RELEASES}/tags/${encodeURIComponent(tag)}`, {
-                    method: 'GET',
-                    headers: { Accept: 'application/vnd.github.v3+json' }
-                })
-                if (res.ok) {
-                    const data = (await res.json()) as { body?: string | null }
-                    const body = data?.body?.trim()
-                    if (body) {
-                        log.info('Release notes fetched from GitHub', { version, tag })
-                        return body
-                    }
-                }
-            } catch (err) {
-                log.debug('GitHub release notes fetch failed', { tag, err: (err as Error).message })
+        const tag = sanitized.startsWith('v') ? sanitized : `v${sanitized}`
+        try {
+            const token = getGitHubApiToken()
+            const headers: Record<string, string> = {
+                Accept: 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28',
+                'User-Agent': 'IGRP-Studio-Updater'
             }
-        }
-        return ''
-    }
-
-    /**
-     * Fetch release notes from S3 (release-notes/{version}.txt or .md).
-     */
-    private async fetchReleaseNotesFromS3(version: string): Promise<string> {
-        const urls = [
-            `${RELEASE_NOTES_BASE_URL}/${version}.txt`,
-            `${RELEASE_NOTES_BASE_URL}/${version}.md`
-        ]
-        for (const url of urls) {
-            try {
-                const res = await fetch(url, { method: 'GET' })
-                if (res.ok) {
-                    const text = await res.text()
-                    if (text?.trim()) {
-                        log.info('Release notes fetched from S3', { version, url })
-                        return text.trim()
-                    }
+            if (token) headers.Authorization = `Bearer ${token}`
+            const res = await fetch(`${GITHUB_API_RELEASES}/tags/${encodeURIComponent(tag)}`, {
+                method: 'GET',
+                headers
+            })
+            if (res.ok) {
+                const data = (await res.json()) as { body?: string | null }
+                const body = data?.body?.trim()
+                if (body) {
+                    log.debug('Release notes fetched from GitHub', { version, tag })
+                    return body
                 }
-            } catch (err) {
-                log.debug('S3 release notes fetch failed', { url, err: (err as Error).message })
             }
+        } catch (err) {
+            log.debug('GitHub release notes fetch failed', { tag, err: (err as Error).message })
         }
         return ''
     }

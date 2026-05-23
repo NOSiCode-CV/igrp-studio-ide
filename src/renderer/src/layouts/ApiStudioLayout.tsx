@@ -13,6 +13,7 @@ import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import type { ProjectData } from 'src/main/types'
+import { IntegratedTerminal } from '../components/integrated-terminal'
 import { AppIGRPSidebar } from './components/app-sidebar'
 import { Footer } from './components/footer'
 import Header from './components/header'
@@ -38,12 +39,8 @@ const Layout = (props: LayoutProps): React.ReactNode => {
 
     useEffect(() => {
         if (changeStatus) {
-            // Add a small delay to ensure file system operations complete
-            const timer = setTimeout(() => {
-                dispatch(onGetFolderFiles(basePath))
-                dispatch(onSetChangeStatus(false))
-            }, 100)
-            return () => clearTimeout(timer)
+            dispatch(onGetFolderFiles(basePath))
+            dispatch(onSetChangeStatus(false))
         }
         return undefined
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -86,6 +83,7 @@ const Layout = (props: LayoutProps): React.ReactNode => {
                     </div>
                 </div>
                 <Footer />
+                <IntegratedTerminal />
             </IGRPSidebarProviderPrimitive>
         </div>
     )

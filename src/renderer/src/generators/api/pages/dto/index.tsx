@@ -10,7 +10,7 @@ import NavigationBar from '../../components/navigation-bar'
 import { useFramework } from '@renderer/hooks/use-framework'
 import { addNewRow, getOptionsByObject, handleChangeValueObject, removeRow } from '../../helpers'
 import AttributesCard from './attributes'
-import { getInitialValues, TabList, TemplateOptions } from './config'
+import { getInitialValues, KIND_OPTIONS, TabList, TemplateOptions } from './config'
 import { useDto } from './useDto'
 
 interface DtoProps {
@@ -79,6 +79,21 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                     <IGRPCardContentPrimitive>
                         <div className="flex flex-col gap-4">
                             <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+                                <SelectInput
+                                    label="Kind"
+                                    id="type"
+                                    options={KIND_OPTIONS}
+                                    value={formik.values.type}
+                                    onChange={(e) => {
+                                        if (typeof e === 'string') {
+                                            formik.setFieldValue('type', e)
+                                        }
+                                    }}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.errors.type}
+                                    isTouched={formik.touched.type}
+                                    isRequired
+                                />
                                 <TextInput
                                     label={t('name')}
                                     id="name"
@@ -132,27 +147,31 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                                     error={formik.errors.extends}
                                     isTouched={formik.touched.extends}
                                 />
-                                <div className="flex flex-1 space-x-2">
-                                    <IGRPLabelPrimitive htmlFor="enableCustonValidation">
-                                        {t('enableCustonValidation')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPCheckboxPrimitive
-                                        id="enableCustonValidation"
-                                        onCheckedChange={(checked: boolean) =>
-                                            formik.setFieldValue('enableCustonValidation', checked)
-                                        }
-                                        checked={formik.values.enableCustonValidation}
-                                    />
-                                    <IGRPLabelPrimitive htmlFor="enableCustonValidation">
-                                        {t('readOnly')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPCheckboxPrimitive
-                                        id="readOnly"
-                                        onCheckedChange={(checked: boolean) =>
-                                            formik.setFieldValue('readOnly', checked)
-                                        }
-                                        checked={formik.values.readOnly}
-                                    />
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center space-x-2">
+                                        <IGRPCheckboxPrimitive
+                                            id="enableCustonValidation"
+                                            onCheckedChange={(checked: boolean) =>
+                                                formik.setFieldValue('enableCustonValidation', checked)
+                                            }
+                                            checked={formik.values.enableCustonValidation}
+                                        />
+                                        <IGRPLabelPrimitive htmlFor="enableCustonValidation" className="whitespace-nowrap">
+                                            {t('enableCustonValidation')}
+                                        </IGRPLabelPrimitive>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <IGRPCheckboxPrimitive
+                                            id="readOnly"
+                                            onCheckedChange={(checked: boolean) =>
+                                                formik.setFieldValue('readOnly', checked)
+                                            }
+                                            checked={formik.values.readOnly}
+                                        />
+                                        <IGRPLabelPrimitive htmlFor="readOnly" className="whitespace-nowrap">
+                                            {t('readOnly')}
+                                        </IGRPLabelPrimitive>
+                                    </div>
                                 </div>
                             </div>
                             {TabList.map(({ value }) => (

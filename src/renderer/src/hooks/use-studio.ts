@@ -1,9 +1,9 @@
 import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 import type { FileTree, ProjectData } from 'src/main/types'
-import { useComponentsContext } from '../generators/ui/contexts/ComponentsContext'
+import { useComponentsContext } from '@renderer/features/engine-catalog'
 
 interface RootState {
     PageBuilder: {

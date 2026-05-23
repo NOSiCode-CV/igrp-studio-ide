@@ -23,8 +23,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { getValuesToSubmit, initialValues } from '../../pages/model/config'
-import { ConnectionManager } from './ConnectionManager'
-import { TableManager } from './TableManager'
+import { ConnectionManager, TablePicker } from '@renderer/features/data-models'
 
 interface DatabaseManagerModalProps {
     isOpen?: boolean
@@ -213,7 +212,7 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
                         </IGRPTabsTriggerPrimitive>
                     </IGRPTabsListPrimitive>
                     <IGRPTabsContentPrimitive value="tables">
-                        <TableManager
+                        <TablePicker
                             onRowsSubmit={setSelectedRows}
                             onSelectedConnection={setSelectedConnection}
                         />

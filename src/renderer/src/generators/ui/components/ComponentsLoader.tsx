@@ -1,6 +1,6 @@
 import type React from 'react'
 import { useEffect } from 'react'
-import { useComponentsContext } from '../contexts/ComponentsContext'
+import { useComponentsContext } from '@renderer/features/engine-catalog'
 
 export const ComponentsLoader: React.FC = () => {
     const { loadRegistryComponent, componentsRegistered } = useComponentsContext()

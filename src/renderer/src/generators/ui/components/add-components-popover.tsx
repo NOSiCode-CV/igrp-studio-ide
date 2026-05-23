@@ -12,7 +12,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ICON_MAP } from '../ComponentTypes'
 import { handleDragEnd } from '../dnd/DraggableItemManager'
-import { useDroppedComponents } from '../dnd/DroppedComponentsContext'
+import { useDroppedComponents } from '../contexts/EditorContext'
 import { useTagManager } from '../hooks/useTagManager'
 
 export const AddComponentPopover = ({

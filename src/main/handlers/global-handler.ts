@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { exec } from 'node:child_process'
 import fs from 'fs'
 import path from 'path'
 import { EVENTS } from '../constants/events'
@@ -17,6 +18,40 @@ ipcMain.handle('theme:set', async (_event, theme: string) => {
 
 ipcMain.handle('run-doctor-checks', async (): Promise<ToolCheck[]> => {
     return DoctorService.run()
+})
+
+ipcMain.handle('install-igrp-cli', async () => {
+    const command =
+        'npm install -g @igrp/cli --registry=https://sonatype.nosi.cv/repository/npm-group/'
+
+    try {
+        const result = await new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
+            exec(command, { timeout: 10 * 60 * 1000 }, (error, stdout, stderr) => {
+                if (error) {
+                    reject(
+                        new Error(
+                            stderr?.trim() ||
+                                stdout?.trim() ||
+                                error.message ||
+                                'Failed to install @igrp/cli'
+                        )
+                    )
+                    return
+                }
+                resolve({ stdout, stderr })
+            })
+        })
+
+        return {
+            success: true,
+            output: [result.stdout, result.stderr].filter(Boolean).join('\n').trim()
+        }
+    } catch (error) {
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to install @igrp/cli'
+        }
+    }
 })
 
 // Save project icon file
@@ -199,6 +234,25 @@ ipcMain.handle(EVENTS.LANGUAGE.SET_LANGUAGE, (_event, lang: string) => {
     }
 })
 
+ipcMain.handle(EVENTS.ONBOARDING.GET_WELCOME_COMPLETED, () => {
+    try {
+        return IGRPStudioSettings.getWelcomeOnboardingCompleted()
+    } catch (error) {
+        console.error('Error getting welcome onboarding flag:', error)
+        return false
+    }
+})
+
+ipcMain.handle(EVENTS.ONBOARDING.SET_WELCOME_COMPLETED, (_event, completed: boolean) => {
+    try {
+        IGRPStudioSettings.setWelcomeOnboardingCompleted(Boolean(completed))
+        return true
+    } catch (error) {
+        console.error('Error setting welcome onboarding flag:', error)
+        return false
+    }
+})
+
 // BPMN Project Preference IPC Handlers
 ipcMain.handle(EVENTS.BPMN.SET_SELECTED_PROJECT, async (_event, projectId: string) => {
     try {
@@ -244,5 +298,25 @@ ipcMain.handle(EVENTS.BPMN.GET_SELECTED_PROCESS, async () => {
     } catch (error) {
         console.error('Error getting selected BPMN process:', error)
         return undefined
+    }
+})
+
+/**
+ * Update a page's parentName field directly on its `.igrpstudio` JSON.
+ * Used by the Move action in the page browser — the operation is purely
+ * metadata so we skip the engine round-trip and just rewrite the file.
+ */
+ipcMain.handle('page:set-parent', async (_event, jsonPath: string, parentName: string | null) => {
+    try {
+        const raw = await fs.promises.readFile(jsonPath, 'utf-8')
+        const data = JSON.parse(raw) as Record<string, unknown>
+        if (parentName) data.parentName = parentName
+        else delete data.parentName
+        await fs.promises.writeFile(jsonPath, `${JSON.stringify(data, null, 2)}\n`, 'utf-8')
+        return { success: true as const }
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error'
+        console.error('Failed to update page parent:', message)
+        return { success: false as const, error: message }
     }
 })

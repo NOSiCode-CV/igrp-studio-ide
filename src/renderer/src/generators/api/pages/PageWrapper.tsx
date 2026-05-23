@@ -3,7 +3,7 @@ import { OPTION_TYPE, type OptionType } from '@renderer/constants/appConstants'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 import type { FileTree, ProjectData } from 'src/main/types'
 import { ControllerLayout } from './controller'
 import ControllerOverview from './controller/overview'
@@ -12,6 +12,7 @@ import DtoLayout from './dto'
 import { EditorLayout } from './EditorLayout'
 import EmptyPage from './EmptyPage'
 import { EnumLayout } from './enum'
+import { GraphQLOperationLayout, GraphQLOverviewLayout } from './graphql'
 import ModelLayout from './model'
 import { ResponseLayout } from './response'
 
@@ -34,6 +35,10 @@ const componentMap = {
     [OPTION_TYPE.MODEL]: ModelLayout,
     [OPTION_TYPE.ACTION]: ControllerLayout,
     [OPTION_TYPE.CONTROLLER]: ControllerOverview,
+    [OPTION_TYPE.GRAPHQL]: GraphQLOverviewLayout,
+    [OPTION_TYPE.GRAPHQL_QUERY]: GraphQLOperationLayout,
+    [OPTION_TYPE.GRAPHQL_MUTATION]: GraphQLOperationLayout,
+    [OPTION_TYPE.GRAPHQL_SUBSCRIPTION]: GraphQLOperationLayout,
     [OPTION_TYPE.DATA_OBJECTS]: DtoLayout,
     [OPTION_TYPE.RESPONSE]: ResponseLayout,
     [OPTION_TYPE.ENUM]: EnumLayout,
@@ -114,6 +119,7 @@ const PageWrapper = ({ onOpenNew, open, tab }: NewProps) => {
         <>
             {Component && (
                 <Component
+                    key={tab.id}
                     selectors={selectors}
                     currentItem={tab.item}
                     onCloseTab={hangleClose}

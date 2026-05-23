@@ -4,16 +4,18 @@ import {
     IGRPSidebarProviderPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { UpdateModalBottomLeft } from '@renderer/components/update-banner'
+import { IntegratedTerminal } from '@renderer/components/integrated-terminal'
+import { useGitTokenExpiredToast } from '@renderer/hooks/use-git-token-expired-toast'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter
 } from '@renderer/layouts/components/app-sidebar-default'
-import { Database } from 'lucide-react'
+import { FileText } from 'lucide-react'
 import type React from 'react'
 import { useMemo } from 'react'
-import { WorkspaceSwitcher } from '../pages/workspaces/components/workspace-switch'
+import { WorkspaceSwitcher } from '../browser/workspaces/components/workspace-switch'
 import { Footer } from './components/footer'
 import FooterSidebar from './components/footer-sidebar'
 import Header from './components/header'
@@ -23,6 +25,7 @@ interface LayoutProps {
 }
 
 const MainLayout = (props: LayoutProps): React.ReactElement => {
+    useGitTokenExpiredToast()
     const {
         workspace,
         actions: { switchWorkspace }
@@ -31,10 +34,10 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
     const navData = useMemo(
         () => [
             {
-                name: 'Database',
+                name: 'Markdown Converter',
                 type: 'item' as const,
-                icon: Database,
-                href: '#/connections'
+                icon: FileText,
+                onClick: () => window.markitdown?.openWindow()
             }
         ],
         []
@@ -70,6 +73,7 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
                         </IGRPSidebarInsetPrimitive>
                     </div>
                     <Footer />
+                    <IntegratedTerminal />
                     <UpdateModalBottomLeft />
                 </div>
             </IGRPSidebarProviderPrimitive>

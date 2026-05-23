@@ -18,7 +18,6 @@ import { getUUID } from '@renderer/utils'
 import { AlertCircle, Filter, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 import type { Repository, RepositoryPlatform } from 'src/main/types'
 import { SearchInput } from '../shared-ui'
 import { ProjectNameDialog } from './dialog-project-name'
@@ -34,8 +33,6 @@ export function RepositoryList() {
     } = useWorkspace()
     const { repositoriesGitHub, repositoriesGitLab, isLoading } = useGitAuth()
     const { checkLocalProjects } = useGit()
-    const dispatch: any = useDispatch()
-
     const [nameDialog, setNameDialog] = useState({
         isOpen: false,
         defaultName: '',
@@ -109,7 +106,7 @@ export function RepositoryList() {
     }
 
     useEffect(() => {
-        window.electron.ipcRenderer.on('clone-progress', async (_event: any, data: any) => {
+        const onCloneProgress = async (_event: any, data: any) => {
             console.log(data)
             if (data.status === 'success' || data.status === 'error') {
                 setCloningRepoId(null)
@@ -157,27 +154,27 @@ export function RepositoryList() {
             } else if (data.status === 'error') {
                 showErrorToast(t('failedCloneRepository', { message: data.message }))
             }
-        })
+        }
 
-        window.electron.ipcRenderer.on(
-            'request-project-name',
-            (_event: any, { defaultName }: { defaultName: string }) => {
-                setNameDialog({
-                    isOpen: true,
-                    defaultName,
-                    onConfirm: async (name) => {
-                        window.electron.ipcRenderer.send('project-name-response', name)
-                        setNameDialog((prev) => ({ ...prev, isOpen: false }))
-                    }
-                })
-            }
-        )
+        const onRequestProjectName = (_event: any, { defaultName }: { defaultName: string }) => {
+            setNameDialog({
+                isOpen: true,
+                defaultName,
+                onConfirm: async (name) => {
+                    window.electron.ipcRenderer.send('project-name-response', name)
+                    setNameDialog((prev) => ({ ...prev, isOpen: false }))
+                }
+            })
+        }
+
+        window.electron.ipcRenderer.on('clone-progress', onCloneProgress)
+        window.electron.ipcRenderer.on('request-project-name', onRequestProjectName)
 
         return () => {
-            window.electron.ipcRenderer.removeAllListeners('clone-progress')
-            window.electron.ipcRenderer.removeAllListeners('request-project-name')
+            window.electron.ipcRenderer.removeListener('clone-progress', onCloneProgress)
+            window.electron.ipcRenderer.removeListener('request-project-name', onRequestProjectName)
         }
-    }, [dispatch, showSuccessToast, showErrorToast, t, cloningRepoId])
+    }, [saveOrOpenProject, showSuccessToast, showErrorToast, t, cloningRepoId, workspace.id])
 
     useEffect(() => {
         const loadClonedReposData = async () => {
@@ -280,8 +277,8 @@ export function RepositoryList() {
                 <IGRPScrollAreaPrimitive className="h-[400px]">
                     {isLoading ? (
                         <div className="divide-y">
-                            {Array.from({ length: 5 }).map((_, index) => (
-                                <div key={index} className="p-4 flex items-center">
+                            {[1, 2, 3, 4, 5].map((skeletonId) => (
+                                <div key={skeletonId} className="p-4 flex items-center">
                                     <IGRPSkeletonPrimitive className="h-10 w-10 rounded-full mr-4" />
                                     <div className="space-y-2 flex-1">
                                         <IGRPSkeletonPrimitive className="h-4 w-3/4" />

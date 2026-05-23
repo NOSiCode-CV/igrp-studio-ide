@@ -1,4 +1,4 @@
-import { FormList } from '../../../../components/form-list'
+import BindingFormList from '../../../ui/components/modals/binding-form-list'
 import type { IColumnsTabelProps } from '../../types/Interfaces'
 
 interface AttributesCardProps {
@@ -21,7 +21,7 @@ const AttributesCard = ({
     changeValue
 }: AttributesCardProps) => {
     return (
-        <FormList
+        <BindingFormList
             errors={errors}
             formik={formik}
             columns={columns}

@@ -228,7 +228,14 @@ export const BodyRequest: React.FC<BodyRequestProps> = ({
         <div className="flex flex-col gap-4 mt-4">
             <div className="flex space-x-4 text-sm">
                 <IGRPBadgePrimitive
-                    onClick={() => setBodyType('none')}
+                    onClick={() => {
+                        setBodyType('none')
+                        formik.setFieldValue(routeFormData, undefined)
+                        setLocalSchema(null)
+                        setName('')
+                        setData([])
+                        setCollectionType('none')
+                    }}
                     variant={bodyType === 'none' ? 'default' : 'outline'}
                     className="cursor-pointer"
                 >

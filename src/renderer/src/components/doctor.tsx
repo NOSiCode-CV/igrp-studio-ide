@@ -243,13 +243,13 @@ export default function Doctor({
                                                 <IGRPTableBodyPrimitive>
                                                     {summary.tools.map((tool, index) => (
                                                         <IGRPTableRowPrimitive key={index}>
-                                                            <IGRPTableCellPrimitive className="py-3">
-                                                                <div>
+                                                            <IGRPTableCellPrimitive className="py-3 align-top">
+                                                                <div className="max-w-[320px]">
                                                                     <div className="font-medium">
                                                                         {tool.name}
                                                                     </div>
                                                                     {tool.description && (
-                                                                        <div className="text-xs text-muted-foreground mt-1">
+                                                                        <div className="text-xs text-muted-foreground mt-1 whitespace-normal break-words">
                                                                             {tool.description}
                                                                         </div>
                                                                     )}

@@ -24,7 +24,7 @@ export const AppSidebarHeader: React.FC<AppSidebarHeaderProps> = ({
     const { t } = useTranslation()
     return (
         <IGRPSidebarHeaderPrimitive className={cn('flex flex-col', className)}>
-            <div className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ml-1 flex flex-1 justify-between items-center">
+            <div className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ml-1 pr-3 flex flex-1 justify-between items-center">
                 <span className="font-semibold">{description}</span>
                 {basePath && <CreateModuleDialog basePath={basePath} />}
             </div>

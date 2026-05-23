@@ -65,6 +65,12 @@ export const TemplateOptions = [
     { label: 'Record', value: 'record' }
 ]
 
+export const KIND_OPTIONS: { label: string; value: DTOConfig['type'] }[] = [
+    { label: 'Data Transfer Object', value: 'dto' },
+    { label: 'GraphQL Type', value: 'graphqlType' },
+    { label: 'GraphQL Input', value: 'graphqlInput' }
+]
+
 export const getTablesColumns = ({
     selectors,
     dto,

@@ -8,7 +8,6 @@ import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useTheme } from './theme-provider'
 
-// @ts-expect-error
 self.MonacoEnvironment = {
     getWorker(_: any, label: string) {
         if (label === 'json') {

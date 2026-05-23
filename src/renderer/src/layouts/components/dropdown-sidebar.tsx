@@ -243,6 +243,22 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                 )
                 createGitCommit(basePath, `Delete action ${actionNameToDelete}`)
                 dispatch(onSetChangeStatus(true))
+            } else if (
+                item.type === OPTION_TYPE.GRAPHQL_QUERY ||
+                item.type === OPTION_TYPE.GRAPHQL_MUTATION ||
+                item.type === OPTION_TYPE.GRAPHQL_SUBSCRIPTION
+            ) {
+                const operationId = item.content?.id || item.id
+
+                if (!operationId) {
+                    showErrorToast('Invalid GraphQL operation')
+                    return
+                }
+
+                await window.graphql.deleteGraphQLOperation(basePath, item.module, operationId)
+                showSuccessToast(t('deletedSuccess', { name: item.label }))
+                createGitCommit(basePath, `Delete GraphQL operation ${item.label}`)
+                dispatch(onSetChangeStatus(true))
             } else {
                 // Standard deletion for other types
                 const config = {
@@ -299,10 +315,12 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                                 <IGRPDropdownMenuItemPrimitive
                                     onClick={(e) => {
                                         e.stopPropagation()
+                                        const actionId = `new-action-${menuItem.id || menuItem.label}`
                                         handleDropdownClick({
-                                            ...menu,
                                             ...menuItem,
-                                            isNew: true
+                                            ...menu,
+                                            isNew: menu.isNew ?? true,
+                                            id: actionId
                                         })
                                     }}
                                     variant={isDelete ? 'destructive' : 'default'}

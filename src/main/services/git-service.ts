@@ -19,6 +19,18 @@ export const GitService = {
         }
     },
 
+    async getRepoRoot(projectPath: string): Promise<string | null> {
+        try {
+            const { stdout } = await execAsync('git rev-parse --show-toplevel', {
+                cwd: projectPath
+            })
+            const root = stdout?.trim()
+            return root ? root : null
+        } catch {
+            return null
+        }
+    },
+
     async initializeGit(projectPath: string) {
         try {
             await execAsync('git init', { cwd: projectPath })
@@ -238,23 +250,33 @@ export const GitService = {
     async createCommit(projectPath: string, message: string): Promise<boolean> {
         try {
             await execAsync('git add .', { cwd: projectPath })
-            await execAsync(`git commit -m "${message}"`, { cwd: projectPath })
+            // Escape any double quotes the caller managed to leave in the
+            // message. Backticks already get stripped upstream; double quotes
+            // are the remaining shell hazard.
+            const safe = message.replace(/"/g, '\\"')
+            await execAsync(`git commit -m "${safe}"`, { cwd: projectPath })
 
             return true
         } catch (error: any) {
-            const errorMessage = error.stderr || error.message || String(error)
+            // `git commit` prints "nothing to commit, working tree clean" on
+            // **stdout** (not stderr) and exits non-zero. The previous version
+            // only inspected stderr; widen the scan so we recognise the
+            // benign no-op and return `false` instead of throwing.
+            const combined = [error.stderr, error.stdout, error.message]
+                .filter(Boolean)
+                .join('\n')
 
-            // Se não houver nada para commitar, retorna false sem lançar erro
             if (
-                errorMessage.includes('nothing to commit') ||
-                errorMessage.includes('no changes added to commit') ||
-                errorMessage.includes('nothing added to commit') ||
-                errorMessage.includes('not a git repository')
+                combined.includes('nothing to commit') ||
+                combined.includes('no changes added to commit') ||
+                combined.includes('nothing added to commit') ||
+                combined.includes('working tree clean') ||
+                combined.includes('not a git repository')
             ) {
                 return false
             }
 
-            throw new Error(errorMessage)
+            throw new Error(combined || 'git commit failed')
         }
     },
 
@@ -511,6 +533,29 @@ export const GitService = {
         } catch (error) {
             console.error('Error checking git remotes:', error)
             return {}
+        }
+    },
+
+    /**
+     * Read the contents of a file as it existed at a given commit/ref.
+     * Returns `null` when the file did not exist at that ref (new file —
+     * a "modified" badge against HEAD~1 means the previous commit had no
+     * such path) or when the ref itself does not resolve (e.g. the very
+     * first commit has no HEAD~1).
+     */
+    async showFileAtCommit(
+        projectPath: string,
+        ref: string,
+        relPath: string
+    ): Promise<{ content: string | null }> {
+        try {
+            const { stdout } = await execAsync(`git show ${ref}:${relPath}`, {
+                cwd: projectPath,
+                maxBuffer: 10 * 1024 * 1024
+            })
+            return { content: stdout }
+        } catch {
+            return { content: null }
         }
     },
 
