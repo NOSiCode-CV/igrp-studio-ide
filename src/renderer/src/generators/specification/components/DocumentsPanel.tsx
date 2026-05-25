@@ -300,7 +300,7 @@ const TabsCleanup = ({ tabIds }: { tabIds: string[] }): null => {
 // ─── Empty state (no docs open) ───────────────────────────────────────────
 
 const EmptyState = (): JSX.Element => (
-    <div className="flex h-full w-full flex-col items-center justify-center bg-card/20 p-8 text-center">
+    <div className="flex h-full w-full flex-col items-center justify-center bg-background p-8 text-center">
         <FileText className="mb-4 text-muted-foreground/30" size={48} />
         <h3 className="mb-1 text-sm font-semibold">No document open</h3>
         <p className="max-w-[260px] text-xs text-muted-foreground">
@@ -695,7 +695,7 @@ const DocTabPane = ({ docId, basePath }: DocTabPaneProps): JSX.Element | null =>
     // "Rendered fewer hooks than expected".
     if (!node) {
         return (
-            <div className="flex h-full flex-col items-center justify-center bg-card/20 p-8 text-center">
+            <div className="flex h-full flex-col items-center justify-center bg-background p-8 text-center">
                 <FileText className="mb-4 text-muted-foreground/30" size={48} />
                 <h3 className="mb-1 text-sm font-semibold">Document not found</h3>
                 <p className="max-w-[260px] text-xs text-muted-foreground">

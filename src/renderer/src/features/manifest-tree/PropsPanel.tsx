@@ -142,7 +142,11 @@ export const PropsPanel = ({
                                 onClick={() => onRemove(node.id)}
                                 className={cn(
                                     'flex w-full items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-[11px] font-medium transition-colors',
-                                    'border-red-200 text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40'
+                                    // Theme-aware: `destructive` token resolves
+                                    // to red in light mode + a brighter red in
+                                    // dark mode. Semi-transparent hover keeps
+                                    // contrast on both backgrounds.
+                                    'border-destructive/40 text-destructive hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-40'
                                 )}
                             >
                                 <Trash2 size={11} />
@@ -306,12 +310,14 @@ const JsonField = ({
                 className={cn(
                     'w-full resize-y rounded-md border bg-background px-2 py-1 font-mono text-[10.5px] outline-none focus:ring-1',
                     parseError
-                        ? 'border-red-300 focus:border-red-400 focus:ring-red-200'
+                        ? 'border-destructive/60 focus:border-destructive focus:ring-destructive/30'
                         : 'focus:border-primary/60 focus:ring-primary/20'
                 )}
                 spellCheck={false}
             />
-            {parseError && <p className="mt-0.5 text-[9.5px] text-red-600">{parseError}</p>}
+            {parseError && (
+                <p className="mt-0.5 text-[9.5px] text-destructive">{parseError}</p>
+            )}
         </div>
     )
 }

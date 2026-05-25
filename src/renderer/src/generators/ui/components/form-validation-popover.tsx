@@ -23,6 +23,16 @@ interface FormValidationPopoverProps {
     changeValue: (element: string, position: number, value: any) => void
 }
 
+/** Zod allows 0 for min/max/minLength/maxLength; do not treat it as unset. */
+function hasValidationValue(value: unknown): boolean {
+    if (typeof value === 'number') return !Number.isNaN(value)
+    return value !== undefined && value !== null && value !== '' && value !== false
+}
+
+function formatValidationInputValue(value: unknown): string | number {
+    return typeof value === 'number' ? value : (value ?? '')
+}
+
 export function FormValidationPopover({
     index,
     field,
@@ -39,14 +49,18 @@ export function FormValidationPopover({
 
     const handleValidationKeyChange = (
         key: string,
-        value: string | boolean | number | unknown[]
+        value: string | boolean | number | unknown[] | undefined
     ) => {
         const currentValidation = field?.validation || {}
-        const updatedValidation = {
+        if (value === undefined || value === null || value === '') {
+            const { [key]: _removed, ...rest } = currentValidation
+            changeValue('validation', index, rest)
+            return
+        }
+        changeValue('validation', index, {
             ...currentValidation,
             [key]: value
-        }
-        changeValue('validation', index, updatedValidation)
+        })
     }
 
     /**
@@ -66,7 +80,10 @@ export function FormValidationPopover({
             'select2',
             'radio',
             'string',
-            'textarea'
+            'textarea',
+            'email',
+            'url',
+            'uuid'
         ]
         const booleanLike = ['checkbox', 'switch', 'boolean']
         const dateLike = ['date', 'time', 'datetime']
@@ -200,7 +217,7 @@ export function FormValidationPopover({
 
     const isValidationActive = (validation: string): boolean => {
         const value = field?.validation?.[validation] ?? field?.[validation]
-        return value !== undefined && value !== null && value !== '' && value !== false
+        return hasValidationValue(value)
     }
 
     const renderValidationField = (validation: string) => {
@@ -215,14 +232,19 @@ export function FormValidationPopover({
                     <Input
                         type="number"
                         className="h-8"
-                        value={value || ''}
+                        value={formatValidationInputValue(value)}
                         placeholder={
                             validation === 'min' || validation === 'minLength' ? '>=0' : '>=0'
                         }
                         min={0}
                         onChange={(ev) => {
-                            const numValue = Number(ev.target.value)
-                            if (numValue >= 0) {
+                            const raw = ev.target.value
+                            if (raw === '') {
+                                handleValidationKeyChange(validation, undefined)
+                                return
+                            }
+                            const numValue = Number(raw)
+                            if (!Number.isNaN(numValue) && numValue >= 0) {
                                 handleValidationKeyChange(validation, numValue)
                             }
                         }}
@@ -324,11 +346,7 @@ export function FormValidationPopover({
         // Apply validations
         validations.forEach((validation) => {
             const validationValue = field?.validation?.[validation] ?? field?.[validation]
-            if (
-                validationValue !== undefined &&
-                validationValue !== null &&
-                validationValue !== ''
-            ) {
+            if (hasValidationValue(validationValue)) {
                 switch (validation) {
                     case 'min':
                     case 'max':
@@ -553,11 +571,7 @@ export function FormValidationPopover({
                                                 const value =
                                                     field?.validation?.[validation] ??
                                                     field?.[validation]
-                                                return (
-                                                    value !== undefined &&
-                                                    value !== null &&
-                                                    value !== ''
-                                                )
+                                                return hasValidationValue(value)
                                             })
                                             .map((validation) => {
                                                 const value =
@@ -579,11 +593,7 @@ export function FormValidationPopover({
                                             const value =
                                                 field?.validation?.[validation] ??
                                                 field?.[validation]
-                                            return (
-                                                value !== undefined &&
-                                                value !== null &&
-                                                value !== ''
-                                            )
+                                            return hasValidationValue(value)
                                         }).length === 0 &&
                                             !field?.validation?.key && (
                                                 <div className="text-xs text-muted-foreground ml-6">

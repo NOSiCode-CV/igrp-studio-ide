@@ -59,6 +59,15 @@ const NavigationBar = ({
                     </Button>
                     <Button
                         size="sm"
+                        onClick={() => onSwitch(APRESENTATION.TREE)}
+                        variant={activePresentation === APRESENTATION.TREE ? 'outline' : 'ghost'}
+                        className="h-7"
+                        title="Tree view — drag from the palette, drop into the manifest tree"
+                    >
+                        Tree
+                    </Button>
+                    <Button
+                        size="sm"
                         onClick={() => onSwitch(APRESENTATION.JSON)}
                         variant={activePresentation === APRESENTATION.JSON ? 'outline' : 'ghost'}
                         className="h-7"

@@ -58,46 +58,114 @@ const defaultFieldType: LabeledElementField = {
 }
 
 /**
- * Mirrors the engine's FIELD_TYPES constant
- * (node_modules/@igrp/igrp-studio-nextjs-engine/dist/utils/constants.d.ts).
- * Kept inline because the engine does not re-export the constant from
- * its public entry point yet. The order intentionally matches the
- * engine source so a quick visual diff catches drift.
+ * Types shown in the binding UI. Primitives map 1:1 to `resolveZodTypes`.
+ * `email` / `url` / `uuid` are string refinements (z.string().email(), …),
+ * persisted as `type: "string"` + `validation.{email|url|uuid}: true`.
+ * @see studio/_skills/igrp-studio-metadata/troubleshooting.md
  */
 const FIELD_TYPES: SchemaTypeItem[] = [
     { value: 'string', label: 'String' },
+    { value: 'email', label: 'Email' },
+    { value: 'url', label: 'URL' },
+    { value: 'uuid', label: 'UUID' },
     { value: 'number', label: 'Number' },
-    { value: 'select', label: 'Select' },
-    { value: 'select2', label: 'Select (multi)' },
-    { value: 'password', label: 'Password' },
-    { value: 'color', label: 'Color' },
-    { value: 'checkbox', label: 'Checkbox' },
-    { value: 'switch', label: 'Switch' },
-    { value: 'radio', label: 'Radio' },
-    { value: 'file', label: 'File' },
-    { value: 'tel', label: 'Telephone' },
-    { value: 'range', label: 'Range' },
-    { value: 'time', label: 'Time' },
+    { value: 'boolean', label: 'Boolean' },
     { value: 'date', label: 'Date' },
-    { value: 'button', label: 'Button' }
+    { value: 'file', label: 'File' }
 ]
 
+const STRING_FORMAT_TYPES = ['email', 'url', 'uuid'] as const
+type StringFormatType = (typeof STRING_FORMAT_TYPES)[number]
+
+function isStringFormatType(type: string): type is StringFormatType {
+    return (STRING_FORMAT_TYPES as readonly string[]).includes(type)
+}
+
 /**
- * Map values stored under the previous (engine-misaligned) vocabulary
- * back to the engine's FieldTypes. Keeps existing projects loadable
- * after the rename. Returns the original value when no mapping applies
- * so unknown values stay visible (rather than silently swallowed).
+ * Map engine widget types and legacy aliases to Zod primitives on load.
+ * Returns the original value when no mapping applies so unknown types
+ * stay visible. 'object' is intentionally NOT mapped — FormList uses it
+ * as a nested-struct marker alongside fields[].
  */
 const LEGACY_TYPE_MAP: Record<string, { type: string; isList?: boolean }> = {
+    // Engine FIELD_TYPES (utils/constants.ts) — UI widgets → Zod
+    text: { type: 'string' },
+    password: { type: 'string' },
+    tel: { type: 'string' },
+    color: { type: 'string' },
+    select: { type: 'string' },
+    select2: { type: 'string' },
+    radio: { type: 'string' },
+    time: { type: 'string' },
+    range: { type: 'number' },
+    checkbox: { type: 'boolean' },
+    switch: { type: 'boolean' },
+    button: { type: 'boolean' },
+    // Legacy / aliases
     string: { type: 'string' },
-    boolean: { type: 'checkbox' },
-    email: { type: 'string' },
-    url: { type: 'string' },
+    boolean: { type: 'boolean' },
+    textarea: { type: 'string' },
     array: { type: 'string', isList: true },
-    integer: { type: 'number' }
-    // 'object' is intentionally NOT mapped — extractValidFields uses it
-    // as an internal marker for nested struct (FormList) entries, and
-    // the engine treats fields[] presence as the actual struct signal.
+    integer: { type: 'number' },
+    long: { type: 'number' },
+    double: { type: 'number' },
+    float: { type: 'number' },
+    datetime: { type: 'date' }
+}
+
+function applyTypeSelection(
+    field: LabeledElementField,
+    selectedType: string
+): LabeledElementField {
+    const validation: FieldValidation = {
+        ...(field.validation ?? {}),
+        errors: field.validation?.errors ?? []
+    }
+    delete validation.email
+    delete validation.url
+    delete validation.uuid
+
+    if (isStringFormatType(selectedType)) {
+        validation[selectedType] = true
+        return { ...field, type: selectedType, validation }
+    }
+
+    const mapped = LEGACY_TYPE_MAP[selectedType]
+    return {
+        ...field,
+        type: mapped?.type ?? selectedType,
+        ...(mapped?.isList !== undefined ? { isList: mapped.isList } : {}),
+        validation
+    }
+}
+
+/** Persist UI presets as `string` + validation flags for codegen. */
+function fieldToPersistedFormat(field: LabeledElementField): LabeledElementField {
+    const nested = field.fields?.map(fieldToPersistedFormat)
+
+    if (isStringFormatType(field.type)) {
+        const format = field.type
+        const { email: _e, url: _u, uuid: _i, ...restValidation } = field.validation ?? {}
+        const validation: FieldValidation = {
+            ...restValidation,
+            errors: field.validation?.errors ?? [],
+            [format]: true
+        }
+        return {
+            ...field,
+            type: 'string',
+            validation,
+            ...(nested ? { fields: nested } : {})
+        }
+    }
+
+    const mapped = LEGACY_TYPE_MAP[field.type]
+    if (!mapped && !nested) return field
+    return {
+        ...field,
+        ...(mapped ? { type: mapped.type, isList: mapped.isList ?? field.isList } : {}),
+        ...(nested ? { fields: nested } : {})
+    }
 }
 
 /**
@@ -120,15 +188,26 @@ function deriveFieldName(child: StructuredComponent): string {
     return child.id ?? ''
 }
 
-function normalizeFieldType<T extends { type: string; isList?: boolean; fields?: any[] }>(
-    field: T
-): T {
+function normalizeFieldType<
+    T extends { type: string; isList?: boolean; fields?: any[]; validation?: FieldValidation }
+>(field: T): T {
     const mapped = LEGACY_TYPE_MAP[field.type]
+    let type = mapped?.type ?? field.type
+    const isList = mapped?.isList ?? field.isList
+
+    const v = field.validation
+    if (type === 'string' && v) {
+        if (v.email) type = 'email'
+        else if (v.url) type = 'url'
+        else if (v.uuid) type = 'uuid'
+    }
+
     const nested = field.fields ? field.fields.map(normalizeFieldType) : undefined
-    if (!mapped && !nested) return field
+    if (type === field.type && isList === field.isList && !nested) return field
     return {
         ...field,
-        ...(mapped ? { type: mapped.type, isList: mapped.isList ?? field.isList } : {}),
+        type,
+        ...(isList !== field.isList ? { isList } : {}),
         ...(nested ? { fields: nested } : {})
     }
 }
@@ -195,23 +274,13 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
 
         switch (field.type) {
             case 'number':
-            case 'range':
                 return '0'
-            case 'checkbox':
-            case 'switch':
+            case 'boolean':
                 return 'false'
             case 'date':
-            case 'time':
                 return 'new Date()'
             case 'string':
-            case 'password':
-            case 'tel':
-            case 'color':
             case 'file':
-            case 'select':
-            case 'select2':
-            case 'radio':
-            case 'button':
                 return ''
             default:
                 return ''
@@ -249,18 +318,22 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
         const updatedComponent = {
             ...values,
             fields: (values.fields as LabeledElementField[]).map((field) => {
+                const persisted = fieldToPersistedFormat(field)
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const { label, ...rest } = field // Removes the 'label' property
+                const { label, ...rest } = persisted
                 return {
                     ...rest,
                     type: rest.type || 'string',
-                    defaultValue: getDefaultValue(field),
+                    defaultValue: getDefaultValue(persisted),
                     ...(rest.fields && {
-                        fields: rest.fields.map((field) => ({
-                            ...field,
-                            type: field.type || 'string',
-                            defaultValue: getDefaultValue(field)
-                        }))
+                        fields: rest.fields.map((nested) => {
+                            const nestedPersisted = fieldToPersistedFormat(nested)
+                            return {
+                                ...nestedPersisted,
+                                type: nestedPersisted.type || 'string',
+                                defaultValue: getDefaultValue(nestedPersisted)
+                            }
+                        })
                     })
                 }
             })
@@ -393,7 +466,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                         } */
                     ]
                   : []),
-              { key: 'defaultValue', name: t('defaultValue'), type: 'string' },
+              { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
               {
                   key: 'group',
                   name: '',
@@ -485,14 +558,16 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             }
 
             if (shouldInclude && !parentIsRepeater) {
-                fields.push({
-                    ...defaultFieldType,
-                    name: deriveFieldName(child),
-                    componentId: child.id,
-                    label: child.properties.label ?? child.properties.headerTitle ?? child.label,
-                    // Include type if available
-                    type: child.properties.dataProperties?.type || undefined
-                })
+                const inferredType = child.properties.dataProperties?.type || 'string'
+                fields.push(
+                    normalizeFieldType({
+                        ...defaultFieldType,
+                        name: deriveFieldName(child),
+                        componentId: child.id,
+                        label: child.properties.label ?? child.properties.headerTitle ?? child.label,
+                        type: inferredType
+                    })
+                )
 
                 componentMap.set(child.id, child)
             }
@@ -559,6 +634,11 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             handleChangeValueObject(formik, 'required', position, field.required, 'fields')
 
             handleChangeValueObject(formik, 'name', position, result, 'fields')
+        } else if (element === 'type') {
+            const fields = [...(formik.values.fields || [])]
+            const current = fields[position] as LabeledElementField
+            fields[position] = applyTypeSelection(current, String(result))
+            formik.setFieldValue('fields', fields)
         } else {
             handleChangeValueObject(formik, element, position, result, 'fields')
         }

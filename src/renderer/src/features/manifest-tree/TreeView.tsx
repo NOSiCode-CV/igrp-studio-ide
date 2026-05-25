@@ -75,9 +75,12 @@ export const TreeView = ({
                 <div
                     className={cn(
                         'flex shrink-0 items-center gap-2 border-b px-3 py-1.5 text-[11px]',
+                        // Semi-transparent tints so the banner reads on both
+                        // light + dark themes — solid `bg-red-50` etc. would
+                        // wash out in dark mode.
                         inline.kind === 'block'
-                            ? 'border-red-200 bg-red-50 text-red-700'
-                            : 'border-amber-200 bg-amber-50 text-amber-700'
+                            ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                            : 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400'
                     )}
                 >
                     <AlertCircle size={11} />
