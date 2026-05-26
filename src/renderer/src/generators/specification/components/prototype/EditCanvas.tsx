@@ -25,6 +25,7 @@ import {
     PropsPanel,
     type TreeCallbacks
 } from '@renderer/features/manifest-tree'
+import { Button } from '@renderer/components/ui/button'
 import { useEngineCatalog } from '@renderer/features/engine-catalog'
 import type { RootState } from '@renderer/redux'
 import {
@@ -135,7 +136,7 @@ export const EditCanvas = ({ basePath }: EditCanvasProps): JSX.Element => {
     }, [root, selectedId])
 
     return (
-        <div className="flex h-full flex-col overflow-hidden rounded-xl border bg-card/30">
+        <div className="flex h-full flex-col overflow-hidden rounded-xl border bg-background">
             <CanvasHeader
                 pageName={manifest?.pageName}
                 dirty={dirty}
@@ -251,21 +252,21 @@ const CanvasHeader = ({
                 {statusIcon}
                 <span className={cn(error && 'text-destructive')}>{statusLabel}</span>
             </div>
-            <button
+            <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={onSaveNow}
                 disabled={!dirty || saving}
-                className={cn(
-                    'flex items-center gap-1 rounded-md border px-2 py-1 text-[10.5px] font-medium transition-colors',
-                    dirty && !saving
-                        ? 'border-primary/30 bg-primary/10 text-primary hover:bg-primary/15'
-                        : 'border-border bg-card text-muted-foreground/60 cursor-not-allowed'
-                )}
                 title="Force save now (overrides the 500ms debounce)"
+                className={cn(
+                    'h-7 gap-1 text-[10.5px]',
+                    dirty && !saving && 'border-primary/30 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary'
+                )}
             >
                 <Save size={11} />
                 Save now
-            </button>
+            </Button>
         </header>
     )
 }

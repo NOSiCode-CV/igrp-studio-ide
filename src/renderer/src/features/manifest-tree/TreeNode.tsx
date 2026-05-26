@@ -13,6 +13,7 @@
  */
 
 import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import { Button } from '@renderer/components/ui/button'
 import { resolveIcon } from '@renderer/features/component-icons'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { cn } from '@renderer/lib/utils'
@@ -192,17 +193,24 @@ export const TreeNode = ({
                 tabIndex={0}
             >
                 {hasChildren ? (
-                    <button
+                    // shadcn Button with size override — the default `size="icon"`
+                    // is 36×36 which is way too big for an inline tree chevron;
+                    // we collapse to 16×16 to fit the row height. Variant `ghost`
+                    // gives us the right hover + focus-visible ring out of the
+                    // box (theme-aware on light + dark).
+                    <Button
                         type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={(e) => {
                             e.stopPropagation()
                             setOpen((v) => !v)
                         }}
-                        className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-accent"
                         aria-label={open ? 'Collapse' : 'Expand'}
+                        className="h-4 w-4 shrink-0 rounded text-muted-foreground"
                     >
                         {open ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
-                    </button>
+                    </Button>
                 ) : (
                     <span className="w-4 shrink-0" />
                 )}

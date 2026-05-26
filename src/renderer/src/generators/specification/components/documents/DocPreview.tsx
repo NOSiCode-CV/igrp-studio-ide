@@ -47,7 +47,7 @@ export const DocPreview = forwardRef<HTMLDivElement, DocPreviewProps>(function D
         )
     }
     return (
-        <div ref={ref} className="h-full overflow-y-auto bg-card/10">
+        <div ref={ref} className="h-full overflow-y-auto bg-background">
             <div className="markdown-body prose prose-sm mx-auto max-w-2xl p-12 dark:prose-invert">
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={SOURCE_LINE_COMPONENTS}>
                     {content}

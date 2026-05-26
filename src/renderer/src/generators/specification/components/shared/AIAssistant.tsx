@@ -849,7 +849,10 @@ export function AIAssistant({
     }, [contextProvider, messages.length, useKB])
 
     return (
-        <div className={cn('flex h-full flex-col bg-card/30', className)}>
+        // No background of our own — the parent aside / column owns the
+        // surface colour (e.g. `bg-sidebar` in PrototypePanel, `bg-background`
+        // in DocTabPane). Stays consistent with the rest of the app shell.
+        <div className={cn('flex h-full flex-col', className)}>
             <header className="flex h-10 shrink-0 items-center justify-between border-b px-3">
                 <div className="flex items-center gap-2 text-xs">
                     <MessageSquare size={12} className="text-primary" />

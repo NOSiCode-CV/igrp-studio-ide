@@ -1259,7 +1259,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                 maxSize="50%"
                 onResize={onResizeChat}
             >
-                <aside className="flex h-full w-full flex-col border-r bg-card/30">
+                <aside className="flex h-full w-full flex-col border-r bg-sidebar">
                     <ChatPanelTabs
                         mode={chatPanelMode}
                         onChangeMode={setChatPanelMode}
@@ -1339,7 +1339,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
 
             {/* Main */}
             <Panel id="proto-main" minSize="40%">
-                <main className="flex h-full w-full flex-col bg-card/10">
+                <main className="flex h-full w-full flex-col bg-background">
                     {devStatus.installing && <FirstRunBanner />}
                     {/* Recommend the `igrp-studio-metadata` skill when it
                         isn't installed yet — generation quality drops
@@ -1447,11 +1447,10 @@ const ChatPanelTabs = ({
     onChangeMode: (next: ChatPanelMode) => void
     pinnedCount: number
 }): JSX.Element => (
-    // Stronger contrast against the panel's `bg-card/30` so the tab row reads
-    // as a control surface (not decoration). Solid background + thicker
-    // bottom border + slightly taller (40px) makes it the first thing the
-    // eye lands on when scanning the panel.
-    <div className="flex h-10 shrink-0 items-center gap-1 border-b border-border/80 bg-background/60 px-2">
+    // Sits on top of the `bg-sidebar` aside; we use the same sidebar token
+    // (instead of an opacity-tinted background) so the tab row reads as part
+    // of the rail rather than a different surface.
+    <div className="flex h-10 shrink-0 items-center gap-1 border-b border-border/80 bg-sidebar px-2">
         <ChatPanelTabButton
             active={mode === 'chat'}
             onClick={() => onChangeMode('chat')}
@@ -2408,7 +2407,7 @@ const FilesPane = ({ basePath }: { basePath?: string }): JSX.Element => {
     const tree = useMemo(() => buildTree(files, changedPaths), [files, changedPaths])
 
     return (
-        <div className="flex h-full overflow-hidden rounded-xl border bg-card/30">
+        <div className="flex h-full overflow-hidden rounded-xl border bg-background">
             <aside className="flex w-64 shrink-0 flex-col border-r bg-card">
                 <div className="flex items-center justify-between border-b p-3">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -2926,7 +2925,7 @@ const HistoryPane = ({ basePath }: { basePath?: string }): JSX.Element => {
                 </button>
             </div>
             {snapshots.length === 0 ? (
-                <div className="rounded-xl border border-dashed bg-card/30 p-8 text-center">
+                <div className="rounded-xl border border-dashed bg-muted/30 p-8 text-center">
                     <History size={28} className="mx-auto mb-3 text-muted-foreground/40" />
                     <p className="text-sm font-medium">No snapshots yet</p>
                     <p className="mt-1 text-xs text-muted-foreground">

@@ -17,6 +17,11 @@
  */
 
 import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import { Button } from '@renderer/components/ui/button'
+import { Checkbox } from '@renderer/components/ui/checkbox'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Textarea } from '@renderer/components/ui/textarea'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { cn } from '@renderer/lib/utils'
 import { Trash2 } from 'lucide-react'
@@ -136,22 +141,21 @@ export const PropsPanel = ({
                         />
 
                         <div className="border-t pt-3">
-                            <button
+                            {/* `variant="outline"` + theme-aware destructive
+                                tones — same as before but via shadcn Button so
+                                hover / disabled / focus states match the rest
+                                of the app. */}
+                            <Button
                                 type="button"
+                                variant="outline"
+                                size="sm"
                                 disabled={!canDelete}
                                 onClick={() => onRemove(node.id)}
-                                className={cn(
-                                    'flex w-full items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-[11px] font-medium transition-colors',
-                                    // Theme-aware: `destructive` token resolves
-                                    // to red in light mode + a brighter red in
-                                    // dark mode. Semi-transparent hover keeps
-                                    // contrast on both backgrounds.
-                                    'border-destructive/40 text-destructive hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-40'
-                                )}
+                                className="w-full gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
                             >
                                 <Trash2 size={11} />
                                 Delete node
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 )}
@@ -187,15 +191,15 @@ const LabelField = ({
     onChange: (e: ChangeEvent<HTMLInputElement>) => void
 }): JSX.Element => (
     <div>
-        <div className="mb-1 text-[9.5px] font-bold uppercase tracking-wide text-muted-foreground">
+        <Label className="mb-1 text-[9.5px] font-bold uppercase tracking-wide text-muted-foreground">
             label
-        </div>
-        <input
+        </Label>
+        <Input
             type="text"
             value={value}
             onChange={onChange}
             placeholder="(no label)"
-            className="w-full rounded-md border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20"
+            className="h-7 text-[11px]"
         />
     </div>
 )
@@ -233,36 +237,35 @@ const PropertyField = ({
                 )}
             </div>
             {fieldType === 'boolean' ? (
-                <label className="flex cursor-pointer items-center gap-1.5 text-[11px]">
-                    <input
-                        type="checkbox"
+                <Label className="flex cursor-pointer items-center gap-1.5 text-[11px] font-normal">
+                    <Checkbox
                         checked={Boolean(value)}
-                        onChange={(e) => onChange(e.target.checked)}
+                        onCheckedChange={(checked) => onChange(checked === true)}
                         className="h-3.5 w-3.5"
                     />
                     <span className="text-muted-foreground">
                         {Boolean(value) ? 'true' : 'false'}
                     </span>
-                </label>
+                </Label>
             ) : fieldType === 'number' ? (
-                <input
+                <Input
                     type="number"
                     value={typeof value === 'number' ? value : ''}
                     onChange={(e) => {
                         const n = Number(e.target.value)
                         onChange(Number.isFinite(n) ? n : 0)
                     }}
-                    className="w-full rounded-md border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20"
+                    className="h-7 text-[11px]"
                 />
             ) : fieldType === 'string' ? (
-                <input
+                <Input
                     type="text"
                     value={typeof value === 'string' ? value : ''}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={
                         typeof defaultValue === 'string' && defaultValue ? defaultValue : '(empty)'
                     }
-                    className="w-full rounded-md border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20"
+                    className="h-7 text-[11px]"
                 />
             ) : (
                 <JsonField value={value} onChange={onChange} />
@@ -293,7 +296,7 @@ const JsonField = ({
 
     return (
         <div>
-            <textarea
+            <Textarea
                 value={draft}
                 onChange={(e) => {
                     const text = e.target.value
@@ -307,13 +310,12 @@ const JsonField = ({
                     }
                 }}
                 rows={3}
-                className={cn(
-                    'w-full resize-y rounded-md border bg-background px-2 py-1 font-mono text-[10.5px] outline-none focus:ring-1',
-                    parseError
-                        ? 'border-destructive/60 focus:border-destructive focus:ring-destructive/30'
-                        : 'focus:border-primary/60 focus:ring-primary/20'
-                )}
                 spellCheck={false}
+                className={cn(
+                    'resize-y font-mono text-[10.5px]',
+                    parseError &&
+                        'border-destructive/60 focus-visible:border-destructive focus-visible:ring-destructive/30'
+                )}
             />
             {parseError && (
                 <p className="mt-0.5 text-[9.5px] text-destructive">{parseError}</p>

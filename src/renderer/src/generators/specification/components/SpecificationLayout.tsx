@@ -84,7 +84,7 @@ const SecondaryPanel = ({
                 : 'Prototype'
 
     return (
-        <aside className="flex w-[320px] flex-col border-r bg-sidebar/40">
+        <aside className="flex w-[320px] flex-col border-r bg-sidebar">
             <header className="flex h-12 shrink-0 items-center justify-between border-b px-4">
                 <h2 className="text-sm font-semibold">{title}</h2>
             </header>
