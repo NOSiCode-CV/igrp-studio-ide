@@ -3,19 +3,16 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
-import { Label } from '@renderer/components/ui/label'
 import { Switch } from '@renderer/components/ui/switch'
 import { Textarea } from '@renderer/components/ui/textarea'
 import {
-    IGRPCard,
     IGRPModalDialog,
     IGRPModalDialogContent,
     IGRPModalDialogDescription,
     IGRPModalDialogFooter,
     IGRPModalDialogHeader,
     IGRPModalDialogTitle,
-    IGRPModalDialogTrigger,
-    IGRPSeparator
+    IGRPModalDialogTrigger
 } from '@igrp/igrp-framework-react-design-system'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
@@ -105,7 +102,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
             <div className="flex min-h-[480px]">
 
                 {/* Left nav panel */}
-                <div className="w-[200px] shrink-0 flex flex-col gap-0.5 border-r p-3">
+                <div className="w-[200px] shrink-0 flex flex-col gap-0.5 border-r p-3 bg-sidebar shadow-[2px_0_6px_rgba(0,0,0,0.06)]">
                     <div className="relative mb-2">
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                         <Input
@@ -150,7 +147,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                 </div>
 
                 {/* Right content */}
-                <main className="flex flex-1 flex-col overflow-auto">
+                <main className="flex flex-col overflow-auto w-full max-w-2xl mx-auto">
                     <AnimatePresence mode="wait">
 
                         {/* General */}
@@ -170,13 +167,13 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 <div className="mx-6 border-t" />
                                 <div className="mx-6 mt-4 mb-2 border rounded-lg overflow-hidden">
                                     <div className="divide-y">
-                                        <div className="py-3 px-4 flex items-start justify-between gap-4">
-                                            <div className="min-w-0">
+                                        <div className="py-3 px-4 flex items-start gap-4">
+                                            <div className="w-2/5 shrink-0">
                                                 <p className="text-xs font-medium">{t('workspaceId')}</p>
                                                 <p className="text-xs text-muted-foreground mt-0.5">{t('workspaceIdDescription')}</p>
                                             </div>
-                                            <div className="flex items-start gap-1 shrink-0">
-                                                <div className="font-mono text-xs bg-muted/50 border rounded-md px-2 py-1.5 w-[160px] break-all leading-tight">
+                                            <div className="flex items-start gap-1 flex-1 min-w-0">
+                                                <div className="font-mono text-xs bg-muted/50 border rounded-md px-2 py-1.5 flex-1 min-w-0 break-all leading-tight">
                                                     {workspace.id}
                                                 </div>
                                                 <Button
@@ -192,8 +189,8 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                                 </Button>
                                             </div>
                                         </div>
-                                        <div className="py-3 px-4 flex items-start justify-between gap-4">
-                                            <div className="min-w-0">
+                                        <div className="py-3 px-4 flex items-start gap-4">
+                                            <div className="w-2/5 shrink-0">
                                                 <p className="text-xs font-medium">{t('nameDescription')}</p>
                                                 <p className="text-xs text-muted-foreground mt-0.5">{t('workspaceNameHint')}</p>
                                             </div>
@@ -201,11 +198,11 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                                 id="workspace-name"
                                                 value={workspaceName}
                                                 onChange={(e) => setWorkspaceName(e.target.value)}
-                                                className="h-8 text-xs w-[200px] shrink-0"
+                                                className="h-8 text-xs flex-1"
                                             />
                                         </div>
-                                        <div className="py-3 px-4 flex items-start justify-between gap-4">
-                                            <div className="min-w-0">
+                                        <div className="py-3 px-4 flex items-start gap-4">
+                                            <div className="w-2/5 shrink-0">
                                                 <p className="text-xs font-medium">{t('description')}</p>
                                                 <p className="text-xs text-muted-foreground mt-0.5">{t('workspaceDescriptionHint')}</p>
                                             </div>
@@ -213,7 +210,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                                 id="workspace-description"
                                                 value={workspaceDescription}
                                                 onChange={(e) => setWorkspaceDescription(e.target.value)}
-                                                className="h-20 text-xs resize-none w-[200px] shrink-0"
+                                                className="h-20 text-xs resize-none flex-1"
                                             />
                                         </div>
                                     </div>
