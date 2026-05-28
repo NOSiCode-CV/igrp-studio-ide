@@ -6,6 +6,8 @@ import type { IDocker } from 'src/main/interfaces'
 import type { DockerComposeConfig, IWorkspace, ProjectData, ServiceInfo } from 'src/main/types'
 
 const AUTO_REFRESH_INTERVAL_MS = 5000
+const ACTION_STATUS_REFRESH_ATTEMPTS = 6
+const ACTION_STATUS_REFRESH_DELAY_MS = 900
 type NginxRoute = { route: string; upstreamHost: string }
 type NginxRouting = { listenPort: number; routes: NginxRoute[] }
 
@@ -155,6 +157,52 @@ export function useDocker({
             }
         },
         [isDockerRunning, dockerOperations, checkDocker, workspace?.path]
+    )
+
+    const fetchStatus = useCallback(async (): Promise<ServiceInfo[]> => {
+        if (!workspace?.path) return []
+        return await dockerOperations.status(workspace.path)
+    }, [dockerOperations, workspace?.path])
+
+    const refreshUntilStatusChanges = useCallback(
+        async (targetServiceNames?: string[]): Promise<void> => {
+            const tracked = (targetServiceNames || [])
+                .map((name) => name?.trim())
+                .filter((name): name is string => Boolean(name))
+
+            const previousStatusByService = new Map<string, string>()
+            if (tracked.length > 0) {
+                tracked.forEach((name) => {
+                    const previous = services.find((svc) => svc.name === name)?.status || 'unknown'
+                    previousStatusByService.set(name, previous)
+                })
+            }
+
+            for (let attempt = 0; attempt < ACTION_STATUS_REFRESH_ATTEMPTS; attempt++) {
+                const nextServices = await fetchStatus()
+
+                if (previousStatusByService.size === 0) {
+                    if (attempt === 0) return
+                } else {
+                    const changed = Array.from(previousStatusByService.entries()).some(
+                        ([name, previousStatus]) => {
+                            const currentStatus =
+                                nextServices.find((svc) => svc.name === name)?.status || 'unknown'
+                            return currentStatus !== previousStatus
+                        }
+                    )
+
+                    if (changed) return
+                }
+
+                if (attempt < ACTION_STATUS_REFRESH_ATTEMPTS - 1) {
+                    await new Promise((resolve) =>
+                        window.setTimeout(resolve, ACTION_STATUS_REFRESH_DELAY_MS)
+                    )
+                }
+            }
+        },
+        [fetchStatus, services]
     )
 
     const getServiceUrl = (service: ServiceInfo): string | null => {
@@ -451,18 +499,22 @@ export function useDocker({
         loadComposeFile,
         startContainers: async () => {
             await handleDockerOperation('up')
+            await refreshUntilStatusChanges()
         },
         stopContainers: async (dropVolume: boolean) => {
             await handleDockerOperation('down', { dropVolume })
+            await refreshUntilStatusChanges()
         },
         refreshContainers: async () => {
-            await handleDockerOperation('status')
+            await fetchStatus()
         },
         stopService: async (services?: string[]) => {
             await handleDockerOperation('stop', { services })
+            await refreshUntilStatusChanges(services)
         },
         restartService: async (services?: string[], timeout?: number) => {
             await handleDockerOperation('restart', { services, timeout })
+            await refreshUntilStatusChanges(services)
         }
     }
 }

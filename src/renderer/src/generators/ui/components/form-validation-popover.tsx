@@ -30,7 +30,9 @@ function hasValidationValue(value: unknown): boolean {
 }
 
 function formatValidationInputValue(value: unknown): string | number {
-    return typeof value === 'number' ? value : (value ?? '')
+    if (typeof value === 'number') return value
+    if (typeof value === 'string') return value
+    return ''
 }
 
 export function FormValidationPopover({

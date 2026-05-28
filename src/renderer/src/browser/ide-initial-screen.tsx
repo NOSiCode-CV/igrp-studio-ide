@@ -69,15 +69,17 @@ const IDEInitialScreen = (): React.JSX.Element => {
     }
 
     return (
-        <div className="mx-auto p-6 space-y-6 flex flex-col h-full">
+        <div className="mx-auto flex h-[calc(100svh-var(--header-height-two))] min-h-[calc(100svh-var(--header-height-two))] flex-col overflow-hidden p-6">
             {showBlockingCreateWorkspace && (
                 <CreateWorkspace open preventDismiss mode="dialog" onOpenChange={() => undefined} />
             )}
             {workspace ? (
-                <>
-                    <WelcomeHeader />
-                    <Tabs defaultValue="resources">
-                        <TabsList className="mb-3">
+                <Tabs defaultValue="resources" className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                    <div
+                        className="sticky top-0 z-40 space-y-3 border-b border-slate-200 bg-background/95 pb-3 backdrop-blur supports-[backdrop-filter]:bg-background/90"
+                    >
+                        <WelcomeHeader />
+                        <TabsList className="w-fit">
                             <TabsTrigger value="resources">
                                 <FolderKanban className="h-3.5 w-3.5 mr-1.5" />
                                 {t('resources')}
@@ -99,31 +101,31 @@ const IDEInitialScreen = (): React.JSX.Element => {
                                 {t('settings')}
                             </TabsTrigger>
                         </TabsList>
+                    </div>
 
-                        <TabsContent value="resources" className="mt-0 space-y-6">
-                            {workspace && <Resources />}
-                        </TabsContent>
+                    <TabsContent value="resources" className="mt-0 min-h-0 overflow-y-auto space-y-6 pt-4">
+                        {workspace && <Resources />}
+                    </TabsContent>
 
-                        <TabsContent
-                            value="diagram"
-                            className="mt-0 h-[calc(100vh-var(--header-height-two)-8rem)]"
-                        >
-                            <WorkspaceDiagram workspace={workspace} changeStatus={changeStatus} />
-                        </TabsContent>
+                    <TabsContent
+                        value="diagram"
+                        className="mt-0 min-h-0 overflow-y-auto pt-4"
+                    >
+                        <WorkspaceDiagram workspace={workspace} changeStatus={changeStatus} />
+                    </TabsContent>
 
-                        <TabsContent value="config" className="mt-0">
-                            <WorkspaceDocker workspace={workspace} />
-                        </TabsContent>
+                    <TabsContent value="config" className="mt-0 min-h-0 overflow-y-auto pt-4">
+                        <WorkspaceDocker workspace={workspace} />
+                    </TabsContent>
 
-                        <TabsContent value="services" className="mt-0">
-                            <WorkspaceServices workspaceId={workspace.id} />
-                        </TabsContent>
+                    <TabsContent value="services" className="mt-0 flex h-0 min-h-0 flex-1 flex-col overflow-hidden pt-4">
+                        <WorkspaceServices workspaceId={workspace.id} />
+                    </TabsContent>
 
-                        <TabsContent value="settings" className="mt-0">
-                            <WorkspaceSettings workspace={workspace} />
-                        </TabsContent>
-                    </Tabs>
-                </>
+                    <TabsContent value="settings" className="mt-0 min-h-0 overflow-y-auto pt-4">
+                        <WorkspaceSettings workspace={workspace} />
+                    </TabsContent>
+                </Tabs>
             ) : null}
         </div>
     )
