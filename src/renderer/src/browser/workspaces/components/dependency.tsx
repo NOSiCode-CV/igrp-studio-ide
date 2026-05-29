@@ -1,6 +1,14 @@
 import { Badge } from '@renderer/components/ui/badge'
 import { cn } from '@renderer/lib/utils'
 import { Layers } from 'lucide-react'
+import {
+    type PointerEvent as ReactPointerEvent,
+    type WheelEvent as ReactWheelEvent,
+    useCallback,
+    useEffect,
+    useRef,
+    useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import { getServiceColor } from '../services'
 
@@ -18,6 +26,11 @@ interface DependencySummaryProps {
     className?: string
 }
 
+type PopoverAlign = 'left' | 'right'
+
+const DEPENDENCY_POPOVER_WIDTH = 220
+const VIEWPORT_SAFE_MARGIN = 16
+
 const normalizeDependencies = (
     dependsOn?: Array<string | Record<string, DependencyConfig>>
 ): string[] => {
@@ -33,10 +46,118 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
     const dependencies = normalizeDependencies(dependsOn)
     const primaryDependency = dependencies[0]
     const hiddenCount = Math.max(dependencies.length - 1, 0)
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+    const [popoverAlign, setPopoverAlign] = useState<PopoverAlign>('left')
+    const rootRef = useRef<HTMLDivElement | null>(null)
+    const popoverRef = useRef<HTMLDivElement | null>(null)
+    const dragStateRef = useRef<{
+        pointerId: number | null
+        startX: number
+        startScrollLeft: number
+    }>({
+        pointerId: null,
+        startX: 0,
+        startScrollLeft: 0
+    })
+
+    const resolvePopoverAlign = useCallback(() => {
+        const root = rootRef.current
+        if (!root) {
+            setPopoverAlign('left')
+            return
+        }
+
+        const rect = root.getBoundingClientRect()
+        const overflowRight = rect.left + DEPENDENCY_POPOVER_WIDTH > window.innerWidth - VIEWPORT_SAFE_MARGIN
+        setPopoverAlign(overflowRight ? 'right' : 'left')
+    }, [])
+
+    const openPopover = (): void => {
+        if (hiddenCount <= 0) return
+        resolvePopoverAlign()
+        setIsPopoverOpen(true)
+    }
+
+    const closePopover = (): void => {
+        setIsPopoverOpen(false)
+    }
+
+    useEffect(() => {
+        if (!isPopoverOpen) return
+
+        const handleResize = (): void => {
+            resolvePopoverAlign()
+        }
+
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [isPopoverOpen, resolvePopoverAlign])
+
+    useEffect(() => {
+        const popover = popoverRef.current
+        if (!popover || !isPopoverOpen) return
+
+        const handleWheel = (event: WheelEvent): void => {
+            event.preventDefault()
+            event.stopPropagation()
+            const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
+            popover.scrollLeft += delta
+        }
+
+        popover.addEventListener('wheel', handleWheel, { passive: false })
+        return () => popover.removeEventListener('wheel', handleWheel)
+    }, [isPopoverOpen])
+
+    const handlePopoverWheel = (event: ReactWheelEvent<HTMLDivElement>): void => {
+        event.preventDefault()
+        event.stopPropagation()
+        const delta =
+            Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
+        event.currentTarget.scrollLeft += delta
+    }
+
+    const handlePopoverPointerDown = (event: ReactPointerEvent<HTMLDivElement>): void => {
+        if (event.button !== 0) return
+        const target = event.currentTarget
+        dragStateRef.current = {
+            pointerId: event.pointerId,
+            startX: event.clientX,
+            startScrollLeft: target.scrollLeft
+        }
+        target.setPointerCapture(event.pointerId)
+    }
+
+    const handlePopoverPointerMove = (event: ReactPointerEvent<HTMLDivElement>): void => {
+        const state = dragStateRef.current
+        if (state.pointerId !== event.pointerId) return
+        const target = event.currentTarget
+        const dx = event.clientX - state.startX
+        target.scrollLeft = state.startScrollLeft - dx
+    }
+
+    const handlePopoverPointerUp = (event: ReactPointerEvent<HTMLDivElement>): void => {
+        const state = dragStateRef.current
+        if (state.pointerId !== event.pointerId) return
+        const target = event.currentTarget
+        if (target.hasPointerCapture(event.pointerId)) {
+            target.releasePointerCapture(event.pointerId)
+        }
+        dragStateRef.current.pointerId = null
+    }
 
     return (
-        <div className={cn('group/deps relative min-w-0', className)}>
-            <div className="flex min-w-0 items-center gap-1.5">
+        <div
+            ref={rootRef}
+            className={cn('relative min-w-0', className)}
+            onMouseEnter={openPopover}
+            onMouseLeave={closePopover}
+        >
+            <div
+                className={cn(
+                    'flex min-w-0 items-center gap-1.5 transition-opacity duration-150',
+                    hiddenCount > 0 && isPopoverOpen ? 'opacity-0' : 'opacity-100'
+                )}
+            >
                 <Layers className="h-3.5 w-3.5 shrink-0 text-slate-300 dark:text-slate-600" />
                 {dependencies.length === 0 ? (
                     <span className="text-xs text-slate-400 dark:text-slate-500">{t('none')}</span>
@@ -44,14 +165,14 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
                     <>
                         <Badge
                             variant="outline"
-                            className="max-w-[130px] truncate border-blue-100 bg-blue-50 text-xs font-medium text-blue-700 dark:border-blue-900/70 dark:bg-blue-900/30 dark:text-blue-300"
+                            className="max-w-[130px] truncate border-slate-200 bg-white text-xs font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
                         >
                             {primaryDependency}
                         </Badge>
                         {hiddenCount > 0 ? (
                             <Badge
                                 variant="outline"
-                                className="shrink-0 border-blue-100 bg-blue-50 text-xs font-semibold text-blue-700 dark:border-blue-900/70 dark:bg-blue-900/30 dark:text-blue-300"
+                                className="shrink-0 border-slate-200 bg-white text-xs font-semibold text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
                             >
                                 +{hiddenCount}
                             </Badge>
@@ -61,12 +182,27 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
             </div>
 
             {hiddenCount > 0 ? (
-                <div className="absolute top-full left-0 z-30 mt-1 hidden max-w-[420px] min-w-max items-center gap-1 overflow-x-auto rounded-lg border border-slate-200 bg-white px-2 py-1.5 shadow-[0_14px_40px_-12px_rgba(15,23,42,0.35)] group-hover/deps:flex dark:border-slate-700 dark:bg-slate-900">
+                <div
+                    ref={popoverRef}
+                    onWheel={handlePopoverWheel}
+                    onWheelCapture={handlePopoverWheel}
+                    onPointerDown={handlePopoverPointerDown}
+                    onPointerMove={handlePopoverPointerMove}
+                    onPointerUp={handlePopoverPointerUp}
+                    onPointerCancel={handlePopoverPointerUp}
+                    className={cn(
+                        'absolute top-0 z-30 flex w-[220px] flex-nowrap items-center gap-1.5 overflow-x-scroll overflow-y-hidden overscroll-x-contain overscroll-y-none rounded-xl border border-slate-200 bg-white px-2 py-1.5 shadow-2xl scrollbar-none transition duration-150 ease-out [touch-action:pan-x] dark:border-slate-700 dark:bg-slate-900',
+                        popoverAlign === 'right' ? 'right-0' : 'left-0',
+                        isPopoverOpen
+                            ? 'pointer-events-auto scale-100 opacity-100 cursor-grab'
+                            : 'pointer-events-none scale-95 opacity-0'
+                    )}
+                >
                     {dependencies.map((dependency, index) => (
                         <Badge
                             key={`${dependency}-${index}`}
                             variant="outline"
-                            className="shrink-0 border-blue-100 bg-blue-50 text-xs font-medium text-blue-700 dark:border-blue-900/70 dark:bg-blue-900/30 dark:text-blue-300"
+                            className="shrink-0 border-slate-200 bg-white text-xs font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
                         >
                             {dependency}
                         </Badge>

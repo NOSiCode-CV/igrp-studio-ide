@@ -65,10 +65,8 @@ export function ServiceGrid({ services, showFilter = true, onActionComplete }: S
                     return (
                         <div
                             key={index}
-                            className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900 dark:hover:shadow-black/25"
+                            className="group relative overflow-visible rounded-xl border border-slate-200 bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900 dark:hover:shadow-black/25"
                         >
-                            <div className="pointer-events-none absolute inset-0 rounded-xl bg-teal-500 opacity-0 transition-opacity duration-200 group-hover:opacity-10 dark:bg-teal-400 dark:group-hover:opacity-10" />
-
                             <div className="relative z-10 flex items-start justify-between gap-2 border-b border-slate-100 px-3 py-3 dark:border-slate-700">
                                 <div className="flex min-w-0 items-center gap-2">
                                     <span
@@ -113,7 +111,7 @@ export function ServiceGrid({ services, showFilter = true, onActionComplete }: S
                             </div>
 
                             <div className="relative z-10 px-3 py-3">
-                                <div className="rounded-lg border border-slate-200 bg-slate-50/50 p-2.5 transition-colors duration-200 group-hover:bg-slate-50/60 dark:border-slate-700 dark:bg-slate-800/55 dark:group-hover:bg-slate-800/70">
+                                <div className="rounded-lg bg-white p-2.5 transition-colors duration-200 group-hover:bg-white dark:bg-slate-900 dark:group-hover:bg-slate-900">
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="min-w-0">
                                             <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">

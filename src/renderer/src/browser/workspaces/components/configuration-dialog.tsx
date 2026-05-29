@@ -594,18 +594,23 @@ export function ConfigurationDialog({
                                     <Label htmlFor="service-type" className={ROW_LABEL_CLASSNAME}>
                                         {t('serviceType')}:
                                     </Label>
-                                    <Select value={type} onValueChange={setType}>
-                                        <SelectTrigger id="service-type" className={FIELD_CLASSNAME}>
-                                            <SelectValue placeholder={t('selectServiceType')} />
-                                        </SelectTrigger>
-                                        <SelectContent className="z-[10020]">
-                                            {SERVICE_TYPE_OPTIONS.map((serviceType) => (
-                                                <SelectItem key={serviceType.value} value={serviceType.value}>
-                                                    {serviceType.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <div className="flex-1">
+                                        <Select value={type} onValueChange={setType}>
+                                            <SelectTrigger
+                                                id="service-type"
+                                                className={`${FIELD_CLASSNAME} w-full`}
+                                            >
+                                                <SelectValue placeholder={t('selectServiceType')} />
+                                            </SelectTrigger>
+                                            <SelectContent className="z-[10020]">
+                                                {SERVICE_TYPE_OPTIONS.map((serviceType) => (
+                                                    <SelectItem key={serviceType.value} value={serviceType.value}>
+                                                        {serviceType.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
                             </section>
                         </TabsContent>
@@ -619,7 +624,7 @@ export function ConfigurationDialog({
                                     </span>
                                 </div>
 
-                                <div className="space-y-2 rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
+                                <div className="space-y-2 rounded-md border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
                                     {ports.length > 0 ? (
                                         <div className="flex flex-wrap gap-1.5">
                                             {ports.map((port) => (
@@ -640,16 +645,16 @@ export function ConfigurationDialog({
                                             ))}
                                         </div>
                                     ) : (
-                                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                                            No Ports Configured
+                                        <p className="py-2 text-center text-[11px] text-slate-400 dark:text-slate-500">
+                                            No ports configured
                                         </p>
                                     )}
 
-                                    <div className="flex gap-2">
+                                    <div className="grid grid-cols-[1fr_auto] gap-2">
                                         <Input
                                             value={newPort}
                                             onChange={(event) => setNewPort(event.target.value)}
-                                            placeholder="HOST:CONTAINER"
+                                            placeholder="e.g., 5432:5432"
                                             className={TECHNICAL_FIELD_CLASSNAME}
                                         />
                                         <Button
@@ -662,6 +667,10 @@ export function ConfigurationDialog({
                                             Add
                                         </Button>
                                     </div>
+
+                                    <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                                        Format: HOST_PORT:CONTAINER_PORT
+                                    </p>
                                 </div>
                             </section>
 
@@ -742,7 +751,7 @@ export function ConfigurationDialog({
                                     </span>
                                 </div>
 
-                                <div className="space-y-2 rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
+                                <div className="space-y-2 rounded-md border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
                                     {volumes.length > 0 ? (
                                         <div className="space-y-1.5">
                                             {volumes.map((volume) => (
@@ -766,8 +775,8 @@ export function ConfigurationDialog({
                                             ))}
                                         </div>
                                     ) : (
-                                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                                            No Volumes Configured
+                                        <p className="py-2 text-center text-[11px] text-slate-400 dark:text-slate-500">
+                                            No storage volumes mounted
                                         </p>
                                     )}
 
@@ -800,18 +809,28 @@ export function ConfigurationDialog({
 
                         <TabsContent value="deps" className="mt-0 space-y-3">
                             <div className={`flex items-center justify-between ${SECTION_HEADER_CLASSNAME}`}>
-                                <p className={SECTION_TITLE_CLASSNAME}>Dependencies</p>
+                                <p className={SECTION_TITLE_CLASSNAME}>Service Dependencies</p>
                                 <span className={COUNT_BADGE_CLASSNAME}>
                                     {dependsOn.length} Dependencies
                                 </span>
                             </div>
 
-                            <div className="space-y-2 rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                Configure the startup sequence. This service will only start after its
+                                nominated dependencies are healthy.
+                            </p>
+
+                            <div className="space-y-3 rounded-md border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
                                 {selectedDependencyItems.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center gap-1 rounded-md border border-dashed border-slate-300 bg-white px-3 py-5 text-center dark:border-slate-700 dark:bg-slate-950">
-                                        <Workflow className="h-4 w-4 text-slate-300 dark:text-slate-600" />
-                                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                    <div className="flex min-h-[120px] flex-col items-center justify-center gap-2 rounded-md border border-dashed border-slate-300 bg-white px-3 py-5 text-center dark:border-slate-700 dark:bg-slate-950">
+                                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900">
+                                            <FolderKanban className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                                        </span>
+                                        <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-700 dark:text-slate-200">
                                             No Dependencies Configured
+                                        </p>
+                                        <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                                            This service will start immediately and independently.
                                         </p>
                                     </div>
                                 ) : (
@@ -861,8 +880,9 @@ export function ConfigurationDialog({
                                         ref={dependencyTriggerRef}
                                         type="button"
                                         onClick={() => setDependencyMenuOpen((prev) => !prev)}
-                                        className="flex h-8 w-full items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-[11px] font-medium text-slate-600 hover:border-teal-300 hover:text-teal-600 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-teal-500/60 dark:hover:text-teal-400"
+                                        className="flex h-8 w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-slate-300 bg-white text-[11px] font-semibold text-slate-700 hover:border-teal-300 hover:text-teal-600 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-teal-500/60 dark:hover:text-teal-400"
                                     >
+                                        <Plus className="h-3.5 w-3.5" />
                                         Add Dependency
                                     </button>
 
@@ -945,27 +965,29 @@ export function ConfigurationDialog({
                                 </p>
                             </div>
 
-                            <div className="space-y-2 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
-                                <div className="flex items-center gap-2">
-                                    <Label className={ROW_LABEL_CLASSNAME}>Custom Network:</Label>
-
+                            <div className="space-y-2 rounded-lg bg-white p-3 dark:bg-slate-900">
+                                <div className="flex items-center gap-3">
                                     <button
                                         type="button"
                                         role="switch"
                                         aria-checked={useCustomNetwork}
                                         onClick={() => setUseCustomNetwork((prev) => !prev)}
-                                        className={`relative h-5 w-10 rounded-full transition-colors ${
+                                        className={`relative h-5 w-10 shrink-0 rounded-full border-0 p-0 transition-colors ${
                                             useCustomNetwork
                                                 ? 'bg-teal-600'
                                                 : 'bg-slate-200 dark:bg-slate-700'
                                         }`}
                                     >
                                         <motion.span
-                                            className="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm"
-                                            animate={{ x: useCustomNetwork ? 20 : 2 }}
+                                            className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow-sm"
+                                            animate={{ x: useCustomNetwork ? 18 : 0 }}
                                             transition={{ type: 'spring', stiffness: 500, damping: 34 }}
                                         />
                                     </button>
+
+                                    <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                                        Use custom isolated workspace network
+                                    </span>
                                 </div>
 
                                 {useCustomNetwork ? (

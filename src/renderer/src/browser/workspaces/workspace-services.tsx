@@ -9,12 +9,12 @@ import {
     Container,
     LayoutDashboard,
     LayoutGrid,
-    List,
     ListFilter,
     Network,
     Play,
     Plus,
     Server,
+    StretchHorizontal,
     Square
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -24,7 +24,7 @@ import { ConfigurationDialog } from './components/configuration-dialog'
 import { DependencyDiagram } from './services/dependency-diagram'
 import { resolveServiceVisualType } from './services'
 import { ServiceGrid } from './services/service-grid'
-import { ServiceList } from './services/service-list'
+import { SERVICE_LIST_GRID, ServiceList } from './services/service-list'
 import { WorkspaceDocker } from './views/workspace-docker'
 
 type ViewMode = 'grid' | 'list'
@@ -457,7 +457,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                         size="sm"
                                         className="h-8 w-8 rounded-sm px-0 text-slate-400 data-[state=on]:bg-white data-[state=on]:text-teal-600 data-[state=on]:shadow-sm dark:text-slate-500 dark:data-[state=on]:bg-slate-800 dark:data-[state=on]:text-teal-300"
                                     >
-                                        <List className="h-3.5 w-3.5" />
+                                        <StretchHorizontal className="h-3.5 w-3.5" />
                                     </ToggleGroupItem>
                                 </ToggleGroup>
                             </>
@@ -537,9 +537,28 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                             </div>
                         ) : (
                             <div className="space-y-4">
+                                {serviceViewMode === 'list' ? (
+                                    <div className="sticky top-0 z-30 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                                        <div
+                                            className="grid items-center gap-3 border-b border-slate-200 bg-slate-50/90 p-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-400"
+                                            style={{ gridTemplateColumns: SERVICE_LIST_GRID }}
+                                        >
+                                            <div>{t('name')}</div>
+                                            <div>{t('ports')}</div>
+                                            <div>{t('dependencies')}</div>
+                                            <div className="w-[80px]">{t('status')}</div>
+                                            <div className="w-[36px]" />
+                                        </div>
+                                    </div>
+                                ) : null}
+
                                 {groupedOverview.map((group) => (
                                     <section key={group.stack.id} className="bg-white dark:bg-slate-950">
-                                        <div className="sticky top-2 z-10 flex min-h-11 items-center justify-between border-b border-[#e5edf5] bg-white px-4 dark:border-slate-800 dark:bg-slate-950">
+                                        <div
+                                            className={`sticky z-10 flex min-h-11 items-center justify-between border-b border-[#e5edf5] bg-white px-4 dark:border-slate-800 dark:bg-slate-950 ${
+                                                serviceViewMode === 'list' ? 'top-[43px]' : 'top-2'
+                                            }`}
+                                        >
                                                 <div className="flex items-center gap-2">
                                                     <h3 className="text-sm font-semibold uppercase tracking-wide text-[#1f2b3d] dark:text-slate-200">
                                                         {group.stack.title}
@@ -619,6 +638,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                             services={typeGroup.services}
                                                             workspaceId={workspaceId}
                                                             showFilter={false}
+                                                            showHeader={serviceViewMode !== 'list'}
                                                             onActionComplete={refreshContainers}
                                                         />
                                                     )}

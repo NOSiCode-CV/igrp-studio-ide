@@ -17,16 +17,24 @@ import {
 import { ServiceActions } from './service-actions'
 import { ServiceFilter } from './service-filter'
 
-const SERVICE_LIST_GRID = '1.5fr 1fr 1fr 80px 36px'
+export const SERVICE_LIST_GRID = '1.5fr 1fr 1fr 80px 36px'
 
 interface ServiceListProps {
     services: any[]
     workspaceId?: string
     showFilter?: boolean
+    showHeader?: boolean
+    stickyHeader?: boolean
     onActionComplete?: () => Promise<void> | void
 }
 
-export function ServiceList({ services, showFilter = true, onActionComplete }: ServiceListProps) {
+export function ServiceList({
+    services,
+    showFilter = true,
+    showHeader = true,
+    stickyHeader = false,
+    onActionComplete
+}: ServiceListProps) {
     const { t } = useTranslation()
     const [activeCategory, setActiveCategory] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
@@ -59,17 +67,20 @@ export function ServiceList({ services, showFilter = true, onActionComplete }: S
 
             {/* Services Table */}
             <div className="w-full overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
-                {/* Header */}
-                <div
-                    className="grid items-center gap-3 border-b border-slate-200 bg-slate-50/70 p-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400"
-                    style={{ gridTemplateColumns: SERVICE_LIST_GRID }}
-                >
-                    <div>{t('name')}</div>
-                    <div>{t('ports')}</div>
-                    <div>{t('dependencies')}</div>
-                    <div className="w-[80px]">{t('status')}</div>
-                    <div className="w-[36px]" />
-                </div>
+                {showHeader ? (
+                    <div
+                        className={`grid items-center gap-3 border-b border-slate-200 bg-slate-50/70 p-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400 ${
+                            stickyHeader ? 'sticky top-0 z-20' : ''
+                        }`}
+                        style={{ gridTemplateColumns: SERVICE_LIST_GRID }}
+                    >
+                        <div>{t('name')}</div>
+                        <div>{t('ports')}</div>
+                        <div>{t('dependencies')}</div>
+                        <div className="w-[80px]">{t('status')}</div>
+                        <div className="w-[36px]" />
+                    </div>
+                ) : null}
 
                 {/* Body */}
                 <div className="divide-y divide-slate-100 dark:divide-slate-800">
