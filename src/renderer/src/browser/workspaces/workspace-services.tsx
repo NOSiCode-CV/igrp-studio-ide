@@ -300,7 +300,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
     }, [allServices, filteredServices])
 
     return (
-        <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-y border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+        <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
             <div className="z-20 shrink-0 bg-white dark:bg-slate-950">
                 <div className="flex min-h-[58px] items-center justify-between gap-4 border-b border-slate-200 px-4 py-2 dark:border-slate-800">
                     <div className="flex items-center gap-2">
