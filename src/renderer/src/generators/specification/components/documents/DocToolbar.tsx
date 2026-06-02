@@ -40,7 +40,7 @@ export function DocToolbar({
     canExport = true
 }: DocToolbarProps): JSX.Element {
     return (
-        <div className="flex h-12 shrink-0 items-center justify-between border-b px-4">
+        <div className="flex h-12 shrink-0 items-center justify-between border-b bg-background px-4">
             <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
                 {breadcrumbs.map((crumb, idx) => (
                     <span key={`${crumb}-${idx}`} className="flex items-center gap-2">

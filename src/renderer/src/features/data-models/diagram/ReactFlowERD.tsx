@@ -7,6 +7,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from '@renderer/components/ui/dropdown-menu'
+import { useTheme } from '@renderer/components/theme-provider'
 import { Database, KeyRound, MoreVertical, Plus, Trash2 } from 'lucide-react'
 import { type FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -80,12 +81,12 @@ const EntityNode: FC<{ data: EntityNodeData; selected: boolean }> = memo(({ data
             <Handle
                 type="target"
                 position={Position.Left}
-                style={{ background: '#888', border: 'none' }}
+                style={{ background: 'var(--muted-foreground)', border: 'none' }}
             />
             <Handle
                 type="source"
                 position={Position.Right}
-                style={{ background: '#888', border: 'none' }}
+                style={{ background: 'var(--muted-foreground)', border: 'none' }}
             />
             <div
                 className="flex items-center justify-between gap-1 px-2 py-1.5 bg-muted/60 border-b cursor-pointer"
@@ -188,6 +189,10 @@ function ReactFlowERDInner({
     onNewEntity
 }: ReactFlowERDProps): React.ReactNode {
     const { t } = useTranslation()
+    // ReactFlow v12 has a built-in `colorMode` prop that swaps edge/control/
+    // background defaults between light + dark palettes. Wire it to the app's
+    // ThemeProvider so the ERD canvas tracks the global toggle automatically.
+    const { theme } = useTheme()
     const writeable = !readOnly && !!basePath
     const { entities: summaries } = useEntities(writeable ? basePath : undefined)
     const [hydrated, setHydrated] = useState<Entity[]>([])
@@ -387,6 +392,7 @@ function ReactFlowERDInner({
                 onNodesChange={handleNodesChange}
                 onEdgesChange={onEdgesChange}
                 fitView
+                colorMode={theme}
                 proOptions={{ hideAttribution: true }}
             >
                 <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
