@@ -75,16 +75,21 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                     const dependsOn = service?.dependsOn || []
                     const ports = service?.ports || []
                     return (
-                        <Card key={index} className="group">
+                        <Card
+                            key={index}
+                            className="group relative gap-4 border-slate-200 bg-white py-4 transition-all duration-200 hover:border-teal-500 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-teal-600/70 dark:hover:shadow-black/25"
+                        >
                             <CardHeader>
                                 <CardTitle>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-2">
-                                            <ProjectIcon
-                                                project={project}
-                                                workspacePath={workspace?.path || ''}
-                                            />
-                                            <span className="text-xs truncate text-ellipsis md:max-w-40">
+                                            <div className="rounded-lg p-0.5 transition-colors duration-200 group-hover:bg-teal-50 dark:group-hover:bg-teal-900/30">
+                                                <ProjectIcon
+                                                    project={project}
+                                                    workspacePath={workspace?.path || ''}
+                                                />
+                                            </div>
+                                            <span className="truncate text-xs text-ellipsis transition-colors duration-200 group-hover:text-teal-700 md:max-w-40 dark:group-hover:text-teal-300">
                                                 {project.name}
                                             </span>
                                         </div>
@@ -99,7 +104,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                             </CardHeader>
                             <CardContent>
                                 {project.config?.description && (
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-sm text-muted-foreground opacity-60 transition-opacity duration-200 group-hover:opacity-100">
                                         {project.config.description}
                                     </p>
                                 )}

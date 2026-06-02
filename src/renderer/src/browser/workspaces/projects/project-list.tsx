@@ -52,18 +52,22 @@ export function ProjectList({ projects, services }: ProjectListProps) {
                         return (
                             <TableRow
                                 key={project.id}
-                                className="hover:bg-muted/50 group cursor-pointer"
+                                className="group cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/50"
                                 onClick={() => handleProjectClick(project)}
                             >
                                 <TableCell className="font-medium">
                                     <div className="flex items-center gap-1.5">
-                                        <ProjectIcon
-                                            project={project}
-                                            workspacePath={workspace?.path || ''}
-                                        />
+                                        <div className="rounded-lg p-0.5 transition-colors duration-200 group-hover:bg-teal-50 dark:group-hover:bg-teal-900/30">
+                                            <ProjectIcon
+                                                project={project}
+                                                workspacePath={workspace?.path || ''}
+                                            />
+                                        </div>
                                         <div>
-                                            <div className="text-xs">{project.name}</div>
-                                            <div className="text-xs text-muted-foreground">
+                                            <div className="text-xs transition-colors duration-200 group-hover:text-teal-700 dark:group-hover:text-teal-300">
+                                                {project.name}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground opacity-60 transition-opacity duration-200 group-hover:opacity-100">
                                                 {project.config?.description}
                                             </div>
                                         </div>
