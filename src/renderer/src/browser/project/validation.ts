@@ -28,9 +28,9 @@ export function useProjectValidation({ t, step }: { t: any; step: number }) {
         })
         .passthrough()
 
-    // Only validate the framework-specific config on step 3, mirroring the
-    // original `Yup.lazy(() => step === 3 ? ... : ...)` switch.
-    if (step !== 3) return baseSchema
+    // The wizard is a 2-step flow: framework-specific `config` is only
+    // validated on the final step (step 2 = Configure).
+    if (step !== 2) return baseSchema
 
     return baseSchema.superRefine((values, ctx) => {
         const framework = values.framework
