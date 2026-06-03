@@ -1,10 +1,6 @@
-import dotenv from 'dotenv'
 import { GitStore } from '../../services/git-store'
 import { GitLabService } from '../../services/gitlab-service'
 import { GitAuth } from './git-auth'
-
-// Load environment variables
-dotenv.config()
 
 const gitlabConfig = {
     clientId: process.env.VITE_GITLAB_CLIENT_ID || '',

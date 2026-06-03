@@ -1,17 +1,14 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogClosePrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
@@ -22,8 +19,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { getValuesToSubmit, initialValues } from '../../pages/model/config'
-import { ConnectionManager } from './ConnectionManager'
-import { TableManager } from './TableManager'
+import { ConnectionManager, TablePicker } from '@renderer/features/data-models'
 
 interface DatabaseManagerModalProps {
     isOpen?: boolean
@@ -180,54 +176,42 @@ const DatabaseManagerModal: React.FC<DatabaseManagerModalProps> = ({
     }
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={setIsOpen}>
-            <IGRPDialogContentPrimitive
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogContent
                 className="sm:max-w-[600px] md:max-w-[900px] max-w-5xl"
                 onClick={(e) => e.stopPropagation()}
             >
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>
-                        {t('importDataTableFromDatabase')}
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        {t('manageDatabaseConnections')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
-                <IGRPTabsPrimitive defaultValue="tables" className="w-full">
-                    <IGRPTabsListPrimitive className="grid w-full grid-cols-2">
-                        <IGRPTabsTriggerPrimitive value="tables">
-                            {t('importDataTables')}
-                        </IGRPTabsTriggerPrimitive>
-                        <IGRPTabsTriggerPrimitive value="connections">
-                            {t('manageConnections')}
-                        </IGRPTabsTriggerPrimitive>
-                    </IGRPTabsListPrimitive>
-                    <IGRPTabsContentPrimitive value="tables">
-                        <TableManager
+                <DialogHeader>
+                    <DialogTitle>{t('importDataTableFromDatabase')}</DialogTitle>
+                    <DialogDescription>{t('manageDatabaseConnections')}</DialogDescription>
+                </DialogHeader>
+                <Tabs defaultValue="tables" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="tables">{t('importDataTables')}</TabsTrigger>
+                        <TabsTrigger value="connections">{t('manageConnections')}</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="tables">
+                        <TablePicker
                             onRowsSubmit={setSelectedRows}
                             onSelectedConnection={setSelectedConnection}
                         />
-                    </IGRPTabsContentPrimitive>
-                    <IGRPTabsContentPrimitive value="connections">
+                    </TabsContent>
+                    <TabsContent value="connections">
                         <ConnectionManager />
-                    </IGRPTabsContentPrimitive>
-                </IGRPTabsPrimitive>
-                <IGRPDialogFooterPrimitive>
-                    <IGRPDialogClosePrimitive asChild>
-                        <IGRPButtonPrimitive
-                            type="button"
-                            variant="secondary"
-                            onClick={() => handleClose}
-                        >
+                    </TabsContent>
+                </Tabs>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button type="button" variant="secondary" onClick={() => handleClose}>
                             {t('close')}
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogClosePrimitive>
-                    <IGRPButtonPrimitive type="submit" onClick={handleClickSubmit}>
+                        </Button>
+                    </DialogClose>
+                    <Button type="submit" onClick={handleClickSubmit}>
                         {t('save')}
-                    </IGRPButtonPrimitive>
-                </IGRPDialogFooterPrimitive>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }
 

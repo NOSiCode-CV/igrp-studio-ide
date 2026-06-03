@@ -3,12 +3,10 @@ import {
     deleteElement,
     initCodeSnippets,
     initComponents,
-    initServices,
     loadAppExports,
     loadCodeSnippetsRegistry,
     loadEngineConfiguration,
     loadRegistry,
-    loadServiceRegistry,
     newApp,
     newComponent,
     newPage,
@@ -24,11 +22,12 @@ import type {
     ComponentConfig,
     ComponentRegistrationConfig,
     DeleteConfig,
-    DockerServiceRegistrationConfig,
     PageConfig,
     ProcessConfig,
     ProcessStepConfig
 } from '@igrp/igrp-studio-nextjs-engine/types'
+import { initServices, loadServiceRegistry } from '@igrp/igrp-studio-workspace-engine'
+import type { DockerServiceRegistrationConfig } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { app } from 'electron'
 import { ensureDirectoryExists } from '../helpers'
 import type { BaseEngine } from '../interfaces'

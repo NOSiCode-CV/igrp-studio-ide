@@ -1,14 +1,14 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
 import { Download, Package, RefreshCw } from 'lucide-react'
 import { type JSX, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -165,15 +165,15 @@ export function UpdateModalBottomLeft(): JSX.Element | null {
                             </p>
                         )}
                         <div className="flex items-center gap-2 mt-3">
-                            <IGRPButtonPrimitive
+                            <Button
                                 variant="ghost"
                                 size="sm"
                                 className="text-muted-foreground hover:text-foreground text-xs"
                                 onClick={handleLater}
                             >
                                 {t('later')}
-                            </IGRPButtonPrimitive>
-                            <IGRPButtonPrimitive
+                            </Button>
+                            <Button
                                 size="sm"
                                 className="rounded-full px-3 text-xs bg-primary text-primary-foreground hover:opacity-90"
                                 onClick={handleInstallNow}
@@ -189,17 +189,17 @@ export function UpdateModalBottomLeft(): JSX.Element | null {
                                         {t('install_now')}
                                     </>
                                 )}
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Modal de detalhes (release notes + progress) */}
-            <IGRPDialogPrimitive open={detailsOpen} onOpenChange={setDetailsOpen}>
-                <IGRPDialogContentPrimitive className="max-w-2xl max-h-[80vh]">
-                    <IGRPDialogHeaderPrimitive>
-                        <IGRPDialogTitlePrimitive className="flex items-center gap-2">
+            <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+                <DialogContent className="max-w-2xl max-h-[80vh]">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
                             {(updateInfo?.type === 'available' ||
                                 updateInfo?.type === 'progress') && (
                                 <>
@@ -213,8 +213,8 @@ export function UpdateModalBottomLeft(): JSX.Element | null {
                                     {t('update_ready')}
                                 </>
                             )}
-                        </IGRPDialogTitlePrimitive>
-                        <IGRPDialogDescriptionPrimitive>
+                        </DialogTitle>
+                        <DialogDescription>
                             {updateInfo?.currentVersion && updateInfo?.version && (
                                 <span className="text-sm">
                                     {t('version')} {updateInfo.currentVersion} →{' '}
@@ -227,8 +227,8 @@ export function UpdateModalBottomLeft(): JSX.Element | null {
                                     {new Date(updateInfo.releaseDate).toLocaleDateString()}
                                 </span>
                             )}
-                        </IGRPDialogDescriptionPrimitive>
-                    </IGRPDialogHeaderPrimitive>
+                        </DialogDescription>
+                    </DialogHeader>
 
                     {updateInfo?.releaseNotes && (
                         <div className="mt-4 space-y-2">
@@ -258,15 +258,12 @@ export function UpdateModalBottomLeft(): JSX.Element | null {
                         </div>
                     )}
 
-                    <IGRPDialogFooterPrimitive className="mt-6">
-                        <IGRPButtonPrimitive
-                            variant="outline"
-                            onClick={() => setDetailsOpen(false)}
-                        >
+                    <DialogFooter className="mt-6">
+                        <Button variant="outline" onClick={() => setDetailsOpen(false)}>
                             {t('continue_background')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                         {updateInfo?.type === 'downloaded' && (
-                            <IGRPButtonPrimitive
+                            <Button
                                 onClick={async () => {
                                     try {
                                         await window.electron.installUpdate?.()
@@ -277,11 +274,11 @@ export function UpdateModalBottomLeft(): JSX.Element | null {
                             >
                                 <RefreshCw className="h-4 w-4 mr-2" />
                                 {t('install_restart')}
-                            </IGRPButtonPrimitive>
+                            </Button>
                         )}
-                    </IGRPDialogFooterPrimitive>
-                </IGRPDialogContentPrimitive>
-            </IGRPDialogPrimitive>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }

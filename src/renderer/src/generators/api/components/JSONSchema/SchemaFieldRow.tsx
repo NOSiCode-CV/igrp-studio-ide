@@ -1,12 +1,7 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive,
-    IGRPTableCellPrimitive,
-    IGRPTableRowPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { TableCell, TableRow } from '@renderer/components/ui/table'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown'
 import { ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react'
 import { type ChangeEvent, useEffect, useRef, useState } from 'react'
@@ -194,15 +189,15 @@ export function SchemaFieldRow({
 
     return (
         <>
-            <IGRPTableRowPrimitive className={`group group/opt ${isNew ? 'bg-muted/50' : ''}`}>
-                <IGRPTableCellPrimitive
+            <TableRow className={`group group/opt ${isNew ? 'bg-muted/50' : ''}`}>
+                <TableCell
                     style={{ paddingLeft: `${depth * 28 + 8}px` }}
                     className="flex flex-1 py-1!"
                 >
                     {(type === 'object' || type === 'array') && (
-                        <IGRPTooltipPrimitive>
-                            <IGRPTooltipTriggerPrimitive asChild>
-                                <IGRPButtonPrimitive
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
                                     type="button"
                                     variant="ghost"
                                     size="icon"
@@ -214,14 +209,14 @@ export function SchemaFieldRow({
                                     ) : (
                                         <ChevronRight size={14} />
                                     )}
-                                </IGRPButtonPrimitive>
-                            </IGRPTooltipTriggerPrimitive>
-                            <IGRPTooltipContentPrimitive side="top" align="center">
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" align="center">
                                 {t('addSubNewField')}
-                            </IGRPTooltipContentPrimitive>
-                        </IGRPTooltipPrimitive>
+                            </TooltipContent>
+                        </Tooltip>
                     )}
-                    <IGRPInputPrimitive
+                    <Input
                         ref={nameInputRef}
                         value={name}
                         onChange={handleNameChange}
@@ -233,8 +228,8 @@ export function SchemaFieldRow({
                                 : 'fieldName'
                         }
                     />
-                </IGRPTableCellPrimitive>
-                <IGRPTableCellPrimitive className="py-1!">
+                </TableCell>
+                <TableCell className="py-1!">
                     <div className="flex flex-1 items-center">
                         <TypeSelectorDropdown
                             type={type}
@@ -256,22 +251,22 @@ export function SchemaFieldRow({
                             options={{ enumTypes }}
                         />
                     </div>
-                </IGRPTableCellPrimitive>
-                <IGRPTableCellPrimitive className="py-1!">
-                    <IGRPInputPrimitive
+                </TableCell>
+                <TableCell className="py-1!">
+                    <Input
                         ref={descInputRef}
                         value={description}
                         onChange={handleDescChange}
                         onBlur={handleDescBlur}
                         className="w-full text-sm h-8"
                     />
-                </IGRPTableCellPrimitive>
-                <IGRPTableCellPrimitive className="text-right py-1!">
+                </TableCell>
+                <TableCell className="text-right py-1!">
                     <div className="flex justify-end space-x-1 opacity-0 group-hover/opt:opacity-100">
                         {(type === 'object' || type === 'array') && (
-                            <IGRPTooltipPrimitive>
-                                <IGRPTooltipTriggerPrimitive asChild>
-                                    <IGRPButtonPrimitive
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
                                         type="button"
                                         onClick={handleAddSubfield}
                                         size="icon"
@@ -280,14 +275,14 @@ export function SchemaFieldRow({
                                     >
                                         <Plus size={14} />
                                         <span className="sr-only">{t('addSubNewField')}</span>
-                                    </IGRPButtonPrimitive>
-                                </IGRPTooltipTriggerPrimitive>
-                                <IGRPTooltipContentPrimitive side="top" align="center">
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" align="center">
                                     {t('addSubNewField')}
-                                </IGRPTooltipContentPrimitive>
-                            </IGRPTooltipPrimitive>
+                                </TooltipContent>
+                            </Tooltip>
                         )}
-                        <IGRPButtonPrimitive
+                        <Button
                             type="button"
                             onClick={() => onDelete(index)}
                             size="icon"
@@ -296,30 +291,30 @@ export function SchemaFieldRow({
                         >
                             <Trash2 size={14} />
                             <span className="sr-only">{t('delete')}</span>
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
-                </IGRPTableCellPrimitive>
-            </IGRPTableRowPrimitive>
+                </TableCell>
+            </TableRow>
             {isExpanded && (
                 <>
                     {isObjectEmpty && (
-                        <IGRPTableRowPrimitive>
-                            <IGRPTableCellPrimitive
+                        <TableRow>
+                            <TableCell
                                 colSpan={3}
                                 style={{
                                     paddingLeft: `${(depth + 1) * 20 + 8}px`
                                 }}
                             >
-                                <IGRPButtonPrimitive
+                                <Button
                                     type="button"
                                     variant="ghost"
                                     className="h-6 w-full text-sm text-muted-foreground justify-start"
                                     onClick={handleAddSubfield}
                                 >
                                     {t('NofieldsdefinedAdd')}
-                                </IGRPButtonPrimitive>
-                            </IGRPTableCellPrimitive>
-                        </IGRPTableRowPrimitive>
+                                </Button>
+                            </TableCell>
+                        </TableRow>
                     )}
                     {renderSubfields()}
                 </>

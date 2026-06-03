@@ -1,17 +1,17 @@
-import { IGRPSidebarInsetPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { SidebarInset } from '@renderer/components/ui/sidebar'
 import Loader from '@renderer/components/loader'
 import { APRESENTATION } from '@renderer/constants/appConstants'
+import { PropsPanel, TreeView } from '@renderer/features/manifest-tree'
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left'
 import useStudio from '@renderer/hooks/use-studio'
 import useToast from '@renderer/hooks/useToast'
-import type { DragEndResult } from '@renderer/lib/dnd/types'
+import type { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types'
 import RENDERER_CONFIG from '@renderer/renderer.config'
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 import { ContainerScrollArea } from '../api/components/ContainerScrollArea'
 import { CodeContentJson, CodeContentTS } from './components/CodeContent'
-import SidebarRight from './components/sidebar/sidebar-right'
 import { handleDragEnd } from './dnd/DraggableItemManager'
-import { useDroppedComponents } from './dnd/DroppedComponentsContext'
+import { useDroppedComponents } from './contexts/EditorContext'
 import { useComponentInitialization } from './hooks/useComponentInitialization'
 // Custom hooks for better organization
 import { useComponentRegistration } from './hooks/useComponentRegistration'
@@ -19,8 +19,9 @@ import { useConfigdata } from './hooks/useConfigData'
 import useCustomCode from './hooks/useCustomCode'
 import { usePageSave } from './hooks/usePageSave'
 import { useTagManager } from './hooks/useTagManager'
-import type { PageDefinition } from './page/page-manager'
-import IGRPStudioMainComponent from './types/components/MainComponent'
+import { useTreeCallbacksFromContext } from './hooks/useTreeCallbacksFromContext'
+import type { PageDefinition } from './browser/page-manager'
+import IGRPStudioMainComponent from './renderers/components/MainComponent'
 
 interface PageBuilderProps {
     basePath: string
@@ -61,6 +62,16 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             currentComponent,
             restData
         } = useDroppedComponents()
+
+        // Adapter: turns the EditorContext API into the `TreeCallbacks`
+        // shape consumed by `features/manifest-tree`. Same shape the
+        // Prototype canvas uses against Redux — the surface is identical.
+        const treeCallbacks = useTreeCallbacksFromContext()
+
+        // Selection is stored in EditorContext as a full component (not an
+        // id); derive the id for the tree's highlight + the panel.
+        const selectedNodeId = currentComponent?.component?.id ?? null
+        const selectedNode = currentComponent?.component ?? null
 
         const { componentsRegistered, findComponentById, fetchComponents, findComponent } =
             useStudio()
@@ -187,6 +198,37 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                 ) : (
                     <IGRPStudioMainComponent component={components ?? []} onDragEnd={onDragEnd} />
                 )
+            } else if (activePresentation === APRESENTATION.TREE) {
+                // Tree view — same surface the Specification Prototype canvas
+                // uses. Mounts `<TreeView />` (drag/drop tree) + `<PropsPanel />`
+                // (engine-schema-aware editor) side by side. State flows
+                // through the EditorContext adapter, so saves + JSON round-trip
+                // behave exactly like Design mode.
+                if (isLoading) return <Loader />
+                const root =
+                    components && (components as StructuredComponent).id
+                        ? (components as StructuredComponent)
+                        : null
+                return (
+                    <div className="flex h-full overflow-hidden rounded-md border bg-card/30">
+                        <TreeView
+                            className="flex-1"
+                            root={root}
+                            selectedId={selectedNodeId}
+                            engineCatalog={componentsRegistered}
+                            callbacks={treeCallbacks}
+                        />
+                        <PropsPanel
+                            node={selectedNode}
+                            engineCatalog={componentsRegistered}
+                            onUpdate={treeCallbacks.onUpdate}
+                            onRemove={treeCallbacks.onRemove}
+                            canDelete={Boolean(
+                                selectedNode && root && root.id !== selectedNode.id
+                            )}
+                        />
+                    </div>
+                )
             } else if (activePresentation === APRESENTATION.JSON) {
                 return <CodeContentJson components={components} pagePath={pagePath} />
             } else if (activePresentation === APRESENTATION.CODE) {
@@ -225,18 +267,21 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
             basePath,
             page,
             content,
-            isPage
+            isPage,
+            componentsRegistered,
+            selectedNodeId,
+            selectedNode,
+            treeCallbacks
         ])
 
         return (
             <div className="flex flex-1 overflow-hidden">
                 <AppSidebar data={menuItems} basePath={basePath} />
-                <IGRPSidebarInsetPrimitive>
+                <SidebarInset>
                     <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>{renderContent}</ContainerScrollArea>
                     </div>
-                </IGRPSidebarInsetPrimitive>
-                {currentComponent && <SidebarRight />}
+                </SidebarInset>
             </div>
         )
     }

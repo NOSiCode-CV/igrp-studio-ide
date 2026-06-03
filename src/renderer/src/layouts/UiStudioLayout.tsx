@@ -1,9 +1,10 @@
-import { IGRPSidebarProvider } from '@igrp/igrp-framework-react-design-system'
+import { SidebarProvider } from '@renderer/components/ui/sidebar'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
+import { IntegratedTerminal } from '../components/integrated-terminal'
 import { Footer } from './components/footer'
 import Header from './components/header'
 
@@ -37,7 +38,7 @@ const Layout = (props: LayoutProps): React.JSX.Element => {
 
     return (
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(20))] [--header-height-three:calc(--spacing(28))]">
-            <IGRPSidebarProvider
+            <SidebarProvider
                 style={
                     {
                         '--sidebar-width': '380px'
@@ -53,8 +54,9 @@ const Layout = (props: LayoutProps): React.JSX.Element => {
                         })}
                     </div>
                     <Footer />
+                    <IntegratedTerminal />
                 </div>
-            </IGRPSidebarProvider>
+            </SidebarProvider>
         </div>
     )
 }

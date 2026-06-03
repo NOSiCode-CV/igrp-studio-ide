@@ -1,0 +1,392 @@
+import { Button } from '@renderer/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@renderer/components/ui/select'
+import { Toggle } from '@renderer/components/ui/toggle'
+import { ToggleGroup, ToggleGroupItem } from '@renderer/components/ui/toggle-group'
+import { CloneProjectModal } from '@renderer/components/git/clone-project-modal'
+import { SearchInput, SubHeadline } from '@renderer/components/shared-ui'
+import { useDocker } from '@renderer/hooks/use-docker'
+import { useWorkspace } from '@renderer/hooks/use-workspace'
+import useToast from '@renderer/hooks/useToast'
+import { ProjectWizard } from '@renderer/browser/project/project-form'
+import { getId } from '@renderer/utils'
+import {
+    EllipsisVertical,
+    FolderKanban,
+    FolderOpen,
+    GitFork,
+    LayoutGrid,
+    List,
+    LoaderCircle,
+    type LucideIcon,
+    PlusCircle
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import type { IOpenProject, ProjectData } from 'src/main/types'
+import ProjectGrid from './projects/project-grid'
+import { ProjectList } from './projects/project-list'
+
+type ResourceType = 'project'
+type ViewMode = 'grid' | 'list'
+
+interface ResourceSectionProps {
+    type: ResourceType
+    icon: LucideIcon
+    title: string
+    count: number
+    searchQuery: string
+    viewMode: ViewMode
+    onViewModeChange: (mode: ViewMode) => void
+    onSearchChange: (value: string) => void
+    sortValue: string
+    onSortChange: (value: string) => void
+    isEmpty: boolean
+    emptyState: React.ReactNode
+    children: React.ReactNode
+    actionButtons: React.ReactNode
+}
+
+const ResourceSection = ({
+    type,
+    icon,
+    title,
+    count,
+    searchQuery,
+    viewMode,
+    onViewModeChange,
+    onSearchChange,
+    sortValue,
+    onSortChange,
+    isEmpty,
+    emptyState,
+    children,
+    actionButtons
+}: ResourceSectionProps) => {
+    const { t } = useTranslation()
+    const countText = `${count} ${count === 1 ? type : `${type}s`}`
+    const queryText = searchQuery ? ` matching "${searchQuery}"` : ''
+
+    return (
+        <div className="space-y-4">
+            <div className="flex justify-between items-center">
+                <SubHeadline
+                    icon={icon}
+                    title={title}
+                    description={
+                        <>
+                            {countText}
+                            {queryText}
+                        </>
+                    }
+                />
+                <div className="flex items-center gap-3">{actionButtons}</div>
+            </div>
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex items-center gap-3">
+                    <SearchInput
+                        placeholder={`${t('search')} ${type}s...`}
+                        value={searchQuery}
+                        onChange={onSearchChange}
+                        className="lg:w-[250px]"
+                    />
+                    <ToggleGroup
+                        type="single"
+                        value={viewMode}
+                        onValueChange={(value) => value && onViewModeChange(value as ViewMode)}
+                    >
+                        <ToggleGroupItem value="grid" size="sm" className="h-8 w-8">
+                            <LayoutGrid className="h-3.5 w-3.5" />
+                        </ToggleGroupItem>
+                        <ToggleGroupItem value="list" size="sm" className="h-8 w-8">
+                            <List className="h-3.5 w-3.5" />
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span>{t('sortBy')}</span>
+                    <Select value={sortValue} onValueChange={onSortChange}>
+                        <SelectTrigger className="w-[180px] !h-7">
+                            <SelectValue placeholder={t('orderBy')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="lastModified">{t('lastModified')}</SelectItem>
+                            <SelectItem value="name">{t('name')}</SelectItem>
+                            <SelectItem value="type">{t('type')}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+            {isEmpty ? emptyState : children}
+        </div>
+    )
+}
+
+const Resources = () => {
+    const [projectViewMode, setProjectViewMode] = useState<ViewMode>('grid')
+    const [projectSearchQuery, setProjectSearchQuery] = useState('')
+    const [sortOrder, setSortOrder] = useState<string>('lastModified')
+    const [allProjects, setAllProjects] = useState<ProjectData[]>([])
+    const [openProjectDialog, setOpenProjectDialog] = useState(false)
+    const [pendingOpenProject, setPendingOpenProject] = useState<IOpenProject | null>(null)
+    const [isOpeningProject, setIsOpeningProject] = useState(false)
+
+    const { showErrorToast } = useToast()
+
+    const { t } = useTranslation()
+
+    const {
+        workspace,
+        actions: { findAllProjects, saveOrOpenProject, refreshWorkspaces },
+        state: { changeStatus }
+    } = useWorkspace()
+
+    const { services, refreshContainers } = useDocker({
+        workspace,
+        changeStatus
+    })
+
+    useEffect(() => {
+        fetchProjects()
+        refreshWorkspaces()
+        refreshContainers()
+    }, [workspace, changeStatus])
+
+    useEffect(() => {
+        const handler = () => {
+            fetchProjects()
+            refreshWorkspaces()
+            refreshContainers()
+        }
+        window.addEventListener('igrp:workspace:refresh', handler)
+        return () => {
+            window.removeEventListener('igrp:workspace:refresh', handler)
+        }
+    }, [workspace, changeStatus])
+
+    const fetchProjects = async () => {
+        await findAllProjects().then((data) => {
+            setAllProjects(data)
+        })
+    }
+
+    const normalizedQuery = (projectSearchQuery || '').toLowerCase()
+    const filteredProjects = allProjects.filter((project) => {
+        const projectName = (project?.name || '').toLowerCase()
+        const projectFramework = (project?.framework || '').toLowerCase()
+        return projectName.includes(normalizedQuery) || projectFramework.includes(normalizedQuery)
+    })
+
+    const onHandleOpenProjectClick = async (): Promise<void> => {
+        const result: IOpenProject = await window.api.openDirectory()
+
+        const { canceled, basePath, config, folderExists } = result
+
+        if (canceled || !basePath || !config) {
+            return
+        }
+
+        if (!folderExists || !config.framework) {
+            showErrorToast(t('notFoundProject'))
+            return
+        }
+
+        setPendingOpenProject(result)
+        setOpenProjectDialog(true)
+    }
+
+    const closeOpenProjectDialog = (): void => {
+        if (isOpeningProject) return
+        setOpenProjectDialog(false)
+        setPendingOpenProject(null)
+    }
+
+    const confirmOpenProject = async (storageMode: 'linked' | 'managed'): Promise<void> => {
+        const config = pendingOpenProject?.config
+        if (!config) {
+            closeOpenProjectDialog()
+            return
+        }
+        if (!workspace?.id) {
+            showErrorToast('Nenhum workspace ativo selecionado.')
+            closeOpenProjectDialog()
+            return
+        }
+
+        setIsOpeningProject(true)
+        try {
+            await saveOrOpenProject({
+                project: {
+                    ...config,
+                    id: config.id ?? getId(),
+                    workspaceId: workspace.id,
+                    storageMode
+                }
+            })
+
+            closeOpenProjectDialog()
+        } finally {
+            setIsOpeningProject(false)
+        }
+    }
+
+    const ProjectActions = () => {
+        const [openCloneProject, setOpenCloneProject] = useState(false)
+        return (
+            <>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Toggle size={'sm'} variant={'outline'}>
+                            <EllipsisVertical />
+                        </Toggle>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem onClick={onHandleOpenProjectClick}>
+                            <FolderOpen className="w-4 h-4 mr-2" />
+                            <span>{t('openProject')}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setOpenCloneProject(true)}>
+                            <GitFork className="w-4 h-4 mr-2" />
+                            {t('cloneProject')}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                <ProjectWizard />
+                {openCloneProject && (
+                    <CloneProjectModal
+                        open={openCloneProject}
+                        setOpen={setOpenCloneProject}
+                        workspace={workspace}
+                    />
+                )}
+
+                <Dialog
+                    open={openProjectDialog}
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            closeOpenProjectDialog()
+                            return
+                        }
+                        setOpenProjectDialog(true)
+                    }}
+                >
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>{t('openProjectOptionsTitle')}</DialogTitle>
+                            <DialogDescription>
+                                {t('openProjectOptionsDescription')}
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <DialogFooter className="grid grid-cols-2 gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => confirmOpenProject('linked')}
+                                disabled={isOpeningProject}
+                            >
+                                {isOpeningProject ? (
+                                    <span className="inline-flex items-center gap-2">
+                                        <LoaderCircle className="h-4 w-4 animate-spin" />
+                                        {t('opening')}
+                                    </span>
+                                ) : (
+                                    t('openProjectAsLinked')
+                                )}
+                            </Button>
+                            <Button
+                                onClick={() => confirmOpenProject('managed')}
+                                disabled={isOpeningProject}
+                            >
+                                {isOpeningProject ? (
+                                    <span className="inline-flex items-center gap-2">
+                                        <LoaderCircle className="h-4 w-4 animate-spin" />
+                                        {t('opening')}
+                                    </span>
+                                ) : (
+                                    t('importProjectToWorkspace')
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </>
+        )
+    }
+
+    const ProjectEmptyState = () => (
+        <div className="shrink-0 border border-dashed rounded-md p-6 text-center">
+            <FolderKanban className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+            <h3 className="text-sm font-medium">{t('noProjectsFound')}</h3>
+            <p className="text-xs text-muted-foreground mb-3">
+                {projectSearchQuery
+                    ? `${t('noProjectsMatching')} "${projectSearchQuery}"`
+                    : t('noProjectsYet')}
+            </p>
+            <ProjectWizard>
+                <Button size="sm">
+                    <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                    {t('createNewProject')}
+                </Button>
+            </ProjectWizard>
+        </div>
+    )
+
+    return (
+        <div className="space-y-6">
+            {/* Projects Section */}
+            <ResourceSection
+                type="project"
+                icon={FolderKanban}
+                title={t('projects')}
+                count={filteredProjects.length}
+                searchQuery={projectSearchQuery}
+                viewMode={projectViewMode}
+                onViewModeChange={setProjectViewMode}
+                onSearchChange={setProjectSearchQuery}
+                sortValue={sortOrder}
+                onSortChange={setSortOrder}
+                isEmpty={filteredProjects.length === 0}
+                emptyState={<ProjectEmptyState />}
+                actionButtons={<ProjectActions />}
+            >
+                {projectViewMode === 'grid' ? (
+                    <>
+                        <ProjectGrid
+                            projects={filteredProjects}
+                            workspaceId={workspace.id}
+                            projectOrder={sortOrder}
+                            services={services}
+                        />
+                    </>
+                ) : (
+                    <ProjectList
+                        projects={filteredProjects}
+                        workspaceId={workspace.id}
+                        services={services}
+                    />
+                )}
+            </ResourceSection>
+        </div>
+    )
+}
+
+export default Resources

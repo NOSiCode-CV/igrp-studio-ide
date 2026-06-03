@@ -1,20 +1,22 @@
 import {
-    IGRPCollapsibleContentPrimitive,
-    IGRPCollapsiblePrimitive,
-    IGRPCollapsibleTriggerPrimitive,
-    IGRPScrollAreaPrimitive,
-    IGRPSidebarMenuButtonPrimitive,
-    IGRPSidebarMenuItemPrimitive,
-    IGRPSidebarMenuPrimitive,
-    IGRPSidebarMenuSubPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger
+} from '@renderer/components/ui/collapsible'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import {
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub
+} from '@renderer/components/ui/sidebar'
 import { type TabItem, useTabs } from '@renderer/components/navigation/TabContext'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { ChevronRight, File, Folder } from 'lucide-react'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 
 interface FileExplorerSidebarProps {
     basePath: string
@@ -71,11 +73,11 @@ const NavigatorSidebar: React.FC<FileExplorerSidebarProps> = ({ searchTerm }) =>
     const renderTree = (tree: StructuredComponent[]) => {
         const filteredTree = searchTerm ? filterTree(tree, searchTerm) : tree
         return filteredTree.map((item) => (
-            <IGRPSidebarMenuItemPrimitive key={item.id}>
+            <SidebarMenuItem key={item.id}>
                 {item.children && item.children.length > 0 ? (
-                    <IGRPCollapsiblePrimitive defaultOpen={true}>
-                        <IGRPCollapsibleTriggerPrimitive asChild>
-                            <IGRPSidebarMenuButtonPrimitive
+                    <Collapsible defaultOpen={true}>
+                        <CollapsibleTrigger asChild>
+                            <SidebarMenuButton
                                 className="justify-between"
                                 onClick={() => handleFileSelect(item)}
                             >
@@ -84,30 +86,28 @@ const NavigatorSidebar: React.FC<FileExplorerSidebarProps> = ({ searchTerm }) =>
                                     <Folder className="w-4 h-4" />
                                     <span>{item.componentName || item.label}</span>
                                 </div>
-                            </IGRPSidebarMenuButtonPrimitive>
-                        </IGRPCollapsibleTriggerPrimitive>
-                        <IGRPCollapsibleContentPrimitive>
-                            <IGRPSidebarMenuSubPrimitive>
-                                {renderTree(item.children)}
-                            </IGRPSidebarMenuSubPrimitive>
-                        </IGRPCollapsibleContentPrimitive>
-                    </IGRPCollapsiblePrimitive>
+                            </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                            <SidebarMenuSub>{renderTree(item.children)}</SidebarMenuSub>
+                        </CollapsibleContent>
+                    </Collapsible>
                 ) : (
-                    <IGRPSidebarMenuButtonPrimitive onClick={() => handleFileSelect(item)}>
+                    <SidebarMenuButton onClick={() => handleFileSelect(item)}>
                         <div className="flex items-center gap-2">
                             <File className="w-4 h-4" />
                             <span>{item.componentName || item.label}</span>
                         </div>
-                    </IGRPSidebarMenuButtonPrimitive>
+                    </SidebarMenuButton>
                 )}
-            </IGRPSidebarMenuItemPrimitive>
+            </SidebarMenuItem>
         ))
     }
 
     return (
-        <IGRPScrollAreaPrimitive className="flex-1 p-2">
-            <IGRPSidebarMenuPrimitive>{renderTree(fileTree)}</IGRPSidebarMenuPrimitive>
-        </IGRPScrollAreaPrimitive>
+        <ScrollArea className="flex-1 p-2">
+            <SidebarMenu>{renderTree(fileTree)}</SidebarMenu>
+        </ScrollArea>
     )
 }
 

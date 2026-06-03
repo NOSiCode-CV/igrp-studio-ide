@@ -16,6 +16,18 @@ ipcMain.handle(EVENTS.DOCKER.UP, async (event, projectPath: string): Promise<voi
     }
 })
 
+ipcMain.handle(EVENTS.DOCKER.DEPLOY_PROJECT, async (event, projectPath: string): Promise<void> => {
+    try {
+        await dockerService.deployProject(projectPath)
+    } catch (error: any) {
+        event.sender.send(EVENTS.LOG, {
+            code: ERROR_CODES.ERROR,
+            message: error.message
+        })
+        throw error
+    }
+})
+
 ipcMain.handle(
     EVENTS.DOCKER.DOWN,
     async (event, projectPath: string, options: { dropVolume: boolean }): Promise<void> => {

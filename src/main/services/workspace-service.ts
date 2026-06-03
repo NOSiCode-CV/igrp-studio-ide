@@ -7,27 +7,585 @@ import {
     saveCustomWorkspaceComposeFile,
     updateProjectToWorkspace,
     updateServiceToWorkspace
-} from '@igrp/igrp-studio-nextjs-engine'
+} from '@igrp/igrp-studio-workspace-engine'
 import type {
     ProjectWorkspace,
     ServiceWorkspace,
     WorkspaceService
-} from '@igrp/igrp-studio-nextjs-engine/types'
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { app } from 'electron'
 import fs from 'fs'
 import { mkdir, readFile, writeFile } from 'fs/promises'
+import net from 'net'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { EngineFactory } from '../engines/EngineFactory'
-import type { FrameworkType, HandlerResponse, IWorkspace, ProjectData } from '../types'
+import { dockerService } from './docker-service'
+import type {
+    FrameworkType,
+    HandlerResponse,
+    IWorkspace,
+    OptionalStacksStatus,
+    ProjectData,
+    WorkspaceBootstrapOptions,
+    WorkspaceBootstrapResult
+} from '../types'
 
 const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json')
 const BACKUP_DIR = path.join(app.getPath('userData'), 'backups')
+const DEFAULT_DEMO_WORKSPACE_DIRS = ['demoworkspace', 'demoworkspace-main']
+const DEFAULT_MAIN_COMPOSE = 'igrp-compose.yaml'
+const DEFAULT_NGINX_CONF = 'nginx.conf'
+const DEFAULT_MONITORING_COMPOSE = path.join('monitoring', 'igrp-monitoring-compose.yaml')
+const DEFAULT_PROCESS_COMPOSE = path.join('process', 'igrp-process-compose.yaml')
+const DEFAULT_MONITORING_SOURCE_COMPOSE = path.join(
+    DEFAULT_DEMO_WORKSPACE_DIRS[0],
+    'monitoring',
+    'igrp-monitoring-compose.yaml'
+)
+const DEFAULT_PROCESS_SOURCE_COMPOSE = path.join(
+    DEFAULT_DEMO_WORKSPACE_DIRS[0],
+    'process',
+    'igrp-process-compose.yaml'
+)
 
 export class WorkspaceRepository {
+    private readonly defaultNginxHostPort = 2575
+
+    private normalizeNginxServicePortMapping(composeContent: string): string {
+        const lines = composeContent.split('\n')
+        let inNginxService = false
+        let inPortsBlock = false
+        let portLineReplaced = false
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i]
+
+            if (/^\s{2}[a-zA-Z0-9_-]+:\s*$/.test(line)) {
+                inNginxService = line.toLowerCase().includes('nginx:')
+                inPortsBlock = false
+            }
+
+            if (!inNginxService) continue
+
+            if (/^\s{4}ports:\s*$/.test(line)) {
+                inPortsBlock = true
+                portLineReplaced = false
+                continue
+            }
+
+            if (inPortsBlock && !portLineReplaced && /^\s*-\s*['"]?[^'"]+['"]?\s*$/.test(line)) {
+                const indent = line.match(/^(\s*)/)?.[1] ?? '      '
+                lines[i] =
+                    `${indent}- "${'${HOST_NGINX_HTTP_PORT:-2575}:${NGINX_HTTP_PORT:-2575}'}"`
+                portLineReplaced = true
+                continue
+            }
+
+            if (inPortsBlock && /^\s{4}[a-zA-Z0-9_-]+:\s*$/.test(line)) {
+                inPortsBlock = false
+            }
+        }
+
+        return lines.join('\n')
+    }
+
+    private async alignMainNginxPortArtifacts(
+        workspacePath: string,
+        nginxPort: number
+    ): Promise<void> {
+        const composePath = path.join(workspacePath, DEFAULT_MAIN_COMPOSE)
+        if (fs.existsSync(composePath)) {
+            let composeRaw = await readFile(composePath, 'utf8')
+            let composeNext = composeRaw
+
+            // Keep host and container nginx ports aligned through env variables.
+            composeNext = composeNext.replace(
+                /"\$\{HOST_NGINX_HTTP_PORT:-\d+\}:\d+"/g,
+                '"${HOST_NGINX_HTTP_PORT:-2575}:${NGINX_HTTP_PORT:-2575}"'
+            )
+            composeNext = this.normalizeNginxServicePortMapping(composeNext)
+
+            // Keep nginx healthcheck aligned with the container listen port.
+            composeNext = composeNext.replace(
+                /http:\/\/127\.0\.0\.1:\d+\/health/g,
+                'http://127.0.0.1:${NGINX_HTTP_PORT:-2575}/health'
+            )
+
+            if (composeNext !== composeRaw) {
+                await writeFile(composePath, composeNext, 'utf8')
+            }
+        }
+
+        const nginxConfPath = path.join(workspacePath, DEFAULT_NGINX_CONF)
+        if (fs.existsSync(nginxConfPath)) {
+            const confRaw = await readFile(nginxConfPath, 'utf8')
+            const confNext = confRaw.replace(
+                /listen\s+\d+\s+default_server;/,
+                `listen   ${nginxPort} default_server;`
+            )
+            if (confNext !== confRaw) {
+                await writeFile(nginxConfPath, confNext, 'utf8')
+            }
+        }
+    }
+
+    private async wait(ms: number): Promise<void> {
+        await new Promise((resolve) => setTimeout(resolve, ms))
+    }
+
+    private async waitForMainStackReadiness(
+        workspacePath: string,
+        timeoutMs = 180000
+    ): Promise<void> {
+        const start = Date.now()
+        const required = ['keycloak', 'access-management', 'gateway', 'eureka', 'database-postgres']
+
+        while (Date.now() - start < timeoutMs) {
+            const services = await dockerService.status(workspacePath)
+            const mainServices = services.filter((service) => service.stack === 'main')
+
+            const allReady = required.every((needle) =>
+                mainServices.some((service) => {
+                    const name = (service.name || '').toLowerCase()
+                    const status = (service.status || '').toLowerCase()
+                    const msg = (service.statusMessage || '').toLowerCase()
+                    return (
+                        name.includes(needle) &&
+                        (status === 'running' || status === 'healthy') &&
+                        !msg.includes('unhealthy')
+                    )
+                })
+            )
+
+            if (allReady) return
+            await this.wait(5000)
+        }
+
+        throw new Error(
+            'Main stack is not healthy yet (keycloak/access-management/gateway/eureka/database).'
+        )
+    }
+
+    private async isMainStackReady(workspacePath: string): Promise<boolean> {
+        const required = ['keycloak', 'access-management', 'gateway', 'eureka', 'database-postgres']
+        const services = await dockerService.status(workspacePath)
+        const mainServices = services.filter((service) => service.stack === 'main')
+
+        return required.every((needle) =>
+            mainServices.some((service) => {
+                const name = (service.name || '').toLowerCase()
+                const status = (service.status || '').toLowerCase()
+                const msg = (service.statusMessage || '').toLowerCase()
+                return (
+                    name.includes(needle) &&
+                    (status === 'running' || status === 'healthy') &&
+                    !msg.includes('unhealthy')
+                )
+            })
+        )
+    }
+
+    private async isPortAvailable(port: number): Promise<boolean> {
+        return await new Promise((resolve) => {
+            const server = net.createServer()
+            server.once('error', () => resolve(false))
+            server.once('listening', () => {
+                server.close(() => resolve(true))
+            })
+            server.listen(port, '0.0.0.0')
+        })
+    }
+
+    private async findNextAvailableNginxHostPort(
+        startPort = this.defaultNginxHostPort
+    ): Promise<number> {
+        let candidate = startPort
+        for (let i = 0; i < 300; i++) {
+            // eslint-disable-next-line no-await-in-loop
+            const free = await this.isPortAvailable(candidate)
+            if (free) return candidate
+            candidate += 1
+        }
+        return startPort
+    }
+
+    private async findNextIncrementalNginxHostPort(): Promise<number> {
+        const data = await this.loadData()
+        const usedPorts = new Set<number>()
+
+        for (const ws of data.workspaces || []) {
+            const envPath = path.join(ws.path, '.env')
+            if (!fs.existsSync(envPath)) continue
+            const raw = await readFile(envPath, 'utf8')
+            const line = raw
+                .split('\n')
+                .find(
+                    (l) => l.startsWith('HOST_NGINX_HTTP_PORT=') || l.startsWith('NGINX_HTTP_PORT=')
+                )
+            if (!line) continue
+            const parsed = Number.parseInt(line.split('=')[1]?.trim() || '', 10)
+            if (!Number.isNaN(parsed) && parsed > 0 && parsed <= 65535) {
+                usedPorts.add(parsed)
+            }
+        }
+
+        // Always pick the smallest available port starting from 2575:
+        // 1st workspace -> 2575
+        // 2nd workspace -> 2576
+        // 3rd workspace -> 2577
+        // ...
+        let candidate = this.defaultNginxHostPort
+        for (let i = 0; i < 300; i++) {
+            if (usedPorts.has(candidate)) {
+                candidate += 1
+                continue
+            }
+            // eslint-disable-next-line no-await-in-loop
+            const free = await this.isPortAvailable(candidate)
+            if (free) return candidate
+            candidate += 1
+        }
+
+        return this.findNextAvailableNginxHostPort(this.defaultNginxHostPort)
+    }
+
+    private getDefaultBootstrapOptions(
+        options?: WorkspaceBootstrapOptions
+    ): Required<WorkspaceBootstrapOptions> {
+        return {
+            autoStartStack: options?.autoStartStack ?? true,
+            installMonitoringStack: options?.installMonitoringStack ?? false,
+            installProcessStack: options?.installProcessStack ?? false
+        }
+    }
+
+    private resolveDemoWorkspacePath(): string | null {
+        for (const demoDir of DEFAULT_DEMO_WORKSPACE_DIRS) {
+            const candidates = [
+                path.join(app.getAppPath(), demoDir),
+                path.join(process.cwd(), demoDir),
+                path.join(process.cwd(), 'studio', 'igrp-studio-ide', demoDir)
+            ]
+
+            for (const candidate of candidates) {
+                if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
+                    return candidate
+                }
+            }
+        }
+
+        return null
+    }
+
+    private async replaceTokenInTextFile(
+        filePath: string,
+        replacements: Array<{ from: string; to: string }>
+    ): Promise<void> {
+        const allowedTextExtensions = new Set([
+            '.yaml',
+            '.yml',
+            '.env',
+            '.json',
+            '.conf',
+            '.sh',
+            '.md',
+            '.txt'
+        ])
+        const ext = path.extname(filePath).toLowerCase()
+        if (!allowedTextExtensions.has(ext) && path.basename(filePath).toLowerCase() !== '.env') {
+            return
+        }
+
+        const raw = await readFile(filePath, 'utf8')
+        let next = raw
+        for (const { from, to } of replacements) {
+            next = next.split(from).join(to)
+        }
+
+        if (next !== raw) {
+            await writeFile(filePath, next, 'utf8')
+        }
+    }
+
+    private async walkAndReplaceTokens(
+        targetDir: string,
+        replacements: Array<{ from: string; to: string }>
+    ): Promise<void> {
+        const entries = await fs.promises.readdir(targetDir, { withFileTypes: true })
+        for (const entry of entries) {
+            const fullPath = path.join(targetDir, entry.name)
+            if (entry.isDirectory()) {
+                await this.walkAndReplaceTokens(fullPath, replacements)
+                continue
+            }
+            if (entry.isFile()) {
+                await this.replaceTokenInTextFile(fullPath, replacements)
+            }
+        }
+    }
+
+    private async ensureHostGatewayAliasesForSlug(filePath: string, slug: string): Promise<void> {
+        if (!fs.existsSync(filePath)) return
+        const raw = await readFile(filePath, 'utf8')
+        const normalized = raw.replace(/\r\n/g, '\n')
+        const lines = normalized.split('\n')
+        const next: string[] = []
+        const longAlias = `${slug}-igrp:host-gateway`
+        const shortAlias = `${slug}:host-gateway`
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i]
+            next.push(line)
+            if (!line.includes(longAlias)) continue
+
+            const nextLine = lines[i + 1] || ''
+            if (nextLine.includes(shortAlias)) continue
+
+            const indentMatch = line.match(/^(\s*)-/)
+            const indent = indentMatch ? indentMatch[1] : '      '
+            next.push(`${indent}- "${shortAlias}"`)
+        }
+
+        const updated = next.join('\n')
+        if (updated !== normalized) {
+            await writeFile(filePath, updated, 'utf8')
+        }
+    }
+
+    private async ensureEnvVariable(
+        envPath: string,
+        variableName: string,
+        value: string
+    ): Promise<void> {
+        if (!fs.existsSync(envPath)) return
+        const raw = await readFile(envPath, 'utf8')
+        const lines = raw.split('\n')
+        let found = false
+        const updated = lines.map((line) => {
+            if (line.startsWith(`${variableName}=`)) {
+                found = true
+                return `${variableName}=${value}`
+            }
+            return line
+        })
+        if (!found) {
+            updated.push(`${variableName}=${value}`)
+        }
+        await writeFile(envPath, updated.join('\n'), 'utf8')
+    }
+
+    private async normalizeOptionalStackEnvFiles(workspace: IWorkspace): Promise<void> {
+        const mainEnv = path.join(workspace.path, '.env')
+        let mainNginxPort: string | undefined
+        if (fs.existsSync(mainEnv)) {
+            const rawMain = await readFile(mainEnv, 'utf8')
+            mainNginxPort = rawMain
+                .split('\n')
+                .find((line) => line.startsWith('NGINX_HTTP_PORT='))
+                ?.split('=')[1]
+                ?.trim()
+        }
+
+        const monitoringEnv = path.join(workspace.path, 'monitoring', '.env_monitoring')
+        if (fs.existsSync(monitoringEnv)) {
+            await this.ensureEnvVariable(monitoringEnv, 'DOCKER_IP', workspace.slug)
+            await this.ensureEnvVariable(monitoringEnv, 'WORKSPACE_SLUG', workspace.slug)
+            if (mainNginxPort) {
+                await this.ensureEnvVariable(monitoringEnv, 'NGINX_HTTP_PORT', mainNginxPort)
+            }
+        }
+
+        const processEnv = path.join(workspace.path, 'process', '.env_process')
+        if (fs.existsSync(processEnv)) {
+            await this.replaceTokenInTextFile(processEnv, [
+                { from: 'demoteste', to: workspace.slug }
+            ])
+            await this.ensureEnvVariable(processEnv, 'DOCKER_IP', workspace.slug)
+            await this.ensureEnvVariable(processEnv, 'WORKSPACE_SLUG', workspace.slug)
+            await this.ensureEnvVariable(
+                processEnv,
+                'IGRP_LOCAL_DATABASE_HOSTNAME',
+                `${workspace.slug}-database-postgres`
+            )
+            await this.ensureEnvVariable(
+                processEnv,
+                'EUREKA_SERVICE_URL',
+                `http://${workspace.slug}-eureka:8761/eureka/`
+            )
+            if (mainNginxPort) {
+                await this.ensureEnvVariable(processEnv, 'NGINX_HTTP_PORT', mainNginxPort)
+            }
+        }
+    }
+
+    private async copyOptionalStacksFromDemoWorkspace(
+        workspace: IWorkspace,
+        options: Required<WorkspaceBootstrapOptions>,
+        bootstrapResult: WorkspaceBootstrapResult
+    ): Promise<void> {
+        const demoWorkspacePath = this.resolveDemoWorkspacePath()
+        if (!demoWorkspacePath) {
+            if (options.installMonitoringStack || options.installProcessStack) {
+                bootstrapResult.errors.push(
+                    'Could not find local demoworkspace template (demoworkspace or demoworkspace-main).'
+                )
+            }
+            return
+        }
+
+        const replacements = [{ from: 'demoteste', to: workspace.slug }]
+
+        if (options.installMonitoringStack) {
+            const sourceDir = path.join(demoWorkspacePath, 'monitoring')
+            const targetDir = path.join(workspace.path, 'monitoring')
+            if (fs.existsSync(sourceDir)) {
+                await fs.promises.cp(sourceDir, targetDir, { recursive: true, force: true })
+                await this.walkAndReplaceTokens(targetDir, replacements)
+                await this.ensureHostGatewayAliasesForSlug(
+                    path.join(targetDir, 'igrp-monitoring-compose.yaml'),
+                    workspace.slug
+                )
+                await this.normalizeOptionalStackEnvFiles(workspace)
+
+                bootstrapResult.optionalStacksInstalled.monitoring = true
+            } else {
+                bootstrapResult.errors.push(
+                    `Monitoring template not found: ${DEFAULT_MONITORING_SOURCE_COMPOSE}`
+                )
+            }
+        }
+
+        if (options.installProcessStack) {
+            const sourceDir = path.join(demoWorkspacePath, 'process')
+            const targetDir = path.join(workspace.path, 'process')
+            if (fs.existsSync(sourceDir)) {
+                await fs.promises.cp(sourceDir, targetDir, { recursive: true, force: true })
+                await this.walkAndReplaceTokens(targetDir, replacements)
+                await this.ensureHostGatewayAliasesForSlug(
+                    path.join(targetDir, 'igrp-process-compose.yaml'),
+                    workspace.slug
+                )
+                await this.ensureHostGatewayAliasesForSlug(
+                    path.join(targetDir, 'igrp-process-autentika-compose.yaml'),
+                    workspace.slug
+                )
+                await this.normalizeOptionalStackEnvFiles(workspace)
+
+                bootstrapResult.optionalStacksInstalled.process = true
+            } else {
+                bootstrapResult.errors.push(
+                    `Process template not found: ${DEFAULT_PROCESS_SOURCE_COMPOSE}`
+                )
+            }
+        }
+    }
+
+    private async ensureMainStackFromDemoWorkspace(
+        workspace: IWorkspace,
+        bootstrapResult: WorkspaceBootstrapResult
+    ): Promise<void> {
+        const targetCompose = path.join(workspace.path, DEFAULT_MAIN_COMPOSE)
+
+        const demoWorkspacePath = this.resolveDemoWorkspacePath()
+        if (!demoWorkspacePath) {
+            bootstrapResult.errors.push(
+                'Could not find local demoworkspace template (demoworkspace or demoworkspace-main) to copy igrp-compose.yaml.'
+            )
+            return
+        }
+
+        const sourceCompose = path.join(demoWorkspacePath, DEFAULT_MAIN_COMPOSE)
+        if (!fs.existsSync(sourceCompose)) {
+            bootstrapResult.errors.push(
+                'Main compose template not found: demoworkspace/igrp-compose.yaml (or fallback demoworkspace-main/igrp-compose.yaml)'
+            )
+            return
+        }
+
+        if (!fs.existsSync(targetCompose)) {
+            await fs.promises.copyFile(sourceCompose, targetCompose)
+            await this.replaceTokenInTextFile(targetCompose, [
+                { from: 'demoteste', to: workspace.slug }
+            ])
+        }
+        await this.ensureHostGatewayAliasesForSlug(targetCompose, workspace.slug)
+
+        const sourceEnv = path.join(demoWorkspacePath, '.env')
+        const targetEnv = path.join(workspace.path, '.env')
+        if (!fs.existsSync(targetEnv) && fs.existsSync(sourceEnv)) {
+            await fs.promises.copyFile(sourceEnv, targetEnv)
+            await this.replaceTokenInTextFile(targetEnv, [
+                { from: 'demoteste', to: workspace.slug }
+            ])
+        }
+        await this.ensureEnvVariable(targetEnv, 'WORKSPACE_SLUG', workspace.slug)
+        await this.ensureEnvVariable(targetEnv, 'DOCKER_IP', workspace.slug)
+        const nginxPort = await this.findNextIncrementalNginxHostPort()
+        await this.ensureEnvVariable(targetEnv, 'HOST_NGINX_HTTP_PORT', String(nginxPort))
+        await this.ensureEnvVariable(targetEnv, 'NGINX_HTTP_PORT', String(nginxPort))
+
+        const sourceNginxConf = path.join(demoWorkspacePath, DEFAULT_NGINX_CONF)
+        const targetNginxConf = path.join(workspace.path, DEFAULT_NGINX_CONF)
+        if (!fs.existsSync(targetNginxConf) && fs.existsSync(sourceNginxConf)) {
+            await fs.promises.copyFile(sourceNginxConf, targetNginxConf)
+            await this.replaceTokenInTextFile(targetNginxConf, [
+                { from: 'demoteste', to: workspace.slug }
+            ])
+        }
+
+        await this.alignMainNginxPortArtifacts(workspace.path, nginxPort)
+
+        const sourceIgrpStudioDir = path.join(demoWorkspacePath, '.igrpstudio')
+        const targetIgrpStudioDir = path.join(workspace.path, '.igrpstudio')
+        if (!fs.existsSync(targetIgrpStudioDir) && fs.existsSync(sourceIgrpStudioDir)) {
+            await fs.promises.cp(sourceIgrpStudioDir, targetIgrpStudioDir, {
+                recursive: true,
+                force: true
+            })
+            await this.walkAndReplaceTokens(targetIgrpStudioDir, [
+                { from: 'demoteste', to: workspace.slug }
+            ])
+        }
+    }
+
     private async ensureFileExists(filePath: string, defaultContent: string): Promise<void> {
         if (!fs.existsSync(filePath)) {
             await writeFile(filePath, defaultContent)
+        }
+    }
+
+    private async removeOptionalStackArtifactsIfDisabled(
+        workspacePath: string,
+        options: Required<WorkspaceBootstrapOptions>
+    ): Promise<void> {
+        if (!options.installMonitoringStack) {
+            await fs.promises.rm(path.join(workspacePath, DEFAULT_MONITORING_COMPOSE), {
+                force: true
+            })
+            await fs.promises.rm(path.join(workspacePath, 'monitoring'), {
+                recursive: true,
+                force: true
+            })
+        }
+
+        if (!options.installProcessStack) {
+            await fs.promises.rm(path.join(workspacePath, DEFAULT_PROCESS_COMPOSE), {
+                force: true
+            })
+            await fs.promises.rm(path.join(workspacePath, 'process'), {
+                recursive: true,
+                force: true
+            })
+        }
+    }
+
+    async getOptionalStacksStatus(workspacePath: string): Promise<OptionalStacksStatus> {
+        return {
+            monitoringInstalled: fs.existsSync(
+                path.join(workspacePath, DEFAULT_MONITORING_COMPOSE)
+            ),
+            processInstalled: fs.existsSync(path.join(workspacePath, DEFAULT_PROCESS_COMPOSE))
         }
     }
 
@@ -67,8 +625,19 @@ export class WorkspaceRepository {
 
     // Workspace CRUD Operations
     async createWorkspace(
-        workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>
-    ): Promise<IWorkspace> {
+        workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>,
+        options?: WorkspaceBootstrapOptions
+    ): Promise<IWorkspace & { bootstrap?: WorkspaceBootstrapResult }> {
+        const normalizedOptions = this.getDefaultBootstrapOptions(options)
+        const bootstrapResult: WorkspaceBootstrapResult = {
+            stackStarted: false,
+            optionalStacksInstalled: {
+                monitoring: false,
+                process: false
+            },
+            errors: []
+        }
+
         const data = await this.loadData()
         const newWorkspace: IWorkspace = {
             ...workspace,
@@ -77,7 +646,7 @@ export class WorkspaceRepository {
             projects: []
         }
 
-        const { path, createdAt, ...baseConfigWorkspace } = newWorkspace
+        const { path: _workspacePath, createdAt, ...baseConfigWorkspace } = newWorkspace
 
         data.workspaces.push(newWorkspace)
 
@@ -86,9 +655,137 @@ export class WorkspaceRepository {
         } catch (error) {
             throw error
         }
+
+        await this.ensureMainStackFromDemoWorkspace(newWorkspace, bootstrapResult)
+        await this.removeOptionalStackArtifactsIfDisabled(newWorkspace.path, normalizedOptions)
+
+        try {
+            await this.copyOptionalStacksFromDemoWorkspace(
+                newWorkspace,
+                normalizedOptions,
+                bootstrapResult
+            )
+        } catch (error) {
+            bootstrapResult.errors.push(
+                error instanceof Error
+                    ? error.message
+                    : 'Failed to install optional compose stacks in workspace.'
+            )
+        }
+
+        if (normalizedOptions.autoStartStack) {
+            try {
+                await dockerService.upMainStack(newWorkspace.path)
+                bootstrapResult.stackStarted = true
+            } catch (error) {
+                bootstrapResult.errors.push(
+                    error instanceof Error
+                        ? error.message
+                        : 'Failed to start igrp stack automatically.'
+                )
+            }
+        }
+
         await this.saveData(data)
 
-        return newWorkspace
+        return {
+            ...newWorkspace,
+            bootstrap: bootstrapResult
+        }
+    }
+
+    async installOptionalStacks(
+        workspaceId: string,
+        options: WorkspaceBootstrapOptions
+    ): Promise<WorkspaceBootstrapResult> {
+        const normalizedOptions = this.getDefaultBootstrapOptions({
+            autoStartStack: false,
+            installMonitoringStack: options.installMonitoringStack,
+            installProcessStack: options.installProcessStack
+        })
+        const bootstrapResult: WorkspaceBootstrapResult = {
+            stackStarted: false,
+            optionalStacksInstalled: {
+                monitoring: false,
+                process: false
+            },
+            errors: []
+        }
+
+        const data = await this.loadData()
+        const workspace = data.workspaces.find((w) => w.id === workspaceId)
+        if (!workspace) {
+            throw new Error(`Workspace ${workspaceId} not found`)
+        }
+
+        await this.copyOptionalStacksFromDemoWorkspace(
+            workspace,
+            normalizedOptions,
+            bootstrapResult
+        )
+
+        if (
+            normalizedOptions.installMonitoringStack &&
+            bootstrapResult.optionalStacksInstalled.monitoring
+        ) {
+            try {
+                await dockerService.upMonitoringStack(workspace.path)
+                bootstrapResult.stackStarted = true
+            } catch (error) {
+                bootstrapResult.errors.push(
+                    error instanceof Error
+                        ? error.message
+                        : 'Failed to start monitoring stack automatically.'
+                )
+            }
+        }
+
+        if (
+            normalizedOptions.installProcessStack &&
+            bootstrapResult.optionalStacksInstalled.process
+        ) {
+            // Process services depend on main stack readiness (db/eureka/keycloak/gateway).
+            // Bring main stack up only when needed to avoid recreating/rattling an already healthy main stack.
+            try {
+                const mainReady = await this.isMainStackReady(workspace.path)
+                if (!mainReady) {
+                    await dockerService.upMainStack(workspace.path)
+                }
+                await this.waitForMainStackReadiness(workspace.path)
+            } catch {
+                // Non-blocking: process startup below still attempts to proceed.
+            }
+
+            const maxAttempts = 3
+            let started = false
+            let lastError: unknown
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                try {
+                    if (attempt > 1) {
+                        await this.wait(6000)
+                    }
+                    await dockerService.upProcessStack(workspace.path)
+                    bootstrapResult.stackStarted = true
+                    started = true
+                    break
+                } catch (error) {
+                    lastError = error
+                }
+            }
+
+            if (!started) {
+                bootstrapResult.errors.push(
+                    lastError instanceof Error
+                        ? lastError.message
+                        : 'Failed to start process stack automatically.'
+                )
+            }
+        }
+
+        workspace.updatedAt = new Date().toISOString()
+        await this.saveData(data)
+
+        return bootstrapResult
     }
 
     async updateWorkspace(id: string, updates: Partial<IWorkspace>): Promise<IWorkspace | null> {
@@ -149,6 +846,35 @@ export class WorkspaceRepository {
             throw new Error(`Workspace ${workspaceId} not found`)
         }
 
+        const existingProjects = workspace.projects || []
+        const nextProjectName = project?.config?.name?.trim()?.toLowerCase()
+        const nextProjectPath = (project.path || '').trim()
+
+        const duplicateByName = existingProjects.find(
+            (p) => (p?.config?.name || '').trim().toLowerCase() === nextProjectName
+        )
+        if (duplicateByName) {
+            throw new Error(
+                `A project named "${project.config.name}" already exists in this workspace.`
+            )
+        }
+
+        const duplicateByPath = existingProjects.find(
+            (p) => (p.path || '').trim() === nextProjectPath
+        )
+        if (duplicateByPath) {
+            throw new Error(`A project already exists at path: ${nextProjectPath}`)
+        }
+
+        if (nextProjectPath && fs.existsSync(nextProjectPath)) {
+            const dirEntries = fs.readdirSync(nextProjectPath)
+            if (dirEntries.length > 0) {
+                throw new Error(
+                    `Target directory already exists and is not empty: ${nextProjectPath}. Choose another project name/path.`
+                )
+            }
+        }
+
         const newProject: ProjectData = {
             ...project,
             id: uuidv4(),
@@ -191,14 +917,21 @@ export class WorkspaceRepository {
         }
 
         if (!existingProject) {
-            //call engine
-            await addProjectToWorkspace(workspaceConfig, workspacePath)
+            // Specification projects manage their own folder structure via
+            // SpecificationEngine (docs/, kb/, vectors/, chats/, prototype/).
+            // The third-party workspace engine doesn't know the 'specification'
+            // type and would crash on a lookup. Skip its registration here —
+            // metadata is still persisted via this.saveData below.
+            if (framework !== 'specification') {
+                //call engine
+                await addProjectToWorkspace(workspaceConfig, workspacePath)
+            }
         } else {
             console.log(`Project "${config.name}" already exists in workspace. Skipping addition.`)
         }
 
         if (move) {
-            const result = await this.validateAndMoveProject(newProject, workspacePath)
+            const result = await this.validateAndImportProject(newProject, workspacePath)
             if (result.nameChanged) {
                 console.log(
                     `Project name changed from "${result.originalName}" to "${newProject.config.name}" due to existing directory`
@@ -276,7 +1009,14 @@ export class WorkspaceRepository {
 
             workspace.updatedAt = new Date().toISOString()
 
-            await this.addProjectToStudioWorkspace(workspace, updatedProject, true)
+            const storageMode = updates.storageMode ?? 'managed'
+            updatedProject.storageMode = storageMode
+
+            await this.addProjectToStudioWorkspace(
+                workspace,
+                updatedProject,
+                storageMode === 'managed'
+            )
 
             foundProject = updatedProject
         }
@@ -486,13 +1226,16 @@ export class WorkspaceRepository {
     async listProjects(workspaceId: string): Promise<ProjectData[]> {
         const data = await this.loadData()
         const workspace = data.workspaces.find((w) => w.id === workspaceId)
-        return (
-            workspace?.projects?.sort((a, b) => {
-                const dateA = new Date(a.updatedAt || a.createdAt || '1970-01-01T00:00:00Z')
-                const dateB = new Date(b.updatedAt || b.createdAt || '1970-01-01T00:00:00Z')
-                return dateB.getTime() - dateA.getTime()
-            }) || []
-        )
+        const projects = (workspace?.projects || []).map((p) => ({
+            ...p,
+            storageMode: p.storageMode ?? 'managed'
+        }))
+
+        return projects.sort((a, b) => {
+            const dateA = new Date(a.updatedAt || a.createdAt || '1970-01-01T00:00:00Z')
+            const dateB = new Date(b.updatedAt || b.createdAt || '1970-01-01T00:00:00Z')
+            return dateB.getTime() - dateA.getTime()
+        })
     }
 
     async getRecentWorkspaces(limit = 15): Promise<IWorkspace[]> {
@@ -642,7 +1385,7 @@ export class WorkspaceRepository {
             .slice(0, limit)
     }
 
-    async validateAndMoveProject(
+    async validateAndImportProject(
         project: ProjectData,
         workspacePath: string
     ): Promise<{ nameChanged: boolean; originalName?: string }> {
@@ -680,19 +1423,15 @@ export class WorkspaceRepository {
             nameChanged = true
         }
 
-        // Move the project
+        // Import (copy) the project into the workspace structure
         try {
             await fs.promises.cp(project.path, expectedPath, {
                 recursive: true
             })
-            await fs.promises.rm(project.path, {
-                recursive: true,
-                force: true
-            })
             project.path = expectedPath
             project.updatedAt = new Date().toISOString()
         } catch (error: any) {
-            throw new Error(`Failed to move project: ${error.message}`)
+            throw new Error(`Failed to import project: ${error.message}`)
         }
 
         return { nameChanged, originalName }

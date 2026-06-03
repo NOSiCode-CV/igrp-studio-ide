@@ -1,17 +1,19 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPSeparator,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import { DebugTerminal } from '@renderer/components/debug-terminal'
+import { TERMINAL_TOGGLE_EVENT } from '@renderer/components/integrated-terminal'
 import Doctor from '@renderer/components/doctor'
 import { SHOW_UPDATE_MODAL_EVENT } from '@renderer/components/update-banner'
-import { AlertCircle, HelpCircle, Stethoscope, Wifi, WifiOff } from 'lucide-react'
+import { captureRendererException } from '@renderer/init-sentry'
+import { AlertCircle, HelpCircle, Stethoscope, Terminal, Wifi, WifiOff } from 'lucide-react'
 import { type JSX, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -101,20 +103,27 @@ export function Footer(): JSX.Element {
         if (appVersion) handleCheckUpdate()
     }, [appVersion, t])
 
-    /*  const simulateError = (): void => {
-    const error = new Error('This is a simulated error from the renderer process.')
+    /** Dev-only: exercise GlitchTip/Sentry (renderer SDK + main via IPC). */
+    const runMonitoringTestError = (): void => {
+        const error = new Error('IGRP Studio: monitoring test (footer, simulated)')
+        error.name = 'MonitoringTestError'
 
-    if (window.electron?.reportError) {
-      window.electron.reportError(error)
-      setLog('Simulated error sent to logger')
-    } else {
-      console.error('Electron reportError bridge is not available')
-      throw error
+        captureRendererException(error, {
+            source: 'footer-monitoring-test',
+            simulated: true
+        })
+
+        if (window.electron?.reportError) {
+            window.electron.reportError(error)
+            setLog(t('monitoringTestSent'))
+        } else {
+            setLog(t('monitoringTestNoBridge'))
+            console.warn('[Monitoring test] window.electron.reportError not available')
+        }
     }
-  } */
 
     return (
-        <IGRPTooltipProviderPrimitive>
+        <TooltipProvider>
             <footer className="h-8 border-t bg-card flex items-center px-3 justify-between text-xs fixed bottom-0 left-0 right-0 z-50">
                 <div className="flex items-center space-x-3">
                     <span className="text-muted-foreground whitespace-nowrap flex-none">
@@ -163,28 +172,59 @@ export function Footer(): JSX.Element {
                 <div className="flex items-center space-x-3">
                     <IGRPSeparator orientation="vertical" className="h-4" />
 
-                    {/*  <button onClick={simulateError} className="">
-            Simulate Error
-          </button> */}
+                    {import.meta.env.DEV ? (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-6 text-xs px-2"
+                                    onClick={runMonitoringTestError}
+                                >
+                                    {t('monitoringTestButton')}
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                                <p className="max-w-xs">{t('monitoringTestTooltip')}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    ) : null}
 
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
-                            <IGRPButtonPrimitive
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
                                 size={'icon'}
                                 variant={'ghost'}
                                 className="h-6 w-6"
                                 onClick={() => setOpen(!open)}
                             >
                                 <Stethoscope className="text-muted-foreground" />
-                            </IGRPButtonPrimitive>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive side="top">Doctor</IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">Doctor</TooltipContent>
+                    </Tooltip>
 
                     <DebugTerminal />
 
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-6 w-6"
+                                onClick={() =>
+                                    window.dispatchEvent(new Event(TERMINAL_TOGGLE_EVENT))
+                                }
+                            >
+                                <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">Terminal (Ctrl+`)</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                        <TooltipTrigger asChild>
                             <div className="flex items-center space-x-1">
                                 {isOnline ? (
                                     <Wifi className="h-3.5 w-3.5 text-green-500" />
@@ -195,26 +235,26 @@ export function Footer(): JSX.Element {
                                     {isOnline ? 'Online' : 'Offline'}
                                 </span>
                             </div>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive side="top">
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
                             <p>{t('networkStatus')}</p>
-                        </IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                        </TooltipContent>
+                    </Tooltip>
 
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
-                            <IGRPButtonPrimitive variant="ghost" size="icon" className="h-6 w-6">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
                                 <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
-                            </IGRPButtonPrimitive>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive side="top">
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
                             <p>{t('helpCenter')}</p>
-                        </IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                        </TooltipContent>
+                    </Tooltip>
 
                     <Doctor open={open} setOpen={setOpen} />
                 </div>
             </footer>
-        </IGRPTooltipProviderPrimitive>
+        </TooltipProvider>
     )
 }

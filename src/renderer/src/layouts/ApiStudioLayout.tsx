@@ -1,7 +1,4 @@
-import {
-    IGRPSidebarInsetPrimitive,
-    IGRPSidebarProviderPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 
 import {
@@ -13,6 +10,7 @@ import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import type { ProjectData } from 'src/main/types'
+import { IntegratedTerminal } from '../components/integrated-terminal'
 import { AppIGRPSidebar } from './components/app-sidebar'
 import { Footer } from './components/footer'
 import Header from './components/header'
@@ -38,12 +36,8 @@ const Layout = (props: LayoutProps): React.ReactNode => {
 
     useEffect(() => {
         if (changeStatus) {
-            // Add a small delay to ensure file system operations complete
-            const timer = setTimeout(() => {
-                dispatch(onGetFolderFiles(basePath))
-                dispatch(onSetChangeStatus(false))
-            }, 100)
-            return () => clearTimeout(timer)
+            dispatch(onGetFolderFiles(basePath))
+            dispatch(onSetChangeStatus(false))
         }
         return undefined
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -59,7 +53,7 @@ const Layout = (props: LayoutProps): React.ReactNode => {
 
     return (
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))] [--header-height-three:calc(--spacing(30))]">
-            <IGRPSidebarProviderPrimitive
+            <SidebarProvider
                 style={
                     {
                         '--sidebar-width': '380px'
@@ -76,17 +70,18 @@ const Layout = (props: LayoutProps): React.ReactNode => {
                             basePath={basePath}
                             header
                         />
-                        <IGRPSidebarInsetPrimitive className="flex-1">
+                        <SidebarInset className="flex-1">
                             {React.cloneElement(props.children, {
                                 basePath,
                                 currentItem,
                                 project: config
                             })}
-                        </IGRPSidebarInsetPrimitive>
+                        </SidebarInset>
                     </div>
                 </div>
                 <Footer />
-            </IGRPSidebarProviderPrimitive>
+                <IntegratedTerminal />
+            </SidebarProvider>
         </div>
     )
 }

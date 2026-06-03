@@ -1,23 +1,20 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPInputPassword,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
+import { IGRPInputPassword } from '@igrp/igrp-framework-react-design-system'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
 import { getUUID } from '@renderer/utils'
 import { GitFork, Key, User } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { IWorkspace } from 'src/main/types'
 import { RepositoryList } from './repository-list'
@@ -53,14 +50,14 @@ export function CloneProjectModal({ workspace, open, setOpen }: CloneProjectModa
 
     }; */
 
-    const resetForm = () => {
+    const resetForm = useCallback(() => {
         setProjectUrl('')
         setAuthType('none')
         setUsername('')
         setPassword('')
         setToken('')
         setIsCloning(false)
-    }
+    }, [])
 
     const handleCloneProject = async (): Promise<void> => {
         // Validate required fields
@@ -111,7 +108,7 @@ export function CloneProjectModal({ workspace, open, setOpen }: CloneProjectModa
     }
 
     useEffect(() => {
-        window.electron.ipcRenderer.on('clone-progress', async (_event: any, data: any) => {
+        const onCloneProgress = async (_event: any, data: any) => {
             if (data.status === 'success') {
                 resetForm()
 
@@ -139,48 +136,40 @@ export function CloneProjectModal({ workspace, open, setOpen }: CloneProjectModa
             } else if (data.status === 'error') {
                 showErrorToast(t('failedCloneRepository', { message: data.message }))
             }
-        })
+        }
+
+        window.electron.ipcRenderer.on('clone-progress', onCloneProgress)
 
         return () => {
-            window.electron.ipcRenderer.removeAllListeners('clone-progress')
-            window.electron.ipcRenderer.removeAllListeners('request-project-name')
+            window.electron.ipcRenderer.removeListener('clone-progress', onCloneProgress)
         }
-    }, [])
+    }, [resetForm, saveOrOpenProject, showErrorToast, showSuccessToast, t, workspace.id])
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-            <IGRPDialogContentPrimitive className="sm:max-w-[700px] lg:max-w-[650px] max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
-                <IGRPDialogHeaderPrimitive className="">
-                    <IGRPDialogTitlePrimitive className="">
-                        {t('cloneProject')}
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive />
-                </IGRPDialogHeaderPrimitive>
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="sm:max-w-[700px] lg:max-w-[650px] max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+                <DialogHeader className="">
+                    <DialogTitle className="">{t('cloneProject')}</DialogTitle>
+                    <DialogDescription />
+                </DialogHeader>
                 <div className="flex-1 overflow-hidden flex flex-col">
-                    <IGRPTabsPrimitive defaultValue="url" className="w-full flex-1 flex flex-col">
-                        <IGRPTabsListPrimitive className="grid w-full grid-cols-2">
-                            <IGRPTabsTriggerPrimitive value="url">
-                                {t('repositoryUrl')}
-                            </IGRPTabsTriggerPrimitive>
-                            <IGRPTabsTriggerPrimitive value="search">
-                                {t('searchRepositories')}
-                            </IGRPTabsTriggerPrimitive>
-                        </IGRPTabsListPrimitive>
+                    <Tabs defaultValue="url" className="w-full flex-1 flex flex-col">
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="url">{t('repositoryUrl')}</TabsTrigger>
+                            <TabsTrigger value="search">{t('searchRepositories')}</TabsTrigger>
+                        </TabsList>
 
-                        <IGRPTabsContentPrimitive
-                            value="url"
-                            className="space-y-4 flex-1 overflow-auto"
-                        >
+                        <TabsContent value="url" className="space-y-4 flex-1 overflow-auto">
                             <div className="grid gap-6 py-6">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2 grid gap-2">
-                                        <IGRPLabelPrimitive
+                                        <Label
                                             htmlFor="project-url"
                                             className="text-muted-foreground"
                                         >
                                             {t('repositoryUrl')}
-                                        </IGRPLabelPrimitive>
-                                        <IGRPInputPrimitive
+                                        </Label>
+                                        <Input
                                             id="project-url"
                                             placeholder={t('repositoryUrlPlaceholder')}
                                             value={projectUrl}
@@ -190,38 +179,32 @@ export function CloneProjectModal({ workspace, open, setOpen }: CloneProjectModa
                                     </div>
                                 </div>
                                 <div className="grid gap-2">
-                                    <IGRPLabelPrimitive className="text-muted-foreground">
+                                    <Label className="text-muted-foreground">
                                         {t('authentication')}
-                                    </IGRPLabelPrimitive>
-                                    <IGRPTabsPrimitive value={authType} onValueChange={setAuthType}>
-                                        <IGRPTabsListPrimitive className="grid w-full grid-cols-3">
-                                            <IGRPTabsTriggerPrimitive value="none">
-                                                {t('none')}
-                                            </IGRPTabsTriggerPrimitive>
-                                            <IGRPTabsTriggerPrimitive value="basic">
-                                                {t('basic')}
-                                            </IGRPTabsTriggerPrimitive>
-                                            <IGRPTabsTriggerPrimitive value="token">
-                                                {t('token')}
-                                            </IGRPTabsTriggerPrimitive>
-                                        </IGRPTabsListPrimitive>
+                                    </Label>
+                                    <Tabs value={authType} onValueChange={setAuthType}>
+                                        <TabsList className="grid w-full grid-cols-3">
+                                            <TabsTrigger value="none">{t('none')}</TabsTrigger>
+                                            <TabsTrigger value="basic">{t('basic')}</TabsTrigger>
+                                            <TabsTrigger value="token">{t('token')}</TabsTrigger>
+                                        </TabsList>
 
-                                        <IGRPTabsContentPrimitive value="none" className="mt-4">
+                                        <TabsContent value="none" className="mt-4">
                                             {/* No authentication content */}
-                                        </IGRPTabsContentPrimitive>
+                                        </TabsContent>
 
-                                        <IGRPTabsContentPrimitive value="basic" className="mt-4">
+                                        <TabsContent value="basic" className="mt-4">
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="grid gap-2">
-                                                    <IGRPLabelPrimitive
+                                                    <Label
                                                         htmlFor="username"
                                                         className="text-muted-foreground"
                                                     >
                                                         {t('username')}
-                                                    </IGRPLabelPrimitive>
+                                                    </Label>
                                                     <div className="relative">
                                                         <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                        <IGRPInputPrimitive
+                                                        <Input
                                                             id="username"
                                                             placeholder={t('usernamePlaceholder')}
                                                             value={username}
@@ -233,12 +216,12 @@ export function CloneProjectModal({ workspace, open, setOpen }: CloneProjectModa
                                                     </div>
                                                 </div>
                                                 <div className="grid gap-2">
-                                                    <IGRPLabelPrimitive
+                                                    <Label
                                                         htmlFor="password"
                                                         className="text-muted-foreground"
                                                     >
                                                         {t('password')}
-                                                    </IGRPLabelPrimitive>
+                                                    </Label>
                                                     <div className="relative">
                                                         <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                                         <IGRPInputPassword
@@ -252,16 +235,16 @@ export function CloneProjectModal({ workspace, open, setOpen }: CloneProjectModa
                                                     </div>
                                                 </div>
                                             </div>
-                                        </IGRPTabsContentPrimitive>
+                                        </TabsContent>
 
-                                        <IGRPTabsContentPrimitive value="token" className="mt-4">
+                                        <TabsContent value="token" className="mt-4">
                                             <div className="grid gap-2">
-                                                <IGRPLabelPrimitive
+                                                <Label
                                                     htmlFor="token"
                                                     className="text-muted-foreground"
                                                 >
                                                     {t('token')}
-                                                </IGRPLabelPrimitive>
+                                                </Label>
                                                 <div className="relative">
                                                     <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                                     <IGRPInputPassword
@@ -274,26 +257,26 @@ export function CloneProjectModal({ workspace, open, setOpen }: CloneProjectModa
                                                     />
                                                 </div>
                                             </div>
-                                        </IGRPTabsContentPrimitive>
-                                    </IGRPTabsPrimitive>
+                                        </TabsContent>
+                                    </Tabs>
                                 </div>
                             </div>
-                            <IGRPButtonPrimitive
+                            <Button
                                 onClick={handleCloneProject}
                                 className="w-full"
                                 disabled={isCloning}
                             >
                                 <GitFork className="w-4 h-4 mr-2" />
                                 {isCloning ? t('cloningProject') : t('cloneProject')}
-                            </IGRPButtonPrimitive>
-                        </IGRPTabsContentPrimitive>
+                            </Button>
+                        </TabsContent>
 
-                        <IGRPTabsContentPrimitive value="search">
+                        <TabsContent value="search">
                             <RepositoryList />
-                        </IGRPTabsContentPrimitive>
-                    </IGRPTabsPrimitive>
+                        </TabsContent>
+                    </Tabs>
                 </div>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

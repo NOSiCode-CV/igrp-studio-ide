@@ -1,7 +1,6 @@
 import './assets/globals.css'
 import { loader } from '@monaco-editor/react'
 import * as monaco from 'monaco-editor'
-
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import AppWithI18n from './components/app-with-i18n'
@@ -9,8 +8,10 @@ import ErrorBoundary from './components/error-boundary'
 
 import '@renderer/localization/i18next.config'
 import LoaderComponent from './components/loader'
+import { initRendererSentry } from './init-sentry'
 
 loader.config({ monaco })
+initRendererSentry()
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>

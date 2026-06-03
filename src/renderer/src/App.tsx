@@ -1,19 +1,58 @@
 import { configureStore } from '@reduxjs/toolkit'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React, { type JSX, useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
 import { ActiveThemeProvider } from './components/active-theme-provider'
 import { ThemeProvider } from './components/theme-provider'
+import { ProcessStudioClientProvider } from './features/bpmn'
+import { EngineCatalogProvider } from './features/engine-catalog'
 import rootReducer from './redux'
+import { subscribeToSpecDataChunks } from './redux/specData/thunks'
+import { subscribeDocsChanged } from './redux/specDocs/thunks'
+import { subscribeKBProgress } from './redux/specKB/thunks'
+import { subscribePrototypeEvents } from './redux/specPrototype/thunks'
 import AppRoutes from './routes/Routes'
 import { ThemeService } from './services/ThemeService'
 
 import '@igrp/framework-process-studio-bpmn-editor/dist/src/styles.css'
 
 import '@igrp/igrp-framework-react-design-system/styles'
-import { IGRPToasterPrimitive } from '@igrp/igrp-framework-react-design-system'
-
+import { Toaster } from '@renderer/components/ui/sonner'
 // Configure Redux store
 const store = configureStore({ reducer: rootReducer, devTools: true })
+
+// TanStack Query client — scoped usage (BPMN module). Defaults from §4.5 of the
+// process-integration plan: read queries are reasonably fresh.
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 30_000,
+            refetchOnWindowFocus: false
+        }
+    }
+})
+
+// Subscribe once to spec:kb progress events so KB items refresh in real time.
+if (typeof window !== 'undefined' && (window as any).specKB) {
+    subscribeKBProgress()(store.dispatch)
+}
+
+// Subscribe once to spec:doc changes so the documents tree refreshes when the
+// backend reports mutations from any source.
+if (typeof window !== 'undefined' && (window as any).specDoc) {
+    subscribeDocsChanged(() => store.getState().PageBuilder.basePath)(store.dispatch)
+}
+
+// Subscribe once to prototype dev-server logs/status events.
+if (typeof window !== 'undefined' && (window as any).specPrototype) {
+    subscribePrototypeEvents()(store.dispatch)
+}
+
+// Subscribe once to spec:data generator chunks so the chat snapshot card
+// + per-turn applied/failed counts land in the specData slice.
+if (typeof window !== 'undefined' && (window as any).specData) {
+    subscribeToSpecDataChunks(store.dispatch)
+}
 
 const App = (): JSX.Element => {
     const [activeThemeValue, setActiveThemeValue] = useState<string>('igrp')
@@ -31,14 +70,20 @@ const App = (): JSX.Element => {
 
     return (
         <Provider store={store}>
-            <React.Fragment>
-                <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-                    <ActiveThemeProvider initialTheme={activeThemeValue}>
-                        <IGRPToasterPrimitive richColors closeButton expand />
-                        <AppRoutes />
-                    </ActiveThemeProvider>
-                </ThemeProvider>
-            </React.Fragment>
+            <QueryClientProvider client={queryClient}>
+                <ProcessStudioClientProvider>
+                    <EngineCatalogProvider>
+                        <React.Fragment>
+                            <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+                                <ActiveThemeProvider initialTheme={activeThemeValue}>
+                                    <Toaster richColors closeButton expand />
+                                    <AppRoutes />
+                                </ActiveThemeProvider>
+                            </ThemeProvider>
+                        </React.Fragment>
+                    </EngineCatalogProvider>
+                </ProcessStudioClientProvider>
+            </QueryClientProvider>
         </Provider>
     )
 }

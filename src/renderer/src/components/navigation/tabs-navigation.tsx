@@ -1,14 +1,13 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPContextMenuContentPrimitive,
-    IGRPContextMenuItemPrimitive,
-    IGRPContextMenuPrimitive,
-    IGRPContextMenuShortcutPrimitive,
-    IGRPContextMenuTriggerPrimitive,
-    IGRPScrollAreaPrimitive,
-    IGRPScrollBarPrimitive,
-    IGRPSeparatorPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuShortcut,
+    ContextMenuTrigger
+} from '@renderer/components/ui/context-menu'
+import { ScrollArea, ScrollBar } from '@renderer/components/ui/scroll-area'
+import { Separator } from '@renderer/components/ui/separator'
 import type { OptionType } from '@renderer/constants/appConstants'
 import { SHORTCUTS } from '@renderer/constants/shortcut'
 import { cn } from '@renderer/lib/utils'
@@ -81,14 +80,14 @@ const TabsNavigation = ({
     return (
         <nav className="flex justify-between pr-5 bg-sidebar">
             <div className="flex flex-1 w-[100px]">
-                <IGRPScrollAreaPrimitive ref={scrollAreaRef}>
+                <ScrollArea ref={scrollAreaRef}>
                     <div className="flex items-center whitespace-nowrap">
                         {tabs.map((tab) => {
                             const Icon = getIcon(tab.open)
                             return (
                                 <React.Fragment key={tab.id}>
-                                    <IGRPContextMenuPrimitive>
-                                        <IGRPContextMenuTriggerPrimitive>
+                                    <ContextMenu>
+                                        <ContextMenuTrigger>
                                             <div
                                                 className={cn(
                                                     'px-4 h-10 text-sm font-medium focus:outline-hidden cursor-pointer align-middle flex',
@@ -116,7 +115,7 @@ const TabsNavigation = ({
                                                     )}
                                                     <span>{tab.title}</span>
                                                     {tab.id !== TAB_DEFAULT && (
-                                                        <IGRPButtonPrimitive
+                                                        <Button
                                                             onClick={(e) => {
                                                                 e.stopPropagation()
                                                                 handleCloseTab(tab.id)
@@ -128,57 +127,52 @@ const TabsNavigation = ({
                                                             )}
                                                         >
                                                             <X className="h-3" />
-                                                        </IGRPButtonPrimitive>
+                                                        </Button>
                                                     )}
                                                 </div>
                                             </div>
-                                        </IGRPContextMenuTriggerPrimitive>
+                                        </ContextMenuTrigger>
                                         {tab.id !== TAB_DEFAULT && (
-                                            <IGRPContextMenuContentPrimitive className="w-64">
-                                                <IGRPContextMenuItemPrimitive
+                                            <ContextMenuContent className="w-64">
+                                                <ContextMenuItem
                                                     onClick={() => handleCloseTab(tab.id)}
                                                 >
                                                     {t('closeSelectedTab')}
-                                                    <IGRPContextMenuShortcutPrimitive>
+                                                    <ContextMenuShortcut>
                                                         {SHORTCUTS.CLOSE_TAB}
-                                                    </IGRPContextMenuShortcutPrimitive>
-                                                </IGRPContextMenuItemPrimitive>
-                                                <IGRPContextMenuItemPrimitive
+                                                    </ContextMenuShortcut>
+                                                </ContextMenuItem>
+                                                <ContextMenuItem
                                                     onClick={() => handleCloseRight(tab.id)}
                                                 >
                                                     {t('closeRight')}
-                                                </IGRPContextMenuItemPrimitive>
-                                                <IGRPContextMenuItemPrimitive
+                                                </ContextMenuItem>
+                                                <ContextMenuItem
                                                     onClick={() => handleCloseLeft(tab.id)}
                                                 >
                                                     {t('closeLeft')}
-                                                </IGRPContextMenuItemPrimitive>
-                                                <IGRPContextMenuItemPrimitive
+                                                </ContextMenuItem>
+                                                <ContextMenuItem
                                                     onClick={() => handleCloseOthers(tab.id)}
                                                 >
                                                     {t('closeOthers')}
-                                                </IGRPContextMenuItemPrimitive>
-                                                <IGRPContextMenuItemPrimitive
-                                                    onClick={handleCloseAll}
-                                                >
+                                                </ContextMenuItem>
+                                                <ContextMenuItem onClick={handleCloseAll}>
                                                     {t('closeAll')}
-                                                </IGRPContextMenuItemPrimitive>
-                                            </IGRPContextMenuContentPrimitive>
+                                                </ContextMenuItem>
+                                            </ContextMenuContent>
                                         )}
-                                    </IGRPContextMenuPrimitive>
-                                    <IGRPSeparatorPrimitive
-                                        orientation="vertical"
-                                        className="h-4"
-                                    />
+                                    </ContextMenu>
+                                    <Separator orientation="vertical" className="h-4" />
                                 </React.Fragment>
                             )
                         })}
                     </div>
-                    <IGRPScrollBarPrimitive orientation="horizontal" className="h-2" />
-                </IGRPScrollAreaPrimitive>
+                    <ScrollBar orientation="horizontal" className="h-2" />
+                </ScrollArea>
                 {btnNew && (
                     <div className="flex items-center px-2 gap-2">
-                        <IGRPButtonPrimitive
+                        <Button
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
@@ -186,7 +180,7 @@ const TabsNavigation = ({
                         >
                             <Plus className="h-4 w-4" />
                             <span className="sr-only">{t('newEndpoint')}</span>
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                 )}
             </div>

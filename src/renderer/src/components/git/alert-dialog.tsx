@@ -1,5 +1,5 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
     IGRPModalDialog,
     IGRPModalDialogContent,
     IGRPModalDialogDescription,
@@ -29,12 +29,10 @@ const AlertDialogSync: React.FC<SyncAlertProps> = ({ isOpen, onConfirm, onClose,
                     </IGRPModalDialogDescription>
                 </IGRPModalDialogHeader>
                 <IGRPModalDialogFooter>
-                    <IGRPButtonPrimitive variant="outline" onClick={() => onClose(false)}>
+                    <Button variant="outline" onClick={() => onClose(false)}>
                         {t('cancel')}
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive onClick={onConfirm}>
-                        {t('syncChanges')}
-                    </IGRPButtonPrimitive>
+                    </Button>
+                    <Button onClick={onConfirm}>{t('syncChanges')}</Button>
                 </IGRPModalDialogFooter>
             </IGRPModalDialogContent>
         </IGRPModalDialog>

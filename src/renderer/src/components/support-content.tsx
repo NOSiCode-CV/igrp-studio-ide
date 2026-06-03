@@ -1,12 +1,12 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
 import { Headset } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -54,7 +54,7 @@ export default function SupportContent({}: SupportContentProps) {
     }
 
     return (
-        <IGRPTooltipProviderPrimitive>
+        <TooltipProvider>
             <div className="space-y-2 mb-4 rounded-lg p-2 shadow-lg border w-full">
                 <div className="flex items-center gap-2">
                     <span className="h-6 w-6">
@@ -66,9 +66,9 @@ export default function SupportContent({}: SupportContentProps) {
                     <p className="text-muted-foreground">{t('supportDescription')}</p>
                     <div className="mt-4 flex justify-center gap-2">
                         {supportChannels.map((channel) => (
-                            <IGRPTooltipPrimitive key={channel.name}>
-                                <IGRPTooltipTriggerPrimitive asChild>
-                                    <IGRPButtonPrimitive
+                            <Tooltip key={channel.name}>
+                                <TooltipTrigger asChild>
+                                    <Button
                                         variant={'ghost'}
                                         size={'icon'}
                                         className={channel.iconClassName}
@@ -82,18 +82,18 @@ export default function SupportContent({}: SupportContentProps) {
                                             alt={channel.name}
                                             className="h-5 w-5"
                                         />
-                                    </IGRPButtonPrimitive>
-                                </IGRPTooltipTriggerPrimitive>
-                                <IGRPTooltipContentPrimitive>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
                                     {t('supportContactVia', {
                                         channel: channel.name
                                     })}
-                                </IGRPTooltipContentPrimitive>
-                            </IGRPTooltipPrimitive>
+                                </TooltipContent>
+                            </Tooltip>
                         ))}
                     </div>
                 </div>
             </div>
-        </IGRPTooltipProviderPrimitive>
+        </TooltipProvider>
     )
 }

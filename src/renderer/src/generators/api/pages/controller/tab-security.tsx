@@ -1,14 +1,14 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardDescriptionPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPCombobox,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@renderer/components/ui/card'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import type { PermissionsConfig } from '@igrp/igrp-studio-springboot-engine/types'
 import { X } from 'lucide-react'
 import type React from 'react'
@@ -127,23 +127,19 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
     return (
         <div className="space-y-4">
             {/* Permissions Section */}
-            <IGRPCardPrimitive>
-                <IGRPCardHeaderPrimitive>
-                    <IGRPCardTitlePrimitive>
-                        {t('permissions') || 'Permissions'}
-                    </IGRPCardTitlePrimitive>
-                    <IGRPCardDescriptionPrimitive>
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('permissions') || 'Permissions'}</CardTitle>
+                    <CardDescription>
                         {t('configurePermissions') ||
                             'Configure the permissions required to access this action. Use AND to require all permissions, OR to require at least one.'}
-                    </IGRPCardDescriptionPrimitive>
-                </IGRPCardHeaderPrimitive>
-                <IGRPCardContentPrimitive className="space-y-4">
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                     {/* Permission Operator */}
                     {permissionItems.length > 0 && (
                         <div className="space-y-2">
-                            <IGRPLabelPrimitive>
-                                {t('permissionOperator') || 'Permission Operator'}
-                            </IGRPLabelPrimitive>
+                            <Label>{t('permissionOperator') || 'Permission Operator'}</Label>
                             <IGRPCombobox
                                 options={[
                                     {
@@ -167,9 +163,7 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
 
                     {/* Permission Input */}
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive>
-                            {t('addPermission') || 'Add Permission'}
-                        </IGRPLabelPrimitive>
+                        <Label>{t('addPermission') || 'Add Permission'}</Label>
                         <div className="flex gap-2">
                             {availablePermissions.length > 0 ? (
                                 <IGRPCombobox
@@ -182,7 +176,7 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
                                     className="flex-1"
                                 />
                             ) : (
-                                <IGRPInputPrimitive
+                                <Input
                                     value={permissionInput}
                                     onChange={(e) => setPermissionInput(e.target.value)}
                                     placeholder={
@@ -198,7 +192,7 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
                                     }}
                                 />
                             )}
-                            <IGRPButtonPrimitive
+                            <Button
                                 type="button"
                                 onClick={handleAddPermission}
                                 disabled={
@@ -206,17 +200,17 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
                                 }
                             >
                                 {t('add') || 'Add'}
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </div>
                     </div>
 
                     {/* Permission Tags */}
                     {permissionItems.length > 0 && (
                         <div className="space-y-2">
-                            <IGRPLabelPrimitive>
+                            <Label>
                                 {t('selectedPermissions') || 'Selected Permissions'} (
                                 {permissionItems.length})
-                            </IGRPLabelPrimitive>
+                            </Label>
                             <div className="flex flex-wrap gap-2">
                                 {permissionItems.map((perm) => (
                                     <div
@@ -239,33 +233,33 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
 
                     {/* Clear Permissions */}
                     {permissionItems.length > 0 && (
-                        <IGRPButtonPrimitive
+                        <Button
                             type="button"
                             variant="outline"
                             onClick={() => formik.setFieldValue('permission', undefined)}
                             className="w-full"
                         >
                             {t('clearPermissions') || 'Clear All Permissions'}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     )}
-                </IGRPCardContentPrimitive>
-            </IGRPCardPrimitive>
+                </CardContent>
+            </Card>
 
             {/* Roles Section */}
-            <IGRPCardPrimitive>
-                <IGRPCardHeaderPrimitive>
-                    <IGRPCardTitlePrimitive>{t('roles') || 'Roles'}</IGRPCardTitlePrimitive>
-                    <IGRPCardDescriptionPrimitive>
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('roles') || 'Roles'}</CardTitle>
+                    <CardDescription>
                         {t('configureRoles') ||
                             'Configure the roles required to access this action. Users must have at least one of these roles.'}
-                    </IGRPCardDescriptionPrimitive>
-                </IGRPCardHeaderPrimitive>
-                <IGRPCardContentPrimitive className="space-y-4">
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                     {/* Role Input */}
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive>{t('addRole') || 'Add Role'}</IGRPLabelPrimitive>
+                        <Label>{t('addRole') || 'Add Role'}</Label>
                         <div className="flex gap-2">
-                            <IGRPInputPrimitive
+                            <Input
                                 value={roleInput}
                                 onChange={(e) => setRoleInput(e.target.value)}
                                 placeholder={
@@ -279,22 +273,22 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
                                     }
                                 }}
                             />
-                            <IGRPButtonPrimitive
+                            <Button
                                 type="button"
                                 onClick={handleAddRole}
                                 disabled={!roleInput.trim()}
                             >
                                 {t('add') || 'Add'}
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </div>
                     </div>
 
                     {/* Role Tags */}
                     {roles.length > 0 && (
                         <div className="space-y-2">
-                            <IGRPLabelPrimitive>
+                            <Label>
                                 {t('selectedRoles') || 'Selected Roles'} ({roles.length})
-                            </IGRPLabelPrimitive>
+                            </Label>
                             <div className="flex flex-wrap gap-2">
                                 {roles.map((role) => (
                                     <div
@@ -317,17 +311,17 @@ export const TabSecurity: React.FC<TabSecurityProps> = ({ formik, basePath, modu
 
                     {/* Clear Roles */}
                     {roles.length > 0 && (
-                        <IGRPButtonPrimitive
+                        <Button
                             type="button"
                             variant="outline"
                             onClick={() => formik.setFieldValue('roles', [])}
                             className="w-full"
                         >
                             {t('clearRoles') || 'Clear All Roles'}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     )}
-                </IGRPCardContentPrimitive>
-            </IGRPCardPrimitive>
+                </CardContent>
+            </Card>
         </div>
     )
 }

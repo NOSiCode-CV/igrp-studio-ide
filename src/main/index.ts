@@ -1,3 +1,6 @@
+// Must come first so process.env is populated before any module that reads
+// env vars at top-level evaluation (e.g. git-auth's DEV_PORT capture).
+import './helpers/env'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { exec } from 'child_process'
 import {
@@ -10,7 +13,10 @@ import {
     shell
 } from 'electron'
 import fs from 'fs'
+import * as os from 'os'
+import dns from 'node:dns'
 import path, { join } from 'path'
+import * as pty from 'node-pty'
 import icon from '../../resources/icon.png?asset'
 import {
     checkAndReadBaseApi,
@@ -21,9 +27,11 @@ import {
     readIgrpStudioDirectory,
     readProjectFile
 } from './helpers'
+import { buildGitAuth, getProviderConfigById } from './helpers/git-auth/git-auth-factory'
 import { githubAuth } from './helpers/git-auth/github-auth'
 import { gitlabAuth } from './helpers/git-auth/gitlab-auth'
-import { initializeLogger, sendErrorReport } from './helpers/logger'
+import { initMainSentryEarly, initializeLogger, sendErrorReport } from './helpers/logger'
+import { registerPowerRecovery } from './helpers/power-recovery'
 import { closeApp, installExtensions } from './helpers/utils'
 import { GitStore } from './services/git-store'
 import { GitHubService } from './services/github-service'
@@ -37,6 +45,14 @@ import './handlers/git-handler'
 import './handlers/app-logic-handlers'
 import './handlers/docker-handler'
 import './handlers/global-handler'
+import './handlers/graphql/graphql-manifest.handler'
+import './handlers/markitdown-handler'
+import './handlers/spec-kb-handler'
+import './handlers/spec-doc-handler'
+import './handlers/spec-llm-handler'
+import './handlers/spec-prototype-handler'
+import './handlers/spec-data-handler'
+import { prototypeDevServer } from './services/prototype/prototype-dev-server'
 import './helpers/fetch-request'
 
 import { initComponents } from '@igrp/igrp-studio-nextjs-engine'
@@ -54,15 +70,35 @@ import { folderWatcher } from './helpers/watch-folder'
 import { WorkspaceRepository } from './services/workspace-service'
 
 let mainWindow: BrowserWindow
+const ptySessions = new Map<string, pty.IPty>()
 
 let nextJsManager: NextJsManager
 let currentAuthProvider: 'github' | 'gitlab' | null = null
+/**
+ * Tracks the GitAuth instance that initiated the in-flight OAuth flow.
+ * When set it is used to handle the protocol callback so dynamic configs
+ * (e.g. GitHub Enterprise instances saved via the UI) can complete the
+ * round-trip alongside the env-based singletons.
+ */
+let activeAuthInstance: import('./helpers/git-auth/git-auth').GitAuth | null = null
 
 dotenv.config()
 
+initMainSentryEarly()
+
 process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error)
-    sendErrorReport(error)
+    void sendErrorReport(error, { errorType: 'uncaughtException' })
+})
+
+process.on('warning', (warning) => {
+    const warningWithCode = warning as Error & { code?: string }
+    // Silence known Node deprecation noise from transitive deps on startup.
+    if (warningWithCode.name === 'DeprecationWarning' && warningWithCode.code === 'DEP0169') {
+        return
+    }
+
+    console.warn(warningWithCode)
 })
 
 function createWindow(): void {
@@ -77,7 +113,10 @@ function createWindow(): void {
         ...(process.platform === 'linux' ? { icon } : {}),
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
-            sandbox: false
+            sandbox: false,
+            // Required so the Specification project type can preview the
+            // Next.js dev server inside an Electron <webview> element.
+            webviewTag: true
         },
         titleBarStyle: 'hidden',
         icon: path.join(__dirname, 'resources/icons', 'icon.icns') // Set icon for the window
@@ -111,9 +150,52 @@ function createWindow(): void {
 
     installExtensions(mainWindow)
 
-    initializeLogger({
-        endpoint: 'localhost:4317'
+    void initializeLogger()
+}
+
+function resolveTerminalShell(): string {
+    if (os.platform() === 'win32') {
+        return 'powershell.exe'
+    }
+
+    return process.env.SHELL || 'bash'
+}
+
+function resolveTerminalCwd(targetCwd?: string): string {
+    if (targetCwd && fs.existsSync(targetCwd) && fs.statSync(targetCwd).isDirectory()) {
+        return targetCwd
+    }
+    return os.homedir()
+}
+
+function createPtyProcess(sessionId: string, targetCwd?: string): pty.IPty {
+    const existingSession = ptySessions.get(sessionId)
+    if (existingSession) {
+        return existingSession
+    }
+
+    const terminalProcess = pty.spawn(resolveTerminalShell(), [], {
+        name: 'xterm-color',
+        cols: 80,
+        rows: 30,
+        cwd: resolveTerminalCwd(targetCwd),
+        env: process.env as Record<string, string>
     })
+
+    terminalProcess.onData((data) => {
+        if (!mainWindow || mainWindow.isDestroyed()) return
+        mainWindow.webContents.send('pty-data', { sessionId, data })
+    })
+
+    terminalProcess.onExit(() => {
+        if (!mainWindow || mainWindow.isDestroyed()) return
+        mainWindow.webContents.send('pty-exit', { sessionId })
+        ptySessions.delete(sessionId)
+    })
+
+    ptySessions.set(sessionId, terminalProcess)
+
+    return terminalProcess
 }
 
 // This method will be called when Electron has finished
@@ -147,16 +229,16 @@ app.whenReady().then(async () => {
                     mainWindow.focus()
 
                     if (url.includes('oauth/callback')) {
-                        if (currentAuthProvider === 'github') {
+                        if (activeAuthInstance) {
+                            activeAuthInstance.handleProtocolCallback(url, mainWindow)
+                        } else if (currentAuthProvider === 'github') {
                             githubAuth.handleProtocolCallback(url, mainWindow)
                         } else if (currentAuthProvider === 'gitlab') {
                             gitlabAuth.handleProtocolCallback(url, mainWindow)
-                        } else {
-                            if (url.includes('github')) {
-                                githubAuth.handleProtocolCallback(url, mainWindow)
-                            } else if (url.includes('gitlab')) {
-                                gitlabAuth.handleProtocolCallback(url, mainWindow)
-                            }
+                        } else if (url.includes('github')) {
+                            githubAuth.handleProtocolCallback(url, mainWindow)
+                        } else if (url.includes('gitlab')) {
+                            gitlabAuth.handleProtocolCallback(url, mainWindow)
                         }
                     }
                 }
@@ -165,7 +247,9 @@ app.whenReady().then(async () => {
             if (process.argv.length > 1) {
                 const url = process.argv[process.argv.length - 1]
                 if (url.startsWith('igrp-studio://')) {
-                    if (url.includes('github')) {
+                    if (activeAuthInstance) {
+                        activeAuthInstance.handleProtocolCallback(url, mainWindow)
+                    } else if (url.includes('github')) {
                         githubAuth.handleProtocolCallback(url, mainWindow)
                     } else if (url.includes('gitlab')) {
                         gitlabAuth.handleProtocolCallback(url, mainWindow)
@@ -189,9 +273,47 @@ app.whenReady().then(async () => {
     // IPC test
     ipcMain.on('ping', () => console.log('pong'))
 
-    ipcMain.on('report-error', (_, error: Error) => {
-        sendErrorReport(error)
+    ipcMain.on('pty-create', (_, payload: { sessionId: string; cwd?: string }) => {
+        const { sessionId, cwd } = payload
+        if (!sessionId) return
+        createPtyProcess(sessionId, cwd)
     })
+
+    ipcMain.on('pty-input', (_, payload: { sessionId: string; data: string }) => {
+        const { sessionId, data } = payload
+        if (!sessionId) return
+        if (!data) return
+        createPtyProcess(sessionId).write(data)
+    })
+
+    ipcMain.on('pty-resize', (_, payload: { sessionId: string; cols: number; rows: number }) => {
+        const { sessionId, cols, rows } = payload
+        if (!sessionId) return
+        if (!cols || !rows) return
+        createPtyProcess(sessionId).resize(cols, rows)
+    })
+
+    ipcMain.on('pty-destroy', (_, sessionId: string) => {
+        if (!sessionId) return
+        const targetSession = ptySessions.get(sessionId)
+        if (!targetSession) return
+        targetSession.kill()
+        ptySessions.delete(sessionId)
+    })
+
+    ipcMain.on(
+        'report-error',
+        (_, payload: Error | { message: string; name?: string; stack?: string }) => {
+            const err =
+                payload instanceof Error
+                    ? payload
+                    : Object.assign(new Error(payload.message), {
+                          name: payload.name ?? 'Error',
+                          stack: payload.stack
+                      })
+            void sendErrorReport(err, { source: 'renderer-ipc' })
+        }
+    )
 
     await GitStore.initialize()
     const initializeGitHubService = async (): Promise<void> => {
@@ -215,31 +337,47 @@ app.whenReady().then(async () => {
     }
     await initializeAllServices()
 
-    ipcMain.on('github-oauth', async () => {
+    ipcMain.on('github-oauth', async (_event, configId?: string) => {
         const isDev = process.env.VITE_NODE_ENV === 'development'
         try {
-            currentAuthProvider = 'github' // Add this line
-            await githubAuth.setupOAuth(mainWindow, isDev)
+            currentAuthProvider = 'github'
+            const auth = configId
+                ? (() => {
+                      const cfg = getProviderConfigById(configId)
+                      return cfg ? buildGitAuth(cfg) : githubAuth
+                  })()
+                : githubAuth
+            activeAuthInstance = auth
+            await auth.setupOAuth(mainWindow, isDev)
         } catch (error: unknown) {
             console.error('GitHub OAuth failed:', error)
-            currentAuthProvider = null // Add this line
+            currentAuthProvider = null
+            activeAuthInstance = null
         }
     })
 
     // GitLab handler
-    ipcMain.on('gitlab-oauth', async () => {
+    ipcMain.on('gitlab-oauth', async (_event, configId?: string) => {
         const isDev = process.env.VITE_NODE_ENV === 'development'
-        console.log('isDev', isDev)
         try {
-            currentAuthProvider = 'gitlab' // Add this line
-            await gitlabAuth.setupOAuth(mainWindow, isDev)
+            currentAuthProvider = 'gitlab'
+            const auth = configId
+                ? (() => {
+                      const cfg = getProviderConfigById(configId)
+                      return cfg ? buildGitAuth(cfg) : gitlabAuth
+                  })()
+                : gitlabAuth
+            activeAuthInstance = auth
+            await auth.setupOAuth(mainWindow, isDev)
         } catch (error: unknown) {
             console.error('GitLab OAuth failed:', error)
-            currentAuthProvider = null // Add this line
+            currentAuthProvider = null
+            activeAuthInstance = null
         }
     })
 
     createWindow()
+    registerPowerRecovery()
 
     app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
@@ -261,17 +399,44 @@ app.whenReady().then(async () => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+    for (const session of ptySessions.values()) {
+        session.kill()
+    }
+    ptySessions.clear()
+    // Tear down any running Next.js dev servers spawned by Specification
+    // projects so we don't leak ports on quit.
+    void prototypeDevServer.stopAll()
     if (process.platform !== 'darwin') {
         app.quit()
     }
 })
 
 ipcMain.on('open-external-url', (_event, url) => {
-    if (url) {
-        // Open the provided URL in the default browser
-        shell.openExternal(url)
-    } else {
+    if (!url) {
         console.error('No URL provided')
+        return
+    }
+
+    try {
+        const parsed = new URL(url)
+        const host = parsed.hostname
+        if (host === 'localhost' || host === '127.0.0.1') {
+            shell.openExternal(url)
+            return
+        }
+
+        dns.lookup(host, (err) => {
+            if (!err) {
+                shell.openExternal(url)
+                return
+            }
+
+            const fallback = new URL(url)
+            fallback.hostname = 'localhost'
+            shell.openExternal(fallback.toString())
+        })
+    } catch {
+        shell.openExternal(url)
     }
 })
 
@@ -314,7 +479,7 @@ ipcMain.handle('get-app-version', () => {
 ipcMain.on('open-directory-dialog', async (event) => {
     await dialog
         .showOpenDialog(mainWindow, {
-            properties: ['openDirectory', 'createDirectory', 'showHiddenFiles'],
+            properties: ['openDirectory', 'createDirectory'],
             buttonLabel: 'Select Destination Folder'
         })
         .then((result) => {
@@ -346,6 +511,7 @@ ipcMain.handle(
 ipcMain.handle(
     'igrp-studio:get-json-content',
     async (_event, filePath: string): Promise<unknown> => {
+        if (!filePath) return null
         return await getJsonContent(filePath)
     }
 )
@@ -438,7 +604,10 @@ app.on('open-url', (event, url) => {
 
     if (mainWindow) {
         if (url.includes('oauth/callback')) {
-            if (currentAuthProvider === 'github') {
+            if (activeAuthInstance) {
+                console.log('Processing OAuth callback via active auth instance')
+                activeAuthInstance.handleProtocolCallback(url, mainWindow)
+            } else if (currentAuthProvider === 'github') {
                 console.log('Processing GitHub callback')
                 githubAuth.handleProtocolCallback(url, mainWindow)
             } else if (currentAuthProvider === 'gitlab') {
@@ -446,7 +615,6 @@ app.on('open-url', (event, url) => {
                 gitlabAuth.handleProtocolCallback(url, mainWindow)
             } else {
                 console.error('Received OAuth callback but no active provider is set')
-                // Try to guess based on URL
                 if (url.includes('github')) {
                     githubAuth.handleProtocolCallback(url, mainWindow)
                 } else if (url.includes('gitlab')) {

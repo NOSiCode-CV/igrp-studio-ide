@@ -33,6 +33,10 @@ export const OPTION_TYPE = {
     MODEL: 'model',
     CONTROLLERS: 'controllers',
     CONTROLLER: 'controller',
+    GRAPHQL: 'graphql',
+    GRAPHQL_QUERY: 'graphql-query',
+    GRAPHQL_MUTATION: 'graphql-mutation',
+    GRAPHQL_SUBSCRIPTION: 'graphql-subscription',
     DATA_OBJECTS: 'dto',
     ACTION: 'action',
     MODAL: 'modal',
@@ -94,7 +98,8 @@ export const httpMethods = [
 export enum ENV_TYPES {
     NEXTJS = 'nextjs',
     SPRING = 'springboot',
-    DOTNET = 'dotnet'
+    DOTNET = 'dotnet',
+    SPECIFICATION = 'specification'
 }
 
 export const DatabaseOptions = [
@@ -110,6 +115,13 @@ export const projectStructureStyle = [
 
 export enum APRESENTATION {
     DESIGN = 'design',
+    /**
+     * Tree view (M-DnD β) — same drag-drop primitives as the Specification
+     * Prototype canvas, mounted via `features/manifest-tree`. Edits flow
+     * through the existing `EditorContext` handlers via the adapter hook
+     * (`useTreeCallbacksFromContext`).
+     */
+    TREE = 'tree',
     CODE = 'code',
     JSON = 'json'
 }

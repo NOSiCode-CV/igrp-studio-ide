@@ -24,35 +24,64 @@ export interface DropdownItem {
     actionType: OptionType
     icon?: LucideIcon
     modalType?: 'database-manager' | 'serialization-config'
+    isNew?: boolean
 }
 
 const IGNORED_PATHS = new Set(['baseApi.json', 'permissions.json', '.DS_store'])
 
 const createMenuItems = (t: any) => ({
     newDto: {
+        id: 'new-dto',
         label: t('newDto'),
         actionType: OPTION_TYPE.DATA_OBJECTS,
         icon: getIcon(OPTION_TYPE.DATA_OBJECTS)
     },
     newModels: {
+        id: 'new-model',
         label: t('newModels'),
         actionType: OPTION_TYPE.MODEL,
         icon: getIcon(OPTION_TYPE.MODELS)
     },
     newEnum: {
+        id: 'new-enum',
         label: t('newEnum'),
         actionType: OPTION_TYPE.ENUM,
         icon: getIcon(OPTION_TYPE.ENUM)
     },
     newResponses: {
+        id: 'new-response',
         label: t('newResponses'),
         actionType: OPTION_TYPE.RESPONSE,
         icon: getIcon(OPTION_TYPE.RESPONSE)
     },
     newControllers: {
+        id: 'new-controller',
         label: t('newControllers'),
         actionType: OPTION_TYPE.ACTION,
         icon: getIcon(OPTION_TYPE.ACTION)
+    },
+    graphql: {
+        label: 'GraphQL',
+        actionType: OPTION_TYPE.GRAPHQL,
+        icon: getIcon(OPTION_TYPE.GRAPHQL)
+    },
+    newGraphQLQuery: {
+        label: 'New Query',
+        actionType: OPTION_TYPE.GRAPHQL_QUERY,
+        icon: getIcon(OPTION_TYPE.GRAPHQL_QUERY),
+        isNew: false
+    },
+    newGraphQLMutation: {
+        label: 'New Mutation',
+        actionType: OPTION_TYPE.GRAPHQL_MUTATION,
+        icon: getIcon(OPTION_TYPE.GRAPHQL_MUTATION),
+        isNew: false
+    },
+    newGraphQLSubscription: {
+        label: 'New Subscription',
+        actionType: OPTION_TYPE.GRAPHQL_SUBSCRIPTION,
+        icon: getIcon(OPTION_TYPE.GRAPHQL_SUBSCRIPTION),
+        isNew: false
     },
     importDataTableFromDatabase: {
         label: t('importDataTableFromDatabase'),
@@ -72,6 +101,7 @@ const createMenuItems = (t: any) => ({
         icon: Cable
     },
     newAction: {
+        id: 'new-action',
         label: t('newAction'),
         actionType: OPTION_TYPE.ACTION,
         icon: getIcon(OPTION_TYPE.ACTION)
@@ -162,6 +192,21 @@ const useNavdata = (filesThree: FileTree[]) => {
         [dispatch]
     )
 
+    const openGraphQLAction = useCallback(
+        (actionType: OptionType, moduleName: string, label: string) => {
+            dispatch(
+                onSetCurrentItem({
+                    id: `${actionType}-${Date.now()}`,
+                    label,
+                    type: actionType,
+                    module: moduleName,
+                    isNew: false
+                } as any)
+            )
+        },
+        [dispatch]
+    )
+
     const getSubItems = useCallback(
         (file: any, folderName: string) => {
             const { path, content } = file
@@ -214,6 +259,10 @@ const useNavdata = (filesThree: FileTree[]) => {
                 if (folder.children) {
                     folder.children.forEach((child: any) => {
                         if (!Object.values(OPTION_TYPE).includes(child.name as OptionType)) {
+                            return
+                        }
+
+                        if (child.name === OPTION_TYPE.GRAPHQL) {
                             return
                         }
 
@@ -275,6 +324,189 @@ const useNavdata = (filesThree: FileTree[]) => {
                     })
                 }
 
+                const graphQLDirectory = folder.children?.find(
+                    (child: any) => child.name === OPTION_TYPE.GRAPHQL
+                )
+                const graphQLManifest = graphQLDirectory?.children?.find(
+                    (file: any) => !file.isDirectory && file.name === 'graphql.json'
+                )?.content
+                const graphQLOperations = Array.isArray(graphQLManifest?.operations)
+                    ? graphQLManifest.operations
+                    : []
+                const graphQLTypesDirectory = graphQLDirectory?.children?.find(
+                    (child: any) => child.isDirectory && child.name === 'types'
+                )
+                const graphQLTypeFiles: any[] =
+                    graphQLTypesDirectory?.children?.filter(
+                        (file: any) => !file.isDirectory && file.name.endsWith('.json')
+                    ) ?? []
+
+                folderMenuItem.subItems?.push({
+                    id: `graphql-${folder.name}`,
+                    label: 'GraphQL',
+                    module: folder.name,
+                    type: OPTION_TYPE.GRAPHQL,
+                    icon: getIcon(OPTION_TYPE.GRAPHQL),
+                    link: ROUTES.PATH_PAGE_BUILDER_API,
+                    click: onClickItem,
+                    dropdownclick: onClickItem,
+                    dropdownMenus: [
+                        {
+                            ...menuItemsConfig.newGraphQLQuery,
+                            dropdownclick: () =>
+                                openGraphQLAction(
+                                    OPTION_TYPE.GRAPHQL_QUERY,
+                                    folder.name,
+                                    'New Query'
+                                )
+                        },
+                        {
+                            ...menuItemsConfig.newGraphQLMutation,
+                            dropdownclick: () =>
+                                openGraphQLAction(
+                                    OPTION_TYPE.GRAPHQL_MUTATION,
+                                    folder.name,
+                                    'New Mutation'
+                                )
+                        },
+                        {
+                            ...menuItemsConfig.newGraphQLSubscription,
+                            dropdownclick: () =>
+                                openGraphQLAction(
+                                    OPTION_TYPE.GRAPHQL_SUBSCRIPTION,
+                                    folder.name,
+                                    'New Subscription'
+                                )
+                        }
+                    ] as any,
+                    content: {
+                        type: OPTION_TYPE.GRAPHQL
+                    },
+                    subItems: [
+                        {
+                            id: `graphql-queries-${folder.name}`,
+                            label: 'Queries',
+                            module: folder.name,
+                            type: OPTION_TYPE.GRAPHQL,
+                            dropdownMenus: [
+                                {
+                                    ...menuItemsConfig.newGraphQLQuery,
+                                    dropdownclick: () =>
+                                        openGraphQLAction(
+                                            OPTION_TYPE.GRAPHQL_QUERY,
+                                            folder.name,
+                                            'New Query'
+                                        )
+                                }
+                            ] as any,
+                            subItems: graphQLOperations
+                                .filter((operation: any) => operation.operationType === 'query')
+                                .map((operation: any) => ({
+                                    id: operation.id,
+                                    label: operation.name,
+                                    module: folder.name,
+                                    type: OPTION_TYPE.GRAPHQL_QUERY,
+                                    link: ROUTES.PATH_PAGE_BUILDER_API,
+                                    click: onClickItem,
+                                    dropdownclick: onClickItem,
+                                    dropdownMenus: [menuItemsConfig.delete] as any,
+                                    content: operation
+                                }))
+                        },
+                        {
+                            id: `graphql-mutations-${folder.name}`,
+                            label: 'Mutations',
+                            module: folder.name,
+                            type: OPTION_TYPE.GRAPHQL,
+                            dropdownMenus: [
+                                {
+                                    ...menuItemsConfig.newGraphQLMutation,
+                                    dropdownclick: () =>
+                                        openGraphQLAction(
+                                            OPTION_TYPE.GRAPHQL_MUTATION,
+                                            folder.name,
+                                            'New Mutation'
+                                        )
+                                }
+                            ] as any,
+                            subItems: graphQLOperations
+                                .filter((operation: any) => operation.operationType === 'mutation')
+                                .map((operation: any) => ({
+                                    id: operation.id,
+                                    label: operation.name,
+                                    module: folder.name,
+                                    type: OPTION_TYPE.GRAPHQL_MUTATION,
+                                    link: ROUTES.PATH_PAGE_BUILDER_API,
+                                    click: onClickItem,
+                                    dropdownclick: onClickItem,
+                                    dropdownMenus: [menuItemsConfig.delete] as any,
+                                    content: operation
+                                }))
+                        },
+                        {
+                            id: `graphql-types-${folder.name}`,
+                            label: 'Types',
+                            module: folder.name,
+                            type: OPTION_TYPE.GRAPHQL,
+                            dropdownMenus: [
+                                {
+                                    ...menuItemsConfig.newDto,
+                                    dropdownclick: () =>
+                                        openGraphQLAction(
+                                            OPTION_TYPE.DATA_OBJECTS,
+                                            folder.name,
+                                            'New Type'
+                                        )
+                                }
+                            ] as any,
+                            subItems: graphQLTypeFiles.map((file: any) => ({
+                                id: file.content?.id || file.name,
+                                label: file.content?.name || file.name.replace('.json', ''),
+                                path: file.path,
+                                module: folder.name,
+                                type: OPTION_TYPE.DATA_OBJECTS,
+                                link: ROUTES.PATH_PAGE_BUILDER_API,
+                                click: onClickItem,
+                                dropdownclick: onClickItem,
+                                dropdownMenus: [menuItemsConfig.delete] as any,
+                                content: file.content
+                            }))
+                        },
+                        {
+                            id: `graphql-subscriptions-${folder.name}`,
+                            label: 'Subscriptions',
+                            module: folder.name,
+                            type: OPTION_TYPE.GRAPHQL,
+                            dropdownMenus: [
+                                {
+                                    ...menuItemsConfig.newGraphQLSubscription,
+                                    dropdownclick: () =>
+                                        openGraphQLAction(
+                                            OPTION_TYPE.GRAPHQL_SUBSCRIPTION,
+                                            folder.name,
+                                            'New Subscription'
+                                        )
+                                }
+                            ] as any,
+                            subItems: graphQLOperations
+                                .filter(
+                                    (operation: any) => operation.operationType === 'subscription'
+                                )
+                                .map((operation: any) => ({
+                                    id: operation.id,
+                                    label: operation.name,
+                                    module: folder.name,
+                                    type: OPTION_TYPE.GRAPHQL_SUBSCRIPTION,
+                                    link: ROUTES.PATH_PAGE_BUILDER_API,
+                                    click: onClickItem,
+                                    dropdownclick: onClickItem,
+                                    dropdownMenus: [menuItemsConfig.delete] as any,
+                                    content: operation
+                                }))
+                        }
+                    ]
+                })
+
                 return folderMenuItem
             })
     }, [
@@ -285,7 +517,8 @@ const useNavdata = (filesThree: FileTree[]) => {
         getDropdownSubMenus,
         getSubItems,
         onClickItem,
-        menuItemsConfig
+        menuItemsConfig,
+        openGraphQLAction
     ])
 
     return { menuItems }

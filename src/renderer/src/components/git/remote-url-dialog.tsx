@@ -1,13 +1,13 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPInputPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -28,35 +28,29 @@ export function RemoteUrlDialog({ isOpen, onClose, onConfirm }: RemoteUrlDialogP
     }
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
-            <IGRPDialogContentPrimitive>
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('addRemoteRepository')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        {t('enterRemoteRepositoryUrl')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{t('addRemoteRepository')}</DialogTitle>
+                    <DialogDescription>{t('enterRemoteRepositoryUrl')}</DialogDescription>
+                </DialogHeader>
                 <div className="py-4">
-                    <IGRPInputPrimitive
+                    <Input
                         placeholder={t('remoteRepositoryUrlPlaceholder')}
                         value={url}
                         onChange={(e) => setUrl(e.target.value)}
                         className="w-full"
                     />
                 </div>
-                <IGRPDialogFooterPrimitive>
-                    <IGRPButtonPrimitive variant="outline" onClick={onClose}>
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose}>
                         {t('cancel')}
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
-                        onClick={handleConfirm}
-                        disabled={!url.trim()}
-                        variant={'default'}
-                    >
+                    </Button>
+                    <Button onClick={handleConfirm} disabled={!url.trim()} variant={'default'}>
                         {t('addRemote')}
-                    </IGRPButtonPrimitive>
-                </IGRPDialogFooterPrimitive>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }

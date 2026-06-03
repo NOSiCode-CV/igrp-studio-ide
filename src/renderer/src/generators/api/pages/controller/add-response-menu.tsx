@@ -1,14 +1,8 @@
 'use client'
 
-import {
-    IGRPButtonPrimitive,
-    IGRPHoverCardContentPrimitive,
-    IGRPHoverCardPrimitive,
-    IGRPHoverCardTriggerPrimitive,
-    IGRPPopoverContentPrimitive,
-    IGRPPopoverPrimitive,
-    IGRPPopoverTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@renderer/components/ui/hover-card'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
 import { ChevronRight, Plus } from 'lucide-react'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -62,16 +56,16 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
 
     return (
         <div className="relative">
-            <IGRPPopoverPrimitive open={isOpen} onOpenChange={setIsOpen}>
-                <IGRPPopoverTriggerPrimitive asChild>
-                    <IGRPButtonPrimitive variant="ghost" size="sm" className="h-8 px-2">
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
+                <PopoverTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 px-2">
                         <Plus className="h-4 w-4" />
                         {t('add')}
-                    </IGRPButtonPrimitive>
-                </IGRPPopoverTriggerPrimitive>
-                <IGRPPopoverContentPrimitive className="p-0" align="end">
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" align="end">
                     <div className="flex flex-col">
-                        <IGRPButtonPrimitive
+                        <Button
                             variant="ghost"
                             className="justify-start px-4 py-2 text-sm font-normal"
                             onClick={() => {
@@ -80,19 +74,19 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                             }}
                         >
                             {t('addBlankResponse')}
-                        </IGRPButtonPrimitive>
-                        <IGRPHoverCardPrimitive openDelay={0} closeDelay={0}>
-                            <IGRPHoverCardTriggerPrimitive asChild>
-                                <IGRPButtonPrimitive
+                        </Button>
+                        <HoverCard openDelay={0} closeDelay={0}>
+                            <HoverCardTrigger asChild>
+                                <Button
                                     variant="ghost"
                                     className="justify-between px-4 py-2 text-sm font-normal hover:bg-muted group"
                                 >
                                     {t('referenceResponseComponent')}
                                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                </IGRPButtonPrimitive>
-                            </IGRPHoverCardTriggerPrimitive>
+                                </Button>
+                            </HoverCardTrigger>
                             {responseTypes && responseTypes.length > 0 && (
-                                <IGRPHoverCardContentPrimitive
+                                <HoverCardContent
                                     className="w-60 p-0"
                                     align="start"
                                     sideOffset={-44}
@@ -101,12 +95,12 @@ export const AddResponseMenu: React.FC<AddResponseMenuProps> = ({
                                     <div className="border-t">
                                         <ErrorList />
                                     </div>
-                                </IGRPHoverCardContentPrimitive>
+                                </HoverCardContent>
                             )}
-                        </IGRPHoverCardPrimitive>
+                        </HoverCard>
                     </div>
-                </IGRPPopoverContentPrimitive>
-            </IGRPPopoverPrimitive>
+                </PopoverContent>
+            </Popover>
         </div>
     )
 }

@@ -84,6 +84,24 @@ export const toolConfig: ToolConfig[] = [
         required: true,
         category: 'development',
         description: 'Version control system'
+    },
+    {
+        name: 'Python',
+        command: 'python3',
+        link: 'https://www.python.org/downloads/',
+        required: false,
+        category: 'development',
+        description: 'Python 3.10+ runtime (required by the Markdown Converter in dev)',
+        extraCheck: 'python3_10Plus'
+    },
+    {
+        name: 'MarkItDown',
+        command: 'python3',
+        link: 'https://github.com/microsoft/markitdown',
+        required: false,
+        category: 'development',
+        description: 'Microsoft MarkItDown module (pip install "markitdown[all]")',
+        extraCheck: 'markitdownModule'
     }
 ]
 

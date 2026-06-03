@@ -1,17 +1,15 @@
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
+import { CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
+import { Label } from '@renderer/components/ui/label'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { Switch } from '@renderer/components/ui/switch'
 import {
-    IGRPBadgePrimitive,
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPLabelPrimitive,
-    IGRPScrollAreaPrimitive,
-    IGRPSwitchPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
 import { useGit } from '@renderer/hooks/use-git'
 import { AlertTriangle, GitBranch, GitCommit, RefreshCw } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -76,7 +74,7 @@ export function GitCommitsSidebar({ basePath, onSelectCommit }: GitCommitsSideba
         onSelectCommit?.(commit)
     }
 
-    const handleAutoCommitIGRPSwitchPrimitive = (prompt: boolean) => {
+    const handleAutoCommitSwitch = (prompt: boolean) => {
         isAutoCommit(prompt)
         setAutoCommit(prompt)
     }
@@ -96,9 +94,9 @@ export function GitCommitsSidebar({ basePath, onSelectCommit }: GitCommitsSideba
                 <div className="flex flex-col items-center justify-center h-full p-4 text-destructive">
                     <AlertTriangle className="h-6 w-6 mb-2" />
                     <p className="text-center">{error}</p>
-                    <IGRPButtonPrimitive variant="outline" className="mt-4" onClick={fetchCommits}>
+                    <Button variant="outline" className="mt-4" onClick={fetchCommits}>
                         {t('retry')}
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
             )
         }
@@ -113,8 +111,8 @@ export function GitCommitsSidebar({ basePath, onSelectCommit }: GitCommitsSideba
         }
 
         return (
-            <IGRPScrollAreaPrimitive className="h-[calc(100vh-230px)]">
-                <IGRPTooltipProviderPrimitive>
+            <ScrollArea className="h-[calc(100vh-230px)]">
+                <TooltipProvider>
                     {commits.map((commit) => (
                         <CommitItem
                             key={commit.hash}
@@ -123,36 +121,36 @@ export function GitCommitsSidebar({ basePath, onSelectCommit }: GitCommitsSideba
                             onSelect={() => handleCommitSelect(commit)}
                         />
                     ))}
-                </IGRPTooltipProviderPrimitive>
-            </IGRPScrollAreaPrimitive>
+                </TooltipProvider>
+            </ScrollArea>
         )
     }
 
     return (
         <div className="w-full h-full">
-            <IGRPCardHeaderPrimitive className="flex space-y-4 p-2">
+            <CardHeader className="flex space-y-4 p-2">
                 <div className="flex flex-1 items-center space-x-2">
-                    <IGRPLabelPrimitive>Auto Commit</IGRPLabelPrimitive>
-                    <IGRPSwitchPrimitive
+                    <Label>Auto Commit</Label>
+                    <Switch
                         checked={autoCommit}
                         onCheckedChange={(value) => {
-                            handleAutoCommitIGRPSwitchPrimitive(value)
+                            handleAutoCommitSwitch(value)
                         }}
-                    ></IGRPSwitchPrimitive>
+                    ></Switch>
                 </div>
                 <div className="flex flex-row items-center justify-between">
-                    <IGRPCardTitlePrimitive className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2">
                         <GitBranch className="h-5 w-5" />
                         {t('gitCommits')}
-                    </IGRPCardTitlePrimitive>
+                    </CardTitle>
                     {!loading && !error && (
-                        <IGRPBadgePrimitive variant="secondary">
+                        <Badge variant="secondary">
                             {t('commitsCount', { count: commits.length })}
-                        </IGRPBadgePrimitive>
+                        </Badge>
                     )}
                 </div>
-            </IGRPCardHeaderPrimitive>
-            <IGRPCardContentPrimitive className="p-0">{renderContent()}</IGRPCardContentPrimitive>
+            </CardHeader>
+            <CardContent className="p-0">{renderContent()}</CardContent>
         </div>
     )
 }
@@ -167,22 +165,22 @@ function CommitItem({ commit, isSelected, onSelect }: CommitItemProps) {
             onClick={onSelect}
         >
             <div className="flex justify-between items-center">
-                <IGRPTooltipPrimitive>
-                    <IGRPTooltipTriggerPrimitive asChild>
+                <Tooltip>
+                    <TooltipTrigger asChild>
                         <div className="flex items-center gap-2">
                             <GitCommit className="h-4 w-4 text-muted-foreground" />
                             <span className="text-sm font-normal truncate max-w-[180px]">
                                 {commit.message}
                             </span>
                         </div>
-                    </IGRPTooltipTriggerPrimitive>
-                    <IGRPTooltipContentPrimitive>
+                    </TooltipTrigger>
+                    <TooltipContent>
                         <p>{commit.message}</p>
-                    </IGRPTooltipContentPrimitive>
-                </IGRPTooltipPrimitive>
-                <IGRPBadgePrimitive variant="outline" className="text-xs">
+                    </TooltipContent>
+                </Tooltip>
+                <Badge variant="outline" className="text-xs">
                     {commit.hash.slice(0, 7)}
-                </IGRPBadgePrimitive>
+                </Badge>
             </div>
             <div className="text-xs text-muted-foreground mt-1 flex justify-between">
                 <span>{commit.author}</span>

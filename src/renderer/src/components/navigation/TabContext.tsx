@@ -99,11 +99,18 @@ export const TabProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (currentItem) {
             const newTabId = currentItem.id || getId()
             const actionType = currentItem.actionType || currentItem.type
+            const graphQLTitleMap: Record<string, string> = {
+                dto: 'New Contract',
+                'graphql-query': 'New Query',
+                'graphql-mutation': 'New Mutation',
+                'graphql-subscription': 'New Subscription'
+            }
             handleNewTab({
                 id: newTabId,
                 title:
                     currentItem.isNew && actionType
-                        ? `new${actionType.charAt(0).toUpperCase() + actionType.slice(1)}`
+                        ? graphQLTitleMap[actionType] ||
+                          `new${actionType.charAt(0).toUpperCase() + actionType.slice(1)}`
                         : currentItem.label,
                 open: actionType,
                 item: { ...currentItem, id: newTabId }

@@ -8,7 +8,7 @@ import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { extractByType, getMergedFiles, getModulesArray } from '@renderer/generators/api/helpers'
 import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 import type { FileTree, MenuItem, ProjectData } from 'src/main/types'
 
 interface RootState {

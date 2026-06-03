@@ -1,12 +1,7 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardPrimitive,
-    IGRPContainer,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Card, CardContent } from '@renderer/components/ui/card'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
+import { IGRPContainer } from '@igrp/igrp-framework-react-design-system'
 import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { KeyboardKey, SHORTCUTS } from '@renderer/constants/shortcut'
 import { useKeyPress } from '@renderer/hooks/useKeyDown'
@@ -53,32 +48,29 @@ const EmptyPage = ({ onClick }: { onClick: (option: string) => void }) => {
         <IGRPContainer className="mb-0">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {actions.map((action, key) => (
-                    <IGRPCardPrimitive
+                    <Card
                         key={key}
                         className="group hover:border-primary/50 transition-colors cursor-pointer"
                         onClick={action.onClick}
                     >
-                        <IGRPCardContentPrimitive className="flex flex-col items-center justify-center space-y-4">
+                        <CardContent className="flex flex-col items-center justify-center space-y-4">
                             <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                                 {action.icon}
                             </div>
-                            <IGRPTooltipPrimitive>
-                                <IGRPTooltipTriggerPrimitive asChild>
-                                    <IGRPButtonPrimitive
-                                        variant="default"
-                                        className="w-full truncate"
-                                    >
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant="default" className="w-full truncate">
                                         <span className="block text-ellipsis overflow-hidden whitespace-nowrap">
                                             {action.title} ({action.shortcut})
                                         </span>
-                                    </IGRPButtonPrimitive>
-                                </IGRPTooltipTriggerPrimitive>
-                                <IGRPTooltipContentPrimitive>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
                                     {action.title} - {action.shortcut}
-                                </IGRPTooltipContentPrimitive>
-                            </IGRPTooltipPrimitive>
-                        </IGRPCardContentPrimitive>
-                    </IGRPCardPrimitive>
+                                </TooltipContent>
+                            </Tooltip>
+                        </CardContent>
+                    </Card>
                 ))}
             </div>
         </IGRPContainer>
