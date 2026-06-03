@@ -15,7 +15,7 @@ branch is shipped. Items are ordered by what's actively broken first
 
 ## 🐛 Bugs
 
-### #1 — "Create project" doesn't work
+### #1 — "Create project" doesn't work(Fixed_02)
 
 **Severity:** blocker
 **Symptom:** the "New project" flow no longer creates a project after the
@@ -33,7 +33,7 @@ merge (or the action doesn't trigger / errors silently).
 
 ---
 
-### #2 — "Clone git" modal — projects list inside has scroll issue
+### #2 — "Clone git" modal — projects list inside has scroll issue(Fixed_02)
 
 **Severity:** UX bug
 **Symptom:** when cloning a git repo, the modal listing existing /
@@ -72,7 +72,7 @@ moves the whole page instead of the list).
 
 ## 🎨 Theme & colors
 
-### #4 — Eliminate hardcoded colors; primary must come from theme tokens
+### #4 — Eliminate hardcoded colors; primary must come from theme tokens(Fixed_02)
 
 **Severity:** high (affects dark mode + future re-theming)
 **Symptom:** the merged branches kept hardcoded `bg-teal-*`,
@@ -146,7 +146,7 @@ shouldn't be needed.
 
 ---
 
-### #7 — Project name font-weight too aggressive
+### #7 — Project name font-weight too aggressive(Fixed_02)
 
 **Severity:** low (typography polish)
 **Symptom:** the merged `project-grid.tsx` / `project-list.tsx` uses
@@ -169,7 +169,7 @@ surrounding text.
 
 ## 📋 Information design
 
-### #8 — In table/list view, show the framework as a badge
+### #8 — In table/list view, show the framework as a badge(Fixed_02)
 
 **Severity:** medium
 **Symptom:** when viewing projects as a list (vs grid), there's no

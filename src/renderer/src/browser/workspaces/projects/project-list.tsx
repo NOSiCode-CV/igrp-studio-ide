@@ -5,14 +5,33 @@
 
 'use client'
 
+import { Badge } from '@renderer/components/ui/badge'
+import { FrameworkIcon, type FrameworkType } from '@renderer/components/framework-icon'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@renderer/components/ui/hover-card'
 import { ProjectIcon } from '@renderer/components/shared-ui'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
+import {
+    backendFrameworks,
+    frontendFrameworks,
+    specificationFrameworks
+} from '@renderer/browser/project/data'
 import { Database } from 'lucide-react'
 import path from 'path'
 import { useTranslation } from 'react-i18next'
 import type { ProjectData, ServiceInfo } from 'src/main/types'
 import { ProjectActions } from './project-actions'
+
+// Resolves a framework id (e.g. 'springboot') to its display name
+// ('Spring Boot') by looking it up in the same arrays the New Project wizard
+// uses, so labels stay consistent across the app.
+const FRAMEWORK_LABELS: Record<string, string> = Object.fromEntries(
+    [...frontendFrameworks, ...backendFrameworks, ...specificationFrameworks].map((f) => [
+        f.id,
+        f.name
+    ])
+)
+const getFrameworkLabel = (id: string | undefined): string =>
+    (id && FRAMEWORK_LABELS[id]) || id || ''
 
 interface ProjectListProps {
     projects: ProjectData[]
@@ -155,8 +174,22 @@ export function ProjectList({ projects, services }: ProjectListProps) {
                             </div>
 
                             {/* Framework */}
-                            <div role="cell" className="truncate font-medium text-muted-foreground">
-                                {project.framework}
+                            <div role="cell" className="min-w-0">
+                                {project.framework && (
+                                    <Badge
+                                        variant="secondary"
+                                        className="h-5 max-w-[140px] gap-1 rounded-md px-1.5 py-0 text-[10px] font-medium"
+                                    >
+                                        <FrameworkIcon
+                                            framework={project.framework as FrameworkType}
+                                            size={10}
+                                            className="rounded-none shrink-0"
+                                        />
+                                        <span className="min-w-0 truncate">
+                                            {getFrameworkLabel(project.framework)}
+                                        </span>
+                                    </Badge>
+                                )}
                             </div>
 
                             {/* Ports */}

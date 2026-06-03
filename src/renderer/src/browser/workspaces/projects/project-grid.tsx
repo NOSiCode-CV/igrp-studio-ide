@@ -123,7 +123,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                 className="border shadow-sm transition-colors group-hover:border-primary/40"
                             />
                             <div className="flex min-w-0 flex-1 flex-col pt-0.5">
-                                <h4 className="truncate text-sm font-semibold leading-tight tracking-tight text-foreground transition-colors group-hover:text-primary">
+                                <h4 className="truncate text-sm font-medium leading-tight tracking-tight text-foreground transition-colors group-hover:text-primary">
                                     {project.name}
                                 </h4>
                                 <div className="mt-0.5 flex min-w-0 items-center gap-1.5">
@@ -142,7 +142,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                                     |
                                                 </span>
                                             )}
-                                            <span className="whitespace-nowrap text-[10px] font-semibold lowercase tracking-tight text-emerald-600">
+                                            <span className="whitespace-nowrap text-[10px] font-semibold lowercase tracking-tight text-primary">
                                                 {ports[0]}
                                             </span>
                                         </>

@@ -133,7 +133,7 @@ const ResourceSection = ({
                                         className={cn(
                                             'flex cursor-pointer items-center justify-between gap-4 rounded-[4px] px-2 py-1.5 text-sm',
                                             isActive &&
-                                                'bg-emerald-50 text-emerald-600 focus:bg-emerald-50 focus:text-emerald-600'
+                                                'bg-primary/10 text-primary focus:bg-primary/10 focus:text-primary'
                                         )}
                                     >
                                         <span>{option.label}</span>
@@ -156,7 +156,7 @@ const ResourceSection = ({
                             value="grid"
                             size="sm"
                             aria-label="Grid view"
-                            className="h-auto min-w-0 rounded-[4px] p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-emerald-600 data-[state=on]:shadow-sm"
+                            className="h-auto min-w-0 rounded-[4px] p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:shadow-sm"
                         >
                             <LayoutGrid className="h-3.5 w-3.5" />
                         </ToggleGroupItem>
@@ -164,7 +164,7 @@ const ResourceSection = ({
                             value="list"
                             size="sm"
                             aria-label="List view"
-                            className="h-auto min-w-0 rounded-[4px] p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-emerald-600 data-[state=on]:shadow-sm"
+                            className="h-auto min-w-0 rounded-[4px] p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:shadow-sm"
                         >
                             <StretchHorizontal className="h-3.5 w-3.5" />
                         </ToggleGroupItem>

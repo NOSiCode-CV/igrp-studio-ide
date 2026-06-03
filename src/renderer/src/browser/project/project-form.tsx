@@ -456,6 +456,32 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         }
     }, [values.framework, values.name, setValue])
 
+    // Auto-populate Next.js config defaults. The pre-redesign `NextConfig`
+    // component used a DEFAULT_NEXT_CONFIG object that always shipped
+    // `description: ''` and `displayName` filled. The new wizard initialises
+    // `config: {}` and only writes fields the user touches, which left
+    // optional fields as `undefined` — the engine's downstream code does
+    // `someField.toLowerCase()` on a couple of optional fields without
+    // guards, producing "Cannot read properties of undefined (reading
+    // 'toLowerCase')" at create time. Defaulting them here restores the
+    // pre-redesign behavior.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: same rationale as the Spring Boot effect above; values.config is read but excluded to avoid a setValue feedback loop
+    React.useEffect(() => {
+        if (values.framework !== 'nextjs') return
+        const current = (values.config ?? {}) as Record<string, unknown>
+        const updates: Record<string, unknown> = {}
+        if (current.description === undefined) updates.description = ''
+        // Keep displayName in sync with the project name as the user types
+        // (was freezing at the first character because of an `!current.displayName`
+        // guard that short-circuited on every subsequent keystroke).
+        if (values.name && current.displayName !== values.name) {
+            updates.displayName = values.name
+        }
+        if (Object.keys(updates).length > 0) {
+            setValue('config', { ...current, ...updates }, { shouldDirty: false })
+        }
+    }, [values.framework, values.name, setValue])
+
     const onFormSubmit = handleSubmit(async (submitted) => {
         setIsCreatingProject(true)
         try {
@@ -700,14 +726,14 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     alt="Project icon preview"
                                     className="w-16 h-16 rounded-full object-cover"
                                 />
-                                <span className="text-sm text-gray-600">{t('clickToChangeIcon')}</span>
+                                <span className="text-sm text-muted-foreground">{t('clickToChangeIcon')}</span>
                             </div>
                         ) : (
                             <>
-                                <Upload className="w-7 h-7 mx-auto text-gray-400" />
-                                <div className="text-sm text-gray-600">
+                                <Upload className="w-7 h-7 mx-auto text-muted-foreground" />
+                                <div className="text-sm text-muted-foreground">
                                     {t('clickOrDragToUploadIcon')}
-                                    <div className="text-xs text-gray-400">
+                                    <div className="text-xs text-muted-foreground">
                                         {t('recommendedSize')}
                                     </div>
                                 </div>
