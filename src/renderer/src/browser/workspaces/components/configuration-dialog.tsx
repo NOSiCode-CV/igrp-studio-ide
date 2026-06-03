@@ -151,18 +151,19 @@ const DEPENDENCY_VISUAL_MAP: Record<
 }
 
 const FIELD_CLASSNAME =
-    'h-8 rounded-sm border border-slate-300 bg-white px-2 py-1 text-[11px] font-sans text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/10 focus-visible:border-teal-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500'
+    'h-9 rounded-sm border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-sans text-slate-900 placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/10 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500'
 const TECHNICAL_FIELD_CLASSNAME = `${FIELD_CLASSNAME} font-mono`
 const TEXTAREA_FIELD_CLASSNAME =
-    'min-h-[56px] resize-none rounded-sm border border-slate-300 px-2 py-1 text-[11px] leading-relaxed text-slate-700 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/10 focus-visible:border-teal-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500'
+    'min-h-[68px] resize-none rounded-sm border border-slate-300 px-2.5 py-1.5 text-xs leading-relaxed text-slate-700 placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/10 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500'
 const ROW_LABEL_CLASSNAME =
-    'w-24 shrink-0 pr-2 text-right text-[11px] text-slate-500 font-sans dark:text-slate-400'
+    'w-28 shrink-0 pr-2 text-right text-xs text-slate-500 font-sans dark:text-slate-400'
 const SECTION_HEADER_CLASSNAME = 'border-b border-slate-100 pb-1 dark:border-slate-700'
-const SECTION_TITLE_CLASSNAME = 'text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500'
+const SECTION_TITLE_CLASSNAME =
+    'text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500'
 const COUNT_BADGE_CLASSNAME =
-    'rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-300'
-const NEW_SERVICE_MODAL_SIZE_CLASSNAME = 'h-[460px] max-w-[1120px] sm:max-w-[1120px]'
-const EDIT_SERVICE_MODAL_SIZE_CLASSNAME = 'h-[380px] max-w-[660px] sm:max-w-[660px]'
+    'rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-300'
+const NEW_SERVICE_MODAL_SIZE_CLASSNAME = 'h-[560px] max-w-[1120px] sm:max-w-[1120px]'
+const EDIT_SERVICE_MODAL_SIZE_CLASSNAME = 'h-[440px] max-w-[700px] sm:max-w-[700px]'
 
 const extractDependencyName = (dependency: any): string => {
     if (typeof dependency === 'string') return dependency
@@ -318,7 +319,9 @@ export function ConfigurationDialog({
             setType(service.labels?.type || resolveServiceVisualType(service) || 'web')
             setPorts(normalizePorts(service.ports || service.properties?.ports || []))
             setEnvironments(
-                normalizeEnvironments(service.environments || service.properties?.environments || [])
+                normalizeEnvironments(
+                    service.environments || service.properties?.environments || []
+                )
             )
             setVolumes(normalizeVolumes(service.volumes || service.properties?.volumes || []))
             setDependsOn(
@@ -326,7 +329,9 @@ export function ConfigurationDialog({
                     ? dependencySource.map(extractDependencyName).filter(Boolean)
                     : []
             )
-            setNetworkType((service.networkType || service.properties?.networkType || 'bridge').toLowerCase())
+            setNetworkType(
+                (service.networkType || service.properties?.networkType || 'bridge').toLowerCase()
+            )
             setUseCustomNetwork(Boolean(networkSource))
             setCustomNetwork(typeof networkSource === 'string' ? networkSource : '')
         } else {
@@ -467,15 +472,15 @@ export function ConfigurationDialog({
             <DialogContent
                 showCloseButton={false}
                 overlayClassName="!z-[10000] bg-slate-950/25 p-4 backdrop-blur-[3px]"
-                className={`!z-[10001] flex ${modalSizeClassName} max-h-[90vh] w-full flex-col gap-0 overflow-hidden rounded-lg border border-slate-200 bg-white p-0 shadow-2xl dark:border-slate-700 dark:bg-slate-950`}
+                className={`!z-[10001] flex ${modalSizeClassName} max-h-[94vh] w-full flex-col gap-0 overflow-hidden rounded-lg border border-slate-200 bg-white p-0 shadow-2xl dark:border-slate-700 dark:bg-slate-950`}
             >
-                <DialogHeader className="border-b border-slate-200 px-4 py-3 dark:border-slate-700">
+                <DialogHeader className="border-b border-slate-200 px-5 py-3.5 dark:border-slate-700">
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
-                            <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm bg-teal-600 text-white">
-                                <Plus className="h-3 w-3" />
+                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm bg-primary text-primary-foreground">
+                                <Plus className="h-3.5 w-3.5" />
                             </span>
-                            <DialogTitle className="text-[12px] font-medium text-slate-700 dark:text-slate-100">
+                            <DialogTitle className="text-sm font-medium text-slate-700 dark:text-slate-100">
                                 {isNew ? 'New Service' : 'Edit Service'}
                             </DialogTitle>
                         </div>
@@ -485,9 +490,9 @@ export function ConfigurationDialog({
                                 type="button"
                                 variant="ghost"
                                 size="icon"
-                                className="h-6 w-6 rounded-sm text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                                className="h-7 w-7 rounded-sm text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                             >
-                                <X className="h-3.5 w-3.5" />
+                                <X className="h-4 w-4" />
                             </Button>
                         </DialogClose>
                     </div>
@@ -499,8 +504,8 @@ export function ConfigurationDialog({
                     orientation="vertical"
                     className="flex min-h-0 flex-1 overflow-hidden"
                 >
-                    <div className="w-[145px] shrink-0 border-r border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
-                        <p className="mb-2 px-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">
+                    <div className="w-[160px] shrink-0 border-r border-slate-200 bg-white p-2.5 dark:border-slate-700 dark:bg-slate-900">
+                        <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">
                             Settings
                         </p>
                         <TabsList className="flex h-auto w-full flex-col gap-1 bg-transparent p-0">
@@ -517,16 +522,16 @@ export function ConfigurationDialog({
                                         key={tab.id}
                                         value={tab.id}
                                         onClick={() => setActiveTab(tab.id as ActiveTab)}
-                                        className={`relative justify-start gap-2 !border-0 !bg-transparent !shadow-none rounded-sm pl-2 pr-2 py-1.5 text-[11px] data-[state=active]:!border-0 data-[state=active]:!bg-transparent data-[state=active]:!shadow-none ${
+                                        className={`relative justify-start gap-2 !border-0 !bg-transparent !shadow-none rounded-sm pl-2.5 pr-2 py-2 text-xs data-[state=active]:!border-0 data-[state=active]:!bg-transparent data-[state=active]:!shadow-none ${
                                             isActive
-                                                ? "text-teal-600 font-semibold before:absolute before:bottom-1 before:left-0 before:top-1 before:w-[2px] before:rounded-full before:bg-teal-500 before:content-[''] dark:text-teal-400"
+                                                ? "text-primary font-semibold before:absolute before:bottom-1 before:left-0 before:top-1 before:w-[2px] before:rounded-full before:bg-primary before:content-[''] dark:text-primary"
                                                 : 'text-slate-500 hover:text-slate-800 font-medium dark:text-slate-400 dark:hover:text-slate-200'
                                         }`}
                                     >
                                         <Icon
-                                            className={`h-3.5 w-3.5 ${
+                                            className={`h-4 w-4 ${
                                                 isActive
-                                                    ? 'text-teal-600 dark:text-teal-400'
+                                                    ? 'text-primary dark:text-primary'
                                                     : 'text-slate-500 dark:text-slate-400'
                                             }`}
                                         />
@@ -537,9 +542,9 @@ export function ConfigurationDialog({
                         </TabsList>
                     </div>
 
-                    <div className="min-h-0 flex-1 overflow-y-auto bg-white px-5 py-4 dark:bg-slate-950">
-                        <TabsContent value="basic" className="mt-0 space-y-4">
-                            <section className="space-y-2.5">
+                    <div className="min-h-0 flex-1 overflow-y-auto bg-white px-7 py-5 dark:bg-slate-950">
+                        <TabsContent value="basic" className="mt-0 space-y-5">
+                            <section className="space-y-3">
                                 <div className={SECTION_HEADER_CLASSNAME}>
                                     <p className={SECTION_TITLE_CLASSNAME}>Service Identity</p>
                                 </div>
@@ -558,7 +563,10 @@ export function ConfigurationDialog({
                                 </div>
 
                                 <div className="flex items-start gap-2">
-                                    <Label htmlFor="description" className={`${ROW_LABEL_CLASSNAME} pt-2`}>
+                                    <Label
+                                        htmlFor="description"
+                                        className={`${ROW_LABEL_CLASSNAME} pt-2`}
+                                    >
                                         {t('description')}:
                                     </Label>
                                     <Textarea
@@ -572,7 +580,7 @@ export function ConfigurationDialog({
                                 </div>
                             </section>
 
-                            <section className="space-y-2.5">
+                            <section className="space-y-3">
                                 <div className={SECTION_HEADER_CLASSNAME}>
                                     <p className={SECTION_TITLE_CLASSNAME}>Docker Configuration</p>
                                 </div>
@@ -604,7 +612,10 @@ export function ConfigurationDialog({
                                             </SelectTrigger>
                                             <SelectContent className="z-[10020]">
                                                 {SERVICE_TYPE_OPTIONS.map((serviceType) => (
-                                                    <SelectItem key={serviceType.value} value={serviceType.value}>
+                                                    <SelectItem
+                                                        key={serviceType.value}
+                                                        value={serviceType.value}
+                                                    >
                                                         {serviceType.label}
                                                     </SelectItem>
                                                 ))}
@@ -617,7 +628,9 @@ export function ConfigurationDialog({
 
                         <TabsContent value="config" className="mt-0 space-y-4">
                             <section className="space-y-2">
-                                <div className={`flex items-center justify-between ${SECTION_HEADER_CLASSNAME}`}>
+                                <div
+                                    className={`flex items-center justify-between ${SECTION_HEADER_CLASSNAME}`}
+                                >
                                     <p className={SECTION_TITLE_CLASSNAME}>Configured Ports</p>
                                     <span className={COUNT_BADGE_CLASSNAME}>
                                         {ports.length} ports
@@ -661,21 +674,23 @@ export function ConfigurationDialog({
                                             type="button"
                                             size="sm"
                                             onClick={addPort}
-                                            className="h-8 rounded-sm border border-slate-300 bg-white px-2.5 text-[11px] font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                                            className="h-9 rounded-sm border border-slate-300 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                                             disabled={!newPort.trim()}
                                         >
                                             Add
                                         </Button>
                                     </div>
 
-                                    <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                                    <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
                                         Format: HOST_PORT:CONTAINER_PORT
                                     </p>
                                 </div>
                             </section>
 
                             <section className="space-y-2">
-                                <div className={`flex items-center justify-between ${SECTION_HEADER_CLASSNAME}`}>
+                                <div
+                                    className={`flex items-center justify-between ${SECTION_HEADER_CLASSNAME}`}
+                                >
                                     <p className={SECTION_TITLE_CLASSNAME}>
                                         Path Parameters / Environment Variables
                                     </p>
@@ -695,7 +710,9 @@ export function ConfigurationDialog({
                                                     <span className="min-w-0 flex-1 truncate font-mono text-[10px] text-slate-700 dark:text-slate-200">
                                                         {environment.key}
                                                     </span>
-                                                    <span className="text-slate-300 dark:text-slate-600">=</span>
+                                                    <span className="text-slate-300 dark:text-slate-600">
+                                                        =
+                                                    </span>
                                                     <span className="min-w-0 flex-1 truncate font-mono text-[10px] text-slate-500 dark:text-slate-400">
                                                         {environment.value}
                                                     </span>
@@ -734,7 +751,7 @@ export function ConfigurationDialog({
                                             type="button"
                                             size="sm"
                                             onClick={addEnvironment}
-                                            className="h-8 rounded-sm border border-slate-300 bg-white px-2.5 text-[11px] font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                                            className="h-9 rounded-sm border border-slate-300 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                                             disabled={!newEnvName.trim()}
                                         >
                                             Add
@@ -744,7 +761,9 @@ export function ConfigurationDialog({
                             </section>
 
                             <section className="space-y-2">
-                                <div className={`flex items-center justify-between ${SECTION_HEADER_CLASSNAME}`}>
+                                <div
+                                    className={`flex items-center justify-between ${SECTION_HEADER_CLASSNAME}`}
+                                >
                                     <p className={SECTION_TITLE_CLASSNAME}>Configured Volumes</p>
                                     <span className={COUNT_BADGE_CLASSNAME}>
                                         {volumes.length} Volumes
@@ -783,13 +802,17 @@ export function ConfigurationDialog({
                                     <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
                                         <Input
                                             value={newVolumeHost}
-                                            onChange={(event) => setNewVolumeHost(event.target.value)}
+                                            onChange={(event) =>
+                                                setNewVolumeHost(event.target.value)
+                                            }
                                             placeholder="Host Path"
                                             className={TECHNICAL_FIELD_CLASSNAME}
                                         />
                                         <Input
                                             value={newVolumeContainer}
-                                            onChange={(event) => setNewVolumeContainer(event.target.value)}
+                                            onChange={(event) =>
+                                                setNewVolumeContainer(event.target.value)
+                                            }
                                             placeholder="Container Path"
                                             className={TECHNICAL_FIELD_CLASSNAME}
                                         />
@@ -797,8 +820,10 @@ export function ConfigurationDialog({
                                             type="button"
                                             size="sm"
                                             onClick={addVolume}
-                                            className="h-8 rounded-sm border border-slate-300 bg-white px-2.5 text-[11px] font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-                                            disabled={!newVolumeHost.trim() || !newVolumeContainer.trim()}
+                                            className="h-9 rounded-sm border border-slate-300 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                                            disabled={
+                                                !newVolumeHost.trim() || !newVolumeContainer.trim()
+                                            }
                                         >
                                             Add
                                         </Button>
@@ -808,16 +833,18 @@ export function ConfigurationDialog({
                         </TabsContent>
 
                         <TabsContent value="deps" className="mt-0 space-y-3">
-                            <div className={`flex items-center justify-between ${SECTION_HEADER_CLASSNAME}`}>
+                            <div
+                                className={`flex items-center justify-between ${SECTION_HEADER_CLASSNAME}`}
+                            >
                                 <p className={SECTION_TITLE_CLASSNAME}>Service Dependencies</p>
                                 <span className={COUNT_BADGE_CLASSNAME}>
                                     {dependsOn.length} Dependencies
                                 </span>
                             </div>
 
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                                Configure the startup sequence. This service will only start after its
-                                nominated dependencies are healthy.
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                Configure the startup sequence. This service will only start after
+                                its nominated dependencies are healthy.
                             </p>
 
                             <div className="space-y-3 rounded-md border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
@@ -850,7 +877,10 @@ export function ConfigurationDialog({
                                                     </span>
 
                                                     <span className="min-w-0 flex-1 truncate text-[11px] font-medium text-slate-700 dark:text-slate-200">
-                                                        {stripWorkspacePrefix(item.name, workspace?.slug)}
+                                                        {stripWorkspacePrefix(
+                                                            item.name,
+                                                            workspace?.slug
+                                                        )}
                                                     </span>
 
                                                     <Badge
@@ -880,7 +910,7 @@ export function ConfigurationDialog({
                                         ref={dependencyTriggerRef}
                                         type="button"
                                         onClick={() => setDependencyMenuOpen((prev) => !prev)}
-                                        className="flex h-8 w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-slate-300 bg-white text-[11px] font-semibold text-slate-700 hover:border-teal-300 hover:text-teal-600 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-teal-500/60 dark:hover:text-teal-400"
+                                        className="flex h-9 w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:border-primary/50 hover:text-primary dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-primary/60 dark:hover:text-primary"
                                     >
                                         <Plus className="h-3.5 w-3.5" />
                                         Add Dependency
@@ -899,22 +929,26 @@ export function ConfigurationDialog({
                                                         setDependencySearch(event.target.value)
                                                     }
                                                     placeholder="Search dependency"
-                                                    className={`${FIELD_CLASSNAME} h-8 pl-7 text-[11px]`}
+                                                    className={`${FIELD_CLASSNAME} pl-7`}
                                                 />
                                             </div>
 
                                             <div className="max-h-40 space-y-1 overflow-y-auto">
                                                 {dependencyCandidates.length > 0 ? (
                                                     dependencyCandidates.map((candidate) => {
-                                                        const visualType = resolveDependencyType(candidate)
-                                                        const meta = DEPENDENCY_VISUAL_MAP[visualType]
+                                                        const visualType =
+                                                            resolveDependencyType(candidate)
+                                                        const meta =
+                                                            DEPENDENCY_VISUAL_MAP[visualType]
                                                         const Icon = meta.icon
                                                         return (
                                                             <button
                                                                 key={candidate.name}
                                                                 type="button"
-                                                                onClick={() => addDependency(candidate.name)}
-                                                                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[11px] text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+                                                                onClick={() =>
+                                                                    addDependency(candidate.name)
+                                                                }
+                                                                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
                                                             >
                                                                 <span
                                                                     className={`inline-flex h-5 w-5 items-center justify-center rounded-sm text-white ${meta.colorClass}`}
@@ -931,7 +965,7 @@ export function ConfigurationDialog({
                                                         )
                                                     })
                                                 ) : (
-                                                    <p className="px-2 py-2 text-[11px] text-slate-500 dark:text-slate-400">
+                                                    <p className="px-2 py-2 text-xs text-slate-500 dark:text-slate-400">
                                                         No services available
                                                     </p>
                                                 )}
@@ -947,7 +981,9 @@ export function ConfigurationDialog({
                                 <div className="flex items-center gap-2">
                                     <Label className={ROW_LABEL_CLASSNAME}>Network Type:</Label>
                                     <Select value={networkType} onValueChange={setNetworkType}>
-                                        <SelectTrigger className={`${FIELD_CLASSNAME} max-w-[140px]`}>
+                                        <SelectTrigger
+                                            className={`${FIELD_CLASSNAME} max-w-[140px]`}
+                                        >
                                             <SelectValue placeholder="Select network type" />
                                         </SelectTrigger>
                                         <SelectContent className="z-[10020]">
@@ -960,8 +996,9 @@ export function ConfigurationDialog({
                                     </Select>
                                 </div>
 
-                                <p className="pl-26 text-[11px] text-slate-500 dark:text-slate-400">
-                                    Choose how this service should connect inside the Docker network.
+                                <p className="pl-30 text-xs text-slate-500 dark:text-slate-400">
+                                    Choose how this service should connect inside the Docker
+                                    network.
                                 </p>
                             </div>
 
@@ -974,31 +1011,40 @@ export function ConfigurationDialog({
                                         onClick={() => setUseCustomNetwork((prev) => !prev)}
                                         className={`relative h-5 w-10 shrink-0 rounded-full border-0 p-0 transition-colors ${
                                             useCustomNetwork
-                                                ? 'bg-teal-600'
+                                                ? 'bg-primary'
                                                 : 'bg-slate-200 dark:bg-slate-700'
                                         }`}
                                     >
                                         <motion.span
                                             className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow-sm"
                                             animate={{ x: useCustomNetwork ? 18 : 0 }}
-                                            transition={{ type: 'spring', stiffness: 500, damping: 34 }}
+                                            transition={{
+                                                type: 'spring',
+                                                stiffness: 500,
+                                                damping: 34
+                                            }}
                                         />
                                     </button>
 
-                                    <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                                    <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
                                         Use custom isolated workspace network
                                     </span>
                                 </div>
 
                                 {useCustomNetwork ? (
                                     <div className="flex items-center gap-2">
-                                        <Label htmlFor="custom-network-name" className={ROW_LABEL_CLASSNAME}>
+                                        <Label
+                                            htmlFor="custom-network-name"
+                                            className={ROW_LABEL_CLASSNAME}
+                                        >
                                             Network Name:
                                         </Label>
                                         <Input
                                             id="custom-network-name"
                                             value={customNetwork}
-                                            onChange={(event) => setCustomNetwork(event.target.value)}
+                                            onChange={(event) =>
+                                                setCustomNetwork(event.target.value)
+                                            }
                                             placeholder="workspace-network"
                                             className={TECHNICAL_FIELD_CLASSNAME}
                                         />
@@ -1009,18 +1055,18 @@ export function ConfigurationDialog({
                     </div>
                 </Tabs>
 
-                <DialogFooter className="border-t border-slate-200 px-4 py-2.5 dark:border-slate-700 sm:justify-end sm:gap-2">
+                <DialogFooter className="border-t border-slate-200 px-5 py-3 dark:border-slate-700 sm:justify-end sm:gap-2">
                     <DialogClose asChild>
                         <Button
                             variant="outline"
-                            className="h-auto min-w-[70px] rounded-sm border border-slate-300 bg-white px-4 py-1 text-[11px] font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                            className="h-9 min-w-[80px] rounded-sm border border-slate-300 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                         >
                             {t('cancel')}
                         </Button>
                     </DialogClose>
 
                     <DialogClose asChild>
-                        <Button className="h-auto min-w-[100px] rounded-sm border border-teal-700 bg-teal-600 px-4 py-1 text-[11px] font-semibold text-white hover:bg-teal-700">
+                        <Button className="h-9 min-w-[112px] rounded-sm border border-primary bg-primary px-4 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
                             {t('saveService')}
                         </Button>
                     </DialogClose>
