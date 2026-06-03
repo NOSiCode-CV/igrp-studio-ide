@@ -171,31 +171,31 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-950/25 backdrop-blur-[3px]"
+                    className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/25 backdrop-blur-[3px]"
                     onClick={onClose}
                 >
                     <motion.div
                         initial={{ opacity: 0, scale: 0.98, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                        className="w-full max-w-[460px] bg-white rounded-[4px] border border-slate-100 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.12),0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col font-sans"
+                        className="w-full max-w-[460px] bg-card rounded-[4px] border border-border shadow-[0_24px_60px_-15px_rgba(0,0,0,0.12),0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col font-sans"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <form onSubmit={onSubmit} className="flex flex-col">
                             {/* Header */}
-                            <div className="pl-3 pr-2 py-1.5 bg-[#fcfcfc] border-b border-slate-200 flex items-center justify-between select-none">
+                            <div className="pl-3 pr-2 py-1.5 bg-muted border-b border-border flex items-center justify-between select-none">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 bg-teal-600 rounded scale-90 flex items-center justify-center">
-                                        <SquarePen className="w-[10px] h-[10px] text-white stroke-[3]" />
+                                    <div className="w-4 h-4 bg-primary rounded scale-90 flex items-center justify-center">
+                                        <SquarePen className="w-[10px] h-[10px] text-primary-foreground stroke-[3]" />
                                     </div>
-                                    <span className="text-[12px] font-medium text-slate-700 tracking-tight">
+                                    <span className="text-[12px] font-medium text-foreground tracking-tight">
                                         Edit Project
                                     </span>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    className="p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 group transition-colors"
+                                    className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted group transition-colors"
                                 >
                                     <X className="w-[14px] h-[14px]" />
                                 </button>
@@ -208,7 +208,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                     <div className="flex flex-col items-center gap-1.5 shrink-0 pt-0.5 select-none">
                                         <button
                                             type="button"
-                                            className="w-12 h-12 rounded border border-dashed border-slate-300 bg-slate-50 text-slate-300 shadow-sm active:scale-95 hover:border-teal-500 hover:bg-teal-50/20 group relative cursor-pointer transition-all flex items-center justify-center overflow-hidden"
+                                            className="w-12 h-12 rounded border border-dashed border-input bg-muted text-muted-foreground/60 shadow-sm active:scale-95 hover:border-primary hover:bg-primary/5 group relative cursor-pointer transition-all flex items-center justify-center overflow-hidden"
                                             onClick={() => fileInputRef.current?.click()}
                                             aria-label="Upload project icon"
                                         >
@@ -220,7 +220,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                             ) : (
                                                 <>
                                                     <FolderKanban className="w-5 h-5 opacity-40 group-hover:opacity-0 transition-opacity duration-300" />
-                                                    <Plus className="w-4 h-4 text-teal-600 absolute scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300" />
+                                                    <Plus className="w-4 h-4 text-primary absolute scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300" />
                                                 </>
                                             )}
                                         </button>
@@ -239,7 +239,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                         <div className="flex items-center gap-2">
                                             <label
                                                 htmlFor="project-name-input"
-                                                className="w-16 text-[11px] text-slate-600 text-right whitespace-nowrap"
+                                                className="w-16 text-[11px] text-muted-foreground text-right whitespace-nowrap"
                                             >
                                                 Name <span className="text-rose-500">*</span>:
                                             </label>
@@ -249,7 +249,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                                     ref={nameRefHandler}
                                                     id="project-name-input"
                                                     placeholder="Enter project name..."
-                                                    className="w-full bg-white border border-slate-300 rounded-[2px] px-2 py-1 text-[11px] text-slate-900 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/10 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                    className="w-full bg-card border border-input rounded-[2px] px-2 py-1 text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-teal-500/10 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                                 />
                                                 {touchedFields.name && nameError && (
                                                     <p className="text-[10px] text-rose-500 mt-1">
@@ -263,14 +263,14 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                         <div className="flex items-center gap-2">
                                             <label
                                                 htmlFor="project-color-picker"
-                                                className="w-16 text-[11px] text-slate-600 text-right whitespace-nowrap"
+                                                className="w-16 text-[11px] text-muted-foreground text-right whitespace-nowrap"
                                             >
                                                 Theme:
                                             </label>
                                             <div className="flex-1 max-w-[180px]">
                                                 {/* biome-ignore lint/a11y/useSemanticElements: this wrapper triggers a nested hidden <input type="color"> via ref; a real <button> would nest an interactive element */}
                                                 <div
-                                                    className="w-full h-[28px] rounded border border-slate-300 shadow-[inset_0_1px_1px_rgba(0,0,0,0.02)] flex items-center justify-between px-2.5 overflow-hidden group hover:ring-1 hover:ring-teal-500/20 hover:border-teal-500 cursor-pointer relative"
+                                                    className="w-full h-[28px] rounded border border-input shadow-[inset_0_1px_1px_rgba(0,0,0,0.02)] flex items-center justify-between px-2.5 overflow-hidden group hover:ring-1 hover:ring-teal-500/20 hover:border-primary cursor-pointer relative"
                                                     style={{ backgroundColor: hexColor }}
                                                     onClick={() => colorInputRef.current?.click()}
                                                     onKeyDown={(e) => {
@@ -313,7 +313,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                         <div className="flex items-start gap-2">
                                             <label
                                                 htmlFor="project-description"
-                                                className="w-16 text-[11px] text-slate-600 text-right whitespace-nowrap pt-1"
+                                                className="w-16 text-[11px] text-muted-foreground text-right whitespace-nowrap pt-1"
                                             >
                                                 Description:
                                             </label>
@@ -334,7 +334,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                                     }
                                                     rows={3}
                                                     placeholder="Describe this project..."
-                                                    className="w-full bg-white border border-slate-300 rounded-[2px] px-2 py-1.5 text-[11px] text-slate-700 leading-relaxed resize-none focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/10 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                    className="w-full bg-card border border-input rounded-[2px] px-2 py-1.5 text-[11px] text-foreground leading-relaxed resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-teal-500/10 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                                 />
                                                 {descriptionError && (
                                                     <p className="text-[10px] text-rose-500 mt-1">
@@ -348,19 +348,19 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                             </div>
 
                             {/* Footer */}
-                            <div className="px-3 py-2 bg-[#f8f9fb] border-t border-slate-200 flex items-center justify-end gap-2">
+                            <div className="px-3 py-2 bg-muted border-t border-border flex items-center justify-end gap-2">
                                 <button
                                     type="button"
                                     onClick={onClose}
                                     disabled={isSubmitting}
-                                    className="px-4 py-1 text-[11px] font-bold text-slate-600 bg-white border border-slate-200 rounded-[2px] hover:bg-slate-50 min-w-[70px] transition-colors disabled:opacity-50"
+                                    className="px-4 py-1 text-[11px] font-bold text-muted-foreground bg-card border border-border rounded-[2px] hover:bg-muted min-w-[70px] transition-colors disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={isSubmitting || !isValid}
-                                    className="px-4 py-1 text-[11px] font-bold text-white bg-teal-600 border border-teal-700 rounded-[2px] shadow-sm hover:bg-teal-700 min-w-[100px] transition-colors disabled:opacity-50"
+                                    className="px-4 py-1 text-[11px] font-bold text-primary-foreground bg-primary border border-primary rounded-[2px] shadow-sm hover:bg-primary/90 min-w-[100px] transition-colors disabled:opacity-50"
                                 >
                                     {isSubmitting ? 'Saving...' : 'Save Changes'}
                                 </button>

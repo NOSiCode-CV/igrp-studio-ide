@@ -1,5 +1,6 @@
 'use client'
 
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { useGit } from '@renderer/hooks/use-git'
 import useGitAuth from '@renderer/hooks/use-git-auth'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
@@ -368,30 +369,30 @@ export function CloneProjectModal({
         // biome-ignore lint/a11y/noStaticElementInteractions: backdrop click-to-close is a standard modal a11y exception (Escape is the keyboard close path)
         // biome-ignore lint/a11y/useKeyWithClickEvents: backdrop click-to-close is a standard modal a11y exception (Escape is the keyboard close path)
         <div
-            className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-950/25 backdrop-blur-[3px]"
+            className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/25 backdrop-blur-[3px]"
             onClick={handleBackdropClick}
         >
             <motion.div
                 initial={{ opacity: 0, scale: 0.98, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                className="w-full max-w-[460px] max-h-[85vh] bg-white rounded-[4px] border border-slate-100 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.12),0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col font-sans"
+                className="w-full max-w-[460px] max-h-[85vh] bg-card rounded-[4px] border border-border shadow-[0_24px_60px_-15px_rgba(0,0,0,0.12),0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col font-sans"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="pl-3 pr-2 py-1.5 bg-[#fcfcfc] border-b border-slate-200 flex items-center justify-between select-none shrink-0">
+                <div className="pl-3 pr-2 py-1.5 bg-muted border-b border-border flex items-center justify-between select-none shrink-0">
                     <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-teal-600 rounded scale-90 flex items-center justify-center">
-                            <GitFork className="w-[10px] h-[10px] text-white stroke-[3]" />
+                        <div className="w-4 h-4 bg-primary rounded scale-90 flex items-center justify-center">
+                            <GitFork className="w-[10px] h-[10px] text-primary-foreground stroke-[3]" />
                         </div>
-                        <span className="text-[12px] font-medium text-slate-700 tracking-tight">
+                        <span className="text-[12px] font-medium text-foreground tracking-tight">
                             Clone Project
                         </span>
                     </div>
                     <button
                         type="button"
                         onClick={() => !isCloning && onClose(false)}
-                        className="p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 group transition-colors"
+                        className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted group transition-colors"
                         disabled={isCloning}
                     >
                         <X className="w-[14px] h-[14px]" />
@@ -399,19 +400,19 @@ export function CloneProjectModal({
                 </div>
 
                 {/* Body container */}
-                <div className="px-5 py-4 space-y-3.5 flex-1 flex flex-col min-h-0 overflow-y-auto">
+                <div className="px-5 py-4 space-y-3.5 flex-1 flex flex-col min-h-0">
                     {/* Tab switcher */}
-                    <div className="flex p-0.5 bg-slate-100 rounded border border-slate-200/50 shrink-0 select-none">
+                    <div className="flex p-0.5 bg-muted rounded border border-border/50 shrink-0 select-none">
                         <button
                             type="button"
                             onClick={() => setTab('url')}
                             className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-[11px] font-semibold rounded-sm transition-all ${
                                 tab === 'url'
-                                    ? 'bg-white text-slate-900 shadow-sm border border-slate-200/20 font-bold'
-                                    : 'text-slate-550 hover:text-slate-800 border border-transparent'
+                                    ? 'bg-card text-foreground shadow-sm border border-border/20 font-bold'
+                                    : 'text-muted-foreground hover:text-foreground border border-transparent'
                             }`}
                         >
-                            <Link2 className="w-3 h-3 text-slate-400" />
+                            <Link2 className="w-3 h-3 text-muted-foreground" />
                             Repository URL
                         </button>
                         <button
@@ -419,11 +420,11 @@ export function CloneProjectModal({
                             onClick={() => setTab('search')}
                             className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-[11px] font-semibold rounded-sm transition-all ${
                                 tab === 'search'
-                                    ? 'bg-white text-slate-900 shadow-sm border border-slate-200/20 font-bold'
-                                    : 'text-slate-550 hover:text-slate-800 border border-transparent'
+                                    ? 'bg-card text-foreground shadow-sm border border-border/20 font-bold'
+                                    : 'text-muted-foreground hover:text-foreground border border-transparent'
                             }`}
                         >
-                            <Search className="w-3 h-3 text-slate-400" />
+                            <Search className="w-3 h-3 text-muted-foreground" />
                             Search Repositories
                         </button>
                     </div>
@@ -443,33 +444,33 @@ export function CloneProjectModal({
                                 <div className="space-y-1">
                                     <label
                                         htmlFor="clone-repo-url"
-                                        className="block text-[11px] font-medium text-slate-600 pl-0.5"
+                                        className="block text-[11px] font-medium text-muted-foreground pl-0.5"
                                     >
                                         Repo URL
                                     </label>
                                     <div className="relative group/input">
-                                        <Globe className="w-[14px] h-[14px] absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-teal-600 transition-colors" />
+                                        <Globe className="w-[14px] h-[14px] absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
                                         <input
                                             id="clone-repo-url"
                                             type="text"
                                             value={url}
                                             onChange={(e) => setUrl(e.target.value)}
                                             placeholder="https://github.com/username/repo.git"
-                                            className="w-full pl-7.5 pr-2 py-1 bg-white border border-slate-300 rounded-sm text-[11px] text-slate-900 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                            className="w-full pl-7.5 pr-2 py-1 bg-card border border-input rounded-sm text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                         />
                                     </div>
-                                    <p className="text-[10px] text-slate-400 mt-1 pl-0.5">
+                                    <p className="text-[10px] text-muted-foreground mt-1 pl-0.5">
                                         Supports GitHub, GitLab, Bitbucket, and custom Git URLs
                                     </p>
                                 </div>
 
                                 {/* Auth Type block */}
                                 <div className="space-y-1">
-                                    <span className="block text-[11px] font-medium text-slate-600 pl-0.5">
+                                    <span className="block text-[11px] font-medium text-muted-foreground pl-0.5">
                                         Auth Type
                                     </span>
                                     <div className="space-y-2.5">
-                                        <div className="grid grid-cols-3 gap-1 p-0.5 bg-slate-100 rounded border border-slate-200/50 select-none">
+                                        <div className="grid grid-cols-3 gap-1 p-0.5 bg-muted rounded border border-border/50 select-none">
                                             {[
                                                 { id: 'none', label: 'None', icon: ShieldOff },
                                                 { id: 'basic', label: 'Basic', icon: UserCircle },
@@ -486,15 +487,15 @@ export function CloneProjectModal({
                                                         }
                                                         className={`flex items-center justify-center gap-1.5 py-1.5 text-[11px] rounded-sm transition-all ${
                                                             isActive
-                                                                ? 'bg-white text-slate-900 shadow-xs font-bold'
-                                                                : 'text-slate-550 hover:text-slate-850 font-medium'
+                                                                ? 'bg-card text-foreground shadow-xs font-bold'
+                                                                : 'text-muted-foreground hover:text-foreground font-medium'
                                                         }`}
                                                     >
                                                         <Icon
                                                             className={`w-[14px] h-[14px] ${
                                                                 isActive
-                                                                    ? 'text-teal-600'
-                                                                    : 'text-slate-400'
+                                                                    ? 'text-primary'
+                                                                    : 'text-muted-foreground'
                                                             }`}
                                                         />
                                                         {method.label}
@@ -516,12 +517,12 @@ export function CloneProjectModal({
                                                     <div className="space-y-1">
                                                         <label
                                                             htmlFor="clone-basic-username"
-                                                            className="block text-[10px] font-medium text-slate-500 pl-0.5"
+                                                            className="block text-[10px] font-medium text-muted-foreground pl-0.5"
                                                         >
                                                             Username
                                                         </label>
                                                         <div className="relative group/input">
-                                                            <User className="w-3 h-3 absolute left-2 top-1.5 text-slate-400 group-focus-within/input:text-teal-600 transition-colors" />
+                                                            <User className="w-3 h-3 absolute left-2 top-1.5 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
                                                             <input
                                                                 id="clone-basic-username"
                                                                 type="text"
@@ -530,19 +531,19 @@ export function CloneProjectModal({
                                                                     setUsername(e.target.value)
                                                                 }
                                                                 placeholder="Username"
-                                                                className="w-full pl-6.5 pr-2 py-1 bg-white border border-slate-300 rounded-sm text-[11px] text-slate-900 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                                className="w-full pl-6.5 pr-2 py-1 bg-card border border-input rounded-sm text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                                             />
                                                         </div>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <label
                                                             htmlFor="clone-basic-password"
-                                                            className="block text-[10px] font-medium text-slate-500 pl-0.5"
+                                                            className="block text-[10px] font-medium text-muted-foreground pl-0.5"
                                                         >
                                                             Password / PAT
                                                         </label>
                                                         <div className="relative group/input">
-                                                            <KeyRound className="w-3 h-3 absolute left-2 top-1.5 text-slate-400 group-focus-within/input:text-teal-600 transition-colors" />
+                                                            <KeyRound className="w-3 h-3 absolute left-2 top-1.5 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
                                                             <input
                                                                 id="clone-basic-password"
                                                                 type={
@@ -555,7 +556,7 @@ export function CloneProjectModal({
                                                                     setPassword(e.target.value)
                                                                 }
                                                                 placeholder="••••••••"
-                                                                className="w-full pl-6.5 pr-6 py-1 bg-white border border-slate-300 rounded-sm text-[11px] text-slate-900 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                                className="w-full pl-6.5 pr-6 py-1 bg-card border border-input rounded-sm text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                                             />
                                                             <button
                                                                 type="button"
@@ -564,7 +565,7 @@ export function CloneProjectModal({
                                                                         !showBasicPassword
                                                                     )
                                                                 }
-                                                                className="absolute right-1.5 top-1 p-0.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
+                                                                className="absolute right-1.5 top-1 p-0.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
                                                             >
                                                                 <AnimatePresence mode="wait">
                                                                     <motion.div
@@ -613,12 +614,12 @@ export function CloneProjectModal({
                                                 >
                                                     <label
                                                         htmlFor="clone-token"
-                                                        className="block text-[10px] font-medium text-slate-500 pl-0.5"
+                                                        className="block text-[10px] font-medium text-muted-foreground pl-0.5"
                                                     >
                                                         Personal Access Token
                                                     </label>
                                                     <div className="relative group/input">
-                                                        <KeyRound className="w-3 h-3 absolute left-2 top-1.5 text-slate-400 group-focus-within/input:text-teal-600 transition-colors" />
+                                                        <KeyRound className="w-3 h-3 absolute left-2 top-1.5 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
                                                         <input
                                                             id="clone-token"
                                                             type={showToken ? 'text' : 'password'}
@@ -627,12 +628,12 @@ export function CloneProjectModal({
                                                                 setToken(e.target.value)
                                                             }
                                                             placeholder="ghp_xxxxxxxxxxxx"
-                                                            className="w-full pl-6.5 pr-6 py-1 bg-white border border-slate-300 rounded-sm text-[11px] text-slate-900 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                            className="w-full pl-6.5 pr-6 py-1 bg-card border border-input rounded-sm text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                                         />
                                                         <button
                                                             type="button"
                                                             onClick={() => setShowToken(!showToken)}
-                                                            className="absolute right-1.5 top-1 p-0.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
+                                                            className="absolute right-1.5 top-1 p-0.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
                                                         >
                                                             <AnimatePresence mode="wait">
                                                                 <motion.div
@@ -681,13 +682,13 @@ export function CloneProjectModal({
                                 <div className="flex flex-col gap-1.5 shrink-0">
                                     <div className="flex gap-1.5">
                                         <div className="relative group/input flex-1">
-                                            <Search className="w-[14px] h-[14px] absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-teal-600 transition-colors" />
+                                            <Search className="w-[14px] h-[14px] absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
                                             <input
                                                 type="text"
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
                                                 placeholder="Search repositories..."
-                                                className="w-full pl-8 pr-2 py-1 bg-white border border-slate-300 rounded-sm text-[11px] text-slate-900 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                className="w-full pl-8 pr-2 py-1 bg-card border border-input rounded-sm text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                             />
                                         </div>
                                         <div className="relative" ref={filterRef}>
@@ -696,8 +697,8 @@ export function CloneProjectModal({
                                                 onClick={() => setFilterMenuOpen(!filterMenuOpen)}
                                                 className={`h-full px-2.5 py-1.2 flex items-center gap-1.5 border rounded-sm text-[11px] font-bold transition-colors ${
                                                     filterMenuOpen || platform !== 'all'
-                                                        ? 'border-teal-500 bg-teal-50/40 text-teal-800'
-                                                        : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800'
+                                                        ? 'border-primary bg-primary/10 text-primary'
+                                                        : 'border-input bg-card text-muted-foreground hover:bg-muted hover:text-foreground'
                                                 }`}
                                             >
                                                 <ListFilter className="w-[14px] h-[14px]" />
@@ -711,7 +712,7 @@ export function CloneProjectModal({
                                                         animate={{ opacity: 1, scale: 1, y: 0 }}
                                                         exit={{ opacity: 0, scale: 0.95, y: 5 }}
                                                         transition={{ duration: 0.1 }}
-                                                        className="absolute right-0 top-full mt-1 w-32 bg-white border border-slate-200 rounded-sm shadow-[0_10px_25px_rgba(0,0,0,0.08)] z-[210] p-0.5 space-y-1"
+                                                        className="absolute right-0 top-full mt-1 w-32 bg-card border border-border rounded-sm shadow-[0_10px_25px_rgba(0,0,0,0.08)] z-[210] p-0.5 space-y-1"
                                                     >
                                                         {[
                                                             {
@@ -742,16 +743,16 @@ export function CloneProjectModal({
                                                                     }}
                                                                     className={`w-full flex items-center justify-between px-2 py-1.2 rounded-sm text-[11px] font-medium transition-colors ${
                                                                         isSelected
-                                                                            ? 'bg-teal-50 text-teal-700 font-semibold'
-                                                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                                                            ? 'bg-primary/10 text-primary font-semibold'
+                                                                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                                                     }`}
                                                                 >
                                                                     <span className="flex items-center gap-1.5">
-                                                                        <Icon className="w-3 h-3 text-slate-500" />
+                                                                        <Icon className="w-3 h-3 text-muted-foreground" />
                                                                         {p.label}
                                                                     </span>
                                                                     {isSelected && (
-                                                                        <Check className="w-[10px] h-[10px] text-teal-600 stroke-[3]" />
+                                                                        <Check className="w-[10px] h-[10px] text-primary stroke-[3]" />
                                                                     )}
                                                                 </button>
                                                             )
@@ -770,7 +771,7 @@ export function CloneProjectModal({
                                                 exit={{ opacity: 0, height: 0 }}
                                                 className="overflow-hidden"
                                             >
-                                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-teal-50/50 text-teal-800 rounded-sm border border-teal-200/50 text-[10px] font-bold uppercase tracking-wider w-fit">
+                                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-primary/10 text-primary rounded-sm border border-primary/30 text-[10px] font-bold uppercase tracking-wider w-fit">
                                                     <span className="opacity-60">Platform:</span>
                                                     {platform === 'github' ? (
                                                         <Github className="w-[10px] h-[10px]" />
@@ -781,7 +782,7 @@ export function CloneProjectModal({
                                                     <button
                                                         type="button"
                                                         onClick={() => setPlatform('all')}
-                                                        className="ml-1 p-0.5 hover:bg-teal-100/50 rounded transition-colors"
+                                                        className="ml-1 p-0.5 hover:bg-primary/10 rounded transition-colors"
                                                     >
                                                         <X className="w-[10px] h-[10px]" />
                                                     </button>
@@ -792,9 +793,10 @@ export function CloneProjectModal({
                                 </div>
 
                                 {/* Results container */}
-                                <div className="flex-1 bg-[#fcfcfc] border border-slate-300 rounded-sm overflow-hidden flex flex-col min-h-[220px]">
+                                <div className="bg-muted border border-input rounded-sm overflow-hidden flex flex-col">
                                     {filteredRepos.length > 0 ? (
-                                        <div className="flex-1 overflow-y-auto divide-y divide-slate-200">
+                                        <ScrollArea className="h-[50vh]">
+                                            <div className="divide-y divide-border">
                                             {filteredRepos.map((repo) => {
                                                 const isSelected = selectedRepoId === repo.id
                                                 const isCloned = clonedRepos.includes(repo.id)
@@ -816,14 +818,14 @@ export function CloneProjectModal({
                                                         }}
                                                         className={`w-full group flex items-start gap-3 p-2.5 outline-none transition-colors relative ${
                                                             isSelected
-                                                                ? 'bg-teal-50/30 shadow-[inset_0_0_0_1px_rgba(13,148,136,0.1)] z-10'
-                                                                : 'bg-white hover:bg-slate-50/75'
+                                                                ? 'bg-primary/5 shadow-[inset_0_0_0_1px_rgba(13,148,136,0.1)] z-10'
+                                                                : 'bg-card hover:bg-muted/75'
                                                         }`}
                                                     >
                                                         {isSelected && (
                                                             <motion.div
                                                                 layoutId="active-bar"
-                                                                className="absolute left-0 top-0 bottom-0 w-[2px] bg-teal-600"
+                                                                className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary"
                                                                 initial={{ opacity: 0 }}
                                                                 animate={{ opacity: 1 }}
                                                                 exit={{ opacity: 0 }}
@@ -833,23 +835,23 @@ export function CloneProjectModal({
                                                         <div
                                                             className={`mt-0.5 w-[28px] h-[28px] rounded border flex items-center justify-center shrink-0 transition-all ${
                                                                 isSelected
-                                                                    ? 'bg-teal-600 border-teal-600 scale-105'
-                                                                    : 'bg-white border-slate-200 group-hover:bg-slate-50'
+                                                                    ? 'bg-primary border-primary scale-105'
+                                                                    : 'bg-card border-border group-hover:bg-muted'
                                                             }`}
                                                         >
                                                             {repo.platform === 'github' ? (
                                                                 <Github
                                                                     className={`w-[14px] h-[14px] ${
                                                                         isSelected
-                                                                            ? 'text-white'
-                                                                            : 'text-slate-600'
+                                                                            ? 'text-primary-foreground'
+                                                                            : 'text-muted-foreground'
                                                                     }`}
                                                                 />
                                                             ) : (
                                                                 <Gitlab
                                                                     className={`w-[14px] h-[14px] ${
                                                                         isSelected
-                                                                            ? 'text-white'
+                                                                            ? 'text-primary-foreground'
                                                                             : 'text-orange-500'
                                                                     }`}
                                                                 />
@@ -861,8 +863,8 @@ export function CloneProjectModal({
                                                                 <span
                                                                     className={`text-[11px] font-bold truncate ${
                                                                         isSelected
-                                                                            ? 'text-teal-950'
-                                                                            : 'text-slate-800'
+                                                                            ? 'text-primary'
+                                                                            : 'text-foreground'
                                                                     }`}
                                                                 >
                                                                     {repo.full_name}
@@ -871,8 +873,8 @@ export function CloneProjectModal({
                                                                     <Lock
                                                                         className={`w-[10px] h-[10px] shrink-0 ${
                                                                             isSelected
-                                                                                ? 'text-teal-600'
-                                                                                : 'text-slate-400'
+                                                                                ? 'text-primary'
+                                                                                : 'text-muted-foreground'
                                                                         }`}
                                                                     />
                                                                 )}
@@ -887,9 +889,9 @@ export function CloneProjectModal({
                                                                                 scale: 1,
                                                                                 opacity: 1
                                                                             }}
-                                                                            className="bg-teal-600 rounded-full p-0.5 scale-75 shrink-0"
+                                                                            className="bg-primary rounded-full p-0.5 scale-75 shrink-0"
                                                                         >
-                                                                            <Check className="w-[10px] h-[10px] text-white stroke-[4px]" />
+                                                                            <Check className="w-[10px] h-[10px] text-primary-foreground stroke-[4px]" />
                                                                         </motion.div>
                                                                     )}
                                                                 </AnimatePresence>
@@ -899,23 +901,23 @@ export function CloneProjectModal({
                                                                 <p
                                                                     className={`text-[10px] line-clamp-2 leading-tight ${
                                                                         isSelected
-                                                                            ? 'text-teal-900/80'
-                                                                            : 'text-slate-500'
+                                                                            ? 'text-primary/80'
+                                                                            : 'text-muted-foreground'
                                                                     }`}
                                                                 >
                                                                     {repo.description}
                                                                 </p>
                                                             ) : (
-                                                                <div className="flex items-center gap-1 text-[10px] italic text-slate-400">
+                                                                <div className="flex items-center gap-1 text-[10px] italic text-muted-foreground">
                                                                     <AlertCircle className="w-[10px] h-[10px]" />
                                                                     No description provided
                                                                 </div>
                                                             )}
 
-                                                            <div className="flex items-center gap-3 pt-0.5 text-[9px] font-semibold text-slate-400 uppercase tracking-wider">
+                                                            <div className="flex items-center gap-3 pt-0.5 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">
                                                                 {repo.updated_at && (
                                                                     <div className="flex items-center gap-1">
-                                                                        <Calendar className="w-3 h-3 text-slate-400" />
+                                                                        <Calendar className="w-3 h-3 text-muted-foreground" />
                                                                         {new Date(
                                                                             repo.updated_at
                                                                         ).toLocaleDateString(
@@ -948,10 +950,10 @@ export function CloneProjectModal({
                                                                         '_blank'
                                                                     )
                                                                 }}
-                                                                className={`p-1 rounded hover:bg-slate-100 transition-colors ${
+                                                                className={`p-1 rounded hover:bg-muted transition-colors ${
                                                                     isSelected
-                                                                        ? 'text-teal-600'
-                                                                        : 'text-slate-400 hover:text-slate-600'
+                                                                        ? 'text-primary'
+                                                                        : 'text-muted-foreground hover:text-foreground'
                                                                 }`}
                                                             >
                                                                 <ExternalLink className="w-[14px] h-[14px]" />
@@ -960,16 +962,17 @@ export function CloneProjectModal({
                                                     </div>
                                                 )
                                             })}
-                                        </div>
-                                    ) : (
-                                        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center select-none bg-white">
-                                            <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center mb-3">
-                                                <Search className="w-5 h-5 text-slate-300" />
                                             </div>
-                                            <span className="text-[11px] font-bold text-slate-700">
+                                        </ScrollArea>
+                                    ) : (
+                                        <div className="flex-1 min-h-[220px] flex flex-col items-center justify-center p-6 text-center select-none bg-card">
+                                            <div className="w-10 h-10 bg-muted border border-border rounded-lg flex items-center justify-center mb-3">
+                                                <Search className="w-5 h-5 text-muted-foreground/60" />
+                                            </div>
+                                            <span className="text-[11px] font-bold text-foreground">
                                                 No repositories found
                                             </span>
-                                            <p className="text-[10px] text-slate-400 max-w-[180px] mt-1 leading-tight">
+                                            <p className="text-[10px] text-muted-foreground max-w-[180px] mt-1 leading-tight">
                                                 Try adjusting your search or filters to find what
                                                 you're looking for.
                                             </p>
@@ -982,11 +985,11 @@ export function CloneProjectModal({
                 </div>
 
                 {/* Footer */}
-                <div className="px-3 py-2 bg-[#f8f9fb] border-t border-slate-200 flex items-center justify-end gap-2 shrink-0 select-none">
+                <div className="px-3 py-2 bg-muted border-t border-border flex items-center justify-end gap-2 shrink-0 select-none">
                     <button
                         type="button"
                         onClick={() => onClose(false)}
-                        className="px-4 py-1 text-[11px] font-bold text-slate-600 bg-white border border-slate-200 rounded-sm hover:bg-slate-50 min-w-[70px] transition-colors"
+                        className="px-4 py-1 text-[11px] font-bold text-muted-foreground bg-card border border-border rounded-sm hover:bg-muted min-w-[70px] transition-colors"
                         disabled={isCloning}
                     >
                         Cancel
@@ -997,8 +1000,8 @@ export function CloneProjectModal({
                         disabled={isCloning || (tab === 'search' && !selectedRepoId)}
                         className={`min-w-[110px] px-4 py-1 text-[11px] font-bold rounded-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 border ${
                             tab === 'search' && isSelectedRepoCloned && !isCloning
-                                ? 'bg-slate-800 border-slate-900 text-white'
-                                : 'bg-teal-600 border-teal-700 text-white'
+                                ? 'bg-black border-black text-white'
+                                : 'bg-primary border-primary text-primary-foreground'
                         }`}
                     >
                         {isCloning ? (
@@ -1022,7 +1025,7 @@ export function CloneProjectModal({
                                         initial={{ opacity: 0, y: 5 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -5 }}
-                                        className="flex items-center gap-1.5 text-white"
+                                        className="flex items-center gap-1.5 text-primary-foreground"
                                     >
                                         <GitFork className="w-[14px] h-[14px]" />
                                         Clone Project

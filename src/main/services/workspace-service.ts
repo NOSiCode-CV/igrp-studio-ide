@@ -920,7 +920,17 @@ export class WorkspaceRepository {
         )
 
         const workspaceConfig: ProjectWorkspace = {
-            config: { ...config, id: projectId, type: framework },
+            // Defensive default for `database`: the external
+            // `@igrp/igrp-studio-workspace-engine`'s `addProjectToWorkspace`
+            // unconditionally calls a `jt(e.config.database)` normalizer
+            // whose default branch does `e.toLowerCase()`. Frameworks that
+            // don't have a database field (Next.js, frontend in general)
+            // crash there with "Cannot read properties of undefined
+            // (reading 'toLowerCase')". Passing an empty string makes `jt`
+            // return "" without throwing; the downstream database service
+            // push is gated by `type === 'springboot'`, so this doesn't
+            // create a phantom DB container for Next.js projects.
+            config: { database: '', ...config, id: projectId, type: framework },
             id: workspaceId
         }
 
