@@ -1,4 +1,5 @@
-import { IGRPInputPrimitive, IGRPLabelPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
 import { CheckboxInput } from '@renderer/generators/api/components/inputs-form'
 import { type ChangeEvent, memo, useId } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -31,10 +32,8 @@ const ComponentIdentitySection = memo(function ComponentIdentitySection({
     return (
         <>
             <div className="space-y-2">
-                <IGRPLabelPrimitive htmlFor={'tab'}>
-                    {`${label || componentName} - ${componentId}`}
-                </IGRPLabelPrimitive>
-                <IGRPInputPrimitive id={idTag} value={tag} onChange={onTagChange} />
+                <Label htmlFor={'tab'}>{`${label || componentName} - ${componentId}`}</Label>
+                <Input id={idTag} value={tag} onChange={onTagChange} />
             </div>
             {isRootComponent && (
                 <CheckboxInput

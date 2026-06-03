@@ -1,23 +1,25 @@
 'use client'
 
-import {
-    IGRPCheckboxPrimitive,
-    IGRPCombobox,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPRadioGroupItemPrimitive,
-    IGRPRadioGroupPrimitive,
-    IGRPTextAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Checkbox } from '@renderer/components/ui/checkbox'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@renderer/components/ui/radio-group'
+import { Textarea } from '@renderer/components/ui/textarea'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import { LabelRequired } from '@renderer/components/label-required'
 import { DatabaseOptions } from '@renderer/constants/appConstants'
-import type { FormikErrors } from 'formik'
 import { useTranslation } from 'react-i18next'
-import type { DotNetConfigData, ProjectData } from 'src/main/types'
+import type { DotNetConfigData } from 'src/main/types'
 
 interface DotNetConfigProps {
     data: DotNetConfigData
-    errors?: FormikErrors<ProjectData>
+    /**
+     * Flattened error bag passed from the parent wizard. The shape matches
+     * what the sibling configs (next/spring/specification) already read:
+     * `errors.config.<field>` is a string. The parent translates the
+     * RHF error object into this shape before handing it down.
+     */
+    errors?: { config?: Record<string, string | undefined> }
     onChange: (data: DotNetConfigData) => void
 }
 
@@ -41,7 +43,7 @@ export function DotNetConfig({
         <div className="space-y-6">
             <div className="space-y-2">
                 <LabelRequired>{t('projectName')}</LabelRequired>
-                <IGRPInputPrimitive
+                <Input
                     id="name"
                     value={data.name}
                     onChange={(e) => onChange({ ...data, name: e.target.value })}
@@ -51,8 +53,8 @@ export function DotNetConfig({
             </div>
 
             <div className="space-y-2">
-                <IGRPLabelPrimitive htmlFor="description">{t('description')}</IGRPLabelPrimitive>
-                <IGRPTextAreaPrimitive
+                <Label htmlFor="description">{t('description')}</Label>
+                <Textarea
                     id="description"
                     value={data.description}
                     onChange={(e) => onChange({ ...data, description: e.target.value })}
@@ -62,7 +64,7 @@ export function DotNetConfig({
 
             <div className="space-y-2">
                 <LabelRequired>{t('artifact')}</LabelRequired>
-                <IGRPInputPrimitive
+                <Input
                     id="artifact"
                     value={data.artifact}
                     onChange={(e) => onChange({ ...data, artifact: e.target.value })}
@@ -85,8 +87,8 @@ export function DotNetConfig({
 
             <div className="grid grid-cols-2">
                 <div className="space-y-3">
-                    <IGRPLabelPrimitive>{t('projectStructureStyle')}</IGRPLabelPrimitive>
-                    <IGRPRadioGroupPrimitive
+                    <Label>{t('projectStructureStyle')}</Label>
+                    <RadioGroup
                         value={data.projectStructureStyle}
                         onValueChange={(value) =>
                             onChange({
@@ -97,22 +99,18 @@ export function DotNetConfig({
                         className="flex gap-4"
                     >
                         <div className="flex items-center space-x-2">
-                            <IGRPRadioGroupItemPrimitive value="technical" id="technical" />
-                            <IGRPLabelPrimitive htmlFor="technical">
-                                {t('technical')}
-                            </IGRPLabelPrimitive>
+                            <RadioGroupItem value="technical" id="technical" />
+                            <Label htmlFor="technical">{t('technical')}</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <IGRPRadioGroupItemPrimitive value="domain" id="domain" />
-                            <IGRPLabelPrimitive htmlFor="domain">
-                                {t('domainDriven')}
-                            </IGRPLabelPrimitive>
+                            <RadioGroupItem value="domain" id="domain" />
+                            <Label htmlFor="domain">{t('domainDriven')}</Label>
                         </div>
-                    </IGRPRadioGroupPrimitive>
+                    </RadioGroup>
                 </div>
 
                 <div className="flex items-center space-x-2">
-                    <IGRPCheckboxPrimitive
+                    <Checkbox
                         id="observability"
                         checked={data.enableObservability}
                         onCheckedChange={(checked) =>
@@ -122,9 +120,7 @@ export function DotNetConfig({
                             })
                         }
                     />
-                    <IGRPLabelPrimitive htmlFor="observability">
-                        {t('enableObservability')}
-                    </IGRPLabelPrimitive>
+                    <Label htmlFor="observability">{t('enableObservability')}</Label>
                 </div>
             </div>
         </div>

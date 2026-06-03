@@ -1,4 +1,5 @@
-import { IGRPButtonPrimitive, IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
 import { cn } from '@renderer/lib/utils'
 import type { DocNode } from '@renderer/redux/specDocs/reducer'
 import { AtSign, Check, FileText, Search } from 'lucide-react'
@@ -59,7 +60,7 @@ export function DocAttachPicker({
 
     return (
         <div ref={containerRef} className="relative">
-            <IGRPButtonPrimitive
+            <Button
                 type="button"
                 variant="ghost"
                 size="sm"
@@ -70,11 +71,9 @@ export function DocAttachPicker({
                 <AtSign size={11} />
                 Attach
                 {attachedCount > 0 && (
-                    <span className="rounded bg-primary/15 px-1 text-primary">
-                        {attachedCount}
-                    </span>
+                    <span className="rounded bg-primary/15 px-1 text-primary">{attachedCount}</span>
                 )}
-            </IGRPButtonPrimitive>
+            </Button>
             {open && (
                 <div className="absolute bottom-8 left-0 z-30 w-[280px] rounded-md border bg-popover p-2 shadow-lg">
                     <div className="relative mb-2">
@@ -82,7 +81,7 @@ export function DocAttachPicker({
                             size={11}
                             className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                         />
-                        <IGRPInputPrimitive
+                        <Input
                             ref={inputRef}
                             placeholder="Find docs in this spec…"
                             className="h-7 pl-7 text-[11px]"
@@ -120,7 +119,10 @@ export function DocAttachPicker({
                                         >
                                             {isAttached && <Check size={9} />}
                                         </span>
-                                        <FileText size={11} className="shrink-0 text-muted-foreground" />
+                                        <FileText
+                                            size={11}
+                                            className="shrink-0 text-muted-foreground"
+                                        />
                                         <span className="flex-1 truncate">{node.name}</span>
                                         {tokens !== null && (
                                             <span className="shrink-0 text-[9px] text-muted-foreground">

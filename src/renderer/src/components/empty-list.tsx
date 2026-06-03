@@ -1,9 +1,7 @@
 'use client'
 
-import {
-    IGRPButtonPrimitive,
-    IGRPSeparatorPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Separator } from '@renderer/components/ui/separator'
 import { cn } from '@renderer/lib/utils'
 import { CuboidIcon as Cube, Plus } from 'lucide-react'
 import type * as React from 'react'
@@ -42,15 +40,15 @@ export function EmptyList({
             <p className="mb-4 mt-2 text-sm text-muted-foreground">{description}</p>
 
             {actionLabel && onAction && (
-                <IGRPButtonPrimitive onClick={onAction} variant="outline" size="sm">
+                <Button onClick={onAction} variant="outline" size="sm">
                     <Plus className="mr-2 h-4 w-4" />
                     {actionLabel}
-                </IGRPButtonPrimitive>
+                </Button>
             )}
 
             {shortcut && (
                 <>
-                    <IGRPSeparatorPrimitive orientation="horizontal" />
+                    <Separator orientation="horizontal" />
                     <p className="mt-4 text-sm text-muted-foreground">
                         {t('createShortcut')} <kbd className="font-semibold">{shortcut}</kbd>
                     </p>

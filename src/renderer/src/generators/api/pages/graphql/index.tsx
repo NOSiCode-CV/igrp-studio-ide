@@ -1,11 +1,11 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardDescriptionPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@renderer/components/ui/card'
 import { useTabs } from '@renderer/components/navigation/TabContext'
 import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
@@ -138,51 +138,47 @@ export const GraphQLOverviewLayout = ({ currentItem }: GraphQLPageProps) => {
 
     return (
         <div className="space-y-6 p-6">
-            <IGRPCardPrimitive>
-                <IGRPCardHeaderPrimitive>
+            <Card>
+                <CardHeader>
                     <div className="flex items-start justify-between gap-4">
                         <div className="space-y-2">
                             <p className="text-xs uppercase tracking-[0.3em] text-primary">
                                 Graph Management
                             </p>
-                            <IGRPCardTitlePrimitive className="text-4xl font-bold">
-                                GraphQL API
-                            </IGRPCardTitlePrimitive>
-                            <IGRPCardDescriptionPrimitive className="max-w-2xl">
+                            <CardTitle className="text-4xl font-bold">GraphQL API</CardTitle>
+                            <CardDescription className="max-w-2xl">
                                 Define queries, mutations, and subscriptions for module{' '}
                                 <strong>{moduleName}</strong>.
-                            </IGRPCardDescriptionPrimitive>
+                            </CardDescription>
                         </div>
                         <Cable className="h-12 w-12 text-primary" />
                     </div>
-                </IGRPCardHeaderPrimitive>
-            </IGRPCardPrimitive>
+                </CardHeader>
+            </Card>
 
             <div className="grid gap-4 lg:grid-cols-3">
                 {groupedOperations.map((group) => (
-                    <IGRPCardPrimitive key={group.key}>
-                        <IGRPCardHeaderPrimitive>
+                    <Card key={group.key}>
+                        <CardHeader>
                             <div className="flex items-center justify-between gap-3">
                                 <div className="flex items-center gap-2">
                                     <group.icon className="h-4 w-4 text-primary" />
-                                    <IGRPCardTitlePrimitive className="text-base">
-                                        {group.title}
-                                    </IGRPCardTitlePrimitive>
+                                    <CardTitle className="text-base">{group.title}</CardTitle>
                                     <span className="text-xs text-muted-foreground">
                                         {group.items.length}
                                     </span>
                                 </div>
-                                <IGRPButtonPrimitive
+                                <Button
                                     type="button"
                                     size="icon"
                                     variant="ghost"
                                     onClick={() => openNewOperation(group.optionType)}
                                 >
                                     <Plus className="h-4 w-4" />
-                                </IGRPButtonPrimitive>
+                                </Button>
                             </div>
-                        </IGRPCardHeaderPrimitive>
-                        <IGRPCardContentPrimitive>
+                        </CardHeader>
+                        <CardContent>
                             <div className="space-y-2">
                                 {group.items.length === 0 && (
                                     <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
@@ -209,8 +205,8 @@ export const GraphQLOverviewLayout = ({ currentItem }: GraphQLPageProps) => {
                                     </button>
                                 ))}
                             </div>
-                        </IGRPCardContentPrimitive>
-                    </IGRPCardPrimitive>
+                        </CardContent>
+                    </Card>
                 ))}
             </div>
         </div>

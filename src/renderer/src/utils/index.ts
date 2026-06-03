@@ -173,9 +173,7 @@ export function camelCase(input: string): string {
     if (words.length === 0) return ''
     return words
         .map((w, i) =>
-            i === 0
-                ? w.toLowerCase()
-                : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+            i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
         )
         .join('')
 }

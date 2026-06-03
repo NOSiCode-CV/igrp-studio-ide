@@ -74,13 +74,10 @@ export class WorkspaceRepository {
                 continue
             }
 
-            if (
-                inPortsBlock &&
-                !portLineReplaced &&
-                /^\s*-\s*['"]?[^'"]+['"]?\s*$/.test(line)
-            ) {
+            if (inPortsBlock && !portLineReplaced && /^\s*-\s*['"]?[^'"]+['"]?\s*$/.test(line)) {
                 const indent = line.match(/^(\s*)/)?.[1] ?? '      '
-                lines[i] = `${indent}- "${'${HOST_NGINX_HTTP_PORT:-2575}:${NGINX_HTTP_PORT:-2575}'}"`
+                lines[i] =
+                    `${indent}- "${'${HOST_NGINX_HTTP_PORT:-2575}:${NGINX_HTTP_PORT:-2575}'}"`
                 portLineReplaced = true
                 continue
             }
@@ -93,7 +90,10 @@ export class WorkspaceRepository {
         return lines.join('\n')
     }
 
-    private async alignMainNginxPortArtifacts(workspacePath: string, nginxPort: number): Promise<void> {
+    private async alignMainNginxPortArtifacts(
+        workspacePath: string,
+        nginxPort: number
+    ): Promise<void> {
         const composePath = path.join(workspacePath, DEFAULT_MAIN_COMPOSE)
         if (fs.existsSync(composePath)) {
             let composeRaw = await readFile(composePath, 'utf8')
@@ -197,7 +197,9 @@ export class WorkspaceRepository {
         })
     }
 
-    private async findNextAvailableNginxHostPort(startPort = this.defaultNginxHostPort): Promise<number> {
+    private async findNextAvailableNginxHostPort(
+        startPort = this.defaultNginxHostPort
+    ): Promise<number> {
         let candidate = startPort
         for (let i = 0; i < 300; i++) {
             // eslint-disable-next-line no-await-in-loop
@@ -218,7 +220,9 @@ export class WorkspaceRepository {
             const raw = await readFile(envPath, 'utf8')
             const line = raw
                 .split('\n')
-                .find((l) => l.startsWith('HOST_NGINX_HTTP_PORT=') || l.startsWith('NGINX_HTTP_PORT='))
+                .find(
+                    (l) => l.startsWith('HOST_NGINX_HTTP_PORT=') || l.startsWith('NGINX_HTTP_PORT=')
+                )
             if (!line) continue
             const parsed = Number.parseInt(line.split('=')[1]?.trim() || '', 10)
             if (!Number.isNaN(parsed) && parsed > 0 && parsed <= 65535) {
@@ -321,10 +325,7 @@ export class WorkspaceRepository {
         }
     }
 
-    private async ensureHostGatewayAliasesForSlug(
-        filePath: string,
-        slug: string
-    ): Promise<void> {
+    private async ensureHostGatewayAliasesForSlug(filePath: string, slug: string): Promise<void> {
         if (!fs.existsSync(filePath)) return
         const raw = await readFile(filePath, 'utf8')
         const normalized = raw.replace(/\r\n/g, '\n')
@@ -397,7 +398,9 @@ export class WorkspaceRepository {
 
         const processEnv = path.join(workspace.path, 'process', '.env_process')
         if (fs.existsSync(processEnv)) {
-            await this.replaceTokenInTextFile(processEnv, [{ from: 'demoteste', to: workspace.slug }])
+            await this.replaceTokenInTextFile(processEnv, [
+                { from: 'demoteste', to: workspace.slug }
+            ])
             await this.ensureEnvVariable(processEnv, 'DOCKER_IP', workspace.slug)
             await this.ensureEnvVariable(processEnv, 'WORKSPACE_SLUG', workspace.slug)
             await this.ensureEnvVariable(
@@ -512,7 +515,9 @@ export class WorkspaceRepository {
         const targetEnv = path.join(workspace.path, '.env')
         if (!fs.existsSync(targetEnv) && fs.existsSync(sourceEnv)) {
             await fs.promises.copyFile(sourceEnv, targetEnv)
-            await this.replaceTokenInTextFile(targetEnv, [{ from: 'demoteste', to: workspace.slug }])
+            await this.replaceTokenInTextFile(targetEnv, [
+                { from: 'demoteste', to: workspace.slug }
+            ])
         }
         await this.ensureEnvVariable(targetEnv, 'WORKSPACE_SLUG', workspace.slug)
         await this.ensureEnvVariable(targetEnv, 'DOCKER_IP', workspace.slug)
@@ -577,7 +582,9 @@ export class WorkspaceRepository {
 
     async getOptionalStacksStatus(workspacePath: string): Promise<OptionalStacksStatus> {
         return {
-            monitoringInstalled: fs.existsSync(path.join(workspacePath, DEFAULT_MONITORING_COMPOSE)),
+            monitoringInstalled: fs.existsSync(
+                path.join(workspacePath, DEFAULT_MONITORING_COMPOSE)
+            ),
             processInstalled: fs.existsSync(path.join(workspacePath, DEFAULT_PROCESS_COMPOSE))
         }
     }
@@ -711,9 +718,16 @@ export class WorkspaceRepository {
             throw new Error(`Workspace ${workspaceId} not found`)
         }
 
-        await this.copyOptionalStacksFromDemoWorkspace(workspace, normalizedOptions, bootstrapResult)
+        await this.copyOptionalStacksFromDemoWorkspace(
+            workspace,
+            normalizedOptions,
+            bootstrapResult
+        )
 
-        if (normalizedOptions.installMonitoringStack && bootstrapResult.optionalStacksInstalled.monitoring) {
+        if (
+            normalizedOptions.installMonitoringStack &&
+            bootstrapResult.optionalStacksInstalled.monitoring
+        ) {
             try {
                 await dockerService.upMonitoringStack(workspace.path)
                 bootstrapResult.stackStarted = true
@@ -726,7 +740,10 @@ export class WorkspaceRepository {
             }
         }
 
-        if (normalizedOptions.installProcessStack && bootstrapResult.optionalStacksInstalled.process) {
+        if (
+            normalizedOptions.installProcessStack &&
+            bootstrapResult.optionalStacksInstalled.process
+        ) {
             // Process services depend on main stack readiness (db/eureka/keycloak/gateway).
             // Bring main stack up only when needed to avoid recreating/rattling an already healthy main stack.
             try {

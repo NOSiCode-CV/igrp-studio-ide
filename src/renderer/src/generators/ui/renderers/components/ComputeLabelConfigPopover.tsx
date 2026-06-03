@@ -1,13 +1,7 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPCombobox,
-    type IGRPOptionsProps,
-    IGRPPopoverContentPrimitive,
-    IGRPPopoverPrimitive,
-    IGRPPopoverTriggerPrimitive,
-    IGRPScrollAreaPrimitive,
-    IGRPScrollBarPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { ScrollArea, ScrollBar } from '@renderer/components/ui/scroll-area'
+import { IGRPCombobox, type IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system'
 import { Settings } from 'lucide-react'
 import React, { useCallback, useMemo } from 'react'
 
@@ -71,18 +65,18 @@ export const ComputeLabelConfigPopover: React.FC<ComputeLabelConfigPopoverProps>
     }, [selectedComputeLabel, selectedComputeLabelFunction])
 
     return (
-        <IGRPPopoverPrimitive open={popoverOpen} onOpenChange={setPopoverOpen}>
-            <IGRPPopoverTriggerPrimitive asChild>
-                <IGRPButtonPrimitive
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger asChild>
+                <Button
                     variant="outline"
                     size="sm"
                     className="gap-2  from-primary-50 to-indigo-50 dark:from-primary-950/20 dark:to-indigo-950/20 border-primary-200 dark:border-primary-800 hover:from-primary-100 hover:to-indigo-100 dark:hover:from-primary-900/30 dark:hover:to-indigo-900/30 transition-all duration-200"
                 >
                     <Settings className="h-4 w-4" />
                     {buttonLabel}
-                </IGRPButtonPrimitive>
-            </IGRPPopoverTriggerPrimitive>
-            <IGRPPopoverContentPrimitive className="w-80" align="start">
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" align="start">
                 <div className="space-y-4">
                     {/* Header */}
                     <div>
@@ -143,7 +137,7 @@ export const ComputeLabelConfigPopover: React.FC<ComputeLabelConfigPopoverProps>
                                 </p>
                             </div>
 
-                            <IGRPScrollAreaPrimitive>
+                            <ScrollArea>
                                 <div className="bg-slate-900 dark:bg-slate-950 p-3 rounded border border-slate-700">
                                     <code className="text-xs text-green-400 font-mono block whitespace-pre leading-relaxed">
                                         {`function renderLabel(item: any, index: number): string {
@@ -155,8 +149,8 @@ export const ComputeLabelConfigPopover: React.FC<ComputeLabelConfigPopoverProps>
 }`}
                                     </code>
                                 </div>
-                                <IGRPScrollBarPrimitive orientation="horizontal" />
-                            </IGRPScrollAreaPrimitive>
+                                <ScrollBar orientation="horizontal" />
+                            </ScrollArea>
 
                             <div className="flex items-start gap-1">
                                 <p className="text-xs text-muted-foreground">
@@ -175,7 +169,7 @@ export const ComputeLabelConfigPopover: React.FC<ComputeLabelConfigPopoverProps>
                         )}
                     </div>
                 </div>
-            </IGRPPopoverContentPrimitive>
-        </IGRPPopoverPrimitive>
+            </PopoverContent>
+        </Popover>
     )
 }

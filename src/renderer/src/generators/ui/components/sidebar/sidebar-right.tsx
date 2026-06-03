@@ -1,11 +1,5 @@
-import {
-    IGRPSidebarContentPrimitive,
-    IGRPSidebarPrimitive,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Sidebar, SidebarContent } from '@renderer/components/ui/sidebar'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { EmptyList } from '@renderer/components/empty-list'
 import Loader from '@renderer/components/loader'
 import useStudio from '@renderer/hooks/use-studio'
@@ -22,7 +16,7 @@ import ComponentIdentitySection from './sidebar-right-identity'
 import SidebarRightHeader from './sidebar-right-header'
 import PropertiesPanel from './sidebar-right-properties-panel'
 
-interface SidebarRightProps extends ComponentProps<typeof IGRPSidebarPrimitive> {
+interface SidebarRightProps extends ComponentProps<typeof Sidebar> {
     comp?: StructuredComponent
     parentComp?: StructuredComponent
     path?: string
@@ -58,7 +52,7 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
     } = useSidebarRightState({ comp, parentComp, path })
 
     return (
-        <IGRPSidebarPrimitive
+        <Sidebar
             collapsible="none"
             className="overflow-hidden *:data-[sidebar=sidebar]:flex-row top-(--header-height-two)! h-[calc(100svh-var(--header-height-three))]!"
             {...props}
@@ -74,7 +68,7 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                 onReset={resetTempData}
                 onClose={handleClose}
             />
-            <IGRPSidebarContentPrimitive>
+            <SidebarContent>
                 <div className="space-y-4 p-2 px-3">
                     {isLoading ? (
                         <Loader />
@@ -96,23 +90,17 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                                 onTagChange={handleTagChange}
                                 onUseClientChange={handleUseClientChange}
                             />
-                            <IGRPTabsPrimitive className="flex-1" defaultValue="props">
-                                <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
-                                    <IGRPTabsTriggerPrimitive value="props">
-                                        {t('props')}
-                                    </IGRPTabsTriggerPrimitive>
-                                    <IGRPTabsTriggerPrimitive value="styles">
-                                        {t('style')}
-                                    </IGRPTabsTriggerPrimitive>
-                                    <IGRPTabsTriggerPrimitive value="interactions">
+                            <Tabs className="flex-1" defaultValue="props">
+                                <TabsList className="grid w-full grid-cols-4">
+                                    <TabsTrigger value="props">{t('props')}</TabsTrigger>
+                                    <TabsTrigger value="styles">{t('style')}</TabsTrigger>
+                                    <TabsTrigger value="interactions">
                                         {t('interactions')}
-                                    </IGRPTabsTriggerPrimitive>
-                                    <IGRPTabsTriggerPrimitive value="copy-content">
-                                        {t('copy')}
-                                    </IGRPTabsTriggerPrimitive>
-                                </IGRPTabsListPrimitive>
+                                    </TabsTrigger>
+                                    <TabsTrigger value="copy-content">{t('copy')}</TabsTrigger>
+                                </TabsList>
 
-                                <IGRPTabsContentPrimitive value="props" className="space-y-6">
+                                <TabsContent value="props" className="space-y-6">
                                     <PropertiesPanel
                                         propsComponent={propsComponent}
                                         propsComponentChild={propsComponentChild}
@@ -125,37 +113,31 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                                         onChildPropertyChange={handleChildPropertyChange}
                                         onSelectState={handleSelectState}
                                     />
-                                </IGRPTabsContentPrimitive>
-                                <IGRPTabsContentPrimitive value="styles" className="space-y-6">
+                                </TabsContent>
+                                <TabsContent value="styles" className="space-y-6">
                                     <StyleTab
                                         comp={tempEditingComponent}
                                         path={currentPath}
                                         onInteranctionsChange={handleUpdateChildComponent}
                                     />
-                                </IGRPTabsContentPrimitive>
-                                <IGRPTabsContentPrimitive
-                                    value="interactions"
-                                    className="space-y-6"
-                                >
+                                </TabsContent>
+                                <TabsContent value="interactions" className="space-y-6">
                                     <Interactions
                                         comp={tempEditingComponent}
                                         path={currentPath}
                                         onInteranctionsChange={handleUpdateChildComponent}
                                         columnsOptions={columnsOptions}
                                     />
-                                </IGRPTabsContentPrimitive>
-                                <IGRPTabsContentPrimitive
-                                    value="copy-content"
-                                    className="space-y-6"
-                                >
+                                </TabsContent>
+                                <TabsContent value="copy-content" className="space-y-6">
                                     <CopyContent currentComp={currentComp} />
-                                </IGRPTabsContentPrimitive>
-                            </IGRPTabsPrimitive>
+                                </TabsContent>
+                            </Tabs>
                         </>
                     )}
                 </div>
-            </IGRPSidebarContentPrimitive>
-        </IGRPSidebarPrimitive>
+            </SidebarContent>
+        </Sidebar>
     )
 }
 

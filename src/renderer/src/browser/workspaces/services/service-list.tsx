@@ -1,6 +1,6 @@
 'use client'
 
-import { IGRPBadgePrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Badge } from '@renderer/components/ui/badge'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Dependency from '../components/dependency'
@@ -81,20 +81,20 @@ export function ServiceList({ services, showFilter = true }: ServiceListProps) {
                                 </div>
                             </div>
                             <div>
-                                <IGRPBadgePrimitive
+                                <Badge
                                     variant="outline"
                                     className={`${getServiceColor(service.labels?.type)} bg-opacity-10 capitalize`}
                                 >
                                     {service.labels?.type}
-                                </IGRPBadgePrimitive>
+                                </Badge>
                             </div>
                             <div>
                                 <div className="flex flex-wrap gap-1">
                                     {service.ports &&
                                         service.ports.map((port: string, i: number) => (
-                                            <IGRPBadgePrimitive key={i} variant="outline">
+                                            <Badge key={i} variant="outline">
                                                 {port}
-                                            </IGRPBadgePrimitive>
+                                            </Badge>
                                         ))}
                                 </div>
                             </div>
@@ -110,12 +110,12 @@ export function ServiceList({ services, showFilter = true }: ServiceListProps) {
                                 </div>
                             </div>
                             <div>
-                                <IGRPBadgePrimitive
+                                <Badge
                                     variant="outline"
                                     className={`capitalize ${getStatusColor(service.status)}`}
                                 >
                                     {service.status}
-                                </IGRPBadgePrimitive>
+                                </Badge>
                             </div>
                             <div onClick={(e) => e.stopPropagation()}>
                                 <ServiceActions service={service} services={filteredServices} />

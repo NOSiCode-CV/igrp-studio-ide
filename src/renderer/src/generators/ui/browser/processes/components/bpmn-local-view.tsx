@@ -1,19 +1,15 @@
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPBadgePrimitive,
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardDescriptionPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPSeparator,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive,
-    IGRPToggleGroupItemPrimitive,
-    IGRPToggleGroupPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@renderer/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
+import { ToggleGroup, ToggleGroupItem } from '@renderer/components/ui/toggle-group'
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import type { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { EmptyList } from '@renderer/components/empty-list'
 import { SearchInput } from '@renderer/components/shared-ui'
@@ -79,22 +75,22 @@ export const BpmnLocalView = ({
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                         <span className="text-sm font-medium">View Mode:</span>
-                        <IGRPToggleGroupPrimitive
+                        <ToggleGroup
                             type="single"
                             value={viewMode}
                             onValueChange={(value) => {
                                 if (value) onViewModeChange(value as 'local' | 'remote')
                             }}
                         >
-                            <IGRPToggleGroupItemPrimitive value="local" aria-label="Local mode">
+                            <ToggleGroupItem value="local" aria-label="Local mode">
                                 <HardDrive className="mr-2 h-4 w-4" />
                                 Local
-                            </IGRPToggleGroupItemPrimitive>
-                            <IGRPToggleGroupItemPrimitive value="remote" aria-label="Remote mode">
+                            </ToggleGroupItem>
+                            <ToggleGroupItem value="remote" aria-label="Remote mode">
                                 <Cloud className="mr-2 h-4 w-4" />
                                 Remote
-                            </IGRPToggleGroupItemPrimitive>
-                        </IGRPToggleGroupPrimitive>
+                            </ToggleGroupItem>
+                        </ToggleGroup>
                     </div>
                 </div>
 
@@ -120,28 +116,28 @@ export const BpmnLocalView = ({
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                     <span className="text-sm font-medium">View Mode:</span>
-                    <IGRPToggleGroupPrimitive
+                    <ToggleGroup
                         type="single"
                         value={viewMode}
                         onValueChange={(value) => {
                             if (value) onViewModeChange(value as 'local' | 'remote')
                         }}
                     >
-                        <IGRPToggleGroupItemPrimitive value="local" aria-label="Local mode">
+                        <ToggleGroupItem value="local" aria-label="Local mode">
                             <HardDrive className="mr-2 h-4 w-4" />
                             Local
-                        </IGRPToggleGroupItemPrimitive>
-                        <IGRPToggleGroupItemPrimitive value="remote" aria-label="Remote mode">
+                        </ToggleGroupItem>
+                        <ToggleGroupItem value="remote" aria-label="Remote mode">
                             <Cloud className="mr-2 h-4 w-4" />
                             Remote
-                        </IGRPToggleGroupItemPrimitive>
-                    </IGRPToggleGroupPrimitive>
+                        </ToggleGroupItem>
+                    </ToggleGroup>
                 </div>
             </div>
 
             {!hasApiProjects && (
-                <IGRPCardPrimitive className="border-orange-200 bg-orange-50 dark:bg-orange-950/20">
-                    <IGRPCardContentPrimitive className="py-4">
+                <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950/20">
+                    <CardContent className="py-4">
                         <div className="flex items-start space-x-3">
                             <div className="shrink-0">
                                 <svg
@@ -169,8 +165,8 @@ export const BpmnLocalView = ({
                                 </p>
                             </div>
                         </div>
-                    </IGRPCardContentPrimitive>
-                </IGRPCardPrimitive>
+                    </CardContent>
+                </Card>
             )}
 
             <div className="space-y-4">
@@ -218,7 +214,7 @@ export const BpmnLocalView = ({
                                     'No description available'
 
                                 return (
-                                    <IGRPCardPrimitive
+                                    <Card
                                         key={`${process.path}-${index}`}
                                         className={`hover:shadow-md transition-all cursor-pointer ${
                                             selectedLocalProcess?.path === process.path
@@ -233,15 +229,15 @@ export const BpmnLocalView = ({
                                             )
                                         }}
                                     >
-                                        <IGRPCardContentPrimitive>
+                                        <CardContent>
                                             <div className="flex items-start justify-between">
                                                 <div className="flex-1">
-                                                    <IGRPCardTitlePrimitive className="text-base font-medium">
+                                                    <CardTitle className="text-base font-medium">
                                                         {process.name}
-                                                    </IGRPCardTitlePrimitive>
-                                                    <IGRPCardDescriptionPrimitive>
+                                                    </CardTitle>
+                                                    <CardDescription>
                                                         {processDescription}
-                                                    </IGRPCardDescriptionPrimitive>
+                                                    </CardDescription>
                                                     <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
                                                         <UserCog className="w-4 h-4" />
                                                         <span>
@@ -253,13 +249,11 @@ export const BpmnLocalView = ({
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-col items-end space-y-2">
-                                                    <IGRPBadgePrimitive variant="secondary">
-                                                        Local
-                                                    </IGRPBadgePrimitive>
+                                                    <Badge variant="secondary">Local</Badge>
                                                 </div>
                                             </div>
-                                        </IGRPCardContentPrimitive>
-                                    </IGRPCardPrimitive>
+                                        </CardContent>
+                                    </Card>
                                 )
                             })}
                         </div>
@@ -290,18 +284,16 @@ export const BpmnLocalView = ({
 
                     return (
                         <div className="space-y-4">
-                            <IGRPTabsPrimitive
+                            <Tabs
                                 value={activeTab}
                                 onValueChange={onActiveTabChange}
                                 className="w-full"
                             >
-                                <IGRPTabsListPrimitive className="grid grid-cols-1">
-                                    <IGRPTabsTriggerPrimitive value="artifacts">
-                                        Process Artifacts
-                                    </IGRPTabsTriggerPrimitive>
-                                </IGRPTabsListPrimitive>
+                                <TabsList className="grid grid-cols-1">
+                                    <TabsTrigger value="artifacts">Process Artifacts</TabsTrigger>
+                                </TabsList>
 
-                                <IGRPTabsContentPrimitive value="artifacts" className="space-y-6">
+                                <TabsContent value="artifacts" className="space-y-6">
                                     <div className="flex items-center justify-between mt-4">
                                         <div>
                                             <h4 className="text-md font-medium">
@@ -324,35 +316,35 @@ export const BpmnLocalView = ({
                                                         artifact.content?.type === 'processStep'
                                                 )
                                                 .map((artifact, index) => (
-                                                    <IGRPCardPrimitive
+                                                    <Card
                                                         key={`${artifact.path}-${index}`}
                                                         className="hover:shadow-md transition-all cursor-pointer hover:bg-muted/30"
                                                     >
-                                                        <IGRPCardHeaderPrimitive>
+                                                        <CardHeader>
                                                             <div className="flex items-start justify-between">
                                                                 <div className="flex-1">
-                                                                    <IGRPCardTitlePrimitive className="text-base font-medium">
+                                                                    <CardTitle className="text-base font-medium">
                                                                         {
                                                                             artifact.content
                                                                                 ?.description
                                                                         }
-                                                                    </IGRPCardTitlePrimitive>
+                                                                    </CardTitle>
                                                                     <div className="text-sm text-muted-foreground mt-1">
                                                                         {artifact.content?.taskKey}
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex flex-col items-end space-y-2">
-                                                                    <IGRPBadgePrimitive
+                                                                    <Badge
                                                                         variant="outline"
                                                                         className="text-xs"
                                                                     >
                                                                         Local
-                                                                    </IGRPBadgePrimitive>
+                                                                    </Badge>
                                                                 </div>
                                                             </div>
-                                                        </IGRPCardHeaderPrimitive>
-                                                        <IGRPCardContentPrimitive className="space-y-2">
-                                                            <IGRPButtonPrimitive
+                                                        </CardHeader>
+                                                        <CardContent className="space-y-2">
+                                                            <Button
                                                                 size="sm"
                                                                 className="w-full"
                                                                 variant="outline"
@@ -366,26 +358,26 @@ export const BpmnLocalView = ({
                                                             >
                                                                 <PenSquare className="mr-2 h-4 w-4" />
                                                                 Open Editor
-                                                            </IGRPButtonPrimitive>
-                                                        </IGRPCardContentPrimitive>
-                                                    </IGRPCardPrimitive>
+                                                            </Button>
+                                                        </CardContent>
+                                                    </Card>
                                                 ))}
                                         </div>
                                     ) : lastVersion ? (
-                                        <IGRPCardPrimitive>
-                                            <IGRPCardContentPrimitive className="py-8 text-center text-muted-foreground">
+                                        <Card>
+                                            <CardContent className="py-8 text-center text-muted-foreground">
                                                 No artifacts found in {lastVersion.name}.
-                                            </IGRPCardContentPrimitive>
-                                        </IGRPCardPrimitive>
+                                            </CardContent>
+                                        </Card>
                                     ) : (
-                                        <IGRPCardPrimitive>
-                                            <IGRPCardContentPrimitive className="py-8 text-center text-muted-foreground">
+                                        <Card>
+                                            <CardContent className="py-8 text-center text-muted-foreground">
                                                 No versions found for this process.
-                                            </IGRPCardContentPrimitive>
-                                        </IGRPCardPrimitive>
+                                            </CardContent>
+                                        </Card>
                                     )}
-                                </IGRPTabsContentPrimitive>
-                            </IGRPTabsPrimitive>
+                                </TabsContent>
+                            </Tabs>
                         </div>
                     )
                 })()}

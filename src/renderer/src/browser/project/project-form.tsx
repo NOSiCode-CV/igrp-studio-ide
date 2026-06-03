@@ -1,21 +1,20 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDialogTriggerPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPRadioGroupItemPrimitive,
-    IGRPRadioGroupPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@renderer/components/ui/radio-group'
 import { FrameworkIcon } from '@renderer/components/framework-icon'
 import { LabelRequired } from '@renderer/components/label-required'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
-import { type FormikErrors, useFormik } from 'formik'
+import { errorMessage, useZodForm } from '@renderer/lib/form'
 import {
     ArrowLeft,
     ArrowRight,
@@ -29,6 +28,7 @@ import {
 } from 'lucide-react'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import type { FieldErrors } from 'react-hook-form'
 import type { FrameworkType, ProjectData } from 'src/main/types'
 import { DotNetConfig } from './components/configurations/dotnet-config'
 import { NextConfig } from './components/configurations/next-config'
@@ -45,8 +45,14 @@ import {
 import { useProjectValidation } from './validation'
 
 interface ConfigComponentProps {
-    data: any // Replace `any` with a specific type if possible (e.g., `ProjectData`)
-    errors?: FormikErrors<ProjectData>
+    data: any
+    /**
+     * Legacy shape kept stable across the migration: `errors?.config?.field`
+     * is a plain string. The wizard adapts RHF errors into this bag before
+     * passing them down so each config component (next/spring/dotnet/spec)
+     * stays unchanged.
+     */
+    errors?: { config?: Record<string, string | undefined> }
     onChange: (config: any) => void
 }
 
@@ -69,6 +75,25 @@ export const ProjectConfigForm = ({
 } & ConfigComponentProps) => {
     const Component = componentsMap[type]
     return <Component data={data} errors={errors} onChange={onChange} />
+}
+
+/**
+ * Flattens the nested RHF errors for the `config` sub-form into the plain
+ * `{ config: { name, group, artifact, database } }` shape the per-framework
+ * config components have read since the Formik days.
+ */
+function flattenConfigErrors(errors: FieldErrors<ProjectData>): {
+    config?: Record<string, string | undefined>
+} {
+    const config = errors.config as Record<string, { message?: string }> | undefined
+    if (!config) return {}
+    const out: Record<string, string | undefined> = {}
+    for (const [k, v] of Object.entries(config)) {
+        if (v && typeof v === 'object' && 'message' in v && typeof v.message === 'string') {
+            out[k] = v.message
+        }
+    }
+    return { config: out }
 }
 
 export function ProjectWizard({ children }: { children?: React.ReactNode }) {
@@ -100,34 +125,33 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         [workspace?.id]
     )
 
-    const validationSchema = useProjectValidation({ t, step })
+    const schema = useProjectValidation({ t, step })
 
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues,
-        validationSchema,
-        onSubmit: async (values, actions) => {
-            setIsCreatingProject(true)
-            try {
-                await saveOrOpenProject({
-                    project: {
-                        ...values,
-                        name: values?.name || '',
-                        framework: values?.framework || '',
-                        path: values?.path || '',
-                        config: values?.config || {}
-                    }
-                })
-            } finally {
-                actions.setSubmitting(false)
-                setIsCreatingProject(false)
-            }
-        }
+    // The wizard's form values are a superset of `ProjectData` (free-form
+    // `config` etc.). Use `Record<string, any>` so RHF accepts `setValue`
+    // calls for dynamically-typed fields without `never` mismatches; the
+    // surface is still type-checked through `values` reads below.
+    type ProjectFormValues = Record<string, any> & Partial<ProjectData>
+    const form = useZodForm<ProjectFormValues>({
+        schema: schema as unknown as import('zod').z.ZodType<ProjectFormValues, unknown>,
+        defaultValues: initialValues as ProjectFormValues
     })
+    const { register, watch, setValue, reset, trigger, handleSubmit, formState } = form
+    const { errors, touchedFields, isSubmitting } = formState
+
+    const values = watch()
+    const flattenedErrors = React.useMemo(() => flattenConfigErrors(errors), [errors])
 
     const inputRef = React.useRef<HTMLInputElement>(null)
     const iconUploadRef = React.useRef<HTMLInputElement>(null)
     const wasOpenRef = React.useRef(open)
+
+    // Wire RHF's ref for the project-name input alongside the autofocus ref.
+    const nameRegister = register('name')
+    const nameRefHandler = (el: HTMLInputElement | null): void => {
+        nameRegister.ref(el)
+        inputRef.current = el
+    }
 
     React.useEffect(() => {
         if (inputRef.current) {
@@ -137,49 +161,37 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     }, [])
 
     /**
-     * Handles file upload for project icons.
-     * Instead of storing base64 data in JSON (which can be very large for big files),
-     * this function saves the file to disk and stores only the relative path.
-     *
-     * Benefits:
-     * - Reduces JSON file size significantly
-     * - Better performance for large files
-     * - Easier to manage and backup
-     * - Supports larger file sizes
+     * Handles file upload for project icons. Saves the file to disk and
+     * stores only the relative path; keeps JSON small and supports larger
+     * files than embedding base64.
      */
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         if (!file) return
 
         try {
-            // Validate file type
             if (!file.type.startsWith('image/')) {
                 alert('Please select a valid image file.')
                 return
             }
 
-            // Check file size (limit to 5MB for icons)
             const maxSize = 5 * 1024 * 1024 // 5MB
             if (file.size > maxSize) {
                 alert('File size too large. Please select an image smaller than 5MB.')
                 return
             }
 
-            // Validate project name exists
-            if (!formik.values.name || formik.values.name.trim() === '') {
+            if (!values.name || values.name.trim() === '') {
                 alert('Please enter a project name before uploading an icon.')
                 return
             }
 
-            // Create a unique filename
             const fileExtension = file.name.split('.').pop() || 'png'
             const fileName = `icon_${Date.now()}.${fileExtension}`
 
-            // Save file to centralized icons directory
             const iconsPath = `${workspace.path}/icons`
             const filePath = `${iconsPath}/${fileName}`
 
-            // Use electron API to save file
             const result = await window.api.saveProjectIcon({
                 filePath,
                 fileData: await file.arrayBuffer(),
@@ -187,10 +199,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             })
 
             if (result.success) {
-                // Store the relative path instead of base64
                 const relativePath = `icons/${fileName}`
-                formik.setFieldValue('icon', relativePath)
-                // Preview will be updated by useEffect when icon changes
+                setValue('icon', relativePath, { shouldDirty: true })
             } else {
                 console.error('Failed to save icon file:', result.error)
                 alert('Failed to save icon file. Please try again.')
@@ -201,45 +211,28 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         }
     }
 
-    /**
-     * Converts an icon path to a displayable URL.
-     * Handles different path formats:
-     * - Relative paths (icons/filename.ext) -> fetches file securely via IPC
-     * - Legacy assets paths -> fetches file securely via IPC
-     * - Base64 data URLs -> returns as is (for backward compatibility)
-     */
     const getIconPreviewUrl = React.useCallback(
         async (iconPath: string): Promise<string | null> => {
             if (!iconPath) return null
-
-            // If it's a base64 string (for backward compatibility), return as is
-            if (iconPath.startsWith('data:')) {
-                return iconPath
-            }
-
-            // If it's a relative path, fetch the file securely
+            if (iconPath.startsWith('data:')) return iconPath
             if (iconPath.startsWith('icons/') || iconPath.startsWith('assets/')) {
                 try {
                     const result = await window.api.getIconFile(iconPath, workspace.path)
-                    if (result.success) {
-                        return result.data
-                    } else {
-                        console.warn('Failed to load icon file:', result.error)
-                        return null
-                    }
+                    if (result.success) return result.data
+                    console.warn('Failed to load icon file:', result.error)
+                    return null
                 } catch (error) {
                     console.error('Error loading icon file:', error)
                     return null
                 }
             }
-
             return null
         },
         [workspace.path]
     )
 
-    const isFrontend = formik.values.type === 'frontend'
-    const isSpecification = formik.values.type === 'specification'
+    const isFrontend = values.type === 'frontend'
+    const isSpecification = values.type === 'specification'
 
     const frameworks = isSpecification
         ? specificationFrameworks
@@ -249,12 +242,10 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
     const canNavigateToStep = (targetStep: number) => {
         if (targetStep === 1) return true
-        if (targetStep === 2) return !!formik.values.name && !!formik.values.type
-        if (targetStep === 3) return !!formik.values.framework
-        if (targetStep === 4) {
-            return !!formik.values.config
-        }
-        if (targetStep === STEPS.length) return !!formik.values.path.trim()
+        if (targetStep === 2) return !!values.name && !!values.type
+        if (targetStep === 3) return !!values.framework
+        if (targetStep === 4) return !!values.config
+        if (targetStep === STEPS.length) return !!values.path?.trim()
         return false
     }
 
@@ -265,55 +256,53 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     }
 
     const handleNext = async () => {
-        const errors = await formik.validateForm()
+        const valid = await trigger()
 
         if (step === 1 && errors.name) return
+        if (step === 3 && !valid && errors.config !== undefined) return
 
-        if (step === 3 && Object.keys(errors).length !== 0 && errors.config !== undefined) {
-            return
-        }
         if (step < STEPS.length && canNavigateToStep(step + 1)) {
             setStep(step + 1)
         }
     }
 
     const handleBack = () => {
-        if (step > 1) {
-            setStep(step - 1)
-        }
+        if (step > 1) setStep(step - 1)
     }
 
     const handleOpenDirectory = async () => {
         const result = await window.api.openDirectory(t('projectDirectory'))
         if (!result.canceled && result.basePath) {
-            formik.setFieldValue('path', result.basePath)
+            setValue('path', result.basePath, { shouldValidate: true })
         }
     }
 
     const handleChangeType = (value: string) => {
-        if (formik.values.framework !== value) formik.setFieldValue('framework', '')
-        formik.setFieldValue('type', value)
+        if (values.framework !== value)
+            setValue('framework', '' as FrameworkType, { shouldValidate: true })
+        setValue('type', value as ProjectData['type'], { shouldValidate: true, shouldTouch: true })
     }
 
     const handleChangeFramework = (value: string) => {
-        if (formik.values.framework !== value) formik.setFieldValue('config', undefined)
-        formik.setFieldValue('framework', value)
+        if (values.framework !== value)
+            setValue('config', {} as ProjectData['config'], { shouldValidate: false })
+        setValue('framework', value as FrameworkType, {
+            shouldValidate: true,
+            shouldTouch: true
+        })
     }
 
-    const SelectedComponent = formik.values?.framework
-        ? componentsMap[formik.values?.framework]
-        : null
+    const SelectedComponent = values?.framework ? componentsMap[values?.framework] : null
 
+    // Reset only when the dialog transitions from open -> closed.
     React.useEffect(() => {
         const wasOpen = wasOpenRef.current
         wasOpenRef.current = open
-
-        // Reset only when the dialog transitions from open -> closed
         if (wasOpen && !open) {
-            formik.resetForm({ values: initialValues })
+            reset(initialValues)
             setStep(1)
         }
-    }, [formik.resetForm, initialValues, open])
+    }, [reset, initialValues, open])
 
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -322,74 +311,84 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 setOpen(true)
             }
         }
-
         document.addEventListener('keydown', handleKeyDown)
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown)
-        }
+        return () => document.removeEventListener('keydown', handleKeyDown)
     }, [])
 
+    // Auto-compute `path` while the project is managed by the workspace.
     React.useEffect(() => {
-        // Only auto-compute the path while the project is managed by the
-        // workspace. In linked mode the user picks the location via the
-        // Browse button, so we must not overwrite their selection.
-        if (formik.values.storageMode === 'linked') return
+        if (values.storageMode === 'linked') return
 
-        const targetPath = `${workspace.path}/projects/${
-            formik.values?.config?.name ?? formik.values.name
-        }`
+        const targetPath = `${workspace.path}/projects/${values?.config?.name ?? values.name}`
 
-        if (formik.values.path !== targetPath) {
-            formik.setFieldValue('path', targetPath, false)
+        if (values.path !== targetPath) {
+            setValue('path', targetPath, { shouldValidate: false })
         }
     }, [
-        formik.setFieldValue,
-        formik.values?.config?.name,
-        formik.values.name,
-        formik.values.path,
-        formik.values.storageMode,
+        setValue,
+        values?.config?.name,
+        values.name,
+        values.path,
+        values.storageMode,
         workspace.path
     ])
 
-    // Update preview when icon changes
+    // Update icon preview.
     React.useEffect(() => {
         const updatePreview = async () => {
-            if (formik.values.icon) {
-                const previewUrl = await getIconPreviewUrl(formik.values.icon)
-                setPreviewUrl(previewUrl)
+            if (values.icon) {
+                const url = await getIconPreviewUrl(values.icon)
+                setPreviewUrl(url)
             } else {
                 setPreviewUrl(null)
             }
         }
-
         updatePreview()
-    }, [formik.values.icon, getIconPreviewUrl])
+    }, [values.icon, getIconPreviewUrl])
+
+    const onFormSubmit = handleSubmit(async (submitted) => {
+        setIsCreatingProject(true)
+        try {
+            await saveOrOpenProject({
+                project: {
+                    ...(submitted as ProjectData),
+                    name: submitted?.name || '',
+                    framework: (submitted?.framework || '') as FrameworkType,
+                    path: submitted?.path || '',
+                    config: submitted?.config || {}
+                }
+            })
+        } finally {
+            setIsCreatingProject(false)
+        }
+    })
+
+    const nameError = errorMessage(errors.name as never)
+    const typeError = errorMessage(errors.type as never)
+    const frameworkError = errorMessage(errors.framework as never)
+    const pathError = errorMessage(errors.path as never)
 
     const renderStep1 = () => (
         <div className="space-y-4">
             <div className="space-y-2">
                 <LabelRequired>{t('projectName')}</LabelRequired>
-                <IGRPInputPrimitive
+                <Input
+                    {...nameRegister}
+                    ref={nameRefHandler}
                     id="name"
-                    name="name"
                     placeholder={t('enterProjectName')}
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    ref={inputRef}
                     autoFocus
                     maxLength={50}
                     className="mt-2"
                 />
-                {formik.touched.name && formik.errors.name && (
-                    <p className="text-xs text-destructive">{formik.errors.name}</p>
+                {touchedFields.name && nameError && (
+                    <p className="text-xs text-destructive">{nameError}</p>
                 )}
             </div>
 
             {/* Project Icon Upload with Preview */}
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('projectIcon')}</IGRPLabelPrimitive>
+                <Label>{t('projectIcon')}</Label>
                 <input
                     ref={iconUploadRef}
                     type="file"
@@ -420,14 +419,14 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         {t('recommendedSize')}
                                     </div>
                                 </div>
-                                <IGRPButtonPrimitive
+                                <Button
                                     variant="outline"
                                     size="sm"
                                     type="button"
                                     onClick={() => iconUploadRef.current?.click()}
                                 >
                                     {t('upload')}...
-                                </IGRPButtonPrimitive>
+                                </Button>
                             </>
                         )}
                     </div>
@@ -435,24 +434,20 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             </div>
 
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('projectType')}</IGRPLabelPrimitive>
-                <IGRPRadioGroupPrimitive
+                <Label>{t('projectType')}</Label>
+                <RadioGroup
                     name="type"
-                    value={formik.values.type}
+                    value={values.type}
                     onValueChange={(value) => handleChangeType(value)}
                     className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2"
                 >
                     <div
                         className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
-                            formik.values.type === 'frontend' ? 'border-primary' : ''
+                            values.type === 'frontend' ? 'border-primary' : ''
                         }`}
                     >
-                        <IGRPRadioGroupItemPrimitive
-                            value="frontend"
-                            id="frontend"
-                            className="sr-only"
-                        />
-                        <IGRPLabelPrimitive
+                        <RadioGroupItem value="frontend" id="frontend" className="sr-only" />
+                        <Label
                             htmlFor="frontend"
                             className="flex items-center gap-2 cursor-pointer"
                         >
@@ -463,22 +458,15 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     {t('frontendDescription')}
                                 </div>
                             </div>
-                        </IGRPLabelPrimitive>
+                        </Label>
                     </div>
                     <div
                         className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
-                            formik.values.type === 'backend' ? 'border-primary' : ''
+                            values.type === 'backend' ? 'border-primary' : ''
                         }`}
                     >
-                        <IGRPRadioGroupItemPrimitive
-                            value="backend"
-                            id="backend"
-                            className="sr-only"
-                        />
-                        <IGRPLabelPrimitive
-                            htmlFor="backend"
-                            className="flex items-center gap-2 cursor-pointer"
-                        >
+                        <RadioGroupItem value="backend" id="backend" className="sr-only" />
+                        <Label htmlFor="backend" className="flex items-center gap-2 cursor-pointer">
                             <Server className="w-5 h-5" />
                             <div>
                                 <div>{t('backend')}</div>
@@ -486,19 +474,19 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     {t('backendDescription')}
                                 </div>
                             </div>
-                        </IGRPLabelPrimitive>
+                        </Label>
                     </div>
                     <div
                         className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
-                            formik.values.type === 'specification' ? 'border-primary' : ''
+                            values.type === 'specification' ? 'border-primary' : ''
                         }`}
                     >
-                        <IGRPRadioGroupItemPrimitive
+                        <RadioGroupItem
                             value="specification"
                             id="specification"
                             className="sr-only"
                         />
-                        <IGRPLabelPrimitive
+                        <Label
                             htmlFor="specification"
                             className="flex items-center gap-2 cursor-pointer"
                         >
@@ -511,11 +499,11 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     })}
                                 </div>
                             </div>
-                        </IGRPLabelPrimitive>
+                        </Label>
                     </div>
-                </IGRPRadioGroupPrimitive>
-                {formik.touched.type && formik.errors.type && (
-                    <p className="text-xs text-destructive">{formik.errors.type}</p>
+                </RadioGroup>
+                {touchedFields.type && typeError && (
+                    <p className="text-xs text-destructive">{typeError}</p>
                 )}
             </div>
         </div>
@@ -523,10 +511,10 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
     const renderStep2 = () => (
         <div className="space-y-4">
-            <IGRPLabelPrimitive>{t('selectFramework')}</IGRPLabelPrimitive>
-            <IGRPRadioGroupPrimitive
+            <Label>{t('selectFramework')}</Label>
+            <RadioGroup
                 name="framework"
-                value={formik.values.framework}
+                value={values.framework}
                 onValueChange={(value) => handleChangeFramework(value)}
                 className="grid gap-4 mt-2"
             >
@@ -535,16 +523,16 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         <div
                             key={fw.id}
                             className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
-                                formik.values.framework === fw.id ? 'border-primary' : ''
+                                values.framework === fw.id ? 'border-primary' : ''
                             } ${!fw.availableSupport ? 'pointer-events-none opacity-75' : ''}`}
                         >
-                            <IGRPRadioGroupItemPrimitive
+                            <RadioGroupItem
                                 value={fw.id}
                                 id={fw.id}
                                 className="sr-only"
                                 disabled={!fw.availableSupport}
                             />
-                            <IGRPLabelPrimitive
+                            <Label
                                 htmlFor={fw.id}
                                 className="flex items-center gap-4 cursor-pointer"
                             >
@@ -567,13 +555,13 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         </span>
                                     )}
                                 </div>
-                            </IGRPLabelPrimitive>
+                            </Label>
                         </div>
                     )
                 })}
-            </IGRPRadioGroupPrimitive>
-            {formik.touched.framework && formik.errors.framework && (
-                <p className="text-xs text-destructive">{formik.errors.framework}</p>
+            </RadioGroup>
+            {touchedFields.framework && frameworkError && (
+                <p className="text-xs text-destructive">{frameworkError}</p>
             )}
         </div>
     )
@@ -582,60 +570,62 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         <div className="space-y-4">
             {SelectedComponent ? (
                 <>
-                    <IGRPLabelPrimitive>{t('frameworkConfiguration')}</IGRPLabelPrimitive>
+                    <Label>{t('frameworkConfiguration')}</Label>
                     <div className="mt-3">
                         <ProjectConfigForm
-                            type={formik.values.framework}
-                            data={formik.values.config}
-                            errors={formik.errors}
-                            onChange={(config) => formik.setFieldValue('config', config)}
+                            type={values.framework ?? ''}
+                            data={values.config}
+                            errors={flattenedErrors}
+                            onChange={(config) =>
+                                setValue('config', config, {
+                                    shouldValidate: true,
+                                    shouldDirty: true,
+                                    shouldTouch: true
+                                })
+                            }
                         />
                     </div>
                 </>
             ) : (
                 <div className="text-center text-muted-foreground pb-8">
-                    {t('configurationComingSoon', {
-                        framework: formik.values.framework
-                    })}
+                    {t('configurationComingSoon', { framework: values.framework })}
                 </div>
             )}
         </div>
     )
 
+    const pathRegister = register('path')
+
     const renderStep4 = (): React.ReactNode => (
         <div className="rounded-lg border p-4 space-y-6">
             <div className="space-y-4">
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive htmlFor="name">{t('projectName')}</IGRPLabelPrimitive>
-                    <IGRPInputPrimitive
-                        id="name"
-                        name="name"
-                        value={formik.values.name}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    />
-                    {formik.touched.name && formik.errors.name && (
-                        <p className="text-xs text-destructive">{formik.errors.name}</p>
+                    <Label htmlFor="name">{t('projectName')}</Label>
+                    <Input {...nameRegister} ref={nameRefHandler} id="name" />
+                    {touchedFields.name && nameError && (
+                        <p className="text-xs text-destructive">{nameError}</p>
                     )}
                 </div>
 
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive>{t('projectLocation')}</IGRPLabelPrimitive>
-                    <IGRPRadioGroupPrimitive
-                        value={formik.values.storageMode ?? 'managed'}
+                    <Label>{t('projectLocation')}</Label>
+                    <RadioGroup
+                        value={values.storageMode ?? 'managed'}
                         onValueChange={(value) => {
-                            formik.setFieldValue('storageMode', value)
+                            setValue('storageMode', value as ProjectData['storageMode'], {
+                                shouldValidate: true
+                            })
                             // Switching back to managed clears any custom
                             // path so the auto-compute effect can take
                             // over again on the next render.
                             if (value === 'managed') {
-                                formik.setFieldValue('path', '')
+                                setValue('path', '', { shouldValidate: false })
                             }
                         }}
                         className="grid grid-cols-2 gap-2"
                     >
                         <label className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40">
-                            <IGRPRadioGroupItemPrimitive value="managed" id="storage-managed" />
+                            <RadioGroupItem value="managed" id="storage-managed" />
                             <div className="space-y-0.5">
                                 <p className="text-sm font-medium">{t('projectLocationManaged')}</p>
                                 <p className="text-xs text-muted-foreground">
@@ -644,7 +634,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             </div>
                         </label>
                         <label className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40">
-                            <IGRPRadioGroupItemPrimitive value="linked" id="storage-linked" />
+                            <RadioGroupItem value="linked" id="storage-linked" />
                             <div className="space-y-0.5">
                                 <p className="text-sm font-medium">{t('projectLocationLinked')}</p>
                                 <p className="text-xs text-muted-foreground">
@@ -652,22 +642,19 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 </p>
                             </div>
                         </label>
-                    </IGRPRadioGroupPrimitive>
+                    </RadioGroup>
                 </div>
 
                 <div className="space-y-2">
-                    <IGRPLabelPrimitive htmlFor="path">{t('projectDirectory')}</IGRPLabelPrimitive>
+                    <Label htmlFor="path">{t('projectDirectory')}</Label>
                     <div className="flex gap-2">
-                        <IGRPInputPrimitive
+                        <Input
+                            {...pathRegister}
                             id="path"
-                            name="path"
-                            value={formik.values.path}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
                             placeholder={t('enterProjectDirectory')}
-                            readOnly={formik.values.storageMode !== 'linked'}
+                            readOnly={values.storageMode !== 'linked'}
                         />
-                        <IGRPButtonPrimitive
+                        <Button
                             variant="outline"
                             size="icon"
                             type="button"
@@ -675,32 +662,32 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 e.preventDefault()
                                 handleOpenDirectory()
                             }}
-                            disabled={formik.values.storageMode !== 'linked'}
+                            disabled={values.storageMode !== 'linked'}
                         >
                             <FolderOpen className="h-4 w-4" />
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
-                    {formik.touched.path && formik.errors.path && (
-                        <p className="text-xs text-destructive">{formik.errors.path}</p>
+                    {touchedFields.path && pathError && (
+                        <p className="text-xs text-destructive">{pathError}</p>
                     )}
                 </div>
 
                 {isFrontend && (
                     <div className="space-y-2">
-                        <IGRPLabelPrimitive>{t('themeColor')}</IGRPLabelPrimitive>
+                        <Label>{t('themeColor')}</Label>
                         <div className="grid grid-cols-12 gap-2 mt-2">
                             {THEME_COLORS.map((color) => (
                                 <button
                                     key={color.value}
                                     type="button"
-                                    onClick={() => formik.setFieldValue('themeColor', color.value)}
+                                    onClick={() =>
+                                        setValue('themeColor', color.value, { shouldDirty: true })
+                                    }
                                     className={`
-                      w-8 h-8 rounded-full 
-                      ${formik.values.themeColor === color.value ? 'ring-2 ring-offset-2 ring-primary' : ''}
+                      w-8 h-8 rounded-full
+                      ${values.themeColor === color.value ? 'ring-2 ring-offset-2 ring-primary' : ''}
                     `}
-                                    style={{
-                                        backgroundColor: color.value
-                                    }}
+                                    style={{ backgroundColor: color.value }}
                                     title={color.name}
                                 />
                             ))}
@@ -727,18 +714,18 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     }
 
     return (
-        <IGRPDialogPrimitive>
-            <IGRPDialogTriggerPrimitive asChild>
+        <Dialog>
+            <DialogTrigger asChild>
                 {children ? (
                     children
                 ) : (
-                    <IGRPButtonPrimitive>
+                    <Button>
                         <PlusCircle className="w-4 h-4" />
                         {t('createNewProject')}
-                    </IGRPButtonPrimitive>
+                    </Button>
                 )}
-            </IGRPDialogTriggerPrimitive>
-            <IGRPDialogContentPrimitive
+            </DialogTrigger>
+            <DialogContent
                 className="flex min-h-0 max-h-[min(90vh,calc(100dvh-2rem))] w-[calc(100vw-2rem)] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:max-w-[700px] lg:max-w-[800px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
@@ -751,13 +738,11 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         </div>
                     </div>
                 )}
-                <IGRPDialogHeaderPrimitive className="shrink-0 border-b border-border px-4 py-3 sm:px-6">
-                    <IGRPDialogTitlePrimitive>{t('newProject')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        {t('newProject')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
-                <form onSubmit={formik.handleSubmit} className="flex min-h-0 flex-1 flex-col">
+                <DialogHeader className="shrink-0 border-b border-border px-4 py-3 sm:px-6">
+                    <DialogTitle>{t('newProject')}</DialogTitle>
+                    <DialogDescription>{t('newProject')}</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={onFormSubmit} className="flex min-h-0 flex-1 flex-col">
                     <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-4 sm:px-6">
                         <div className="relative mb-6">
                             <div className="absolute top-5 left-0 right-0 h-[2px] bg-muted" />
@@ -778,10 +763,10 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         <div className="pb-2">{renderStepContent()}</div>
                     </div>
 
-                    <IGRPDialogFooterPrimitive className="mt-0 shrink-0 border-t border-border bg-background px-4 py-3 sm:px-6">
+                    <DialogFooter className="mt-0 shrink-0 border-t border-border bg-background px-4 py-3 sm:px-6">
                         <div className="flex w-full justify-between gap-2">
                             {step > 1 ? (
-                                <IGRPButtonPrimitive
+                                <Button
                                     type="button"
                                     variant="outline"
                                     onClick={handleBack}
@@ -789,12 +774,12 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 >
                                     <ArrowLeft className="w-4 h-4 mr-2" />
                                     {t('back')}
-                                </IGRPButtonPrimitive>
+                                </Button>
                             ) : (
                                 <div />
                             )}
                             {step < STEPS.length ? (
-                                <IGRPButtonPrimitive
+                                <Button
                                     type="button"
                                     onClick={(e) => {
                                         e.preventDefault()
@@ -804,22 +789,19 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                 >
                                     {t('next')}
                                     <ArrowRight className="w-4 h-4 ml-2" />
-                                </IGRPButtonPrimitive>
+                                </Button>
                             ) : (
-                                <IGRPButtonPrimitive
-                                    type="submit"
-                                    disabled={formik.isSubmitting || isCreatingProject}
-                                >
-                                    {(formik.isSubmitting || isCreatingProject) && (
+                                <Button type="submit" disabled={isSubmitting || isCreatingProject}>
+                                    {(isSubmitting || isCreatingProject) && (
                                         <Loader2 className="animate-spin" />
                                     )}
                                     {isCreatingProject ? 'A criar...' : t('createProject')}
-                                </IGRPButtonPrimitive>
+                                </Button>
                             )}
                         </div>
-                    </IGRPDialogFooterPrimitive>
+                    </DialogFooter>
                 </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

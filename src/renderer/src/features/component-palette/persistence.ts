@@ -28,9 +28,7 @@ export function readPersistedComponentIds(
         const raw = window.localStorage?.getItem(componentsKey(basePath, namespace))
         if (!raw) return []
         const parsed = JSON.parse(raw)
-        return Array.isArray(parsed)
-            ? parsed.filter((x): x is string => typeof x === 'string')
-            : []
+        return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : []
     } catch {
         return []
     }

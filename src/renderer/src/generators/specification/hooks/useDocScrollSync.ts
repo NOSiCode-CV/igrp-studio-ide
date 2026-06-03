@@ -38,9 +38,7 @@ export function usePreviewToEditorScrollSync(
                 // and pick the first whose top is at-or-below the viewport top.
                 // (Document order matches markdown source order since react-
                 // markdown renders depth-first.)
-                const blocks = previewEl.querySelectorAll<HTMLElement>(
-                    '[data-source-line]'
-                )
+                const blocks = previewEl.querySelectorAll<HTMLElement>('[data-source-line]')
                 let chosenLine: number | null = null
                 for (const el of blocks) {
                     const rect = el.getBoundingClientRect()

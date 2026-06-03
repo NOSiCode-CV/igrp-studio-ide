@@ -1,4 +1,4 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
 import { Check, Copy, FolderOpen, Save, Trash2 } from 'lucide-react'
 import { type JSX, useState } from 'react'
 
@@ -39,34 +39,19 @@ const Toolbar = ({
 
     return (
         <div className="flex items-center gap-2">
-            <IGRPButtonPrimitive
-                size="sm"
-                variant="default"
-                onClick={onPickFile}
-                disabled={disabled}
-            >
+            <Button size="sm" variant="default" onClick={onPickFile} disabled={disabled}>
                 <FolderOpen className="h-4 w-4 mr-2" />
                 Choose file
-            </IGRPButtonPrimitive>
-            <IGRPButtonPrimitive
-                size="sm"
-                variant="outline"
-                onClick={handleCopy}
-                disabled={!hasMarkdown}
-            >
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleCopy} disabled={!hasMarkdown}>
                 {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
                 {copied ? 'Copied' : 'Copy'}
-            </IGRPButtonPrimitive>
-            <IGRPButtonPrimitive
-                size="sm"
-                variant="outline"
-                onClick={handleSave}
-                disabled={!hasMarkdown}
-            >
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleSave} disabled={!hasMarkdown}>
                 <Save className="h-4 w-4 mr-2" />
                 Save as .md
-            </IGRPButtonPrimitive>
-            <IGRPButtonPrimitive
+            </Button>
+            <Button
                 size="sm"
                 variant="ghost"
                 onClick={onClear}
@@ -74,7 +59,7 @@ const Toolbar = ({
             >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Clear
-            </IGRPButtonPrimitive>
+            </Button>
         </div>
     )
 }

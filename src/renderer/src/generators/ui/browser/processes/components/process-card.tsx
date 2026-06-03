@@ -1,21 +1,10 @@
-import {
-    IGRPBadgePrimitive,
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardDescriptionPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPPopoverContentPrimitive,
-    IGRPPopoverPrimitive,
-    IGRPPopoverTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
+import { Card, CardContent, CardDescription, CardTitle } from '@renderer/components/ui/card'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
 import { Calendar, Info, UserCog } from 'lucide-react'
 import type { JSX } from 'react/jsx-runtime'
-import type {
-    BPMNAuditUser,
-    BPMNDateLike,
-    BPMNProjectProcessDefinition
-} from 'src/main/types'
+import type { BPMNAuditUser, BPMNDateLike, BPMNProjectProcessDefinition } from 'src/main/types'
 
 interface ProcessCardProps {
     process: BPMNProjectProcessDefinition
@@ -58,9 +47,10 @@ function formatDate(value: BPMNDateLike | undefined): string {
  * a user object (`{ id, username, email, fullName, … }`) — extract a single
  * display name + secondary identifier (username/email) for the popover.
  */
-function resolveAuditUser(
-    by: BPMNAuditUser | string | undefined
-): { name: string; secondary?: string } {
+function resolveAuditUser(by: BPMNAuditUser | string | undefined): {
+    name: string
+    secondary?: string
+} {
     if (!by) return { name: '—' }
     if (typeof by === 'string') return { name: by }
     const composed =
@@ -75,8 +65,8 @@ function resolveAuditUser(
         by.username && by.username !== composed
             ? by.username
             : by.email && by.email !== composed
-                ? by.email
-                : undefined
+              ? by.email
+              : undefined
     return { name: composed || '—', secondary }
 }
 
@@ -94,9 +84,7 @@ function AuditRow({ label, by, at }: AuditPair): JSX.Element {
                 {label}
             </div>
             <div className="text-sm">{name}</div>
-            {secondary && (
-                <div className="text-xs text-muted-foreground">{secondary}</div>
-            )}
+            {secondary && <div className="text-xs text-muted-foreground">{secondary}</div>}
             {at && <div className="text-xs text-muted-foreground">{formatDate(at)}</div>}
         </div>
     )
@@ -109,28 +97,25 @@ export const ProcessCard = ({
 }: ProcessCardProps): JSX.Element => {
     const hasAudit = Boolean(
         process.createdBy ||
-        process.createdDate ||
-        process.lastModifiedBy ||
-        process.lastModifiedDate
+            process.createdDate ||
+            process.lastModifiedBy ||
+            process.lastModifiedDate
     )
 
     return (
-        <IGRPCardPrimitive
-            className={`hover:shadow-md transition-all cursor-pointer ${isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
-                }`}
+        <Card
+            className={`hover:shadow-md transition-all cursor-pointer ${
+                isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
+            }`}
             onClick={() => {
                 onSelectProcess(process)
             }}
         >
-            <IGRPCardContentPrimitive>
+            <CardContent>
                 <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                        <IGRPCardTitlePrimitive className="text-base font-medium">
-                            {process.title}
-                        </IGRPCardTitlePrimitive>
-                        <IGRPCardDescriptionPrimitive>
-                            {process.processKey}
-                        </IGRPCardDescriptionPrimitive>
+                        <CardTitle className="text-base font-medium">{process.title}</CardTitle>
+                        <CardDescription>{process.processKey}</CardDescription>
                         {process.deploymentDate && (
                             <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
                                 <Calendar className="w-4 h-4" />
@@ -144,13 +129,11 @@ export const ProcessCard = ({
                     </div>
                     <div className="flex flex-col items-end space-y-2 shrink-0">
                         <div className="flex items-center gap-1">
-                            <IGRPBadgePrimitive variant={'outline'}>
-                                v{process.version || 'N/A'}
-                            </IGRPBadgePrimitive>
+                            <Badge variant={'outline'}>v{process.version || 'N/A'}</Badge>
                             {hasAudit && (
-                                <IGRPPopoverPrimitive>
-                                    <IGRPPopoverTriggerPrimitive asChild>
-                                        <IGRPButtonPrimitive
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
                                             variant="ghost"
                                             size="icon"
                                             className="h-6 w-6 text-muted-foreground hover:text-foreground"
@@ -159,17 +142,15 @@ export const ProcessCard = ({
                                             aria-label="Audit info"
                                         >
                                             <Info className="h-3.5 w-3.5" />
-                                        </IGRPButtonPrimitive>
-                                    </IGRPPopoverTriggerPrimitive>
-                                    <IGRPPopoverContentPrimitive
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent
                                         align="end"
                                         side="bottom"
                                         className="w-64 space-y-3"
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        <div className="text-xs text-muted-foreground">
-                                            Audit
-                                        </div>
+                                        <div className="text-xs text-muted-foreground">Audit</div>
                                         <AuditRow
                                             label="Created by"
                                             by={process.createdBy}
@@ -180,13 +161,13 @@ export const ProcessCard = ({
                                             by={process.lastModifiedBy}
                                             at={process.lastModifiedDate}
                                         />
-                                    </IGRPPopoverContentPrimitive>
-                                </IGRPPopoverPrimitive>
+                                    </PopoverContent>
+                                </Popover>
                             )}
                         </div>
                     </div>
                 </div>
-            </IGRPCardContentPrimitive>
-        </IGRPCardPrimitive>
+            </CardContent>
+        </Card>
     )
 }

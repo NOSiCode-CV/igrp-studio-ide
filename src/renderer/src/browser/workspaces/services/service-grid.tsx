@@ -1,13 +1,13 @@
 'use client'
 
+import { Badge } from '@renderer/components/ui/badge'
 import {
-    IGRPBadgePrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardDescriptionPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@renderer/components/ui/card'
 import { useMemo, useState } from 'react'
 import Dependency from '../components/dependency'
 import { PortsBadgeList } from '../components/ports-badge-list'
@@ -60,9 +60,9 @@ export function ServiceGrid({ services, showFilter = true }: ServiceGridProps) {
             {/* Services Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {filteredServices.map((service, index) => (
-                    <IGRPCardPrimitive key={index}>
-                        <IGRPCardHeaderPrimitive>
-                            <IGRPCardTitlePrimitive>
+                    <Card key={index}>
+                        <CardHeader>
+                            <CardTitle>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-1">
                                         <div
@@ -70,38 +70,33 @@ export function ServiceGrid({ services, showFilter = true }: ServiceGridProps) {
                                         >
                                             {getServiceIcon(service.labels?.type)}
                                         </div>
-                                        <IGRPBadgePrimitive
-                                            variant="outline"
-                                            className="capitalize"
-                                        >
+                                        <Badge variant="outline" className="capitalize">
                                             {service.labels?.type}
-                                        </IGRPBadgePrimitive>
+                                        </Badge>
                                     </div>
                                     <div className="flex items-center gap-1">
-                                        <IGRPBadgePrimitive
+                                        <Badge
                                             variant="outline"
                                             className={`capitalize ${getStatusColor(service.status)}`}
                                         >
                                             {service.status}
-                                        </IGRPBadgePrimitive>
+                                        </Badge>
                                         <ServiceActions
                                             service={service}
                                             services={filteredServices}
                                         />
                                     </div>
                                 </div>
-                            </IGRPCardTitlePrimitive>
-                            <IGRPCardDescriptionPrimitive className="truncate">
-                                {service.name}
-                            </IGRPCardDescriptionPrimitive>
-                        </IGRPCardHeaderPrimitive>
-                        <IGRPCardContentPrimitive>
+                            </CardTitle>
+                            <CardDescription className="truncate">{service.name}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
                             <div className="grid grid-cols-1">
                                 <PortsBadgeList ports={service.ports} />
                                 <Dependency dependsOn={service.dependsOn} />
                             </div>
-                        </IGRPCardContentPrimitive>
-                    </IGRPCardPrimitive>
+                        </CardContent>
+                    </Card>
                 ))}
             </div>
         </div>

@@ -216,12 +216,12 @@ export function useDocker({
         }
 
         if (nginxRouting) {
-                const directMatch = nginxRouting.routes.find((route) =>
-                    route.upstreamHost.toLowerCase().includes(serviceName)
-                )
-                if (directMatch) {
+            const directMatch = nginxRouting.routes.find((route) =>
+                route.upstreamHost.toLowerCase().includes(serviceName)
+            )
+            if (directMatch) {
                 return `http://${browserHost}:${resolvedNginxPort}${directMatch.route}`
-                }
+            }
 
             // Common aliases from nginx.conf patterns
             const aliases: Array<{ key: string; route: string }> = [
@@ -282,8 +282,12 @@ export function useDocker({
     const getProjectBrowserUrl = (project: ProjectData, service?: ServiceInfo): string | null => {
         if (service) return getServiceUrl(service)
         const browserHost = workspace?.slug || 'localhost'
-        const resolvedNginxPort = workspaceNginxPort && workspaceNginxPort > 0 ? workspaceNginxPort : 2575
-        const projectDir = path.basename(project.path || '').toLowerCase().trim()
+        const resolvedNginxPort =
+            workspaceNginxPort && workspaceNginxPort > 0 ? workspaceNginxPort : 2575
+        const projectDir = path
+            .basename(project.path || '')
+            .toLowerCase()
+            .trim()
         if (!projectDir) return null
         const inferredServiceName = `${browserHost}-${projectDir}`
         return `http://${browserHost}:${resolvedNginxPort}/gateway-api/${inferredServiceName}/v3/api-docs`
@@ -328,7 +332,9 @@ export function useDocker({
             if (upstreamMatch) {
                 const upstreamHost = upstreamMatch[1].trim()
                 const locationPathMatch = rawLocation.match(/(\/[^\s]*)/)
-                const route = locationPathMatch ? locationPathMatch[1].replace(/\^~/g, '').trim() : '/'
+                const route = locationPathMatch
+                    ? locationPathMatch[1].replace(/\^~/g, '').trim()
+                    : '/'
                 routes.push({
                     route: route.endsWith('/') ? route : `${route}/`,
                     upstreamHost

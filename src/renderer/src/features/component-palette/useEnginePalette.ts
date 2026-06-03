@@ -16,10 +16,7 @@ import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/ty
 import type React from 'react'
 import { useMemo } from 'react'
 import { resolveIcon } from '@renderer/features/component-icons'
-import {
-    HIDDEN_COMPONENT_NAMES,
-    resolveGroupLabel
-} from './groups'
+import { HIDDEN_COMPONENT_NAMES, resolveGroupLabel } from './groups'
 
 export interface EnginePaletteComponent {
     /** Component name as the engine emits it — stable identifier. */

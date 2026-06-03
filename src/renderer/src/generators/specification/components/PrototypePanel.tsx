@@ -1,5 +1,6 @@
 import MonacoEditor, { DiffEditor } from '@monaco-editor/react'
-import { IGRPButtonPrimitive, IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
 import { cn } from '@renderer/lib/utils'
 import type { RootState } from '@renderer/redux'
 import {
@@ -232,8 +233,20 @@ const GOLDEN_LIST_PAGE_EXAMPLE = JSON.stringify(
         args: [],
         types: [],
         states: [
-            { id: 'state_showFilter', name: 'showFilter', type: 'boolean', defaultValue: 'false', imports: [] },
-            { id: 'state_searchValue', name: 'searchValue', type: 'string', defaultValue: "''", imports: [] }
+            {
+                id: 'state_showFilter',
+                name: 'showFilter',
+                type: 'boolean',
+                defaultValue: 'false',
+                imports: []
+            },
+            {
+                id: 'state_searchValue',
+                name: 'searchValue',
+                type: 'string',
+                defaultValue: "''",
+                imports: []
+            }
         ],
         functions: [],
         imports: [],
@@ -297,7 +310,10 @@ const GOLDEN_LIST_PAGE_EXAMPLE = JSON.stringify(
                                         required: false,
                                         showSubmitButton: true,
                                         submitButtonLabel: 'Search',
-                                        iconProperties: { showStartIcon: true, startIcon: 'Search' },
+                                        iconProperties: {
+                                            showStartIcon: true,
+                                            startIcon: 'Search'
+                                        },
                                         commonProperties: { generateReference: false }
                                     },
                                     interactions: {},
@@ -492,12 +508,13 @@ async function buildSkillContextBlock(
             if (!content) continue
             const remaining = SKILL_BLOCK_MAX_BYTES - usedBytes
             const slice =
-                content.length > remaining ? `${content.slice(0, remaining)}\n…(truncated)` : content
+                content.length > remaining
+                    ? `${content.slice(0, remaining)}\n…(truncated)`
+                    : content
             baseline.push(
-                [
-                    `### Baseline — ${studio.name}/${item.filename} § "${item.heading}"`,
-                    slice
-                ].join('\n')
+                [`### Baseline — ${studio.name}/${item.filename} § "${item.heading}"`, slice].join(
+                    '\n'
+                )
             )
             usedBytes += slice.length
         }
@@ -532,7 +549,8 @@ async function buildSkillContextBlock(
             : await readSection(hint.skillName, hint.filename, '')
         if (!content) continue
         const remaining = SKILL_BLOCK_MAX_BYTES - usedBytes
-        const slice = content.length > remaining ? `${content.slice(0, remaining)}\n…(truncated)` : content
+        const slice =
+            content.length > remaining ? `${content.slice(0, remaining)}\n…(truncated)` : content
         sections.push(
             [
                 `### From ${hint.skillName}/${hint.filename}${hint.sectionHeading ? ` — section "${hint.sectionHeading}"` : ''}`,
@@ -542,12 +560,7 @@ async function buildSkillContextBlock(
         usedBytes += slice.length
     }
     if (sections.length === 0 && baseline.length === 0) return null
-    return [
-        '## Skill — relevant patterns for this turn',
-        '',
-        ...baseline,
-        ...sections
-    ].join('\n\n')
+    return ['## Skill — relevant patterns for this turn', '', ...baseline, ...sections].join('\n\n')
 }
 
 function buildEngineCatalogBlock(
@@ -603,7 +616,7 @@ function buildEngineCatalogBlock(
 
     const lines: string[] = ['## Engine catalog (allowed `componentName` values)', '']
     lines.push(
-        'Use these — and only these — values for the `componentName` field of each `StructuredComponent`. Names are listed under their engine group. Property keys after the dash are the recognised props for that component (omit any prop you don\'t need).',
+        "Use these — and only these — values for the `componentName` field of each `StructuredComponent`. Names are listed under their engine group. Property keys after the dash are the recognised props for that component (omit any prop you don't need).",
         ''
     )
 
@@ -926,15 +939,11 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
             dispatch(loadPrototypeFiles(basePath))
             dispatch(loadPrototypeSnapshots(basePath))
             const manifest = await dispatch(loadManifest(basePath))
-            const view = document.querySelector(
-                'webview.spec-prototype-preview'
-            ) as
-                | {
-                      reload?: () => void
-                      loadURL?: (url: string) => void
-                      getURL?: () => string
-                  }
-                | null
+            const view = document.querySelector('webview.spec-prototype-preview') as {
+                reload?: () => void
+                loadURL?: (url: string) => void
+                getURL?: () => string
+            } | null
             if (!view) return
             const targetUrl = computePreviewUrl(devStatus.url, manifest)
             if (targetUrl && view.loadURL && view.getURL?.() !== targetUrl) {
@@ -992,10 +1001,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
             // Save. Removes the file-ops path entirely — no LLM-generated TSX,
             // no env vars, no auth providers, no lockfile drift. The engine
             // package owns the compile-to-code step.
-            const catalogBlock = buildEngineCatalogBlock(
-                componentsRegistered,
-                attachedComponents
-            )
+            const catalogBlock = buildEngineCatalogBlock(componentsRegistered, attachedComponents)
 
             // M-Skill Fase 1/3 — when the `igrp-studio-metadata` skill is
             // installed, pull the most relevant companion sections into the
@@ -1087,10 +1093,10 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                     '4. **Every node needs `properties.commonProperties`** — `{}` or `{ generateReference: false }`. Empty object suffices; omitting fails validation.',
                     '5. **`interactions: {}` and `data: {}`** when not wired. They are NOT optional fields; emit empty objects.',
                     '6. **`componentName` MUST be drawn from the catalog below.** Inventing a name fails the build.',
-                    '7. **Custom components from the user\'s project** (e.g. `Dashboard`, `LoadingPage`) are NOT in the catalog and MUST NOT be emitted in a fresh prototype. Compose from primitives instead.',
+                    "7. **Custom components from the user's project** (e.g. `Dashboard`, `LoadingPage`) are NOT in the catalog and MUST NOT be emitted in a fresh prototype. Compose from primitives instead.",
                     '8. **`path` without leading slash.** Use Next.js App Router segments. Declare `[uuid]`-style segments under `args`.',
                     '9. **`id` and `tag` MUST be unique** within the page tree. Short snake-case or camelCase. Examples: `page_root`, `section_main`, `pageheader_users`, `table_users`, `tabletextcell_name`.',
-                    '10. **Use the spec\'s terminology verbatim** for `properties.title`, `properties.placeholder`, `properties.label`. Portuguese stays Portuguese.',
+                    "10. **Use the spec's terminology verbatim** for `properties.title`, `properties.placeholder`, `properties.label`. Portuguese stays Portuguese.",
                     '11. **`types`, `states`, `functions`, `imports` default to `[]`** unless the spec mandates real state. Forms without a real backend = `[]` (engine still generates the form fine).',
                     '12. **The manifest is the handoff artifact — keep it clean.** Devs in other Studios will reuse this `page.json` and wire it to a real backend. For list/table pages, DO declare the `states` array (`tableData: Invoice[]`, defaultValue `"[]"`) AND the `data.data.state` binding on the table, BUT in `onLoad.fnCode` write **only a commented stub** pointing at the production hook — DO NOT inline mock arrays. The Studio runs a separate post-engine step to seed preview data into a sibling file; that step needs the binding to exist but reads the values from `<pageName>.mock.json`, not from the manifest.',
                     '13. **Never emit a component name that is not in the catalog.** When uncertain about an action component (e.g. an "view details" row action), use `tableLinkAction` inside a `tableActionListCell` — same shape as the golden anatomy. Inventing names like `tableActionView` produces an `Unsupported Component` placeholder in the generated code, which then crashes the runtime via `React.Children.only`.',
@@ -1103,7 +1109,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                         [
                             '## Golden anatomy example (list page with header + filter + table)',
                             '',
-                            'Reference for shape only — adapt to the user\'s spec. Every field shown is required at that nesting level.',
+                            "Reference for shape only — adapt to the user's spec. Every field shown is required at that nesting level.",
                             '',
                             '```json',
                             GOLDEN_LIST_PAGE_EXAMPLE,
@@ -1253,7 +1259,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                 maxSize="50%"
                 onResize={onResizeChat}
             >
-                <aside className="flex h-full w-full flex-col border-r bg-card/30">
+                <aside className="flex h-full w-full flex-col border-r bg-sidebar">
                     <ChatPanelTabs
                         mode={chatPanelMode}
                         onChangeMode={setChatPanelMode}
@@ -1283,9 +1289,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                                 placeholder="Describe a feature or change…"
                                 submitLabel="Build"
                                 supportsKB
-                                persistenceKey={
-                                    basePath ? `prototype:${basePath}` : undefined
-                                }
+                                persistenceKey={basePath ? `prototype:${basePath}` : undefined}
                                 chatBackend={
                                     basePath
                                         ? {
@@ -1335,7 +1339,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
 
             {/* Main */}
             <Panel id="proto-main" minSize="40%">
-                <main className="flex h-full w-full flex-col bg-card/10">
+                <main className="flex h-full w-full flex-col bg-background">
                     {devStatus.installing && <FirstRunBanner />}
                     {/* Recommend the `igrp-studio-metadata` skill when it
                         isn't installed yet — generation quality drops
@@ -1443,11 +1447,10 @@ const ChatPanelTabs = ({
     onChangeMode: (next: ChatPanelMode) => void
     pinnedCount: number
 }): JSX.Element => (
-    // Stronger contrast against the panel's `bg-card/30` so the tab row reads
-    // as a control surface (not decoration). Solid background + thicker
-    // bottom border + slightly taller (40px) makes it the first thing the
-    // eye lands on when scanning the panel.
-    <div className="flex h-10 shrink-0 items-center gap-1 border-b border-border/80 bg-background/60 px-2">
+    // Sits on top of the `bg-sidebar` aside; we use the same sidebar token
+    // (instead of an opacity-tinted background) so the tab row reads as part
+    // of the rail rather than a different surface.
+    <div className="flex h-10 shrink-0 items-center gap-1 border-b border-border/80 bg-sidebar px-2">
         <ChatPanelTabButton
             active={mode === 'chat'}
             onClick={() => onChangeMode('chat')}
@@ -1555,7 +1558,7 @@ const ComponentPalettePane = ({
                         size={11}
                         className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                     />
-                    <IGRPInputPrimitive
+                    <Input
                         placeholder="Find a component…"
                         className="h-7 pl-7 text-[11px]"
                         value={query}
@@ -1631,9 +1634,7 @@ const SkillInstallBanner = ({
 }): JSX.Element | null => {
     const [installing, setInstalling] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const dismissKey = basePath
-        ? `${SKILL_BANNER_DISMISS_KEY_PREFIX}${basePath}`
-        : null
+    const dismissKey = basePath ? `${SKILL_BANNER_DISMISS_KEY_PREFIX}${basePath}` : null
     const [dismissed, setDismissed] = useState<boolean>(() => {
         if (!dismissKey || typeof window === 'undefined') return false
         try {
@@ -1643,10 +1644,7 @@ const SkillInstallBanner = ({
         }
     })
 
-    const installed = useMemo(
-        () => skills.some((s) => s.name === CANONICAL_SKILL),
-        [skills]
-    )
+    const installed = useMemo(() => skills.some((s) => s.name === CANONICAL_SKILL), [skills])
 
     if (!basePath || installed || dismissed) return null
 
@@ -1675,9 +1673,7 @@ const SkillInstallBanner = ({
             <Library size={14} className="text-blue-500" />
             <div className="flex-1">
                 <span className="font-medium">Recommended:</span> install the{' '}
-                <code className="rounded bg-muted px-1 py-0.5 font-mono">
-                    {CANONICAL_SKILL}
-                </code>{' '}
+                <code className="rounded bg-muted px-1 py-0.5 font-mono">{CANONICAL_SKILL}</code>{' '}
                 skill for better generation quality.
                 {error && (
                     <span className="ml-2 text-red-500" title={error}>
@@ -1746,10 +1742,7 @@ const SkillUpdateBanner = ({
     const candidate = useMemo(() => {
         return (
             updates.find(
-                (u) =>
-                    u.hasUpdate &&
-                    u.latest &&
-                    !dismissedKeys.has(`${u.name}:${u.latest}`)
+                (u) => u.hasUpdate && u.latest && !dismissedKeys.has(`${u.name}:${u.latest}`)
             ) ?? null
         )
     }, [updates, dismissedKeys])
@@ -1789,9 +1782,7 @@ const SkillUpdateBanner = ({
             <RefreshCw size={14} className="text-amber-500" />
             <div className="flex-1">
                 <span className="font-medium">Update available:</span>{' '}
-                <code className="rounded bg-muted px-1 py-0.5 font-mono">
-                    {candidate.name}
-                </code>{' '}
+                <code className="rounded bg-muted px-1 py-0.5 font-mono">{candidate.name}</code>{' '}
                 <span className="text-muted-foreground">
                     {candidate.installed ?? '?'} → {candidate.latest}
                 </span>
@@ -1812,11 +1803,7 @@ const SkillUpdateBanner = ({
                         : 'border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-400'
                 )}
             >
-                {updating ? (
-                    <Loader2 size={11} className="animate-spin" />
-                ) : (
-                    <Download size={11} />
-                )}
+                {updating ? <Loader2 size={11} className="animate-spin" /> : <Download size={11} />}
                 {updating ? 'Updating…' : 'Update'}
             </button>
             <button
@@ -1958,7 +1945,7 @@ const PreviewToolbar = ({
             )}
             <PreviewUrlBar url={url} />
             <PagesDropdown devUrl={url} basePath={basePath} />
-            <IGRPButtonPrimitive
+            <Button
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
@@ -1967,8 +1954,8 @@ const PreviewToolbar = ({
                 title="Reload preview"
             >
                 <RefreshCw size={14} />
-            </IGRPButtonPrimitive>
-            <IGRPButtonPrimitive
+            </Button>
+            <Button
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
@@ -1976,8 +1963,8 @@ const PreviewToolbar = ({
                 title={running ? 'Stop dev server' : 'Start dev server'}
             >
                 {running ? <Pause size={14} /> : <Play size={14} />}
-            </IGRPButtonPrimitive>
-            <IGRPButtonPrimitive
+            </Button>
+            <Button
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
@@ -1986,8 +1973,8 @@ const PreviewToolbar = ({
                 title="Toggle DevTools for the preview"
             >
                 <Bug size={14} />
-            </IGRPButtonPrimitive>
-            <IGRPButtonPrimitive
+            </Button>
+            <Button
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
@@ -1996,7 +1983,7 @@ const PreviewToolbar = ({
                 title="Open in browser"
             >
                 <ExternalLink size={14} />
-            </IGRPButtonPrimitive>
+            </Button>
         </div>
     )
 }
@@ -2024,9 +2011,9 @@ const PreviewUrlBar = ({ url }: { url: string | null }): JSX.Element => {
     }, [url])
 
     const navigate = useCallback((target: string) => {
-        const view = document.querySelector('webview.spec-prototype-preview') as
-            | { loadURL?: (u: string) => void }
-            | null
+        const view = document.querySelector('webview.spec-prototype-preview') as {
+            loadURL?: (u: string) => void
+        } | null
         view?.loadURL?.(target)
     }, [])
 
@@ -2068,8 +2055,7 @@ const PreviewUrlBar = ({ url }: { url: string | null }): JSX.Element => {
 //   - `src/app/(group1)/(group2)/<name>/page.tsx`   (current template)
 //   - `src/app/<name>/page.tsx`                    (no groups)
 //   - `app/pages/<name>/page.tsx`                  (legacy / non-`src`)
-const PAGE_ROUTE_RE =
-    /^(?:src\/)?app\/(?:pages\/)?(?:\([^)]+\)\/)*([^/]+)\/page\.tsx$/
+const PAGE_ROUTE_RE = /^(?:src\/)?app\/(?:pages\/)?(?:\([^)]+\)\/)*([^/]+)\/page\.tsx$/
 
 const PagesDropdown = ({
     devUrl,
@@ -2112,9 +2098,9 @@ const PagesDropdown = ({
     const navigate = useCallback(
         (pageName: string) => {
             if (!devUrl) return
-            const view = document.querySelector('webview.spec-prototype-preview') as
-                | { loadURL?: (u: string) => void }
-                | null
+            const view = document.querySelector('webview.spec-prototype-preview') as {
+                loadURL?: (u: string) => void
+            } | null
             // Route groups in the engine path (`(igrp)`, `(generated)`) do
             // NOT appear in the URL — Next.js serves the page at the
             // segment name directly. So `users` page lives at `/users`,
@@ -2151,7 +2137,10 @@ const PagesDropdown = ({
                 className={cn(
                     'flex h-8 items-center gap-1 rounded-md border bg-card px-2 text-[10.5px] transition-colors hover:bg-accent'
                 )}
-                title={reason ?? `${pages.length} page${pages.length === 1 ? '' : 's'} — click to switch`}
+                title={
+                    reason ??
+                    `${pages.length} page${pages.length === 1 ? '' : 's'} — click to switch`
+                }
             >
                 Pages
                 <span
@@ -2181,16 +2170,11 @@ const PagesDropdown = ({
                                 disabled={!devUrl}
                                 className={cn(
                                     'flex w-full items-center justify-between rounded px-2 py-1 text-left text-[11px]',
-                                    devUrl
-                                        ? 'hover:bg-accent'
-                                        : 'cursor-not-allowed opacity-50'
+                                    devUrl ? 'hover:bg-accent' : 'cursor-not-allowed opacity-50'
                                 )}
                             >
                                 <span className="font-mono">{name}</span>
-                                <ExternalLink
-                                    size={10}
-                                    className="text-muted-foreground/60"
-                                />
+                                <ExternalLink size={10} className="text-muted-foreground/60" />
                             </button>
                         ))
                     )}
@@ -2423,7 +2407,7 @@ const FilesPane = ({ basePath }: { basePath?: string }): JSX.Element => {
     const tree = useMemo(() => buildTree(files, changedPaths), [files, changedPaths])
 
     return (
-        <div className="flex h-full overflow-hidden rounded-xl border bg-card/30">
+        <div className="flex h-full overflow-hidden rounded-xl border bg-background">
             <aside className="flex w-64 shrink-0 flex-col border-r bg-card">
                 <div className="flex items-center justify-between border-b p-3">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -2819,7 +2803,7 @@ const LogsPane = (): JSX.Element => {
                         size={11}
                         className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                     />
-                    <IGRPInputPrimitive
+                    <Input
                         placeholder="Search…"
                         className="h-7 pl-7 text-[11px]"
                         value={search}
@@ -2832,7 +2816,7 @@ const LogsPane = (): JSX.Element => {
                             paused
                         </span>
                     )}
-                    <IGRPButtonPrimitive
+                    <Button
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7"
@@ -2841,8 +2825,8 @@ const LogsPane = (): JSX.Element => {
                         disabled={filtered.length === 0}
                     >
                         <Copy size={12} />
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
+                    </Button>
+                    <Button
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7"
@@ -2851,7 +2835,7 @@ const LogsPane = (): JSX.Element => {
                         disabled={logs.length === 0}
                     >
                         <Trash2 size={12} />
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
             </div>
             <div
@@ -2894,7 +2878,9 @@ const LogFilterButton = ({
         onClick={onClick}
         className={cn(
             'rounded px-2 py-0.5 text-[10px] font-medium transition-colors',
-            active ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-accent'
+            active
+                ? 'bg-secondary text-secondary-foreground'
+                : 'text-muted-foreground hover:bg-accent'
         )}
     >
         {label}
@@ -2939,7 +2925,7 @@ const HistoryPane = ({ basePath }: { basePath?: string }): JSX.Element => {
                 </button>
             </div>
             {snapshots.length === 0 ? (
-                <div className="rounded-xl border border-dashed bg-card/30 p-8 text-center">
+                <div className="rounded-xl border border-dashed bg-muted/30 p-8 text-center">
                     <History size={28} className="mx-auto mb-3 text-muted-foreground/40" />
                     <p className="text-sm font-medium">No snapshots yet</p>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -2983,14 +2969,14 @@ const SnapshotCard = ({
                 <History size={12} />
                 {snap.date} · {snap.author}
             </div>
-            <IGRPButtonPrimitive
+            <Button
                 variant="ghost"
                 size="sm"
                 className="h-6 px-2 text-[10px] opacity-0 transition-opacity group-hover:opacity-100"
                 onClick={onRestore}
             >
                 Restore version
-            </IGRPButtonPrimitive>
+            </Button>
         </div>
         <p className="text-xs leading-relaxed">{snap.message}</p>
         <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
@@ -3030,9 +3016,7 @@ const PrototypeFooter = ({ basePath }: { basePath?: string }): JSX.Element => {
                 window.alert(`Open folder failed: ${result.error}`)
             }
         } catch (err) {
-            window.alert(
-                `Open folder failed: ${err instanceof Error ? err.message : String(err)}`
-            )
+            window.alert(`Open folder failed: ${err instanceof Error ? err.message : String(err)}`)
         }
     }, [basePath])
 
@@ -3046,7 +3030,7 @@ const PrototypeFooter = ({ basePath }: { basePath?: string }): JSX.Element => {
     return (
         <footer className="flex h-12 shrink-0 items-center justify-between border-t bg-card px-4">
             <div className="flex items-center gap-2">
-                <IGRPButtonPrimitive
+                <Button
                     variant="outline"
                     size="sm"
                     className="h-8 gap-2 text-xs"
@@ -3054,8 +3038,8 @@ const PrototypeFooter = ({ basePath }: { basePath?: string }): JSX.Element => {
                     disabled={!basePath}
                 >
                     <Download size={14} /> Export project…
-                </IGRPButtonPrimitive>
-                <IGRPButtonPrimitive
+                </Button>
+                <Button
                     variant="outline"
                     size="sm"
                     className="h-8 gap-2 text-xs"
@@ -3064,7 +3048,7 @@ const PrototypeFooter = ({ basePath }: { basePath?: string }): JSX.Element => {
                     title="Open the prototype folder in your file manager"
                 >
                     <FolderOpen size={14} /> Open folder
-                </IGRPButtonPrimitive>
+                </Button>
                 <span className="ml-2 truncate text-[10px] text-muted-foreground">
                     {basePath ?? '—'}
                 </span>
@@ -3077,7 +3061,7 @@ const PrototypeFooter = ({ basePath }: { basePath?: string }): JSX.Element => {
                     </span>
                 )}
             </div>
-            <IGRPButtonPrimitive
+            <Button
                 variant="ghost"
                 size="sm"
                 className="h-8 gap-2 text-xs text-red-500 hover:bg-red-500/10"
@@ -3085,7 +3069,7 @@ const PrototypeFooter = ({ basePath }: { basePath?: string }): JSX.Element => {
                 disabled={!basePath}
             >
                 <RotateCcw size={14} /> Reset prototype
-            </IGRPButtonPrimitive>
+            </Button>
         </footer>
     )
 }

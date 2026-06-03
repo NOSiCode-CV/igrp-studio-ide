@@ -1,6 +1,7 @@
 'use client'
 
-import { IGRPButtonPrimitive, IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import { Eraser, Plus, Terminal as TerminalIcon, X } from 'lucide-react'
 import { SearchAddon } from '@xterm/addon-search'
 import { FitAddon } from '@xterm/addon-fit'
@@ -447,31 +448,31 @@ export function IntegratedTerminal(): JSX.Element {
                 </div>
 
                 <div className="flex items-center">
-                    <IGRPButtonPrimitive
+                    <Button
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 text-[#d4d4d4] hover:bg-[#2a2a2a]"
                         onClick={clearActiveTerminal}
                     >
                         <Eraser className="h-4 w-4" />
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
+                    </Button>
+                    <Button
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 text-[#d4d4d4] hover:bg-[#2a2a2a]"
                         onClick={createNewTerminal}
                     >
                         <Plus className="h-4 w-4" />
-                    </IGRPButtonPrimitive>
+                    </Button>
                     <IGRPSeparator orientation="vertical" className="h-4 bg-[#2a2a2a]" />
-                    <IGRPButtonPrimitive
+                    <Button
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 ml-2 text-[#d4d4d4] hover:bg-[#2a2a2a]"
                         onClick={() => setIsOpen(false)}
                     >
                         <X className="h-4 w-4" />
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
             </div>
 

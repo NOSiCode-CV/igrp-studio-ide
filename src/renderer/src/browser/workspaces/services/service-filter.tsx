@@ -1,4 +1,5 @@
-import { IGRPBadgePrimitive, IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
 import { Compass, Database, Globe, HardDrive, Server, Shield } from 'lucide-react'
 import type React from 'react'
 import { type JSX, useState } from 'react'
@@ -110,7 +111,7 @@ export function ServiceFilter({ onFilterChange, totalServices }: ServiceFilterPr
             {/* Category Tabs */}
             <div className="flex flex-wrap gap-2">
                 {serviceCategories.map((category) => (
-                    <IGRPBadgePrimitive
+                    <Badge
                         key={category.id}
                         variant={activeCategory === category.id ? 'default' : 'outline'}
                         onClick={() => handleCategoryClick(category.id)}
@@ -125,7 +126,7 @@ export function ServiceFilter({ onFilterChange, totalServices }: ServiceFilterPr
                         {category.id !== 'all' && (
                             <span className="text-xs opacity-75">({category.types.length})</span>
                         )}
-                    </IGRPBadgePrimitive>
+                    </Badge>
                 ))}
             </div>
 
@@ -140,14 +141,9 @@ export function ServiceFilter({ onFilterChange, totalServices }: ServiceFilterPr
                     )}
                 </span>
                 {(activeCategory !== 'all' || searchQuery) && (
-                    <IGRPButtonPrimitive
-                        variant="ghost"
-                        size="sm"
-                        onClick={clearFilters}
-                        className="text-xs"
-                    >
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
                         Clear filters
-                    </IGRPButtonPrimitive>
+                    </Button>
                 )}
             </div>
         </div>

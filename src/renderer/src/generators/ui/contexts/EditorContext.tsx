@@ -1,4 +1,4 @@
-import { useIGRPSidebarPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { useSidebar } from '@renderer/components/ui/sidebar'
 import type {
     Arguments,
     CustomFunctionConfig,
@@ -62,7 +62,7 @@ interface ProviderProps {
  * currently active tab's slice; switching tabs is just an `activeTabId` change.
  */
 export const DroppedComponentsProvider: React.FC<ProviderProps> = ({ children, activeTabId }) => {
-    const { toggleSidebar, setOpen } = useIGRPSidebarPrimitive()
+    const { toggleSidebar, setOpen } = useSidebar()
 
     const [byTab, setByTab] = useState<Record<string, TabSlice>>({})
 

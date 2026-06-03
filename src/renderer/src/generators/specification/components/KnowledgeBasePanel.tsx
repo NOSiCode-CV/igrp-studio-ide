@@ -1,4 +1,5 @@
-import { IGRPButtonPrimitive, IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
 import { cn } from '@renderer/lib/utils'
 import type { RootState } from '@renderer/redux'
 import {
@@ -158,14 +159,14 @@ const ListVariant = ({ basePath }: PanelProps): JSX.Element => {
                 <div className="flex items-center gap-2">
                     <div className="relative flex-1">
                         <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-                        <IGRPInputPrimitive
+                        <Input
                             placeholder="Search KB…"
                             className="h-8 pl-7"
                             value={searchQuery}
                             onChange={(e) => dispatch(kbSearchQueryChanged(e.target.value))}
                         />
                     </div>
-                    <IGRPButtonPrimitive
+                    <Button
                         size="sm"
                         variant="outline"
                         className="h-8 px-2"
@@ -174,8 +175,8 @@ const ListVariant = ({ basePath }: PanelProps): JSX.Element => {
                         title="Add file"
                     >
                         <Plus className="h-3.5 w-3.5" />
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
+                    </Button>
+                    <Button
                         size="sm"
                         variant="outline"
                         className="h-8 px-2"
@@ -184,20 +185,20 @@ const ListVariant = ({ basePath }: PanelProps): JSX.Element => {
                         title="Add URL"
                     >
                         <LinkIcon className="h-3.5 w-3.5" />
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
                 {urlInputOpen && (
                     <form onSubmit={handleAddUrl} className="flex gap-2">
-                        <IGRPInputPrimitive
+                        <Input
                             autoFocus
                             placeholder="https://… or youtube.com/…"
                             className="h-8 text-xs"
                             value={urlValue}
                             onChange={(e) => setUrlValue(e.target.value)}
                         />
-                        <IGRPButtonPrimitive type="submit" size="sm" className="h-8 px-3 text-xs">
+                        <Button type="submit" size="sm" className="h-8 px-3 text-xs">
                             Add
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </form>
                 )}
             </div>
@@ -287,7 +288,7 @@ const KBRow = ({ item, active, onSelect, onReindex, onRemove }: KBRowProps): JSX
             <div className="flex items-center gap-1">
                 {statusIcon(item.status)}
                 <div className="relative">
-                    <IGRPButtonPrimitive
+                    <Button
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 opacity-0 group-hover:opacity-100"
@@ -297,7 +298,7 @@ const KBRow = ({ item, active, onSelect, onReindex, onRemove }: KBRowProps): JSX
                         }}
                     >
                         <MoreHorizontal size={14} />
-                    </IGRPButtonPrimitive>
+                    </Button>
                     {menuOpen && (
                         <div
                             className="absolute right-0 top-7 z-10 w-32 rounded-md border bg-popover p-1 shadow-md"
@@ -398,15 +399,15 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                     </h3>
                 </div>
                 <div className="flex items-center gap-2">
-                    <IGRPButtonPrimitive
+                    <Button
                         variant="outline"
                         size="sm"
                         className="h-8 gap-1.5 text-xs"
                         onClick={() => setViewRaw((v) => !v)}
                     >
                         <Eye size={14} /> {viewRaw ? 'Rendered' : 'View Raw'}
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
+                    </Button>
+                    <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
@@ -414,7 +415,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                         title="Remove from KB"
                     >
                         <Trash2 size={14} className="text-red-500" />
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
             </header>
 
@@ -470,20 +471,20 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
                     </span>
                 </div>
                 <form onSubmit={handleSearch} className="flex gap-3">
-                    <IGRPInputPrimitive
+                    <Input
                         placeholder="Ask the KB…"
                         className="h-9 flex-1 text-xs"
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
                     />
-                    <IGRPButtonPrimitive
+                    <Button
                         type="submit"
                         size="sm"
                         className="h-9 px-4 text-xs"
                         disabled={searchPending || !searchInput.trim()}
                     >
                         {searchPending ? 'Searching…' : 'Search'}
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </form>
                 {lastSearch && lastSearch.hits.length > 0 && (
                     <div className="mt-3 max-h-40 space-y-1.5 overflow-y-auto">

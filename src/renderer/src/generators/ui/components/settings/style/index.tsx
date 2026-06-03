@@ -1,10 +1,10 @@
 import {
-    IGRPAccordionContentPrimitive,
-    IGRPAccordionItemPrimitive,
-    IGRPAccordionPrimitive,
-    IGRPAccordionTriggerPrimitive,
-    IGRPButtonPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger
+} from '@renderer/components/ui/accordion'
+import { Button } from '@renderer/components/ui/button'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import {
     Box,
@@ -163,10 +163,10 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
 
     return (
         <div className="p-1.5">
-            <IGRPAccordionPrimitive type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full">
                 {sections.map((section) => (
-                    <IGRPAccordionItemPrimitive key={section.id} value={section.id}>
-                        <IGRPAccordionTriggerPrimitive
+                    <AccordionItem key={section.id} value={section.id}>
+                        <AccordionTrigger
                             className="group"
                             iconName="ChevronDown"
                             showIcon
@@ -175,7 +175,7 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
                             <div className="flex align-middle items-center gap-2">
                                 {section.icon}
                                 {section.title}
-                                <IGRPButtonPrimitive
+                                <Button
                                     asChild
                                     variant={'ghost'}
                                     size={'sm'}
@@ -190,19 +190,19 @@ export function StyleTab({ comp, onInteranctionsChange }: StyleTabProps) {
                                     title={`Reset ${section.title} styles`}
                                 >
                                     <RotateCcw className="h-4" />
-                                </IGRPButtonPrimitive>
+                                </Button>
                             </div>
-                        </IGRPAccordionTriggerPrimitive>
-                        <IGRPAccordionContentPrimitive>
+                        </AccordionTrigger>
+                        <AccordionContent>
                             <section.component
                                 onChangeStyles={onChangeStyles}
                                 styles={styleState}
                                 resetStyles={resetStyles}
                             />
-                        </IGRPAccordionContentPrimitive>
-                    </IGRPAccordionItemPrimitive>
+                        </AccordionContent>
+                    </AccordionItem>
                 ))}
-            </IGRPAccordionPrimitive>
+            </Accordion>
 
             {/* Style Class Info */}
             {classes && (

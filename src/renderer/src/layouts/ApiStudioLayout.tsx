@@ -1,7 +1,4 @@
-import {
-    IGRPSidebarInsetPrimitive,
-    IGRPSidebarProviderPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 
 import {
@@ -56,7 +53,7 @@ const Layout = (props: LayoutProps): React.ReactNode => {
 
     return (
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))] [--header-height-three:calc(--spacing(30))]">
-            <IGRPSidebarProviderPrimitive
+            <SidebarProvider
                 style={
                     {
                         '--sidebar-width': '380px'
@@ -73,18 +70,18 @@ const Layout = (props: LayoutProps): React.ReactNode => {
                             basePath={basePath}
                             header
                         />
-                        <IGRPSidebarInsetPrimitive className="flex-1">
+                        <SidebarInset className="flex-1">
                             {React.cloneElement(props.children, {
                                 basePath,
                                 currentItem,
                                 project: config
                             })}
-                        </IGRPSidebarInsetPrimitive>
+                        </SidebarInset>
                     </div>
                 </div>
                 <Footer />
                 <IntegratedTerminal />
-            </IGRPSidebarProviderPrimitive>
+            </SidebarProvider>
         </div>
     )
 }

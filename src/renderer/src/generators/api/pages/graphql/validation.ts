@@ -1,9 +1,23 @@
-import type { FormikErrors } from 'formik'
 import type {
     GraphQLArgumentFormValue,
     GraphQLOperationFormValues,
     GraphQLPersistedOperation
 } from './types'
+
+/**
+ * Recursive form-error bag, equivalent to Formik's `FormErrors<T>`:
+ * each key maps to either a string message, a nested record (for nested
+ * objects) or an array of nested records (for repeated fields). Kept
+ * library-agnostic so this module stops depending on Formik now that the
+ * project standardises on React Hook Form.
+ */
+type FormErrors<T> = {
+    [K in keyof T]?: T[K] extends Array<infer U>
+        ? Array<FormErrors<U>> | string
+        : T[K] extends object
+          ? FormErrors<T[K]> | string
+          : string
+}
 
 const GRAPHQL_NAME_PATTERN = /^[_A-Za-z][_0-9A-Za-z]*$/
 
@@ -19,8 +33,8 @@ const normalize = (value?: string) => value?.trim() || ''
 export async function validateGraphQLOperation(
     values: GraphQLOperationFormValues,
     { operations, availableTypeValues }: ValidateGraphQLOperationOptions
-): Promise<FormikErrors<GraphQLOperationFormValues>> {
-    const errors: FormikErrors<GraphQLOperationFormValues> = {}
+): Promise<FormErrors<GraphQLOperationFormValues>> {
+    const errors: FormErrors<GraphQLOperationFormValues> = {}
     const operationName = normalize(values.name)
     const returnType = normalize(values.returnType)
     const inputType = normalize(values.inputType)
@@ -62,13 +76,13 @@ export async function validateGraphQLOperation(
         errors.eventTopic = 'Event topic / pattern is required'
     }
 
-    const argErrors: Array<FormikErrors<GraphQLArgumentFormValue> | undefined> = []
+    const argErrors: Array<FormErrors<GraphQLArgumentFormValue> | undefined> = []
     const seenArgumentNames = new Set<string>()
 
     values.args.forEach((argument, index) => {
         const argumentName = normalize(argument.name)
         const argumentType = normalize(argument.type)
-        const currentErrors: FormikErrors<GraphQLArgumentFormValue> = {}
+        const currentErrors: FormErrors<GraphQLArgumentFormValue> = {}
 
         if (argumentName.length === 0) {
             currentErrors.name = 'Parameter name is required'
@@ -96,7 +110,7 @@ export async function validateGraphQLOperation(
     if (argErrors.some(Boolean)) {
         errors.args = argErrors.map(
             (entry) => entry ?? {}
-        ) as FormikErrors<GraphQLArgumentFormValue>[]
+        ) as FormErrors<GraphQLArgumentFormValue>[]
     }
 
     return errors

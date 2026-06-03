@@ -1,20 +1,21 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPCombobox,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuTriggerPrimitive,
-    IGRPLabelPrimitive,
-    type IGRPOptionsProps,
-    IGRPScrollAreaPrimitive,
-    IGRPSidebarInsetPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import { Label } from '@renderer/components/ui/label'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { SidebarInset } from '@renderer/components/ui/sidebar'
+import { IGRPCombobox, type IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system'
 import type { Import, Segment } from '@igrp/igrp-studio-nextjs-engine/types'
 import MonacoEditor from '@renderer/components/monaco-editor'
 import { useComponents } from '@renderer/generators/ui/hooks/useComponents'
@@ -119,26 +120,23 @@ export function TriggerControls({
 
     const AddDropdown = (): React.ReactNode => {
         return (
-            <IGRPDropdownMenuPrimitive>
-                <IGRPDropdownMenuTriggerPrimitive asChild>
-                    <IGRPButtonPrimitive variant={'secondary'} size={'sm'}>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant={'secondary'} size={'sm'}>
                         <Plus size={10} />
-                    </IGRPButtonPrimitive>
-                </IGRPDropdownMenuTriggerPrimitive>
-                <IGRPDropdownMenuContentPrimitive className="min-w-60">
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="min-w-60">
                     {Object.keys(interactionsType).map((key, index) => {
                         const interaction = interactionsType[key]
                         return (
-                            <IGRPDropdownMenuItemPrimitive
-                                key={index}
-                                onClick={() => addInteraction(key)}
-                            >
+                            <DropdownMenuItem key={index} onClick={() => addInteraction(key)}>
                                 {interaction?.label || key}
-                            </IGRPDropdownMenuItemPrimitive>
+                            </DropdownMenuItem>
                         )
                     })}
-                </IGRPDropdownMenuContentPrimitive>
-            </IGRPDropdownMenuPrimitive>
+                </DropdownMenuContent>
+            </DropdownMenu>
         )
     }
 
@@ -172,7 +170,7 @@ export function TriggerControls({
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <IGRPButtonPrimitive
+                                    <Button
                                         variant={'ghost'}
                                         size={'icon'}
                                         onClick={() => {
@@ -183,14 +181,14 @@ export function TriggerControls({
                                         className="w-6 h-6"
                                     >
                                         <Edit2 size={4} />
-                                    </IGRPButtonPrimitive>
-                                    <IGRPButtonPrimitive
+                                    </Button>
+                                    <Button
                                         variant={'ghost'}
                                         size={'sm'}
                                         onClick={() => removeInteraction(key)}
                                     >
                                         <Trash2 size={4} className="text-destructive" />
-                                    </IGRPButtonPrimitive>
+                                    </Button>
                                 </div>
                             </div>
                         )
@@ -345,9 +343,9 @@ const InteractionEditor = ({
                         {hasfnCustomSetOption && (
                             <>
                                 <div className="flex-1 border rounded">
-                                    <IGRPLabelPrimitive className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                                    <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                                         Inline Function
-                                    </IGRPLabelPrimitive>
+                                    </Label>
                                     <MonacoEditor
                                         content={currentAction.function?.fnCustomSet || ''}
                                         filePath=""
@@ -389,9 +387,9 @@ const InteractionEditor = ({
 
                         {hasfnCodeOption && (
                             <div className="flex-1 border rounded">
-                                <IGRPLabelPrimitive className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
+                                <Label className="block text-sm font-medium text-foreground mb-2 p-2 border-b">
                                     Custom Code
-                                </IGRPLabelPrimitive>
+                                </Label>
                                 <MonacoEditor
                                     content={currentAction.function?.fnCustomCode?.fnCode || ''}
                                     filePath=""
@@ -497,27 +495,25 @@ const InteractionEditor = ({
     }
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-            <IGRPDialogContentPrimitive className="p-0 flex overflow-hidden [--header-height:calc(--spacing(99))] [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw]">
-                <IGRPSidebarInsetPrimitive className="space-y-4">
-                    <IGRPDialogHeaderPrimitive className="p-4">
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="p-0 flex overflow-hidden [--header-height:calc(--spacing(99))] [--header-height-three:calc(--spacing(75))] w-full sm:max-w-[800px] lg:max-w-[70vw] max-w-[90vw]">
+                <SidebarInset className="space-y-4">
+                    <DialogHeader className="p-4">
                         <div className="flex flex-1 justify-between">
                             <div className="space-y-2">
-                                <IGRPDialogTitlePrimitive>
-                                    Edit Interaction
-                                </IGRPDialogTitlePrimitive>
-                                <IGRPDialogDescriptionPrimitive>
+                                <DialogTitle>Edit Interaction</DialogTitle>
+                                <DialogDescription>
                                     Configure what happens when this interaction is triggered
-                                </IGRPDialogDescriptionPrimitive>
+                                </DialogDescription>
                             </div>
                             <div>
-                                <IGRPButtonPrimitive size={'sm'} onClick={() => saveInteraction()}>
+                                <Button size={'sm'} onClick={() => saveInteraction()}>
                                     Save changes
-                                </IGRPButtonPrimitive>
+                                </Button>
                             </div>
                         </div>
-                    </IGRPDialogHeaderPrimitive>
-                    <IGRPScrollAreaPrimitive className="h-[calc(100svh-var(--header-height))]">
+                    </DialogHeader>
+                    <ScrollArea className="h-[calc(100svh-var(--header-height))]">
                         <div className="space-y-4 p-4">
                             <IGRPCombobox
                                 label="Action Type"
@@ -536,8 +532,8 @@ const InteractionEditor = ({
 
                             {renderActionConfig()}
                         </div>
-                    </IGRPScrollAreaPrimitive>
-                </IGRPSidebarInsetPrimitive>
+                    </ScrollArea>
+                </SidebarInset>
 
                 {/* Sidebar com configurações adicionais */}
                 {actionType === 'function' && (
@@ -549,7 +545,7 @@ const InteractionEditor = ({
                         componentTag={componentTag}
                     />
                 )}
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

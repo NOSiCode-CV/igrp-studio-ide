@@ -159,11 +159,7 @@ export function usePrototypeSkills(basePath: string | undefined): UsePrototypeSk
             const cacheKey = `${skillName}/${filename}`
             const hit = cacheRef.current.get(cacheKey)
             if (hit !== undefined) return hit
-            const result = await window.specPrototype.readSkillFile(
-                basePath,
-                skillName,
-                filename
-            )
+            const result = await window.specPrototype.readSkillFile(basePath, skillName, filename)
             if (result.content !== null) {
                 cacheRef.current.set(cacheKey, result.content)
             }
@@ -236,10 +232,7 @@ export function usePrototypeSkills(basePath: string | undefined): UsePrototypeSk
  * an exact match would miss obvious targets; matching across `##` + `###`
  * keeps the heuristic forgiving without becoming sloppy.
  */
-export function extractMarkdownSection(
-    content: string,
-    heading: string
-): string | null {
+export function extractMarkdownSection(content: string, heading: string): string | null {
     if (!heading.trim()) return null
     const needle = heading.toLowerCase().trim()
     const lines = content.split('\n')
@@ -310,7 +303,10 @@ export function pickSkillHints(
         studio.companions.some((c) => c.filename === filename)
 
     // Order matters — most specific first.
-    if ((has('error') || has('fix') || has('fail') || has('issue')) && companionExists('troubleshooting.md')) {
+    if (
+        (has('error') || has('fix') || has('fail') || has('issue')) &&
+        companionExists('troubleshooting.md')
+    ) {
         hints.push({
             skillName: 'igrp-studio-metadata',
             filename: 'troubleshooting.md',
@@ -340,7 +336,10 @@ export function pickSkillHints(
             })
         }
     }
-    if ((has('component') || has('button') || has('input') || has('select')) && companionExists('component-reference.md')) {
+    if (
+        (has('component') || has('button') || has('input') || has('select')) &&
+        companionExists('component-reference.md')
+    ) {
         hints.push({
             skillName: 'igrp-studio-metadata',
             filename: 'component-reference.md',

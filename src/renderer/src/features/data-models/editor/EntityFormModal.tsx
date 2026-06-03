@@ -1,14 +1,14 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -64,22 +64,16 @@ export function EntityFormModal({
     }
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={onOpenChange}>
-            <IGRPDialogContentPrimitive>
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>
-                        {initialName ? t('rename_entity') : t('new_entity')}
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        {t('entity_form_description')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{initialName ? t('rename_entity') : t('new_entity')}</DialogTitle>
+                    <DialogDescription>{t('entity_form_description')}</DialogDescription>
+                </DialogHeader>
                 <div className="space-y-3 py-2">
                     <div className="space-y-1">
-                        <IGRPLabelPrimitive htmlFor="entity-name">
-                            {t('entity_name')}
-                        </IGRPLabelPrimitive>
-                        <IGRPInputPrimitive
+                        <Label htmlFor="entity-name">{t('entity_name')}</Label>
+                        <Input
                             id="entity-name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -88,10 +82,8 @@ export function EntityFormModal({
                         />
                     </div>
                     <div className="space-y-1">
-                        <IGRPLabelPrimitive htmlFor="entity-description">
-                            {t('description')}
-                        </IGRPLabelPrimitive>
-                        <IGRPInputPrimitive
+                        <Label htmlFor="entity-description">{t('description')}</Label>
+                        <Input
                             id="entity-description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -100,20 +92,20 @@ export function EntityFormModal({
                     </div>
                     {error && <p className="text-sm text-destructive">{error}</p>}
                 </div>
-                <IGRPDialogFooterPrimitive>
-                    <IGRPButtonPrimitive
+                <DialogFooter>
+                    <Button
                         type="button"
                         variant="secondary"
                         onClick={() => onOpenChange(false)}
                         disabled={submitting}
                     >
                         {t('cancel')}
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive type="button" onClick={handleSubmit} disabled={submitting}>
+                    </Button>
+                    <Button type="button" onClick={handleSubmit} disabled={submitting}>
                         {submitting ? t('saving') : t('save')}
-                    </IGRPButtonPrimitive>
-                </IGRPDialogFooterPrimitive>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }

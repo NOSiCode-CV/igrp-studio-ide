@@ -1,7 +1,4 @@
-import {
-    IGRPCardContentPrimitive,
-    IGRPCardPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Card, CardContent } from '@renderer/components/ui/card'
 import App from '@renderer/App'
 import i18n from '@renderer/localization/i18next.config'
 import { Globe, RefreshCw } from 'lucide-react'
@@ -9,8 +6,8 @@ import { type JSX, useEffect, useState } from 'react'
 
 const LoadingScreen = (): JSX.Element => (
     <div className="flex items-center justify-center min-h-screen bg-background">
-        <IGRPCardPrimitive className="w-96">
-            <IGRPCardContentPrimitive className="flex flex-col items-center justify-center p-8">
+        <Card className="w-96">
+            <CardContent className="flex flex-col items-center justify-center p-8">
                 <div className="flex items-center gap-3 mb-4">
                     <Globe className="h-8 w-8 text-primary animate-pulse" />
                     <h2 className="text-lg font-semibold">Initializing Application</h2>
@@ -19,15 +16,15 @@ const LoadingScreen = (): JSX.Element => (
                     <RefreshCw className="h-4 w-4 animate-spin" />
                     <span>Loading translations...</span>
                 </div>
-            </IGRPCardContentPrimitive>
-        </IGRPCardPrimitive>
+            </CardContent>
+        </Card>
     </div>
 )
 
 const ErrorScreen = ({ onRetry }: { onRetry: () => void }): JSX.Element => (
     <div className="flex items-center justify-center min-h-screen bg-background">
-        <IGRPCardPrimitive className="w-96">
-            <IGRPCardContentPrimitive className="flex flex-col items-center justify-center p-8">
+        <Card className="w-96">
+            <CardContent className="flex flex-col items-center justify-center p-8">
                 <div className="flex items-center gap-3 mb-4">
                     <Globe className="h-8 w-8 text-destructive" />
                     <h2 className="text-lg font-semibold">Initialization Error</h2>
@@ -42,8 +39,8 @@ const ErrorScreen = ({ onRetry }: { onRetry: () => void }): JSX.Element => (
                     <RefreshCw className="h-4 w-4" />
                     Retry
                 </button>
-            </IGRPCardContentPrimitive>
-        </IGRPCardPrimitive>
+            </CardContent>
+        </Card>
     </div>
 )
 

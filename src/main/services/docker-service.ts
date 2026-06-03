@@ -102,7 +102,8 @@ export class DockerService {
         projectId?: string
     ): string | null {
         if (!projectId || !fs.existsSync(workspaceComposePath)) return null
-        const compose = this.composeCache[workspaceComposePath] ||
+        const compose =
+            this.composeCache[workspaceComposePath] ||
             (yaml.load(fs.readFileSync(workspaceComposePath, 'utf8')) as DockerComposeConfig)
         this.composeCache[workspaceComposePath] = compose
         const services = compose?.services || {}
@@ -127,7 +128,9 @@ export class DockerService {
             (yaml.load(fs.readFileSync(workspaceComposePath, 'utf8')) as DockerComposeConfig)
         this.composeCache[workspaceComposePath] = compose
         const services = compose?.services || {}
-        const normalizedName = (projectName || path.basename(projectPath || '')).toLowerCase().trim()
+        const normalizedName = (projectName || path.basename(projectPath || ''))
+            .toLowerCase()
+            .trim()
         if (!normalizedName) return null
 
         const slugLike = normalizedName.replace(/[^a-z0-9-]/gi, '-')
@@ -196,7 +199,9 @@ export class DockerService {
         const keys = Object.keys(services)
         if (keys.length === 0) return null
 
-        const normalizedName = (projectName || path.basename(projectPath || '')).toLowerCase().trim()
+        const normalizedName = (projectName || path.basename(projectPath || ''))
+            .toLowerCase()
+            .trim()
         const slugLike = normalizedName.replace(/[^a-z0-9-]/gi, '-')
 
         for (const serviceName of keys) {
@@ -226,8 +231,7 @@ export class DockerService {
         const envVars = this.parseEnvFile(workspaceEnvPath)
         const workspaceSlug =
             envVars.WORKSPACE_SLUG || envVars.DOCKER_IP || path.basename(workspacePath).trim()
-        const dbHost =
-            envVars.IGRP_LOCAL_DATABASE_HOSTNAME || `${workspaceSlug}-database-postgres`
+        const dbHost = envVars.IGRP_LOCAL_DATABASE_HOSTNAME || `${workspaceSlug}-database-postgres`
         const dbName = envVars.IGRP_DATABASE_NAME || 'postgres'
         const dbUser = envVars.IGRP_DATABASE_USER || 'igrp'
         const dbPassword = envVars.IGRP_DATABASE_PASSWORD || 'igrp'
@@ -359,9 +363,7 @@ export class DockerService {
     private getDependsOnServiceNames(dependsOn: unknown): string[] {
         if (!dependsOn) return []
         if (Array.isArray(dependsOn)) {
-            return dependsOn
-                .map((item) => (typeof item === 'string' ? item : ''))
-                .filter(Boolean)
+            return dependsOn.map((item) => (typeof item === 'string' ? item : '')).filter(Boolean)
         }
         if (typeof dependsOn === 'object') {
             return Object.keys(dependsOn as Record<string, unknown>)
@@ -442,16 +444,14 @@ export class DockerService {
         const envVars = this.parseEnvFile(workspaceEnvPath)
         const workspaceSlug =
             envVars.WORKSPACE_SLUG || envVars.DOCKER_IP || path.basename(workspacePath).trim()
-        const dbHost =
-            envVars.IGRP_LOCAL_DATABASE_HOSTNAME || `${workspaceSlug}-database-postgres`
+        const dbHost = envVars.IGRP_LOCAL_DATABASE_HOSTNAME || `${workspaceSlug}-database-postgres`
         const dbName = envVars.IGRP_DATABASE_NAME || 'postgres'
         const dbUser = envVars.IGRP_DATABASE_USER || 'igrp'
         const dbPassword = envVars.IGRP_DATABASE_PASSWORD || 'igrp'
         const jdbcUrl = `jdbc:postgresql://${dbHost}:5432/${dbName}`
         const eurekaUrl =
             envVars.EUREKA_SERVICE_URL || `http://${workspaceSlug}-eureka:8761/eureka/`
-        const composeProjectName =
-            envVars.COMPOSE_PROJECT_NAME || `${workspaceSlug}-igrp`
+        const composeProjectName = envVars.COMPOSE_PROJECT_NAME || `${workspaceSlug}-igrp`
         const networkName = `${composeProjectName}_default`
         const nginxPort = envVars.NGINX_HTTP_PORT || envVars.HOST_NGINX_HTTP_PORT || '2575'
         const tenant = envVars.IGRP_IAM_TENANT || 'igrp'
@@ -528,7 +528,10 @@ export class DockerService {
         envMap.set('SPRING_DATASOURCE_USERNAME', dbUser)
         envMap.set('SPRING_DATASOURCE_PASSWORD', dbPassword)
         envMap.set('SPRING_DATASOURCE_DRIVER_CLASS_NAME', 'org.postgresql.Driver')
-        envMap.set('SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT', 'org.hibernate.dialect.PostgreSQLDialect')
+        envMap.set(
+            'SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT',
+            'org.hibernate.dialect.PostgreSQLDialect'
+        )
         envMap.set('SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT', '0')
         envMap.set('SPRING_DATASOURCE_HIKARI_VALIDATION_TIMEOUT', '5000')
         envMap.set('JDBC_DATABASE_URL', jdbcUrl)
@@ -590,7 +593,9 @@ export class DockerService {
             }
         } else if (dependsOn && typeof dependsOn === 'object') {
             const filteredObject: Record<string, unknown> = {}
-            for (const [depName, depConfig] of Object.entries(dependsOn as Record<string, unknown>)) {
+            for (const [depName, depConfig] of Object.entries(
+                dependsOn as Record<string, unknown>
+            )) {
                 if (existingServiceNames.has(depName)) {
                     filteredObject[depName] = depConfig
                 }
@@ -675,7 +680,11 @@ export class DockerService {
             const fileName = entry.name.toLowerCase()
             if (
                 !fileName.startsWith('application') ||
-                !(fileName.endsWith('.properties') || fileName.endsWith('.yml') || fileName.endsWith('.yaml'))
+                !(
+                    fileName.endsWith('.properties') ||
+                    fileName.endsWith('.yml') ||
+                    fileName.endsWith('.yaml')
+                )
             ) {
                 continue
             }
@@ -688,9 +697,7 @@ export class DockerService {
 
             if (sanitized !== original) {
                 fs.writeFileSync(filePath, sanitized, 'utf8')
-                this.logInfo(
-                    `Removed invalid spring.datasource.hikari.connection from ${filePath}`
-                )
+                this.logInfo(`Removed invalid spring.datasource.hikari.connection from ${filePath}`)
             }
         }
 
@@ -733,7 +740,9 @@ export class DockerService {
         const descriptors: ComposeDescriptor[] = []
 
         for (const key of Object.keys(perStackCandidates) as ComposeStack[]) {
-            const found = perStackCandidates[key].find((candidatePath) => fs.existsSync(candidatePath))
+            const found = perStackCandidates[key].find((candidatePath) =>
+                fs.existsSync(candidatePath)
+            )
             if (found) {
                 let envFilePath: string | undefined
                 if (key === 'main') {
@@ -881,16 +890,16 @@ export class DockerService {
             const idx = line.indexOf('=')
             if (idx <= 0) continue
             const key = line.slice(0, idx).trim()
-            const value = line.slice(idx + 1).trim().replace(/^['"]|['"]$/g, '')
+            const value = line
+                .slice(idx + 1)
+                .trim()
+                .replace(/^['"]|['"]$/g, '')
             env[key] = value
         }
         return env
     }
 
-    private resolveHttpPort(
-        envVars: Record<string, string>,
-        fallback = '2575'
-    ): string {
+    private resolveHttpPort(envVars: Record<string, string>, fallback = '2575'): string {
         const raw = envVars.NGINX_HTTP_PORT || envVars.HOST_NGINX_HTTP_PORT || fallback
         const parsed = Number.parseInt(String(raw), 10)
         if (Number.isNaN(parsed) || parsed <= 0 || parsed > 65535) return fallback
@@ -899,7 +908,13 @@ export class DockerService {
 
     private syncKeycloakRealmFrontendUrl(projectPath: string, envFilePath?: string): void {
         try {
-            const realmPath = path.join(projectPath, '.igrpstudio', 'auth', 'data', 'igrp-realm.json')
+            const realmPath = path.join(
+                projectPath,
+                '.igrpstudio',
+                'auth',
+                'data',
+                'igrp-realm.json'
+            )
             if (!fs.existsSync(realmPath)) return
 
             const envVars = this.parseEnvFile(envFilePath)
@@ -917,7 +932,10 @@ export class DockerService {
             // Keep realm frontend URL aligned with the current workspace host/port.
             // Keycloak exports may place this either at root "frontendUrl"
             // and/or inside "attributes.frontendUrl". We normalize both.
-            next = next.replace(/"frontendUrl"\s*:\s*"[^"]*"/g, `"frontendUrl": "${expectedFrontendUrl}"`)
+            next = next.replace(
+                /"frontendUrl"\s*:\s*"[^"]*"/g,
+                `"frontendUrl": "${expectedFrontendUrl}"`
+            )
 
             // Normalize old localhost admin redirect to workspace host.
             next = next.replace(
@@ -937,9 +955,7 @@ export class DockerService {
 
             if (next !== raw) {
                 fs.writeFileSync(realmPath, next, 'utf8')
-                this.logInfo(
-                    `Synchronized Keycloak realm frontend URL to ${expectedFrontendUrl}`
-                )
+                this.logInfo(`Synchronized Keycloak realm frontend URL to ${expectedFrontendUrl}`)
             }
         } catch (error: unknown) {
             this.logWarn(
@@ -958,16 +974,14 @@ export class DockerService {
             const host = envVars.WORKSPACE_SLUG || envVars.DOCKER_IP || workspaceHost || 'localhost'
 
             const raw = fs.readFileSync(composePath, 'utf8')
-            const fixed =
-                `- AUTH_JWT_ISSUER=http://${host}:\${NGINX_HTTP_PORT}/auth/realms/\${IGRP_IAM_TENANT}`
-            const next = raw.replace(
-                /^\s*-\s*AUTH_JWT_ISSUER=.*$/m,
-                `      ${fixed}`
-            )
+            const fixed = `- AUTH_JWT_ISSUER=http://${host}:\${NGINX_HTTP_PORT}/auth/realms/\${IGRP_IAM_TENANT}`
+            const next = raw.replace(/^\s*-\s*AUTH_JWT_ISSUER=.*$/m, `      ${fixed}`)
 
             if (next !== raw) {
                 fs.writeFileSync(composePath, next, 'utf8')
-                this.logInfo(`Synchronized AUTH_JWT_ISSUER to ${host}:\${NGINX_HTTP_PORT} in compose.`)
+                this.logInfo(
+                    `Synchronized AUTH_JWT_ISSUER to ${host}:\${NGINX_HTTP_PORT} in compose.`
+                )
             }
         } catch (error: unknown) {
             this.logWarn(
@@ -1015,10 +1029,7 @@ export class DockerService {
         this.updateEnvFileVariable(envFilePath, 'NGINX_HTTP_PORT', resolvedNginxPort)
     }
 
-    private resolveTemplateValue(
-        raw: string,
-        envVars: Record<string, string>
-    ): string | null {
+    private resolveTemplateValue(raw: string, envVars: Record<string, string>): string | null {
         const value = raw.trim()
         const direct = Number.parseInt(value, 10)
         if (!Number.isNaN(direct)) return String(direct)
@@ -1044,7 +1055,9 @@ export class DockerService {
         envFilePath?: string
     ): ComposeHostPortBinding[] {
         if (!fs.existsSync(composePath)) return []
-        const compose = this.composeCache[composePath] || (yaml.load(fs.readFileSync(composePath, 'utf8')) as DockerComposeConfig)
+        const compose =
+            this.composeCache[composePath] ||
+            (yaml.load(fs.readFileSync(composePath, 'utf8')) as DockerComposeConfig)
         this.composeCache[composePath] = compose
 
         const envVars = this.parseEnvFile(envFilePath)
@@ -1251,9 +1264,13 @@ export class DockerService {
             if (!free) {
                 const isNginxPortVariable =
                     variableName === 'HOST_NGINX_HTTP_PORT' || variableName === 'NGINX_HTTP_PORT'
-                const isResolvedNginxPort = !Number.isNaN(resolvedNginxPort) && port === resolvedNginxPort
+                const isResolvedNginxPort =
+                    !Number.isNaN(resolvedNginxPort) && port === resolvedNginxPort
                 const isNginxLiteralBinding = this.hasNginxHostPortLiteralBinding(composePath, port)
-                if (envFilePath && (isNginxPortVariable || isResolvedNginxPort || isNginxLiteralBinding)) {
+                if (
+                    envFilePath &&
+                    (isNginxPortVariable || isResolvedNginxPort || isNginxLiteralBinding)
+                ) {
                     // Auto-switch nginx host port for this workspace when Start is pressed.
                     // eslint-disable-next-line no-await-in-loop
                     const nextPort = await this.findNextAvailablePort(port)
@@ -1723,7 +1740,10 @@ export class DockerService {
 
         const workspaceProject = this.findWorkspaceByProjectPath(projectPath)
         if (workspaceProject?.workspacePath) {
-            const workspaceComposePath = path.join(workspaceProject.workspacePath, 'igrp-compose.yaml')
+            const workspaceComposePath = path.join(
+                workspaceProject.workspacePath,
+                'igrp-compose.yaml'
+            )
             const workspaceEnvPath = path.join(workspaceProject.workspacePath, '.env')
             const workspaceProjectComposePath = path.join(
                 workspaceProject.workspacePath,
@@ -1761,7 +1781,11 @@ export class DockerService {
                         `up -d --build ${serviceName}`,
                         undefined,
                         workspaceComposePath,
-                        { envFilePath: fs.existsSync(workspaceEnvPath) ? workspaceEnvPath : undefined }
+                        {
+                            envFilePath: fs.existsSync(workspaceEnvPath)
+                                ? workspaceEnvPath
+                                : undefined
+                        }
                     )
                     await this.status(workspaceProject.workspacePath)
                     return
@@ -1796,7 +1820,11 @@ export class DockerService {
                         `up -d --build ${projectComposeService}`,
                         undefined,
                         workspaceProjectComposePath,
-                        { envFilePath: fs.existsSync(workspaceEnvPath) ? workspaceEnvPath : undefined }
+                        {
+                            envFilePath: fs.existsSync(workspaceEnvPath)
+                                ? workspaceEnvPath
+                                : undefined
+                        }
                     )
                     await this.status(workspaceProject.workspacePath)
                     return

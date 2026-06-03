@@ -1,10 +1,8 @@
 'use client'
 
-import {
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive,
-    IGRPSwitchPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Switch } from '@renderer/components/ui/switch'
 import { SHORTCUTS } from '@renderer/constants/shortcut'
 import { Search } from 'lucide-react'
 import * as React from 'react'
@@ -131,20 +129,16 @@ export default function KeyboardShortcuts() {
                         <span className="text-sm text-muted-foreground">
                             {t('keyboardShortcuts')}
                         </span>
-                        <IGRPSwitchPrimitive checked={enabled} onCheckedChange={setEnabled} />
+                        <Switch checked={enabled} onCheckedChange={setEnabled} />
                     </div>
-                    <IGRPButtonPrimitive
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEnabled(true)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => setEnabled(true)}>
                         {t('resetToDefault')}
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
 
                 <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <IGRPInputPrimitive
+                    <Input
                         placeholder={t('searchShortcuts')}
                         className="pl-8"
                         value={search}

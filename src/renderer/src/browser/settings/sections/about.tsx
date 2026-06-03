@@ -2,12 +2,9 @@
 
 'use client'
 
-import {
-    IGRPButtonPrimitive,
-    IGRPCombobox,
-    IGRPLabelPrimitive,
-    IGRPSeparator
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Label } from '@renderer/components/ui/label'
+import { IGRPCombobox, IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import logo from '@renderer/assets/images/igrp-green.svg'
 import { SHOW_UPDATE_MODAL_EVENT } from '@renderer/components/update-banner'
 import useToast from '@renderer/hooks/useToast'
@@ -161,7 +158,7 @@ export function AboutSettings(): JSX.Element {
                                         ✓ {t('ready_to_install')}
                                     </p>
                                 )}
-                                <IGRPButtonPrimitive
+                                <Button
                                     className="gap-2 mt-1"
                                     size="sm"
                                     variant="outline"
@@ -175,7 +172,7 @@ export function AboutSettings(): JSX.Element {
                                     {updateInfo.type === 'downloaded'
                                         ? t('install_restart')
                                         : t('view_progress')}
-                                </IGRPButtonPrimitive>
+                                </Button>
                             </div>
                         ) : (
                             <p className="text-muted-foreground">
@@ -186,7 +183,7 @@ export function AboutSettings(): JSX.Element {
                         )}
                         <div className="flex items-center gap-2 pt-1">
                             {(!updateInfo?.version || updateInfo.version === appVersion) && (
-                                <IGRPButtonPrimitive
+                                <Button
                                     className="gap-2"
                                     size="sm"
                                     onClick={checkForUpdates}
@@ -198,7 +195,7 @@ export function AboutSettings(): JSX.Element {
                                         <CircleArrowUp className="h-4 w-4" />
                                     )}
                                     {t('check_update')}
-                                </IGRPButtonPrimitive>
+                                </Button>
                             )}
                         </div>
                     </div>
@@ -211,9 +208,7 @@ export function AboutSettings(): JSX.Element {
                     <h3 className="text-sm font-medium">{t('updateChannel')}</h3>
                     <p className="text-xs text-muted-foreground">{t('updateChannelDescription')}</p>
                     <div className="space-y-2 flex flex-col">
-                        <IGRPLabelPrimitive htmlFor="update-channel">
-                            {t('updateChannel')}
-                        </IGRPLabelPrimitive>
+                        <Label htmlFor="update-channel">{t('updateChannel')}</Label>
                         <IGRPCombobox
                             id="update-channel"
                             value={updateChannel}
@@ -232,7 +227,7 @@ export function AboutSettings(): JSX.Element {
                 {/*  <div className="space-y-4">
           <h3 className="text-sm font-medium">{t('software_update')}</h3>
           <div className="flex items-center space-x-2">
-            <IGRPCheckboxPrimitive id="notifications" />
+            <Checkbox id="notifications" />
             <label
               htmlFor="notifications"
               className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -248,7 +243,7 @@ export function AboutSettings(): JSX.Element {
                 <div className="space-y-4">
                     <h3 className="text-sm font-medium">{t('other_information')}</h3>
                     <div className="flex flex-row items-start space-y-1">
-                        <IGRPButtonPrimitive
+                        <Button
                             variant="link"
                             size={'sm'}
                             onClick={() =>
@@ -259,8 +254,8 @@ export function AboutSettings(): JSX.Element {
                             }
                         >
                             {t('get_latest_version')}
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive
+                        </Button>
+                        <Button
                             variant="link"
                             size={'sm'}
                             onClick={() =>
@@ -271,8 +266,8 @@ export function AboutSettings(): JSX.Element {
                             }
                         >
                             {t('terms_of_service')}
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive
+                        </Button>
+                        <Button
                             variant="link"
                             size={'sm'}
                             onClick={() =>
@@ -283,7 +278,7 @@ export function AboutSettings(): JSX.Element {
                             }
                         >
                             {t('privacy_policy')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                 </div>
             </div>

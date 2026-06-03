@@ -1,7 +1,7 @@
 import { DiffEditor } from '@monaco-editor/react'
 import { AlertTriangle, Check, X } from 'lucide-react'
 import { type JSX, useState } from 'react'
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
 import { cn } from '@renderer/lib/utils'
 import { summariseOps, type SROp } from '../../utils/searchReplaceParser'
 
@@ -47,10 +47,7 @@ export function DocDiffPreview({
     // per-edit picks; otherwise fall back to the bulk summary.
     const okTotal = ops.filter((op) => op.ok).length
     const selectedOk = selected
-        ? ops.reduce(
-              (acc, op, idx) => acc + (op.ok && selected[idx] ? 1 : 0),
-              0
-          )
+        ? ops.reduce((acc, op, idx) => acc + (op.ok && selected[idx] ? 1 : 0), 0)
         : okTotal
 
     return (
@@ -77,7 +74,7 @@ export function DocDiffPreview({
                     )}
                 </div>
                 <div className="flex items-center gap-1">
-                    <IGRPButtonPrimitive
+                    <Button
                         type="button"
                         variant="ghost"
                         size="sm"
@@ -85,8 +82,8 @@ export function DocDiffPreview({
                         onClick={onReject}
                     >
                         <X size={12} /> Reject
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
+                    </Button>
+                    <Button
                         type="button"
                         size="sm"
                         className="h-7 gap-1 px-2 text-[11px]"
@@ -96,14 +93,14 @@ export function DocDiffPreview({
                     >
                         <Check size={12} />
                         {selected ? `Apply ${selectedOk}/${okTotal}` : 'Apply'}
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
             </div>
             {showFailures && failed.length > 0 && (
                 <div className="max-h-40 overflow-auto border-b bg-amber-500/5 px-3 py-2 text-[11px]">
                     <p className="mb-1 font-medium text-amber-700 dark:text-amber-400">
-                        Edits that couldn't be applied — ask the assistant to retry these
-                        with more context:
+                        Edits that couldn't be applied — ask the assistant to retry these with more
+                        context:
                     </p>
                     <ul className="space-y-2">
                         {failed.map((op, idx) => (
@@ -115,8 +112,7 @@ export function DocDiffPreview({
                                     {op.reason === 'no-match' && 'No match in document'}
                                     {op.reason === 'multiple-matches' &&
                                         'Ambiguous (multiple matches)'}
-                                    {op.reason === 'empty-edit' &&
-                                        'Empty SEARCH and REPLACE'}
+                                    {op.reason === 'empty-edit' && 'Empty SEARCH and REPLACE'}
                                 </div>
                                 {op.search && (
                                     <pre className="mt-1 overflow-auto whitespace-pre-wrap break-all rounded bg-muted/40 p-1.5 font-mono text-[10px] text-muted-foreground">

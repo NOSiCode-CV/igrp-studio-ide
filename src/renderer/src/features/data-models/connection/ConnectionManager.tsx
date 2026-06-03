@@ -1,15 +1,14 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    type ColumnDef,
-    IGRPButtonPrimitive,
-    IGRPDataTable,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDialogTriggerPrimitive,
-    IGRPScrollAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from '@renderer/components/ui/dialog'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { IGRPDataTable, type ColumnDef } from '@igrp/igrp-framework-react-design-system'
 import { Edit, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -101,22 +100,22 @@ export function ConnectionManager({ title }: { title?: string }) {
             header: t('actions'),
             cell: ({ row }) => (
                 <div className="flex space-x-2">
-                    <IGRPButtonPrimitive
+                    <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => handleEditClick(row.original)}
                     >
                         <span className="sr-only">{t('edit')}</span>
                         <Edit className="h-4 w-4 " />
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
+                    </Button>
+                    <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDeleteConnection(row.original.name)}
                     >
                         <span className="sr-only">{t('delete')}</span>
                         <Trash2 className="h-4 w-4 text-destructive" />
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
             )
         }
@@ -130,40 +129,36 @@ export function ConnectionManager({ title }: { title?: string }) {
                         <h1 className="text-3xl font-semibold">{title}</h1>
                     </div>
                 )}
-                <IGRPDialogPrimitive open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-                    <IGRPDialogTriggerPrimitive asChild>
-                        <IGRPButtonPrimitive>
+                <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+                    <DialogTrigger asChild>
+                        <Button>
                             <Plus className="h-4" />
                             {t('new')} {/* Use translation for button text */}
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogTriggerPrimitive>
-                    <IGRPDialogContentPrimitive>
-                        <IGRPDialogHeaderPrimitive>
-                            <IGRPDialogTitlePrimitive>
-                                {t('add_new_connection')}
-                            </IGRPDialogTitlePrimitive>
-                            <IGRPDialogDescriptionPrimitive>
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>{t('add_new_connection')}</DialogTitle>
+                            <DialogDescription>
                                 {t('fill_details_to_add_connection')}
-                            </IGRPDialogDescriptionPrimitive>
-                        </IGRPDialogHeaderPrimitive>
+                            </DialogDescription>
+                        </DialogHeader>
                         <ConnectionForm
                             connection={newConnection}
                             onSubmit={handleAddConnection}
                             onCancel={() => setIsAddModalOpen(false)}
                         />
-                    </IGRPDialogContentPrimitive>
-                </IGRPDialogPrimitive>
+                    </DialogContent>
+                </Dialog>
             </div>
 
             {/* Edit Connection Dialog */}
-            <IGRPDialogPrimitive open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-                <IGRPDialogContentPrimitive>
-                    <IGRPDialogHeaderPrimitive>
-                        <IGRPDialogTitlePrimitive>{t('edit_connection')}</IGRPDialogTitlePrimitive>
-                        <IGRPDialogDescriptionPrimitive>
-                            {t('edit_connection_description')}
-                        </IGRPDialogDescriptionPrimitive>
-                    </IGRPDialogHeaderPrimitive>
+            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t('edit_connection')}</DialogTitle>
+                        <DialogDescription>{t('edit_connection_description')}</DialogDescription>
+                    </DialogHeader>
                     {editingConnection && (
                         <ConnectionForm
                             connection={editingConnection}
@@ -174,13 +169,13 @@ export function ConnectionManager({ title }: { title?: string }) {
                             }}
                         />
                     )}
-                </IGRPDialogContentPrimitive>
-            </IGRPDialogPrimitive>
+                </DialogContent>
+            </Dialog>
 
             {/* Render connections table here */}
-            <IGRPScrollAreaPrimitive>
+            <ScrollArea>
                 <IGRPDataTable data={connections} columns={columns} />
-            </IGRPScrollAreaPrimitive>
+            </ScrollArea>
         </div>
     )
 }

@@ -1,10 +1,10 @@
 import {
-    IGRPAccordionContentPrimitive,
-    IGRPAccordionItemPrimitive,
-    IGRPAccordionPrimitive,
-    IGRPAccordionTriggerPrimitive,
-    type IGRPOptionsProps
-} from '@igrp/igrp-framework-react-design-system'
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger
+} from '@renderer/components/ui/accordion'
+import { type IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system'
 import type { State } from '@igrp/igrp-studio-nextjs-engine/types'
 import type { DataValue, StructuredComponent } from '@renderer/lib/dnd/types'
 import { memo } from 'react'
@@ -40,12 +40,12 @@ const PropertiesPanel = memo(function PropertiesPanel({
     const tag = tempEditingComponent.tag || ''
 
     return (
-        <IGRPAccordionPrimitive type="single" collapsible className="w-full" defaultValue="item-1">
-            <IGRPAccordionItemPrimitive value="item-1">
-                <IGRPAccordionTriggerPrimitive iconName="ChevronDown" showIcon iconPlacement="end">
+        <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
+            <AccordionItem value="item-1">
+                <AccordionTrigger iconName="ChevronDown" showIcon iconPlacement="end">
                     {t('properties')}
-                </IGRPAccordionTriggerPrimitive>
-                <IGRPAccordionContentPrimitive className="space-y-2">
+                </AccordionTrigger>
+                <AccordionContent className="space-y-2">
                     {propsComponent && (
                         <RenderPropsConfig
                             propsComp={propsComponent}
@@ -59,18 +59,14 @@ const PropertiesPanel = memo(function PropertiesPanel({
                             onSelectState={onSelectState}
                         />
                     )}
-                </IGRPAccordionContentPrimitive>
-            </IGRPAccordionItemPrimitive>
+                </AccordionContent>
+            </AccordionItem>
             {Object.keys(propsComponentChild).length > 0 && (
-                <IGRPAccordionItemPrimitive value="item-2">
-                    <IGRPAccordionTriggerPrimitive
-                        iconName="ChevronDown"
-                        showIcon
-                        iconPlacement="end"
-                    >
+                <AccordionItem value="item-2">
+                    <AccordionTrigger iconName="ChevronDown" showIcon iconPlacement="end">
                         {t('childProperties')}
-                    </IGRPAccordionTriggerPrimitive>
-                    <IGRPAccordionContentPrimitive className="space-y-2">
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-2">
                         <RenderPropsConfig
                             propsComp={propsComponentChild}
                             formValues={childformValues}
@@ -82,10 +78,10 @@ const PropertiesPanel = memo(function PropertiesPanel({
                             onInputChange={onChildPropertyChange}
                             onSelectState={onSelectState}
                         />
-                    </IGRPAccordionContentPrimitive>
-                </IGRPAccordionItemPrimitive>
+                    </AccordionContent>
+                </AccordionItem>
             )}
-        </IGRPAccordionPrimitive>
+        </Accordion>
     )
 })
 

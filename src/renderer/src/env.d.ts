@@ -343,15 +343,8 @@ interface SpecPrototypeBridge {
         raw: string
     ) => Promise<{ summary: string; applied: number; failed: number }>
     listFiles: (basePath: string) => Promise<SpecPrototypeFileEntry[]>
-    readFile: (
-        basePath: string,
-        path: string
-    ) => Promise<{ content: string } | null>
-    readFileAt: (
-        basePath: string,
-        ref: string,
-        path: string
-    ) => Promise<{ content: string | null }>
+    readFile: (basePath: string, path: string) => Promise<{ content: string } | null>
+    readFileAt: (basePath: string, ref: string, path: string) => Promise<{ content: string | null }>
     startDev: (basePath: string) => Promise<SpecPrototypeDevStatus>
     stopDev: (basePath: string) => Promise<SpecPrototypeDevStatus>
     devStatus: (basePath: string) => Promise<SpecPrototypeDevStatus>
@@ -392,10 +385,7 @@ interface SpecPrototypeBridge {
         skillName: string,
         filename: string
     ) => Promise<{ content: string | null; error?: string }>
-    installSkill: (
-        basePath: string,
-        skillName: string
-    ) => Promise<{ ok: boolean; error?: string }>
+    installSkill: (basePath: string, skillName: string) => Promise<{ ok: boolean; error?: string }>
     checkSkillUpdates: (basePath: string) => Promise<{
         updates: Array<{
             name: string
@@ -405,10 +395,7 @@ interface SpecPrototypeBridge {
             error?: string
         }>
     }>
-    updateSkill: (
-        basePath: string,
-        skillName: string
-    ) => Promise<{ ok: boolean; error?: string }>
+    updateSkill: (basePath: string, skillName: string) => Promise<{ ok: boolean; error?: string }>
     onChunk: (
         callback: (payload: { requestId: string; chunk: SpecPrototypeChunk }) => void
     ) => () => void

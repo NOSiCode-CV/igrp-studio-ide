@@ -1,9 +1,6 @@
-import {
-    IGRPCardContentPrimitive,
-    IGRPCardPrimitive,
-    IGRPCheckboxPrimitive,
-    IGRPLabelPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Card, CardContent } from '@renderer/components/ui/card'
+import { Checkbox } from '@renderer/components/ui/checkbox'
+import { Label } from '@renderer/components/ui/label'
 import { useTranslation } from 'react-i18next'
 import { SelectInput, TextInput } from '../../components/inputs-form'
 import NavigationBar from '../../components/navigation-bar'
@@ -70,8 +67,8 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                 title={t('dto')}
             />
             <div className="space-y-4 p-4">
-                <IGRPCardPrimitive>
-                    <IGRPCardContentPrimitive>
+                <Card>
+                    <CardContent>
                         <div className="flex flex-col gap-4">
                             <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
                                 <SelectInput
@@ -144,28 +141,34 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                                 />
                                 <div className="flex items-center gap-4">
                                     <div className="flex items-center space-x-2">
-                                        <IGRPCheckboxPrimitive
+                                        <Checkbox
                                             id="enableCustonValidation"
                                             onCheckedChange={(checked: boolean) =>
-                                                formik.setFieldValue('enableCustonValidation', checked)
+                                                formik.setFieldValue(
+                                                    'enableCustonValidation',
+                                                    checked
+                                                )
                                             }
                                             checked={formik.values.enableCustonValidation}
                                         />
-                                        <IGRPLabelPrimitive htmlFor="enableCustonValidation" className="whitespace-nowrap">
+                                        <Label
+                                            htmlFor="enableCustonValidation"
+                                            className="whitespace-nowrap"
+                                        >
                                             {t('enableCustonValidation')}
-                                        </IGRPLabelPrimitive>
+                                        </Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <IGRPCheckboxPrimitive
+                                        <Checkbox
                                             id="readOnly"
                                             onCheckedChange={(checked: boolean) =>
                                                 formik.setFieldValue('readOnly', checked)
                                             }
                                             checked={formik.values.readOnly}
                                         />
-                                        <IGRPLabelPrimitive htmlFor="readOnly" className="whitespace-nowrap">
+                                        <Label htmlFor="readOnly" className="whitespace-nowrap">
                                             {t('readOnly')}
-                                        </IGRPLabelPrimitive>
+                                        </Label>
                                     </div>
                                 </div>
                             </div>
@@ -175,8 +178,8 @@ const DtoLayout = ({ selectors, currentItem, onCloseTab }: DtoProps) => {
                                 </div>
                             ))}
                         </div>
-                    </IGRPCardContentPrimitive>
-                </IGRPCardPrimitive>
+                    </CardContent>
+                </Card>
             </div>
         </form>
     )

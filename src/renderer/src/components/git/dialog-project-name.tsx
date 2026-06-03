@@ -1,13 +1,13 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPInputPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -26,14 +26,14 @@ export const ProjectNameDialog = ({
     const [projectName, setProjectName] = useState(defaultName)
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
-            <IGRPDialogContentPrimitive>
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('enterProjectName')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive />
-                </IGRPDialogHeaderPrimitive>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{t('enterProjectName')}</DialogTitle>
+                    <DialogDescription />
+                </DialogHeader>
                 <div className="py-4">
-                    <IGRPInputPrimitive
+                    <Input
                         type="text"
                         value={projectName}
                         onChange={(e) => setProjectName(e.target.value)}
@@ -41,18 +41,15 @@ export const ProjectNameDialog = ({
                         placeholder={t('projectNamePlaceholder')}
                     />
                 </div>
-                <IGRPDialogFooterPrimitive>
-                    <IGRPButtonPrimitive variant="outline" onClick={onClose}>
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose}>
                         {t('cancel')}
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
-                        onClick={() => onConfirm(projectName)}
-                        disabled={!projectName.trim()}
-                    >
+                    </Button>
+                    <Button onClick={() => onConfirm(projectName)} disabled={!projectName.trim()}>
                         {t('confirm')}
-                    </IGRPButtonPrimitive>
-                </IGRPDialogFooterPrimitive>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }

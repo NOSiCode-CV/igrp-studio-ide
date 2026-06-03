@@ -1,4 +1,4 @@
-import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Input } from '@renderer/components/ui/input'
 import * as LucideIcons from 'lucide-react'
 import { type LucideIcon, Search } from 'lucide-react'
 import * as React from 'react'
@@ -116,7 +116,7 @@ function SearchInput({
             <Search
                 className={`absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground ${iconClassName}`}
             />
-            <IGRPInputPrimitive
+            <Input
                 type="text"
                 placeholder={placeholder}
                 className={`pl-8 h-8 text-xs ${inputClassName}`}

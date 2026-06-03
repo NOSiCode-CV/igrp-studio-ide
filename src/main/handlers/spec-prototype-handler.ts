@@ -317,10 +317,7 @@ ipcMain.handle(
     EVENTS.SPEC_PROTOTYPE.APPLY_MANIFEST,
     async (
         event,
-        {
-            basePath,
-            manifest
-        }: { basePath: string; manifest: Record<string, unknown> }
+        { basePath, manifest }: { basePath: string; manifest: Record<string, unknown> }
     ): Promise<{
         ok: boolean
         sha?: string | null
@@ -434,7 +431,8 @@ function formatEngineIssue(issue: unknown): string {
     let path = ''
     if (Array.isArray(obj.path)) path = (obj.path as unknown[]).join('.')
     else if (typeof obj.path === 'string') path = obj.path
-    else if (typeof obj.instancePath === 'string' && obj.instancePath !== '') path = obj.instancePath
+    else if (typeof obj.instancePath === 'string' && obj.instancePath !== '')
+        path = obj.instancePath
     else if (typeof obj.dataPath === 'string' && obj.dataPath !== '') path = obj.dataPath
     if (
         path &&
@@ -481,11 +479,7 @@ ipcMain.handle(
     EVENTS.SPEC_PROTOTYPE.READ_SKILL_FILE,
     async (
         _event,
-        {
-            basePath,
-            skillName,
-            filename
-        }: { basePath: string; skillName: string; filename: string }
+        { basePath, skillName, filename }: { basePath: string; skillName: string; filename: string }
     ) => {
         return readSkillCompanion(basePath, skillName, filename)
     }

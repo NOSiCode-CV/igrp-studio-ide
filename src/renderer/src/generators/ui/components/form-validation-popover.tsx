@@ -1,20 +1,10 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPPopoverContentPrimitive,
-    IGRPPopoverPrimitive,
-    IGRPPopoverTriggerPrimitive,
-    IGRPSeparator,
-    IGRPSwitch,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
+import { IGRPSeparator, IGRPSwitch } from '@igrp/igrp-framework-react-design-system'
 import { toInitCap } from '@renderer/utils'
 import { AlertCircle, Shield } from 'lucide-react'
 import { type ReactNode, useEffect, useState } from 'react'
@@ -33,6 +23,16 @@ interface FormValidationPopoverProps {
     changeValue: (element: string, position: number, value: any) => void
 }
 
+/** Zod allows 0 for min/max/minLength/maxLength; do not treat it as unset. */
+function hasValidationValue(value: unknown): boolean {
+    if (typeof value === 'number') return !Number.isNaN(value)
+    return value !== undefined && value !== null && value !== '' && value !== false
+}
+
+function formatValidationInputValue(value: unknown): string | number {
+    return typeof value === 'number' ? value : (value ?? '')
+}
+
 export function FormValidationPopover({
     index,
     field,
@@ -49,14 +49,18 @@ export function FormValidationPopover({
 
     const handleValidationKeyChange = (
         key: string,
-        value: string | boolean | number | unknown[]
+        value: string | boolean | number | unknown[] | undefined
     ) => {
         const currentValidation = field?.validation || {}
-        const updatedValidation = {
+        if (value === undefined || value === null || value === '') {
+            const { [key]: _removed, ...rest } = currentValidation
+            changeValue('validation', index, rest)
+            return
+        }
+        changeValue('validation', index, {
             ...currentValidation,
             [key]: value
-        }
-        changeValue('validation', index, updatedValidation)
+        })
     }
 
     /**
@@ -76,7 +80,10 @@ export function FormValidationPopover({
             'select2',
             'radio',
             'string',
-            'textarea'
+            'textarea',
+            'email',
+            'url',
+            'uuid'
         ]
         const booleanLike = ['checkbox', 'switch', 'boolean']
         const dateLike = ['date', 'time', 'datetime']
@@ -210,7 +217,7 @@ export function FormValidationPopover({
 
     const isValidationActive = (validation: string): boolean => {
         const value = field?.validation?.[validation] ?? field?.[validation]
-        return value !== undefined && value !== null && value !== '' && value !== false
+        return hasValidationValue(value)
     }
 
     const renderValidationField = (validation: string) => {
@@ -222,17 +229,22 @@ export function FormValidationPopover({
             case 'minLength':
             case 'maxLength':
                 return (
-                    <IGRPInputPrimitive
+                    <Input
                         type="number"
                         className="h-8"
-                        value={value || ''}
+                        value={formatValidationInputValue(value)}
                         placeholder={
                             validation === 'min' || validation === 'minLength' ? '>=0' : '>=0'
                         }
                         min={0}
                         onChange={(ev) => {
-                            const numValue = Number(ev.target.value)
-                            if (numValue >= 0) {
+                            const raw = ev.target.value
+                            if (raw === '') {
+                                handleValidationKeyChange(validation, undefined)
+                                return
+                            }
+                            const numValue = Number(raw)
+                            if (!Number.isNaN(numValue) && numValue >= 0) {
                                 handleValidationKeyChange(validation, numValue)
                             }
                         }}
@@ -243,7 +255,7 @@ export function FormValidationPopover({
             case 'lt':
             case 'lte':
                 return (
-                    <IGRPInputPrimitive
+                    <Input
                         type="number"
                         className="h-8"
                         value={value ?? ''}
@@ -262,7 +274,7 @@ export function FormValidationPopover({
                 )
             case 'regex':
                 return (
-                    <IGRPInputPrimitive
+                    <Input
                         className="h-8"
                         value={value || ''}
                         placeholder="/pattern/"
@@ -273,7 +285,7 @@ export function FormValidationPopover({
             case 'endsWith':
             case 'includes':
                 return (
-                    <IGRPInputPrimitive
+                    <Input
                         className="h-8"
                         value={value || ''}
                         placeholder={t('enterValue')}
@@ -283,7 +295,7 @@ export function FormValidationPopover({
             case 'minDate':
             case 'maxDate':
                 return (
-                    <IGRPInputPrimitive
+                    <Input
                         type="date"
                         className="h-8"
                         value={value || ''}
@@ -292,7 +304,7 @@ export function FormValidationPopover({
                 )
             case 'mime':
                 return (
-                    <IGRPInputPrimitive
+                    <Input
                         className="h-8"
                         value={value || ''}
                         placeholder="image/png"
@@ -334,11 +346,7 @@ export function FormValidationPopover({
         // Apply validations
         validations.forEach((validation) => {
             const validationValue = field?.validation?.[validation] ?? field?.[validation]
-            if (
-                validationValue !== undefined &&
-                validationValue !== null &&
-                validationValue !== ''
-            ) {
+            if (hasValidationValue(validationValue)) {
                 switch (validation) {
                     case 'min':
                     case 'max':
@@ -407,44 +415,32 @@ export function FormValidationPopover({
     }
 
     return (
-        <IGRPPopoverPrimitive>
-            <IGRPTooltipPrimitive>
-                <IGRPTooltipTriggerPrimitive asChild>
-                    <IGRPPopoverTriggerPrimitive asChild>
-                        <IGRPButtonPrimitive
-                            variant="ghost"
-                            className="flex items-center"
-                            size={'icon'}
-                        >
+        <Popover>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <PopoverTrigger asChild>
+                        <Button variant="ghost" className="flex items-center" size={'icon'}>
                             <Shield className="w-4 h-4" />
                             <span className="sr-only">{t('validation')}</span>
-                        </IGRPButtonPrimitive>
-                    </IGRPPopoverTriggerPrimitive>
-                </IGRPTooltipTriggerPrimitive>
-                <IGRPTooltipContentPrimitive side="top" align="center">
+                        </Button>
+                    </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="top" align="center">
                     {t('openValidationSettings')}
-                </IGRPTooltipContentPrimitive>
-            </IGRPTooltipPrimitive>
-            <IGRPPopoverContentPrimitive className="w-96" align="end" side="bottom">
+                </TooltipContent>
+            </Tooltip>
+            <PopoverContent className="w-96" align="end" side="bottom">
                 <div className="grid gap-4">
                     <div className="space-y-2">
-                        <IGRPTabsPrimitive defaultValue="validations">
-                            <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
-                                <IGRPTabsTriggerPrimitive value="validations">
-                                    {t('validations')}
-                                </IGRPTabsTriggerPrimitive>
-                                <IGRPTabsTriggerPrimitive value="errors">
-                                    {t('errorMessages')}
-                                </IGRPTabsTriggerPrimitive>
-                                <IGRPTabsTriggerPrimitive value="zod">
-                                    Zod Schema
-                                </IGRPTabsTriggerPrimitive>
-                                <IGRPTabsTriggerPrimitive value="preview">
-                                    {t('preview')}
-                                </IGRPTabsTriggerPrimitive>
-                            </IGRPTabsListPrimitive>
+                        <Tabs defaultValue="validations">
+                            <TabsList className="grid w-full grid-cols-4">
+                                <TabsTrigger value="validations">{t('validations')}</TabsTrigger>
+                                <TabsTrigger value="errors">{t('errorMessages')}</TabsTrigger>
+                                <TabsTrigger value="zod">Zod Schema</TabsTrigger>
+                                <TabsTrigger value="preview">{t('preview')}</TabsTrigger>
+                            </TabsList>
 
-                            <IGRPTabsContentPrimitive value="validations" className="space-y-4">
+                            <TabsContent value="validations" className="space-y-4">
                                 <p className="text-sm text-muted-foreground mb-3">
                                     {t('setValidationsForFormField')}
                                 </p>
@@ -467,12 +463,12 @@ export function FormValidationPopover({
                                                     key={`${validation}-${index}`}
                                                     className="flex items-center gap-4"
                                                 >
-                                                    <IGRPLabelPrimitive
+                                                    <Label
                                                         htmlFor={`${validation}-${index}`}
                                                         className="w-24"
                                                     >
                                                         {toInitCap(t(validation))}
-                                                    </IGRPLabelPrimitive>
+                                                    </Label>
                                                     <div className="flex-1">
                                                         {renderValidationField(validation)}
                                                     </div>
@@ -480,9 +476,9 @@ export function FormValidationPopover({
                                             ))}
                                     </div>
                                 </div>
-                            </IGRPTabsContentPrimitive>
+                            </TabsContent>
 
-                            <IGRPTabsContentPrimitive value="errors" className="space-y-4">
+                            <TabsContent value="errors" className="space-y-4">
                                 <p className="text-sm text-muted-foreground mb-3">
                                     {t('errorMessagesHint')}
                                 </p>
@@ -504,10 +500,10 @@ export function FormValidationPopover({
                                                     key={`error-${validation}-${index}`}
                                                     className="flex items-center gap-4"
                                                 >
-                                                    <IGRPLabelPrimitive className="w-24">
+                                                    <Label className="w-24">
                                                         {toInitCap(t(validation))}
-                                                    </IGRPLabelPrimitive>
-                                                    <IGRPInputPrimitive
+                                                    </Label>
+                                                    <Input
                                                         className="h-8 flex-1"
                                                         value={getErrorMessage(validation)}
                                                         placeholder={t('errorMessagePlaceholder')}
@@ -523,9 +519,9 @@ export function FormValidationPopover({
                                         </div>
                                     )
                                 })()}
-                            </IGRPTabsContentPrimitive>
+                            </TabsContent>
 
-                            <IGRPTabsContentPrimitive value="zod" className="space-y-4">
+                            <TabsContent value="zod" className="space-y-4">
                                 <p className="text-sm text-muted-foreground mb-3">
                                     {t('generatedZodSchema')}
                                 </p>
@@ -535,7 +531,7 @@ export function FormValidationPopover({
                                     </pre>
                                 </div>
                                 <div className="flex gap-2">
-                                    <IGRPButtonPrimitive
+                                    <Button
                                         variant="outline"
                                         size="sm"
                                         onClick={() => {
@@ -543,11 +539,11 @@ export function FormValidationPopover({
                                         }}
                                     >
                                         {t('copyToClipboard')}
-                                    </IGRPButtonPrimitive>
+                                    </Button>
                                 </div>
-                            </IGRPTabsContentPrimitive>
+                            </TabsContent>
 
-                            <IGRPTabsContentPrimitive value="preview" className="space-y-4">
+                            <TabsContent value="preview" className="space-y-4">
                                 <p className="text-sm text-muted-foreground mb-3">
                                     {t('validationPreview')}
                                 </p>
@@ -575,11 +571,7 @@ export function FormValidationPopover({
                                                 const value =
                                                     field?.validation?.[validation] ??
                                                     field?.[validation]
-                                                return (
-                                                    value !== undefined &&
-                                                    value !== null &&
-                                                    value !== ''
-                                                )
+                                                return hasValidationValue(value)
                                             })
                                             .map((validation) => {
                                                 const value =
@@ -601,11 +593,7 @@ export function FormValidationPopover({
                                             const value =
                                                 field?.validation?.[validation] ??
                                                 field?.[validation]
-                                            return (
-                                                value !== undefined &&
-                                                value !== null &&
-                                                value !== ''
-                                            )
+                                            return hasValidationValue(value)
                                         }).length === 0 &&
                                             !field?.validation?.key && (
                                                 <div className="text-xs text-muted-foreground ml-6">
@@ -614,11 +602,11 @@ export function FormValidationPopover({
                                             )}
                                     </div>
                                 </div>
-                            </IGRPTabsContentPrimitive>
-                        </IGRPTabsPrimitive>
+                            </TabsContent>
+                        </Tabs>
                     </div>
                 </div>
-            </IGRPPopoverContentPrimitive>
-        </IGRPPopoverPrimitive>
+            </PopoverContent>
+        </Popover>
     )
 }

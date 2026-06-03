@@ -1,5 +1,5 @@
 import Editor, { type OnMount } from '@monaco-editor/react'
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
 import { Check, FileCode2, ListChecks, Save } from 'lucide-react'
 import * as monaco from 'monaco-editor'
 import { type JSX, useCallback, useEffect, useRef, useState } from 'react'
@@ -130,15 +130,15 @@ export function XmlTab({ xml, onChange }: XmlTabProps): JSX.Element {
     return (
         <div className="flex h-full flex-col">
             <div className="flex items-center justify-end gap-2 border-b px-3 py-2">
-                <IGRPButtonPrimitive variant="outline" size="sm" onClick={handleFormat}>
+                <Button variant="outline" size="sm" onClick={handleFormat}>
                     <FileCode2 className="mr-1 h-4 w-4" />
                     Format
-                </IGRPButtonPrimitive>
-                <IGRPButtonPrimitive variant="outline" size="sm" onClick={handleValidate}>
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleValidate}>
                     <ListChecks className="mr-1 h-4 w-4" />
                     Validate
-                </IGRPButtonPrimitive>
-                <IGRPButtonPrimitive
+                </Button>
+                <Button
                     variant={dirty ? 'default' : 'secondary'}
                     size="sm"
                     onClick={handleManualSave}
@@ -146,7 +146,7 @@ export function XmlTab({ xml, onChange }: XmlTabProps): JSX.Element {
                 >
                     {dirty ? <Save className="mr-1 h-4 w-4" /> : <Check className="mr-1 h-4 w-4" />}
                     {dirty ? 'Save' : 'Saved'}
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
             <div className="flex-1 overflow-hidden">
                 <Editor

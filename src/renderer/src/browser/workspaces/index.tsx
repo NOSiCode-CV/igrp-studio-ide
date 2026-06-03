@@ -1,24 +1,27 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuTriggerPrimitive,
-    IGRPSelectContentPrimitive,
-    IGRPSelectItemPrimitive,
-    IGRPSelectPrimitive,
-    IGRPSelectTriggerPrimitive,
-    IGRPSelectValuePrimitive,
-    IGRPToggleGroupItemPrimitive,
-    IGRPToggleGroupPrimitive,
-    IGRPTogglePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@renderer/components/ui/select'
+import { Toggle } from '@renderer/components/ui/toggle'
+import { ToggleGroup, ToggleGroupItem } from '@renderer/components/ui/toggle-group'
 import { CloneProjectModal } from '@renderer/components/git/clone-project-modal'
 import { SearchInput, SubHeadline } from '@renderer/components/shared-ui'
 import { useDocker } from '@renderer/hooks/use-docker'
@@ -106,37 +109,31 @@ const ResourceSection = ({
                         onChange={onSearchChange}
                         className="lg:w-[250px]"
                     />
-                    <IGRPToggleGroupPrimitive
+                    <ToggleGroup
                         type="single"
                         value={viewMode}
                         onValueChange={(value) => value && onViewModeChange(value as ViewMode)}
                     >
-                        <IGRPToggleGroupItemPrimitive value="grid" size="sm" className="h-8 w-8">
+                        <ToggleGroupItem value="grid" size="sm" className="h-8 w-8">
                             <LayoutGrid className="h-3.5 w-3.5" />
-                        </IGRPToggleGroupItemPrimitive>
-                        <IGRPToggleGroupItemPrimitive value="list" size="sm" className="h-8 w-8">
+                        </ToggleGroupItem>
+                        <ToggleGroupItem value="list" size="sm" className="h-8 w-8">
                             <List className="h-3.5 w-3.5" />
-                        </IGRPToggleGroupItemPrimitive>
-                    </IGRPToggleGroupPrimitive>
+                        </ToggleGroupItem>
+                    </ToggleGroup>
                 </div>
                 <div className="flex items-center gap-2">
                     <span>{t('sortBy')}</span>
-                    <IGRPSelectPrimitive value={sortValue} onValueChange={onSortChange}>
-                        <IGRPSelectTriggerPrimitive className="w-[180px] !h-7">
-                            <IGRPSelectValuePrimitive placeholder={t('orderBy')} />
-                        </IGRPSelectTriggerPrimitive>
-                        <IGRPSelectContentPrimitive>
-                            <IGRPSelectItemPrimitive value="lastModified">
-                                {t('lastModified')}
-                            </IGRPSelectItemPrimitive>
-                            <IGRPSelectItemPrimitive value="name">
-                                {t('name')}
-                            </IGRPSelectItemPrimitive>
-                            <IGRPSelectItemPrimitive value="type">
-                                {t('type')}
-                            </IGRPSelectItemPrimitive>
-                        </IGRPSelectContentPrimitive>
-                    </IGRPSelectPrimitive>
+                    <Select value={sortValue} onValueChange={onSortChange}>
+                        <SelectTrigger className="w-[180px] !h-7">
+                            <SelectValue placeholder={t('orderBy')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="lastModified">{t('lastModified')}</SelectItem>
+                            <SelectItem value="name">{t('name')}</SelectItem>
+                            <SelectItem value="type">{t('type')}</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
             {isEmpty ? emptyState : children}
@@ -256,23 +253,23 @@ const Resources = () => {
         const [openCloneProject, setOpenCloneProject] = useState(false)
         return (
             <>
-                <IGRPDropdownMenuPrimitive>
-                    <IGRPDropdownMenuTriggerPrimitive asChild>
-                        <IGRPTogglePrimitive size={'sm'} variant={'outline'}>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Toggle size={'sm'} variant={'outline'}>
                             <EllipsisVertical />
-                        </IGRPTogglePrimitive>
-                    </IGRPDropdownMenuTriggerPrimitive>
-                    <IGRPDropdownMenuContentPrimitive>
-                        <IGRPDropdownMenuItemPrimitive onClick={onHandleOpenProjectClick}>
+                        </Toggle>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem onClick={onHandleOpenProjectClick}>
                             <FolderOpen className="w-4 h-4 mr-2" />
                             <span>{t('openProject')}</span>
-                        </IGRPDropdownMenuItemPrimitive>
-                        <IGRPDropdownMenuItemPrimitive onClick={() => setOpenCloneProject(true)}>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setOpenCloneProject(true)}>
                             <GitFork className="w-4 h-4 mr-2" />
                             {t('cloneProject')}
-                        </IGRPDropdownMenuItemPrimitive>
-                    </IGRPDropdownMenuContentPrimitive>
-                </IGRPDropdownMenuPrimitive>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 <ProjectWizard />
                 {openCloneProject && (
                     <CloneProjectModal
@@ -282,7 +279,7 @@ const Resources = () => {
                     />
                 )}
 
-                <IGRPDialogPrimitive
+                <Dialog
                     open={openProjectDialog}
                     onOpenChange={(open) => {
                         if (!open) {
@@ -292,18 +289,16 @@ const Resources = () => {
                         setOpenProjectDialog(true)
                     }}
                 >
-                    <IGRPDialogContentPrimitive>
-                        <IGRPDialogHeaderPrimitive>
-                            <IGRPDialogTitlePrimitive>
-                                {t('openProjectOptionsTitle')}
-                            </IGRPDialogTitlePrimitive>
-                            <IGRPDialogDescriptionPrimitive>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>{t('openProjectOptionsTitle')}</DialogTitle>
+                            <DialogDescription>
                                 {t('openProjectOptionsDescription')}
-                            </IGRPDialogDescriptionPrimitive>
-                        </IGRPDialogHeaderPrimitive>
+                            </DialogDescription>
+                        </DialogHeader>
 
-                        <IGRPDialogFooterPrimitive className="grid grid-cols-2 gap-2">
-                            <IGRPButtonPrimitive
+                        <DialogFooter className="grid grid-cols-2 gap-2">
+                            <Button
                                 variant="outline"
                                 onClick={() => confirmOpenProject('linked')}
                                 disabled={isOpeningProject}
@@ -316,8 +311,8 @@ const Resources = () => {
                                 ) : (
                                     t('openProjectAsLinked')
                                 )}
-                            </IGRPButtonPrimitive>
-                            <IGRPButtonPrimitive
+                            </Button>
+                            <Button
                                 onClick={() => confirmOpenProject('managed')}
                                 disabled={isOpeningProject}
                             >
@@ -329,10 +324,10 @@ const Resources = () => {
                                 ) : (
                                     t('importProjectToWorkspace')
                                 )}
-                            </IGRPButtonPrimitive>
-                        </IGRPDialogFooterPrimitive>
-                    </IGRPDialogContentPrimitive>
-                </IGRPDialogPrimitive>
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </>
         )
     }
@@ -347,10 +342,10 @@ const Resources = () => {
                     : t('noProjectsYet')}
             </p>
             <ProjectWizard>
-                <IGRPButtonPrimitive size="sm">
+                <Button size="sm">
                     <PlusCircle className="h-3.5 w-3.5 mr-1" />
                     {t('createNewProject')}
-                </IGRPButtonPrimitive>
+                </Button>
             </ProjectWizard>
         </div>
     )

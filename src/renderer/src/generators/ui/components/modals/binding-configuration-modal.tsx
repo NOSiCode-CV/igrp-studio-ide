@@ -1,17 +1,16 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogClosePrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPLabelPrimitive,
-    type IGRPOptionsProps,
-    IGRPScrollAreaPrimitive,
-    IGRPSwitch
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Label } from '@renderer/components/ui/label'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { IGRPSwitch, type IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system'
 import type { FieldValidation } from '@igrp/igrp-studio-nextjs-engine/types'
 import { SelectInput, TextInput } from '@renderer/generators/api/components/inputs-form'
 import { handleChangeValueObject } from '@renderer/generators/api/helpers'
@@ -19,7 +18,8 @@ import useStudio from '@renderer/hooks/use-studio'
 import useToast from '@renderer/hooks/useToast'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { capitalize, getId } from '@renderer/utils'
-import { useFormik } from 'formik'
+import { useFormikCompat, useZodForm } from '@renderer/lib/form'
+import { z } from 'zod'
 import { camelCase } from '@renderer/utils'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -58,46 +58,114 @@ const defaultFieldType: LabeledElementField = {
 }
 
 /**
- * Mirrors the engine's FIELD_TYPES constant
- * (node_modules/@igrp/igrp-studio-nextjs-engine/dist/utils/constants.d.ts).
- * Kept inline because the engine does not re-export the constant from
- * its public entry point yet. The order intentionally matches the
- * engine source so a quick visual diff catches drift.
+ * Types shown in the binding UI. Primitives map 1:1 to `resolveZodTypes`.
+ * `email` / `url` / `uuid` are string refinements (z.string().email(), …),
+ * persisted as `type: "string"` + `validation.{email|url|uuid}: true`.
+ * @see studio/_skills/igrp-studio-metadata/troubleshooting.md
  */
 const FIELD_TYPES: SchemaTypeItem[] = [
     { value: 'string', label: 'String' },
+    { value: 'email', label: 'Email' },
+    { value: 'url', label: 'URL' },
+    { value: 'uuid', label: 'UUID' },
     { value: 'number', label: 'Number' },
-    { value: 'select', label: 'Select' },
-    { value: 'select2', label: 'Select (multi)' },
-    { value: 'password', label: 'Password' },
-    { value: 'color', label: 'Color' },
-    { value: 'checkbox', label: 'Checkbox' },
-    { value: 'switch', label: 'Switch' },
-    { value: 'radio', label: 'Radio' },
-    { value: 'file', label: 'File' },
-    { value: 'tel', label: 'Telephone' },
-    { value: 'range', label: 'Range' },
-    { value: 'time', label: 'Time' },
+    { value: 'boolean', label: 'Boolean' },
     { value: 'date', label: 'Date' },
-    { value: 'button', label: 'Button' }
+    { value: 'file', label: 'File' }
 ]
 
+const STRING_FORMAT_TYPES = ['email', 'url', 'uuid'] as const
+type StringFormatType = (typeof STRING_FORMAT_TYPES)[number]
+
+function isStringFormatType(type: string): type is StringFormatType {
+    return (STRING_FORMAT_TYPES as readonly string[]).includes(type)
+}
+
 /**
- * Map values stored under the previous (engine-misaligned) vocabulary
- * back to the engine's FieldTypes. Keeps existing projects loadable
- * after the rename. Returns the original value when no mapping applies
- * so unknown values stay visible (rather than silently swallowed).
+ * Map engine widget types and legacy aliases to Zod primitives on load.
+ * Returns the original value when no mapping applies so unknown types
+ * stay visible. 'object' is intentionally NOT mapped — FormList uses it
+ * as a nested-struct marker alongside fields[].
  */
 const LEGACY_TYPE_MAP: Record<string, { type: string; isList?: boolean }> = {
+    // Engine FIELD_TYPES (utils/constants.ts) — UI widgets → Zod
+    text: { type: 'string' },
+    password: { type: 'string' },
+    tel: { type: 'string' },
+    color: { type: 'string' },
+    select: { type: 'string' },
+    select2: { type: 'string' },
+    radio: { type: 'string' },
+    time: { type: 'string' },
+    range: { type: 'number' },
+    checkbox: { type: 'boolean' },
+    switch: { type: 'boolean' },
+    button: { type: 'boolean' },
+    // Legacy / aliases
     string: { type: 'string' },
-    boolean: { type: 'checkbox' },
-    email: { type: 'string' },
-    url: { type: 'string' },
+    boolean: { type: 'boolean' },
+    textarea: { type: 'string' },
     array: { type: 'string', isList: true },
-    integer: { type: 'number' }
-    // 'object' is intentionally NOT mapped — extractValidFields uses it
-    // as an internal marker for nested struct (FormList) entries, and
-    // the engine treats fields[] presence as the actual struct signal.
+    integer: { type: 'number' },
+    long: { type: 'number' },
+    double: { type: 'number' },
+    float: { type: 'number' },
+    datetime: { type: 'date' }
+}
+
+function applyTypeSelection(
+    field: LabeledElementField,
+    selectedType: string
+): LabeledElementField {
+    const validation: FieldValidation = {
+        ...(field.validation ?? {}),
+        errors: field.validation?.errors ?? []
+    }
+    delete validation.email
+    delete validation.url
+    delete validation.uuid
+
+    if (isStringFormatType(selectedType)) {
+        validation[selectedType] = true
+        return { ...field, type: selectedType, validation }
+    }
+
+    const mapped = LEGACY_TYPE_MAP[selectedType]
+    return {
+        ...field,
+        type: mapped?.type ?? selectedType,
+        ...(mapped?.isList !== undefined ? { isList: mapped.isList } : {}),
+        validation
+    }
+}
+
+/** Persist UI presets as `string` + validation flags for codegen. */
+function fieldToPersistedFormat(field: LabeledElementField): LabeledElementField {
+    const nested = field.fields?.map(fieldToPersistedFormat)
+
+    if (isStringFormatType(field.type)) {
+        const format = field.type
+        const { email: _e, url: _u, uuid: _i, ...restValidation } = field.validation ?? {}
+        const validation: FieldValidation = {
+            ...restValidation,
+            errors: field.validation?.errors ?? [],
+            [format]: true
+        }
+        return {
+            ...field,
+            type: 'string',
+            validation,
+            ...(nested ? { fields: nested } : {})
+        }
+    }
+
+    const mapped = LEGACY_TYPE_MAP[field.type]
+    if (!mapped && !nested) return field
+    return {
+        ...field,
+        ...(mapped ? { type: mapped.type, isList: mapped.isList ?? field.isList } : {}),
+        ...(nested ? { fields: nested } : {})
+    }
 }
 
 /**
@@ -109,6 +177,7 @@ const LEGACY_TYPE_MAP: Record<string, { type: string; isList?: boolean }> = {
  */
 function deriveFieldName(child: StructuredComponent): string {
     const tag = child.tag?.trim()
+
     if (tag) return tag
     const label =
         (child.properties?.label as string | undefined)?.trim() ??
@@ -119,15 +188,26 @@ function deriveFieldName(child: StructuredComponent): string {
     return child.id ?? ''
 }
 
-function normalizeFieldType<T extends { type: string; isList?: boolean; fields?: any[] }>(
-    field: T
-): T {
+function normalizeFieldType<
+    T extends { type: string; isList?: boolean; fields?: any[]; validation?: FieldValidation }
+>(field: T): T {
     const mapped = LEGACY_TYPE_MAP[field.type]
+    let type = mapped?.type ?? field.type
+    const isList = mapped?.isList ?? field.isList
+
+    const v = field.validation
+    if (type === 'string' && v) {
+        if (v.email) type = 'email'
+        else if (v.url) type = 'url'
+        else if (v.uuid) type = 'uuid'
+    }
+
     const nested = field.fields ? field.fields.map(normalizeFieldType) : undefined
-    if (!mapped && !nested) return field
+    if (type === field.type && isList === field.isList && !nested) return field
     return {
         ...field,
-        ...(mapped ? { type: mapped.type, isList: mapped.isList ?? field.isList } : {}),
+        type,
+        ...(isList !== field.isList ? { isList } : {}),
         ...(nested ? { fields: nested } : {})
     }
 }
@@ -194,145 +274,138 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
 
         switch (field.type) {
             case 'number':
-            case 'range':
                 return '0'
-            case 'checkbox':
-            case 'switch':
+            case 'boolean':
                 return 'false'
             case 'date':
-            case 'time':
                 return 'new Date()'
             case 'string':
-            case 'password':
-            case 'tel':
-            case 'color':
             case 'file':
-            case 'select':
-            case 'select2':
-            case 'radio':
-            case 'button':
                 return ''
             default:
                 return ''
         }
     }
 
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues: {
-            componentId,
-            path: '',
-            fields: [],
-            isEnum: false,
-            isMainType: false,
-            definitionType: 'auto' as 'zod-object' | 'json-schema' | 'auto',
-            tags: [] as string[],
-            customInstanceName: '',
-            customInitInstanceName: '',
-            ...compType,
-            // Resolve `name` AFTER the spread so an empty or missing
-            // compType.name does not overwrite the component's tag.
-            // Falls back to the component name (e.g. 'form', 'table')
-            // so the field is never blank when the modal opens.
-            name:
-                (compType?.name && String(compType.name).trim()) ||
-                (tag && String(tag).trim()) ||
-                comp.componentName ||
-                ''
-        },
-        onSubmit: async (values, actions) => {
-            actions.setSubmitting(false)
+    const initialValues: any = {
+        componentId,
+        path: '',
+        fields: [],
+        isEnum: false,
+        isMainType: false,
+        definitionType: 'auto' as 'zod-object' | 'json-schema' | 'auto',
+        tags: [] as string[],
+        customInstanceName: '',
+        customInitInstanceName: '',
+        ...compType,
+        // Resolve `name` AFTER the spread so an empty or missing
+        // compType.name does not overwrite the component's tag.
+        // Falls back to the component name (e.g. 'form', 'table')
+        // so the field is never blank when the modal opens.
+        name:
+            (compType?.name && String(compType.name).trim()) ||
+            (tag && String(tag).trim()) ||
+            comp.componentName ||
+            ''
+    }
+    const rhfForm = useZodForm<any>({
+        schema: z.object({}).passthrough() as never,
+        defaultValues: initialValues
+    })
+    const formik = useFormikCompat<any>(rhfForm, async (values) => {
+        if (!validate() || !componentId) return
 
-            if (!validate() || !componentId) return
-
-            const updatedComponent = {
-                ...values,
-                fields: (values.fields as LabeledElementField[]).map((field) => {
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { label, ...rest } = field // Removes the 'label' property
-                    return {
-                        ...rest,
-                        type: rest.type || 'string',
-                        defaultValue: getDefaultValue(field),
-                        ...(rest.fields && {
-                            fields: rest.fields.map((field) => ({
-                                ...field,
-                                type: field.type || 'string',
-                                defaultValue: getDefaultValue(field)
-                            }))
+        const updatedComponent = {
+            ...values,
+            fields: (values.fields as LabeledElementField[]).map((field) => {
+                const persisted = fieldToPersistedFormat(field)
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { label, ...rest } = persisted
+                return {
+                    ...rest,
+                    type: rest.type || 'string',
+                    defaultValue: getDefaultValue(persisted),
+                    ...(rest.fields && {
+                        fields: rest.fields.map((nested) => {
+                            const nestedPersisted = fieldToPersistedFormat(nested)
+                            return {
+                                ...nestedPersisted,
+                                type: nestedPersisted.type || 'string',
+                                defaultValue: getDefaultValue(nestedPersisted)
+                            }
                         })
-                    }
-                })
-            }
-
-            createOrUpdateType({
-                ...updatedComponent,
-                isEnum: !!values.isEnum,
-                isMainType: !!values.isMainType,
-                definitionType: values.definitionType ?? 'auto',
-                tags: Array.isArray(values.tags)
-                    ? values.tags.filter((tag: string) => tag.trim().length > 0)
-                    : [],
-                customInstanceName: values.customInstanceName?.trim() || undefined,
-                customInitInstanceName: values.customInitInstanceName?.trim() || undefined,
-                path: !newBinding && typeFilePath ? typeFilePath : ''
-            })
-
-            //TODO For revisions]
-            if (comp.componentName === COMPONENT.Form) {
-                //TODOREVISAR
-                const data = formDefaultData
-                const newState = {
-                    state: {
-                        id: getId(),
-                        type:
-                            (data &&
-                                'defaultValues' in data &&
-                                data.defaultValues?.properties?.type?.default) ??
-                            'any',
-                        name: `${
-                            values.name ??
-                            (
-                                data &&
-                                    'defaultValues' in data &&
-                                    data.defaultValues?.properties?.name?.default
-                            ) ??
-                            ''
-                        }Data`,
-                        defaultValue: `init${capitalize(values.name)}`,
-                        imports:
-                            (data &&
-                                'defaultValues' in data &&
-                                data.defaultValues?.properties?.imports?.default) ??
-                            [],
-                        generate: true
-                    }
-                }
-
-                handleUpdateChildComponent(componentId, {
-                    dataType: values.name,
-                    data: {
-                        ...comp.data,
-                        defaultValues: newState
-                    }
-                })
-            } else {
-                handleUpdateChildComponent(componentId, {
-                    dataType: values.name
-                })
-            }
-
-            values.fields.forEach(({ componentId: id, name }) => {
-                const component = componentMap.get(id)
-                if (component) {
-                    handleUpdateChildComponent(id, {
-                        tag: name
                     })
                 }
             })
-
-            setOpen(false)
         }
+
+        createOrUpdateType({
+            ...updatedComponent,
+            isEnum: !!values.isEnum,
+            isMainType: !!values.isMainType,
+            definitionType: values.definitionType ?? 'auto',
+            tags: Array.isArray(values.tags)
+                ? values.tags.filter((tag: string) => tag.trim().length > 0)
+                : [],
+            customInstanceName: values.customInstanceName?.trim() || undefined,
+            customInitInstanceName: values.customInitInstanceName?.trim() || undefined,
+            path: !newBinding && typeFilePath ? typeFilePath : ''
+        })
+
+        //TODO For revisions]
+        if (comp.componentName === COMPONENT.Form) {
+            //TODOREVISAR
+            const data = formDefaultData
+            const newState = {
+                state: {
+                    id: getId(),
+                    type:
+                        (data &&
+                            'defaultValues' in data &&
+                            data.defaultValues?.properties?.type?.default) ??
+                        'any',
+                    name: `${
+                        values.name ??
+                        (
+                            data &&
+                                'defaultValues' in data &&
+                                data.defaultValues?.properties?.name?.default
+                        ) ??
+                        ''
+                    }Data`,
+                    defaultValue: `init${capitalize(values.name)}`,
+                    imports:
+                        (data &&
+                            'defaultValues' in data &&
+                            data.defaultValues?.properties?.imports?.default) ??
+                        [],
+                    generate: true
+                }
+            }
+
+            handleUpdateChildComponent(componentId, {
+                dataType: values.name,
+                data: {
+                    ...comp.data,
+                    defaultValues: newState
+                }
+            })
+        } else {
+            handleUpdateChildComponent(componentId, {
+                dataType: values.name
+            })
+        }
+
+        values.fields.forEach(({ componentId: id, name }) => {
+            const component = componentMap.get(id)
+            if (component) {
+                handleUpdateChildComponent(id, {
+                    tag: name
+                })
+            }
+        })
+
+        setOpen(false)
     })
 
     const isEnum = !!formik.values.isEnum
@@ -351,7 +424,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
           ]
         : [
               { key: 'label', name: t('label'), type: 'label' },
-              { key: 'name', name: t('name'), type: 'string', readonly: !newBinding },
+              { key: 'name', name: t('name'), type: 'text', readonly: !newBinding },
               ...(!newBinding
                   ? [
                         {
@@ -393,7 +466,7 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                         } */
                     ]
                   : []),
-              { key: 'defaultValue', name: t('defaultValue'), type: 'string' },
+              { key: 'defaultValue', name: t('defaultValue'), type: 'text' },
               {
                   key: 'group',
                   name: '',
@@ -485,14 +558,16 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             }
 
             if (shouldInclude && !parentIsRepeater) {
-                fields.push({
-                    ...defaultFieldType,
-                    name: deriveFieldName(child),
-                    componentId: child.id,
-                    label: child.properties.label ?? child.properties.headerTitle ?? child.label,
-                    // Include type if available
-                    type: child.properties.dataProperties?.type || undefined
-                })
+                const inferredType = child.properties.dataProperties?.type || 'string'
+                fields.push(
+                    normalizeFieldType({
+                        ...defaultFieldType,
+                        name: deriveFieldName(child),
+                        componentId: child.id,
+                        label: child.properties.label ?? child.properties.headerTitle ?? child.label,
+                        type: inferredType
+                    })
+                )
 
                 componentMap.set(child.id, child)
             }
@@ -522,12 +597,8 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                 // value is empty (legacy data saved before
                 // deriveFieldName fell back through label) — otherwise
                 // keep whatever the user typed manually.
-                name:
-                    (currentField?.name && String(currentField.name).trim()) ||
-                    field.name,
-                label:
-                    (currentField?.label && String(currentField.label).trim()) ||
-                    field.label
+                name: (currentField?.name && String(currentField.name).trim()) || field.name,
+                label: (currentField?.label && String(currentField.label).trim()) || field.label
             }
 
             if (field.fields && currentField?.fields) {
@@ -563,6 +634,11 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
             handleChangeValueObject(formik, 'required', position, field.required, 'fields')
 
             handleChangeValueObject(formik, 'name', position, result, 'fields')
+        } else if (element === 'type') {
+            const fields = [...(formik.values.fields || [])]
+            const current = fields[position] as LabeledElementField
+            fields[position] = applyTypeSelection(current, String(result))
+            formik.setFieldValue('fields', fields)
         } else {
             handleChangeValueObject(formik, element, position, result, 'fields')
         }
@@ -576,22 +652,20 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
 
     return (
         <>
-            <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-                <IGRPDialogContentPrimitive className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px]! lg:max-w-[900px]! max-h-[80vh]">
-                    <IGRPScrollAreaPrimitive className="h-full p-4 max-h-[70vh] overflow-auto">
-                        <IGRPDialogHeaderPrimitive className="mb-4">
-                            <IGRPDialogTitlePrimitive>
-                                Binding Configuration
-                            </IGRPDialogTitlePrimitive>
-                            <IGRPDialogDescriptionPrimitive>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="p-0 flex flex-col overflow-hidden [--header-height-three:calc(--spacing(75))] sm:max-w-[800px]! lg:max-w-[900px]! max-h-[80vh]">
+                    <ScrollArea className="h-full p-4 max-h-[70vh] overflow-auto">
+                        <DialogHeader className="mb-4">
+                            <DialogTitle>Binding Configuration</DialogTitle>
+                            <DialogDescription>
                                 Make changes to your Binding Configuration here. Click save when
                                 you&apos;re done.
-                            </IGRPDialogDescriptionPrimitive>
-                        </IGRPDialogHeaderPrimitive>
+                            </DialogDescription>
+                        </DialogHeader>
                         <form onSubmit={formik.handleSubmit} className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="relative flex rounded-lg border bg-muted p-0.5 string-sm space-x-2">
-                                    <IGRPButtonPrimitive
+                                    <Button
                                         type="button"
                                         variant={newBinding ? 'outline' : 'ghost'}
                                         onClick={() => setNewBinding(true)}
@@ -599,8 +673,8 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                         size="sm"
                                     >
                                         New
-                                    </IGRPButtonPrimitive>
-                                    <IGRPButtonPrimitive
+                                    </Button>
+                                    <Button
                                         type="button"
                                         onClick={() => setNewBinding(false)}
                                         className="rounded-lg"
@@ -608,17 +682,17 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                         variant={!newBinding ? 'outline' : 'ghost'}
                                     >
                                         Existing
-                                    </IGRPButtonPrimitive>
+                                    </Button>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     {/* {newBinding && (
                                         <div className="flex items-center gap-2">
-                                            <IGRPLabelPrimitive
+                                            <Label
                                                 htmlFor="isEnum"
                                                 className="string-sm cursor-pointer"
                                             >
                                                 {t('enumType')}
-                                            </IGRPLabelPrimitive>
+                                            </Label>
                                             <IGRPSwitch
                                                 id="isEnum"
                                                 checked={isEnum}
@@ -629,12 +703,12 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                         </div>
                                     )} */}
                                     <div className="flex items-center gap-2">
-                                        <IGRPLabelPrimitive
+                                        <Label
                                             htmlFor="definitionType"
                                             className="string-sm whitespace-nowrap"
                                         >
                                             {t('definitionType')}
-                                        </IGRPLabelPrimitive>
+                                        </Label>
                                         <select
                                             id="definitionType"
                                             value={
@@ -693,9 +767,9 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                 </summary>
                                 <div className="space-y-3 px-3 pb-3 pt-1">
                                     <div className="space-y-1">
-                                        <IGRPLabelPrimitive htmlFor="tags" className="string-sm">
+                                        <Label htmlFor="tags" className="string-sm">
                                             {t('typeTags')}
-                                        </IGRPLabelPrimitive>
+                                        </Label>
                                         <input
                                             id="tags"
                                             value={(formik.values.tags ?? []).join(', ')}
@@ -721,23 +795,23 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                                 formik.setFieldValue('isMainType', checked)
                                             }
                                         />
-                                        <IGRPLabelPrimitive
+                                        <Label
                                             htmlFor="isMainType"
                                             className="string-sm cursor-pointer"
                                         >
                                             {t('mainType')}
-                                        </IGRPLabelPrimitive>
+                                        </Label>
                                     </div>
 
                                     {formik.values.definitionType !== 'auto' && (
                                         <>
                                             <div className="space-y-1">
-                                                <IGRPLabelPrimitive
+                                                <Label
                                                     htmlFor="customInstanceName"
                                                     className="string-sm"
                                                 >
                                                     {t('customInstanceName')}
-                                                </IGRPLabelPrimitive>
+                                                </Label>
                                                 <input
                                                     id="customInstanceName"
                                                     value={formik.values.customInstanceName ?? ''}
@@ -752,12 +826,12 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <IGRPLabelPrimitive
+                                                <Label
                                                     htmlFor="customInitInstanceName"
                                                     className="string-sm"
                                                 >
                                                     {t('customInitInstanceName')}
-                                                </IGRPLabelPrimitive>
+                                                </Label>
                                                 <input
                                                     id="customInitInstanceName"
                                                     value={
@@ -794,17 +868,17 @@ export const BindingConfigurationModal = ({ comp, open, setOpen }: BindingProps)
                                 </div>
                             )}
 
-                            <IGRPDialogFooterPrimitive className="space-x-2">
-                                <IGRPDialogClosePrimitive>Close</IGRPDialogClosePrimitive>
-                                <IGRPButtonPrimitive type="submit" disabled={formik.isSubmitting}>
+                            <DialogFooter className="space-x-2">
+                                <DialogClose>Close</DialogClose>
+                                <Button type="submit" disabled={formik.isSubmitting}>
                                     {formik.isSubmitting && <Loader2 className="animate-spin" />}
                                     Save changes
-                                </IGRPButtonPrimitive>
-                            </IGRPDialogFooterPrimitive>
+                                </Button>
+                            </DialogFooter>
                         </form>
-                    </IGRPScrollAreaPrimitive>
-                </IGRPDialogContentPrimitive>
-            </IGRPDialogPrimitive>
+                    </ScrollArea>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }
