@@ -1,4 +1,10 @@
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@renderer/components/ui/sidebar'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
 import { TabProvider } from '@renderer/components/navigation/TabContext'
 import { DataModelsPanel } from '@renderer/features/data-models'
 import { cn } from '@renderer/lib/utils'
@@ -48,20 +54,31 @@ const RailButton = ({
     onClick: () => void
 }): JSX.Element => {
     const Icon = item.icon
+    // Use shadcn `Tooltip` instead of the native `title` attribute — the
+    // native one renders an OS-level light tooltip that ignores the app
+    // theme (always white on macOS), breaking the dark-mode chrome.
     return (
-        <button
-            type="button"
-            onClick={onClick}
-            title={item.label}
-            className={cn(
-                'flex flex-col items-center justify-center gap-1 rounded-lg py-2 text-xs font-medium transition-colors',
-                'hover:bg-accent',
-                active ? 'text-primary' : 'text-muted-foreground'
-            )}
-        >
-            <Icon className="h-5 w-5" />
-            <span className="w-16 truncate text-center text-ellipsis">{item.label}</span>
-        </button>
+        <TooltipProvider delayDuration={300}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <button
+                        type="button"
+                        onClick={onClick}
+                        className={cn(
+                            'flex flex-col items-center justify-center gap-1 rounded-lg py-2 text-xs font-medium transition-colors',
+                            'hover:bg-accent',
+                            active ? 'text-primary' : 'text-muted-foreground'
+                        )}
+                    >
+                        <Icon className="h-5 w-5" />
+                        <span className="w-16 truncate text-center text-ellipsis">
+                            {item.label}
+                        </span>
+                    </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">{item.label}</TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     )
 }
 
