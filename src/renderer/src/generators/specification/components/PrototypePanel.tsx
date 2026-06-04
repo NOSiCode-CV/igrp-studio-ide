@@ -40,8 +40,6 @@ import {
     History,
     Layout as LayoutIcon,
     LayoutGrid,
-    Library,
-    Loader2,
     MessageSquare,
     Monitor,
     MoveHorizontal,
@@ -77,17 +75,16 @@ import {
     type EnginePaletteComponent
 } from '@renderer/features/component-palette'
 import { useEngineCatalog } from '@renderer/features/engine-catalog'
-import {
-    usePrototypeSkills,
-    type InstalledSkillSummary,
-    type SkillUpdateSummary
-} from '../hooks/usePrototypeSkills'
+import { usePrototypeSkills } from '../hooks/usePrototypeSkills'
 import { GOLDEN_LIST_PAGE_EXAMPLE } from './prototype/ai-prompts/golden-list-example'
 import { buildEngineCatalogBlock } from './prototype/ai-prompts/engine-catalog'
 import { buildSkillContextBlock } from './prototype/ai-prompts/skill-context'
 import { buildTree, type TreeNode } from './prototype/files/file-tree'
 import { languageFromExt, monacoOptions } from './prototype/files/monaco-config'
 import { computePreviewUrl } from './prototype/preview/url'
+import { FirstRunBanner } from './prototype/banners/FirstRunBanner'
+import { SkillInstallBanner } from './prototype/banners/SkillInstallBanner'
+import { SkillUpdateBanner } from './prototype/banners/SkillUpdateBanner'
 import {
     readPersistedAttachedIds,
     writePersistedAttachedIds
@@ -103,11 +100,9 @@ import {
     readPersistedCustomViewport,
     writePersistedCustomViewport
 } from './prototype/persistence/custom-viewport'
-import {
-    CANONICAL_SKILL,
-    SKILL_BANNER_DISMISS_KEY_PREFIX,
-    SKILL_UPDATE_DISMISS_KEY_PREFIX
-} from './prototype/persistence/skill-banner-dismiss'
+// Skill banner dismissal keys live in
+// `./prototype/persistence/skill-banner-dismiss.ts` and are now consumed
+// directly by the extracted banners (P3).
 
 interface PanelProps {
     basePath?: string
@@ -1077,224 +1072,8 @@ const ComponentPalettePane = ({
     )
 }
 
-// ─── Skill install banner (M-Skill Fase 2) ──────────────────────────────
-//
-// Surfaces a one-click install for the canonical Prototype skill when it
-// isn't present in `.agents/skills/`. Stays out of the way once dismissed
-// (per-project, localStorage). Install spawns the CLI via IPC and refreshes
-// the local skill list on success.
-
-// Skill banner dismissal keys moved to
-// `./prototype/persistence/skill-banner-dismiss.ts` (P1).
-
-const SkillInstallBanner = ({
-    basePath,
-    skills,
-    installSkill
-}: {
-    basePath: string | undefined
-    skills: InstalledSkillSummary[]
-    installSkill: (name: string) => Promise<{ ok: boolean; error?: string }>
-}): JSX.Element | null => {
-    const [installing, setInstalling] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-    const dismissKey = basePath ? `${SKILL_BANNER_DISMISS_KEY_PREFIX}${basePath}` : null
-    const [dismissed, setDismissed] = useState<boolean>(() => {
-        if (!dismissKey || typeof window === 'undefined') return false
-        try {
-            return window.localStorage?.getItem(dismissKey) === '1'
-        } catch {
-            return false
-        }
-    })
-
-    const installed = useMemo(() => skills.some((s) => s.name === CANONICAL_SKILL), [skills])
-
-    if (!basePath || installed || dismissed) return null
-
-    const dismiss = () => {
-        setDismissed(true)
-        if (!dismissKey) return
-        try {
-            window.localStorage?.setItem(dismissKey, '1')
-        } catch {
-            // noop — private mode etc.
-        }
-    }
-
-    const handleInstall = async () => {
-        setInstalling(true)
-        setError(null)
-        const result = await installSkill(CANONICAL_SKILL)
-        setInstalling(false)
-        if (!result.ok) {
-            setError(result.error ?? 'Install failed.')
-        }
-    }
-
-    return (
-        <div className="flex items-center gap-3 border-b bg-blue-500/5 px-4 py-2 text-[11px]">
-            <Library size={14} className="text-blue-500" />
-            <div className="flex-1">
-                <span className="font-medium">Recommended:</span> install the{' '}
-                <code className="rounded bg-muted px-1 py-0.5 font-mono">{CANONICAL_SKILL}</code>{' '}
-                skill for better generation quality.
-                {error && (
-                    <span className="ml-2 text-red-500" title={error}>
-                        — {error.length > 80 ? `${error.slice(0, 80)}…` : error}
-                    </span>
-                )}
-            </div>
-            <button
-                type="button"
-                onClick={handleInstall}
-                disabled={installing}
-                className={cn(
-                    'flex items-center gap-1 rounded-md border px-2 py-1 text-[10.5px] font-medium transition-colors',
-                    installing
-                        ? 'border-border bg-card text-muted-foreground'
-                        : 'border-blue-500/30 bg-blue-500/10 text-blue-600 hover:bg-blue-500/15'
-                )}
-            >
-                {installing ? (
-                    <Loader2 size={11} className="animate-spin" />
-                ) : (
-                    <Download size={11} />
-                )}
-                {installing ? 'Installing…' : 'Install'}
-            </button>
-            <button
-                type="button"
-                onClick={dismiss}
-                className="text-[10.5px] text-muted-foreground hover:text-foreground"
-                title="Dismiss"
-            >
-                ✕
-            </button>
-        </div>
-    )
-}
-
-// Update banner — same visual language as install, in amber, surfaces ONE
-// skill at a time (the first with `hasUpdate`). Dismiss is per
-// `${basePath}:${name}:${latest}` so a new version pops the banner again,
-// while clicking ✕ on 1.0.2 doesn't keep silencing 1.0.3.
-const SkillUpdateBanner = ({
-    basePath,
-    updates,
-    updateSkill
-}: {
-    basePath: string | undefined
-    updates: SkillUpdateSummary[]
-    updateSkill: (name: string) => Promise<{ ok: boolean; error?: string }>
-}): JSX.Element | null => {
-    const [updating, setUpdating] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-    const [dismissedKeys, setDismissedKeys] = useState<Set<string>>(() => {
-        if (typeof window === 'undefined' || !basePath) return new Set()
-        try {
-            const raw = window.localStorage?.getItem(
-                `${SKILL_UPDATE_DISMISS_KEY_PREFIX}${basePath}`
-            )
-            return raw ? new Set(JSON.parse(raw) as string[]) : new Set()
-        } catch {
-            return new Set()
-        }
-    })
-
-    // First update that isn't dismissed for its (name, latest) tuple.
-    const candidate = useMemo(() => {
-        return (
-            updates.find(
-                (u) => u.hasUpdate && u.latest && !dismissedKeys.has(`${u.name}:${u.latest}`)
-            ) ?? null
-        )
-    }, [updates, dismissedKeys])
-
-    if (!basePath || !candidate) return null
-
-    const dismiss = () => {
-        if (!candidate.latest) return
-        const key = `${candidate.name}:${candidate.latest}`
-        const next = new Set(dismissedKeys)
-        next.add(key)
-        setDismissedKeys(next)
-        try {
-            window.localStorage?.setItem(
-                `${SKILL_UPDATE_DISMISS_KEY_PREFIX}${basePath}`,
-                JSON.stringify(Array.from(next))
-            )
-        } catch {
-            // noop — private mode etc.
-        }
-    }
-
-    const handleUpdate = async () => {
-        setUpdating(true)
-        setError(null)
-        const result = await updateSkill(candidate.name)
-        setUpdating(false)
-        if (!result.ok) {
-            setError(result.error ?? 'Update failed.')
-        }
-        // On success the hook re-checks; the banner will hide itself
-        // when `hasUpdate` flips to false (installed === latest).
-    }
-
-    return (
-        <div className="flex items-center gap-3 border-b bg-amber-500/5 px-4 py-2 text-[11px]">
-            <RefreshCw size={14} className="text-amber-500" />
-            <div className="flex-1">
-                <span className="font-medium">Update available:</span>{' '}
-                <code className="rounded bg-muted px-1 py-0.5 font-mono">{candidate.name}</code>{' '}
-                <span className="text-muted-foreground">
-                    {candidate.installed ?? '?'} → {candidate.latest}
-                </span>
-                {error && (
-                    <span className="ml-2 text-red-500" title={error}>
-                        — {error.length > 80 ? `${error.slice(0, 80)}…` : error}
-                    </span>
-                )}
-            </div>
-            <button
-                type="button"
-                onClick={handleUpdate}
-                disabled={updating}
-                className={cn(
-                    'flex items-center gap-1 rounded-md border px-2 py-1 text-[10.5px] font-medium transition-colors',
-                    updating
-                        ? 'border-border bg-card text-muted-foreground'
-                        : 'border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-400'
-                )}
-            >
-                {updating ? <Loader2 size={11} className="animate-spin" /> : <Download size={11} />}
-                {updating ? 'Updating…' : 'Update'}
-            </button>
-            <button
-                type="button"
-                onClick={dismiss}
-                className="text-[10.5px] text-muted-foreground hover:text-foreground"
-                title="Dismiss until next version"
-            >
-                ✕
-            </button>
-        </div>
-    )
-}
-
-const FirstRunBanner = (): JSX.Element => (
-    <div className="relative overflow-hidden border-b bg-amber-500/5 px-4 py-2 text-[11px] text-amber-700 dark:text-amber-400">
-        <div className="flex items-center gap-2">
-            <Loader2 size={12} className="animate-spin" />
-            <span className="font-medium">Installing dependencies…</span>
-            <span className="text-muted-foreground">
-                first-time setup, ~30s. Live progress in the Logs tab.
-            </span>
-        </div>
-        <div className="absolute bottom-0 left-0 h-0.5 w-1/3 animate-[firstrun_1.4s_linear_infinite] bg-amber-500/60" />
-        <style>{`@keyframes firstrun{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}`}</style>
-    </div>
-)
+// `SkillInstallBanner`, `SkillUpdateBanner`, `FirstRunBanner` moved to
+// `./prototype/banners/{SkillInstallBanner,SkillUpdateBanner,FirstRunBanner}.tsx` (P3).
 
 // ─── Preview ──────────────────────────────────────────────────────────────
 
