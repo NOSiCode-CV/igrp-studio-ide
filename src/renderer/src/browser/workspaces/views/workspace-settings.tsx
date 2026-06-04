@@ -20,16 +20,12 @@ import {
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
 import { setWorkspace } from '@renderer/redux/thunks'
-import { getLocale } from '@renderer/utils'
 import { cn } from '@renderer/lib/utils'
-import { formatDistanceToNow } from 'date-fns'
 import {
     AlertTriangle,
     Check,
-    Clock,
     Copy,
     Info,
-    Search,
     SlidersHorizontal,
     Trash2
 } from 'lucide-react'
@@ -57,7 +53,6 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
     const [isDeleting, setIsDeleting] = useState(false)
     const [copied, setCopied] = useState(false)
     const [activeSection, setActiveSection] = useState<Section>('general')
-    const [searchQuery, setSearchQuery] = useState('')
 
     const dispatch: any = useDispatch()
     const { showSuccessToast } = useToast()
@@ -96,27 +91,13 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
         setTimeout(() => setCopied(false), 2000)
     }
 
-    const filtered = SECTIONS.filter((s) =>
-        t(s.tKey).toLowerCase().includes(searchQuery.toLowerCase())
-    )
-
     return (
         <div className="flex h-full">
 
             {/* Left nav panel */}
-            <div className="w-[200px] shrink-0 flex flex-col gap-0.5 border-r p-3 bg-sidebar shadow-[2px_0_6px_rgba(0,0,0,0.06)]">
-                <div className="relative mb-2">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-                    <Input
-                        type="text"
-                        placeholder="Search preferences..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="h-8 text-xs pl-8"
-                    />
-                </div>
+            <div className="w-[200px] shrink-0 flex flex-col gap-0.5 border-r p-3">
 
-                {filtered.map(({ id, tKey, icon: Icon }) => (
+                {SECTIONS.map(({ id, tKey, icon: Icon }) => (
                     <button
                         key={id}
                         onClick={() => setActiveSection(id)}
@@ -135,20 +116,6 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                     </button>
                 ))}
 
-                <div className="flex-1" />
-
-                {workspace.updatedAt && (
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground px-2 py-1">
-                        <Clock className="h-3.5 w-3.5 shrink-0" />
-                        <span>
-                            {t('lastUpdated')}{' '}
-                            {formatDistanceToNow(workspace.updatedAt, {
-                                addSuffix: true,
-                                locale: getLocale()
-                            })}
-                        </span>
-                    </div>
-                )}
             </div>
 
             {/* Right content */}
