@@ -78,17 +78,16 @@ import {
 } from '@renderer/features/component-palette'
 import { useEngineCatalog } from '@renderer/features/engine-catalog'
 import {
-    pickSkillHints,
     usePrototypeSkills,
     type InstalledSkillSummary,
     type SkillUpdateSummary
 } from '../hooks/usePrototypeSkills'
-import { ALWAYS_INCLUDED_COMPONENTS } from './prototype/ai-prompts/always-included'
 import { GOLDEN_LIST_PAGE_EXAMPLE } from './prototype/ai-prompts/golden-list-example'
-import {
-    ALWAYS_INJECT_SKILL_SECTIONS,
-    SKILL_BLOCK_MAX_BYTES
-} from './prototype/ai-prompts/skill-sections'
+import { buildEngineCatalogBlock } from './prototype/ai-prompts/engine-catalog'
+import { buildSkillContextBlock } from './prototype/ai-prompts/skill-context'
+import { buildTree, type TreeNode } from './prototype/files/file-tree'
+import { languageFromExt, monacoOptions } from './prototype/files/monaco-config'
+import { computePreviewUrl } from './prototype/preview/url'
 import {
     readPersistedAttachedIds,
     writePersistedAttachedIds
@@ -153,245 +152,12 @@ const PALETTE_NAMESPACE = { namespace: 'prototype' as const }
 // are listed but not their value schemas; the LLM has enough signal from
 // labels + property keys + the spec context to produce a valid manifest.
 
-/**
- * Translate a manifest's `path` field into a concrete URL the dev server
- * can serve. Two transformations matter:
- *   - **Route groups** like `(parametrizacao)/categorias` → strip the
- *     `(parametrizacao)/` segment. Route groups are organisational; they
- *     don't appear in the URL.
- *   - **Dynamic segments** like `caixa/dias/[uuid]/atendedores/novo` →
- *     replace `[uuid]` (and friends) with the literal `"preview"` so the
- *     URL resolves to a concrete route.
- *
- * The IGRP framework template wraps engine-generated pages in
- * `src/app/(igrp)/(generated)/<name>/page.tsx`. Both `(igrp)` and
- * `(generated)` are route groups, so they don't appear in the URL —
- * `users` page is served at `/users`, not `/generated/users`. No prefix
- * needed in the computed URL.
- */
-function computePreviewUrl(
-    devUrl: string | null,
-    manifest: { pageName?: string; path?: string } | null | undefined
-): string | null {
-    if (!devUrl || !manifest) return null
-    // Prefer `path` when it has actual segments; fall back to `pageName`.
-    const rawPath =
-        typeof manifest.path === 'string' && manifest.path.trim().length > 0
-            ? manifest.path
-            : manifest.pageName
-    if (!rawPath) return null
-    const normalised = rawPath
-        .replace(/\([^)]*\)\//g, '') // strip route groups
-        .replace(/\[\[\.\.\.[^\]]*\]\]/g, 'preview') // optional catch-alls
-        .replace(/\[\.\.\.[^\]]*\]/g, 'preview') // catch-alls
-        .replace(/\[[^\]]*\]/g, 'preview') // dynamic segments
-        .replace(/^\/+/, '') // belt-and-braces strip leading slash
-    const base = devUrl.replace(/\/+$/, '')
-    return `${base}/${normalised}`
-}
-
+// `computePreviewUrl` moved to `./prototype/preview/url.ts` (P2).
 // M7 golden anatomy + M6.1 always-included component list moved to
 // `./prototype/ai-prompts/{golden-list-example,always-included}.ts` (P1).
 
-/**
- * Build the `## Skill — <name>` block from the most relevant companion
- * sections for the current user message. Returns `null` when no skill is
- * installed OR when the heuristic finds no matching section — caller falls
- * back to the embedded golden anatomy.
- *
- * Token budget: cap at ~6KB total to keep prompt size predictable. When
- * multiple hints would exceed the cap, we trim in selection order (most
- * specific first).
- */
-// `SKILL_BLOCK_MAX_BYTES` + `ALWAYS_INJECT_SKILL_SECTIONS` moved to
-// `./prototype/ai-prompts/skill-sections.ts` (P1).
-
-async function buildSkillContextBlock(
-    userMessage: string,
-    skills: InstalledSkillSummary[],
-    readSection: (
-        skillName: string,
-        filename: string,
-        sectionHeading: string
-    ) => Promise<string | null>
-): Promise<string | null> {
-    if (!skills || skills.length === 0) return null
-    const studio = skills.find((s) => s.name === 'igrp-studio-metadata')
-
-    // 1. Always-on baseline sections — engine rules that apply to every
-    //    generation. We pull them from SKILL.md (or companions) by exact
-    //    heading. If the installed skill is older than the version that
-    //    introduced the heading, `readSection` returns null and we skip
-    //    silently (no broken-link noise in the prompt).
-    const baseline: string[] = []
-    let usedBytes = 0
-    if (studio) {
-        for (const item of ALWAYS_INJECT_SKILL_SECTIONS) {
-            if (usedBytes >= SKILL_BLOCK_MAX_BYTES) break
-            // `readSection` is wired to the renderer hook's
-            // `readCompanionSection`, which for `SKILL.md` reads the same
-            // body that listSkills already cached. That's fine — the IPC
-            // round-trip is short and the hook caches by `${name}/${file}`.
-            const content = await readSection(studio.name, item.filename, item.heading)
-            if (!content) continue
-            const remaining = SKILL_BLOCK_MAX_BYTES - usedBytes
-            const slice =
-                content.length > remaining
-                    ? `${content.slice(0, remaining)}\n…(truncated)`
-                    : content
-            baseline.push(
-                [`### Baseline — ${studio.name}/${item.filename} § "${item.heading}"`, slice].join(
-                    '\n'
-                )
-            )
-            usedBytes += slice.length
-        }
-    }
-
-    // 2. Turn-specific hints — `pickSkillHints` selects companion sections
-    //    matching keywords in the user message (list/form/modal/etc).
-    const hints = pickSkillHints(skills, userMessage)
-
-    if (hints.length === 0) {
-        // No hint matched. If we have at least a baseline, ship it alone.
-        if (baseline.length > 0) {
-            return ['## Skill — relevant patterns for this turn', '', ...baseline].join('\n\n')
-        }
-        // Otherwise fall back to dumping SKILL.md body so the LLM at least
-        // sees the corpus map + "when to invoke" guidance.
-        if (!studio) return null
-        return [
-            `## Skill — ${studio.frontmatter.name ?? studio.name}`,
-            '',
-            (studio.frontmatter.description ?? '').trim(),
-            '',
-            studio.skillMdBody.trim().slice(0, SKILL_BLOCK_MAX_BYTES)
-        ].join('\n')
-    }
-
-    const sections: string[] = []
-    for (const hint of hints) {
-        if (usedBytes >= SKILL_BLOCK_MAX_BYTES) break
-        const content = hint.sectionHeading
-            ? await readSection(hint.skillName, hint.filename, hint.sectionHeading)
-            : await readSection(hint.skillName, hint.filename, '')
-        if (!content) continue
-        const remaining = SKILL_BLOCK_MAX_BYTES - usedBytes
-        const slice =
-            content.length > remaining ? `${content.slice(0, remaining)}\n…(truncated)` : content
-        sections.push(
-            [
-                `### From ${hint.skillName}/${hint.filename}${hint.sectionHeading ? ` — section "${hint.sectionHeading}"` : ''}`,
-                slice
-            ].join('\n')
-        )
-        usedBytes += slice.length
-    }
-    if (sections.length === 0 && baseline.length === 0) return null
-    return ['## Skill — relevant patterns for this turn', '', ...baseline, ...sections].join('\n\n')
-}
-
-function buildEngineCatalogBlock(
-    componentsRegistered: ReadonlyArray<{
-        name: string
-        label?: string
-        group?: string
-        properties?: unknown
-        deprecated?: boolean
-    }>,
-    pinned: ReadonlyArray<{ id: string; name: string; groupLabel: string }>
-): string {
-    if (componentsRegistered.length === 0) {
-        // Engine catalog hasn't loaded yet (or is empty). Fall back to a hint
-        // so the LLM doesn't fabricate component names from training data.
-        return [
-            '## Engine catalog',
-            '',
-            '_Catalog not loaded yet — emit a minimal placeholder page using `section` + `paragraph` only._'
-        ].join('\n')
-    }
-
-    const wantedNames = new Set<string>(ALWAYS_INCLUDED_COMPONENTS)
-    for (const p of pinned) wantedNames.add(p.id)
-
-    type Entry = {
-        name: string
-        label: string
-        group: string
-        propertyKeys: string[]
-        deprecated: boolean
-    }
-
-    const entriesByGroup = new Map<string, Entry[]>()
-    for (const c of componentsRegistered) {
-        if (!wantedNames.has(c.name)) continue
-        const props =
-            c.properties && typeof c.properties === 'object'
-                ? Object.keys(c.properties as Record<string, unknown>)
-                : []
-        const group = c.group || 'others'
-        const entry: Entry = {
-            name: c.name,
-            label: c.label || c.name,
-            group,
-            propertyKeys: props.slice(0, 8), // cap to keep prompt tight
-            deprecated: Boolean(c.deprecated)
-        }
-        const list = entriesByGroup.get(group) ?? []
-        list.push(entry)
-        entriesByGroup.set(group, list)
-    }
-
-    const lines: string[] = ['## Engine catalog (allowed `componentName` values)', '']
-    lines.push(
-        "Use these — and only these — values for the `componentName` field of each `StructuredComponent`. Names are listed under their engine group. Property keys after the dash are the recognised props for that component (omit any prop you don't need).",
-        ''
-    )
-
-    // Stable group order: prefer the curated `GROUP_LABELS` insertion order,
-    // then anything else alphabetical.
-    const groupOrder = [
-        'structure',
-        'containers',
-        'layout',
-        'typography',
-        'formElements',
-        'basicElements',
-        'dataDisplay',
-        'widget',
-        'advanced',
-        'appComponents',
-        'customComponents'
-    ]
-    const orderedGroups = Array.from(entriesByGroup.keys()).sort((a, b) => {
-        const ia = groupOrder.indexOf(a)
-        const ib = groupOrder.indexOf(b)
-        if (ia === -1 && ib === -1) return a.localeCompare(b)
-        if (ia === -1) return 1
-        if (ib === -1) return -1
-        return ia - ib
-    })
-
-    for (const group of orderedGroups) {
-        const entries = entriesByGroup.get(group)
-        if (!entries || entries.length === 0) continue
-        lines.push(`### ${group}`)
-        for (const e of entries) {
-            const propsHint =
-                e.propertyKeys.length > 0 ? ` — props: ${e.propertyKeys.join(', ')}` : ''
-            const depHint = e.deprecated ? ' _(deprecated — avoid unless requested)_' : ''
-            lines.push(`- \`${e.name}\` (${e.label})${propsHint}${depHint}`)
-        }
-        lines.push('')
-    }
-
-    if (pinned.length > 0) {
-        lines.push('### Pinned by user (prioritise these for this turn)')
-        for (const p of pinned) lines.push(`- \`${p.id}\` (${p.name}, ${p.groupLabel})`)
-    }
-
-    return lines.join('\n')
-}
+// `buildSkillContextBlock` moved to `./prototype/ai-prompts/skill-context.ts` (P2).
+// `buildEngineCatalogBlock` moved to `./prototype/ai-prompts/engine-catalog.ts` (P2).
 
 // Custom viewport width (M4.19) moved to
 // `./prototype/persistence/custom-viewport.ts` (P1).
@@ -2053,46 +1819,8 @@ const PreviewPane = ({
 }
 
 // ─── Files ────────────────────────────────────────────────────────────────
-
-interface TreeNode {
-    name: string
-    path: string
-    type: 'file' | 'folder'
-    depth: number
-    children?: TreeNode[]
-    status?: FileChangeKind
-}
-
-function buildTree(files: PrototypeFile[], changes: Record<string, FileChangeKind>): TreeNode[] {
-    const root: TreeNode[] = []
-    const dirs = new Map<string, TreeNode>()
-
-    for (const file of files) {
-        const segments = file.path.split('/')
-        const depth = segments.length - 1
-        const node: TreeNode = {
-            name: segments[segments.length - 1],
-            path: file.path,
-            type: file.type,
-            depth,
-            status: changes[file.path]
-        }
-        if (depth === 0) {
-            root.push(node)
-        } else {
-            const parentPath = segments.slice(0, -1).join('/')
-            const parent = dirs.get(parentPath)
-            if (parent) {
-                parent.children = parent.children ?? []
-                parent.children.push(node)
-            } else {
-                root.push(node)
-            }
-        }
-        if (file.type === 'folder') dirs.set(file.path, node)
-    }
-    return root
-}
+//
+// `TreeNode` + `buildTree` moved to `./prototype/files/file-tree.ts` (P2).
 
 const FilesPane = ({ basePath }: { basePath?: string }): JSX.Element => {
     const dispatch = useDispatch<any>()
@@ -2154,66 +1882,9 @@ const FilesPane = ({ basePath }: { basePath?: string }): JSX.Element => {
 }
 
 // ─── File viewer (Monaco read-only + optional diff vs HEAD~1) ────────────
-
-const languageFromExt = (path: string): string => {
-    const ext = path.split('.').pop()?.toLowerCase() ?? ''
-    switch (ext) {
-        case 'ts':
-        case 'tsx':
-            return 'typescript'
-        case 'js':
-        case 'jsx':
-        case 'mjs':
-        case 'cjs':
-            return 'javascript'
-        case 'json':
-            return 'json'
-        case 'md':
-        case 'markdown':
-            return 'markdown'
-        case 'css':
-            return 'css'
-        case 'scss':
-        case 'sass':
-            return 'scss'
-        case 'html':
-        case 'htm':
-            return 'html'
-        case 'yml':
-        case 'yaml':
-            return 'yaml'
-        case 'sh':
-        case 'bash':
-        case 'zsh':
-            return 'shell'
-        case 'sql':
-            return 'sql'
-        case 'py':
-            return 'python'
-        case 'rb':
-            return 'ruby'
-        case 'go':
-            return 'go'
-        case 'rs':
-            return 'rust'
-        default:
-            return 'plaintext'
-    }
-}
-
-const monacoOptions = {
-    readOnly: true,
-    fontSize: 13,
-    fontFamily:
-        'JetBrains Mono, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-    minimap: { enabled: false },
-    wordWrap: 'on' as const,
-    scrollBeyondLastLine: false,
-    renderLineHighlight: 'none' as const,
-    folding: true,
-    glyphMargin: false,
-    padding: { top: 12, bottom: 12 }
-}
+//
+// `languageFromExt` + `monacoOptions` moved to
+// `./prototype/files/monaco-config.ts` (P2).
 
 const FileViewer = ({
     basePath,
