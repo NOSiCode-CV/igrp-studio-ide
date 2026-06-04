@@ -83,6 +83,32 @@ import {
     type InstalledSkillSummary,
     type SkillUpdateSummary
 } from '../hooks/usePrototypeSkills'
+import { ALWAYS_INCLUDED_COMPONENTS } from './prototype/ai-prompts/always-included'
+import { GOLDEN_LIST_PAGE_EXAMPLE } from './prototype/ai-prompts/golden-list-example'
+import {
+    ALWAYS_INJECT_SKILL_SECTIONS,
+    SKILL_BLOCK_MAX_BYTES
+} from './prototype/ai-prompts/skill-sections'
+import {
+    readPersistedAttachedIds,
+    writePersistedAttachedIds
+} from './prototype/persistence/attached-ids'
+import {
+    MIN_CHAT_WIDTH,
+    readPersistedChatWidth,
+    writePersistedChatWidth
+} from './prototype/persistence/chat-width'
+import {
+    MAX_CUSTOM_VIEWPORT,
+    MIN_CUSTOM_VIEWPORT,
+    readPersistedCustomViewport,
+    writePersistedCustomViewport
+} from './prototype/persistence/custom-viewport'
+import {
+    CANONICAL_SKILL,
+    SKILL_BANNER_DISMISS_KEY_PREFIX,
+    SKILL_UPDATE_DISMISS_KEY_PREFIX
+} from './prototype/persistence/skill-banner-dismiss'
 
 interface PanelProps {
     basePath?: string
@@ -110,57 +136,8 @@ const TABS: { id: PrototypeTab; label: string }[] = [
 
 type ChatPanelMode = 'chat' | 'palette'
 
-// ─── Persistence helpers ──────────────────────────────────────────────────
-//
-// Chat width is global (all projects share the same comfortable size).
-// Attached spec ids are per-project (each spec has its own picks).
-
-const CHAT_WIDTH_KEY = 'spec.prototype.chatWidth'
-// Default chosen to fit the AI composer comfortably without dominating the
-// main pane. Previous default (480) felt oversized once the palette tab
-// landed; sticking to ~33% of a 1280-wide window feels balanced.
-const DEFAULT_CHAT_WIDTH = 380
-const MIN_CHAT_WIDTH = 300
-// Upper guard for the persisted value. localStorage can carry over from
-// earlier builds when the user dragged way too wide; clamp on read so a
-// stale 800px doesn't follow them forever.
-const MAX_PERSISTED_CHAT_WIDTH = 560
-
-const readPersistedChatWidth = (): number => {
-    if (typeof window === 'undefined') return DEFAULT_CHAT_WIDTH
-    try {
-        const raw = window.localStorage?.getItem(CHAT_WIDTH_KEY)
-        const parsed = raw ? Number(raw) : NaN
-        if (!Number.isFinite(parsed) || parsed < MIN_CHAT_WIDTH) return DEFAULT_CHAT_WIDTH
-        return Math.min(parsed, MAX_PERSISTED_CHAT_WIDTH)
-    } catch {
-        return DEFAULT_CHAT_WIDTH
-    }
-}
-
-const attachedIdsKey = (basePath?: string): string =>
-    basePath ? `spec.prototype.attachedSpecIds.${basePath}` : ''
-
-const readPersistedAttachedIds = (basePath?: string): string[] => {
-    if (!basePath || typeof window === 'undefined') return []
-    try {
-        const raw = window.localStorage?.getItem(attachedIdsKey(basePath))
-        if (!raw) return []
-        const parsed = JSON.parse(raw)
-        return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : []
-    } catch {
-        return []
-    }
-}
-
-const writePersistedAttachedIds = (basePath: string | undefined, ids: string[]): void => {
-    if (!basePath || typeof window === 'undefined') return
-    try {
-        window.localStorage?.setItem(attachedIdsKey(basePath), JSON.stringify(ids))
-    } catch {
-        // noop — private mode etc.
-    }
-}
+// Persistence helpers moved to `./prototype/persistence/{chat-width,
+// attached-ids,custom-viewport,skill-banner-dismiss}.ts` (P1).
 
 // Pinned palette components (M4.28) live in `features/component-palette` so
 // the persistence shape can be reused by future generators that want their
@@ -213,238 +190,8 @@ function computePreviewUrl(
     return `${base}/${normalised}`
 }
 
-// M7 — golden anatomy embedded in the system prompt so the LLM sees the
-// real shape it has to emit (engine `additionalProperties: false` + Next.js
-// route-segment regex on `path` are unforgiving when the LLM extrapolates
-// from training data). Built from an anonymised version of a real validated
-// manifest (`inss-sisgb-core-mono-frontend/.igrpstudio/pages/contribuintes.json`).
-// Demonstrates: `page` → `section` → `pageHeader`, `grid` of `statsCard`,
-// filter strip (`container` + `inputSearch` + `flex` + `button`), `separator`
-// gated by visibility rule, `grid` of `combobox` + `datePickerRange`, and a
-// `table` with `tableColumns` cells + `tableActionListCell` actions.
-const GOLDEN_LIST_PAGE_EXAMPLE = JSON.stringify(
-    {
-        type: 'page',
-        pageName: 'entities',
-        path: 'entities',
-        description: 'List of entities',
-        forceDynamic: false,
-        id: 'page_entities',
-        args: [],
-        types: [],
-        states: [
-            {
-                id: 'state_showFilter',
-                name: 'showFilter',
-                type: 'boolean',
-                defaultValue: 'false',
-                imports: []
-            },
-            {
-                id: 'state_searchValue',
-                name: 'searchValue',
-                type: 'string',
-                defaultValue: "''",
-                imports: []
-            }
-        ],
-        functions: [],
-        imports: [],
-        components: {
-            id: 'page_root',
-            componentName: 'page',
-            tag: 'page1',
-            label: 'page',
-            properties: { variant: 'default', commonProperties: {} },
-            interactions: {},
-            data: {},
-            children: [
-                {
-                    id: 'section_main',
-                    componentName: 'section',
-                    tag: 'section1',
-                    label: 'section',
-                    properties: { spaceX: '3', spaceY: '6', commonProperties: {} },
-                    interactions: {},
-                    data: {},
-                    children: [
-                        {
-                            id: 'pageheader_main',
-                            componentName: 'pageHeader',
-                            tag: 'pageHeader1',
-                            label: 'Page Header',
-                            type: 'group',
-                            allowTypes: false,
-                            properties: {
-                                title: 'Entities',
-                                description: 'Manage entities in the system',
-                                variant: 'h3',
-                                commonProperties: { generateReference: false }
-                            },
-                            interactions: {},
-                            data: {},
-                            children: [],
-                            childProperties: {}
-                        },
-                        {
-                            id: 'container_filter',
-                            componentName: 'container',
-                            tag: 'container1',
-                            label: 'Container',
-                            type: 'group',
-                            allowTypes: false,
-                            properties: { className: 'px-4 pt-2 space-y-3', commonProperties: {} },
-                            interactions: {},
-                            data: {},
-                            children: [
-                                {
-                                    id: 'inputsearch_main',
-                                    componentName: 'inputSearch',
-                                    tag: 'inputSearch1',
-                                    label: 'Input Search',
-                                    type: 'group',
-                                    allowTypes: false,
-                                    properties: {
-                                        label: '',
-                                        placeholder: 'Search by name…',
-                                        required: false,
-                                        showSubmitButton: true,
-                                        submitButtonLabel: 'Search',
-                                        iconProperties: {
-                                            showStartIcon: true,
-                                            startIcon: 'Search'
-                                        },
-                                        commonProperties: { generateReference: false }
-                                    },
-                                    interactions: {},
-                                    data: {},
-                                    children: [],
-                                    childProperties: {}
-                                }
-                            ],
-                            childProperties: {}
-                        },
-                        {
-                            id: 'table_entities',
-                            componentName: 'table',
-                            tag: 'table1',
-                            label: 'Table',
-                            type: 'group',
-                            allowTypes: true,
-                            dataType: 'entityRow',
-                            properties: {
-                                showFilter: true,
-                                showPagination: true,
-                                commonProperties: { generateReference: false }
-                            },
-                            interactions: {},
-                            data: {},
-                            childProperties: {},
-                            children: [
-                                {
-                                    id: 'tablecolumns_main',
-                                    componentName: 'tableColumns',
-                                    tag: 'tableColumns1',
-                                    label: 'Table Column',
-                                    properties: { commonProperties: {} },
-                                    interactions: {},
-                                    data: {},
-                                    childProperties: {},
-                                    children: [
-                                        {
-                                            id: 'tabletextcell_name',
-                                            componentName: 'tableTextCell',
-                                            tag: 'name',
-                                            label: 'Text Column',
-                                            type: '',
-                                            allowTypes: false,
-                                            properties: {
-                                                headerTitle: 'Name',
-                                                variant: 'default',
-                                                headerType: 'sortToggle',
-                                                commonProperties: { generateReference: false }
-                                            },
-                                            interactions: {},
-                                            data: {},
-                                            children: [],
-                                            childProperties: {}
-                                        },
-                                        {
-                                            id: 'tablebadgecell_status',
-                                            componentName: 'tableBadgeCell',
-                                            tag: 'status',
-                                            label: 'Badge Column',
-                                            type: '',
-                                            allowTypes: false,
-                                            properties: {
-                                                headerTitle: 'Status',
-                                                variant: 'soft',
-                                                commonProperties: { generateReference: false }
-                                            },
-                                            interactions: {},
-                                            data: {},
-                                            children: [],
-                                            childProperties: {}
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    childProperties: {}
-                }
-            ],
-            childProperties: {}
-        }
-    },
-    null,
-    2
-)
-
-const ALWAYS_INCLUDED_COMPONENTS: ReadonlyArray<string> = [
-    // Structure
-    'section',
-    'container',
-    'grid',
-    'flex',
-    'columns',
-    // Layout / display
-    'card',
-    'panel',
-    'tabs',
-    'accordion',
-    'separator',
-    // Typography / atoms
-    'pageHeader',
-    'headline',
-    'paragraph',
-    'text',
-    'span',
-    'badge',
-    // Forms
-    'form',
-    'input',
-    'inputText',
-    'inputNumber',
-    'inputDatePicker',
-    'inputPassword',
-    'inputTextarea',
-    'select',
-    'combobox',
-    'checkbox',
-    'radio',
-    'switch',
-    'button',
-    // Data display
-    'table',
-    'list',
-    'infoCard',
-    // Feedback / nav
-    'alert',
-    'modalDialog',
-    'menuNavigation',
-    'breadcrumb'
-] as const
+// M7 golden anatomy + M6.1 always-included component list moved to
+// `./prototype/ai-prompts/{golden-list-example,always-included}.ts` (P1).
 
 /**
  * Build the `## Skill — <name>` block from the most relevant companion
@@ -456,27 +203,8 @@ const ALWAYS_INCLUDED_COMPONENTS: ReadonlyArray<string> = [
  * multiple hints would exceed the cap, we trim in selection order (most
  * specific first).
  */
-// Raised from 6000 → 10000 when the baseline list grew to 4 always-on
-// sections (naming, children rules, variants, type shape). Each baseline
-// is ~600–1200 bytes; reserving 4–5KB for them leaves enough room for the
-// turn-specific patterns.md hint without truncation. Claude's context is
-// huge — the budget exists mostly to keep the prompt focused, not to save
-// tokens.
-const SKILL_BLOCK_MAX_BYTES = 10000
-/**
- * Headings (substring-match, case-insensitive) that we ALWAYS extract from
- * SKILL.md regardless of the user message. These describe engine contracts
- * that the LLM gets wrong silently — e.g. the naming/description character
- * class — and the failure mode is a generic "must only contain letters"
- * error with no useful guidance. Keep this list short; every entry is paid
- * on every turn.
- */
-const ALWAYS_INJECT_SKILL_SECTIONS: ReadonlyArray<{ filename: string; heading: string }> = [
-    { filename: 'SKILL.md', heading: 'Engine naming constraints' },
-    { filename: 'SKILL.md', heading: 'Component children rules' },
-    { filename: 'SKILL.md', heading: 'Component variant gotchas' },
-    { filename: 'SKILL.md', heading: 'Engine type-definition shape' }
-]
+// `SKILL_BLOCK_MAX_BYTES` + `ALWAYS_INJECT_SKILL_SECTIONS` moved to
+// `./prototype/ai-prompts/skill-sections.ts` (P1).
 
 async function buildSkillContextBlock(
     userMessage: string,
@@ -665,29 +393,8 @@ function buildEngineCatalogBlock(
     return lines.join('\n')
 }
 
-// Custom viewport width (M4.19) — global preference, not per-project.
-const CUSTOM_VIEWPORT_KEY = 'spec.prototype.customViewportWidth'
-const DEFAULT_CUSTOM_VIEWPORT = 1024
-const MIN_CUSTOM_VIEWPORT = 240
-const MAX_CUSTOM_VIEWPORT = 2560
-
-const readPersistedCustomViewport = (): number => {
-    if (typeof window === 'undefined') return DEFAULT_CUSTOM_VIEWPORT
-    try {
-        const raw = window.localStorage?.getItem(CUSTOM_VIEWPORT_KEY)
-        const parsed = raw ? Number(raw) : NaN
-        if (
-            Number.isFinite(parsed) &&
-            parsed >= MIN_CUSTOM_VIEWPORT &&
-            parsed <= MAX_CUSTOM_VIEWPORT
-        ) {
-            return parsed
-        }
-        return DEFAULT_CUSTOM_VIEWPORT
-    } catch {
-        return DEFAULT_CUSTOM_VIEWPORT
-    }
-}
+// Custom viewport width (M4.19) moved to
+// `./prototype/persistence/custom-viewport.ts` (P1).
 
 // ─── List variant — placeholder; the rail hides the secondary panel here. ─
 
@@ -740,11 +447,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
     const handleChangeCustomWidth = useCallback((next: number) => {
         const clamped = Math.max(MIN_CUSTOM_VIEWPORT, Math.min(MAX_CUSTOM_VIEWPORT, next))
         setCustomWidth(clamped)
-        try {
-            window.localStorage?.setItem(CUSTOM_VIEWPORT_KEY, String(Math.round(clamped)))
-        } catch {
-            // noop — private mode etc.
-        }
+        writePersistedCustomViewport(clamped)
     }, [])
 
     // Spec attachments — explicit picker drives chat context (M4.29).
@@ -883,11 +586,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
     const onResizeChat = useCallback((size: { inPixels: number }) => {
         if (size.inPixels >= MIN_CHAT_WIDTH) {
             setChatWidth(size.inPixels)
-            try {
-                window.localStorage?.setItem(CHAT_WIDTH_KEY, String(Math.round(size.inPixels)))
-            } catch {
-                // noop
-            }
+            writePersistedChatWidth(size.inPixels)
         }
     }, [])
 
@@ -1619,9 +1318,8 @@ const ComponentPalettePane = ({
 // (per-project, localStorage). Install spawns the CLI via IPC and refreshes
 // the local skill list on success.
 
-const SKILL_BANNER_DISMISS_KEY_PREFIX = 'spec.prototype.skillBanner.dismissed.'
-const SKILL_UPDATE_DISMISS_KEY_PREFIX = 'spec.prototype.skillUpdate.dismissed.'
-const CANONICAL_SKILL = 'igrp-studio-metadata'
+// Skill banner dismissal keys moved to
+// `./prototype/persistence/skill-banner-dismiss.ts` (P1).
 
 const SkillInstallBanner = ({
     basePath,
