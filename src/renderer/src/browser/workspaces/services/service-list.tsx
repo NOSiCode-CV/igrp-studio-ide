@@ -87,7 +87,8 @@ export function ServiceList({
                     {filteredServices.map((service, index) => {
                         const visualType = resolveServiceVisualType(service)
                         const serviceTypeLabel =
-                            service.labels?.type || (visualType !== 'other' ? visualType : t('type'))
+                            service.labels?.type ||
+                            (visualType !== 'other' ? visualType : t('type'))
 
                         return (
                             <div
@@ -108,7 +109,7 @@ export function ServiceList({
                                             {getServiceIcon(visualType)}
                                         </div>
                                         <div className="min-w-0">
-                                            <div className="truncate text-xs font-semibold text-slate-800 dark:text-slate-100">
+                                            <div className="truncate text-xs font-semibold text-slate-800 transition-colors duration-200 group-hover:text-primary dark:text-slate-100 dark:group-hover:text-primary">
                                                 {service.name}
                                             </div>
                                             <div className="text-[11px] text-slate-500 capitalize dark:text-slate-400">

@@ -100,7 +100,7 @@ const IDEInitialScreen = (): React.JSX.Element => {
                         <WorkspaceServices workspaceId={workspace.id} />
                     </TabsContent>
 
-                    <TabsContent value="settings" className="mt-0 min-h-0 overflow-y-auto pt-4">
+                    <TabsContent value="settings" className="mt-0 flex h-0 min-h-0 flex-1 flex-col overflow-hidden pt-4">
                         <WorkspaceSettings workspace={workspace} />
                     </TabsContent>
                 </Tabs>

@@ -85,10 +85,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
     }
 
     return (
-        <div
-            className="grid gap-3"
-            style={{ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}
-        >
+        <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>
             {sortProjects(projects).map((project, index) => {
                 const service = findServiceByProjectName(project)
                 const dependencyNames = getDependencyNames(service?.dependsOn ?? [])
@@ -166,9 +163,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                                 variant="outline"
                                                 className="h-5 max-w-[140px] rounded-md bg-muted/40 px-2 text-[10px] font-semibold text-muted-foreground"
                                             >
-                                                <span className="min-w-0 truncate">
-                                                    {firstDep}
-                                                </span>
+                                                <span className="min-w-0 truncate">{firstDep}</span>
                                             </Badge>
                                             {dependencyNames.length > 1 && (
                                                 <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-md border bg-muted px-1 text-[10px] font-bold text-muted-foreground">
@@ -177,7 +172,10 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                             )}
                                         </div>
                                     </HoverCardTrigger>
-                                    <HoverCardContent align="start" className="w-auto max-w-[240px] p-2">
+                                    <HoverCardContent
+                                        align="start"
+                                        className="w-auto max-w-[240px] p-2"
+                                    >
                                         <div className="flex flex-wrap gap-1">
                                             {dependencyNames.map((name, i) => (
                                                 <Badge

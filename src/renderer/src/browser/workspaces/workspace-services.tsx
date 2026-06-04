@@ -132,10 +132,12 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
         state: { changeStatus }
     } = useWorkspace()
 
-    const { services, refreshContainers, restartService, stopService, startContainers } = useDocker({
-        workspace: workspace!,
-        changeStatus
-    })
+    const { services, refreshContainers, restartService, stopService, startContainers } = useDocker(
+        {
+            workspace: workspace!,
+            changeStatus
+        }
+    )
 
     useEffect(() => {
         // Intentionally keyed only by workspaceId to avoid render loops:
@@ -190,8 +192,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                 resolveServiceStatusFilterKey(service) === statusFilter
 
             const matchesType =
-                typeFilter === ALL_FILTER_VALUE ||
-                resolveServiceTypeKey(service) === typeFilter
+                typeFilter === ALL_FILTER_VALUE || resolveServiceTypeKey(service) === typeFilter
 
             return matchesSearch && matchesCategory && matchesStatus && matchesType
         })
@@ -304,8 +305,10 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
             <div className="z-20 shrink-0 bg-white dark:bg-slate-950">
                 <div className="flex min-h-[58px] items-center justify-between gap-4 border-b border-slate-200 px-4 py-2 dark:border-slate-800">
                     <div className="flex items-center gap-2">
-                        <Server className="h-4 w-4 text-teal-600" strokeWidth={1.8} />
-                        <h2 className="text-sm font-semibold leading-none text-slate-900 dark:text-slate-100">{t('services')}</h2>
+                        <Server className="h-4 w-4 text-primary" strokeWidth={1.8} />
+                        <h2 className="text-sm font-semibold leading-none text-slate-900 dark:text-slate-100">
+                            {t('services')}
+                        </h2>
                         <span className="text-slate-300 dark:text-slate-600">·</span>
                         <span className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                             {servicesCountLabel}
@@ -320,7 +323,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                     value={serviceSearchQuery}
                                     onChange={setServiceSearchQuery}
                                     className="w-[226px]"
-                                    inputClassName="h-8 border-slate-200 bg-white text-xs text-slate-600 placeholder:text-slate-400 focus-visible:border-teal-500 focus-visible:ring-teal-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder:text-slate-500"
+                                    inputClassName="h-8 border-slate-200 bg-white text-xs text-slate-600 placeholder:text-slate-400 focus-visible:border-primary focus-visible:ring-primary/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder:text-slate-500"
                                     iconClassName="text-slate-400 dark:text-slate-500"
                                 />
                                 <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
@@ -330,13 +333,13 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                             size="icon"
                                             className={`relative h-[30px] w-[30px] rounded-md border border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800 ${
                                                 isFilterOpen
-                                                    ? 'bg-slate-100 text-teal-600 dark:bg-slate-800 dark:text-teal-400'
+                                                    ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
                                                     : 'bg-white text-slate-400 dark:bg-slate-900 dark:text-slate-500'
                                             }`}
                                         >
                                             <ListFilter className="h-4 w-4" />
                                             {activeFiltersCount > 0 && (
-                                                <span className="absolute -top-1 -right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#0d9488] px-1 text-[10px] font-semibold text-white">
+                                                <span className="absolute -top-1 -right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
                                                     {activeFiltersCount}
                                                 </span>
                                             )}
@@ -353,21 +356,24 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                 </div>
                                                 <div className="space-y-1">
                                                     {categoryOptions.map((option) => {
-                                                        const selected = categoryFilter === option.value
+                                                        const selected =
+                                                            categoryFilter === option.value
                                                         return (
                                                             <button
                                                                 key={option.value}
                                                                 type="button"
-                                                                onClick={() => setCategoryFilter(option.value)}
+                                                                onClick={() =>
+                                                                    setCategoryFilter(option.value)
+                                                                }
                                                                 className={`flex h-8 w-full items-center justify-between rounded-md px-2.5 text-xs transition-colors ${
                                                                     selected
-                                                                        ? 'bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300'
+                                                                        ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
                                                                         : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
                                                                 }`}
                                                             >
                                                                 <span>{option.label}</span>
                                                                 {selected && (
-                                                                    <Check className="h-4 w-4 text-teal-700 dark:text-teal-300" />
+                                                                    <Check className="h-4 w-4 text-primary" />
                                                                 )}
                                                             </button>
                                                         )
@@ -383,21 +389,24 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                 </div>
                                                 <div className="space-y-1">
                                                     {statusOptions.map((option) => {
-                                                        const selected = statusFilter === option.value
+                                                        const selected =
+                                                            statusFilter === option.value
                                                         return (
                                                             <button
                                                                 key={option.value}
                                                                 type="button"
-                                                                onClick={() => setStatusFilter(option.value)}
+                                                                onClick={() =>
+                                                                    setStatusFilter(option.value)
+                                                                }
                                                                 className={`flex h-8 w-full items-center justify-between rounded-md px-2.5 text-xs transition-colors ${
                                                                     selected
-                                                                        ? 'bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300'
+                                                                        ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
                                                                         : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
                                                                 }`}
                                                             >
                                                                 <span>{option.label}</span>
                                                                 {selected && (
-                                                                    <Check className="h-4 w-4 text-teal-700 dark:text-teal-300" />
+                                                                    <Check className="h-4 w-4 text-primary" />
                                                                 )}
                                                             </button>
                                                         )
@@ -418,16 +427,18 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                             <button
                                                                 key={option.value}
                                                                 type="button"
-                                                                onClick={() => setTypeFilter(option.value)}
+                                                                onClick={() =>
+                                                                    setTypeFilter(option.value)
+                                                                }
                                                                 className={`flex h-8 w-full items-center justify-between rounded-md px-2.5 text-xs transition-colors ${
                                                                     selected
-                                                                        ? 'bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300'
+                                                                        ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
                                                                         : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
                                                                 }`}
                                                             >
                                                                 <span>{option.label}</span>
                                                                 {selected && (
-                                                                    <Check className="h-4 w-4 text-teal-700 dark:text-teal-300" />
+                                                                    <Check className="h-4 w-4 text-primary" />
                                                                 )}
                                                             </button>
                                                         )
@@ -448,14 +459,14 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                     <ToggleGroupItem
                                         value="grid"
                                         size="sm"
-                                        className="h-8 w-8 rounded-sm px-0 text-slate-400 data-[state=on]:bg-white data-[state=on]:text-teal-600 data-[state=on]:shadow-sm dark:text-slate-500 dark:data-[state=on]:bg-slate-800 dark:data-[state=on]:text-teal-300"
+                                        className="h-8 w-8 rounded-sm px-0 text-slate-400 data-[state=on]:bg-white data-[state=on]:text-primary data-[state=on]:shadow-sm dark:text-slate-500 dark:data-[state=on]:bg-slate-800 dark:data-[state=on]:text-primary"
                                     >
                                         <LayoutGrid className="h-3.5 w-3.5" />
                                     </ToggleGroupItem>
                                     <ToggleGroupItem
                                         value="list"
                                         size="sm"
-                                        className="h-8 w-8 rounded-sm px-0 text-slate-400 data-[state=on]:bg-white data-[state=on]:text-teal-600 data-[state=on]:shadow-sm dark:text-slate-500 dark:data-[state=on]:bg-slate-800 dark:data-[state=on]:text-teal-300"
+                                        className="h-8 w-8 rounded-sm px-0 text-slate-400 data-[state=on]:bg-white data-[state=on]:text-primary data-[state=on]:shadow-sm dark:text-slate-500 dark:data-[state=on]:bg-slate-800 dark:data-[state=on]:text-primary"
                                     >
                                         <StretchHorizontal className="h-3.5 w-3.5" />
                                     </ToggleGroupItem>
@@ -464,8 +475,8 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                         )}
 
                         <ConfigurationDialog services={allServices} isNew={true}>
-                            <Button className="h-[30px] rounded-md border border-[#0d9488] !bg-[#0d9488] px-2.5 font-semibold !text-white hover:border-[#0f766e] hover:!bg-[#0f766e]">
-                                <Plus className="mr-1 h-3.5 w-3.5 text-white" />
+                            <Button size="sm" className="h-8 gap-1.5 rounded-[4px]">
+                                <Plus className="h-3.5 w-3.5" />
                                 {t('newService')}
                             </Button>
                         </ConfigurationDialog>
@@ -483,7 +494,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                 onClick={() => setActivePanelTab(tab.id)}
                                 className={`inline-flex h-11 items-center gap-1.5 border-b-2 px-2 text-sm transition-colors ${
                                     isActive
-                                        ? 'border-b-teal-600 text-slate-900 dark:text-slate-100'
+                                        ? 'border-b-primary text-slate-900 dark:text-slate-100'
                                         : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
                                 }`}
                             >
@@ -525,12 +536,15 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
 
                 {activePanelTab === 'docker' && workspace && (
                     <div className="h-full overflow-y-auto p-4">
-                        <WorkspaceDocker workspace={workspace} onStacksChanged={refreshContainers} />
+                        <WorkspaceDocker
+                            workspace={workspace}
+                            onStacksChanged={refreshContainers}
+                        />
                     </div>
                 )}
 
                 {activePanelTab === 'overview' && (
-                    <div className="h-full overflow-y-auto overflow-x-hidden scrollbar-thin p-4">
+                    <div className="h-full overflow-y-auto overflow-x-hidden overscroll-contain p-4">
                         {groupedOverview.length === 0 ? (
                             <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/30 p-8 text-center text-sm text-slate-400 dark:border-slate-700 dark:bg-slate-900/30 dark:text-slate-500">
                                 {t('noServicesFound')}
@@ -538,10 +552,12 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                         ) : (
                             <div className="space-y-4">
                                 {serviceViewMode === 'list' ? (
-                                    <div className="sticky top-0 z-30 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                                    <div className="sticky top-0 z-30 border-b border-[#e5edf5] bg-white dark:border-slate-800 dark:bg-slate-950">
                                         <div
-                                            className="grid items-center gap-3 border-b border-slate-200 bg-slate-50/90 p-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-400"
-                                            style={{ gridTemplateColumns: SERVICE_LIST_GRID }}
+                                            className="grid items-center gap-3 px-2 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#8aa0bb] dark:text-slate-400"
+                                            style={{
+                                                gridTemplateColumns: SERVICE_LIST_GRID
+                                            }}
                                         >
                                             <div>{t('name')}</div>
                                             <div>{t('ports')}</div>
@@ -553,69 +569,78 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                 ) : null}
 
                                 {groupedOverview.map((group) => (
-                                    <section key={group.stack.id} className="bg-white dark:bg-slate-950">
+                                    <section
+                                        key={group.stack.id}
+                                        className="bg-white dark:bg-slate-950"
+                                    >
                                         <div
                                             className={`sticky z-10 flex min-h-11 items-center justify-between border-b border-[#e5edf5] bg-white px-4 dark:border-slate-800 dark:bg-slate-950 ${
-                                                serviceViewMode === 'list' ? 'top-[43px]' : 'top-2'
+                                                serviceViewMode === 'list' ? 'top-[43px]' : 'top-0'
                                             }`}
                                         >
-                                                <div className="flex items-center gap-2">
-                                                    <h3 className="text-sm font-semibold uppercase tracking-wide text-[#1f2b3d] dark:text-slate-200">
-                                                        {group.stack.title}
-                                                    </h3>
-                                                    <span className="inline-flex h-6 items-center rounded-md border border-teal-200 bg-teal-50 px-2 text-xs font-semibold text-teal-700 dark:border-teal-800/70 dark:bg-teal-900/30 dark:text-teal-300">
-                                                        {group.runningInStack}/{group.totalInStack}
-                                                    </span>
-                                                    <span className="text-xs text-[#8aa0bb] dark:text-slate-400">
-                                                        {group.stack.description}
-                                                    </span>
-                                                </div>
+                                            <div className="flex items-center gap-2">
+                                                <h3 className="text-sm font-semibold uppercase tracking-wide text-[#1f2b3d] dark:text-slate-200">
+                                                    {group.stack.title}
+                                                </h3>
+                                                <span className="inline-flex h-6 items-center rounded-md border border-primary/30 bg-primary/10 px-2 text-xs font-semibold text-primary dark:bg-primary/15">
+                                                    {group.runningInStack}/{group.totalInStack}
+                                                </span>
+                                                <span className="text-xs text-[#8aa0bb] dark:text-slate-500">
+                                                    -
+                                                </span>
+                                                <span className="text-xs text-[#8aa0bb] dark:text-slate-400">
+                                                    {group.stack.description}
+                                                </span>
+                                            </div>
 
-                                                <div className="flex items-center gap-1">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() =>
-                                                            void handleStackAction(
-                                                                group.stack.id,
-                                                                'start',
-                                                                group.stackServiceNames
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            stackActionState.stackId ===
-                                                                group.stack.id &&
-                                                            stackActionState.action !== null
-                                                        }
-                                                        className="h-7 w-7 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:text-slate-500 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-300"
-                                                    >
-                                                        <Play className="h-3.5 w-3.5" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() =>
-                                                            void handleStackAction(
-                                                                group.stack.id,
-                                                                'stop',
-                                                                group.stackServiceNames
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            stackActionState.stackId ===
-                                                                group.stack.id &&
-                                                            stackActionState.action !== null
-                                                        }
-                                                        className="h-7 w-7 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-rose-900/30 dark:hover:text-rose-300"
-                                                    >
-                                                        <Square className="h-3.5 w-3.5" />
-                                                    </Button>
-                                                </div>
+                                            <div className="flex items-center gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() =>
+                                                        void handleStackAction(
+                                                            group.stack.id,
+                                                            'start',
+                                                            group.stackServiceNames
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        stackActionState.stackId ===
+                                                            group.stack.id &&
+                                                        stackActionState.action !== null
+                                                    }
+                                                    className="h-7 w-7 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:text-slate-500 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-300"
+                                                >
+                                                    <Play className="h-3.5 w-3.5" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() =>
+                                                        void handleStackAction(
+                                                            group.stack.id,
+                                                            'stop',
+                                                            group.stackServiceNames
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        stackActionState.stackId ===
+                                                            group.stack.id &&
+                                                        stackActionState.action !== null
+                                                    }
+                                                    className="h-7 w-7 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-rose-900/30 dark:hover:text-rose-300"
+                                                >
+                                                    <Square className="h-3.5 w-3.5" />
+                                                </Button>
+                                            </div>
                                         </div>
 
                                         <div className="space-y-4 p-4">
                                             {group.typeGroups.map((typeGroup) => (
-                                                <div key={`${group.stack.id}-${typeGroup.type}`} className="space-y-2">
+                                                <div
+                                                    key={`${group.stack.id}-${typeGroup.type}`}
+                                                    className="space-y-2"
+                                                >
                                                     <div className="flex items-center gap-2">
                                                         <span className="h-1.5 w-1.5 rounded-full bg-[#b8c5d8] dark:bg-slate-600" />
                                                         <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[#8aa0bb] dark:text-slate-400">

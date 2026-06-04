@@ -80,7 +80,7 @@ export function ServiceGrid({ services, showFilter = true, onActionComplete }: S
                                         {getServiceIcon(visualType)}
                                     </div>
                                     <div className="min-w-0">
-                                        <div className="truncate text-sm font-semibold text-slate-800 transition-colors duration-200 group-hover:text-teal-700 dark:text-slate-100 dark:group-hover:text-teal-300">
+                                        <div className="truncate text-sm font-semibold text-slate-800 transition-colors duration-200 group-hover:text-primary dark:text-slate-100 dark:group-hover:text-primary">
                                             {service.name}
                                         </div>
                                         <div className="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400">

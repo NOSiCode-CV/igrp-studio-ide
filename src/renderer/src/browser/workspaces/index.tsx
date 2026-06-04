@@ -104,7 +104,7 @@ const ResourceSection = ({
                         value={searchQuery}
                         onChange={onSearchChange}
                         className="w-[224px] max-w-full"
-                        inputClassName="rounded-[4px] focus-visible:ring-1"
+                        inputClassName="rounded-[4px] focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary/20"
                     />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
