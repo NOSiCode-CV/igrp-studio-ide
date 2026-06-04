@@ -24,13 +24,11 @@ import { errorMessage, useZodForm } from '@renderer/lib/form'
 import { cn } from '@renderer/lib/utils'
 import {
     Check,
-    ChevronDown,
     ChevronRight,
     Database,
     FolderOpen,
     Loader2,
     Monitor,
-    Palette,
     Plus,
     PlusCircle,
     Search,
@@ -188,19 +186,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
 
     const inputRef = React.useRef<HTMLInputElement>(null)
     const iconUploadRef = React.useRef<HTMLInputElement>(null)
-    const colorInputRef = React.useRef<HTMLInputElement>(null)
     const wasOpenRef = React.useRef(open)
-
-    // Choose readable text/icon color (near-black vs near-white) for a swatch
-    // background, mirroring the scaffold's luminance threshold (#ffffff / 1.5).
-    const contrastTextColor = (hex?: string): string => {
-        if (!hex) return 'rgba(255,255,255,0.9)'
-        const cleaned = hex.replace('#', '')
-        if (cleaned.length !== 6) return 'rgba(255,255,255,0.9)'
-        const n = parseInt(cleaned, 16)
-        if (Number.isNaN(n)) return 'rgba(255,255,255,0.9)'
-        return n > 0xffffff / 1.5 ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)'
-    }
 
     // Wire RHF's ref for the project-name input alongside the autofocus ref.
     const nameRegister = register('name')
@@ -321,19 +307,26 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         }
     }
 
+    // Switching project type or framework restarts the wizard with a clean
+    // slate: Project Name, Description, Path, Icon, storageMode and all
+    // framework-specific config are wiped. Without this, the previously-typed
+    // values bled over into the new selection, which looked like a bug
+    // (PROJECT DETAILS section came pre-filled with stale values).
     const handleChangeType = (value: string) => {
-        if (values.framework !== value)
-            setValue('framework', '' as FrameworkType, { shouldValidate: true })
-        setValue('type', value as ProjectData['type'], { shouldValidate: true, shouldTouch: true })
+        if (values.type === value) return
+        reset({
+            ...initialValues,
+            type: value as ProjectData['type']
+        })
         setFrameworkSearch('')
     }
 
     const handleChangeFramework = (value: string) => {
-        if (values.framework !== value)
-            setValue('config', {} as ProjectData['config'], { shouldValidate: false })
-        setValue('framework', value as FrameworkType, {
-            shouldValidate: true,
-            shouldTouch: true
+        if (values.framework === value) return
+        reset({
+            ...initialValues,
+            type: values.type,
+            framework: value as FrameworkType
         })
     }
 
@@ -441,8 +434,10 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         }
     }, [values.framework, values.name, setValue])
 
-    // Auto-populate Specification config defaults (LLM, embeddings) and seed
-    // a config.name from the project name only while empty.
+    // Auto-populate Specification config defaults (LLM, embeddings) and keep
+    // the Application Name (config.name) continuously synced with the project
+    // name as a hyphen-cased slug — matches the Next.js behavior so the user
+    // doesn't double-type the name.
     // biome-ignore lint/correctness/useExhaustiveDependencies: same rationale as the Spring Boot effect above; values.config is read but excluded to avoid a setValue feedback loop
     React.useEffect(() => {
         if (values.framework !== 'specification') return
@@ -450,7 +445,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         const updates: Record<string, unknown> = {}
         if (!current.defaultLLM) updates.defaultLLM = llmModels[0]
         if (!current.embeddings) updates.embeddings = embeddingsModels[0]
-        if (!current.name && values.name) updates.name = slugifyConfigName(values.name)
+        const expectedAppName = slugifyArtifact(values.name || '')
+        if (current.name !== expectedAppName) updates.name = expectedAppName
         if (Object.keys(updates).length > 0) {
             setValue('config', { ...current, ...updates }, { shouldDirty: false })
         }
@@ -477,6 +473,13 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         if (values.name && current.displayName !== values.name) {
             updates.displayName = values.name
         }
+        // Keep the Application Name (config.name) in sync with the project name
+        // as a hyphen-cased slug ("My Awesome App" → "my-awesome-app"). User
+        // visible in the renderNextJsStep2 "Application Name" field; the field
+        // tracks the project name automatically so the user doesn't have to
+        // double-type it.
+        const expectedAppName = slugifyArtifact(values.name || '')
+        if (current.name !== expectedAppName) updates.name = expectedAppName
         if (Object.keys(updates).length > 0) {
             setValue('config', { ...current, ...updates }, { shouldDirty: false })
         }
@@ -543,7 +546,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                     name="type"
                     value={values.type}
                     onValueChange={(value) => handleChangeType(value)}
-                    className="mt-2 grid grid-cols-3 gap-2"
+                    className="mt-2 grid grid-cols-3 gap-4"
                 >
                     {types.map(({ id, label, description, Icon }) => {
                         const active = values.type === id
@@ -626,7 +629,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                     name="framework"
                     value={values.framework}
                     onValueChange={(value) => handleChangeFramework(value)}
-                    className="mt-2 grid gap-2 sm:grid-cols-2"
+                    className="mt-2 grid gap-4 sm:grid-cols-2"
                 >
                     {filtered.map((fw) => {
                         const active = values.framework === fw.id
@@ -1025,11 +1028,11 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 <div className="flex items-start gap-3">
                     <Label
                         htmlFor="app-name"
-                        className="w-[72px] shrink-0 pt-1.5 text-[11px] text-muted-foreground"
+                        className="w-[110px] shrink-0 whitespace-nowrap pt-1.5 text-[11px] text-muted-foreground"
                     >
                         {t('applicationName')}
                     </Label>
-                    <div className="max-w-[350px] flex-1">
+                    <div className="max-w-[388px] flex-1">
                         <Input
                             id="app-name"
                             value={values.config?.name ?? ''}
@@ -1050,41 +1053,6 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             </p>
                         )}
                     </div>
-                </div>
-
-                {/* Theme Color */}
-                <div className="flex items-start gap-3">
-                    <Label className="w-[72px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
-                        {t('themeColor')}
-                    </Label>
-                    <button
-                        type="button"
-                        onClick={() => colorInputRef.current?.click()}
-                        className="flex h-7 max-w-[350px] flex-1 items-center justify-between rounded-sm border px-2"
-                        style={{ backgroundColor: values.themeColor || '#000000' }}
-                        aria-label={t('themeColor')}
-                    >
-                        <span
-                            className="font-mono text-[11px] font-bold"
-                            style={{ color: contrastTextColor(values.themeColor) }}
-                        >
-                            {values.themeColor || '#000000'}
-                        </span>
-                        <Palette
-                            className="h-3.5 w-3.5"
-                            style={{ color: contrastTextColor(values.themeColor) }}
-                        />
-                    </button>
-                    <input
-                        ref={colorInputRef}
-                        type="color"
-                        value={values.themeColor || '#000000'}
-                        onChange={(e) =>
-                            setValue('themeColor', e.target.value, { shouldDirty: true })
-                        }
-                        className="sr-only"
-                        aria-label={t('themeColor')}
-                    />
                 </div>
             </div>
         </div>
@@ -1303,8 +1271,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         >
                             {t('group', { defaultValue: 'Group' })}
                         </Label>
-                        <div className="flex max-w-[350px] flex-1 items-start gap-3">
-                            <div className="flex-1">
+                        <div className="flex max-w-[426px] flex-1 items-start gap-3">
+                            <div className="w-[150px]">
                                 <Input
                                     id="group"
                                     value={(cfg.group as string) ?? ''}
@@ -1319,12 +1287,12 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             </div>
                             <Label
                                 htmlFor="artifact"
-                                className="w-[64px] shrink-0 pt-1.5 text-[11px] text-muted-foreground"
+                                className="ml-auto w-[64px] shrink-0 pt-1.5 text-[11px] text-muted-foreground"
                             >
                                 {t('artifact', { defaultValue: 'Artifact' })}{' '}
                                 <span className="text-destructive">*</span>
                             </Label>
-                            <div className="flex-1">
+                            <div className="w-[150px]">
                                 <Input
                                     id="artifact"
                                     value={(cfg.artifact as string) ?? ''}
@@ -1348,8 +1316,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             {t('dbEngine', { defaultValue: 'DB Engine' })}{' '}
                             <span className="text-destructive">*</span>
                         </Label>
-                        <div className="flex max-w-[350px] flex-1 items-start gap-3">
-                            <div className="flex-1">
+                        <div className="flex max-w-[426px] flex-1 items-start gap-3">
+                            <div className="w-[150px]">
                                 <Select
                                     value={(cfg.database as string) ?? ''}
                                     onValueChange={(value) => setCfg({ database: value })}
@@ -1376,10 +1344,10 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     <p className="mt-1 text-xs text-destructive">{cfgErr.database}</p>
                                 )}
                             </div>
-                            <Label className="w-[64px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
+                            <Label className="ml-auto w-[64px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
                                 {t('structureStyle', { defaultValue: 'Structure Style' })}
                             </Label>
-                            <div className="flex-1">
+                            <div className="w-[150px]">
                                 <Select
                                     value={(cfg.projectStructureStyle as string) ?? 'technical'}
                                     onValueChange={(value) =>
@@ -1413,7 +1381,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         <Label className="w-[72px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
                             {t('features', { defaultValue: 'Features' })}
                         </Label>
-                        <div className="flex max-w-[350px] flex-1 gap-1.5">
+                        <div className="flex max-w-[426px] flex-1 gap-1.5">
                             {features.map(({ key, label }) => {
                                 const checked = Boolean(cfg[key])
                                 return (
@@ -1456,7 +1424,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         <Label className="w-[72px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
                             {t('furtherDependencies', { defaultValue: 'Further dependencies' })}
                         </Label>
-                        <div className="max-w-[350px] flex-1 space-y-2">
+                        <div className="max-w-[426px] flex-1 space-y-2">
                             <div className="relative" ref={springDepRef}>
                                 <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                                 <Input
@@ -1704,11 +1672,11 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                     <div className="flex items-start gap-3">
                         <Label
                             htmlFor="app-name"
-                            className="w-[80px] shrink-0 pt-1.5 text-[11px] leading-tight text-muted-foreground"
+                            className="w-[110px] shrink-0 whitespace-nowrap pt-1.5 text-[11px] text-muted-foreground"
                         >
                             {t('applicationName')}
                         </Label>
-                        <div className="max-w-[350px] flex-1">
+                        <div className="max-w-[388px] flex-1">
                             <Input
                                 id="app-name"
                                 value={(cfg.name as string) ?? ''}
@@ -1728,51 +1696,63 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                         <Label className="w-[80px] shrink-0 pt-1.5 text-[11px] leading-tight text-muted-foreground">
                             {t('defaultLLM', { defaultValue: 'Default LLM' })}
                         </Label>
-                        <div className="flex max-w-[350px] flex-1 items-start gap-3">
-                            <div className="flex-1">
-                                <div className="relative">
-                                    <select
-                                        value={currentLlm.model}
-                                        onChange={(e) => {
-                                            const sel = llmModels.find(
-                                                (m) => m.model === e.target.value
-                                            )
-                                            if (sel) setCfg({ defaultLLM: sel })
-                                        }}
-                                        className="h-7 w-full appearance-none rounded-sm border border-input bg-background pl-2 pr-6 text-[11px] focus-visible:outline-none focus-visible:ring-1"
+                        <div className="flex max-w-[418px] flex-1 items-start gap-3">
+                            <div className="w-[140px]">
+                                <Select
+                                    value={currentLlm.model}
+                                    onValueChange={(value) => {
+                                        const sel = llmModels.find((m) => m.model === value)
+                                        if (sel) setCfg({ defaultLLM: sel })
+                                    }}
+                                >
+                                    <SelectTrigger
+                                        size="sm"
+                                        className="h-7 w-full rounded-sm border-input bg-background px-2 text-[11px] shadow-none [&>svg]:size-3"
                                     >
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
                                         {llmModels.map((m) => (
-                                            <option key={m.model} value={m.model}>
+                                            <SelectItem
+                                                key={m.model}
+                                                value={m.model}
+                                                className="text-[11px]"
+                                            >
                                                 {m.model}
-                                            </option>
+                                            </SelectItem>
                                         ))}
-                                    </select>
-                                    <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
-                                </div>
+                                    </SelectContent>
+                                </Select>
                             </div>
-                            <Label className="w-[100px] shrink-0 pt-1.5 text-[11px] leading-tight text-muted-foreground">
+                            <Label className="ml-auto w-[100px] shrink-0 pt-1.5 text-[11px] leading-tight text-muted-foreground">
                                 {t('embeddingsModel', { defaultValue: 'Embeddings model' })}
                             </Label>
-                            <div className="flex-1">
-                                <div className="relative">
-                                    <select
-                                        value={currentEmb.model}
-                                        onChange={(e) => {
-                                            const sel = embeddingsModels.find(
-                                                (m) => m.model === e.target.value
-                                            )
-                                            if (sel) setCfg({ embeddings: sel })
-                                        }}
-                                        className="h-7 w-full appearance-none rounded-sm border border-input bg-background pl-2 pr-6 text-[11px] focus-visible:outline-none focus-visible:ring-1"
+                            <div className="w-[140px]">
+                                <Select
+                                    value={currentEmb.model}
+                                    onValueChange={(value) => {
+                                        const sel = embeddingsModels.find((m) => m.model === value)
+                                        if (sel) setCfg({ embeddings: sel })
+                                    }}
+                                >
+                                    <SelectTrigger
+                                        size="sm"
+                                        className="h-7 w-full rounded-sm border-input bg-background px-2 text-[11px] shadow-none [&>svg]:size-3"
                                     >
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
                                         {embeddingsModels.map((m) => (
-                                            <option key={m.model} value={m.model}>
+                                            <SelectItem
+                                                key={m.model}
+                                                value={m.model}
+                                                className="text-[11px]"
+                                            >
                                                 {m.model}
-                                            </option>
+                                            </SelectItem>
                                         ))}
-                                    </select>
-                                    <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
-                                </div>
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
                     </div>
@@ -1837,7 +1817,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 )}
             </DialogTrigger>
             <DialogContent
-                className="flex min-h-0 max-h-[min(700px,96vh)] w-[calc(100vw-2rem)] max-w-2xl sm:max-w-2xl flex-col gap-0 overflow-hidden rounded-md p-0 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                className="flex min-h-0 h-[700px] w-[768px] max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-2rem)] flex-col gap-0 overflow-hidden rounded-md p-0 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >

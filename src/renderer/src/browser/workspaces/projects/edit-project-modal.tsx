@@ -4,7 +4,7 @@ import { ProjectIcon } from '@renderer/components/shared-ui'
 import { PATTERNS } from '@renderer/constants/appConstants'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import { errorMessage, useZodForm } from '@renderer/lib/form'
-import { FolderKanban, Palette, Plus, SquarePen, X } from 'lucide-react'
+import { FolderKanban, Plus, SquarePen, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import type React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -35,12 +35,12 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
 }) => {
     const { t } = useTranslation()
     const {
+        workspace,
         actions: { updateProject }
     } = useWorkspace()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const nameInputRef = useRef<HTMLInputElement>(null)
-    const colorInputRef = useRef<HTMLInputElement>(null)
 
     const schema = useMemo(
         () =>
@@ -132,11 +132,28 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
             return
         }
 
+        if (!workspace?.path) {
+            console.error('No active workspace path; cannot persist project icon.')
+            return
+        }
+
         try {
-            const timestamp = Date.now()
             const fileExtension = file.name.split('.').pop() || 'png'
-            const fileName = `project-icon-${timestamp}.${fileExtension}`
-            setValue('icon', `icons/${fileName}`, { shouldDirty: true })
+            const fileName = `icon_${Date.now()}.${fileExtension}`
+            const iconsPath = `${workspace.path}/icons`
+            const filePath = `${iconsPath}/${fileName}`
+
+            const result = await window.api.saveProjectIcon({
+                filePath,
+                fileData: await file.arrayBuffer(),
+                assetsPath: iconsPath
+            })
+
+            if (result.success) {
+                setValue('icon', `icons/${fileName}`, { shouldDirty: true })
+            } else {
+                console.error('Failed to save icon file:', result.error)
+            }
         } catch (error) {
             console.error('Error handling icon upload:', error)
         }
@@ -155,12 +172,6 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
             nameInputRef.current?.select()
         }
     }, [values.name, isOpen])
-
-    const hexColor = values.themeColor || '#000000'
-    const luminance = parseInt(hexColor.replace('#', ''), 16) || 0
-    const isLight = luminance > 0xffffff / 1.5
-    const textColor = isLight ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,1)'
-    const iconColor = isLight ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.9)'
 
     if (!project) return null
 
@@ -215,7 +226,8 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                             {values.icon ? (
                                                 <ProjectIcon
                                                     project={{ ...project, icon: values.icon }}
-                                                    workspacePath=""
+                                                    workspacePath={workspace?.path || ''}
+                                                    className="h-12 w-12 rounded"
                                                 />
                                             ) : (
                                                 <>
@@ -256,56 +268,6 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                                         {nameError}
                                                     </p>
                                                 )}
-                                            </div>
-                                        </div>
-
-                                        {/* Field 2 - Theme color */}
-                                        <div className="flex items-center gap-2">
-                                            <label
-                                                htmlFor="project-color-picker"
-                                                className="w-16 text-[11px] text-muted-foreground text-right whitespace-nowrap"
-                                            >
-                                                Theme:
-                                            </label>
-                                            <div className="flex-1 max-w-[180px]">
-                                                {/* biome-ignore lint/a11y/useSemanticElements: this wrapper triggers a nested hidden <input type="color"> via ref; a real <button> would nest an interactive element */}
-                                                <div
-                                                    className="w-full h-[28px] rounded border border-input shadow-[inset_0_1px_1px_rgba(0,0,0,0.02)] flex items-center justify-between px-2.5 overflow-hidden group hover:ring-1 hover:ring-teal-500/20 hover:border-primary cursor-pointer relative"
-                                                    style={{ backgroundColor: hexColor }}
-                                                    onClick={() => colorInputRef.current?.click()}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter' || e.key === ' ') {
-                                                            e.preventDefault()
-                                                            colorInputRef.current?.click()
-                                                        }
-                                                    }}
-                                                    role="button"
-                                                    tabIndex={0}
-                                                    aria-label="Pick theme color"
-                                                >
-                                                    <input
-                                                        type="color"
-                                                        ref={colorInputRef}
-                                                        id="project-color-picker"
-                                                        value={hexColor}
-                                                        onChange={(e) =>
-                                                            setValue('themeColor', e.target.value, {
-                                                                shouldDirty: true
-                                                            })
-                                                        }
-                                                        className="absolute opacity-0 w-0 h-0"
-                                                    />
-                                                    <span
-                                                        className="text-[10px] font-mono font-semibold tracking-wide"
-                                                        style={{ color: textColor }}
-                                                    >
-                                                        {hexColor.toUpperCase()}
-                                                    </span>
-                                                    <Palette
-                                                        className="w-[14px] h-[14px] group-hover:rotate-12 transition-transform duration-300"
-                                                        style={{ color: iconColor }}
-                                                    />
-                                                </div>
                                             </div>
                                         </div>
 

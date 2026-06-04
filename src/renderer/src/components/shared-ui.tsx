@@ -93,14 +93,12 @@ function ProjectIcon({
     if (iconUrl) {
         return (
             <div
-                className={cn('h-8 w-8 rounded-[4px] bg-muted flex items-center justify-center', className)}
+                className={cn('h-8 w-8 overflow-hidden rounded-[4px] bg-muted', className)}
             >
                 <img
                     src={iconUrl}
                     alt="Project icon"
-                    width={20}
-                    height={20}
-                    className="rounded-full object-cover"
+                    className="h-full w-full object-cover"
                 />
             </div>
         )

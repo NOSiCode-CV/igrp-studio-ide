@@ -195,7 +195,7 @@ export function ProjectList({ projects, services }: ProjectListProps) {
                             {/* Ports */}
                             <div role="cell" className="min-w-0">
                                 {port && (
-                                    <span className="inline-flex items-center rounded-md border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground transition-colors group-hover:bg-background">
+                                    <span className="inline-flex items-center rounded-md border border-primary/20 bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] text-primary transition-colors">
                                         {port}
                                     </span>
                                 )}
