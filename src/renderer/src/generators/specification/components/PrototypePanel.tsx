@@ -1,5 +1,3 @@
-import { Button } from '@renderer/components/ui/button'
-import { Input } from '@renderer/components/ui/input'
 import { cn } from '@renderer/lib/utils'
 import type { RootState } from '@renderer/redux'
 import {
@@ -22,15 +20,6 @@ import {
 import { loadManifest } from '@renderer/redux/specPrototypeManifest/thunks'
 import { selectDocNodes, selectSelectedDocId } from '@renderer/redux/specDocs/reducer'
 import {
-    AlertCircle,
-    Download,
-    FolderOpen,
-    LayoutGrid,
-    MessageSquare,
-    RotateCcw,
-    Search
-} from 'lucide-react'
-import {
     type JSX,
     useCallback,
     useEffect,
@@ -44,7 +33,6 @@ import { AIAssistant, type ChatAttachment } from './shared/AIAssistant'
 import { EditCanvas } from './prototype/EditCanvas'
 import { DocAttachPicker } from '@renderer/features/spec-attachments'
 import {
-    PaletteComponentCard,
     readPersistedComponentIds,
     writePersistedComponentIds,
     useEnginePalette,
@@ -62,6 +50,10 @@ import type { DeviceFrame, PreviewMode } from './prototype/preview/types'
 import { FilesPane } from './prototype/files/FilesPane'
 import { LogsPane } from './prototype/logs/LogsPane'
 import { HistoryPane } from './prototype/history/HistoryPane'
+import { ChatPanelTabs } from './prototype/chat/ChatPanelTabs'
+import { ComponentPalettePane } from './prototype/chat/ComponentPalettePane'
+import type { ChatPanelMode } from './prototype/chat/types'
+import { PrototypeFooter } from './prototype/footer/PrototypeFooter'
 import { FirstRunBanner } from './prototype/banners/FirstRunBanner'
 import { SkillInstallBanner } from './prototype/banners/SkillInstallBanner'
 import { SkillUpdateBanner } from './prototype/banners/SkillUpdateBanner'
@@ -101,7 +93,7 @@ const TABS: { id: PrototypeTab; label: string }[] = [
     { id: 'history', label: 'History' }
 ]
 
-type ChatPanelMode = 'chat' | 'palette'
+// `ChatPanelMode` moved to `./prototype/chat/types.ts` (P6).
 
 // Persistence helpers moved to `./prototype/persistence/{chat-width,
 // attached-ids,custom-viewport,skill-banner-dismiss}.ts` (P1).
@@ -867,183 +859,8 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
 
 // ─── Chat panel tabs (M4.28) ──────────────────────────────────────────────
 //
-// Two-way switch in the left panel header. Mounts both the chat and the
-// palette but toggles `display`, so the AIAssistant's local state (message
-// history, streaming chunks, composer draft) survives jumps between modes.
-
-const ChatPanelTabs = ({
-    mode,
-    onChangeMode,
-    pinnedCount
-}: {
-    mode: ChatPanelMode
-    onChangeMode: (next: ChatPanelMode) => void
-    pinnedCount: number
-}): JSX.Element => (
-    // Sits on top of the `bg-sidebar` aside; we use the same sidebar token
-    // (instead of an opacity-tinted background) so the tab row reads as part
-    // of the rail rather than a different surface.
-    <div className="flex h-10 shrink-0 items-center gap-1 border-b border-border/80 bg-sidebar px-2">
-        <ChatPanelTabButton
-            active={mode === 'chat'}
-            onClick={() => onChangeMode('chat')}
-            icon={<MessageSquare size={13} />}
-            label="Chat"
-        />
-        <ChatPanelTabButton
-            active={mode === 'palette'}
-            onClick={() => onChangeMode('palette')}
-            icon={<LayoutGrid size={13} />}
-            label="Palette"
-            badge={pinnedCount > 0 ? pinnedCount : undefined}
-        />
-    </div>
-)
-
-const ChatPanelTabButton = ({
-    active,
-    onClick,
-    icon,
-    label,
-    badge
-}: {
-    active: boolean
-    onClick: () => void
-    icon: JSX.Element
-    label: string
-    badge?: number
-}): JSX.Element => (
-    <button
-        type="button"
-        onClick={onClick}
-        className={cn(
-            'flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-medium transition-colors',
-            active
-                ? 'bg-primary/10 text-primary ring-1 ring-primary/20'
-                : 'text-muted-foreground hover:bg-accent'
-        )}
-    >
-        {icon}
-        {label}
-        {badge !== undefined && (
-            <span
-                className={cn(
-                    'rounded-full px-1.5 py-px text-[9px] font-semibold',
-                    active ? 'bg-primary/20 text-primary' : 'bg-muted-foreground/20'
-                )}
-            >
-                {badge}
-            </span>
-        )}
-    </button>
-)
-
-// ─── Component palette pane (M4.28) ───────────────────────────────────────
-
-const ComponentPalettePane = ({
-    attachedIds,
-    onToggle
-}: {
-    attachedIds: string[]
-    onToggle: (id: string) => void
-}): JSX.Element => {
-    const [query, setQuery] = useState('')
-
-    // Pull the engine's component catalog (`window.engine.getComponent(NEXTJS)`)
-    // — the same source the UI generator's visual palette uses, so the
-    // Prototype design intent stays in sync with what the engine actually
-    // knows how to generate. The provider lives at App root, so it's safe to
-    // call from here even before the UI generator is mounted.
-    const { componentsRegistered, loadRegistryComponent, isLoading } = useEngineCatalog()
-    useEffect(() => {
-        if (componentsRegistered.length === 0) {
-            void loadRegistryComponent()
-        }
-    }, [componentsRegistered.length, loadRegistryComponent])
-
-    const palette = useEnginePalette(componentsRegistered)
-
-    const filteredGroups = useMemo(() => {
-        const needle = query.trim().toLowerCase()
-        if (!needle) return palette.groups
-        return palette.groups
-            .map((g) => ({
-                ...g,
-                items: g.items.filter(
-                    (c) =>
-                        c.name.toLowerCase().includes(needle) ||
-                        c.id.toLowerCase().includes(needle) ||
-                        g.label.toLowerCase().includes(needle)
-                )
-            }))
-            .filter((g) => g.items.length > 0)
-    }, [palette.groups, query])
-
-    const attachedSet = useMemo(() => new Set(attachedIds), [attachedIds])
-    const empty = componentsRegistered.length === 0
-    const noMatch = !empty && filteredGroups.length === 0
-
-    return (
-        <div className="flex h-full w-full flex-col">
-            <div className="border-b px-3 py-2">
-                <div className="relative">
-                    <Search
-                        size={11}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-                    />
-                    <Input
-                        placeholder="Find a component…"
-                        className="h-7 pl-7 text-[11px]"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                    />
-                </div>
-                <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">
-                    Click to pin · remove via chip in chat
-                    {attachedIds.length > 0 && (
-                        <span className="ml-1 font-medium text-primary">
-                            · {attachedIds.length} pinned
-                        </span>
-                    )}
-                </p>
-            </div>
-            <div className="flex-1 overflow-y-auto p-2">
-                {empty ? (
-                    <p className="px-2 py-3 text-[11px] italic text-muted-foreground">
-                        {isLoading
-                            ? 'Loading engine catalog…'
-                            : 'No components available — engine catalog is empty.'}
-                    </p>
-                ) : noMatch ? (
-                    <p className="px-2 py-3 text-[11px] italic text-muted-foreground">
-                        No components match "{query}".
-                    </p>
-                ) : (
-                    filteredGroups.map((group) => (
-                        <section key={group.key} className="mb-3">
-                            <h4 className="mb-1.5 px-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-                                {group.label}
-                            </h4>
-                            <div className="grid grid-cols-2 gap-1.5">
-                                {group.items.map((c) => (
-                                    <PaletteComponentCard
-                                        key={c.id}
-                                        icon={c.icon}
-                                        label={c.name}
-                                        deprecated={c.deprecated}
-                                        active={attachedSet.has(c.id)}
-                                        showGripHint={false}
-                                        onClick={() => onToggle(c.id)}
-                                    />
-                                ))}
-                            </div>
-                        </section>
-                    ))
-                )}
-            </div>
-        </div>
-    )
-}
+// `ChatPanelTabs`, `ChatPanelTabButton`, `ComponentPalettePane` moved to
+// `./prototype/chat/*.tsx` (P6).
 
 // `SkillInstallBanner`, `SkillUpdateBanner`, `FirstRunBanner` moved to
 // `./prototype/banners/{SkillInstallBanner,SkillUpdateBanner,FirstRunBanner}.tsx` (P3).
@@ -1056,89 +873,7 @@ const ComponentPalettePane = ({
 // `PreviewPane`, `FilesPane`, `FileViewer`, `FileTreeRow`, `LogsPane`,
 // `LogFilterButton`, `LogLine`, `HistoryPane`, `SnapshotCard` moved to
 // `./prototype/{preview,files,logs,history}/*.tsx` (P5).
-// ─── Footer ──────────────────────────────────────────────────────────────
-
-const PrototypeFooter = ({ basePath }: { basePath?: string }): JSX.Element => {
-    const dispatch = useDispatch<any>()
-    const lastError = useSelector((s: RootState) => s.specPrototype.error)
-
-    const handleExport = useCallback(async () => {
-        if (!basePath) return
-        try {
-            const result = await window.specPrototype.export(basePath)
-            if (result.ok && result.path) {
-                window.alert(`Exported to:\n${result.path}`)
-            }
-        } catch (err) {
-            window.alert(`Export failed: ${err instanceof Error ? err.message : String(err)}`)
-        }
-    }, [basePath])
-
-    const handleOpenFolder = useCallback(async () => {
-        if (!basePath) return
-        try {
-            const result = await window.specPrototype.openFolder(basePath)
-            if (!result.ok && result.error) {
-                window.alert(`Open folder failed: ${result.error}`)
-            }
-        } catch (err) {
-            window.alert(`Open folder failed: ${err instanceof Error ? err.message : String(err)}`)
-        }
-    }, [basePath])
-
-    const handleReset = useCallback(async () => {
-        if (!basePath) return
-        if (!window.confirm('Stop the dev server and clear local prototype state?')) return
-        await window.specPrototype.stopDev(basePath)
-        dispatch({ type: 'specPrototype/protoReset' })
-    }, [basePath, dispatch])
-
-    return (
-        <footer className="flex h-12 shrink-0 items-center justify-between border-t bg-card px-4">
-            <div className="flex items-center gap-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 gap-2 text-xs"
-                    onClick={handleExport}
-                    disabled={!basePath}
-                >
-                    <Download size={14} /> Export project…
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 gap-2 text-xs"
-                    onClick={handleOpenFolder}
-                    disabled={!basePath}
-                    title="Open the prototype folder in your file manager"
-                >
-                    <FolderOpen size={14} /> Open folder
-                </Button>
-                <span className="ml-2 truncate text-[10px] text-muted-foreground">
-                    {basePath ?? '—'}
-                </span>
-                {lastError && (
-                    <span className="ml-3 flex items-center gap-1 text-[10px] text-red-500">
-                        <AlertCircle size={11} />
-                        <span className="max-w-[280px] truncate" title={lastError}>
-                            {lastError}
-                        </span>
-                    </span>
-                )}
-            </div>
-            <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-2 text-xs text-red-500 hover:bg-red-500/10"
-                onClick={handleReset}
-                disabled={!basePath}
-            >
-                <RotateCcw size={14} /> Reset prototype
-            </Button>
-        </footer>
-    )
-}
+// `PrototypeFooter` moved to `./prototype/footer/PrototypeFooter.tsx` (P6).
 
 const PrototypePanel = ({ variant = 'content', ...rest }: PanelProps): JSX.Element => {
     return variant === 'list' ? <ListVariant /> : <ContentVariant {...rest} />
