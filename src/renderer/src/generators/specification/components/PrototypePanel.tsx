@@ -1,3 +1,31 @@
+/**
+ * Prototype tab — orchestrator for the Specification rail's `prototype`
+ * surface.
+ *
+ * This file owns the wiring only: it composes the chat aside (with
+ * Chat / Palette modes), the device-framed Preview pane (or the manifest
+ * Edit canvas), the Files / Logs / History tabs, the dev-server toggle,
+ * and the contextual prompt builder (`buildSystemPrompt`) that ships to
+ * the AIAssistant on every turn.
+ *
+ * Sub-components, constants, and pure helpers live under `./prototype/`:
+ *
+ *     ai-prompts/   golden anatomy, always-included list, engine catalog
+ *                   + skill-context system-prompt builders
+ *     persistence/  localStorage read/write for chat width, viewport,
+ *                   attached doc ids, skill banner dismissal
+ *     preview/      PreviewToolbar + PreviewPane + URL bar + Pages
+ *                   dropdown + device pill + computePreviewUrl
+ *     files/        FilesPane (Explorer + Monaco viewer), file-tree
+ *                   folding, language detection
+ *     logs/         LogsPane with filter + search + auto-scroll
+ *     history/      HistoryPane snapshot grid + restore
+ *     banners/      first-run, skill-install, skill-update banners
+ *     chat/         tab switcher (Chat / Palette) + ComponentPalettePane
+ *     footer/       Export / Open / Reset action bar
+ *
+ * Look there for the component bodies; this file is just the glue.
+ */
 import { cn } from '@renderer/lib/utils'
 import type { RootState } from '@renderer/redux'
 import {
@@ -72,18 +100,12 @@ import {
     readPersistedCustomViewport,
     writePersistedCustomViewport
 } from './prototype/persistence/custom-viewport'
-// Skill banner dismissal keys live in
-// `./prototype/persistence/skill-banner-dismiss.ts` and are now consumed
-// directly by the extracted banners (P3).
-
 interface PanelProps {
     basePath?: string
     currentItem?: any
     variant?: 'list' | 'content'
 }
 
-// `DeviceFrame` + `PreviewMode` moved to
-// `./prototype/preview/types.ts` (P4).
 type PrototypeTab = 'preview' | 'files' | 'logs' | 'history'
 
 const TABS: { id: PrototypeTab; label: string }[] = [
@@ -93,34 +115,10 @@ const TABS: { id: PrototypeTab; label: string }[] = [
     { id: 'history', label: 'History' }
 ]
 
-// `ChatPanelMode` moved to `./prototype/chat/types.ts` (P6).
-
-// Persistence helpers moved to `./prototype/persistence/{chat-width,
-// attached-ids,custom-viewport,skill-banner-dismiss}.ts` (P1).
-
 // Pinned palette components (M4.28) live in `features/component-palette` so
 // the persistence shape can be reused by future generators that want their
 // own pinned-component vocabulary. We pass `namespace: 'prototype'` here.
 const PALETTE_NAMESPACE = { namespace: 'prototype' as const }
-
-// M6.1 — engine-catalog block builder for the manifest-first system prompt.
-//
-// The full engine catalog can be ~100 components × dozens of properties each
-// — too large to inline in every chat turn. We pick a curated set of
-// always-included "structural" components (containers, common form fields,
-// headlines) plus whatever the user pinned via the palette. Property names
-// are listed but not their value schemas; the LLM has enough signal from
-// labels + property keys + the spec context to produce a valid manifest.
-
-// `computePreviewUrl` moved to `./prototype/preview/url.ts` (P2).
-// M7 golden anatomy + M6.1 always-included component list moved to
-// `./prototype/ai-prompts/{golden-list-example,always-included}.ts` (P1).
-
-// `buildSkillContextBlock` moved to `./prototype/ai-prompts/skill-context.ts` (P2).
-// `buildEngineCatalogBlock` moved to `./prototype/ai-prompts/engine-catalog.ts` (P2).
-
-// Custom viewport width (M4.19) moved to
-// `./prototype/persistence/custom-viewport.ts` (P1).
 
 // ─── List variant — placeholder; the rail hides the secondary panel here. ─
 
@@ -852,29 +850,6 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
 
 // ─── First-run banner (M4.18) ─────────────────────────────────────────────
 //
-// Indeterminate progress bar shown while `npm install` runs the very first
-// time the dev server is started for a project. The Logs tab is auto-focused
-// in parallel so the user sees the actual download stream — this banner is
-// just a thin reminder of what's happening so it stays out of the way.
-
-// ─── Chat panel tabs (M4.28) ──────────────────────────────────────────────
-//
-// `ChatPanelTabs`, `ChatPanelTabButton`, `ComponentPalettePane` moved to
-// `./prototype/chat/*.tsx` (P6).
-
-// `SkillInstallBanner`, `SkillUpdateBanner`, `FirstRunBanner` moved to
-// `./prototype/banners/{SkillInstallBanner,SkillUpdateBanner,FirstRunBanner}.tsx` (P3).
-
-// ─── Preview ──────────────────────────────────────────────────────────────
-//
-// `PreviewToolbar`, `PreviewUrlBar`, `PagesDropdown`, `DeviceButton`,
-// `PreviewModeButton` moved to `./prototype/preview/*.tsx` (P4).
-
-// `PreviewPane`, `FilesPane`, `FileViewer`, `FileTreeRow`, `LogsPane`,
-// `LogFilterButton`, `LogLine`, `HistoryPane`, `SnapshotCard` moved to
-// `./prototype/{preview,files,logs,history}/*.tsx` (P5).
-// `PrototypeFooter` moved to `./prototype/footer/PrototypeFooter.tsx` (P6).
-
 const PrototypePanel = ({ variant = 'content', ...rest }: PanelProps): JSX.Element => {
     return variant === 'list' ? <ListVariant /> : <ContentVariant {...rest} />
 }
