@@ -21,6 +21,7 @@ When a new version is available, the update dialog can now show release notes fe
 
 ### Improvements and fixes
 
+- **.NET backend generation** – Generated .NET projects now build, migrate, and run end-to-end. Fixed a compile error (`CS0246`) for models with `biginteger` primary-key columns, and fixed duplicated models mapping onto the same database table (which prevented the EF Core `DbContext` from being created).
 - General stability and performance improvements.
 
 ---
@@ -42,4 +43,5 @@ Quando há uma nova versão, o diálogo de atualização pode mostrar as notas d
 
 ### Melhorias e correções
 
+- **Geração de backend .NET** – Os projetos .NET gerados agora compilam, migram e arrancam de ponta a ponta. Corrigido um erro de compilação (`CS0246`) em modelos com colunas de chave primária `biginteger` e corrigida a colisão de modelos duplicados na mesma tabela de base de dados (que impedia a criação do `DbContext` do EF Core).
 - Melhorias gerais de estabilidade e desempenho.
