@@ -110,7 +110,7 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
                                 handleOpenProject(project)
                             }
                         }}
-                        className="group flex h-[130px] cursor-pointer flex-col justify-between gap-0 rounded-[8px] p-3 transition-all hover:border-primary hover:shadow-md focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+                        className="group flex h-[130px] cursor-pointer flex-col justify-between gap-0 rounded-lg p-3 transition-all hover:border-primary hover:shadow-md focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
                     >
                         {/* Header: icon + title + description / port */}
                         <div className="flex w-full min-w-0 items-start gap-2">

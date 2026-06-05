@@ -83,7 +83,7 @@ function ProjectIcon({
     if (isLoading) {
         return (
             <div
-                className={cn('h-8 w-8 rounded-[4px] bg-muted flex items-center justify-center', className)}
+                className={cn('h-8 w-8 rounded-sm bg-muted flex items-center justify-center', className)}
             >
                 <div className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin"></div>
             </div>
@@ -93,7 +93,7 @@ function ProjectIcon({
     if (iconUrl) {
         return (
             <div
-                className={cn('h-8 w-8 overflow-hidden rounded-[4px] bg-muted', className)}
+                className={cn('h-8 w-8 overflow-hidden rounded-sm bg-muted', className)}
             >
                 <img
                     src={iconUrl}
@@ -108,7 +108,7 @@ function ProjectIcon({
         <FrameworkIcon
             framework={project.framework as any}
             size={20}
-            className={cn('h-8 w-8 rounded-[4px] bg-muted p-1', className)}
+            className={cn('h-8 w-8 rounded-sm bg-muted p-1', className)}
             alt={`${project.framework} logo`}
         />
     )

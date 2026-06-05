@@ -65,7 +65,7 @@ export function ServiceGrid({ services, showFilter = true, onActionComplete }: S
                     return (
                         <div
                             key={index}
-                            className="group relative overflow-visible rounded-xl border border-slate-200 bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900 dark:hover:shadow-black/25"
+                            className="group relative overflow-visible rounded-lg border border-slate-200 bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900 dark:hover:shadow-black/25"
                         >
                             <div className="relative z-10 flex items-start justify-between gap-2 border-b border-slate-100 px-3 py-3 dark:border-slate-700">
                                 <div className="flex min-w-0 items-center gap-2">

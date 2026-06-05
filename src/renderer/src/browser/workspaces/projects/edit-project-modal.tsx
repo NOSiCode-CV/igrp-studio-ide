@@ -189,7 +189,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                         initial={{ opacity: 0, scale: 0.98, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                        className="w-full max-w-[460px] bg-card rounded-[4px] border border-border shadow-[0_24px_60px_-15px_rgba(0,0,0,0.12),0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col font-sans"
+                        className="w-full max-w-[460px] bg-card rounded-sm border border-border shadow-[0_24px_60px_-15px_rgba(0,0,0,0.12),0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col font-sans"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <form onSubmit={onSubmit} className="flex flex-col">
@@ -261,7 +261,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                                     ref={nameRefHandler}
                                                     id="project-name-input"
                                                     placeholder="Enter project name..."
-                                                    className="w-full bg-card border border-input rounded-[2px] px-2 py-1 text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-teal-500/10 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                    className="w-full bg-card border border-input rounded-sm px-2 py-1 text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-teal-500/10 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                                 />
                                                 {touchedFields.name && nameError && (
                                                     <p className="text-[10px] text-rose-500 mt-1">
@@ -296,7 +296,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                                     }
                                                     rows={3}
                                                     placeholder="Describe this project..."
-                                                    className="w-full bg-card border border-input rounded-[2px] px-2 py-1.5 text-[11px] text-foreground leading-relaxed resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-teal-500/10 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                    className="w-full bg-card border border-input rounded-sm px-2 py-1.5 text-[11px] text-foreground leading-relaxed resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-teal-500/10 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                                 />
                                                 {descriptionError && (
                                                     <p className="text-[10px] text-rose-500 mt-1">
@@ -315,14 +315,14 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                                     type="button"
                                     onClick={onClose}
                                     disabled={isSubmitting}
-                                    className="px-4 py-1 text-[11px] font-bold text-muted-foreground bg-card border border-border rounded-[2px] hover:bg-muted min-w-[70px] transition-colors disabled:opacity-50"
+                                    className="px-4 py-1 text-[11px] font-bold text-muted-foreground bg-card border border-border rounded-sm hover:bg-muted min-w-[70px] transition-colors disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={isSubmitting || !isValid}
-                                    className="px-4 py-1 text-[11px] font-bold text-primary-foreground bg-primary border border-primary rounded-[2px] shadow-sm hover:bg-primary/90 min-w-[100px] transition-colors disabled:opacity-50"
+                                    className="px-4 py-1 text-[11px] font-bold text-primary-foreground bg-primary border border-primary rounded-sm shadow-sm hover:bg-primary/90 min-w-[100px] transition-colors disabled:opacity-50"
                                 >
                                     {isSubmitting ? 'Saving...' : 'Save Changes'}
                                 </button>

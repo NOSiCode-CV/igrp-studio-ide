@@ -376,7 +376,7 @@ export function CloneProjectModal({
                 initial={{ opacity: 0, scale: 0.98, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                className="w-full max-w-[460px] max-h-[85vh] bg-card rounded-[4px] border border-border shadow-[0_24px_60px_-15px_rgba(0,0,0,0.12),0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col font-sans"
+                className="w-full max-w-[460px] max-h-[85vh] bg-card rounded-sm border border-border shadow-[0_24px_60px_-15px_rgba(0,0,0,0.12),0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col font-sans"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}

@@ -554,7 +554,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             <div
                                 key={id}
                                 className={cn(
-                                    'cursor-pointer rounded-[4px] border p-3 transition-colors',
+                                    'cursor-pointer rounded-sm border p-3 transition-colors',
                                     active
                                         ? 'border-primary bg-primary/5'
                                         : 'border-border hover:border-primary/40'
@@ -621,7 +621,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             placeholder={t('searchGenerators', {
                                 defaultValue: 'Search generators...'
                             })}
-                            className="h-7 rounded-[4px] border-[0.5px] border-muted-foreground/20 pl-7 text-[11px] shadow-none"
+                            className="h-7 rounded-sm border-[0.5px] border-muted-foreground/20 pl-7 text-[11px] shadow-none"
                         />
                     </div>
                 </div>
@@ -638,7 +638,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             <div
                                 key={fw.id}
                                 className={cn(
-                                    'cursor-pointer rounded-[4px] border p-3 transition-colors',
+                                    'cursor-pointer rounded-sm border p-3 transition-colors',
                                     active
                                         ? 'border-primary bg-primary/5'
                                         : 'border-border hover:border-primary/40',
@@ -914,7 +914,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     defaultValue: 'e.g. acme-dashboard'
                                 })}
                                 maxLength={50}
-                                className="h-7 rounded-[4px] text-[11px]"
+                                className="h-7 rounded-sm text-[11px]"
                             />
                             {touchedFields.name && nameError && (
                                 <p className="mt-1 text-xs text-destructive">{nameError}</p>
@@ -940,7 +940,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                             placeholder={t('projectDescription', {
                                 defaultValue: 'Briefly describe this project...'
                             })}
-                            className="h-7 max-w-[350px] flex-1 rounded-[4px] text-[11px]"
+                            className="h-7 max-w-[350px] flex-1 rounded-sm text-[11px]"
                         />
                     </div>
 
@@ -993,13 +993,13 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     id="path"
                                     placeholder={t('enterProjectDirectory')}
                                     disabled={values.storageMode !== 'linked'}
-                                    className="h-7 rounded-[4px] font-mono text-[10.5px]"
+                                    className="h-7 rounded-sm font-mono text-[10.5px]"
                                 />
                                 <Button
                                     variant="outline"
                                     size="icon"
                                     type="button"
-                                    className="h-7 w-7 rounded-[4px]"
+                                    className="h-7 w-7 rounded-sm"
                                     onClick={(e) => {
                                         e.preventDefault()
                                         handleOpenDirectory()
@@ -1161,7 +1161,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                             defaultValue: 'e.g. acme-dashboard'
                                         })}
                                         maxLength={50}
-                                        className="h-7 rounded-[4px] text-[11px]"
+                                        className="h-7 rounded-sm text-[11px]"
                                     />
                                     {touchedFields.name && nameError && (
                                         <p className="mt-1 text-xs text-destructive">
@@ -1181,7 +1181,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     placeholder={t('projectDescription', {
                                         defaultValue: 'Briefly describe this project...'
                                     })}
-                                    className="h-7 max-w-[350px] flex-1 rounded-[4px] text-[11px]"
+                                    className="h-7 max-w-[350px] flex-1 rounded-sm text-[11px]"
                                 />
                             </div>
                             <div className="flex items-start gap-3">
@@ -1232,13 +1232,13 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                             id="path"
                                             placeholder={t('enterProjectDirectory')}
                                             disabled={values.storageMode !== 'linked'}
-                                            className="h-7 rounded-[4px] font-mono text-[10.5px]"
+                                            className="h-7 rounded-sm font-mono text-[10.5px]"
                                         />
                                         <Button
                                             variant="outline"
                                             size="icon"
                                             type="button"
-                                            className="h-7 w-7 rounded-[4px]"
+                                            className="h-7 w-7 rounded-sm"
                                             onClick={(e) => {
                                                 e.preventDefault()
                                                 handleOpenDirectory()
@@ -1390,7 +1390,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         type="button"
                                         onClick={() => setCfg({ [key]: !checked })}
                                         className={cn(
-                                            'flex flex-1 items-center justify-between rounded-[4px] border px-2 py-1 text-left transition-colors',
+                                            'flex flex-1 items-center justify-between rounded-sm border px-2 py-1 text-left transition-colors',
                                             checked
                                                 ? 'border-primary bg-primary/5 text-foreground'
                                                 : 'border-border bg-background text-muted-foreground hover:bg-muted/50'
@@ -1399,7 +1399,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                         <span className="text-[10px] font-medium">{label}</span>
                                         <span
                                             className={cn(
-                                                'flex h-3 w-3 shrink-0 items-center justify-center rounded-[4px] border',
+                                                'flex h-3 w-3 shrink-0 items-center justify-center rounded-sm border',
                                                 checked
                                                     ? 'border-primary bg-primary text-primary-foreground'
                                                     : 'border-border bg-background'
@@ -1566,7 +1566,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                             defaultValue: 'e.g. acme-dashboard'
                                         })}
                                         maxLength={50}
-                                        className="h-7 rounded-[4px] text-[11px]"
+                                        className="h-7 rounded-sm text-[11px]"
                                     />
                                     {touchedFields.name && nameError && (
                                         <p className="mt-1 text-xs text-destructive">
@@ -1586,7 +1586,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     placeholder={t('projectDescription', {
                                         defaultValue: 'Briefly describe this project...'
                                     })}
-                                    className="h-7 max-w-[350px] flex-1 rounded-[4px] text-[11px]"
+                                    className="h-7 max-w-[350px] flex-1 rounded-sm text-[11px]"
                                 />
                             </div>
                             <div className="flex items-start gap-3">
@@ -1637,13 +1637,13 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                             id="path"
                                             placeholder={t('enterProjectDirectory')}
                                             disabled={values.storageMode !== 'linked'}
-                                            className="h-7 rounded-[4px] font-mono text-[10.5px]"
+                                            className="h-7 rounded-sm font-mono text-[10.5px]"
                                         />
                                         <Button
                                             variant="outline"
                                             size="icon"
                                             type="button"
-                                            className="h-7 w-7 rounded-[4px]"
+                                            className="h-7 w-7 rounded-sm"
                                             onClick={(e) => {
                                                 e.preventDefault()
                                                 handleOpenDirectory()

@@ -104,7 +104,7 @@ const ResourceSection = ({
                         value={searchQuery}
                         onChange={onSearchChange}
                         className="w-[224px] max-w-full"
-                        inputClassName="rounded-[4px] focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary/20"
+                        inputClassName="rounded-sm focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary/20"
                     />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -131,7 +131,7 @@ const ResourceSection = ({
                                         key={option.value}
                                         onSelect={() => onSortChange(option.value)}
                                         className={cn(
-                                            'flex cursor-pointer items-center justify-between gap-4 rounded-[4px] px-2 py-1.5 text-sm',
+                                            'flex cursor-pointer items-center justify-between gap-4 rounded-sm px-2 py-1.5 text-sm',
                                             isActive &&
                                                 'bg-primary/10 text-primary focus:bg-primary/10 focus:text-primary'
                                         )}
@@ -150,13 +150,13 @@ const ResourceSection = ({
                         value={viewMode}
                         onValueChange={(value) => value && onViewModeChange(value as ViewMode)}
                         spacing={1}
-                        className="flex shrink-0 items-center gap-0 rounded-[4px] border bg-muted p-0.5"
+                        className="flex shrink-0 items-center gap-0 rounded-sm border bg-muted p-0.5"
                     >
                         <ToggleGroupItem
                             value="grid"
                             size="sm"
                             aria-label="Grid view"
-                            className="h-auto min-w-0 rounded-[4px] p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:shadow-sm"
+                            className="h-auto min-w-0 rounded-sm p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:shadow-sm"
                         >
                             <LayoutGrid className="h-3.5 w-3.5" />
                         </ToggleGroupItem>
@@ -164,7 +164,7 @@ const ResourceSection = ({
                             value="list"
                             size="sm"
                             aria-label="List view"
-                            className="h-auto min-w-0 rounded-[4px] p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:shadow-sm"
+                            className="h-auto min-w-0 rounded-sm p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:shadow-sm"
                         >
                             <StretchHorizontal className="h-3.5 w-3.5" />
                         </ToggleGroupItem>
@@ -307,7 +307,7 @@ const Resources = () => {
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <ProjectWizard>
-                    <Button size="sm" className="h-8 gap-1.5 rounded-[4px]">
+                    <Button size="sm" className="h-8 gap-1.5 rounded-sm">
                         <Plus className="h-3.5 w-3.5" />
                         {t('newProject')}
                     </Button>
