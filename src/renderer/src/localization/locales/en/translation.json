@@ -2,6 +2,8 @@
     "welcome": "Welcome to IGRP Studio",
     "selectProject": "Select Project",
     "start": "Start",
+    "startGroup": "Start all services in this group",
+    "stopGroup": "Stop all services in this group",
     "createNewProject": "New Project",
     "openProject": "Open Project",
     "openProjectOptionsTitle": "How do you want to open this project?",

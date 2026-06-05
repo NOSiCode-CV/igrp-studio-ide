@@ -1,6 +1,12 @@
 import { Button } from '@renderer/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
 import { ToggleGroup, ToggleGroupItem } from '@renderer/components/ui/toggle-group'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
 import { SearchInput } from '@renderer/components/shared-ui'
 import { useDocker } from '@renderer/hooks/use-docker'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
@@ -475,7 +481,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                         )}
 
                         <ConfigurationDialog services={allServices} isNew={true}>
-                            <Button size="sm" className="h-8 gap-1.5 rounded-[4px]">
+                            <Button size="sm" className="h-8 gap-1.5 rounded-sm">
                                 <Plus className="h-3.5 w-3.5" />
                                 {t('newService')}
                             </Button>
@@ -593,46 +599,62 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                 </span>
                                             </div>
 
-                                            <div className="flex items-center gap-1">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() =>
-                                                        void handleStackAction(
-                                                            group.stack.id,
-                                                            'start',
-                                                            group.stackServiceNames
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        stackActionState.stackId ===
-                                                            group.stack.id &&
-                                                        stackActionState.action !== null
-                                                    }
-                                                    className="h-7 w-7 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:text-slate-500 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-300"
-                                                >
-                                                    <Play className="h-3.5 w-3.5" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() =>
-                                                        void handleStackAction(
-                                                            group.stack.id,
-                                                            'stop',
-                                                            group.stackServiceNames
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        stackActionState.stackId ===
-                                                            group.stack.id &&
-                                                        stackActionState.action !== null
-                                                    }
-                                                    className="h-7 w-7 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-rose-900/30 dark:hover:text-rose-300"
-                                                >
-                                                    <Square className="h-3.5 w-3.5" />
-                                                </Button>
-                                            </div>
+                                            <TooltipProvider>
+                                                <div className="flex items-center gap-1">
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() =>
+                                                                    void handleStackAction(
+                                                                        group.stack.id,
+                                                                        'start',
+                                                                        group.stackServiceNames
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    stackActionState.stackId ===
+                                                                        group.stack.id &&
+                                                                    stackActionState.action !== null
+                                                                }
+                                                                className="h-7 w-7 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:text-slate-500 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-300"
+                                                            >
+                                                                <Play className="h-3.5 w-3.5" />
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>{t('startGroup')}</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() =>
+                                                                    void handleStackAction(
+                                                                        group.stack.id,
+                                                                        'stop',
+                                                                        group.stackServiceNames
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    stackActionState.stackId ===
+                                                                        group.stack.id &&
+                                                                    stackActionState.action !== null
+                                                                }
+                                                                className="h-7 w-7 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-rose-900/30 dark:hover:text-rose-300"
+                                                            >
+                                                                <Square className="h-3.5 w-3.5" />
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>{t('stopGroup')}</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </div>
+                                            </TooltipProvider>
                                         </div>
 
                                         <div className="space-y-4 p-4">
