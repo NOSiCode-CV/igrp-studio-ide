@@ -366,7 +366,7 @@ const ContentVariant = ({ basePath }: PanelProps): JSX.Element => {
 
     if (!item) {
         return (
-            <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+            <div className="flex h-full flex-col items-center justify-center bg-background p-8 text-center">
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent">
                     <LayoutIcon className="text-muted-foreground/40" size={28} />
                 </div>

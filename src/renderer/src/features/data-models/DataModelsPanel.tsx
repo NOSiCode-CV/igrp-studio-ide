@@ -53,8 +53,12 @@ export function DataModelsPanel({
     }, [])
 
     return (
-        <div className="flex h-full">
-            <aside className="w-[360px] border-r flex flex-col">
+        <div className="flex h-full bg-background">
+            {/* Chat aside — uses `bg-sidebar` to match the Prototype panel and
+                the Specification rail's secondary panels. Without an explicit
+                token here the aside inherits from `<body>`, which falls back
+                to a near-white surface in dark mode. */}
+            <aside className="w-[360px] border-r flex flex-col bg-sidebar">
                 <DataChatPanel
                     basePath={basePath}
                     activeDoc={activeDoc}
@@ -62,7 +66,7 @@ export function DataModelsPanel({
                     className="flex-1"
                 />
             </aside>
-            <main className="flex-1 flex flex-col min-w-0">
+            <main className="flex-1 flex flex-col min-w-0 bg-background">
                 <Tabs
                     value={view}
                     onValueChange={(v) => setView(v as 'entities' | 'erd')}

@@ -137,7 +137,11 @@ const MainContent = ({
     currentItem?: any
 }): JSX.Element => {
     return (
-        <main className="flex-1 overflow-hidden">
+        // `bg-background` here is a defence-in-depth default — individual
+        // panels still own their own surface tokens, but if any forget to
+        // set one (as the KB empty state did) we don't fall through to the
+        // body's near-white surface in dark mode.
+        <main className="flex-1 overflow-hidden bg-background">
             {activeTab === 'documents' && (
                 <DocumentsPanel basePath={basePath} currentItem={currentItem} variant="content" />
             )}
