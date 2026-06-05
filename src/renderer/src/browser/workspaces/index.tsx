@@ -84,7 +84,7 @@ const ResourceSection = ({
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b pb-2">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b pb-4">
                 {/* LEFT: icon + title + count */}
                 <div className="flex items-center gap-2 min-w-0">
                     {Icon && <Icon className="h-4 w-4 text-primary shrink-0" />}

@@ -92,7 +92,7 @@ const IDEInitialScreen = (): React.JSX.Element => {
                         </TabsList>
                     </div>
 
-                    <TabsContent value="resources" className="mt-0 min-h-0 overflow-y-auto space-y-6 pt-4">
+                    <TabsContent value="resources" className="mt-0 min-h-0 overflow-y-auto space-y-6 pt-2">
                         {workspace && <Resources />}
                     </TabsContent>
 
