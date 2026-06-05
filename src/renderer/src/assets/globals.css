@@ -20,6 +20,15 @@
 }
 
 :root {
+    --font-inter: Inter, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-jetbrains-mono:
+        "JetBrains Mono", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono",
+        "Courier New", monospace;
+    --font-sans: var(--font-inter);
+    --font-mono: var(--font-jetbrains-mono);
+    --brand-teal: #0d9488;
+    --brand-teal-hover: #0f766e;
+
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -172,6 +181,14 @@
 
     body {
         @apply bg-background text-foreground;
+        font-family: var(--font-sans);
+    }
+
+    code,
+    kbd,
+    pre,
+    samp {
+        font-family: var(--font-mono);
     }
 
     button:not(:disabled),

@@ -66,7 +66,7 @@ const serviceCategories: ServiceCategory[] = [
         name: 'Monitoring',
         icon: <Compass className="h-4 w-4" />,
         color: 'bg-purple-500',
-        types: ['observability', 'messaging']
+        types: ['observability', 'monitoring', 'messaging']
     }
 ]
 
@@ -118,7 +118,7 @@ export function ServiceFilter({ onFilterChange, totalServices }: ServiceFilterPr
                         className={`flex items-center gap-2 ${
                             activeCategory === category.id
                                 ? `${category.color} text-white hover:opacity-90`
-                                : 'hover:bg-muted'
+                                : 'hover:bg-muted dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
                         }`}
                     >
                         {category.icon}

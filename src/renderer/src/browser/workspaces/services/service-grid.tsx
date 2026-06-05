@@ -1,22 +1,18 @@
 'use client'
 
 import { Badge } from '@renderer/components/ui/badge'
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle
-} from '@renderer/components/ui/card'
 import { useMemo, useState } from 'react'
-import Dependency from '../components/dependency'
-import { PortsBadgeList } from '../components/ports-badge-list'
+import { useTranslation } from 'react-i18next'
+import { DependencySummary } from '../components/dependency'
 import {
     filterServicesByCategory,
     filterServicesBySearch,
     getServiceColor,
     getServiceIcon,
-    getStatusColor
+    getServiceStatusText,
+    getStatusColor,
+    getStatusDotColor,
+    resolveServiceVisualType
 } from '.'
 import { ServiceActions } from './service-actions'
 import { ServiceFilter } from './service-filter'
@@ -25,9 +21,11 @@ interface ServiceGridProps {
     services: any[]
     workspaceId?: string
     showFilter?: boolean
+    onActionComplete?: () => Promise<void> | void
 }
 
-export function ServiceGrid({ services, showFilter = true }: ServiceGridProps) {
+export function ServiceGrid({ services, showFilter = true, onActionComplete }: ServiceGridProps) {
+    const { t } = useTranslation()
     const [activeCategory, setActiveCategory] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
@@ -59,45 +57,97 @@ export function ServiceGrid({ services, showFilter = true }: ServiceGridProps) {
 
             {/* Services Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                {filteredServices.map((service, index) => (
-                    <Card key={index}>
-                        <CardHeader>
-                            <CardTitle>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-1">
-                                        <div
-                                            className={`${getServiceColor(service.labels?.type)} rounded-sm p-1 text-white`}
-                                        >
-                                            {getServiceIcon(service.labels?.type)}
-                                        </div>
-                                        <Badge variant="outline" className="capitalize">
-                                            {service.labels?.type}
-                                        </Badge>
+                {filteredServices.map((service, index) => {
+                    const visualType = resolveServiceVisualType(service)
+                    const serviceTypeLabel =
+                        service.labels?.type || (visualType !== 'other' ? visualType : t('type'))
+
+                    return (
+                        <div
+                            key={index}
+                            className="group relative overflow-visible rounded-xl border border-slate-200 bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900 dark:hover:shadow-black/25"
+                        >
+                            <div className="relative z-10 flex items-start justify-between gap-2 border-b border-slate-100 px-3 py-3 dark:border-slate-700">
+                                <div className="flex min-w-0 items-center gap-2">
+                                    <span
+                                        className={`h-1.5 w-1.5 rounded-full ${getStatusDotColor(
+                                            service.status
+                                        )}`}
+                                    />
+                                    <div
+                                        className={`${getServiceColor(visualType)} rounded-sm p-1 text-white transition-all duration-200 group-hover:-translate-y-0.5 group-hover:scale-110 group-hover:shadow-sm`}
+                                    >
+                                        {getServiceIcon(visualType)}
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                        <Badge
-                                            variant="outline"
-                                            className={`capitalize ${getStatusColor(service.status)}`}
-                                        >
-                                            {service.status}
-                                        </Badge>
-                                        <ServiceActions
-                                            service={service}
-                                            services={filteredServices}
-                                        />
+                                    <div className="min-w-0">
+                                        <div className="truncate text-sm font-semibold text-slate-800 transition-colors duration-200 group-hover:text-primary dark:text-slate-100 dark:group-hover:text-primary">
+                                            {service.name}
+                                        </div>
+                                        <div className="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                                            {serviceTypeLabel}
+                                        </div>
                                     </div>
                                 </div>
-                            </CardTitle>
-                            <CardDescription className="truncate">{service.name}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1">
-                                <PortsBadgeList ports={service.ports} />
-                                <Dependency dependsOn={service.dependsOn} />
+                                <div className="flex items-center gap-1">
+                                    <Badge
+                                        variant="outline"
+                                        className={`border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getStatusColor(
+                                            service.status
+                                        )}`}
+                                    >
+                                        <span
+                                            className={`mr-1 inline-block h-1.5 w-1.5 rounded-full ${getStatusDotColor(
+                                                service.status
+                                            )}`}
+                                        />
+                                        {getServiceStatusText(service.status)}
+                                    </Badge>
+                                    <ServiceActions
+                                        service={service}
+                                        services={filteredServices}
+                                        onActionComplete={onActionComplete}
+                                    />
+                                </div>
                             </div>
-                        </CardContent>
-                    </Card>
-                ))}
+
+                            <div className="relative z-10 px-3 py-3">
+                                <div className="rounded-lg bg-white p-2.5 transition-colors duration-200 group-hover:bg-white dark:bg-slate-900 dark:group-hover:bg-slate-900">
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="min-w-0">
+                                            <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                                                {t('ports')}
+                                            </div>
+                                            <div className="flex flex-wrap gap-1">
+                                                {service.ports && service.ports.length > 0 ? (
+                                                    service.ports.map((port: string, i: number) => (
+                                                        <Badge
+                                                            key={i}
+                                                            variant="outline"
+                                                            className="border-slate-200 bg-white text-[10px] text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                                                        >
+                                                            {port}
+                                                        </Badge>
+                                                    ))
+                                                ) : (
+                                                    <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                                                        {t('none')}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="min-w-0">
+                                            <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                                                {t('dependencies')}
+                                            </div>
+                                            <DependencySummary dependsOn={service.dependsOn} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                })}
             </div>
         </div>
     )
