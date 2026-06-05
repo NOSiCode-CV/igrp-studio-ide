@@ -73,7 +73,7 @@ const IDEInitialScreen = (): React.JSX.Element => {
             {workspace ? (
                 <Tabs defaultValue="resources" className="flex min-h-0 flex-1 flex-col overflow-hidden">
                     <div
-                        className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-background/95 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/90"
+                        className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-background/95 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/90"
                     >
                         <WelcomeHeader />
                         <TabsList className="w-fit">
