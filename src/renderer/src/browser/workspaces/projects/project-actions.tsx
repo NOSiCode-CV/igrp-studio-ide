@@ -9,6 +9,7 @@ import {
     DropdownMenuTrigger
 } from '@renderer/components/ui/dropdown-menu'
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
+import { cn } from '@renderer/lib/utils'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import { useDocker } from '@renderer/hooks/use-docker'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
@@ -28,6 +29,8 @@ interface ProjectDropdownProps {
     projects?: ProjectData[]
     onConvertToSpringBoot?: () => void
     onConvertToDotNet?: () => void
+    /** Extra classes for the 3-dot trigger (e.g. to keep it always visible). */
+    triggerClassName?: string
 }
 
 export const ProjectActions: React.FC<ProjectDropdownProps> = ({
@@ -35,7 +38,8 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
     services = [],
     projects = [],
     onConvertToSpringBoot,
-    onConvertToDotNet
+    onConvertToDotNet,
+    triggerClassName
 }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -127,7 +131,11 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                        aria-label="Project actions"
+                        className={cn(
+                            'h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100',
+                            triggerClassName
+                        )}
                     >
                         <MoreVertical className="h-4 w-4" />
                     </Button>

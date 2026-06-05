@@ -1,0 +1,26 @@
+# TODO: replace with your own configuration if necessary
+# global config
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'template-service'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['template-service:8080']
+
+  - job_name: 'otel-collector'
+    static_configs:
+      - targets: ['demoteste-otel-collector:8889']
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['demoteste-cadvisor:8080']

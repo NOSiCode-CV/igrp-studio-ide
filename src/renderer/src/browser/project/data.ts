@@ -1,8 +1,6 @@
 export const STEPS = [
-    { id: 1, label: 'projectInfo' },
-    { id: 2, label: 'framework' },
-    { id: 3, label: 'configure' },
-    { id: 4, label: 'summary' }
+    { id: 1, label: 'framework' },
+    { id: 2, label: 'configure' }
 ]
 
 export const THEME_COLORS = [

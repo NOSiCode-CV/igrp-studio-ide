@@ -6,7 +6,7 @@ const WelcomeHeader = () => {
     const { workspace } = useWorkspace()
 
     return (
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between">
             <Headline
                 icon={FolderKanban}
                 title={workspace.name}
