@@ -46,7 +46,7 @@
         "@igrp/framework-process-studio-client": "^0.0.1-beta.12",
         "@igrp/framework-process-studio-types": "^0.0.1-beta.12",
         "@igrp/igrp-framework-react-design-system": "0.1.0-beta.103",
-        "@igrp/igrp-studio-nextjs-engine": "0.2.0-beta.13",
+        "@igrp/igrp-studio-nextjs-engine": "0.2.0-beta.14",
         "@igrp/igrp-studio-springboot-engine": "0.1.0-beta.20-snapshot.4",
         "@igrp/igrp-studio-workspace-engine": "0.2.0-beta.6",
         "@lancedb/lancedb": "^0.27.2",
