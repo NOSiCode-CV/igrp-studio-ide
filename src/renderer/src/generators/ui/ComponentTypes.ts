@@ -12,7 +12,6 @@ import {
     IGRPCheckbox,
     IGRPCombobox,
     IGRPCopyTo,
-    IGRPDataTableFilterDate,
     IGRPDataTableFilterDropdown,
     IGRPDataTableFilterFaceted,
     IGRPDataTableFilterInput,
@@ -81,6 +80,7 @@ import IGRPStudioParagraph from './renderers/components/Paragraph'
 import IGRPStudioRepetitive from './renderers/components/RepetitiveList'
 import IGRPStudioSection from './renderers/components/Section'
 import IGRPStudioTable from './renderers/components/Table'
+import IGRPStudioTableDateFilterPreview from './renderers/components/TableDateFilterPreview'
 import IGRPStudioTabs from './renderers/components/Tabs'
 import IGRPStudioTextList from './renderers/components/TextList'
 
@@ -268,7 +268,7 @@ export const COMPONENT_MAP: Record<string, any> = {
 
     [COMPONENT.TableInputFilter]: IGRPDataTableFilterInput,
     [COMPONENT.TableMinMaxFilter]: IGRPDataTableFilterMinMax,
-    [COMPONENT.TableFilterDate]: IGRPDataTableFilterDate,
+    [COMPONENT.TableFilterDate]: IGRPStudioTableDateFilterPreview,
     [COMPONENT.TableSelectFilter]: IGRPDataTableFilterSelect,
     [COMPONENT.TableFacetedFilter]: IGRPDataTableFilterFaceted,
     [COMPONENT.TableFilterDropdown]: IGRPDataTableFilterDropdown,

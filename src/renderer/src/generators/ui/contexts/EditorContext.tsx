@@ -1,4 +1,3 @@
-import { useSidebar } from '@renderer/components/ui/sidebar'
 import type {
     Arguments,
     CustomFunctionConfig,
@@ -29,64 +28,31 @@ const emptyComponents: StructuredComponent = {
     children: []
 }
 
-interface TabSlice {
-    components: StructuredComponent
-    types: TypeDef[]
-    functions: CustomFunctionConfig[]
-    states: State[]
-    imports: Import[]
-    componentArguments: Arguments[]
-    currentComponent: EditingComponentParams | null
-    restData: any
-}
-
-const emptyTabSlice = (): TabSlice => ({
-    components: { ...emptyComponents, children: [] },
-    types: [],
-    functions: [],
-    states: [],
-    imports: [],
-    componentArguments: [],
-    currentComponent: null,
-    restData: {}
-})
-
-interface ProviderProps {
-    children: ReactNode
-    activeTabId: string
-}
-
 /**
- * Single provider for all tabs. Keeps a per-tab slice keyed by `activeTabId`.
- * Selectors and setters in `useDroppedComponents()` always operate on the
- * currently active tab's slice; switching tabs is just an `activeTabId` change.
+ * Per-instance editor store. One `DroppedComponentsProvider` is mounted PER TAB
+ * (inside the tabs map), so each open page owns an independent React state tree.
+ * Hidden tabs keep their state untouched; closing a tab unmounts its provider
+ * and the state is garbage-collected. This is the isolation model — there is no
+ * shared "active tab" slice, by design (a single shared store previously leaked
+ * edits across tabs).
  */
-export const DroppedComponentsProvider: React.FC<ProviderProps> = ({ children, activeTabId }) => {
-    const { toggleSidebar, setOpen } = useSidebar()
-
-    const [byTab, setByTab] = useState<Record<string, TabSlice>>({})
-
-    const slice = byTab[activeTabId] ?? emptyTabSlice()
-
-    const updateSlice = useCallback((tabId: string, updater: (prev: TabSlice) => TabSlice) => {
-        setByTab((prev) => {
-            const current = prev[tabId] ?? emptyTabSlice()
-            return { ...prev, [tabId]: updater(current) }
-        })
-    }, [])
-
-    const updateActive = useCallback(
-        (updater: (prev: TabSlice) => TabSlice) => updateSlice(activeTabId, updater),
-        [activeTabId, updateSlice]
-    )
+export const DroppedComponentsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const [components, setComponents] = useState<StructuredComponent>({
+        ...emptyComponents,
+        children: []
+    })
+    const [types, setTypes] = useState<TypeDef[]>([])
+    const [functions, setFunctions] = useState<CustomFunctionConfig[]>([])
+    const [states, setStates] = useState<State[]>([])
+    const [imports, setImports] = useState<Import[]>([])
+    const [componentArguments, setComponentArguments] = useState<Arguments[]>([])
+    const [currentComponent, setCurrentComponent] = useState<EditingComponentParams | null>(null)
+    const [restData, setRestData] = useState<any>({})
 
     // ----- components ---------------------------------------------------------
-    const setAllComponents = useCallback(
-        (components: StructuredLayout) => {
-            updateActive((prev) => ({ ...prev, components: components as StructuredComponent }))
-        },
-        [updateActive]
-    )
+    const setAllComponents = useCallback((components: StructuredLayout) => {
+        setComponents(components as StructuredComponent)
+    }, [])
 
     const handleAddChildToComponent = useCallback(
         (destination: Destination, childComponent: StructuredComponent) => {
@@ -102,20 +68,14 @@ export const DroppedComponentsProvider: React.FC<ProviderProps> = ({ children, a
                     return { ...component, children: updatedChildren }
                 }
                 if (component.children) {
-                    return {
-                        ...component,
-                        children: component.children.map(updateComponentTree)
-                    }
+                    return { ...component, children: component.children.map(updateComponentTree) }
                 }
                 return component
             }
 
-            updateActive((prev) => ({
-                ...prev,
-                components: updateComponentTree(prev.components)
-            }))
+            setComponents((prev) => updateComponentTree(prev))
         },
-        [updateActive]
+        []
     )
 
     const handleReorderChildInComponent = useCallback(
@@ -125,7 +85,7 @@ export const DroppedComponentsProvider: React.FC<ProviderProps> = ({ children, a
                 return
             }
 
-            updateActive((prev) => {
+            setComponents((prev) => {
                 let movedComponent: StructuredComponent | null = null
 
                 const removeComponentFromSource = (
@@ -164,47 +124,40 @@ export const DroppedComponentsProvider: React.FC<ProviderProps> = ({ children, a
                     return component
                 }
 
-                const afterRemoval = removeComponentFromSource(prev.components)
-                const afterInsert = insertComponentIntoDestination(afterRemoval)
-                return { ...prev, components: afterInsert }
+                const afterRemoval = removeComponentFromSource(prev)
+                return insertComponentIntoDestination(afterRemoval)
             })
         },
-        [updateActive]
+        []
     )
 
-    const handleRemoveChildFromComponent = useCallback(
-        (destination: Destination) => {
-            if (!destination || !destination.droppableId) {
-                console.error('Invalid destination')
-                return
-            }
+    const handleRemoveChildFromComponent = useCallback((destination: Destination) => {
+        if (!destination || !destination.droppableId) {
+            console.error('Invalid destination')
+            return
+        }
 
-            const updateComponentTree = (
-                component: StructuredComponent
-            ): StructuredComponent | null => {
-                if (component.id === destination.droppableId) return null
-                if (component.children) {
-                    const updatedChildren = component.children
-                        .map(updateComponentTree)
-                        .filter((c): c is StructuredComponent => c !== null)
-                    return { ...component, children: updatedChildren }
-                }
-                return component
+        const updateComponentTree = (
+            component: StructuredComponent
+        ): StructuredComponent | null => {
+            if (component.id === destination.droppableId) return null
+            if (component.children) {
+                const updatedChildren = component.children
+                    .map(updateComponentTree)
+                    .filter((c): c is StructuredComponent => c !== null)
+                return { ...component, children: updatedChildren }
             }
+            return component
+        }
 
-            updateActive((prev) => ({
-                ...prev,
-                components: {
-                    ...prev.components,
-                    children: (prev.components.children || [])
-                        .map(updateComponentTree)
-                        .filter((c): c is StructuredComponent => c !== null)
-                },
-                currentComponent: null
-            }))
-        },
-        [updateActive]
-    )
+        setComponents((prev) => ({
+            ...prev,
+            children: (prev.children || [])
+                .map(updateComponentTree)
+                .filter((c): c is StructuredComponent => c !== null)
+        }))
+        setCurrentComponent(null)
+    }, [])
 
     const handleUpdateChildComponent = useCallback(
         (componentId: string, updates: Partial<StructuredComponent>) => {
@@ -213,12 +166,9 @@ export const DroppedComponentsProvider: React.FC<ProviderProps> = ({ children, a
                 return
             }
 
-            updateActive((prev) => {
-                if (prev.components.id === componentId) {
-                    return {
-                        ...prev,
-                        components: { ...prev.components, ...updates }
-                    }
+            setComponents((prev) => {
+                if (prev.id === componentId) {
+                    return { ...prev, ...updates }
                 }
 
                 const updateComponentTree = (
@@ -236,317 +186,194 @@ export const DroppedComponentsProvider: React.FC<ProviderProps> = ({ children, a
 
                 return {
                     ...prev,
-                    components: {
-                        ...prev.components,
-                        children: (prev.components.children || []).map(updateComponentTree)
-                    }
+                    children: (prev.children || []).map(updateComponentTree)
                 }
             })
         },
-        [updateActive]
+        []
     )
 
-    const removeRow = useCallback(
-        (rowId: string) => {
-            updateActive((prev) => ({
-                ...prev,
-                components: {
-                    ...prev.components,
-                    children: (prev.components.children || []).filter((row) => row.id !== rowId)
-                }
-            }))
-        },
-        [updateActive]
-    )
+    const removeRow = useCallback((rowId: string) => {
+        setComponents((prev) => ({
+            ...prev,
+            children: (prev.children || []).filter((row) => row.id !== rowId)
+        }))
+    }, [])
 
     // ----- editing component --------------------------------------------------
-    const setEditingComponent = useCallback(
-        ({ path, component }: EditingComponentParams) => {
-            updateActive((prev) => ({
-                ...prev,
-                currentComponent: { path, component }
-            }))
-            toggleSidebar()
-            setOpen(false)
-        },
-        [updateActive, toggleSidebar, setOpen]
-    )
+    const setEditingComponent = useCallback(({ path, component }: EditingComponentParams) => {
+        // Selecting a component only opens the Settings panel. We intentionally
+        // do NOT collapse the left palette anymore — both panels can stay open
+        // and the canvas shrinks + scrolls horizontally to fit (docked-panels
+        // pattern). The user controls each sidebar.
+        setCurrentComponent({ path, component })
+    }, [])
 
     const clearEditingComponent = useCallback(() => {
-        updateActive((prev) => ({ ...prev, currentComponent: null }))
-    }, [updateActive])
+        setCurrentComponent(null)
+    }, [])
 
     // ----- types --------------------------------------------------------------
-    const addType = useCallback(
-        (type: TypeDef) => {
-            updateActive((prev) => ({ ...prev, types: [...prev.types, type] }))
-        },
-        [updateActive]
-    )
+    const addType = useCallback((type: TypeDef) => {
+        setTypes((prev) => [...prev, type])
+    }, [])
 
-    const updateType = useCallback(
-        (id: string, updates: Partial<TypeDef>) => {
-            updateActive((prev) => ({
-                ...prev,
-                types: prev.types.map((t) => (t.componentId === id ? { ...t, ...updates } : t))
-            }))
-        },
-        [updateActive]
-    )
+    const updateType = useCallback((id: string, updates: Partial<TypeDef>) => {
+        setTypes((prev) => prev.map((t) => (t.componentId === id ? { ...t, ...updates } : t)))
+    }, [])
 
-    const removeType = useCallback(
-        (id: string) => {
-            updateActive((prev) => ({
-                ...prev,
-                types: prev.types.filter((t) => t.componentId !== id)
-            }))
-        },
-        [updateActive]
-    )
+    const removeType = useCallback((id: string) => {
+        setTypes((prev) => prev.filter((t) => t.componentId !== id))
+    }, [])
 
-    const createOrUpdateType = useCallback(
-        (newType: TypeDef) => {
-            updateActive((prev) => {
-                const idx = prev.types.findIndex((t) => t.componentId === newType.componentId)
-                if (idx !== -1) {
-                    const updated = [...prev.types]
-                    updated[idx] = newType
-                    return { ...prev, types: updated }
-                }
-                return { ...prev, types: [...prev.types, newType] }
-            })
-        },
-        [updateActive]
-    )
-
-    const getTypeByComponentId = useCallback(
-        (componentId: string): TypeDef | undefined =>
-            slice.types.find((t) => t.componentId === componentId),
-        [slice.types]
-    )
-
-    const setAllTypes = useCallback(
-        (newTypes: TypeDef[]) => {
-            updateActive((prev) => ({
-                ...prev,
-                types: Array.isArray(newTypes) ? newTypes : []
-            }))
-        },
-        [updateActive]
-    )
-
-    // ----- functions ----------------------------------------------------------
-    const addFunction = useCallback(
-        (fnc: CustomFunctionConfig) => {
-            updateActive((prev) => ({
-                ...prev,
-                functions: [...(prev.functions ?? []), fnc]
-            }))
-        },
-        [updateActive]
-    )
-
-    const updateFunction = useCallback(
-        (id: string, updates: Partial<CustomFunctionConfig>) => {
-            updateActive((prev) => ({
-                ...prev,
-                functions: prev.functions.map((f) => (f.id === id ? { ...f, ...updates } : f))
-            }))
-        },
-        [updateActive]
-    )
-
-    const removeFunction = useCallback(
-        (id: string) => {
-            updateActive((prev) => ({
-                ...prev,
-                functions: prev.functions.filter((f) => f.id !== id)
-            }))
-        },
-        [updateActive]
-    )
-
-    const setAllFunctions = useCallback(
-        (fncs: CustomFunctionConfig[]) => {
-            updateActive((prev) => ({
-                ...prev,
-                functions: Array.isArray(fncs) ? fncs : []
-            }))
-        },
-        [updateActive]
-    )
-
-    // ----- states -------------------------------------------------------------
-    const addState = useCallback(
-        (state: State) => {
-            updateActive((prev) => {
-                const list = prev.states ?? []
-                const idx = list.findIndex((s) => s.name === state.name)
-                if (idx !== -1) {
-                    console.warn(
-                        `State with name "${state.name}" already exists. Replacing existing state.`
-                    )
-                    const updated = [...list]
-                    updated[idx] = state
-                    return { ...prev, states: updated }
-                }
-                return { ...prev, states: [...list, state] }
-            })
-        },
-        [updateActive]
-    )
-
-    const updateState = useCallback(
-        (id: string, updates: Partial<State>) => {
-            updateActive((prev) => ({
-                ...prev,
-                states: prev.states.map((s) => (s.id === id ? { ...s, ...updates } : s))
-            }))
-        },
-        [updateActive]
-    )
-
-    const removeState = useCallback(
-        (id: string) => {
-            updateActive((prev) => ({
-                ...prev,
-                states: prev.states.filter((s) => s.id !== id)
-            }))
-        },
-        [updateActive]
-    )
-
-    const setAllStates = useCallback(
-        (states: State[]) => {
-            updateActive((prev) => ({
-                ...prev,
-                states: Array.isArray(states) ? states : []
-            }))
-        },
-        [updateActive]
-    )
-
-    // ----- imports ------------------------------------------------------------
-    const addImport = useCallback(
-        (importPath: Import) => {
-            updateActive((prev) => ({
-                ...prev,
-                imports: [...(prev.imports ?? []), importPath]
-            }))
-        },
-        [updateActive]
-    )
-
-    const updateImport = useCallback(
-        (id: string, updates: Partial<Import>) => {
-            updateActive((prev) => ({
-                ...prev,
-                imports: prev.imports.map((i) => (i.id === id ? { ...i, ...updates } : i))
-            }))
-        },
-        [updateActive]
-    )
-
-    const removeImport = useCallback(
-        (id: string) => {
-            updateActive((prev) => ({
-                ...prev,
-                imports: prev.imports.filter((i) => i.id !== id)
-            }))
-        },
-        [updateActive]
-    )
-
-    const setAllImports = useCallback(
-        (imports: Import[]) => {
-            updateActive((prev) => ({
-                ...prev,
-                imports: Array.isArray(imports) ? imports : []
-            }))
-        },
-        [updateActive]
-    )
-
-    // ----- arguments / restData ----------------------------------------------
-    const setAllArguments = useCallback(
-        (args: Arguments[]) => {
-            updateActive((prev) => ({
-                ...prev,
-                componentArguments: Array.isArray(args) ? args : []
-            }))
-        },
-        [updateActive]
-    )
-
-    const setAllRestData = useCallback(
-        (restData: any) => {
-            updateActive((prev) => ({ ...prev, restData }))
-        },
-        [updateActive]
-    )
-
-    // ----- tab lifecycle ------------------------------------------------------
-    const removeTab = useCallback((tabId: string) => {
-        setByTab((prev) => {
-            if (!(tabId in prev)) return prev
-            const next = { ...prev }
-            delete next[tabId]
-            return next
+    const createOrUpdateType = useCallback((newType: TypeDef) => {
+        setTypes((prev) => {
+            const idx = prev.findIndex((t) => t.componentId === newType.componentId)
+            if (idx !== -1) {
+                const updated = [...prev]
+                updated[idx] = newType
+                return updated
+            }
+            return [...prev, newType]
         })
     }, [])
 
+    const getTypeByComponentId = useCallback(
+        (componentId: string): TypeDef | undefined =>
+            types.find((t) => t.componentId === componentId),
+        [types]
+    )
+
+    const setAllTypes = useCallback((newTypes: TypeDef[]) => {
+        setTypes(Array.isArray(newTypes) ? newTypes : [])
+    }, [])
+
+    // ----- functions ----------------------------------------------------------
+    const addFunction = useCallback((fnc: CustomFunctionConfig) => {
+        setFunctions((prev) => [...(prev ?? []), fnc])
+    }, [])
+
+    const updateFunction = useCallback((id: string, updates: Partial<CustomFunctionConfig>) => {
+        setFunctions((prev) => prev.map((f) => (f.id === id ? { ...f, ...updates } : f)))
+    }, [])
+
+    const removeFunction = useCallback((id: string) => {
+        setFunctions((prev) => prev.filter((f) => f.id !== id))
+    }, [])
+
+    const setAllFunctions = useCallback((fncs: CustomFunctionConfig[]) => {
+        setFunctions(Array.isArray(fncs) ? fncs : [])
+    }, [])
+
+    // ----- states -------------------------------------------------------------
+    const addState = useCallback((state: State) => {
+        setStates((prev) => {
+            const list = prev ?? []
+            const idx = list.findIndex((s) => s.name === state.name)
+            if (idx !== -1) {
+                console.warn(
+                    `State with name "${state.name}" already exists. Replacing existing state.`
+                )
+                const updated = [...list]
+                updated[idx] = state
+                return updated
+            }
+            return [...list, state]
+        })
+    }, [])
+
+    const updateState = useCallback((id: string, updates: Partial<State>) => {
+        setStates((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)))
+    }, [])
+
+    const removeState = useCallback((id: string) => {
+        setStates((prev) => prev.filter((s) => s.id !== id))
+    }, [])
+
+    const setAllStates = useCallback((newStates: State[]) => {
+        setStates(Array.isArray(newStates) ? newStates : [])
+    }, [])
+
+    // ----- imports ------------------------------------------------------------
+    const addImport = useCallback((importPath: Import) => {
+        setImports((prev) => [...(prev ?? []), importPath])
+    }, [])
+
+    const updateImport = useCallback((id: string, updates: Partial<Import>) => {
+        setImports((prev) => prev.map((i) => (i.id === id ? { ...i, ...updates } : i)))
+    }, [])
+
+    const removeImport = useCallback((id: string) => {
+        setImports((prev) => prev.filter((i) => i.id !== id))
+    }, [])
+
+    const setAllImports = useCallback((newImports: Import[]) => {
+        setImports(Array.isArray(newImports) ? newImports : [])
+    }, [])
+
+    // ----- arguments / restData ----------------------------------------------
+    const setAllArguments = useCallback((args: Arguments[]) => {
+        setComponentArguments(Array.isArray(args) ? args : [])
+    }, [])
+
+    const setAllRestData = useCallback((data: any) => {
+        setRestData(data)
+    }, [])
+
     const value = useMemo<DroppedComponentsContextType>(
-        () =>
-            ({
-                setAllComponents,
-                handleAddChildToComponent,
-                handleRemoveChildFromComponent,
-                handleReorderChildInComponent,
-                handleUpdateChildComponent,
-                removeRow,
-                setEditingComponent,
-                clearEditingComponent,
+        () => ({
+            setAllComponents,
+            handleAddChildToComponent,
+            handleRemoveChildFromComponent,
+            handleReorderChildInComponent,
+            handleUpdateChildComponent,
+            removeRow,
+            setEditingComponent,
+            clearEditingComponent,
 
-                addType,
-                updateType,
-                removeType,
-                createOrUpdateType,
-                getTypeByComponentId,
-                setAllTypes,
+            addType,
+            updateType,
+            removeType,
+            createOrUpdateType,
+            getTypeByComponentId,
+            setAllTypes,
 
-                addFunction,
-                updateFunction,
-                removeFunction,
-                setAllFunctions,
+            addFunction,
+            updateFunction,
+            removeFunction,
+            setAllFunctions,
 
-                addState,
-                updateState,
-                removeState,
-                setAllStates,
+            addState,
+            updateState,
+            removeState,
+            setAllStates,
 
-                addImport,
-                updateImport,
-                removeImport,
-                setAllImports,
+            addImport,
+            updateImport,
+            removeImport,
+            setAllImports,
 
-                components: slice.components,
-                currentComponent: slice.currentComponent,
-                types: slice.types,
-                functions: slice.functions,
-                states: slice.states,
-                imports: slice.imports,
+            components,
+            currentComponent,
+            types,
+            functions,
+            states,
+            imports,
 
-                setAllArguments,
-                componentArguments: slice.componentArguments,
-                setAllRestData,
-                restData: slice.restData,
-
-                // New API for tab cleanup. Cast through unknown to keep external
-                // type compatibility while consumers can opt-in.
-                removeTab
-            }) as DroppedComponentsContextType & { removeTab: (tabId: string) => void },
+            setAllArguments,
+            componentArguments,
+            setAllRestData,
+            restData
+        }),
         [
-            slice,
+            components,
+            currentComponent,
+            types,
+            functions,
+            states,
+            imports,
+            componentArguments,
+            restData,
             setAllComponents,
             handleAddChildToComponent,
             handleRemoveChildFromComponent,
@@ -574,8 +401,7 @@ export const DroppedComponentsProvider: React.FC<ProviderProps> = ({ children, a
             removeImport,
             setAllImports,
             setAllArguments,
-            setAllRestData,
-            removeTab
+            setAllRestData
         ]
     )
 
@@ -592,19 +418,4 @@ export const useDroppedComponents = (): DroppedComponentsContextType => {
         throw new Error('useDroppedComponents must be used within a DroppedComponentsProvider')
     }
     return context
-}
-
-/**
- * Escape hatch for callers that need to drop a tab's slice (e.g. TabContext on
- * close). Cast at the call site since `removeTab` is appended to the context
- * object outside the public type.
- */
-export const useDroppedComponentsAdmin = (): { removeTab: (tabId: string) => void } => {
-    const context = useContext(DroppedComponentsContext) as
-        | (DroppedComponentsContextType & { removeTab: (tabId: string) => void })
-        | undefined
-    if (context === undefined) {
-        throw new Error('useDroppedComponentsAdmin must be used within a DroppedComponentsProvider')
-    }
-    return { removeTab: context.removeTab }
 }

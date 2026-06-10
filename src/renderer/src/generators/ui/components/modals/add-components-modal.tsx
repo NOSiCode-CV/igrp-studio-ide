@@ -1,3 +1,5 @@
+import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import { EmptyList } from '@renderer/components/empty-list'
 import { Button } from '@renderer/components/ui/button'
 import {
     Dialog,
@@ -12,9 +14,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from '@renderer/components/ui/dropdown-menu'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { SidebarInset } from '@renderer/components/ui/sidebar'
-import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
-import { EmptyList } from '@renderer/components/empty-list'
 import useStudio from '@renderer/hooks/use-studio'
 import useToast from '@renderer/hooks/useToast'
 import Draggable from '@renderer/lib/dnd/Draggable'
@@ -26,8 +27,8 @@ import { Plus } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ICON_MAP } from '../../ComponentTypes'
-import { handleDragEnd } from '../../dnd/DraggableItemManager'
 import { useDroppedComponents } from '../../contexts/EditorContext'
+import { handleDragEnd } from '../../dnd/DraggableItemManager'
 import { useTagManager } from '../../hooks/useTagManager'
 import SidebarRight from '../sidebar/sidebar-right'
 
@@ -149,70 +150,73 @@ export const AddComponentModal = ({ path, comp, parentComp, open, setOpen }: Add
                                 </div>
                             </div>
                         </DialogHeader>
-                        <div className="flex-1 overflow-auto p-4">
-                            <div className="space-y-3">
-                                <div>
-                                    {children.length > 0 ? (
-                                        <ComponentTable
-                                            parentComp={comp}
-                                            components={children}
-                                            registryComponents={components}
-                                            onEdit={onEditComponent}
-                                            onOrderComponent={handleOrderComponent}
-                                            handleAddComponent={handleAddComponent}
-                                            handleRemoveChildFromComponent={
-                                                handleRemoveChildFromComponent
-                                            }
-                                        />
-                                    ) : (
-                                        <>
-                                            <EmptyList description="" />
-                                        </>
-                                    )}
+                        <ScrollArea className="flex-1 min-h-0">
+                            <div className="p-4">
+                                <div className="space-y-3">
+                                    <div>
+                                        {children.length > 0 ? (
+                                            <ComponentTable
+                                                parentComp={comp}
+                                                components={children}
+                                                registryComponents={components}
+                                                onEdit={onEditComponent}
+                                                onOrderComponent={handleOrderComponent}
+                                                handleAddComponent={handleAddComponent}
+                                                handleRemoveChildFromComponent={
+                                                    handleRemoveChildFromComponent
+                                                }
+                                            />
+                                        ) : (
+                                            <>
+                                                <EmptyList description="" />
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Helper Section */}
+                                <div className="p-2 text-xs text-muted-foreground border-b bg-muted rounded-t mt-6">
+                                    <p className="mb-2">
+                                        <strong>rowData</strong> is a variable provided by the table
+                                        that contains all the data from the current row. Use it in
+                                        your click handlers to access row information.
+                                    </p>
+                                    <p className="mb-2">Available data in rowData:</p>
+                                    <ul className="list-disc list-inside mt-1 space-y-1">
+                                        <li>
+                                            <code>rowData.id</code> - Row identifier
+                                        </li>
+                                        <li>
+                                            <code>rowData.nome</code> - Name field
+                                        </li>
+                                        <li>
+                                            <code>rowData.status</code> - Status field
+                                        </li>
+                                        <li>
+                                            <code>rowData.data</code> - Date field
+                                        </li>
+                                    </ul>
+                                    <p className="mt-2 mb-2">Example usage in table actions:</p>
+                                    <ul className="list-disc list-inside mt-1 space-y-1">
+                                        <li>
+                                            <code>handleView</code>
+                                        </li>
+                                        <li>
+                                            <code>() =&gt; handleView(rowData.id)</code>
+                                        </li>
+                                        <li>
+                                            <code>() =&gt; handleEdit(rowData)</code>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
-
-                            {/* Helper Section */}
-                            <div className="p-2 text-xs text-muted-foreground border-b bg-muted rounded-t mt-6">
-                                <p className="mb-2">
-                                    <strong>rowData</strong> is a variable provided by the table
-                                    that contains all the data from the current row. Use it in your
-                                    click handlers to access row information.
-                                </p>
-                                <p className="mb-2">Available data in rowData:</p>
-                                <ul className="list-disc list-inside mt-1 space-y-1">
-                                    <li>
-                                        <code>rowData.id</code> - Row identifier
-                                    </li>
-                                    <li>
-                                        <code>rowData.nome</code> - Name field
-                                    </li>
-                                    <li>
-                                        <code>rowData.status</code> - Status field
-                                    </li>
-                                    <li>
-                                        <code>rowData.data</code> - Date field
-                                    </li>
-                                </ul>
-                                <p className="mt-2 mb-2">Example usage in table actions:</p>
-                                <ul className="list-disc list-inside mt-1 space-y-1">
-                                    <li>
-                                        <code>handleView</code>
-                                    </li>
-                                    <li>
-                                        <code>() =&gt; handleView(rowData.id)</code>
-                                    </li>
-                                    <li>
-                                        <code>() =&gt; handleEdit(rowData)</code>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                        </ScrollArea>
                     </SidebarInset>
                     <SidebarRight
                         comp={currentComponent}
                         path={currentPath}
                         parentComp={parentComp}
+                        className="h-full!"
                     />
                 </DialogContent>
             </Dialog>
@@ -362,6 +366,11 @@ const RenderCreatedComponents = ({
                                     <div className="flex items-center gap-2">
                                         {renderIcon(properties?.iconProperties?.iconName)}
                                         <span className="text-sm">{`${label} (${properties?.labelTrigger || 'Click'})`}</span>
+                                        {properties?.headerTitle && (
+                                            <span className="text-xs text-muted-foreground truncate">
+                                                — {properties.headerTitle}
+                                            </span>
+                                        )}
                                     </div>
                                 </Draggable>
                             </div>
