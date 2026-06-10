@@ -109,18 +109,18 @@ function findWorkspaceJsonDatabaseService(
 
 const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json')
 const BACKUP_DIR = path.join(app.getPath('userData'), 'backups')
-const DEFAULT_DEMO_WORKSPACE_DIRS = ['demoworkspace', 'demoworkspace-main']
+const DEFAULT_STACK_TEMPLATE_DIR = 'docker'
 const DEFAULT_MAIN_COMPOSE = 'igrp-compose.yaml'
 const DEFAULT_NGINX_CONF = 'nginx.conf'
 const DEFAULT_MONITORING_COMPOSE = path.join('monitoring', 'igrp-monitoring-compose.yaml')
 const DEFAULT_PROCESS_COMPOSE = path.join('process', 'igrp-process-compose.yaml')
 const DEFAULT_MONITORING_SOURCE_COMPOSE = path.join(
-    DEFAULT_DEMO_WORKSPACE_DIRS[0],
+    DEFAULT_STACK_TEMPLATE_DIR,
     'monitoring',
     'igrp-monitoring-compose.yaml'
 )
 const DEFAULT_PROCESS_SOURCE_COMPOSE = path.join(
-    DEFAULT_DEMO_WORKSPACE_DIRS[0],
+    DEFAULT_STACK_TEMPLATE_DIR,
     'process',
     'igrp-process-compose.yaml'
 )
@@ -150,13 +150,10 @@ export class WorkspaceRepository {
                 continue
             }
 
-            if (
-                inPortsBlock &&
-                !portLineReplaced &&
-                /^\s*-\s*['"]?[^'"]+['"]?\s*$/.test(line)
-            ) {
+            if (inPortsBlock && !portLineReplaced && /^\s*-\s*['"]?[^'"]+['"]?\s*$/.test(line)) {
                 const indent = line.match(/^(\s*)/)?.[1] ?? '      '
-                lines[i] = `${indent}- "${'${HOST_NGINX_HTTP_PORT:-2575}:${NGINX_HTTP_PORT:-2575}'}"`
+                lines[i] =
+                    `${indent}- "${'${HOST_NGINX_HTTP_PORT:-2575}:${NGINX_HTTP_PORT:-2575}'}"`
                 portLineReplaced = true
                 continue
             }
@@ -169,7 +166,10 @@ export class WorkspaceRepository {
         return lines.join('\n')
     }
 
-    private async alignMainNginxPortArtifacts(workspacePath: string, nginxPort: number): Promise<void> {
+    private async alignMainNginxPortArtifacts(
+        workspacePath: string,
+        nginxPort: number
+    ): Promise<void> {
         const composePath = path.join(workspacePath, DEFAULT_MAIN_COMPOSE)
         if (fs.existsSync(composePath)) {
             let composeRaw = await readFile(composePath, 'utf8')
@@ -273,7 +273,9 @@ export class WorkspaceRepository {
         })
     }
 
-    private async findNextAvailableNginxHostPort(startPort = this.defaultNginxHostPort): Promise<number> {
+    private async findNextAvailableNginxHostPort(
+        startPort = this.defaultNginxHostPort
+    ): Promise<number> {
         let candidate = startPort
         for (let i = 0; i < 300; i++) {
             // eslint-disable-next-line no-await-in-loop
@@ -294,7 +296,9 @@ export class WorkspaceRepository {
             const raw = await readFile(envPath, 'utf8')
             const line = raw
                 .split('\n')
-                .find((l) => l.startsWith('HOST_NGINX_HTTP_PORT=') || l.startsWith('NGINX_HTTP_PORT='))
+                .find(
+                    (l) => l.startsWith('HOST_NGINX_HTTP_PORT=') || l.startsWith('NGINX_HTTP_PORT=')
+                )
             if (!line) continue
             const parsed = Number.parseInt(line.split('=')[1]?.trim() || '', 10)
             if (!Number.isNaN(parsed) && parsed > 0 && parsed <= 65535) {
@@ -332,18 +336,16 @@ export class WorkspaceRepository {
         }
     }
 
-    private resolveDemoWorkspacePath(): string | null {
-        for (const demoDir of DEFAULT_DEMO_WORKSPACE_DIRS) {
-            const candidates = [
-                path.join(app.getAppPath(), demoDir),
-                path.join(process.cwd(), demoDir),
-                path.join(process.cwd(), 'studio', 'igrp-studio-ide', demoDir)
-            ]
+    private resolveStackTemplatePath(): string | null {
+        const candidates = [
+            path.join(app.getAppPath(), DEFAULT_STACK_TEMPLATE_DIR),
+            path.join(process.cwd(), DEFAULT_STACK_TEMPLATE_DIR),
+            path.join(process.cwd(), 'studio', 'igrp-studio-ide', DEFAULT_STACK_TEMPLATE_DIR)
+        ]
 
-            for (const candidate of candidates) {
-                if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
-                    return candidate
-                }
+        for (const candidate of candidates) {
+            if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
+                return candidate
             }
         }
 
@@ -397,10 +399,7 @@ export class WorkspaceRepository {
         }
     }
 
-    private async ensureHostGatewayAliasesForSlug(
-        filePath: string,
-        slug: string
-    ): Promise<void> {
+    private async ensureHostGatewayAliasesForSlug(filePath: string, slug: string): Promise<void> {
         if (!fs.existsSync(filePath)) return
         const raw = await readFile(filePath, 'utf8')
         const normalized = raw.replace(/\r\n/g, '\n')
@@ -473,7 +472,9 @@ export class WorkspaceRepository {
 
         const processEnv = path.join(workspace.path, 'process', '.env_process')
         if (fs.existsSync(processEnv)) {
-            await this.replaceTokenInTextFile(processEnv, [{ from: 'demoteste', to: workspace.slug }])
+            await this.replaceTokenInTextFile(processEnv, [
+                { from: 'demoteste', to: workspace.slug }
+            ])
             await this.ensureEnvVariable(processEnv, 'DOCKER_IP', workspace.slug)
             await this.ensureEnvVariable(processEnv, 'WORKSPACE_SLUG', workspace.slug)
             await this.ensureEnvVariable(
@@ -492,25 +493,25 @@ export class WorkspaceRepository {
         }
     }
 
-    private async copyOptionalStacksFromDemoWorkspace(
+    private async copyOptionalStacksFromTemplate(
         workspace: IWorkspace,
         options: Required<WorkspaceBootstrapOptions>,
         bootstrapResult: WorkspaceBootstrapResult
     ): Promise<void> {
-        const demoWorkspacePath = this.resolveDemoWorkspacePath()
-        if (!demoWorkspacePath) {
+        const templateRootPath = this.resolveStackTemplatePath()
+        const replacements = [{ from: 'demoteste', to: workspace.slug }]
+
+        if (!templateRootPath) {
             if (options.installMonitoringStack || options.installProcessStack) {
                 bootstrapResult.errors.push(
-                    'Could not find local demoworkspace template (demoworkspace or demoworkspace-main).'
+                    `Could not find local ${DEFAULT_STACK_TEMPLATE_DIR} template.`
                 )
             }
             return
         }
 
-        const replacements = [{ from: 'demoteste', to: workspace.slug }]
-
         if (options.installMonitoringStack) {
-            const sourceDir = path.join(demoWorkspacePath, 'monitoring')
+            const sourceDir = path.join(templateRootPath, 'monitoring')
             const targetDir = path.join(workspace.path, 'monitoring')
             if (fs.existsSync(sourceDir)) {
                 await fs.promises.cp(sourceDir, targetDir, { recursive: true, force: true })
@@ -520,7 +521,6 @@ export class WorkspaceRepository {
                     workspace.slug
                 )
                 await this.normalizeOptionalStackEnvFiles(workspace)
-
                 bootstrapResult.optionalStacksInstalled.monitoring = true
             } else {
                 bootstrapResult.errors.push(
@@ -530,7 +530,7 @@ export class WorkspaceRepository {
         }
 
         if (options.installProcessStack) {
-            const sourceDir = path.join(demoWorkspacePath, 'process')
+            const sourceDir = path.join(templateRootPath, 'process')
             const targetDir = path.join(workspace.path, 'process')
             if (fs.existsSync(sourceDir)) {
                 await fs.promises.cp(sourceDir, targetDir, { recursive: true, force: true })
@@ -554,24 +554,24 @@ export class WorkspaceRepository {
         }
     }
 
-    private async ensureMainStackFromDemoWorkspace(
+    private async ensureMainStackFromTemplate(
         workspace: IWorkspace,
         bootstrapResult: WorkspaceBootstrapResult
     ): Promise<void> {
         const targetCompose = path.join(workspace.path, DEFAULT_MAIN_COMPOSE)
 
-        const demoWorkspacePath = this.resolveDemoWorkspacePath()
-        if (!demoWorkspacePath) {
+        const templateRootPath = this.resolveStackTemplatePath()
+        if (!templateRootPath) {
             bootstrapResult.errors.push(
-                'Could not find local demoworkspace template (demoworkspace or demoworkspace-main) to copy igrp-compose.yaml.'
+                `Could not find local ${DEFAULT_STACK_TEMPLATE_DIR} template to copy igrp-compose.yaml.`
             )
             return
         }
 
-        const sourceCompose = path.join(demoWorkspacePath, DEFAULT_MAIN_COMPOSE)
+        const sourceCompose = path.join(templateRootPath, DEFAULT_MAIN_COMPOSE)
         if (!fs.existsSync(sourceCompose)) {
             bootstrapResult.errors.push(
-                'Main compose template not found: demoworkspace/igrp-compose.yaml (or fallback demoworkspace-main/igrp-compose.yaml)'
+                `Main compose template not found: ${DEFAULT_STACK_TEMPLATE_DIR}/igrp-compose.yaml`
             )
             return
         }
@@ -584,11 +584,13 @@ export class WorkspaceRepository {
         }
         await this.ensureHostGatewayAliasesForSlug(targetCompose, workspace.slug)
 
-        const sourceEnv = path.join(demoWorkspacePath, '.env')
+        const sourceEnv = path.join(templateRootPath, '.env')
         const targetEnv = path.join(workspace.path, '.env')
         if (!fs.existsSync(targetEnv) && fs.existsSync(sourceEnv)) {
             await fs.promises.copyFile(sourceEnv, targetEnv)
-            await this.replaceTokenInTextFile(targetEnv, [{ from: 'demoteste', to: workspace.slug }])
+            await this.replaceTokenInTextFile(targetEnv, [
+                { from: 'demoteste', to: workspace.slug }
+            ])
         }
         await this.ensureEnvVariable(targetEnv, 'WORKSPACE_SLUG', workspace.slug)
         await this.ensureEnvVariable(targetEnv, 'DOCKER_IP', workspace.slug)
@@ -596,7 +598,7 @@ export class WorkspaceRepository {
         await this.ensureEnvVariable(targetEnv, 'HOST_NGINX_HTTP_PORT', String(nginxPort))
         await this.ensureEnvVariable(targetEnv, 'NGINX_HTTP_PORT', String(nginxPort))
 
-        const sourceNginxConf = path.join(demoWorkspacePath, DEFAULT_NGINX_CONF)
+        const sourceNginxConf = path.join(templateRootPath, DEFAULT_NGINX_CONF)
         const targetNginxConf = path.join(workspace.path, DEFAULT_NGINX_CONF)
         if (!fs.existsSync(targetNginxConf) && fs.existsSync(sourceNginxConf)) {
             await fs.promises.copyFile(sourceNginxConf, targetNginxConf)
@@ -607,7 +609,7 @@ export class WorkspaceRepository {
 
         await this.alignMainNginxPortArtifacts(workspace.path, nginxPort)
 
-        const sourceIgrpStudioDir = path.join(demoWorkspacePath, '.igrpstudio')
+        const sourceIgrpStudioDir = path.join(templateRootPath, '.igrpstudio')
         const targetIgrpStudioDir = path.join(workspace.path, '.igrpstudio')
         if (!fs.existsSync(targetIgrpStudioDir) && fs.existsSync(sourceIgrpStudioDir)) {
             await fs.promises.cp(sourceIgrpStudioDir, targetIgrpStudioDir, {
@@ -652,9 +654,22 @@ export class WorkspaceRepository {
     }
 
     async getOptionalStacksStatus(workspacePath: string): Promise<OptionalStacksStatus> {
+        const monitoringComposeCandidates = [
+            path.join(workspacePath, DEFAULT_MONITORING_COMPOSE),
+            path.join(workspacePath, 'compose-monitoring.yaml'),
+            path.join(workspacePath, 'igrp-monitoring-compose.yaml')
+        ]
+        const processComposeCandidates = [
+            path.join(workspacePath, DEFAULT_PROCESS_COMPOSE),
+            path.join(workspacePath, 'compose-process.yaml'),
+            path.join(workspacePath, 'igrp-process-compose.yaml')
+        ]
+
         return {
-            monitoringInstalled: fs.existsSync(path.join(workspacePath, DEFAULT_MONITORING_COMPOSE)),
-            processInstalled: fs.existsSync(path.join(workspacePath, DEFAULT_PROCESS_COMPOSE))
+            monitoringInstalled: monitoringComposeCandidates.some((candidate) =>
+                fs.existsSync(candidate)
+            ),
+            processInstalled: processComposeCandidates.some((candidate) => fs.existsSync(candidate))
         }
     }
 
@@ -725,11 +740,11 @@ export class WorkspaceRepository {
             throw error
         }
 
-        await this.ensureMainStackFromDemoWorkspace(newWorkspace, bootstrapResult)
+        await this.ensureMainStackFromTemplate(newWorkspace, bootstrapResult)
         await this.removeOptionalStackArtifactsIfDisabled(newWorkspace.path, normalizedOptions)
 
         try {
-            await this.copyOptionalStacksFromDemoWorkspace(
+            await this.copyOptionalStacksFromTemplate(
                 newWorkspace,
                 normalizedOptions,
                 bootstrapResult
@@ -787,9 +802,16 @@ export class WorkspaceRepository {
             throw new Error(`Workspace ${workspaceId} not found`)
         }
 
-        await this.copyOptionalStacksFromDemoWorkspace(workspace, normalizedOptions, bootstrapResult)
+        await this.copyOptionalStacksFromTemplate(
+            workspace,
+            normalizedOptions,
+            bootstrapResult
+        )
 
-        if (normalizedOptions.installMonitoringStack && bootstrapResult.optionalStacksInstalled.monitoring) {
+        if (
+            normalizedOptions.installMonitoringStack &&
+            bootstrapResult.optionalStacksInstalled.monitoring
+        ) {
             try {
                 await dockerService.upMonitoringStack(workspace.path)
                 bootstrapResult.stackStarted = true
@@ -802,7 +824,10 @@ export class WorkspaceRepository {
             }
         }
 
-        if (normalizedOptions.installProcessStack && bootstrapResult.optionalStacksInstalled.process) {
+        if (
+            normalizedOptions.installProcessStack &&
+            bootstrapResult.optionalStacksInstalled.process
+        ) {
             // Process services depend on main stack readiness (db/eureka/keycloak/gateway).
             // Bring main stack up only when needed to avoid recreating/rattling an already healthy main stack.
             try {
@@ -971,7 +996,17 @@ export class WorkspaceRepository {
         )
 
         const workspaceConfig: ProjectWorkspace = {
-            config: { ...config, id: projectId, type: framework },
+            // Defensive default for `database`: the external
+            // `@igrp/igrp-studio-workspace-engine`'s `addProjectToWorkspace`
+            // unconditionally calls a `jt(e.config.database)` normalizer
+            // whose default branch does `e.toLowerCase()`. Frameworks that
+            // don't have a database field (Next.js, frontend in general)
+            // crash there with "Cannot read properties of undefined
+            // (reading 'toLowerCase')". Passing an empty string makes `jt`
+            // return "" without throwing; the downstream database service
+            // push is gated by `type === 'springboot'`, so this doesn't
+            // create a phantom DB container for Next.js projects.
+            config: { database: '', ...config, id: projectId, type: framework },
             id: workspaceId
         }
 

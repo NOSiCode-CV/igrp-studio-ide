@@ -1,9 +1,7 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPCombobox,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import { LabelRequired } from '@renderer/components/label-required'
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown'
 import { httpStatusCodes } from '@renderer/constants/appConstants'
@@ -252,8 +250,8 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <IGRPLabelPrimitive>{t('name')}</IGRPLabelPrimitive>
-                                    <IGRPInputPrimitive
+                                    <Label>{t('name')}</Label>
+                                    <Input
                                         name={t('name')}
                                         value={name}
                                         onChange={(e) =>
@@ -311,7 +309,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                 </div>
 
                                 <div className="flex flex-col gap-2">
-                                    <IGRPLabelPrimitive>{t('collectionType')}</IGRPLabelPrimitive>
+                                    <Label>{t('collectionType')}</Label>
                                     <IGRPCombobox
                                         options={collectionTypes}
                                         value={collectionType}
@@ -332,7 +330,7 @@ export const TabResponse: React.FC<TabResponseProps> = ({
 
                                 {Object.keys(responses).length > 1 && (
                                     <div className="absolute right-3">
-                                        <IGRPButtonPrimitive
+                                        <Button
                                             type="button"
                                             variant="ghost"
                                             size="sm"
@@ -340,15 +338,15 @@ export const TabResponse: React.FC<TabResponseProps> = ({
                                             onClick={() => handleClose(statusCode)}
                                         >
                                             <Trash />
-                                        </IGRPButtonPrimitive>
+                                        </Button>
                                     </div>
                                 )}
                             </div>
 
                             {/* Descritpion */}
                             <div className="flex flex-col gap-2">
-                                <IGRPLabelPrimitive>{t('description')}</IGRPLabelPrimitive>
-                                <IGRPInputPrimitive
+                                <Label>{t('description')}</Label>
+                                <Input
                                     type="text"
                                     name="description"
                                     value={description}

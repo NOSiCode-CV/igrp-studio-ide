@@ -1,32 +1,34 @@
 'use client'
 
 import {
-    IGRPBreadcrumbItemPrimitive,
-    IGRPBreadcrumbLinkPrimitive,
-    IGRPBreadcrumbListPrimitive,
-    IGRPBreadcrumbPagePrimitive,
-    IGRPBreadcrumbPrimitive,
-    IGRPBreadcrumbSeparatorPrimitive,
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDialogTriggerPrimitive,
-    IGRPScrollAreaPrimitive,
-    IGRPSidebarContentPrimitive,
-    IGRPSidebarGroupContentPrimitive,
-    IGRPSidebarGroupPrimitive,
-    IGRPSidebarMenuButtonPrimitive,
-    IGRPSidebarMenuItemPrimitive,
-    IGRPSidebarMenuPrimitive,
-    IGRPSidebarPrimitive,
-    IGRPSidebarProviderPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator
+} from '@renderer/components/ui/breadcrumb'
+import { Button } from '@renderer/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from '@renderer/components/ui/dialog'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarProvider
+} from '@renderer/components/ui/sidebar'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import { Bell, Globe, Home, Keyboard, Link, Settings, Shirt, Sparkles } from 'lucide-react'
 import React from 'react'
@@ -60,36 +62,34 @@ export function SettingsDialog() {
     const [open, setOpen] = React.useState(false)
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-            <IGRPTooltipPrimitive>
-                <IGRPTooltipTriggerPrimitive asChild>
-                    <IGRPDialogTriggerPrimitive asChild>
-                        <IGRPButtonPrimitive variant="ghost" size="sm">
+        <Dialog open={open} onOpenChange={setOpen}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm">
                             <Settings className="w-5 h-5" />
                             <span className="sr-only">{t('settings')}</span>
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogTriggerPrimitive>
-                </IGRPTooltipTriggerPrimitive>
-                <IGRPTooltipContentPrimitive>{t('settings')}</IGRPTooltipContentPrimitive>
-            </IGRPTooltipPrimitive>
-            <IGRPDialogContentPrimitive className="overflow-hidden p-0 md:max-h-[500px] sm:max-w-[600px] md:max-w-[700px] max-w-4xl">
-                <IGRPDialogHeaderPrimitive className="pb-3">
-                    <IGRPDialogTitlePrimitive className="sr-only">
-                        {t('settings')}
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive className="sr-only">
+                        </Button>
+                    </DialogTrigger>
+                </TooltipTrigger>
+                <TooltipContent>{t('settings')}</TooltipContent>
+            </Tooltip>
+            <DialogContent className="overflow-hidden p-0 md:max-h-[500px] sm:max-w-[600px] md:max-w-[700px] max-w-4xl">
+                <DialogHeader className="pb-3">
+                    <DialogTitle className="sr-only">{t('settings')}</DialogTitle>
+                    <DialogDescription className="sr-only">
                         {t('customizeSettingsHere')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
-                <IGRPSidebarProviderPrimitive className="items-start">
-                    <IGRPSidebarPrimitive collapsible="none" className="hidden md:flex">
-                        <IGRPSidebarContentPrimitive>
-                            <IGRPSidebarGroupPrimitive>
-                                <IGRPSidebarGroupContentPrimitive>
-                                    <IGRPSidebarMenuPrimitive>
+                    </DialogDescription>
+                </DialogHeader>
+                <SidebarProvider className="items-start">
+                    <Sidebar collapsible="none" className="hidden md:flex">
+                        <SidebarContent>
+                            <SidebarGroup>
+                                <SidebarGroupContent>
+                                    <SidebarMenu>
                                         {data.nav.map((item) => (
-                                            <IGRPSidebarMenuItemPrimitive key={item.name}>
-                                                <IGRPSidebarMenuButtonPrimitive
+                                            <SidebarMenuItem key={item.name}>
+                                                <SidebarMenuButton
                                                     asChild
                                                     isActive={item.name === activeItem}
                                                     onClick={() => setActiveItem(item.name)}
@@ -98,34 +98,32 @@ export function SettingsDialog() {
                                                         <item.icon />
                                                         <span>{t(item.name)}</span>
                                                     </button>
-                                                </IGRPSidebarMenuButtonPrimitive>
-                                            </IGRPSidebarMenuItemPrimitive>
+                                                </SidebarMenuButton>
+                                            </SidebarMenuItem>
                                         ))}
-                                    </IGRPSidebarMenuPrimitive>
-                                </IGRPSidebarGroupContentPrimitive>
-                            </IGRPSidebarGroupPrimitive>
-                        </IGRPSidebarContentPrimitive>
-                    </IGRPSidebarPrimitive>
+                                    </SidebarMenu>
+                                </SidebarGroupContent>
+                            </SidebarGroup>
+                        </SidebarContent>
+                    </Sidebar>
 
                     <main className="flex h-[480px] flex-1 flex-col">
-                        <IGRPScrollAreaPrimitive className="h-full">
+                        <ScrollArea className="h-full">
                             <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
                                 <div className="flex items-center gap-2 px-4">
-                                    <IGRPBreadcrumbPrimitive>
-                                        <IGRPBreadcrumbListPrimitive>
-                                            <IGRPBreadcrumbItemPrimitive className="hidden md:block">
-                                                <IGRPBreadcrumbLinkPrimitive href={ROUTES.HOME}>
+                                    <Breadcrumb>
+                                        <BreadcrumbList>
+                                            <BreadcrumbItem className="hidden md:block">
+                                                <BreadcrumbLink href={ROUTES.HOME}>
                                                     {t('settings')}
-                                                </IGRPBreadcrumbLinkPrimitive>
-                                            </IGRPBreadcrumbItemPrimitive>
-                                            <IGRPBreadcrumbSeparatorPrimitive className="hidden md:block" />
-                                            <IGRPBreadcrumbItemPrimitive>
-                                                <IGRPBreadcrumbPagePrimitive>
-                                                    {t(activeItem)}
-                                                </IGRPBreadcrumbPagePrimitive>
-                                            </IGRPBreadcrumbItemPrimitive>
-                                        </IGRPBreadcrumbListPrimitive>
-                                    </IGRPBreadcrumbPrimitive>
+                                                </BreadcrumbLink>
+                                            </BreadcrumbItem>
+                                            <BreadcrumbSeparator className="hidden md:block" />
+                                            <BreadcrumbItem>
+                                                <BreadcrumbPage>{t(activeItem)}</BreadcrumbPage>
+                                            </BreadcrumbItem>
+                                        </BreadcrumbList>
+                                    </Breadcrumb>
                                 </div>
                             </header>
 
@@ -143,10 +141,10 @@ export function SettingsDialog() {
                                     </div>
                                 )}
                             </div>
-                        </IGRPScrollAreaPrimitive>
+                        </ScrollArea>
                     </main>
-                </IGRPSidebarProviderPrimitive>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+                </SidebarProvider>
+            </DialogContent>
+        </Dialog>
     )
 }

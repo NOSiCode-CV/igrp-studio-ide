@@ -1,12 +1,12 @@
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPBadge,
-    IGRPBadgePrimitive,
-    IGRPButtonPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
+import { IGRPBadge } from '@igrp/igrp-framework-react-design-system'
 import type {
     Arguments,
     CustomFunctionConfig,
@@ -138,10 +138,10 @@ const TabStates = ({
                                 </div>
 
                                 <div className="flex items-center gap-2 ml-3">
-                                    <IGRPTooltipProviderPrimitive>
-                                        <IGRPTooltipPrimitive>
-                                            <IGRPTooltipTriggerPrimitive asChild>
-                                                <IGRPButtonPrimitive
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
                                                     size={'sm'}
                                                     variant="outline"
                                                     onClick={() => handleInsertState(state)}
@@ -149,19 +149,19 @@ const TabStates = ({
                                                 >
                                                     <Code className="w-3 h-3" />
                                                     Name
-                                                </IGRPButtonPrimitive>
-                                            </IGRPTooltipTriggerPrimitive>
-                                            <IGRPTooltipContentPrimitive>
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
                                                 <p>Insert state variable name</p>
-                                            </IGRPTooltipContentPrimitive>
-                                        </IGRPTooltipPrimitive>
-                                    </IGRPTooltipProviderPrimitive>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
 
                                     {!pageArguments?.some((arg) => arg.id === state.id) && (
-                                        <IGRPTooltipProviderPrimitive>
-                                            <IGRPTooltipPrimitive>
-                                                <IGRPTooltipTriggerPrimitive asChild>
-                                                    <IGRPButtonPrimitive
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
                                                         size={'sm'}
                                                         variant="outline"
                                                         onClick={() => handleInsertStateSet(state)}
@@ -169,13 +169,13 @@ const TabStates = ({
                                                     >
                                                         <Zap className="w-3 h-3" />
                                                         Set
-                                                    </IGRPButtonPrimitive>
-                                                </IGRPTooltipTriggerPrimitive>
-                                                <IGRPTooltipContentPrimitive>
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
                                                     <p>Insert setter function with default value</p>
-                                                </IGRPTooltipContentPrimitive>
-                                            </IGRPTooltipPrimitive>
-                                        </IGRPTooltipProviderPrimitive>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                     )}
                                 </div>
                             </div>
@@ -236,12 +236,9 @@ const TabSnipptes = ({ snippets, componentTag, editorRef, globalFilter }: TabSni
                                             {snippet.title}
                                         </span>
                                         {snippet.type && (
-                                            <IGRPBadgePrimitive
-                                                variant="outline"
-                                                className="text-xs"
-                                            >
+                                            <Badge variant="outline" className="text-xs">
                                                 {snippet.type}
-                                            </IGRPBadgePrimitive>
+                                            </Badge>
                                         )}
                                     </div>
 
@@ -268,10 +265,10 @@ const TabSnipptes = ({ snippets, componentTag, editorRef, globalFilter }: TabSni
                                 </div>
 
                                 <div className="flex items-center gap-2 ml-3">
-                                    <IGRPTooltipProviderPrimitive>
-                                        <IGRPTooltipPrimitive>
-                                            <IGRPTooltipTriggerPrimitive asChild>
-                                                <IGRPButtonPrimitive
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
                                                     variant="outline"
                                                     size={'sm'}
                                                     onClick={() => handleInsertSnippet(snippet)}
@@ -279,13 +276,13 @@ const TabSnipptes = ({ snippets, componentTag, editorRef, globalFilter }: TabSni
                                                 >
                                                     <Zap className="w-3 h-3" />
                                                     Insert
-                                                </IGRPButtonPrimitive>
-                                            </IGRPTooltipTriggerPrimitive>
-                                            <IGRPTooltipContentPrimitive>
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
                                                 <p>Insert code snippet into editor</p>
-                                            </IGRPTooltipContentPrimitive>
-                                        </IGRPTooltipPrimitive>
-                                    </IGRPTooltipProviderPrimitive>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </div>
                             </div>
                         </div>
@@ -376,9 +373,9 @@ const TabsFunctions = ({
                 </div>
                 <div className="flex flex-wrap gap-1">
                     {params.map((param, idx) => (
-                        <IGRPTooltipProviderPrimitive key={idx}>
-                            <IGRPTooltipPrimitive>
-                                <IGRPTooltipTriggerPrimitive asChild>
+                        <TooltipProvider key={idx}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
                                     <IGRPBadge variant="soft" className="text-xs cursor-help">
                                         {param.name}
                                         {param.isOptional && '?'}
@@ -387,8 +384,8 @@ const TabsFunctions = ({
                                             : {param.type}
                                         </span>
                                     </IGRPBadge>
-                                </IGRPTooltipTriggerPrimitive>
-                                <IGRPTooltipContentPrimitive>
+                                </TooltipTrigger>
+                                <TooltipContent>
                                     <div className="text-xs">
                                         <div className="font-medium">{param.name}</div>
                                         <div className="text-muted-foreground">
@@ -401,9 +398,9 @@ const TabsFunctions = ({
                                             <div className="text-green-500">Array</div>
                                         )}
                                     </div>
-                                </IGRPTooltipContentPrimitive>
-                            </IGRPTooltipPrimitive>
-                        </IGRPTooltipProviderPrimitive>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     ))}
                 </div>
             </div>
@@ -443,10 +440,10 @@ const TabsFunctions = ({
                                 </div>
 
                                 <div className="flex items-center gap-2 ml-3">
-                                    <IGRPTooltipProviderPrimitive>
-                                        <IGRPTooltipPrimitive>
-                                            <IGRPTooltipTriggerPrimitive asChild>
-                                                <IGRPButtonPrimitive
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
                                                     size={'sm'}
                                                     variant="outline"
                                                     onClick={() => {
@@ -456,13 +453,13 @@ const TabsFunctions = ({
                                                 >
                                                     <Zap className="w-3 h-3" />
                                                     Insert
-                                                </IGRPButtonPrimitive>
-                                            </IGRPTooltipTriggerPrimitive>
-                                            <IGRPTooltipContentPrimitive>
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
                                                 <p>Insert function call into editor</p>
-                                            </IGRPTooltipContentPrimitive>
-                                        </IGRPTooltipPrimitive>
-                                    </IGRPTooltipProviderPrimitive>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </div>
                             </div>
                         </div>
@@ -559,10 +556,10 @@ const TabTypes = ({ types, editorRef, globalFilter, onInsertImport }: TabTypesPr
                                 </div>
 
                                 <div className="flex items-center gap-2 ml-3">
-                                    <IGRPTooltipProviderPrimitive>
-                                        <IGRPTooltipPrimitive>
-                                            <IGRPTooltipTriggerPrimitive asChild>
-                                                <IGRPButtonPrimitive
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
                                                     variant="outline"
                                                     size={'sm'}
                                                     onClick={() => handleInsertType(type)}
@@ -570,13 +567,13 @@ const TabTypes = ({ types, editorRef, globalFilter, onInsertImport }: TabTypesPr
                                                 >
                                                     <Zap className="w-3 h-3" />
                                                     Insert
-                                                </IGRPButtonPrimitive>
-                                            </IGRPTooltipTriggerPrimitive>
-                                            <IGRPTooltipContentPrimitive>
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
                                                 <p>Insert type name and import statement</p>
-                                            </IGRPTooltipContentPrimitive>
-                                        </IGRPTooltipPrimitive>
-                                    </IGRPTooltipProviderPrimitive>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </div>
                             </div>
                         </div>

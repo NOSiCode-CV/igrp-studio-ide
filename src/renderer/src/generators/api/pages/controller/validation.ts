@@ -1,76 +1,83 @@
 import { PATTERNS } from '@renderer/constants/appConstants'
-import * as Yup from 'yup'
+import { z } from 'zod'
 
-const methodConditions = (method: any, schema: any, requiredMethods: any, errorMessage: any) => {
-    const methodValue = Array.isArray(method) ? method[0] : method
-    return requiredMethods.includes(methodValue) ? schema.required(errorMessage) : schema.nullable()
-}
-
-const conditionalValidation = Yup.object()
-    .shape({
-        type: Yup.string().nullable(),
-        name: Yup.string().nullable()
+/**
+ * Validates a request param / path variable: either both `type` and `name`
+ * are present, or both are blank. Mirrors the Yup `.test('type-or-name-required')`
+ * rule that used to emit `{ message: { name: '...' } }` so the
+ * BindingFormList downstream can highlight the correct sub-field.
+ */
+const conditionalValidation = z
+    .object({
+        type: z.string().nullable().optional(),
+        name: z.string().nullable().optional()
     })
-    .test('type-or-name-required', 'Either Type or Name is required', function (value) {
+    .passthrough()
+    .superRefine((value, ctx) => {
         const { type, name } = value || {}
-
-        // If Type is present, Name must be required
         if (type && !name) {
-            return this.createError({
-                path: this.path,
-                message: { name: 'Name is required when Type is provided' }
+            ctx.addIssue({
+                code: 'custom',
+                path: ['name'],
+                message: 'Name is required when Type is provided'
             })
         }
-
-        // If Name is present, Type must be required
         if (name && !type) {
-            return this.createError({
-                path: this.path,
-                message: { type: 'Type is required if Name is present' }
+            ctx.addIssue({
+                code: 'custom',
+                path: ['type'],
+                message: 'Type is required if Name is present'
             })
         }
-
-        return true // If both are valid or both are not present, return true
     })
 
 export function useActionValidation({ t }: { t: any }) {
-    return Yup.object().shape({
-        actionName: Yup.string()
-            .required('Action Name is required')
-            .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
-            .max(50, t('maxLengthExceeded', { max: 50 })),
-        method: Yup.string().required('Method is required')
-    })
+    return z
+        .object({
+            actionName: z
+                .string()
+                .min(1, 'Action Name is required')
+                .regex(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
+                .max(50, t('maxLengthExceeded', { max: 50 })),
+            method: z.string().min(1, 'Method is required')
+        })
+        .passthrough()
 }
 
 export function useControllerValidation({ t }: { t: any }) {
-    return Yup.object({
-        //name: Yup.string().required('Name is required')
-        //    .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
-        //    .max(20, t("maxLengthExceeded", { max: 20 })),
-        //   basePath: Yup.string().required('Base Path is required'),
-        actions: Yup.array().of(
-            Yup.object().shape({
-                actionName: Yup.string()
-                    .required('Action Name is required')
-                    .matches(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
-                    .max(50, t('maxLengthExceeded', { max: 50 })),
-                method: Yup.string().required('Method is required'),
-                accepts: Yup.string().when('method', (method, schema) =>
-                    methodConditions(
-                        method,
-                        schema,
-                        ['POST', 'PUT', 'PATCH'],
-                        'Accepts is required for POST, PUT, PATCH'
-                    )
-                ),
-                /* requestBody: Yup.string().when('method', (method, schema) =>
-                    methodConditions(method, schema, ['POST', 'PUT', 'PATCH'], 'Request Body is required for POST, PUT, PATCH')
-                ), */
-                //response: Yup.string().required('Response Type is required'),
-                requestParams: Yup.array().of(conditionalValidation),
-                pathVariables: Yup.array().of(conditionalValidation)
-            })
-        )
-    })
+    const writeMethods = new Set(['POST', 'PUT', 'PATCH'])
+    return z
+        .object({
+            actions: z
+                .array(
+                    z
+                        .object({
+                            actionName: z
+                                .string()
+                                .min(1, 'Action Name is required')
+                                .regex(PATTERNS.NAME_VALIDATION_PATTERN, t('msgInfoAccpetName'))
+                                .max(50, t('maxLengthExceeded', { max: 50 })),
+                            method: z.string().min(1, 'Method is required'),
+                            // `accepts` is required for write methods only.
+                            accepts: z.string().nullable().optional(),
+                            requestParams: z.array(conditionalValidation).optional(),
+                            pathVariables: z.array(conditionalValidation).optional()
+                        })
+                        .passthrough()
+                        .superRefine((action, ctx) => {
+                            const method = Array.isArray(action.method)
+                                ? action.method[0]
+                                : action.method
+                            if (writeMethods.has(method) && !action.accepts) {
+                                ctx.addIssue({
+                                    code: 'custom',
+                                    path: ['accepts'],
+                                    message: 'Accepts is required for POST, PUT, PATCH'
+                                })
+                            }
+                        })
+                )
+                .default([])
+        })
+        .passthrough()
 }

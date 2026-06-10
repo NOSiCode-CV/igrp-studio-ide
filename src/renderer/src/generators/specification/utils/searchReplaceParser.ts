@@ -58,8 +58,7 @@ export function parseSearchReplaceBlocks(text: string): SREdit[] {
     if (!text) return []
     // Strip an outer ```...``` wrapper if the model wrapped its blocks.
     const unwrapped = stripOuterFence(text)
-    const re =
-        /<{5,}\s*SEARCH\s*\n([\s\S]*?)\n?={5,}\s*\n([\s\S]*?)\n?>{5,}\s*REPLACE/g
+    const re = /<{5,}\s*SEARCH\s*\n([\s\S]*?)\n?={5,}\s*\n([\s\S]*?)\n?>{5,}\s*REPLACE/g
     const out: SREdit[] = []
     let match: RegExpExecArray | null
     // eslint-disable-next-line no-cond-assign
@@ -100,9 +99,10 @@ export function applyEdits(original: string, edits: SREdit[]): SRApplyResult {
 
         if (!search) {
             // Append at end. Add a separating blank line if the doc has content.
-            working = working.trim().length === 0
-                ? replace
-                : `${working.replace(/\s+$/, '')}\n\n${replace}`
+            working =
+                working.trim().length === 0
+                    ? replace
+                    : `${working.replace(/\s+$/, '')}\n\n${replace}`
             ops.push({ kind: 'append', ok: true })
             continue
         }
@@ -111,11 +111,7 @@ export function applyEdits(original: string, edits: SREdit[]): SRApplyResult {
         const literalCount = countOccurrences(working, search)
         if (literalCount === 1) {
             working = working.replace(search, replace)
-            ops.push(
-                replace
-                    ? { kind: 'replace', ok: true }
-                    : { kind: 'delete', ok: true }
-            )
+            ops.push(replace ? { kind: 'replace', ok: true } : { kind: 'delete', ok: true })
             continue
         }
         if (literalCount > 1) {
@@ -131,10 +127,7 @@ export function applyEdits(original: string, edits: SREdit[]): SRApplyResult {
         // Whitespace-normalised fallback.
         const fuzzy = findFuzzy(working, search)
         if (fuzzy) {
-            working =
-                working.slice(0, fuzzy.start) +
-                replace +
-                working.slice(fuzzy.end)
+            working = working.slice(0, fuzzy.start) + replace + working.slice(fuzzy.end)
             ops.push({ kind: 'fuzzy-replace', ok: true })
             continue
         }
@@ -168,10 +161,7 @@ function countOccurrences(haystack: string, needle: string): number {
  * Note: linear-time enough for documents up to ~1 MB; if we ever blow past
  * that we should switch to a proper diff-match-patch.
  */
-function findFuzzy(
-    haystack: string,
-    needle: string
-): { start: number; end: number } | null {
+function findFuzzy(haystack: string, needle: string): { start: number; end: number } | null {
     const norm = (s: string) => s.replace(/\s+/g, ' ').trim()
     const target = norm(needle)
     if (!target) return null
@@ -283,7 +273,8 @@ function describeEdit(edit: SREdit, op: SROp): ProposalSummary {
                 label: heading
                     ? `Edited section: ${heading}`
                     : `Replaced "${truncateOneLine(edit.search, 50)}"`,
-                detail: op.kind === 'fuzzy-replace' ? 'Matched with whitespace tolerance' : undefined
+                detail:
+                    op.kind === 'fuzzy-replace' ? 'Matched with whitespace tolerance' : undefined
             }
         }
     }

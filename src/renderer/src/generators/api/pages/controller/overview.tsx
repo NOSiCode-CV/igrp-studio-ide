@@ -1,8 +1,8 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    type ColumnDef,
     IGRPAlertDialog,
-    IGRPButtonPrimitive,
-    IGRPDataTable
+    IGRPDataTable,
+    type ColumnDef
 } from '@igrp/igrp-framework-react-design-system'
 import { getBadgeColor } from '@renderer/utils'
 import { Trash2 } from 'lucide-react'
@@ -57,10 +57,10 @@ const ControllerOverview = ({ currentItem }: PageBuilderProps): React.ReactNode 
                             title="Você tem absoluta certeza?"
                             description={`Tem certeza de que deseja remover este registro ${endpoint.codigoAcompanhamento}?`}
                         >
-                            <IGRPButtonPrimitive variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm">
                                 <Trash2 className="h-4 w-4 text-red-500" />
                                 <span className="sr-only">Excluir</span>
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </IGRPAlertDialog>
                     </div>
                 )

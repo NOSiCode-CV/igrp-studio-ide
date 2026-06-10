@@ -1,19 +1,24 @@
 import {
-    IGRPCollapsibleContentPrimitive,
-    IGRPCollapsiblePrimitive,
-    IGRPCollapsibleTriggerPrimitive,
-    IGRPScrollAreaPrimitive,
-    IGRPSidebarContentPrimitive,
-    IGRPSidebarFooterPrimitive,
-    IGRPSidebarGroupContentPrimitive,
-    IGRPSidebarGroupLabelPrimitive,
-    IGRPSidebarGroupPrimitive,
-    IGRPSidebarHeaderPrimitive,
-    IGRPSidebarMenuButtonPrimitive,
-    IGRPSidebarMenuItemPrimitive,
-    IGRPSidebarMenuPrimitive,
-    IGRPSidebarPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger
+} from '@renderer/components/ui/collapsible'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+// Aliased shadcn primitives — the file re-exports its own opinionated
+// `Sidebar`, `SidebarContent`, `SidebarHeader` and `SidebarFooter` wrappers
+// below, so we need the raw primitives under a different name.
+import {
+    Sidebar as ShadcnSidebar,
+    SidebarContent as ShadcnSidebarContent,
+    SidebarFooter as ShadcnSidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader as ShadcnSidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem
+} from '@renderer/components/ui/sidebar'
 import { cn } from '@renderer/lib/utils'
 import { ChevronRight, type LucideIcon } from 'lucide-react'
 import * as React from 'react'
@@ -38,7 +43,7 @@ export interface SidebarItemProps {
     onClick?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement, MouseEvent>) => void
 }
 
-export interface SidebarProps extends React.ComponentProps<typeof IGRPSidebarPrimitive> {
+export interface SidebarProps extends React.ComponentProps<typeof ShadcnSidebar> {
     children: React.ReactNode
     items?: SidebarProps[]
     collapsible?: 'offcanvas' | 'icon' | 'none'
@@ -61,13 +66,13 @@ export interface SidebarFooterProps extends React.ComponentProps<'div'> {
 
 const Sidebar = ({ collapsible = 'offcanvas', children, ...props }: SidebarProps) => {
     return (
-        <IGRPSidebarPrimitive
+        <ShadcnSidebar
             collapsible={collapsible}
             className={cn(props.className, 'group-data-[side=left]:border-r-none')}
             {...props}
         >
             {children}
-        </IGRPSidebarPrimitive>
+        </ShadcnSidebar>
     )
 }
 
@@ -80,12 +85,8 @@ const SidebarContent = React.forwardRef<HTMLDivElement, SidebarContentProps>(
         )
 
         return (
-            <IGRPSidebarContentPrimitive
-                ref={ref}
-                {...props}
-                className={cn('gap-0 py-3', className)}
-            >
-                <IGRPScrollAreaPrimitive className="h-[calc(100svh-var(--header-height-two))]">
+            <ShadcnSidebarContent ref={ref} {...props} className={cn('gap-0 py-3', className)}>
+                <ScrollArea className="h-[calc(100svh-var(--header-height-two))]">
                     <div className="flex flex-col h-full px-3">
                         {searchActive && (
                             <div className="group-data-[collapsible=icon]:hidden">
@@ -102,8 +103,8 @@ const SidebarContent = React.forwardRef<HTMLDivElement, SidebarContentProps>(
 
                         {renderMenu(filteredItems, null)}
                     </div>
-                </IGRPScrollAreaPrimitive>
-            </IGRPSidebarContentPrimitive>
+                </ScrollArea>
+            </ShadcnSidebarContent>
         )
     }
 )
@@ -113,7 +114,7 @@ SidebarContent.displayName = 'SidebarContent'
 const SidebarHeader = React.forwardRef<HTMLDivElement, SidebarHeaderProps>(
     ({ className, children, ...props }, ref) => {
         return (
-            <IGRPSidebarHeaderPrimitive
+            <ShadcnSidebarHeader
                 ref={ref}
                 className={cn(
                     'p-2 flex items-center justify-center border-b border-border',
@@ -122,7 +123,7 @@ const SidebarHeader = React.forwardRef<HTMLDivElement, SidebarHeaderProps>(
                 {...props}
             >
                 {children}
-            </IGRPSidebarHeaderPrimitive>
+            </ShadcnSidebarHeader>
         )
     }
 )
@@ -132,14 +133,14 @@ SidebarHeader.displayName = 'SidebarHeader'
 const SidebarFooter = React.forwardRef<HTMLDivElement, SidebarFooterProps>(
     ({ items, children, className, ...props }, ref) => {
         return (
-            <IGRPSidebarFooterPrimitive
+            <ShadcnSidebarFooter
                 ref={ref}
                 className={cn('px-3 py-2 border-t border-border', className)}
                 {...props}
             >
                 {children}
                 {renderMenu(items, 'sm')}
-            </IGRPSidebarFooterPrimitive>
+            </ShadcnSidebarFooter>
         )
     }
 )
@@ -151,9 +152,9 @@ const renderMenu = (menus: SidebarItemProps[], size: 'lg' | 'sm' | null): JSX.El
         <>
             {menus.map((item) =>
                 item.type === 'item' ? (
-                    <IGRPSidebarMenuPrimitive key={item.name}>
-                        <IGRPSidebarMenuItemPrimitive>
-                            <IGRPSidebarMenuButtonPrimitive tooltip={item.name}>
+                    <SidebarMenu key={item.name}>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton tooltip={item.name}>
                                 {item.icon && <item.icon />}
                                 <a
                                     href={item.href ?? '#'}
@@ -166,18 +167,18 @@ const renderMenu = (menus: SidebarItemProps[], size: 'lg' | 'sm' | null): JSX.El
                                 >
                                     {item.name}
                                 </a>
-                            </IGRPSidebarMenuButtonPrimitive>
-                        </IGRPSidebarMenuItemPrimitive>
-                    </IGRPSidebarMenuPrimitive>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
                 ) : item.type === 'group' ? (
-                    <IGRPSidebarGroupPrimitive key={item.name} className="px-0">
-                        <IGRPSidebarGroupLabelPrimitive>{item.name}</IGRPSidebarGroupLabelPrimitive>
+                    <SidebarGroup key={item.name} className="px-0">
+                        <SidebarGroupLabel>{item.name}</SidebarGroupLabel>
                         {item.items && (
-                            <IGRPSidebarGroupContentPrimitive>
-                                <IGRPSidebarMenuPrimitive>
+                            <SidebarGroupContent>
+                                <SidebarMenu>
                                     {item.items.map((subItem) => (
-                                        <IGRPSidebarMenuItemPrimitive key={subItem.name}>
-                                            <IGRPSidebarMenuButtonPrimitive
+                                        <SidebarMenuItem key={subItem.name}>
+                                            <SidebarMenuButton
                                                 asChild
                                                 isActive={subItem.isActive}
                                                 onClick={(e) => {
@@ -186,68 +187,64 @@ const renderMenu = (menus: SidebarItemProps[], size: 'lg' | 'sm' | null): JSX.El
                                                 }}
                                             >
                                                 <a href={subItem.href ?? '#'}>{subItem.name}</a>
-                                            </IGRPSidebarMenuButtonPrimitive>
-                                        </IGRPSidebarMenuItemPrimitive>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
                                     ))}
-                                </IGRPSidebarMenuPrimitive>
-                            </IGRPSidebarGroupContentPrimitive>
+                                </SidebarMenu>
+                            </SidebarGroupContent>
                         )}
-                    </IGRPSidebarGroupPrimitive>
+                    </SidebarGroup>
                 ) : (
-                    <IGRPCollapsiblePrimitive
+                    <Collapsible
                         key={item.name}
                         title={item.name}
                         className="group/collapsible"
                         asChild
                     >
-                        <IGRPSidebarGroupPrimitive>
-                            <IGRPSidebarGroupLabelPrimitive
+                        <SidebarGroup>
+                            <SidebarGroupLabel
                                 asChild
                                 className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                             >
                                 {item.items ? (
-                                    <IGRPCollapsibleTriggerPrimitive asChild>
-                                        <IGRPSidebarMenuButtonPrimitive tooltip={item.name}>
+                                    <CollapsibleTrigger asChild>
+                                        <SidebarMenuButton tooltip={item.name}>
                                             {item.icon && <item.icon />}
                                             <span>{item.name}</span>
                                             <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                                        </IGRPSidebarMenuButtonPrimitive>
-                                    </IGRPCollapsibleTriggerPrimitive>
+                                        </SidebarMenuButton>
+                                    </CollapsibleTrigger>
                                 ) : (
-                                    <IGRPSidebarMenuButtonPrimitive
-                                        tooltip={item.name}
-                                        size={size}
-                                        asChild
-                                    >
+                                    <SidebarMenuButton tooltip={item.name} size={size} asChild>
                                         <a href={item.href ?? '#'} className="flex flex-1">
                                             {item.icon && <item.icon />}
                                             <span>{item.name}</span>
                                         </a>
-                                    </IGRPSidebarMenuButtonPrimitive>
+                                    </SidebarMenuButton>
                                 )}
-                            </IGRPSidebarGroupLabelPrimitive>
+                            </SidebarGroupLabel>
                             {item.items && (
-                                <IGRPCollapsibleContentPrimitive>
-                                    <IGRPSidebarGroupContentPrimitive>
-                                        <IGRPSidebarMenuPrimitive>
+                                <CollapsibleContent>
+                                    <SidebarGroupContent>
+                                        <SidebarMenu>
                                             {item.items.map((subItem) => (
-                                                <IGRPSidebarMenuItemPrimitive key={subItem.name}>
-                                                    <IGRPSidebarMenuButtonPrimitive
+                                                <SidebarMenuItem key={subItem.name}>
+                                                    <SidebarMenuButton
                                                         asChild
                                                         isActive={subItem.isActive}
                                                     >
                                                         <a href={subItem.href ?? '#'}>
                                                             {subItem.name}
                                                         </a>
-                                                    </IGRPSidebarMenuButtonPrimitive>
-                                                </IGRPSidebarMenuItemPrimitive>
+                                                    </SidebarMenuButton>
+                                                </SidebarMenuItem>
                                             ))}
-                                        </IGRPSidebarMenuPrimitive>
-                                    </IGRPSidebarGroupContentPrimitive>
-                                </IGRPCollapsibleContentPrimitive>
+                                        </SidebarMenu>
+                                    </SidebarGroupContent>
+                                </CollapsibleContent>
                             )}
-                        </IGRPSidebarGroupPrimitive>
-                    </IGRPCollapsiblePrimitive>
+                        </SidebarGroup>
+                    </Collapsible>
                 )
             )}
         </>

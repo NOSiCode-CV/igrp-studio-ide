@@ -1,12 +1,12 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
 import type { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { SelectInput, TextInput } from '@renderer/generators/api/components/inputs-form'
 import { Plus } from 'lucide-react'
@@ -131,17 +131,17 @@ export const GenerateNewStepForm: React.FC<GenerateNewStepFormProps> = ({
     }
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={onOpenChange}>
-            <IGRPDialogContentPrimitive>
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive className="flex items-center gap-2">
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
                         <Plus className="h-5 w-5" />
                         Configure New Step
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
+                    </DialogTitle>
+                    <DialogDescription>
                         Configure the new step name and optionally copy from an existing version.
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+                    </DialogDescription>
+                </DialogHeader>
 
                 <div className="space-y-6 py-4">
                     <TextInput
@@ -191,20 +191,20 @@ export const GenerateNewStepForm: React.FC<GenerateNewStepFormProps> = ({
                     )}
                 </div>
 
-                <IGRPDialogFooterPrimitive className="gap-2">
-                    <IGRPButtonPrimitive variant="outline" onClick={handleCancel}>
+                <DialogFooter className="gap-2">
+                    <Button variant="outline" onClick={handleCancel}>
                         Cancel
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive
+                    </Button>
+                    <Button
                         onClick={handleConfirm}
                         disabled={!description.trim() || !componentName.trim()}
                         className="gap-2"
                     >
                         <Plus className="h-4 w-4" />
                         {previousComponent ? 'Copy Step' : 'Generate Step'}
-                    </IGRPButtonPrimitive>
-                </IGRPDialogFooterPrimitive>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }

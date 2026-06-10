@@ -1,15 +1,15 @@
+import { Button } from '@renderer/components/ui/button'
+import { Checkbox } from '@renderer/components/ui/checkbox'
+import { Input } from '@renderer/components/ui/input'
 import {
-    IGRPButtonPrimitive,
-    IGRPCheckboxPrimitive,
-    IGRPCombobox,
-    IGRPInputPrimitive,
-    IGRPTableBodyPrimitive,
-    IGRPTableCellPrimitive,
-    IGRPTableHeadPrimitive,
-    IGRPTableHeaderPrimitive,
-    IGRPTablePrimitive,
-    IGRPTableRowPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@renderer/components/ui/table'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import { Plus, Trash2 } from 'lucide-react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -79,45 +79,37 @@ export function FieldsTable({
 
     return (
         <div className="space-y-2">
-            <IGRPTablePrimitive>
-                <IGRPTableHeaderPrimitive>
-                    <IGRPTableRowPrimitive>
-                        <IGRPTableHeadPrimitive>{t('field_name')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('field_type')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive className="w-16 text-center">
-                            {t('field_pk')}
-                        </IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive className="w-20 text-center">
-                            {t('field_nullable')}
-                        </IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive className="w-20 text-center">
-                            {t('field_unique')}
-                        </IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive className="w-20 text-center">
-                            {t('field_indexed')}
-                        </IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('field_default')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('field_extra')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive className="w-10" />
-                    </IGRPTableRowPrimitive>
-                </IGRPTableHeaderPrimitive>
-                <IGRPTableBodyPrimitive>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{t('field_name')}</TableHead>
+                        <TableHead>{t('field_type')}</TableHead>
+                        <TableHead className="w-16 text-center">{t('field_pk')}</TableHead>
+                        <TableHead className="w-20 text-center">{t('field_nullable')}</TableHead>
+                        <TableHead className="w-20 text-center">{t('field_unique')}</TableHead>
+                        <TableHead className="w-20 text-center">{t('field_indexed')}</TableHead>
+                        <TableHead>{t('field_default')}</TableHead>
+                        <TableHead>{t('field_extra')}</TableHead>
+                        <TableHead className="w-10" />
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
                     {fields.length === 0 ? (
-                        <IGRPTableRowPrimitive>
-                            <IGRPTableCellPrimitive
+                        <TableRow>
+                            <TableCell
                                 colSpan={9}
                                 className="text-center text-xs text-muted-foreground py-6"
                             >
                                 {t('no_fields_yet')}
-                            </IGRPTableCellPrimitive>
-                        </IGRPTableRowPrimitive>
+                            </TableCell>
+                        </TableRow>
                     ) : (
                         fields.map((field, index) => {
                             const dup = duplicateName(field.name, index)
                             return (
-                                <IGRPTableRowPrimitive key={field.id}>
-                                    <IGRPTableCellPrimitive>
-                                        <IGRPInputPrimitive
+                                <TableRow key={field.id}>
+                                    <TableCell>
+                                        <Input
                                             value={field.name}
                                             onChange={(e) =>
                                                 update(index, { name: e.target.value })
@@ -130,8 +122,8 @@ export function FieldsTable({
                                                 {t('field_name_duplicate')}
                                             </span>
                                         )}
-                                    </IGRPTableCellPrimitive>
-                                    <IGRPTableCellPrimitive>
+                                    </TableCell>
+                                    <TableCell>
                                         <IGRPCombobox
                                             value={field.type}
                                             onChange={(v) =>
@@ -141,9 +133,9 @@ export function FieldsTable({
                                             placeholder={t('field_type')}
                                             className="w-full"
                                         />
-                                    </IGRPTableCellPrimitive>
-                                    <IGRPTableCellPrimitive className="text-center">
-                                        <IGRPCheckboxPrimitive
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <Checkbox
                                             checked={!!field.primaryKey}
                                             onCheckedChange={(checked) =>
                                                 update(index, {
@@ -152,34 +144,34 @@ export function FieldsTable({
                                                 })
                                             }
                                         />
-                                    </IGRPTableCellPrimitive>
-                                    <IGRPTableCellPrimitive className="text-center">
-                                        <IGRPCheckboxPrimitive
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <Checkbox
                                             checked={field.nullable !== false}
                                             disabled={!!field.primaryKey}
                                             onCheckedChange={(checked) =>
                                                 update(index, { nullable: !!checked })
                                             }
                                         />
-                                    </IGRPTableCellPrimitive>
-                                    <IGRPTableCellPrimitive className="text-center">
-                                        <IGRPCheckboxPrimitive
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <Checkbox
                                             checked={!!field.unique}
                                             onCheckedChange={(checked) =>
                                                 update(index, { unique: !!checked })
                                             }
                                         />
-                                    </IGRPTableCellPrimitive>
-                                    <IGRPTableCellPrimitive className="text-center">
-                                        <IGRPCheckboxPrimitive
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <Checkbox
                                             checked={!!field.indexed}
                                             onCheckedChange={(checked) =>
                                                 update(index, { indexed: !!checked })
                                             }
                                         />
-                                    </IGRPTableCellPrimitive>
-                                    <IGRPTableCellPrimitive>
-                                        <IGRPInputPrimitive
+                                    </TableCell>
+                                    <TableCell>
+                                        <Input
                                             value={
                                                 field.defaultValue == null
                                                     ? ''
@@ -195,8 +187,8 @@ export function FieldsTable({
                                             }
                                             placeholder="—"
                                         />
-                                    </IGRPTableCellPrimitive>
-                                    <IGRPTableCellPrimitive>
+                                    </TableCell>
+                                    <TableCell>
                                         {field.type === 'reference' ? (
                                             <IGRPCombobox
                                                 value={field.referenceEntityId ?? ''}
@@ -211,7 +203,7 @@ export function FieldsTable({
                                                 className="w-full"
                                             />
                                         ) : field.type === 'enum' ? (
-                                            <IGRPInputPrimitive
+                                            <Input
                                                 value={(field.enumValues ?? []).join(', ')}
                                                 onChange={(e) =>
                                                     update(index, {
@@ -226,27 +218,27 @@ export function FieldsTable({
                                         ) : (
                                             <span className="text-xs text-muted-foreground">—</span>
                                         )}
-                                    </IGRPTableCellPrimitive>
-                                    <IGRPTableCellPrimitive>
-                                        <IGRPButtonPrimitive
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => remove(index)}
                                             title={t('delete')}
                                         >
                                             <Trash2 className="h-4 w-4 text-destructive" />
-                                        </IGRPButtonPrimitive>
-                                    </IGRPTableCellPrimitive>
-                                </IGRPTableRowPrimitive>
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
                             )
                         })
                     )}
-                </IGRPTableBodyPrimitive>
-            </IGRPTablePrimitive>
-            <IGRPButtonPrimitive variant="secondary" size="sm" onClick={add}>
+                </TableBody>
+            </Table>
+            <Button variant="secondary" size="sm" onClick={add}>
                 <Plus className="h-4 w-4 mr-1" />
                 {t('add_field')}
-            </IGRPButtonPrimitive>
+            </Button>
         </div>
     )
 }

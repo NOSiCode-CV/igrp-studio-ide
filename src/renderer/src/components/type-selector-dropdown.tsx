@@ -1,14 +1,14 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuSubContentPrimitive,
-    IGRPDropdownMenuSubPrimitive,
-    IGRPDropdownMenuSubTriggerPrimitive,
-    IGRPDropdownMenuTriggerPrimitive,
-    IGRPScrollAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { isSharedModuleName } from '@renderer/constants/appConstants'
 import { cn } from '@renderer/lib/utils'
 import { getLabel } from '@renderer/utils'
@@ -52,41 +52,34 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
         return null
     }
     return (
-        <IGRPDropdownMenuPrimitive>
-            <IGRPDropdownMenuTriggerPrimitive asChild>
-                <IGRPButtonPrimitive
-                    variant={variant}
-                    className={cn('h-6 px-2 text-sm', className)}
-                >
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant={variant} className={cn('h-6 px-2 text-sm', className)}>
                     <span className="flex flex-1">{type || 'Set Type'}</span>
                     {children}
-                </IGRPButtonPrimitive>
-            </IGRPDropdownMenuTriggerPrimitive>
-            <IGRPDropdownMenuContentPrimitive className="w-60">
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-60">
                 {schemaTypes &&
                     schemaTypes.map(({ label, value, module, items }) => {
                         return (
                             <React.Fragment key={value}>
                                 {items && typeof items === 'object' && !Array.isArray(items) ? (
                                     // When items is an object (like your example)
-                                    <IGRPDropdownMenuSubPrimitive>
-                                        <IGRPDropdownMenuSubTriggerPrimitive>
-                                            {label}
-                                        </IGRPDropdownMenuSubTriggerPrimitive>
-                                        <IGRPDropdownMenuSubContentPrimitive className="min-w-50">
-                                            <IGRPScrollAreaPrimitive>
+                                    <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger>{label}</DropdownMenuSubTrigger>
+                                        <DropdownMenuSubContent className="min-w-50">
+                                            <ScrollArea>
                                                 <div className="max-h-[60svh]">
                                                     {Object.entries(items).map(
                                                         ([category, subItems]) => (
                                                             <React.Fragment key={category}>
-                                                                <IGRPDropdownMenuItemPrimitive
-                                                                    disabled
-                                                                >
+                                                                <DropdownMenuItem disabled>
                                                                     {getLabel(category)}
-                                                                </IGRPDropdownMenuItemPrimitive>
+                                                                </DropdownMenuItem>
                                                                 {(subItems as string[]).map(
                                                                     (subItemValue, key) => (
-                                                                        <IGRPDropdownMenuItemPrimitive
+                                                                        <DropdownMenuItem
                                                                             key={key}
                                                                             onClick={() =>
                                                                                 onTypeChange({
@@ -96,16 +89,16 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                                                             }
                                                                         >
                                                                             {getLabel(subItemValue)}
-                                                                        </IGRPDropdownMenuItemPrimitive>
+                                                                        </DropdownMenuItem>
                                                                     )
                                                                 )}
                                                             </React.Fragment>
                                                         )
                                                     )}
                                                 </div>
-                                            </IGRPScrollAreaPrimitive>
-                                        </IGRPDropdownMenuSubContentPrimitive>
-                                    </IGRPDropdownMenuSubPrimitive>
+                                            </ScrollArea>
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuSub>
                                 ) : items && Array.isArray(items) && items.length > 0 ? (
                                     // When items is an array. Items may be
                                     // `{label, value, module?}` objects (the
@@ -115,12 +108,10 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                     // entry so the dropdown renders text and
                                     // dispatches the correct value regardless
                                     // of which engine produced the list.
-                                    <IGRPDropdownMenuSubPrimitive>
-                                        <IGRPDropdownMenuSubTriggerPrimitive>
-                                            {label}
-                                        </IGRPDropdownMenuSubTriggerPrimitive>
-                                        <IGRPDropdownMenuSubContentPrimitive className="min-w-50">
-                                            <IGRPScrollAreaPrimitive>
+                                    <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger>{label}</DropdownMenuSubTrigger>
+                                        <DropdownMenuSubContent className="min-w-50">
+                                            <ScrollArea>
                                                 <div className="max-h-[60svh]">
                                                     {items.map((subItem, key) => {
                                                         const isString = typeof subItem === 'string'
@@ -134,7 +125,7 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                                             ? undefined
                                                             : subItem.module
                                                         return (
-                                                            <IGRPDropdownMenuItemPrimitive
+                                                            <DropdownMenuItem
                                                                 key={key}
                                                                 onClick={() =>
                                                                     onTypeChange({
@@ -146,16 +137,16 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                                             >
                                                                 {!isString && renderIcon(subItem)}
                                                                 {subItemLabel}
-                                                            </IGRPDropdownMenuItemPrimitive>
+                                                            </DropdownMenuItem>
                                                         )
                                                     })}
                                                 </div>
-                                            </IGRPScrollAreaPrimitive>
-                                        </IGRPDropdownMenuSubContentPrimitive>
-                                    </IGRPDropdownMenuSubPrimitive>
+                                            </ScrollArea>
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuSub>
                                 ) : (
                                     // When there are no items
-                                    <IGRPDropdownMenuItemPrimitive
+                                    <DropdownMenuItem
                                         onClick={() => {
                                             if (module)
                                                 onTypeChange({
@@ -167,12 +158,12 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                     >
                                         {renderIcon({ label, value, module })}
                                         {label}
-                                    </IGRPDropdownMenuItemPrimitive>
+                                    </DropdownMenuItem>
                                 )}
                             </React.Fragment>
                         )
                     })}
-            </IGRPDropdownMenuContentPrimitive>
-        </IGRPDropdownMenuPrimitive>
+            </DropdownMenuContent>
+        </DropdownMenu>
     )
 }

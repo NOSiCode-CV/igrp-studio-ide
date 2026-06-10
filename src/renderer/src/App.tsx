@@ -17,8 +17,7 @@ import { ThemeService } from './services/ThemeService'
 import '@igrp/framework-process-studio-bpmn-editor/dist/src/styles.css'
 
 import '@igrp/igrp-framework-react-design-system/styles'
-import { IGRPToasterPrimitive } from '@igrp/igrp-framework-react-design-system'
-
+import { Toaster } from '@renderer/components/ui/sonner'
 // Configure Redux store
 const store = configureStore({ reducer: rootReducer, devTools: true })
 
@@ -77,7 +76,7 @@ const App = (): JSX.Element => {
                         <React.Fragment>
                             <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
                                 <ActiveThemeProvider initialTheme={activeThemeValue}>
-                                    <IGRPToasterPrimitive richColors closeButton expand />
+                                    <Toaster richColors closeButton expand />
                                     <AppRoutes />
                                 </ActiveThemeProvider>
                             </ThemeProvider>

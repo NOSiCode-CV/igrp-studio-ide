@@ -154,9 +154,7 @@ class PrototypeGeneratorService {
         let applied: AppliedManifest | null = null
         let priorAttempt: {
             manifestText: string
-            failure:
-                | { kind: 'parse'; message: string }
-                | { kind: 'engine'; message: string }
+            failure: { kind: 'parse'; message: string } | { kind: 'engine'; message: string }
         } | null = null
 
         for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS; attempt++) {
@@ -270,11 +268,7 @@ class PrototypeGeneratorService {
             try {
                 const manifestFile = join(basePath, MANIFEST_RELATIVE_PATH)
                 await fsp.mkdir(dirname(manifestFile), { recursive: true })
-                await fsp.writeFile(
-                    manifestFile,
-                    JSON.stringify(attemptManifest, null, 2),
-                    'utf-8'
-                )
+                await fsp.writeFile(manifestFile, JSON.stringify(attemptManifest, null, 2), 'utf-8')
             } catch (err) {
                 yield {
                     type: 'error',
@@ -571,9 +565,7 @@ function tryExtractRawJson(reply: string): string {
 function buildRetryPrompt(args: {
     originalUserMessage: string
     priorManifestText: string
-    failure:
-        | { kind: 'parse'; message: string }
-        | { kind: 'engine'; message: string }
+    failure: { kind: 'parse'; message: string } | { kind: 'engine'; message: string }
 }): string {
     const failureLabel =
         args.failure.kind === 'parse'
@@ -611,9 +603,7 @@ function parsePageConfig(raw: string): PageConfigLike {
     try {
         parsed = JSON.parse(raw)
     } catch (err) {
-        throw new Error(
-            `Invalid JSON: ${err instanceof Error ? err.message : String(err)}`
-        )
+        throw new Error(`Invalid JSON: ${err instanceof Error ? err.message : String(err)}`)
     }
 
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
@@ -639,9 +629,7 @@ function parsePageConfig(raw: string): PageConfigLike {
     if (!('path' in obj) || obj.path === null || obj.path === undefined) {
         obj.path = (obj.pageName as string).toLowerCase()
     } else if (typeof obj.path !== 'string') {
-        throw new Error(
-            `Manifest \`path\` must be a string (got ${typeof obj.path}).`
-        )
+        throw new Error(`Manifest \`path\` must be a string (got ${typeof obj.path}).`)
     } else {
         obj.path = (obj.path as string).trim().replace(/^\/+/, '')
     }
@@ -738,7 +726,8 @@ function formatEngineIssue(issue: unknown): string {
     let path = ''
     if (Array.isArray(obj.path)) path = (obj.path as unknown[]).join('.')
     else if (typeof obj.path === 'string') path = obj.path
-    else if (typeof obj.instancePath === 'string' && obj.instancePath !== '') path = obj.instancePath
+    else if (typeof obj.instancePath === 'string' && obj.instancePath !== '')
+        path = obj.instancePath
     else if (typeof obj.dataPath === 'string' && obj.dataPath !== '') path = obj.dataPath
     // AJV `required` errors put the missing prop under `params.missingProperty`
     // — fold it into the path so the message stays clean.

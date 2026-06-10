@@ -1,4 +1,4 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
 import { EmptyList } from '@renderer/components/empty-list'
 import { Loader2, Plus } from 'lucide-react'
 import type React from 'react'
@@ -58,10 +58,10 @@ export const BPMNConfigGrid: React.FC<BPMNConfigGridProps> = ({
                         {configs.length !== 1 ? 's' : ''})
                     </p>
                 </div>
-                <IGRPButtonPrimitive onClick={onAddNew} className="flex items-center gap-2">
+                <Button onClick={onAddNew} className="flex items-center gap-2">
                     <Plus className="h-4 w-4" />
                     Add Configuration
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

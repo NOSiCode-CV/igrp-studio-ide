@@ -1,7 +1,5 @@
-import {
-    IGRPButtonPrimitive,
-    useIGRPToast
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { useIGRPToast } from '@igrp/igrp-framework-react-design-system'
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
 import { EmptyList } from '@renderer/components/empty-list'
 import { Plus } from 'lucide-react'
@@ -106,10 +104,7 @@ export function BPMNConnectionsManager({
         }
     }
 
-    const handleToggleActive = async (
-        configId: string,
-        isActive: boolean
-    ): Promise<void> => {
+    const handleToggleActive = async (configId: string, isActive: boolean): Promise<void> => {
         try {
             await window.igrpStudioSettings.setActiveBPMNConfig(isActive ? configId : '')
             await loadConfigs()
@@ -139,11 +134,11 @@ export function BPMNConnectionsManager({
                 <div>
                     <h3 className="text-sm font-semibold">BPMN API connections</h3>
                     <p className="text-xs text-muted-foreground">
-                        Add multiple Process API endpoints and switch between them. The
-                        active connection is used by every BPMN view in the Studio.
+                        Add multiple Process API endpoints and switch between them. The active
+                        connection is used by every BPMN view in the Studio.
                     </p>
                 </div>
-                <IGRPButtonPrimitive
+                <Button
                     size="sm"
                     onClick={() => {
                         setEditingConfig(undefined)
@@ -152,7 +147,7 @@ export function BPMNConnectionsManager({
                 >
                     <Plus className="h-4 w-4 mr-1" />
                     Add
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
 
             {configs.configs.length > 0 ? (

@@ -1,5 +1,5 @@
 import { IGRPBpmnModeler } from '@igrp/framework-process-studio-bpmn-editor'
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
 import { X } from 'lucide-react'
 import type { JSX } from 'react'
 import { DelegatesHelper } from './DelegatesHelper'
@@ -39,14 +39,14 @@ export function DiagramTab({
                 <aside className="w-[420px] shrink-0 overflow-auto border-l bg-background p-4">
                     <div className="mb-3 flex items-center justify-between">
                         <h3 className="text-sm font-semibold">Delegates reference</h3>
-                        <IGRPButtonPrimitive
+                        <Button
                             variant="ghost"
                             size="sm"
                             onClick={onHelperClose}
                             aria-label="Close delegates reference"
                         >
                             <X className="h-4 w-4" />
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                     <DelegatesHelper />
                 </aside>

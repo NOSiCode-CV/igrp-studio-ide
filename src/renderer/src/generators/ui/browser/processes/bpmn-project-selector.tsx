@@ -1,30 +1,24 @@
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
+import { Card, CardContent } from '@renderer/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@renderer/components/ui/dialog'
 import {
-    IGRPBadgePrimitive,
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuLabelPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuSeparatorPrimitive,
-    IGRPDropdownMenuTriggerPrimitive,
-    IGRPLoadingSpinner,
-    IGRPSelectContentPrimitive,
-    IGRPSelectItemPrimitive,
-    IGRPSelectPrimitive,
-    IGRPSelectTriggerPrimitive,
-    IGRPSelectValuePrimitive,
-    IGRPSeparator,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@renderer/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
+import { IGRPLoadingSpinner, IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import type { ProcessConfig, ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { nanoid } from '@reduxjs/toolkit'
 import { BPMNDiagramViewer } from '@renderer/components/bpmn-diagram-viewer'
@@ -486,7 +480,7 @@ export const BPMNProjectSelector = ({
                         <span aria-hidden />
                     )}
                     <div className="flex items-center gap-1">
-                        <IGRPButtonPrimitive
+                        <Button
                             variant="outline"
                             size="sm"
                             onClick={() => setShowApiManager(true)}
@@ -495,8 +489,8 @@ export const BPMNProjectSelector = ({
                         >
                             <Plug className="h-4 w-4" />
                             API
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive
+                        </Button>
+                        <Button
                             variant="outline"
                             size="sm"
                             onClick={() => {
@@ -513,76 +507,65 @@ export const BPMNProjectSelector = ({
                                 className={`h-4 w-4 ${loading || loadingProcesses ? 'animate-spin' : ''}`}
                             />
                             Refresh
-                        </IGRPButtonPrimitive>
-                        <IGRPDropdownMenuPrimitive>
-                            <IGRPDropdownMenuTriggerPrimitive asChild>
-                                <IGRPButtonPrimitive
+                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
                                     variant="ghost"
                                     size="icon"
                                     className="h-8 w-8"
                                     title="View options"
                                 >
                                     <MoreVertical className="h-4 w-4" />
-                                </IGRPButtonPrimitive>
-                            </IGRPDropdownMenuTriggerPrimitive>
-                            <IGRPDropdownMenuContentPrimitive align="end" className="min-w-40">
-                                <IGRPDropdownMenuLabelPrimitive className="text-xs text-muted-foreground">
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="min-w-40">
+                                <DropdownMenuLabel className="text-xs text-muted-foreground">
                                     View Mode
-                                </IGRPDropdownMenuLabelPrimitive>
-                                <IGRPDropdownMenuSeparatorPrimitive />
-                                <IGRPDropdownMenuItemPrimitive
-                                    onClick={() => setViewMode('local')}
-                                >
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => setViewMode('local')}>
                                     <HardDrive className="h-3.5 w-3.5 mr-2" />
                                     Local
                                     {currentViewMode === 'local' && (
                                         <Check className="h-3.5 w-3.5 ml-auto" />
                                     )}
-                                </IGRPDropdownMenuItemPrimitive>
-                                <IGRPDropdownMenuItemPrimitive
-                                    onClick={() => setViewMode('remote')}
-                                >
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setViewMode('remote')}>
                                     <Cloud className="h-3.5 w-3.5 mr-2" />
                                     Remote
                                     {currentViewMode === 'remote' && (
                                         <Check className="h-3.5 w-3.5 ml-auto" />
                                     )}
-                                </IGRPDropdownMenuItemPrimitive>
-                            </IGRPDropdownMenuContentPrimitive>
-                        </IGRPDropdownMenuPrimitive>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
                 {hasProjects && (
-                    <IGRPSelectPrimitive
+                    <Select
                         onValueChange={handleProjectChange}
                         value={selectedProject?.projectId || ''}
                     >
-                        <IGRPSelectTriggerPrimitive className="w-full">
-                            <IGRPSelectValuePrimitive placeholder="Choose a project..." />
-                        </IGRPSelectTriggerPrimitive>
-                        <IGRPSelectContentPrimitive>
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Choose a project..." />
+                        </SelectTrigger>
+                        <SelectContent>
                             {projects.map((project) => (
-                                <IGRPSelectItemPrimitive
-                                    key={project.projectId}
-                                    value={project.projectId}
-                                >
+                                <SelectItem key={project.projectId} value={project.projectId}>
                                     <div className="flex items-center space-x-2">
                                         <span className="font-medium">{project.name}</span>
-                                        <IGRPBadgePrimitive
-                                            variant={project.active ? 'default' : 'secondary'}
-                                        >
+                                        <Badge variant={project.active ? 'default' : 'secondary'}>
                                             {project.code}
-                                        </IGRPBadgePrimitive>
+                                        </Badge>
                                         {!project.active && (
-                                            <IGRPBadgePrimitive variant="outline">
-                                                Inactive
-                                            </IGRPBadgePrimitive>
+                                            <Badge variant="outline">Inactive</Badge>
                                         )}
                                     </div>
-                                </IGRPSelectItemPrimitive>
+                                </SelectItem>
                             ))}
-                        </IGRPSelectContentPrimitive>
-                    </IGRPSelectPrimitive>
+                        </SelectContent>
+                    </Select>
                 )}
             </div>
 
@@ -594,8 +577,8 @@ export const BPMNProjectSelector = ({
                         <div>
                             <h3 className="text-lg font-semibold">Select Process</h3>
                             <p className="text-sm text-muted-foreground">
-                                Choose a specific process to view its artifacts, or load all
-                                project artifacts below.
+                                Choose a specific process to view its artifacts, or load all project
+                                artifacts below.
                             </p>
                         </div>
                         <SearchInput
@@ -645,21 +628,13 @@ export const BPMNProjectSelector = ({
             {selectedProcess && (
                 <>
                     <div className="space-y-4">
-                        <IGRPTabsPrimitive
-                            value={activeTab}
-                            onValueChange={setActiveTab}
-                            className="w-full"
-                        >
-                            <IGRPTabsListPrimitive className="grid grid-cols-2">
-                                <IGRPTabsTriggerPrimitive value="artifacts">
-                                    Process Artifacts
-                                </IGRPTabsTriggerPrimitive>
-                                <IGRPTabsTriggerPrimitive value="diagram">
-                                    BPMN Diagram
-                                </IGRPTabsTriggerPrimitive>
-                            </IGRPTabsListPrimitive>
+                        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                            <TabsList className="grid grid-cols-2">
+                                <TabsTrigger value="artifacts">Process Artifacts</TabsTrigger>
+                                <TabsTrigger value="diagram">BPMN Diagram</TabsTrigger>
+                            </TabsList>
 
-                            <IGRPTabsContentPrimitive value="artifacts" className="space-y-6">
+                            <TabsContent value="artifacts" className="space-y-6">
                                 <div className="flex items-center justify-between mt-4">
                                     <div>
                                         <h4 className="text-md font-medium">Process Artifacts</h4>
@@ -700,15 +675,15 @@ export const BPMNProjectSelector = ({
                                         )}
                                     </div>
                                 ) : (
-                                    <IGRPCardPrimitive>
-                                        <IGRPCardContentPrimitive className="py-8 text-center text-muted-foreground">
+                                    <Card>
+                                        <CardContent className="py-8 text-center text-muted-foreground">
                                             No artifacts found for this process.
-                                        </IGRPCardContentPrimitive>
-                                    </IGRPCardPrimitive>
+                                        </CardContent>
+                                    </Card>
                                 )}
-                            </IGRPTabsContentPrimitive>
+                            </TabsContent>
 
-                            <IGRPTabsContentPrimitive value="diagram" className="space-y-4">
+                            <TabsContent value="diagram" className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <h4 className="text-md font-medium">BPMN Diagram</h4>
@@ -724,16 +699,16 @@ export const BPMNProjectSelector = ({
                                         bpmnContent={processDefinitionDetails.bpmFileContent}
                                     />
                                 )}
-                            </IGRPTabsContentPrimitive>
-                        </IGRPTabsPrimitive>
+                            </TabsContent>
+                        </Tabs>
                     </div>
                 </>
             )}
 
             {/* No Projects Message */}
             {!loading && projects.length === 0 && (
-                <IGRPCardPrimitive>
-                    <IGRPCardContentPrimitive className="py-8 text-center">
+                <Card>
+                    <CardContent className="py-8 text-center">
                         <div className="flex flex-col items-center space-y-3">
                             <p className="text-muted-foreground">
                                 No projects found. Please check your BPMN API configuration.
@@ -745,8 +720,8 @@ export const BPMNProjectSelector = ({
                                 </p>
                             )}
                         </div>
-                    </IGRPCardContentPrimitive>
-                </IGRPCardPrimitive>
+                    </CardContent>
+                </Card>
             )}
 
             {/* Add Components Name Modal */}
@@ -770,18 +745,16 @@ export const BPMNProjectSelector = ({
                 bpmnProcesses={bpmnProcesses}
             />
 
-            <IGRPDialogPrimitive open={showApiManager} onOpenChange={setShowApiManager}>
-                <IGRPDialogContentPrimitive className="sm:max-w-6xl w-[95vw] max-h-[85vh] overflow-hidden flex flex-col p-0">
-                    <IGRPDialogHeaderPrimitive className="border-b px-6 py-4 shrink-0">
-                        <IGRPDialogTitlePrimitive>
-                            Manage BPMN API connections
-                        </IGRPDialogTitlePrimitive>
-                    </IGRPDialogHeaderPrimitive>
+            <Dialog open={showApiManager} onOpenChange={setShowApiManager}>
+                <DialogContent className="sm:max-w-6xl w-[95vw] max-h-[85vh] overflow-hidden flex flex-col p-0">
+                    <DialogHeader className="border-b px-6 py-4 shrink-0">
+                        <DialogTitle>Manage BPMN API connections</DialogTitle>
+                    </DialogHeader>
                     <div className="flex-1 overflow-y-auto px-6 py-4">
                         <BPMNConnectionsManager compact />
                     </div>
-                </IGRPDialogContentPrimitive>
-            </IGRPDialogPrimitive>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

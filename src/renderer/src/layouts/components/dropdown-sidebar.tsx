@@ -1,11 +1,11 @@
 import {
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuSeparatorPrimitive,
-    IGRPDropdownMenuShortcutPrimitive,
-    IGRPDropdownMenuTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
 import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { useFramework } from '@renderer/hooks/use-framework'
@@ -294,8 +294,8 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
         <></>
     ) : (
         <>
-            <IGRPDropdownMenuPrimitive>
-                <IGRPDropdownMenuTriggerPrimitive asChild>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                     <div className="text-muted-foreground hover:text-foreground">
                         {isDeleteAction ? (
                             <Ellipsis className="h-4 w-4" />
@@ -303,16 +303,16 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                             <Plus className="h-4 w-4" />
                         )}
                     </div>
-                </IGRPDropdownMenuTriggerPrimitive>
-                <IGRPDropdownMenuContentPrimitive side="right" align="start" className="min-w-56">
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="right" align="start" className="min-w-56">
                     {(menuItem.dropdownMenus ?? []).map((menu: DropdownItem, idx: number) => {
                         const isDelete = menu.actionType === OPTION_TYPE.DELETE
                         return (
                             <React.Fragment key={idx}>
                                 {menu.actionType === OPTION_TYPE.DELETE && (
-                                    <IGRPDropdownMenuSeparatorPrimitive />
+                                    <DropdownMenuSeparator />
                                 )}
-                                <IGRPDropdownMenuItemPrimitive
+                                <DropdownMenuItem
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         const actionId = `new-action-${menuItem.id || menuItem.label}`
@@ -331,17 +331,13 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                                         <span className="h-4 me-4"></span>
                                     )}
                                     {menu.label}
-                                    {isDelete && (
-                                        <IGRPDropdownMenuShortcutPrimitive>
-                                            ⌘+D
-                                        </IGRPDropdownMenuShortcutPrimitive>
-                                    )}
-                                </IGRPDropdownMenuItemPrimitive>
+                                    {isDelete && <DropdownMenuShortcut>⌘+D</DropdownMenuShortcut>}
+                                </DropdownMenuItem>
                             </React.Fragment>
                         )
                     })}
-                </IGRPDropdownMenuContentPrimitive>
-            </IGRPDropdownMenuPrimitive>
+                </DropdownMenuContent>
+            </DropdownMenu>
 
             {modalType && (
                 <ModalManager

@@ -1,13 +1,13 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPSeparator,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import { DebugTerminal } from '@renderer/components/debug-terminal'
 import { TERMINAL_TOGGLE_EVENT } from '@renderer/components/integrated-terminal'
 import Doctor from '@renderer/components/doctor'
@@ -123,7 +123,7 @@ export function Footer(): JSX.Element {
     }
 
     return (
-        <IGRPTooltipProviderPrimitive>
+        <TooltipProvider>
             <footer className="h-8 border-t bg-card flex items-center px-3 justify-between text-xs fixed bottom-0 left-0 right-0 z-50">
                 <div className="flex items-center space-x-3">
                     <span className="text-muted-foreground whitespace-nowrap flex-none">
@@ -173,9 +173,9 @@ export function Footer(): JSX.Element {
                     <IGRPSeparator orientation="vertical" className="h-4" />
 
                     {import.meta.env.DEV ? (
-                        <IGRPTooltipPrimitive>
-                            <IGRPTooltipTriggerPrimitive asChild>
-                                <IGRPButtonPrimitive
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
                                     type="button"
                                     variant="outline"
                                     size="sm"
@@ -183,33 +183,33 @@ export function Footer(): JSX.Element {
                                     onClick={runMonitoringTestError}
                                 >
                                     {t('monitoringTestButton')}
-                                </IGRPButtonPrimitive>
-                            </IGRPTooltipTriggerPrimitive>
-                            <IGRPTooltipContentPrimitive side="top">
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
                                 <p className="max-w-xs">{t('monitoringTestTooltip')}</p>
-                            </IGRPTooltipContentPrimitive>
-                        </IGRPTooltipPrimitive>
+                            </TooltipContent>
+                        </Tooltip>
                     ) : null}
 
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
-                            <IGRPButtonPrimitive
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
                                 size={'icon'}
                                 variant={'ghost'}
                                 className="h-6 w-6"
                                 onClick={() => setOpen(!open)}
                             >
                                 <Stethoscope className="text-muted-foreground" />
-                            </IGRPButtonPrimitive>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive side="top">Doctor</IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">Doctor</TooltipContent>
+                    </Tooltip>
 
                     <DebugTerminal />
 
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
-                            <IGRPButtonPrimitive
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
                                 size="icon"
                                 variant="ghost"
                                 className="h-6 w-6"
@@ -218,15 +218,13 @@ export function Footer(): JSX.Element {
                                 }
                             >
                                 <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
-                            </IGRPButtonPrimitive>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive side="top">
-                            Terminal (Ctrl+`)
-                        </IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">Terminal (Ctrl+`)</TooltipContent>
+                    </Tooltip>
 
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
                             <div className="flex items-center space-x-1">
                                 {isOnline ? (
                                     <Wifi className="h-3.5 w-3.5 text-green-500" />
@@ -237,26 +235,26 @@ export function Footer(): JSX.Element {
                                     {isOnline ? 'Online' : 'Offline'}
                                 </span>
                             </div>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive side="top">
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
                             <p>{t('networkStatus')}</p>
-                        </IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                        </TooltipContent>
+                    </Tooltip>
 
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
-                            <IGRPButtonPrimitive variant="ghost" size="icon" className="h-6 w-6">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
                                 <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
-                            </IGRPButtonPrimitive>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive side="top">
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
                             <p>{t('helpCenter')}</p>
-                        </IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                        </TooltipContent>
+                    </Tooltip>
 
                     <Doctor open={open} setOpen={setOpen} />
                 </div>
             </footer>
-        </IGRPTooltipProviderPrimitive>
+        </TooltipProvider>
     )
 }

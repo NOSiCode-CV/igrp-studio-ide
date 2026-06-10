@@ -1,7 +1,4 @@
-import {
-    IGRPCardContentPrimitive,
-    IGRPCardPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Card, CardContent } from '@renderer/components/ui/card'
 import { useTranslation } from 'react-i18next'
 import { FormList } from '../../../../components/form-list'
 import { TextInput } from '../../components/inputs-form'
@@ -37,8 +34,8 @@ export const EnumLayout = ({ currentItem, onCloseTab }: EnumProps) => {
                 showSourceCode={onClickSourceCode}
             />
             <div className="space-y-4 p-4">
-                <IGRPCardPrimitive>
-                    <IGRPCardContentPrimitive>
+                <Card>
+                    <CardContent>
                         <div className="flex flex-col gap-4">
                             <TextInput
                                 id="name"
@@ -65,8 +62,8 @@ export const EnumLayout = ({ currentItem, onCloseTab }: EnumProps) => {
                                 />
                             </div>
                         </div>
-                    </IGRPCardContentPrimitive>
-                </IGRPCardPrimitive>
+                    </CardContent>
+                </Card>
             </div>
         </form>
     )

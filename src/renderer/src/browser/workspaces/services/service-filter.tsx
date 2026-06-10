@@ -1,4 +1,5 @@
-import { IGRPBadgePrimitive, IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
 import { Compass, Database, Globe, HardDrive, Server, Shield } from 'lucide-react'
 import type React from 'react'
 import { type JSX, useState } from 'react'
@@ -65,7 +66,7 @@ const serviceCategories: ServiceCategory[] = [
         name: 'Monitoring',
         icon: <Compass className="h-4 w-4" />,
         color: 'bg-purple-500',
-        types: ['observability', 'messaging']
+        types: ['observability', 'monitoring', 'messaging']
     }
 ]
 
@@ -110,14 +111,14 @@ export function ServiceFilter({ onFilterChange, totalServices }: ServiceFilterPr
             {/* Category Tabs */}
             <div className="flex flex-wrap gap-2">
                 {serviceCategories.map((category) => (
-                    <IGRPBadgePrimitive
+                    <Badge
                         key={category.id}
                         variant={activeCategory === category.id ? 'default' : 'outline'}
                         onClick={() => handleCategoryClick(category.id)}
                         className={`flex items-center gap-2 ${
                             activeCategory === category.id
                                 ? `${category.color} text-white hover:opacity-90`
-                                : 'hover:bg-muted'
+                                : 'hover:bg-muted dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
                         }`}
                     >
                         {category.icon}
@@ -125,7 +126,7 @@ export function ServiceFilter({ onFilterChange, totalServices }: ServiceFilterPr
                         {category.id !== 'all' && (
                             <span className="text-xs opacity-75">({category.types.length})</span>
                         )}
-                    </IGRPBadgePrimitive>
+                    </Badge>
                 ))}
             </div>
 
@@ -140,14 +141,9 @@ export function ServiceFilter({ onFilterChange, totalServices }: ServiceFilterPr
                     )}
                 </span>
                 {(activeCategory !== 'all' || searchQuery) && (
-                    <IGRPButtonPrimitive
-                        variant="ghost"
-                        size="sm"
-                        onClick={clearFilters}
-                        className="text-xs"
-                    >
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
                         Clear filters
-                    </IGRPButtonPrimitive>
+                    </Button>
                 )}
             </div>
         </div>

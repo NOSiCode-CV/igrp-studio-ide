@@ -1,12 +1,12 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPBadge,
-    IGRPButtonPrimitive,
-    IGRPCollapsibleContentPrimitive,
-    IGRPCollapsiblePrimitive,
-    IGRPCollapsibleTriggerPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger
+} from '@renderer/components/ui/collapsible'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { IGRPBadge } from '@igrp/igrp-framework-react-design-system'
 import type { Import } from '@igrp/igrp-studio-nextjs-engine/types'
 import { nanoid } from '@reduxjs/toolkit'
 import useToast from '@renderer/hooks/useToast'
@@ -61,10 +61,10 @@ const ImportComponent = ({ onChange, initialImports = [] }: ImportComponentProps
 
     return (
         <div className="space-y-2">
-            <IGRPCollapsiblePrimitive open={isOpen} onOpenChange={setIsOpen}>
+            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
                 <div className="flex items-center justify-between">
-                    <IGRPCollapsibleTriggerPrimitive asChild>
-                        <IGRPButtonPrimitive
+                    <CollapsibleTrigger asChild>
+                        <Button
                             variant="ghost"
                             className="flex items-center gap-2 p-0 h-auto hover:bg-transparent"
                         >
@@ -74,17 +74,15 @@ const ImportComponent = ({ onChange, initialImports = [] }: ImportComponentProps
                                     isOpen && 'rotate-90'
                                 )}
                             />
-                            <IGRPLabelPrimitive className="cursor-pointer">
-                                {t('imports.title')}
-                            </IGRPLabelPrimitive>
-                        </IGRPButtonPrimitive>
-                    </IGRPCollapsibleTriggerPrimitive>
+                            <Label className="cursor-pointer">{t('imports.title')}</Label>
+                        </Button>
+                    </CollapsibleTrigger>
                     <IGRPBadge variant="outline" className="text-xs">
                         {t('imports.count', { count: imports.length })}
                     </IGRPBadge>
                 </div>
 
-                <IGRPCollapsibleContentPrimitive>
+                <CollapsibleContent>
                     <div className="border rounded-md p-3 space-y-2 mt-2">
                         {imports.length > 0 ? (
                             <div className="flex flex-wrap gap-2">
@@ -95,14 +93,14 @@ const ImportComponent = ({ onChange, initialImports = [] }: ImportComponentProps
                                         className="px-2 py-1 flex items-center gap-1"
                                     >
                                         <span className="font-mono text-sm">{imp.namespace}</span>
-                                        <IGRPButtonPrimitive
+                                        <Button
                                             variant="ghost"
                                             size="icon"
                                             className="h-4 w-4 p-0 ml-1"
                                             onClick={() => removeImport(imp.id)}
                                         >
                                             <X className="h-3 w-3" />
-                                        </IGRPButtonPrimitive>
+                                        </Button>
                                     </IGRPBadge>
                                 ))}
                             </div>
@@ -113,14 +111,14 @@ const ImportComponent = ({ onChange, initialImports = [] }: ImportComponentProps
                         )}
 
                         <div className="flex gap-2">
-                            <IGRPInputPrimitive
+                            <Input
                                 value={newImport}
                                 onChange={(e) => setNewImport(e.target.value)}
                                 placeholder={t('imports.placeholder')}
                                 className="h-8 flex-1"
                                 onKeyDown={(e) => e.key === 'Enter' && addImport()}
                             />
-                            <IGRPButtonPrimitive
+                            <Button
                                 type="button"
                                 size="sm"
                                 className="h-8"
@@ -128,11 +126,11 @@ const ImportComponent = ({ onChange, initialImports = [] }: ImportComponentProps
                                 disabled={!newImport}
                             >
                                 <Plus /> {t('add')}
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </div>
                     </div>
-                </IGRPCollapsibleContentPrimitive>
-            </IGRPCollapsiblePrimitive>
+                </CollapsibleContent>
+            </Collapsible>
         </div>
     )
 }

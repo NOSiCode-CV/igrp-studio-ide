@@ -103,6 +103,10 @@ export const handleWithCustomErrors = (channel: string, handler: Handler) => {
                 result: await Promise.resolve(handler(event, ...args))
             }
         } catch (e) {
+            // Print full stack to main-process terminal — only the message
+            // survives IPC serialization, so without this the renderer never
+            // sees a stack and the terminal stays silent on engine throws.
+            console.error(`[ipc:${channel}]`, e)
             return { error: e }
         }
     })

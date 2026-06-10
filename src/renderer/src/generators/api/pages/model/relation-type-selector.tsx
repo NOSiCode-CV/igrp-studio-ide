@@ -1,9 +1,5 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import { cn } from '@renderer/lib/utils'
 import React from 'react'
 
@@ -85,9 +81,9 @@ export function RelationTypeSelector({ value, onChange }: RelationTypeSelectorPr
                     <div className="w-6 h-0.5 bg-primary" />
                     {Object.keys(relationTypeIcons).map((type, index, array) => (
                         <React.Fragment key={type}>
-                            <IGRPTooltipPrimitive>
-                                <IGRPTooltipTriggerPrimitive asChild>
-                                    <IGRPButtonPrimitive
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
                                         size="icon"
                                         onClick={() => onChange(type)}
                                         className={cn(
@@ -97,12 +93,12 @@ export function RelationTypeSelector({ value, onChange }: RelationTypeSelectorPr
                                         )}
                                     >
                                         {relationTypeIcons[type as keyof typeof relationTypeIcons]}
-                                    </IGRPButtonPrimitive>
-                                </IGRPTooltipTriggerPrimitive>
-                                <IGRPTooltipContentPrimitive>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
                                     <p>{type}</p>
-                                </IGRPTooltipContentPrimitive>
-                            </IGRPTooltipPrimitive>
+                                </TooltipContent>
+                            </Tooltip>
                             {index < array.length - 1 && <div className="w-6 h-0.5 bg-primary" />}
                         </React.Fragment>
                     ))}

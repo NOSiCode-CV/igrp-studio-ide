@@ -1,10 +1,6 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPIcon,
-    IGRPPopoverContentPrimitive,
-    IGRPPopoverPrimitive,
-    IGRPPopoverTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { IGRPIcon } from '@igrp/igrp-framework-react-design-system'
 import { cn } from '@renderer/lib/utils'
 import { Bell, Check, MoreHorizontal } from 'lucide-react'
 import type { JSX } from 'react'
@@ -64,13 +60,9 @@ const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Ele
     }
 
     return (
-        <IGRPPopoverPrimitive>
-            <IGRPPopoverTriggerPrimitive asChild>
-                <IGRPButtonPrimitive
-                    variant="ghost"
-                    size="sm"
-                    className={cn('relative', className)}
-                >
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button variant="ghost" size="sm" className={cn('relative', className)}>
                     <Bell className="w-5 h-5" />
                     {unreadCount > 0 && (
                         <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-xs text-white flex items-center justify-center">
@@ -78,14 +70,14 @@ const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Ele
                         </span>
                     )}
                     <span className="sr-only">{t('notifications')}</span>
-                </IGRPButtonPrimitive>
-            </IGRPPopoverTriggerPrimitive>
-            <IGRPPopoverContentPrimitive className="w-80 p-0" align="end" sideOffset={8}>
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-0" align="end" sideOffset={8}>
                 <div className="flex items-center justify-between border-b p-4">
                     <h4 className="leading-none font-medium">{t('notifications')}</h4>
 
                     {notifications.length > 0 && (
-                        <IGRPButtonPrimitive
+                        <Button
                             variant="ghost"
                             size="sm"
                             onClick={markAllAsRead}
@@ -93,7 +85,7 @@ const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Ele
                         >
                             <Check className="w-4 h-4 mr-1" />
                             {t('markAllAsRead')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     )}
                 </div>
 
@@ -143,13 +135,13 @@ const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Ele
                                                     {!notification.read && (
                                                         <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
                                                     )}
-                                                    <IGRPButtonPrimitive
+                                                    <Button
                                                         variant="ghost"
                                                         size="sm"
                                                         className="h-6 w-6 p-0"
                                                     >
                                                         <MoreHorizontal className="w-3 h-3" />
-                                                    </IGRPButtonPrimitive>
+                                                    </Button>
                                                 </div>
                                             </div>
                                         </div>
@@ -162,13 +154,13 @@ const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Ele
 
                 {notifications.length > 0 && (
                     <div className="border-t p-3">
-                        <IGRPButtonPrimitive variant="ghost" className="w-full text-sm">
+                        <Button variant="ghost" className="w-full text-sm">
                             {t('viewAllNotifications')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                 )}
-            </IGRPPopoverContentPrimitive>
-        </IGRPPopoverPrimitive>
+            </PopoverContent>
+        </Popover>
     )
 }
 

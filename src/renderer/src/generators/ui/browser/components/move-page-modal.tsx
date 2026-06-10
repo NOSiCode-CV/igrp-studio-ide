@@ -1,14 +1,14 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPCombobox,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPLabelPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Label } from '@renderer/components/ui/label'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import useToast from '@renderer/hooks/useToast'
 import { type JSX, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -113,21 +113,21 @@ export function MovePageModal({
     }
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <IGRPDialogContentPrimitive className="sm:max-w-md">
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('move_page_title')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{t('move_page_title')}</DialogTitle>
+                    <DialogDescription>
                         {page
                             ? t('move_page_description', {
                                   name: page.description || page.pageName
                               })
                             : ''}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+                    </DialogDescription>
+                </DialogHeader>
 
                 <div className="space-y-2 py-2">
-                    <IGRPLabelPrimitive>{t('move_target')}</IGRPLabelPrimitive>
+                    <Label>{t('move_target')}</Label>
                     <IGRPCombobox
                         name="target"
                         value={target}
@@ -140,15 +140,15 @@ export function MovePageModal({
                     />
                 </div>
 
-                <IGRPDialogFooterPrimitive>
-                    <IGRPButtonPrimitive variant="outline" onClick={onClose} disabled={submitting}>
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose} disabled={submitting}>
                         {t('cancel')}
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive onClick={handleConfirm} disabled={submitting || !page}>
+                    </Button>
+                    <Button onClick={handleConfirm} disabled={submitting || !page}>
                         {t('move')}
-                    </IGRPButtonPrimitive>
-                </IGRPDialogFooterPrimitive>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }

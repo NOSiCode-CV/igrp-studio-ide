@@ -1,28 +1,24 @@
 'use client'
 
-import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPTextAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
-import { LabelRequired } from '@renderer/components/label-required'
 import { ProjectIcon } from '@renderer/components/shared-ui'
 import { PATTERNS } from '@renderer/constants/appConstants'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
-import { useFormik } from 'formik'
-import { Upload, X } from 'lucide-react'
+import { errorMessage, useZodForm } from '@renderer/lib/form'
+import { FolderKanban, Plus, SquarePen, X } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import type React from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import type { ProjectData } from 'src/main/types'
-import * as Yup from 'yup'
+import { z } from 'zod'
+
+interface EditProjectFormValues {
+    name: string
+    config: { description: string } & Record<string, unknown>
+    themeColor: string
+    icon: string
+}
 
 interface EditProjectModalProps {
     project: ProjectData
@@ -39,57 +35,86 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
 }) => {
     const { t } = useTranslation()
     const {
+        workspace,
         actions: { updateProject }
     } = useWorkspace()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const nameInputRef = useRef<HTMLInputElement>(null)
 
-    const validationSchema = Yup.object().shape({
-        name: Yup.string()
-            .required(t('fieldRequired', { name: t('projectName') }))
-            .matches(PATTERNS.SPECIAL_CHARACTERS_PROJECT_NAME, t('msgSpecialCharactersRegex'))
-            .max(100, t('maxLengthExceeded', { max: 100 })),
-        config: Yup.object().shape({
-            description: Yup.string().max(500, t('maxLengthExceeded', { max: 500 }))
-        })
-    })
+    const schema = useMemo(
+        () =>
+            z
+                .object({
+                    name: z
+                        .string()
+                        .min(1, t('fieldRequired', { name: t('projectName') }))
+                        .regex(
+                            PATTERNS.SPECIAL_CHARACTERS_PROJECT_NAME,
+                            t('msgSpecialCharactersRegex')
+                        )
+                        .max(100, t('maxLengthExceeded', { max: 100 })),
+                    config: z
+                        .object({
+                            description: z
+                                .string()
+                                .max(500, t('maxLengthExceeded', { max: 500 }))
+                                .default('')
+                        })
+                        .passthrough()
+                })
+                .passthrough() as unknown as z.ZodType<EditProjectFormValues, unknown>,
+        [t]
+    )
 
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues: {
-            name: project.name || '',
+    const defaultValues = useMemo<EditProjectFormValues>(
+        () => ({
+            name: project?.name || '',
             config: {
-                description: project.config?.description || '',
-                ...project.config
+                description: project?.config?.description || '',
+                ...project?.config
             },
-            themeColor: project.themeColor || '#000000',
-            icon: project.icon || ''
-        },
-        validationSchema,
-        onSubmit: async (values, actions) => {
-            setIsSubmitting(true)
-            try {
-                const updatedProject = {
-                    ...project,
-                    name: values.name,
-                    config: {
-                        ...project.config,
-                        description: values.config.description
-                    },
-                    themeColor: values.themeColor,
-                    icon: values.icon
-                }
+            themeColor: project?.themeColor || '#000000',
+            icon: project?.icon || ''
+        }),
+        [project]
+    )
 
-                await updateProject(project.id, updatedProject)
-                onSuccess?.()
-                onClose()
-            } catch (error) {
-                console.error('Error updating project:', error)
-            } finally {
-                setIsSubmitting(false)
-                actions.setSubmitting(false)
+    const form = useZodForm<EditProjectFormValues>({ schema, defaultValues })
+    const { register, watch, setValue, reset, handleSubmit, formState } = form
+    const { errors, touchedFields, isValid } = formState
+
+    useEffect(() => {
+        reset(defaultValues)
+    }, [defaultValues, reset])
+
+    const values = watch()
+    const nameError = errorMessage(errors.name as never)
+    const descriptionError = errorMessage(
+        (errors.config as { description?: { message?: string } } | undefined)?.description as never
+    )
+
+    const onSubmit = handleSubmit(async (formValues) => {
+        setIsSubmitting(true)
+        try {
+            const updatedProject = {
+                ...project,
+                name: formValues.name,
+                config: {
+                    ...project.config,
+                    description: formValues.config.description
+                },
+                themeColor: formValues.themeColor,
+                icon: formValues.icon
             }
+
+            await updateProject(project.id, updatedProject)
+            onSuccess?.()
+            onClose()
+        } catch (error) {
+            console.error('Error updating project:', error)
+        } finally {
+            setIsSubmitting(false)
         }
     })
 
@@ -97,200 +122,219 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
         const file = event.target.files?.[0]
         if (!file) return
 
-        // Validate file type
         if (!file.type.startsWith('image/')) {
             alert(t('invalidFileType'))
             return
         }
 
-        // Validate file size (max 2MB)
         if (file.size > 2 * 1024 * 1024) {
             alert(t('fileTooLarge'))
             return
         }
 
-        try {
-            // Create a unique filename
-            const timestamp = Date.now()
-            const fileExtension = file.name.split('.').pop()
-            const fileName = `project-icon-${timestamp}.${fileExtension}`
+        if (!workspace?.path) {
+            console.error('No active workspace path; cannot persist project icon.')
+            return
+        }
 
-            // For now, we'll store the file name as the icon path
-            // In a real implementation, you'd want to save the file to the workspace
-            formik.setFieldValue('icon', `icons/${fileName}`)
+        try {
+            const fileExtension = file.name.split('.').pop() || 'png'
+            const fileName = `icon_${Date.now()}.${fileExtension}`
+            const iconsPath = `${workspace.path}/icons`
+            const filePath = `${iconsPath}/${fileName}`
+
+            const result = await window.api.saveProjectIcon({
+                filePath,
+                fileData: await file.arrayBuffer(),
+                assetsPath: iconsPath
+            })
+
+            if (result.success) {
+                setValue('icon', `icons/${fileName}`, { shouldDirty: true })
+            } else {
+                console.error('Failed to save icon file:', result.error)
+            }
         } catch (error) {
             console.error('Error handling icon upload:', error)
         }
     }
 
-    const handleRemoveIcon = (): void => {
-        formik.setFieldValue('icon', '')
-        if (fileInputRef.current) {
-            fileInputRef.current.value = ''
-        }
+    const nameRegister = register('name')
+
+    const nameRefHandler = (el: HTMLInputElement | null): void => {
+        nameRegister.ref(el)
+        nameInputRef.current = el
     }
 
     useEffect(() => {
-        if (isOpen && formik.values.name) {
+        if (isOpen && values.name) {
             nameInputRef.current?.focus()
             nameInputRef.current?.select()
         }
-    }, [formik.values.name, isOpen])
+    }, [values.name, isOpen])
 
-    return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
-            <IGRPDialogContentPrimitive className="overflow-hidden max-h-[80svh] sm:max-w-[700px] lg:max-w-[800px] max-w-4xl">
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('editProject')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        {t('editProjectDescription')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+    if (!project) return null
 
-                <form onSubmit={formik.handleSubmit} className="space-y-6">
-                    <div className="space-y-4">
-                        {/* Project Icon */}
-                        <div className="space-y-2">
-                            <IGRPLabelPrimitive>{t('projectIcon')}</IGRPLabelPrimitive>
-                            <div className="flex items-center space-x-4">
-                                <div className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                                    {formik.values.icon ? (
-                                        <ProjectIcon
-                                            project={{
-                                                ...project,
-                                                icon: formik.values.icon
-                                            }}
-                                            workspacePath=""
-                                        />
-                                    ) : (
-                                        <div className="text-gray-400 text-xs text-center">
-                                            {t('noIcon')}
-                                        </div>
-                                    )}
+    const modalContent = (
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/25 backdrop-blur-[3px]"
+                    onClick={onClose}
+                >
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                        className="w-full max-w-[460px] bg-card rounded-sm border border-border shadow-[0_24px_60px_-15px_rgba(0,0,0,0.12),0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col font-sans"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <form onSubmit={onSubmit} className="flex flex-col">
+                            {/* Header */}
+                            <div className="pl-3 pr-2 py-1.5 bg-muted border-b border-border flex items-center justify-between select-none">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 bg-primary rounded scale-90 flex items-center justify-center">
+                                        <SquarePen className="w-[10px] h-[10px] text-primary-foreground stroke-[3]" />
+                                    </div>
+                                    <span className="text-[12px] font-medium text-foreground tracking-tight">
+                                        Edit Project
+                                    </span>
                                 </div>
-                                <div className="flex-1 space-y-2">
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleIconUpload}
-                                        className="hidden"
-                                    />
-                                    <IGRPButtonPrimitive
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="w-full"
-                                    >
-                                        <Upload className="w-4 h-4 mr-2" />
-                                        {t('uploadIcon')}
-                                    </IGRPButtonPrimitive>
-                                    {formik.values.icon && (
-                                        <IGRPButtonPrimitive
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted group transition-colors"
+                                >
+                                    <X className="w-[14px] h-[14px]" />
+                                </button>
+                            </div>
+
+                            {/* Body */}
+                            <div className="px-5 py-4 overflow-y-auto max-h-[80vh]">
+                                <div className="flex items-start gap-4">
+                                    {/* Left column - Icon uploader */}
+                                    <div className="flex flex-col items-center gap-1.5 shrink-0 pt-0.5 select-none">
+                                        <button
                                             type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={handleRemoveIcon}
-                                            className="w-full"
+                                            className="w-12 h-12 rounded border border-dashed border-input bg-muted text-muted-foreground/60 shadow-sm active:scale-95 hover:border-primary hover:bg-primary/5 group relative cursor-pointer transition-all flex items-center justify-center overflow-hidden"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            aria-label="Upload project icon"
                                         >
-                                            <X className="w-4 h-4 mr-2" />
-                                            {t('removeIcon')}
-                                        </IGRPButtonPrimitive>
-                                    )}
+                                            {values.icon ? (
+                                                <ProjectIcon
+                                                    project={{ ...project, icon: values.icon }}
+                                                    workspacePath={workspace?.path || ''}
+                                                    className="h-12 w-12 rounded"
+                                                />
+                                            ) : (
+                                                <>
+                                                    <FolderKanban className="w-5 h-5 opacity-40 group-hover:opacity-0 transition-opacity duration-300" />
+                                                    <Plus className="w-4 h-4 text-primary absolute scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300" />
+                                                </>
+                                            )}
+                                        </button>
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleIconUpload}
+                                            className="hidden"
+                                        />
+                                    </div>
+
+                                    {/* Right column - Fields */}
+                                    <div className="flex-1 flex flex-col space-y-2.5">
+                                        {/* Field 1 - Name */}
+                                        <div className="flex items-center gap-2">
+                                            <label
+                                                htmlFor="project-name-input"
+                                                className="w-16 text-[11px] text-muted-foreground text-right whitespace-nowrap"
+                                            >
+                                                Name <span className="text-rose-500">*</span>:
+                                            </label>
+                                            <div className="flex-1">
+                                                <input
+                                                    {...nameRegister}
+                                                    ref={nameRefHandler}
+                                                    id="project-name-input"
+                                                    placeholder="Enter project name..."
+                                                    className="w-full bg-card border border-input rounded-sm px-2 py-1 text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-teal-500/10 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                />
+                                                {touchedFields.name && nameError && (
+                                                    <p className="text-[10px] text-rose-500 mt-1">
+                                                        {nameError}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Field 3 - Description */}
+                                        <div className="flex items-start gap-2">
+                                            <label
+                                                htmlFor="project-description"
+                                                className="w-16 text-[11px] text-muted-foreground text-right whitespace-nowrap pt-1"
+                                            >
+                                                Description:
+                                            </label>
+                                            <div className="flex-1">
+                                                <textarea
+                                                    id="project-description"
+                                                    value={values.config.description}
+                                                    onChange={(e) =>
+                                                        setValue(
+                                                            'config.description',
+                                                            e.target.value,
+                                                            {
+                                                                shouldValidate: true,
+                                                                shouldDirty: true,
+                                                                shouldTouch: true
+                                                            }
+                                                        )
+                                                    }
+                                                    rows={3}
+                                                    placeholder="Describe this project..."
+                                                    className="w-full bg-card border border-input rounded-sm px-2 py-1.5 text-[11px] text-foreground leading-relaxed resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-teal-500/10 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                />
+                                                {descriptionError && (
+                                                    <p className="text-[10px] text-rose-500 mt-1">
+                                                        {descriptionError}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Project Name */}
-                        <div className="space-y-2">
-                            <LabelRequired>{t('projectName')}</LabelRequired>
-                            <IGRPInputPrimitive
-                                ref={nameInputRef}
-                                id="project-name"
-                                name="name"
-                                value={formik.values.name}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                placeholder={t('enterProjectName')}
-                                maxLength={100}
-                            />
-                            {formik.touched.name && formik.errors.name && (
-                                <p className="text-xs text-destructive">{formik.errors.name}</p>
-                            )}
-                        </div>
-
-                        {/* Project Description */}
-                        <div className="space-y-2">
-                            <IGRPLabelPrimitive htmlFor="description">
-                                {t('description')}
-                            </IGRPLabelPrimitive>
-                            <IGRPTextAreaPrimitive
-                                id="description"
-                                value={formik.values.config.description}
-                                onChange={(e) =>
-                                    formik.setFieldValue('config.description', e.target.value)
-                                }
-                                onBlur={formik.handleBlur}
-                                placeholder={t('projectDescription')}
-                                maxLength={500}
-                                rows={3}
-                            />
-                            {formik.touched.config && formik.errors.config && (
-                                <p className="text-xs text-destructive">
-                                    {typeof formik.errors.config === 'object' &&
-                                    'description' in formik.errors.config
-                                        ? String(formik.errors.config.description)
-                                        : ''}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Theme Color */}
-                        <div className="space-y-2">
-                            <IGRPLabelPrimitive htmlFor="themeColor">
-                                {t('themeColor')}
-                            </IGRPLabelPrimitive>
-                            <div className="flex items-center space-x-2">
-                                <input
-                                    type="color"
-                                    id="themeColor"
-                                    value={formik.values.themeColor}
-                                    onChange={(e) =>
-                                        formik.setFieldValue('themeColor', e.target.value)
-                                    }
-                                    className="w-12 h-8 border border-gray-300 rounded cursor-pointer"
-                                />
-                                <IGRPInputPrimitive
-                                    value={formik.values.themeColor}
-                                    onChange={(e) =>
-                                        formik.setFieldValue('themeColor', e.target.value)
-                                    }
-                                    placeholder="#000000"
-                                    className="flex-1"
-                                />
+                            {/* Footer */}
+                            <div className="px-3 py-2 bg-muted border-t border-border flex items-center justify-end gap-2">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    disabled={isSubmitting}
+                                    className="px-4 py-1 text-[11px] font-bold text-muted-foreground bg-card border border-border rounded-sm hover:bg-muted min-w-[70px] transition-colors disabled:opacity-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting || !isValid}
+                                    className="px-4 py-1 text-[11px] font-bold text-primary-foreground bg-primary border border-primary rounded-sm shadow-sm hover:bg-primary/90 min-w-[100px] transition-colors disabled:opacity-50"
+                                >
+                                    {isSubmitting ? 'Saving...' : 'Save Changes'}
+                                </button>
                             </div>
-                        </div>
-                    </div>
-
-                    <IGRPDialogFooterPrimitive>
-                        <IGRPButtonPrimitive
-                            type="button"
-                            variant="outline"
-                            onClick={onClose}
-                            disabled={isSubmitting}
-                        >
-                            {t('cancel')}
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive
-                            type="submit"
-                            disabled={isSubmitting || !formik.isValid}
-                        >
-                            {isSubmitting ? t('saving') : t('saveChanges')}
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogFooterPrimitive>
-                </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+                        </form>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     )
+
+    if (typeof document === 'undefined') return null
+
+    return createPortal(modalContent, document.body)
 }

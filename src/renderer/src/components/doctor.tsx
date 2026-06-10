@@ -1,26 +1,27 @@
+import { Badge } from '@renderer/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import {
-    IGRPBadgePrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPScrollAreaPrimitive,
-    IGRPTableBodyPrimitive,
-    IGRPTableCellPrimitive,
-    IGRPTableHeaderPrimitive,
-    IGRPTableHeadPrimitive,
-    IGRPTablePrimitive,
-    IGRPTableRowPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@renderer/components/ui/table'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
 import {
     AlertTriangle,
     CheckCircle,
@@ -139,17 +140,17 @@ export default function Doctor({
     ]
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-            <IGRPDialogContentPrimitive className="sm:max-w-[730px] max-w-4xl max-h-[80vh]">
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive className="flex gap-2 items-center text-xl">
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="sm:max-w-[730px] max-w-4xl max-h-[80vh]">
+                <DialogHeader>
+                    <DialogTitle className="flex gap-2 items-center text-xl">
                         <Stethoscope className="h-6 w-6" />
                         <span>System Health Check</span>
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
+                    </DialogTitle>
+                    <DialogDescription>
                         Comprehensive check of your development environment tools
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+                    </DialogDescription>
+                </DialogHeader>
 
                 {loading ? (
                     <div className="flex items-center justify-center py-8">
@@ -159,7 +160,7 @@ export default function Doctor({
                         </div>
                     </div>
                 ) : (
-                    <IGRPScrollAreaPrimitive className="h-[60vh] pr-4">
+                    <ScrollArea className="h-[60vh] pr-4">
                         {/* Overall Status */}
                         <div className="mb-6">
                             {allGood ? (
@@ -188,17 +189,17 @@ export default function Doctor({
                                 if (summary.totalTools === 0) return null
 
                                 return (
-                                    <IGRPCardPrimitive key={category}>
-                                        <IGRPCardHeaderPrimitive className="pb-3">
+                                    <Card key={category}>
+                                        <CardHeader className="pb-3">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
                                                     <div className="text-muted-foreground">
                                                         {summary.icon}
                                                     </div>
                                                     <div>
-                                                        <IGRPCardTitlePrimitive className="text-lg">
+                                                        <CardTitle className="text-lg">
                                                             {summary.title}
-                                                        </IGRPCardTitlePrimitive>
+                                                        </CardTitle>
                                                         <p className="text-sm text-muted-foreground">
                                                             {summary.description}
                                                         </p>
@@ -206,7 +207,7 @@ export default function Doctor({
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     {status.icon}
-                                                    <IGRPBadgePrimitive
+                                                    <Badge
                                                         variant={
                                                             status.status === 'success'
                                                                 ? 'default'
@@ -218,32 +219,24 @@ export default function Doctor({
                                                     >
                                                         {summary.successfulRequiredTools}/
                                                         {summary.requiredTools} required
-                                                    </IGRPBadgePrimitive>
+                                                    </Badge>
                                                 </div>
                                             </div>
-                                        </IGRPCardHeaderPrimitive>
-                                        <IGRPCardContentPrimitive className="pt-0">
-                                            <IGRPTablePrimitive>
-                                                <IGRPTableHeaderPrimitive>
-                                                    <IGRPTableRowPrimitive>
-                                                        <IGRPTableHeadPrimitive>
-                                                            Tool
-                                                        </IGRPTableHeadPrimitive>
-                                                        <IGRPTableHeadPrimitive>
-                                                            Status
-                                                        </IGRPTableHeadPrimitive>
-                                                        <IGRPTableHeadPrimitive>
-                                                            Version / Error
-                                                        </IGRPTableHeadPrimitive>
-                                                        <IGRPTableHeadPrimitive>
-                                                            Action
-                                                        </IGRPTableHeadPrimitive>
-                                                    </IGRPTableRowPrimitive>
-                                                </IGRPTableHeaderPrimitive>
-                                                <IGRPTableBodyPrimitive>
+                                        </CardHeader>
+                                        <CardContent className="pt-0">
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead>Tool</TableHead>
+                                                        <TableHead>Status</TableHead>
+                                                        <TableHead>Version / Error</TableHead>
+                                                        <TableHead>Action</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
                                                     {summary.tools.map((tool, index) => (
-                                                        <IGRPTableRowPrimitive key={index}>
-                                                            <IGRPTableCellPrimitive className="py-3 align-top">
+                                                        <TableRow key={index}>
+                                                            <TableCell className="py-3 align-top">
                                                                 <div className="max-w-[320px]">
                                                                     <div className="font-medium">
                                                                         {tool.name}
@@ -254,8 +247,8 @@ export default function Doctor({
                                                                         </div>
                                                                     )}
                                                                 </div>
-                                                            </IGRPTableCellPrimitive>
-                                                            <IGRPTableCellPrimitive className="py-3">
+                                                            </TableCell>
+                                                            <TableCell className="py-3">
                                                                 <div className="flex items-center gap-2">
                                                                     {tool.success ? (
                                                                         <CheckCircle className="h-4 w-4 text-green-600" />
@@ -276,33 +269,31 @@ export default function Doctor({
                                                                               : 'Optional'}
                                                                     </span>
                                                                 </div>
-                                                            </IGRPTableCellPrimitive>
-                                                            <IGRPTableCellPrimitive className="py-3 text-xs">
+                                                            </TableCell>
+                                                            <TableCell className="py-3 text-xs">
                                                                 {tool.success && (
                                                                     <code className="bg-muted px-1 py-0.5 rounded text-xs">
                                                                         {tool.version}
                                                                     </code>
                                                                 )}
                                                                 {!tool.success && tool.error && (
-                                                                    <IGRPTooltipProviderPrimitive>
-                                                                        <IGRPTooltipPrimitive>
-                                                                            <IGRPTooltipTriggerPrimitive
-                                                                                asChild
-                                                                            >
+                                                                    <TooltipProvider>
+                                                                        <Tooltip>
+                                                                            <TooltipTrigger asChild>
                                                                                 <span className="cursor-help text-red-600 underline decoration-dotted">
                                                                                     Error
                                                                                 </span>
-                                                                            </IGRPTooltipTriggerPrimitive>
-                                                                            <IGRPTooltipContentPrimitive className="max-w-md">
+                                                                            </TooltipTrigger>
+                                                                            <TooltipContent className="max-w-md">
                                                                                 <p className="text-xs whitespace-pre-wrap">
                                                                                     {tool.error}
                                                                                 </p>
-                                                                            </IGRPTooltipContentPrimitive>
-                                                                        </IGRPTooltipPrimitive>
-                                                                    </IGRPTooltipProviderPrimitive>
+                                                                            </TooltipContent>
+                                                                        </Tooltip>
+                                                                    </TooltipProvider>
                                                                 )}
-                                                            </IGRPTableCellPrimitive>
-                                                            <IGRPTableCellPrimitive className="py-3">
+                                                            </TableCell>
+                                                            <TableCell className="py-3">
                                                                 {!tool.success && tool.link && (
                                                                     <a
                                                                         href={tool.link}
@@ -314,13 +305,13 @@ export default function Doctor({
                                                                         Download
                                                                     </a>
                                                                 )}
-                                                            </IGRPTableCellPrimitive>
-                                                        </IGRPTableRowPrimitive>
+                                                            </TableCell>
+                                                        </TableRow>
                                                     ))}
-                                                </IGRPTableBodyPrimitive>
-                                            </IGRPTablePrimitive>
-                                        </IGRPCardContentPrimitive>
-                                    </IGRPCardPrimitive>
+                                                </TableBody>
+                                            </Table>
+                                        </CardContent>
+                                    </Card>
                                 )
                             })}
                         </div>
@@ -339,9 +330,9 @@ export default function Doctor({
                                 </div>
                             </div>
                         )}
-                    </IGRPScrollAreaPrimitive>
+                    </ScrollArea>
                 )}
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

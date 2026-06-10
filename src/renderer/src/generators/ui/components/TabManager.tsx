@@ -1,7 +1,4 @@
-import {
-    IGRPSidebarInsetPrimitive,
-    IGRPSidebarProviderPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
 import { TAB_DEFAULT, useTabs } from '@renderer/components/navigation/TabContext'
 import TabsNavigation from '@renderer/components/navigation/tabs-navigation'
 import { APRESENTATION, OPTION_TYPE } from '@renderer/constants/appConstants'
@@ -117,7 +114,7 @@ export default function TabManager({ basePath }: ContentProps): React.JSX.Elemen
                 )}
             </TabsNavigation>
 
-            <IGRPSidebarProviderPrimitive
+            <SidebarProvider
                 style={
                     {
                         '--sidebar-width': '380px'
@@ -136,11 +133,11 @@ export default function TabManager({ basePath }: ContentProps): React.JSX.Elemen
                                 )}
                             >
                                 {tab.id === TAB_DEFAULT ? (
-                                    <IGRPSidebarInsetPrimitive>
+                                    <SidebarInset>
                                         <ContainerScrollArea>
                                             <PageManager onPageClick={handleClickOpenGerador} />
                                         </ContainerScrollArea>
-                                    </IGRPSidebarInsetPrimitive>
+                                    </SidebarInset>
                                 ) : tab.open === OPTION_TYPE.FILE_THREE ? (
                                     <EditorLayout currentItem={tab.item} />
                                 ) : (
@@ -163,7 +160,7 @@ export default function TabManager({ basePath }: ContentProps): React.JSX.Elemen
                         <SidebarRightSlot />
                     </div>
                 </DroppedComponentsProvider>
-            </IGRPSidebarProviderPrimitive>
+            </SidebarProvider>
         </div>
     )
 }

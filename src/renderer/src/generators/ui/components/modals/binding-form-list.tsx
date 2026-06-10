@@ -1,14 +1,13 @@
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
 import {
-    IGRPButtonPrimitive,
-    IGRPCheckbox,
-    IGRPCombobox,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
+import { IGRPCheckbox, IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import MultipleSelector from '@renderer/components/multiples-selector'
 import { TypeSelectorDropdown } from '@renderer/components/type-selector-dropdown'
 import { cn } from '@renderer/lib/utils'
@@ -255,10 +254,10 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
                 {removeRow && (
                     <div className="flex justify-end items-center">
                         {addRow && (
-                            <IGRPTooltipProviderPrimitive>
-                                <IGRPTooltipPrimitive>
-                                    <IGRPTooltipTriggerPrimitive asChild>
-                                        <IGRPButtonPrimitive
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
                                             onClick={(e) => {
                                                 e.preventDefault()
                                                 addRow()
@@ -269,11 +268,11 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
                                         >
                                             <Plus size={14} />
                                             <span className="sr-only">{`New ${btnLabels}`}</span>
-                                        </IGRPButtonPrimitive>
-                                    </IGRPTooltipTriggerPrimitive>
-                                    <IGRPTooltipContentPrimitive>{`New ${btnLabels}`}</IGRPTooltipContentPrimitive>
-                                </IGRPTooltipPrimitive>
-                            </IGRPTooltipProviderPrimitive>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>{`New ${btnLabels}`}</TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                         )}
                     </div>
                 )}
@@ -321,8 +320,8 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
                     if (item.type === 'checkbox') {
                         return (
                             <React.Fragment key={itemIndex}>
-                                <IGRPTooltipPrimitive>
-                                    <IGRPTooltipTriggerPrimitive asChild>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
                                         <div className="flex align-center mt-2.5">
                                             <IGRPCheckbox
                                                 name={`${item.key}_${index2}`}
@@ -338,11 +337,9 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
                                                 checked={row?.[item.key] || false}
                                             />
                                         </div>
-                                    </IGRPTooltipTriggerPrimitive>
-                                    <IGRPTooltipContentPrimitive>
-                                        {item.name}
-                                    </IGRPTooltipContentPrimitive>
-                                </IGRPTooltipPrimitive>
+                                    </TooltipTrigger>
+                                    <TooltipContent>{item.name}</TooltipContent>
+                                </Tooltip>
                             </React.Fragment>
                         )
                     }
@@ -431,7 +428,7 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
             }
 
             return (
-                <IGRPInputPrimitive
+                <Input
                     className={className}
                     type={type}
                     value={localValue}
@@ -480,9 +477,9 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
 
         if (type === 'label') {
             return (
-                <IGRPLabelPrimitive htmlFor={`${key}_${index}`} className="w-30 truncate">
+                <Label htmlFor={`${key}_${index}`} className="w-30 truncate">
                     {row?.[key] || ''}
-                </IGRPLabelPrimitive>
+                </Label>
             )
         }
 
@@ -637,7 +634,7 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
                 })}
                 {removeRow && (
                     <React.Fragment key={index}>
-                        <IGRPButtonPrimitive
+                        <Button
                             variant="ghost"
                             size="icon"
                             className="text-destructive opacity-0 group-hover/item:opacity-100"
@@ -647,7 +644,7 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
                             }}
                         >
                             <Trash />
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </React.Fragment>
                 )}
             </div>
@@ -668,7 +665,7 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
     }
 
     return (
-        <IGRPTooltipProviderPrimitive>
+        <TooltipProvider>
             <FormErrors />
             {formData.length === 0 ? (
                 <div className="w-full border rounded-lg overflow-hidden">
@@ -721,7 +718,7 @@ export const BindingFormList: FunctionComponent<ITabelContainer> = ({
                     </div>
                 </div>
             )}
-        </IGRPTooltipProviderPrimitive>
+        </TooltipProvider>
     )
 }
 

@@ -1,9 +1,5 @@
-import {
-    IGRPBadgePrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Badge } from '@renderer/components/ui/badge'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
 import useStudio from '@renderer/hooks/use-studio'
@@ -76,22 +72,22 @@ const TableTool = ({
                     <div className="flex align-middle items-center">
                         <span className="text-xs">{comp.label || comp.componentName}</span>
                     </div>
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
                             <button
                                 className="flex items-center p-1 hover:bg-gray-700 rounded cursor-pointer"
                                 onClick={onEdit}
                             >
                                 <Settings className="h-3.5" />
                             </button>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive>
+                        </TooltipTrigger>
+                        <TooltipContent>
                             <p>{t('edit')}</p>
-                        </IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                        </TooltipContent>
+                    </Tooltip>
 
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
                             <button
                                 className="flex items-center justify-center p-1 hover:bg-white hover:text-black rounded"
                                 title="Delete"
@@ -99,11 +95,11 @@ const TableTool = ({
                             >
                                 <Trash className="h-3.5" />
                             </button>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive>
+                        </TooltipTrigger>
+                        <TooltipContent>
                             <p>{t('delete')}</p>
-                        </IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                        </TooltipContent>
+                    </Tooltip>
 
                     <div className="space-x-1">
                         {components.length > 0 && (
@@ -111,9 +107,9 @@ const TableTool = ({
                         )}
                         {tableColumns.length > 0 && (
                             <>
-                                <IGRPTooltipPrimitive>
-                                    <IGRPTooltipTriggerPrimitive asChild>
-                                        <IGRPBadgePrimitive
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge
                                             variant={'default'}
                                             className="rounded-sm cursor-pointer h-6"
                                             onClick={(e) => {
@@ -123,12 +119,12 @@ const TableTool = ({
                                             }}
                                         >
                                             <span className="text-xs">Binding Filter</span>
-                                        </IGRPBadgePrimitive>
-                                    </IGRPTooltipTriggerPrimitive>
-                                    <IGRPTooltipContentPrimitive>
+                                        </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
                                         <p>Binding Filter Configuration </p>
-                                    </IGRPTooltipContentPrimitive>
-                                </IGRPTooltipPrimitive>
+                                    </TooltipContent>
+                                </Tooltip>
 
                                 {isOpen && currentComponent && (
                                     <BindingConfigurationFilterModal

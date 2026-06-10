@@ -3,9 +3,10 @@ import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useFramework } from '@renderer/hooks/use-framework'
 import useToast from '@renderer/hooks/useToast'
+import { useFormikCompat, useZodForm } from '@renderer/lib/form'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
-import { useFormik } from 'formik'
 import { useMemo, useState } from 'react'
+import { z } from 'zod'
 import { useDispatch } from 'react-redux'
 import { GraphQLService } from './service'
 import { buildGraphQLOperationTouched, validateGraphQLOperation } from './validation'
@@ -122,46 +123,57 @@ export const useGraphQLOperation = ({
         [filesThree, currentItem?.module]
     )
 
-    const formik = useFormik<GraphQLOperationFormValues>({
-        initialValues: buildInitialValues(currentItem),
-        enableReinitialize: false,
-        onSubmit: async (values) => {
-            try {
-                const validationErrors = await validateGraphQLOperation(values, {
-                    operations: cachedOperations,
-                    availableTypeValues: returnTypeOptions.map((option) => option.value)
-                })
+    // The GraphQL operation form uses a hand-written async validator instead
+    // of a static schema, so the Zod side here is essentially a passthrough
+    // — the real validation still lives in `validateGraphQLOperation` and
+    // its errors are injected via `formik.setErrors` below.
+    const passthroughSchema = useMemo(
+        () => z.object({}).passthrough() as unknown as z.ZodType<any, unknown>,
+        []
+    )
+    const rhfForm = useZodForm<GraphQLOperationFormValues>({
+        schema: passthroughSchema as never,
+        defaultValues: buildInitialValues(currentItem)
+    })
+    const formik = useFormikCompat<GraphQLOperationFormValues>(rhfForm, async (values) => {
+        try {
+            const validationErrors = await validateGraphQLOperation(values, {
+                operations: cachedOperations,
+                availableTypeValues: returnTypeOptions.map((option) => option.value)
+            })
 
-                if (Object.keys(validationErrors).length > 0) {
-                    await formik.setTouched(buildGraphQLOperationTouched(values) as any, true)
-                    formik.setErrors(validationErrors)
-                    showErrorToast('Please fix the GraphQL validation errors before saving')
-                    return
-                }
-
-                const result = savedOperation?.id
-                    ? await GraphQLService.updateGraphQLOperation(
-                          basePath,
-                          currentItem.module,
-                          framework,
-                          savedOperation.id,
-                          values
-                      )
-                    : await GraphQLService.createGraphQLOperation(
-                          basePath,
-                          currentItem.module,
-                          framework,
-                          values
-                      )
-
-                setSavedOperation(result)
-                formik.setFieldValue('id', result.id, false)
-                handleRenameTab(currentItem.id, result.name)
-                dispatch(onSetChangeStatus(true))
-                showSuccessToast(`GraphQL operation "${result.name}" saved successfully`)
-            } catch (error) {
-                showErrorToast(error instanceof Error ? error.message : 'Failed to save operation')
+            if (Object.keys(validationErrors).length > 0) {
+                await formik.setTouched(
+                    buildGraphQLOperationTouched(values) as Record<string, unknown>,
+                    true
+                )
+                formik.setErrors(validationErrors as Record<string, unknown>)
+                showErrorToast('Please fix the GraphQL validation errors before saving')
+                return
             }
+
+            const result = savedOperation?.id
+                ? await GraphQLService.updateGraphQLOperation(
+                      basePath,
+                      currentItem.module,
+                      framework,
+                      savedOperation.id,
+                      values
+                  )
+                : await GraphQLService.createGraphQLOperation(
+                      basePath,
+                      currentItem.module,
+                      framework,
+                      values
+                  )
+
+            setSavedOperation(result)
+            formik.setFieldValue('id', result.id)
+            handleRenameTab(currentItem.id, result.name)
+            dispatch(onSetChangeStatus(true))
+            showSuccessToast(`GraphQL operation "${result.name}" saved successfully`)
+        } catch (error) {
+            showErrorToast(error instanceof Error ? error.message : 'Failed to save operation')
         }
     })
 

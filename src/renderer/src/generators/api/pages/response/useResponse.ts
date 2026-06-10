@@ -4,9 +4,9 @@ import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import { useFramework } from '@renderer/hooks/use-framework'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import useToast from '@renderer/hooks/useToast'
+import { useFormikCompat, useZodForm } from '@renderer/lib/form'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
 import { getStatusLabel } from '@renderer/utils'
-import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -48,14 +48,12 @@ export const useResponse = ({
 
     const schemaTypes = useSchemaTypes(selectors, dto, enums) // Removed selectors dependency
 
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues,
-        validationSchema,
-        onSubmit: (_values, actions) => {
-            actions.setSubmitting(false)
-            handleSave()
-        }
+    const rhfForm = useZodForm<any>({
+        schema: validationSchema as never,
+        defaultValues: initialValues
+    })
+    const formik = useFormikCompat(rhfForm, async () => {
+        await handleSave()
     })
 
     useEffect(() => {

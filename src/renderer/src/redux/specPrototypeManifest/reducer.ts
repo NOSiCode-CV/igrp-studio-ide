@@ -240,9 +240,7 @@ export const selectSelectedNodeId = (s: RootState): string | null =>
 
 // ─── tree helpers ───────────────────────────────────────────────────────
 
-function isStructuredComponent(
-    node: unknown
-): node is StructuredComponent {
+function isStructuredComponent(node: unknown): node is StructuredComponent {
     return Boolean(node) && typeof node === 'object' && 'id' in (node as object)
 }
 
@@ -270,10 +268,7 @@ function removeNodeById(root: StructuredComponent, id: string): boolean {
     return false
 }
 
-function detachNodeById(
-    root: StructuredComponent,
-    id: string
-): StructuredComponent | null {
+function detachNodeById(root: StructuredComponent, id: string): StructuredComponent | null {
     if (!Array.isArray(root.children)) return null
     const idx = root.children.findIndex((c) => c.id === id)
     if (idx >= 0) {

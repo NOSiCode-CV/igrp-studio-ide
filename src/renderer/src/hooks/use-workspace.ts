@@ -47,7 +47,10 @@ interface UseWorkspaceReturn {
             options?: WorkspaceBootstrapOptions
         ) => Promise<IWorkspace | null>
         installOptionalStacks: (
-            options: Pick<WorkspaceBootstrapOptions, 'installMonitoringStack' | 'installProcessStack'>
+            options: Pick<
+                WorkspaceBootstrapOptions,
+                'installMonitoringStack' | 'installProcessStack'
+            >
         ) => Promise<HandlerResponse>
         getOptionalStacksStatus: () => Promise<OptionalStacksStatus>
         updateWorkspace: (id: string, updates: Partial<IWorkspace>) => Promise<IWorkspace | null>

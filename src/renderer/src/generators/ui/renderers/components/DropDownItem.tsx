@@ -1,11 +1,11 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuLabelPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { Ellipsis } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -18,21 +18,19 @@ export function DropDownItem({ comp }: DropdownItemProps) {
     const { children } = comp
     const { t } = useTranslation()
     return (
-        <IGRPDropdownMenuPrimitive>
-            <IGRPDropdownMenuTriggerPrimitive asChild>
-                <IGRPButtonPrimitive variant={'ghost'} size={'icon'}>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant={'ghost'} size={'icon'}>
                     <Ellipsis />
-                </IGRPButtonPrimitive>
-            </IGRPDropdownMenuTriggerPrimitive>
-            <IGRPDropdownMenuContentPrimitive className="w-56">
-                <IGRPDropdownMenuLabelPrimitive>{t('actions')}</IGRPDropdownMenuLabelPrimitive>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+                <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                 {children.length > 0 &&
                     children.map((child) => (
-                        <IGRPDropdownMenuItemPrimitive key={child.id}>
-                            {child.label}
-                        </IGRPDropdownMenuItemPrimitive>
+                        <DropdownMenuItem key={child.id}>{child.label}</DropdownMenuItem>
                     ))}
-            </IGRPDropdownMenuContentPrimitive>
-        </IGRPDropdownMenuPrimitive>
+            </DropdownMenuContent>
+        </DropdownMenu>
     )
 }

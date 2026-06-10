@@ -1,8 +1,10 @@
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@renderer/components/ui/sidebar'
 import {
-    IGRPSidebarMenuButtonPrimitive,
-    IGRPSidebarMenuItemPrimitive,
-    IGRPSidebarMenuPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
 import { TabProvider } from '@renderer/components/navigation/TabContext'
 import { DataModelsPanel } from '@renderer/features/data-models'
 import { cn } from '@renderer/lib/utils'
@@ -52,20 +54,31 @@ const RailButton = ({
     onClick: () => void
 }): JSX.Element => {
     const Icon = item.icon
+    // Use shadcn `Tooltip` instead of the native `title` attribute — the
+    // native one renders an OS-level light tooltip that ignores the app
+    // theme (always white on macOS), breaking the dark-mode chrome.
     return (
-        <button
-            type="button"
-            onClick={onClick}
-            title={item.label}
-            className={cn(
-                'flex flex-col items-center justify-center gap-1 rounded-lg py-2 text-xs font-medium transition-colors',
-                'hover:bg-accent',
-                active ? 'text-primary' : 'text-muted-foreground'
-            )}
-        >
-            <Icon className="h-5 w-5" />
-            <span className="w-16 truncate text-center text-ellipsis">{item.label}</span>
-        </button>
+        <TooltipProvider delayDuration={300}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <button
+                        type="button"
+                        onClick={onClick}
+                        className={cn(
+                            'flex flex-col items-center justify-center gap-1 rounded-lg py-2 text-xs font-medium transition-colors',
+                            'hover:bg-accent',
+                            active ? 'text-primary' : 'text-muted-foreground'
+                        )}
+                    >
+                        <Icon className="h-5 w-5" />
+                        <span className="w-16 truncate text-center text-ellipsis">
+                            {item.label}
+                        </span>
+                    </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">{item.label}</TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     )
 }
 
@@ -88,7 +101,7 @@ const SecondaryPanel = ({
                 : 'Prototype'
 
     return (
-        <aside className="flex w-[320px] flex-col border-r bg-sidebar/40">
+        <aside className="flex w-[320px] flex-col border-r bg-sidebar">
             <header className="flex h-12 shrink-0 items-center justify-between border-b px-4">
                 <h2 className="text-sm font-semibold">{title}</h2>
             </header>
@@ -124,7 +137,11 @@ const MainContent = ({
     currentItem?: any
 }): JSX.Element => {
     return (
-        <main className="flex-1 overflow-hidden">
+        // `bg-background` here is a defence-in-depth default — individual
+        // panels still own their own surface tokens, but if any forget to
+        // set one (as the KB empty state did) we don't fall through to the
+        // body's near-white surface in dark mode.
+        <main className="flex-1 overflow-hidden bg-background">
             {activeTab === 'documents' && (
                 <DocumentsPanel basePath={basePath} currentItem={currentItem} variant="content" />
             )}
@@ -162,60 +179,64 @@ const SpecificationLayout = ({ basePath, currentItem }: SpecificationLayoutProps
 
     return (
         <ProcessesSelectionProvider>
-        <TabProvider>
-            <div className="flex h-full w-full pb-8">
-                {/* Icon rail — same 80px width as the Studio's main sidebar
+            <TabProvider>
+                <div className="flex h-full w-full pb-8">
+                    {/* Icon rail — same 80px width as the Studio's main sidebar
                 (`app-sidebar.tsx`), so the two layouts look continuous when the
                 user navigates between generators. */}
-                <aside className="flex w-20 shrink-0 flex-col items-stretch gap-2 border-r bg-sidebar p-2">
-                    <IGRPSidebarMenuPrimitive>
-                        <IGRPSidebarMenuItemPrimitive>
-                            <IGRPSidebarMenuButtonPrimitive
-                                size="lg"
-                                asChild
-                                className="md:h-8 md:p-0 items-center justify-center"
-                            >
-                                <a
-                                    href={ROUTES.HOME}
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        navigate(ROUTES.HOME)
-                                    }}
+                    <aside className="flex w-20 shrink-0 flex-col items-stretch gap-2 border-r bg-sidebar p-2">
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    size="lg"
+                                    asChild
+                                    className="md:h-8 md:p-0 items-center justify-center"
                                 >
-                                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                                        <Home className="size-4" />
-                                    </div>
-                                </a>
-                            </IGRPSidebarMenuButtonPrimitive>
-                        </IGRPSidebarMenuItemPrimitive>
-                    </IGRPSidebarMenuPrimitive>
+                                    <a
+                                        href={ROUTES.HOME}
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            navigate(ROUTES.HOME)
+                                        }}
+                                    >
+                                        <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                                            <Home className="size-4" />
+                                        </div>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
 
-                    <div className="my-1 h-px bg-border" />
+                        <div className="my-1 h-px bg-border" />
 
-                    {RAIL_ITEMS.map((item) => (
-                        <RailButton
-                            key={item.id}
-                            item={item}
-                            active={activeTab === item.id}
-                            onClick={() => setActiveTab(item.id)}
-                        />
-                    ))}
-                </aside>
+                        {RAIL_ITEMS.map((item) => (
+                            <RailButton
+                                key={item.id}
+                                item={item}
+                                active={activeTab === item.id}
+                                onClick={() => setActiveTab(item.id)}
+                            />
+                        ))}
+                    </aside>
 
-                {/* Secondary panel — hidden for tabs that own their own multi-pane
+                    {/* Secondary panel — hidden for tabs that own their own multi-pane
                 layout (Prototype, Data). */}
-                {activeTab !== 'prototype' && activeTab !== 'data' && (
-                    <SecondaryPanel
+                    {activeTab !== 'prototype' && activeTab !== 'data' && (
+                        <SecondaryPanel
+                            activeTab={activeTab}
+                            basePath={basePath}
+                            currentItem={currentItem}
+                        />
+                    )}
+
+                    {/* Main content */}
+                    <MainContent
                         activeTab={activeTab}
                         basePath={basePath}
                         currentItem={currentItem}
                     />
-                )}
-
-                {/* Main content */}
-                <MainContent activeTab={activeTab} basePath={basePath} currentItem={currentItem} />
-            </div>
-        </TabProvider>
+                </div>
+            </TabProvider>
         </ProcessesSelectionProvider>
     )
 }

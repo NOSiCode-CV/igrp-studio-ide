@@ -1,15 +1,15 @@
+import { Button } from '@renderer/components/ui/button'
+import { Checkbox } from '@renderer/components/ui/checkbox'
+import { Label } from '@renderer/components/ui/label'
 import {
-    IGRPButtonPrimitive,
-    IGRPCheckboxPrimitive,
-    IGRPCombobox,
-    IGRPLabelPrimitive,
-    IGRPTableBodyPrimitive,
-    IGRPTableCellPrimitive,
-    IGRPTableHeadPrimitive,
-    IGRPTableHeaderPrimitive,
-    IGRPTablePrimitive,
-    IGRPTableRowPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@renderer/components/ui/table'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import { Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -87,62 +87,58 @@ export function RelationsList({
 
     return (
         <div className="space-y-3">
-            <IGRPTablePrimitive>
-                <IGRPTableHeaderPrimitive>
-                    <IGRPTableRowPrimitive>
-                        <IGRPTableHeadPrimitive>{t('relation_kind')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('relation_target')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('relation_join_entity')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive className="w-10" />
-                    </IGRPTableRowPrimitive>
-                </IGRPTableHeaderPrimitive>
-                <IGRPTableBodyPrimitive>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{t('relation_kind')}</TableHead>
+                        <TableHead>{t('relation_target')}</TableHead>
+                        <TableHead>{t('relation_join_entity')}</TableHead>
+                        <TableHead className="w-10" />
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
                     {relations.length === 0 ? (
-                        <IGRPTableRowPrimitive>
-                            <IGRPTableCellPrimitive
+                        <TableRow>
+                            <TableCell
                                 colSpan={4}
                                 className="text-center text-xs text-muted-foreground py-6"
                             >
                                 {t('no_relations_yet')}
-                            </IGRPTableCellPrimitive>
-                        </IGRPTableRowPrimitive>
+                            </TableCell>
+                        </TableRow>
                     ) : (
                         relations.map((r) => (
-                            <IGRPTableRowPrimitive key={r.id}>
-                                <IGRPTableCellPrimitive>{r.kind}</IGRPTableCellPrimitive>
-                                <IGRPTableCellPrimitive>
-                                    {targetName(r.toEntityId)}
-                                </IGRPTableCellPrimitive>
-                                <IGRPTableCellPrimitive>
+                            <TableRow key={r.id}>
+                                <TableCell>{r.kind}</TableCell>
+                                <TableCell>{targetName(r.toEntityId)}</TableCell>
+                                <TableCell>
                                     {r.joinEntityId ? (
                                         targetName(r.joinEntityId)
                                     ) : (
                                         <span className="text-xs text-muted-foreground">—</span>
                                     )}
-                                </IGRPTableCellPrimitive>
-                                <IGRPTableCellPrimitive>
-                                    <IGRPButtonPrimitive
+                                </TableCell>
+                                <TableCell>
+                                    <Button
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => handleRemove(r.id)}
                                         title={t('delete')}
                                     >
                                         <Trash2 className="h-4 w-4 text-destructive" />
-                                    </IGRPButtonPrimitive>
-                                </IGRPTableCellPrimitive>
-                            </IGRPTableRowPrimitive>
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
                         ))
                     )}
-                </IGRPTableBodyPrimitive>
-            </IGRPTablePrimitive>
+                </TableBody>
+            </Table>
 
             <div className="border rounded p-3 space-y-2 bg-muted/30">
                 <div className="text-xs font-medium text-muted-foreground">{t('add_relation')}</div>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1">
-                        <IGRPLabelPrimitive className="text-xs">
-                            {t('relation_kind')}
-                        </IGRPLabelPrimitive>
+                        <Label className="text-xs">{t('relation_kind')}</Label>
                         <IGRPCombobox
                             value={draftKind}
                             onChange={(v) => setDraftKind(v as RelationKind)}
@@ -151,9 +147,7 @@ export function RelationsList({
                         />
                     </div>
                     <div className="space-y-1">
-                        <IGRPLabelPrimitive className="text-xs">
-                            {t('relation_target')}
-                        </IGRPLabelPrimitive>
+                        <Label className="text-xs">{t('relation_target')}</Label>
                         <IGRPCombobox
                             value={draftTarget}
                             onChange={(v) => setDraftTarget(v as string)}
@@ -165,17 +159,14 @@ export function RelationsList({
                 </div>
                 {draftKind === 'many-to-many' && (
                     <label className="flex items-center gap-2 text-xs">
-                        <IGRPCheckboxPrimitive
-                            checked={autoJoin}
-                            onCheckedChange={(c) => setAutoJoin(!!c)}
-                        />
+                        <Checkbox checked={autoJoin} onCheckedChange={(c) => setAutoJoin(!!c)} />
                         <span>{t('auto_create_join_entity')}</span>
                     </label>
                 )}
-                <IGRPButtonPrimitive size="sm" onClick={handleAdd} disabled={!draftTarget || busy}>
+                <Button size="sm" onClick={handleAdd} disabled={!draftTarget || busy}>
                     <Plus className="h-4 w-4 mr-1" />
                     {t('add_relation')}
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
         </div>
     )

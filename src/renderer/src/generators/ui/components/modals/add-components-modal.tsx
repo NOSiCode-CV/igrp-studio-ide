@@ -1,16 +1,18 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuTriggerPrimitive,
-    IGRPSidebarInsetPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import { SidebarInset } from '@renderer/components/ui/sidebar'
 import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { EmptyList } from '@renderer/components/empty-list'
 import useStudio from '@renderer/hooks/use-studio'
@@ -131,24 +133,22 @@ export const AddComponentModal = ({ path, comp, parentComp, open, setOpen }: Add
 
     return (
         <>
-            <IGRPDialogPrimitive open={open} onOpenChange={setOpen}>
-                <IGRPDialogContentPrimitive className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] max-w-[80vw]! h-[80vh]!">
-                    <IGRPSidebarInsetPrimitive>
-                        <IGRPDialogHeaderPrimitive className="p-4">
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="p-0 flex overflow-hidden [--header-height-three:calc(--spacing(75))] max-w-[80vw]! h-[80vh]!">
+                    <SidebarInset>
+                        <DialogHeader className="p-4">
                             <div className="flex justify-between">
                                 <div>
-                                    <IGRPDialogTitlePrimitive>
-                                        {t('manageComponents')}
-                                    </IGRPDialogTitlePrimitive>
-                                    <IGRPDialogDescriptionPrimitive>
+                                    <DialogTitle>{t('manageComponents')}</DialogTitle>
+                                    <DialogDescription>
                                         {t('config')} - {componentName}
-                                    </IGRPDialogDescriptionPrimitive>
+                                    </DialogDescription>
                                 </div>
                                 <div className="justify-end">
                                     {renderAddComponents(components, id, handleAddComponent, t)}
                                 </div>
                             </div>
-                        </IGRPDialogHeaderPrimitive>
+                        </DialogHeader>
                         <div className="flex-1 overflow-auto p-4">
                             <div className="space-y-3">
                                 <div>
@@ -208,14 +208,14 @@ export const AddComponentModal = ({ path, comp, parentComp, open, setOpen }: Add
                                 </ul>
                             </div>
                         </div>
-                    </IGRPSidebarInsetPrimitive>
+                    </SidebarInset>
                     <SidebarRight
                         comp={currentComponent}
                         path={currentPath}
                         parentComp={parentComp}
                     />
-                </IGRPDialogContentPrimitive>
-            </IGRPDialogPrimitive>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }
@@ -227,24 +227,24 @@ const renderAddComponents = (
     t: any
 ) => {
     return (
-        <IGRPDropdownMenuPrimitive>
-            <IGRPDropdownMenuTriggerPrimitive asChild>
-                <IGRPButtonPrimitive variant="outline" size={'sm'}>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" size={'sm'}>
                     <Plus className="mr-2 h-4 w-4" />
                     {t('addComponent')}
-                </IGRPButtonPrimitive>
-            </IGRPDropdownMenuTriggerPrimitive>
-            <IGRPDropdownMenuContentPrimitive align="end">
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
                 {components.map((comp) => (
-                    <IGRPDropdownMenuItemPrimitive
+                    <DropdownMenuItem
                         key={comp.name}
                         onSelect={() => handleAddComponent(comp, droppableId)}
                     >
                         {comp.label}
-                    </IGRPDropdownMenuItemPrimitive>
+                    </DropdownMenuItem>
                 ))}
-            </IGRPDropdownMenuContentPrimitive>
-        </IGRPDropdownMenuPrimitive>
+            </DropdownMenuContent>
+        </DropdownMenu>
     )
 }
 
@@ -366,15 +366,15 @@ const RenderCreatedComponents = ({
                                 </Draggable>
                             </div>
                             <div className="flex gap-2">
-                                <IGRPButtonPrimitive
+                                <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => handleEditComponent(component, parentComponent)}
                                 >
                                     <LucideIcons.Edit />
                                     <span className="sr-only">Edit</span>
-                                </IGRPButtonPrimitive>
-                                <IGRPButtonPrimitive
+                                </Button>
+                                <Button
                                     variant="ghost"
                                     size="sm"
                                     className="text-destructive"
@@ -387,7 +387,7 @@ const RenderCreatedComponents = ({
                                 >
                                     <LucideIcons.Trash />
                                     <span className="sr-only">Delete</span>
-                                </IGRPButtonPrimitive>
+                                </Button>
                                 {canAcceptChildren(component) &&
                                     renderAddComponents(
                                         getAcceptedChildren(component),

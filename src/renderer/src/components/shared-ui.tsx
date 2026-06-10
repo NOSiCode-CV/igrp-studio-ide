@@ -1,4 +1,5 @@
-import { IGRPInputPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Input } from '@renderer/components/ui/input'
+import { cn } from '@renderer/lib/utils'
 import * as LucideIcons from 'lucide-react'
 import { type LucideIcon, Search } from 'lucide-react'
 import * as React from 'react'
@@ -23,7 +24,15 @@ interface SearchInputProps {
 }
 
 // Get project type icon
-function ProjectIcon({ project, workspacePath }: { project: ProjectData; workspacePath?: string }) {
+function ProjectIcon({
+    project,
+    workspacePath,
+    className = ''
+}: {
+    project: ProjectData
+    workspacePath?: string
+    className?: string
+}) {
     const [iconUrl, setIconUrl] = React.useState<string | null>(null)
     const [isLoading, setIsLoading] = React.useState(false)
 
@@ -73,7 +82,9 @@ function ProjectIcon({ project, workspacePath }: { project: ProjectData; workspa
 
     if (isLoading) {
         return (
-            <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+            <div
+                className={cn('h-8 w-8 rounded-sm bg-muted flex items-center justify-center', className)}
+            >
                 <div className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin"></div>
             </div>
         )
@@ -81,13 +92,13 @@ function ProjectIcon({ project, workspacePath }: { project: ProjectData; workspa
 
     if (iconUrl) {
         return (
-            <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+            <div
+                className={cn('h-8 w-8 overflow-hidden rounded-sm bg-muted', className)}
+            >
                 <img
                     src={iconUrl}
                     alt="Project icon"
-                    width={20}
-                    height={20}
-                    className="rounded-full object-cover"
+                    className="h-full w-full object-cover"
                 />
             </div>
         )
@@ -97,7 +108,7 @@ function ProjectIcon({ project, workspacePath }: { project: ProjectData; workspa
         <FrameworkIcon
             framework={project.framework as any}
             size={20}
-            className="h-8 w-8 rounded-lg bg-muted p-1"
+            className={cn('h-8 w-8 rounded-sm bg-muted p-1', className)}
             alt={`${project.framework} logo`}
         />
     )
@@ -116,7 +127,7 @@ function SearchInput({
             <Search
                 className={`absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground ${iconClassName}`}
             />
-            <IGRPInputPrimitive
+            <Input
                 type="text"
                 placeholder={placeholder}
                 className={`pl-8 h-8 text-xs ${inputClassName}`}

@@ -1,15 +1,13 @@
+import { Alert, AlertDescription, AlertTitle } from '@renderer/components/ui/alert'
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPAlertDescriptionPrimitive,
-    IGRPAlertPrimitive,
-    IGRPAlertTitlePrimitive,
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDialogTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from '@renderer/components/ui/dialog'
 import { cn } from '@renderer/lib/utils'
 import { AlertTriangle, ExternalLink, FileText, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -128,7 +126,7 @@ export function VersionAlert({
     }
 
     return enabledVersionAlert ? (
-        <IGRPAlertPrimitive
+        <Alert
             className={cn(
                 'md:block border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20',
                 className
@@ -136,39 +134,39 @@ export function VersionAlert({
         >
             <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             <div className="flex-1">
-                <IGRPAlertTitlePrimitive className="text-amber-800 dark:text-amber-200">
+                <AlertTitle className="text-amber-800 dark:text-amber-200">
                     {t('versionOutdated')}
-                </IGRPAlertTitlePrimitive>
-                <IGRPAlertDescriptionPrimitive className="text-amber-700 dark:text-amber-300">
+                </AlertTitle>
+                <AlertDescription className="text-amber-700 dark:text-amber-300">
                     {t('versionOutdatedDescription', {
                         projectVersion,
                         appVersion
                     })}
-                </IGRPAlertDescriptionPrimitive>
+                </AlertDescription>
             </div>
             <div className="flex items-center gap-2">
-                <IGRPDialogPrimitive open={showChangelog} onOpenChange={setShowChangelog}>
-                    <IGRPDialogTriggerPrimitive asChild>
-                        <IGRPButtonPrimitive
+                <Dialog open={showChangelog} onOpenChange={setShowChangelog}>
+                    <DialogTrigger asChild>
+                        <Button
                             variant="outline"
                             size="sm"
                             className="border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/30"
                         >
                             <FileText className="h-3.5 w-3.5 mr-1" />
                             View Changelog
-                        </IGRPButtonPrimitive>
-                    </IGRPDialogTriggerPrimitive>
-                    <IGRPDialogContentPrimitive className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                        <IGRPDialogHeaderPrimitive>
-                            <IGRPDialogTitlePrimitive className="flex items-center gap-2">
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
                                 <FileText className="h-5 w-5" />
                                 {finalChangelogContent.title}
-                            </IGRPDialogTitlePrimitive>
-                            <IGRPDialogDescriptionPrimitive>
+                            </DialogTitle>
+                            <DialogDescription>
                                 Version {finalChangelogContent.version} •{' '}
                                 {finalChangelogContent.date}
-                            </IGRPDialogDescriptionPrimitive>
-                        </IGRPDialogHeaderPrimitive>
+                            </DialogDescription>
+                        </DialogHeader>
                         <div className="space-y-6">
                             {finalChangelogContent.sections.map((section, index) => (
                                 <div key={index} className="space-y-3">
@@ -190,13 +188,10 @@ export function VersionAlert({
                             ))}
                         </div>
                         <div className="flex justify-end gap-2 pt-4 border-t">
-                            <IGRPButtonPrimitive
-                                variant="outline"
-                                onClick={() => setShowChangelog(false)}
-                            >
+                            <Button variant="outline" onClick={() => setShowChangelog(false)}>
                                 Close
-                            </IGRPButtonPrimitive>
-                            <IGRPButtonPrimitive
+                            </Button>
+                            <Button
                                 onClick={() => {
                                     const releaseUrl = `https://github.com/NOSiCode-CV/igrp-studio-ide/releases/tag/v0.0.59` ///${appVersion}
                                     window.open(releaseUrl, '_blank')
@@ -206,22 +201,22 @@ export function VersionAlert({
                             >
                                 <ExternalLink className="h-4 w-4" />
                                 View {appVersion} Release
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </div>
-                    </IGRPDialogContentPrimitive>
-                </IGRPDialogPrimitive>
+                    </DialogContent>
+                </Dialog>
                 {showDismiss && onDismiss && (
-                    <IGRPButtonPrimitive
+                    <Button
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0 text-amber-600 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-900/30"
                         onClick={onDismiss}
                     >
                         <X className="h-3.5 w-3.5" />
-                    </IGRPButtonPrimitive>
+                    </Button>
                 )}
             </div>
-        </IGRPAlertPrimitive>
+        </Alert>
     ) : (
         <></>
     )

@@ -1,8 +1,6 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive,
-    IGRPScrollAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { Database, FileBox, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -42,23 +40,23 @@ export function EntityList({
     return (
         <div className="flex flex-col h-full gap-2 p-2">
             <div className="flex gap-1">
-                <IGRPInputPrimitive
+                <Input
                     value={filter}
                     onChange={(e) => setFilter(e.target.value)}
                     placeholder={t('filter_entities')}
                     className="flex-1"
                 />
-                <IGRPButtonPrimitive
+                <Button
                     size="icon"
                     title={t('new_entity')}
                     onClick={() => setCreateOpen(true)}
                     disabled={!basePath}
                 >
                     <Plus className="h-4 w-4" />
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
             {onImportFromDb && (
-                <IGRPButtonPrimitive
+                <Button
                     variant="secondary"
                     size="sm"
                     onClick={onImportFromDb}
@@ -67,9 +65,9 @@ export function EntityList({
                 >
                     <Database className="h-4 w-4 mr-2" />
                     {t('import_from_db')}
-                </IGRPButtonPrimitive>
+                </Button>
             )}
-            <IGRPScrollAreaPrimitive className="flex-1">
+            <ScrollArea className="flex-1">
                 {loading ? (
                     <p className="p-2 text-xs text-muted-foreground">{t('loading')}</p>
                 ) : filtered.length === 0 ? (
@@ -101,7 +99,7 @@ export function EntityList({
                         ))}
                     </ul>
                 )}
-            </IGRPScrollAreaPrimitive>
+            </ScrollArea>
             <EntityFormModal
                 open={createOpen}
                 onOpenChange={setCreateOpen}

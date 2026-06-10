@@ -1,9 +1,5 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPPopoverContentPrimitive,
-    IGRPPopoverPrimitive,
-    IGRPPopoverTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
 import { Edit2, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { BackgroundStyle } from '../effects/types'
@@ -32,13 +28,13 @@ export function BackgroundEditor({
     const { t } = useTranslation()
 
     return (
-        <IGRPPopoverPrimitive>
-            <IGRPPopoverTriggerPrimitive asChild>
-                <IGRPButtonPrimitive variant="ghost" size={'icon'} onClick={onEdit}>
+        <Popover>
+            <PopoverTrigger asChild>
+                <Button variant="ghost" size={'icon'} onClick={onEdit}>
                     <Edit2 />
-                </IGRPButtonPrimitive>
-            </IGRPPopoverTriggerPrimitive>
-            <IGRPPopoverContentPrimitive className="w-80">
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
                 <div className="space-y-2">
                     <div className="flex items-center justify-between pb-1 border-b border-gray-200 dark:border-gray-700">
                         <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300">
@@ -75,7 +71,7 @@ export function BackgroundEditor({
                         />
                     </div>
                 </div>
-            </IGRPPopoverContentPrimitive>
-        </IGRPPopoverPrimitive>
+            </PopoverContent>
+        </Popover>
     )
 }

@@ -7,8 +7,8 @@ import { useGit } from '@renderer/hooks/use-git'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useKeyPress } from '@renderer/hooks/useKeyDown'
 import useToast from '@renderer/hooks/useToast'
+import { useFormikCompat, useZodForm } from '@renderer/lib/form'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
-import { useFormik } from 'formik'
 import { type FocusEvent, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -40,18 +40,16 @@ export const useModel = ({
     const [data, setData] = useState<any>(null)
     const [enableEntityRevision, setEnableEntityRevision] = useState(false)
 
-    const formik: any = useFormik({
-        enableReinitialize: true,
-        // Per-framework defaults: the primary-key `generationType` differs
-        // between Spring (`'IDENTITY'`) and .NET (`'Identity'`). Computed each
-        // render so the form re-seeds if the active project's framework
-        // changes (e.g. user opens a different project without remounting).
-        initialValues: getInitialValues(framework),
-        validationSchema,
-        onSubmit: (_values, actions) => {
-            actions.setSubmitting(false)
-            handleSave()
-        }
+    // Per-framework defaults: the primary-key `generationType` differs
+    // between Spring (`'IDENTITY'`) and .NET (`'Identity'`). Computed each
+    // render so the form re-seeds if the active project's framework
+    // changes (e.g. user opens a different project without remounting).
+    const rhfForm = useZodForm<any>({
+        schema: validationSchema as never,
+        defaultValues: getInitialValues(framework)
+    })
+    const formik: any = useFormikCompat(rhfForm, async () => {
+        await handleSave()
     })
 
     const suggestTableName = async (name: string) => {

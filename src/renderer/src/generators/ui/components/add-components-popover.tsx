@@ -1,9 +1,5 @@
-import {
-    IGRPBadgePrimitive,
-    IGRPPopoverContentPrimitive,
-    IGRPPopoverPrimitive,
-    IGRPPopoverTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Badge } from '@renderer/components/ui/badge'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
 import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import useStudio from '@renderer/hooks/use-studio'
 import useToast from '@renderer/hooks/useToast'
@@ -65,13 +61,13 @@ export const AddComponentPopover = ({
     }, [rebuild])
 
     return (
-        <IGRPPopoverPrimitive>
-            <IGRPPopoverTriggerPrimitive asChild>
-                <IGRPBadgePrimitive variant={'secondary'} className="rounded-sm cursor-pointer h-6">
+        <Popover>
+            <PopoverTrigger asChild>
+                <Badge variant={'secondary'} className="rounded-sm cursor-pointer h-6">
                     <span className="text-xs">Add Comp</span>
-                </IGRPBadgePrimitive>
-            </IGRPPopoverTriggerPrimitive>
-            <IGRPPopoverContentPrimitive className="w-100 p-3 space-y-3">
+                </Badge>
+            </PopoverTrigger>
+            <PopoverContent className="w-100 p-3 space-y-3">
                 <div className="p-2 border-b">
                     <h3 className="text-lg font-semibold">{t('addComponent')}</h3>
                     <p className="text-sm text-muted-foreground">
@@ -91,7 +87,7 @@ export const AddComponentPopover = ({
                             </button>
                         ))}
                 </div>
-            </IGRPPopoverContentPrimitive>
-        </IGRPPopoverPrimitive>
+            </PopoverContent>
+        </Popover>
     )
 }

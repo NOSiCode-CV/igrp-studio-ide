@@ -1,17 +1,15 @@
 'use client'
 
 import {
-    IGRPBadge,
-    IGRPCommandEmptyPrimitive,
-    IGRPCommandGroupPrimitive,
-    IGRPCommandInputPrimitive,
-    IGRPCommandItemPrimitive,
-    IGRPCommandPrimitive,
-    IGRPPopoverContentPrimitive,
-    IGRPPopoverPrimitive,
-    IGRPPopoverTriggerPrimitive,
-    IGRPScrollAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem
+} from '@renderer/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { IGRPBadge } from '@igrp/igrp-framework-react-design-system'
 import { cn } from '@renderer/lib/utils'
 import { X } from 'lucide-react'
 import * as React from 'react'
@@ -44,8 +42,8 @@ export default function MultipleSelector({
     }
 
     return (
-        <IGRPPopoverPrimitive open={open} onOpenChange={setOpen}>
-            <IGRPPopoverTriggerPrimitive asChild>
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
                 <div className="flex min-h-[40px] w-full flex-wrap items-center justify-start rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                     {value && value.length > 0 ? (
                         value.map((item) => (
@@ -72,19 +70,17 @@ export default function MultipleSelector({
                         <span className="text-muted-foreground">{placeholder}</span>
                     )}
                 </div>
-            </IGRPPopoverTriggerPrimitive>
-            <IGRPPopoverContentPrimitive className="w-[200px] p-0 min-w-50">
-                <IGRPScrollAreaPrimitive>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] p-0 min-w-50">
+                <ScrollArea>
                     <div className="max-h-[60svh]">
-                        <IGRPCommandPrimitive>
-                            <IGRPCommandInputPrimitive placeholder={placeholder} />
-                            <IGRPCommandEmptyPrimitive>
-                                {t('noItemFound')}
-                            </IGRPCommandEmptyPrimitive>
-                            <IGRPCommandGroupPrimitive>
+                        <Command>
+                            <CommandInput placeholder={placeholder} />
+                            <CommandEmpty>{t('noItemFound')}</CommandEmpty>
+                            <CommandGroup>
                                 {options &&
                                     options.map((option) => (
-                                        <IGRPCommandItemPrimitive
+                                        <CommandItem
                                             key={option.value}
                                             onSelect={() => {
                                                 onChange(
@@ -112,13 +108,13 @@ export default function MultipleSelector({
                                                 )}
                                             </div>
                                             {option.label}
-                                        </IGRPCommandItemPrimitive>
+                                        </CommandItem>
                                     ))}
-                            </IGRPCommandGroupPrimitive>
-                        </IGRPCommandPrimitive>
+                            </CommandGroup>
+                        </Command>
                     </div>
-                </IGRPScrollAreaPrimitive>
-            </IGRPPopoverContentPrimitive>
-        </IGRPPopoverPrimitive>
+                </ScrollArea>
+            </PopoverContent>
+        </Popover>
     )
 }

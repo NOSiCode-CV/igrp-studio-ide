@@ -1,11 +1,11 @@
 import {
-    IGRPCardContentPrimitive,
-    IGRPCardDescriptionPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPSeparator
-} from '@igrp/igrp-framework-react-design-system'
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@renderer/components/ui/card'
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import { FormList } from '../../../../components/form-list'
 import type { IColumnsTabelProps } from '../../types/Interfaces'
 import NavigationBar from '../../components/navigation-bar'
@@ -66,14 +66,14 @@ export const GraphQLOperationEditor = ({
             <NavigationBar title={title} isNew={!isPersisted} onDelete={handleDelete} />
 
             <div className="space-y-4 p-4">
-                <IGRPCardPrimitive>
-                    <IGRPCardHeaderPrimitive>
-                        <IGRPCardTitlePrimitive>Definition</IGRPCardTitlePrimitive>
-                        <IGRPCardDescriptionPrimitive>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Definition</CardTitle>
+                        <CardDescription>
                             Configure this GraphQL operation and persist it to the module manifest.
-                        </IGRPCardDescriptionPrimitive>
-                    </IGRPCardHeaderPrimitive>
-                    <IGRPCardContentPrimitive>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
                         <div className="w-full">
                             <div
                                 className="grid gap-4"
@@ -163,20 +163,18 @@ export const GraphQLOperationEditor = ({
                                 </>
                             )}
                         </div>
-                    </IGRPCardContentPrimitive>
-                </IGRPCardPrimitive>
+                    </CardContent>
+                </Card>
 
                 {isSubscription && (
-                    <IGRPCardPrimitive>
-                        <IGRPCardHeaderPrimitive>
-                            <IGRPCardTitlePrimitive>
-                                Event Pattern Configuration
-                            </IGRPCardTitlePrimitive>
-                            <IGRPCardDescriptionPrimitive>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Event Pattern Configuration</CardTitle>
+                            <CardDescription>
                                 Define which events trigger this GraphQL subscription.
-                            </IGRPCardDescriptionPrimitive>
-                        </IGRPCardHeaderPrimitive>
-                        <IGRPCardContentPrimitive>
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
                             <TextInput
                                 id="eventTopic"
                                 label="Event Topic / Pattern"
@@ -187,8 +185,8 @@ export const GraphQLOperationEditor = ({
                                 error={formik.errors.eventTopic}
                                 isTouched={Boolean(formik.touched.eventTopic)}
                             />
-                        </IGRPCardContentPrimitive>
-                    </IGRPCardPrimitive>
+                        </CardContent>
+                    </Card>
                 )}
 
                 <div className="space-y-3">

@@ -217,10 +217,17 @@ const specDocsSlice = createSlice({
          */
         docProposalStaged(
             state,
-            action: PayloadAction<{ id: string; proposal: PendingProposal; summary: ProposalSummary[] }>
+            action: PayloadAction<{
+                id: string
+                proposal: PendingProposal
+                summary: ProposalSummary[]
+            }>
         ) {
             const docState = ensureDoc(state, action.payload.id)
-            if (docState.pendingProposal && docState.pendingProposal.messageId !== action.payload.proposal.messageId) {
+            if (
+                docState.pendingProposal &&
+                docState.pendingProposal.messageId !== action.payload.proposal.messageId
+            ) {
                 docState.proposalHistory[docState.pendingProposal.messageId] = 'stale'
             }
             docState.pendingProposal = action.payload.proposal
@@ -308,17 +315,25 @@ export const selectDocState =
     (state: RootState): DocPerState =>
         (docId && state.specDocs.byDoc[docId]) || EMPTY_DOC
 
-export const selectDocBuffer = (docId: string | null) => (state: RootState): string =>
-    selectDocState(docId)(state).buffer
+export const selectDocBuffer =
+    (docId: string | null) =>
+    (state: RootState): string =>
+        selectDocState(docId)(state).buffer
 
-export const selectDocDirty = (docId: string | null) => (state: RootState): boolean =>
-    selectDocState(docId)(state).dirty
+export const selectDocDirty =
+    (docId: string | null) =>
+    (state: RootState): boolean =>
+        selectDocState(docId)(state).dirty
 
-export const selectDocSaving = (docId: string | null) => (state: RootState): boolean =>
-    docId ? Boolean(state.specDocs.saving[docId]) : false
+export const selectDocSaving =
+    (docId: string | null) =>
+    (state: RootState): boolean =>
+        docId ? Boolean(state.specDocs.saving[docId]) : false
 
-export const selectDocViewMode = (docId: string | null) => (state: RootState): DocViewMode =>
-    selectDocState(docId)(state).viewMode
+export const selectDocViewMode =
+    (docId: string | null) =>
+    (state: RootState): DocViewMode =>
+        selectDocState(docId)(state).viewMode
 
 export const selectDocRightPane =
     (docId: string | null) =>

@@ -1,10 +1,6 @@
 'use client'
 
-import {
-    IGRPCardContentPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Card, CardContent, CardHeader } from '@renderer/components/ui/card'
 import { useTabs } from '@renderer/components/navigation/TabContext'
 import { OPTION_TYPE, type OptionType } from '@renderer/constants/appConstants'
 import { cn } from '@renderer/lib/utils'
@@ -42,7 +38,7 @@ function StatsCard({
     onClick
 }: StatsCardProps): React.ReactNode {
     return (
-        <IGRPCardPrimitive className="group relative">
+        <Card className="group relative">
             <div
                 className={cn(
                     `absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg`,
@@ -50,7 +46,7 @@ function StatsCard({
                     'z-0'
                 )}
             ></div>
-            <IGRPCardHeaderPrimitive>
+            <CardHeader>
                 <div className="flex items-center justify-between ">
                     <div className="flex items-center">
                         <Icon className={cn(`w-5 h-5 mr-2`, iconColor)} />
@@ -69,12 +65,12 @@ function StatsCard({
                         </button>
                     )}
                 </div>
-            </IGRPCardHeaderPrimitive>
-            <IGRPCardContentPrimitive>
+            </CardHeader>
+            <CardContent>
                 <div className="text-2xl font-bold">{value}</div>
                 {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
-            </IGRPCardContentPrimitive>
-        </IGRPCardPrimitive>
+            </CardContent>
+        </Card>
     )
 }
 

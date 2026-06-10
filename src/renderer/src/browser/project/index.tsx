@@ -1,10 +1,5 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import { FrameworkIcon } from '@renderer/components/framework-icon'
 import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea'
 import { cn } from '@renderer/lib/utils'
@@ -36,14 +31,9 @@ function SettingsRow({ label, value, description, onEdit }: SettingsRowProps) {
                 {description && <p className="text-sm text-muted-foreground">{description}</p>}
             </div>
             {onEdit && (
-                <IGRPButtonPrimitive
-                    variant="outline"
-                    size="sm"
-                    onClick={onEdit}
-                    className="hidden"
-                >
+                <Button variant="outline" size="sm" onClick={onEdit} className="hidden">
                     {t('edit')}
-                </IGRPButtonPrimitive>
+                </Button>
             )}
         </div>
     )
@@ -59,11 +49,11 @@ export default function ProjectSettings({ project, className, hasTitle = true }:
             <div className={cn('w-full max-w-3xl mx-auto space-y-8 p-6 mb-10', className)}>
                 {hasTitle && <h1 className="text-3xl font-semibold">{t('basic_settings')}</h1>}
 
-                <IGRPCardPrimitive className="border-border/50">
-                    <IGRPCardHeaderPrimitive>
-                        <IGRPCardTitlePrimitive>{t('general_info')}</IGRPCardTitlePrimitive>
-                    </IGRPCardHeaderPrimitive>
-                    <IGRPCardContentPrimitive className="space-y-0 divide-y divide-border/50">
+                <Card className="border-border/50">
+                    <CardHeader>
+                        <CardTitle>{t('general_info')}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-0 divide-y divide-border/50">
                         <SettingsRow
                             label="project_name"
                             value={name}
@@ -96,8 +86,8 @@ export default function ProjectSettings({ project, className, hasTitle = true }:
                                 />
                             )
                         })}
-                    </IGRPCardContentPrimitive>
-                </IGRPCardPrimitive>
+                    </CardContent>
+                </Card>
             </div>
         </ContainerScrollArea>
     )

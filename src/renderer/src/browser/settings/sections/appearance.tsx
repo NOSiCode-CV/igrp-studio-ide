@@ -1,10 +1,8 @@
 'use client'
 
-import {
-    IGRPButtonPrimitive,
-    IGRPLabelPrimitive,
-    IGRPSkeletonPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Label } from '@renderer/components/ui/label'
+import { Skeleton } from '@renderer/components/ui/skeleton'
 import { useThemeConfig } from '@renderer/components/active-theme-provider'
 import { cn } from '@renderer/lib/utils'
 import { ThemeService } from '@renderer/services/ThemeService'
@@ -38,13 +36,13 @@ export function AppearanceSettings() {
             </div>
             <div className="space-y-6">
                 <div className="flex flex-col gap-2">
-                    <IGRPLabelPrimitive className="text-xs">{t('accentColor')}</IGRPLabelPrimitive>
+                    <Label className="text-xs">{t('accentColor')}</Label>
                     <div className="grid w-full md:grid-cols-4 grid-cols-6 gap-3">
                         {baseColors.map((theme) => {
                             const isActive = activeTheme === theme.name
 
                             return mounted ? (
-                                <IGRPButtonPrimitive
+                                <Button
                                     variant="outline"
                                     size="sm"
                                     key={theme.name}
@@ -81,12 +79,9 @@ export function AppearanceSettings() {
                                     <span className="hidden md:block">
                                         {theme.label === 'Zinc' ? 'default' : theme.label}
                                     </span>
-                                </IGRPButtonPrimitive>
+                                </Button>
                             ) : (
-                                <IGRPSkeletonPrimitive
-                                    className="h-8 w-[32px] xl:w-[86px]"
-                                    key={theme.name}
-                                />
+                                <Skeleton className="h-8 w-[32px] xl:w-[86px]" key={theme.name} />
                             )
                         })}
                     </div>

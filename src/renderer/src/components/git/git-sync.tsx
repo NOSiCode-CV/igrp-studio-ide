@@ -1,9 +1,5 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import { useGit } from '@renderer/hooks/use-git'
 import { cn } from '@renderer/lib/utils'
 import type { RootState } from '@renderer/redux'
@@ -54,9 +50,9 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
 
     return (
         <>
-            <IGRPTooltipPrimitive>
-                <IGRPTooltipTriggerPrimitive asChild>
-                    <IGRPButtonPrimitive
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setShowConfirm(true)}
@@ -64,12 +60,12 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
                     >
                         <RefreshCw className={cn('h-4 w-4', isSyncing && 'animate-spin')} />
                         {isSyncing && t('syncing')}
-                    </IGRPButtonPrimitive>
-                </IGRPTooltipTriggerPrimitive>
-                <IGRPTooltipContentPrimitive>
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
                     <p>{t('pullAndPushChanges')}</p>
-                </IGRPTooltipContentPrimitive>
-            </IGRPTooltipPrimitive>
+                </TooltipContent>
+            </Tooltip>
 
             <AlertDialogSync
                 isOpen={showConfirm}

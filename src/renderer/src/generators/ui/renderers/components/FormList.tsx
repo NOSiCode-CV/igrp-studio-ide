@@ -1,4 +1,5 @@
-import { IGRPBadge, IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { IGRPBadge } from '@igrp/igrp-framework-react-design-system'
 import Draggable from '@renderer/lib/dnd/Draggable'
 import Droppable from '@renderer/lib/dnd/Droppable'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
@@ -153,7 +154,7 @@ const IGRPStudioFormList: React.FC<CardComponentProps> = ({ comp, onDragEnd }) =
                         })}
                     </Droppable>
 
-                    <IGRPButtonPrimitive
+                    <Button
                         type="button"
                         variant="outline"
                         onClick={() => void 0}
@@ -161,7 +162,7 @@ const IGRPStudioFormList: React.FC<CardComponentProps> = ({ comp, onDragEnd }) =
                     >
                         <Plus className="h-4 w-4 mr-1" />
                         {addButtonLabel || 'Add'}
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
             )
         },

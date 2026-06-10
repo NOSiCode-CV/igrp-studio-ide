@@ -699,8 +699,7 @@ const specPrototype = {
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.LIST_SNAPSHOTS, { basePath }),
     restoreSnapshot: (basePath: string, sha: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.RESTORE_SNAPSHOT, { basePath, sha }),
-    export: (basePath: string) =>
-        ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.EXPORT, { basePath }),
+    export: (basePath: string) => ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.EXPORT, { basePath }),
     openFolder: (basePath: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.OPEN_FOLDER, { basePath }),
     readManifest: (basePath: string) =>
@@ -721,9 +720,7 @@ const specPrototype = {
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.CHECK_SKILL_UPDATES, { basePath }),
     updateSkill: (basePath: string, skillName: string) =>
         ipcRenderer.invoke(EVENTS.SPEC_PROTOTYPE.UPDATE_SKILL, { basePath, skillName }),
-    onChunk: (
-        callback: (payload: { requestId: string; chunk: any }) => void
-    ): (() => void) => {
+    onChunk: (callback: (payload: { requestId: string; chunk: any }) => void): (() => void) => {
         const sub = (_event: Electron.IpcRendererEvent, payload: any) => callback(payload)
         ipcRenderer.on(EVENTS.SPEC_PROTOTYPE.GENERATE_CHUNK, sub)
         return () => ipcRenderer.removeListener(EVENTS.SPEC_PROTOTYPE.GENERATE_CHUNK, sub)

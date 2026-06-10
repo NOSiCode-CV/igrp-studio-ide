@@ -1,13 +1,8 @@
-import {
-    IGRPBadgePrimitive,
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPInputPrimitive,
-    IGRPSkeletonPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Skeleton } from '@renderer/components/ui/skeleton'
 import { AlertTriangle, Plug, Plus, RotateCcw, Search, Settings, Workflow } from 'lucide-react'
 import { type JSX, useMemo, useState } from 'react'
 import { cn } from '../../../lib/utils'
@@ -53,18 +48,16 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
     }, [processes, search])
 
     const manageDialog = (
-        <IGRPDialogPrimitive open={manageOpen} onOpenChange={setManageOpen}>
-            <IGRPDialogContentPrimitive className="sm:max-w-6xl w-[95vw] max-h-[85vh] overflow-hidden flex flex-col p-0">
-                <IGRPDialogHeaderPrimitive className="border-b px-6 py-4 shrink-0">
-                    <IGRPDialogTitlePrimitive>
-                        Manage BPMN API connections
-                    </IGRPDialogTitlePrimitive>
-                </IGRPDialogHeaderPrimitive>
+        <Dialog open={manageOpen} onOpenChange={setManageOpen}>
+            <DialogContent className="sm:max-w-6xl w-[95vw] max-h-[85vh] overflow-hidden flex flex-col p-0">
+                <DialogHeader className="border-b px-6 py-4 shrink-0">
+                    <DialogTitle>Manage BPMN API connections</DialogTitle>
+                </DialogHeader>
                 <div className="flex-1 overflow-y-auto px-6 py-4">
                     <BPMNConnectionsManager compact />
                 </div>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 
     if (!binding && !clientLoading) {
@@ -75,14 +68,14 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
                     <div className="space-y-1">
                         <p className="text-sm font-medium">No active BPMN configuration</p>
                         <p className="text-xs text-muted-foreground">
-                            Add a Process API endpoint and activate it to start
-                            managing process definitions.
+                            Add a Process API endpoint and activate it to start managing process
+                            definitions.
                         </p>
                     </div>
-                    <IGRPButtonPrimitive size="sm" onClick={() => setManageOpen(true)}>
+                    <Button size="sm" onClick={() => setManageOpen(true)}>
                         <Plus className="mr-1 h-4 w-4" />
                         Add BPMN connection
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
                 {manageDialog}
             </>
@@ -95,11 +88,9 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
             <>
                 <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
                     <AlertTriangle className="h-8 w-8 text-destructive" />
-                    <p className="max-w-xs text-xs text-muted-foreground">
-                        {queryError.message}
-                    </p>
+                    <p className="max-w-xs text-xs text-muted-foreground">{queryError.message}</p>
                     <div className="flex gap-2">
-                        <IGRPButtonPrimitive
+                        <Button
                             variant="outline"
                             size="sm"
                             onClick={() => {
@@ -109,15 +100,11 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
                         >
                             <RotateCcw className="mr-1 h-4 w-4" />
                             Retry
-                        </IGRPButtonPrimitive>
-                        <IGRPButtonPrimitive
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setManageOpen(true)}
-                        >
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => setManageOpen(true)}>
                             <Settings className="mr-1 h-4 w-4" />
                             Manage connections
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                 </div>
                 {manageDialog}
@@ -137,7 +124,7 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
                             <Plug className="h-3 w-3 shrink-0" />
                             <span className="truncate">{binding.config.name}</span>
                         </div>
-                        <IGRPButtonPrimitive
+                        <Button
                             variant="ghost"
                             size="sm"
                             className="h-6 px-1 text-xs"
@@ -145,7 +132,7 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
                             title="Manage BPMN connections"
                         >
                             <Settings className="h-3.5 w-3.5" />
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                 )}
                 <select
@@ -167,14 +154,14 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
                 </select>
                 <div className="relative">
                     <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-                    <IGRPInputPrimitive
+                    <Input
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Filter processes…"
                         className="pl-7"
                     />
                 </div>
-                <IGRPButtonPrimitive
+                <Button
                     variant="outline"
                     size="sm"
                     className="w-full"
@@ -183,17 +170,17 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
                 >
                     <Plus className="mr-1 h-4 w-4" />
                     New process
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
             <div className="flex-1 overflow-y-auto">
                 {processesQuery.isLoading ? (
                     <div className="space-y-2 p-3">
                         {Array.from({ length: 5 }).map((_, i) => (
                             <div key={i} className="flex items-start gap-2">
-                                <IGRPSkeletonPrimitive className="mt-0.5 h-4 w-4 rounded" />
+                                <Skeleton className="mt-0.5 h-4 w-4 rounded" />
                                 <div className="flex-1 space-y-1">
-                                    <IGRPSkeletonPrimitive className="h-3 w-2/3" />
-                                    <IGRPSkeletonPrimitive className="h-2 w-1/3" />
+                                    <Skeleton className="h-3 w-2/3" />
+                                    <Skeleton className="h-2 w-1/3" />
                                 </div>
                             </div>
                         ))}
@@ -226,12 +213,12 @@ export function ProcessList({ variant = 'panel' }: ProcessListProps): JSX.Elemen
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                 <span className="truncate">{p.processKey}</span>
                                                 {p.status && (
-                                                    <IGRPBadgePrimitive
+                                                    <Badge
                                                         variant="outline"
                                                         className="h-4 px-1 text-[10px]"
                                                     >
                                                         {p.statusDesc || p.status}
-                                                    </IGRPBadgePrimitive>
+                                                    </Badge>
                                                 )}
                                             </div>
                                         </div>

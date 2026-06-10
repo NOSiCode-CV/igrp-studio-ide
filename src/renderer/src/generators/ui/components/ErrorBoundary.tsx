@@ -1,4 +1,4 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
 import { captureRendererException } from '@renderer/init-sentry'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
 import React from 'react'
@@ -29,17 +29,13 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) 
                 {error.message || 'An unexpected error occurred while rendering this component.'}
             </p>
             <div className="flex gap-2">
-                <IGRPButtonPrimitive
-                    onClick={onRetry}
-                    variant="outline"
-                    className="flex items-center gap-2"
-                >
+                <Button onClick={onRetry} variant="outline" className="flex items-center gap-2">
                     <RefreshCw className="w-4 h-4" />
                     Try Again
-                </IGRPButtonPrimitive>
-                <IGRPButtonPrimitive onClick={() => window.location.reload()} variant="default">
+                </Button>
+                <Button onClick={() => window.location.reload()} variant="default">
                     Reload Page
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
             {process.env.NODE_ENV === 'development' && (
                 <details className="mt-4 text-left w-full max-w-md">

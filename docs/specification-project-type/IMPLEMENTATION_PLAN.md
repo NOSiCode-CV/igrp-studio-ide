@@ -787,3 +787,276 @@ Estes pilares foram esboçados como tabs adicionais no rail da Specification mas
 - `@lancedb/lancedb` (vector DB embarcado)
 - `apache-arrow` (peer dep do LanceDB)
 - `react-markdown` + `remark-gfm` (preview Documents + AIAssistant)
+
+---
+
+## 14. Arquitectura AI — runtime (actualizado 2026-05-23)
+
+Esta secção descreve **como** o stack AI executa em runtime (providers, IPC bridge, pipeline de geração, retry, seeding), complementando a §13 que enumera o que está feito.
+
+### 14.1 Camadas
+
+```
+RENDERER (UI)
+  AIAssistant.tsx                — chat genérico reutilizável (modes: 'llm' | 'prototype' | 'data')
+  PrototypePanel.contextProvider — monta o system prompt:
+    • 8 baselines do SKILL.md (always-injected; ver §14.5)
+    • Engine catalog block (componentes + props)
+    • Skill hints contextuais (patterns / troubleshooting via pickSkillHints)
+    • Spec attachments + KB search (RAG)
+    • Strict rules + Golden anatomy fallback
+                              ↓ IPC
+PRELOAD
+  window.llm.chatStart()                 — chat genérico
+  window.specPrototype.generateStart()   — pipeline completo prototype
+                              ↓
+MAIN (Electron)
+  prototype-generator-service.ts (auto-retry × 3)
+    │
+    ├─ LLM Router                  Engine.createPage()         Mock Seeder
+    │  (chat)                      (manifest → page.tsx)       (2ª LLM call)
+    │
+    ↓
+  LLM Router (llm-router.ts) — dispatch por provider id:
+    • openrouter   → OpenRouter HTTP API + SSE streaming
+    • cli:claude   → spawn `claude` CLI local (stdin/stdout)
+    • cli:ollama   → spawn `ollama` CLI local (stdin/stdout)
+```
+
+### 14.2 Providers — como cada um executa
+
+| Provider | Mecanismo | Auth | Streaming |
+|---|---|---|---|
+| `openrouter` | `POST https://openrouter.ai/api/v1/chat/completions` com `stream: true` | API key via Settings UI → grava encriptada em `<userData>/spec-secrets.bin` (Electron `safeStorage` → Keychain/DPAPI/libsecret) | Server-Sent Events; cada chunk `{ choices:[{ delta:{content:"…"} }] }` re-emitido como `delta` |
+| `cli:claude` | `child_process.spawn('claude', ['-p', '--output-format', 'text'])`; prompt vai por stdin, resposta vem por stdout | **Não precisa API key** — o `claude` CLI gere auth interna (OAuth + token em `~/.claude/`) com a subscrição da Anthropic | stdout buffered linha-a-linha, emitido como `delta` chunks |
+| `cli:ollama` | `child_process.spawn('ollama', ['run', <model>])`; prompt por stdin | Nenhuma — 100% local | stdout chunks |
+
+**Detecção de binários CLI:**
+1. Tenta spawn `<bin> --version`.
+2. Se PATH não tem (Electron lançado do Finder herda PATH magro): pergunta ao login shell via `zsh -lic 'command -v <bin>'` — carrega `.zprofile` + `.zshrc` (apanha nvm/asdf paths).
+3. Cache do status por 30s.
+
+**Selecção provider/model:** model picker do AIAssistant chama `llmRouter.statuses()` (cada adapter responde `isReady()`) e `llmRouter.listAllModels()` (agrega — OpenRouter via API, Ollama via `ollama list`, Claude lista estática). Escolha persistida em `localStorage` por surface (`prototype:<basePath>`, `docs:<basePath>:<docId>`, etc.).
+
+### 14.3 Pipeline de geração do Prototype (M6-M9)
+
+```
+User typed message
+    │ AIAssistant → window.specPrototype.generateStart(input)
+    ↓
+prototype-generator-service.generate()    ◄── retry loop M8 (até 3 tentativas)
+    │
+    │ ATTEMPT N:
+    ├─ Build system prompt (skill baselines + catalog + hints + KB)
+    ├─ llmRouter.chat(providerId, messages, opts) → streams deltas para o chat
+    ├─ Extract JSON block do buffer
+    ├─ parsePageConfig (valida discriminator + shape)
+    │
+    ├─ ON PARSE/ENGINE ERROR & attempt < 3:
+    │   ├─ yield 'retry-attempt' chunk (visível no chat: "Attempt 2/3 — fixing: <error>")
+    │   ├─ Build retry prompt (original msg + bad manifest + formatted error)
+    │   └─ loop para ATTEMPT N+1
+    │
+    ├─ Persist manifest → .igrpstudio/prototype/page.json
+    ├─ engine.createPage(manifest, prototypeRoot)
+    │   → src/app/(igrp)/(generated)/<route>/page.tsx
+    │
+    ├─ MOCK SEEDER (M9, 2ª LLM call):
+    │   ├─ Lê o page.tsx gerado, regex extrai column ids reais
+    │   ├─ Pede ao LLM 4-6 rows mock realistas (prompt curto, 1 turn)
+    │   ├─ Escreve .igrpstudio/prototype/preview/<name>.mock.json
+    │   ├─ Escreve sibling _preview.ts (re-exporta o JSON)
+    │   └─ Patcha page.tsx com bloco /* PREVIEW BEGIN/END */ useEffect
+    │      (idempotente — substitui bloco existente em re-runs)
+    │
+    └─ Git commit ([page] <pageName> — <componentCount> components)
+```
+
+**Streaming chunks** consumidos pelo `AIAssistant`:
+- `delta` (raw text), `manifest-parsed`, `manifest-applied`
+- `retry-attempt { attempt, maxAttempts, reason }`
+- `mock-seeding`, `mock-seeded { mockJsonPath, previewTsPath, rowCount }`, `mock-skipped { reason }`
+- `commit { sha, summary }`, `parse-error`, `error`, `done`
+
+### 14.4 Skill system (M7)
+
+**Disk layout** (Anthropic format):
+```
+<project>/.agents/skills/<name>/
+  SKILL.md              ← frontmatter (name, description) + markdown body
+  skill.json            ← { name, version, framework, description, files[] }
+  <companion>.md × N    ← patterns.md, troubleshooting.md, etc.
+```
+
+**Studio integration** (`skill-discovery.ts` + `usePrototypeSkills` hook):
+- `listInstalledSkills(basePath)` — scan `.agents/skills/`, retorna metadata + companions
+- `readSkillCompanion(name, filename)` — sandbox read (path traversal check)
+- `checkSkillUpdates(basePath)` — HTTP `GET <registry>/index.json`, compara `installed.version` vs `entry.latest` com semver-lite
+- `installSkill / updateSkill` — spawn `igrp skill add|update <name>` (CLI owns registry + tarball)
+
+**Registry default:** `https://sonatype.nosi.cv/repository/igrp-templates/@igrp/skills/`. Override via env `IGRP_SKILL_REGISTRY`.
+
+**UI:**
+- `SkillInstallBanner` (azul) quando `igrp-studio-metadata` não está instalado
+- `SkillUpdateBanner` (âmbar) quando há versão nova no registry; dismiss persistente por versão (`localStorage skillUpdateDismissed:<name>:<latest>`)
+
+### 14.5 Skill `igrp-studio-metadata` — 8 baselines always-injected
+
+Cada baseline tem ~600-8000 bytes; total ~36KB sempre presente no system prompt. Cada uma preempt uma classe concreta de silent-failure do engine (descobrimos por bater nela em produção):
+
+| Baseline | Bytes | Preempts |
+|---|---|---|
+| **Core principles** | 5.7KB | (a) Manifest é handoff; (b) Engine falha em silêncio; (c) Auto-retry — JSON é único output; (d) `name = tag = data key` trinity; (e) Compor primitives → custom → registry |
+| **Engine naming constraints** | 1.9KB | `pageName`/`name`/`componentName` só letters; `description` só letters+digits+spaces; transliteração PT→ASCII |
+| **Component children rules** | 3.3KB | `card` max 3 (cardHeader/Content/Footer); `table` max 3 (tableColumns/Filters/RowSubcomponent); `modalDialog` max 3; `textListItem` max 2 |
+| **Component variant gotchas** | 4.1KB | `pageHeader`/`headline` só h1-h6 (NUNCA "default" → renderiza `<default>`); enum strict de `colorSection`; Tailwind numeric scale (`gap-4`, não `gap-md`) |
+| **Custom components — when and how** | 5.5KB | Hierarquia primitive → composition → custom; tudo importa de `@igrp/igrp-framework-react-design-system` (inclui shadcn re-exportado); ID prefix convention; `.tsx` + `igrp.config.ts` register |
+| **Dashboard / list cell properties** | 4.2KB | `headerTitle` (NÃO `title`) em column cells; `statsCard` (NÃO `infoCard`) para tiles de contagem; wiring counts no preview |
+| **Table row actions** | 8.2KB | `tableLinkAction` vs `tableAlertAction`; `labelTrigger` (NÃO `content`); `interactions.action`/`onClickConfirm`; icon map (Eye, SquarePen, Trash2, Check, Send, …); slug-based navigation via `href` + `segments` + `params` (NÃO `?id=rowData.id`) |
+| **Engine type-definition shape** | 6.3KB | `types[].fields[].name === cell.tag` (trinity); `defaultValue` é raw TS code (`""` empty string, `"All"` for "All", `"[]"` for array — NÃO single-quote inner) |
+
+**Versão actual no source:** v1.0.14. Sincronização local `studio/_skills/igrp-studio-metadata/` → projecto via `cp` ou via `igrp skill update`.
+
+### 14.6 Caminho non-AI — `features/manifest-tree/` (M-DnD α + β)
+
+Drag-and-drop para compor manifests **sem LLM**. Produz o mesmo JSON.
+
+```
+features/manifest-tree/
+  types.ts                — TreeCallbacks interface (onAdd, onMove, onRemove, onUpdate, onSelect)
+  validation.ts           — HARD/SOFT rules (extraídas do engine bundle)
+  defaults.ts             — buildNewNode(componentName, engineConfig) — id + tag + props hydration
+  drop-orchestrator.ts    — applyPaletteDrop, applyTreeReorder (callback-driven, sem Redux)
+  TreeNode.tsx            — recursive renderer + drag-source + drop-target
+  TreeView.tsx            — root wrapper + drop-feedback banner
+  PropsPanel.tsx          — engine-schema-aware property editor
+  index.ts                — public API
+```
+
+**Consumers:**
+- **Prototype Edit canvas** (`generators/specification/components/prototype/EditCanvas.tsx`, 311 linhas) — wraps com TreeCallbacks ligados ao `specPrototypeManifest` Redux slice. Auto-save 500ms debounced.
+- **Page Builder Tree mode** (`generators/ui/page-builder.tsx`) — novo botão "Tree" no `NavigationBar`. Callbacks via `useTreeCallbacksFromContext` adapter que mapeia `EditorContext` → `TreeCallbacks`. Default = Design (preserva UX); Tree é opt-in.
+
+Manifest produzido por chat ou drag-drop é **idêntico em forma** — workflow misto: começa por chat, refina à mão, ou vice-versa.
+
+### 14.7 Trade-offs práticos dos providers
+
+| | Pros | Contras |
+|---|---|---|
+| `openrouter` | Múltiplos modelos (Claude/GPT/Gemini/Llama…) via 1 API key; SSE rápido | Precisa API key + créditos; tudo passa por OpenRouter (latência + privacy) |
+| `cli:claude` | Usa subscrição Claude existente; sem gerir API key; mesma versão de Claude que o CLI tem | Tens de ter `claude` CLI instalado; non-interactive `-p` depende da versão do CLI |
+| `cli:ollama` | 100% offline; sem custos; modelos locais | Qualidade depende do modelo local; máquina precisa de RAM/GPU |
+
+### 14.8 Onde tu, user, configuras
+
+| Coisa | Onde |
+|---|---|
+| OpenRouter API key | Settings UI → `<userData>/spec-secrets.bin` encriptada |
+| `claude` CLI | `npm i -g @anthropic-ai/claude-code` — Studio auto-detecta |
+| `ollama` | `brew install ollama && ollama pull <model>` — Studio auto-detecta |
+| Provider/model preferido | Model picker do AIAssistant → `localStorage` por surface |
+| Skill registry URL | env `IGRP_SKILL_REGISTRY` (default sonatype) |
+| Skill auto-update | `igrp skill update <name>` no terminal OU botão "Update" no banner amber |
+
+---
+
+## 15. Milestones recentes (2026-05-15 → 2026-05-23)
+
+### M6 — Manifest-first transition ✅ (completo)
+| Sub-task | Estado |
+|---|---|
+| M6.1 System prompt reescrito (emit `PageConfig` JSON) | ✅ |
+| M6.2 Stream handler parsa JSON no done, valida shape | ✅ |
+| M6.3 IPC `apply-manifest` (delega `EngineFactory.getEngine('nextjs').createPage` + git) | ✅ |
+| M6.4 Persistência raw manifest em `.igrpstudio/prototype/page.json` | ✅ |
+| M6.5 Validação (parsePageConfig com discriminator + identifier checks) | ✅ |
+| M6.6 Snapshot card adaptado (pageName + componentes top-level) | ✅ |
+
+### M7 — Skill corpus ✅ (completo)
+- Skill canónico `igrp-studio-metadata` (`studio/_skills/igrp-studio-metadata/`, v1.0.14) com SKILL.md + 5 companion files (patterns, component-reference, process-steps, project-conventions, troubleshooting)
+- IPC: `LIST_SKILLS`, `READ_SKILL_FILE`, `INSTALL_SKILL`, `CHECK_SKILL_UPDATES`, `UPDATE_SKILL`
+- `SkillInstallBanner` (azul) + `SkillUpdateBanner` (âmbar) com dismiss persistente
+- 8 baselines always-injected no system prompt (~36KB; ver §14.5)
+- `pickSkillHints` heuristic para selecção contextual de companion sections (list/form/modal/filter/stats/process/error keywords → patterns.md / troubleshooting.md)
+
+### M8 — Auto-retry loop ✅
+- `MAX_GENERATION_ATTEMPTS = 3` no `prototype-generator-service`
+- Em falha de parse OU engine, re-prompta com original message + manifest verbatim + error
+- Streams `retry-attempt { attempt, maxAttempts, reason }` chunk visível no chat (separator `--- Attempt 2/3 — fixing: <erro>`)
+- `formatEngineIssue` robustez: lê `path` (Zod), `instancePath`/`dataPath` (AJV), `params.missingProperty`
+
+### M9 — Preview seeder ✅
+- `prototype-mock-seeder.ts` corre após engine sucedido, antes do git commit
+- 2ª chamada LLM dedicada (prompt curto, batch — não stream)
+- Lê `page.tsx` gerado, regex extrai column ids reais (e.g. `tableTextCellNumber` quando manifest tem `field.name = "number"` mas cell `tag = "cellNumber"`)
+- Outputs:
+  - `.igrpstudio/prototype/preview/<pageName>.mock.json` (4-6 rows realistas)
+  - `<route>/_preview.ts` (sibling do `page.tsx`, re-exporta o JSON)
+  - Patcha `page.tsx` com bloco `/* PREVIEW BEGIN/END */ useEffect(() => setTableData(previewSeed.tableData), [])`
+- Idempotente: re-runs substituem o bloco entre markers
+- Manifest fica **clean** (sem mock data inline) — preview seeding é Studio-managed, separado do handoff artifact
+
+### M-DnD α — Manifest-tree feature extraction ✅
+- Novo `features/manifest-tree/` (8 ficheiros, ~1700 linhas total, state-agnostic)
+- Movido de `prototype/dnd/` + `prototype/EditCanvas.tsx` (que encolheu de ~924 para 311 linhas)
+- API pública: `<TreeView />`, `<PropsPanel />`, `TreeCallbacks`, helpers (`evaluateDrop`, `buildNewNode`, `applyPaletteDrop`, `applyTreeReorder`)
+- HARD rules (engine bundle): `card`/`table`/`modalDialog`/`textListItem` com `maxChildren` + `acceptedChildren`
+- SOFT rules (best practice): `tableColumns` accepts cell-family, `tableActionListCell` accepts actions
+- Drop verdict 3 níveis: `allow` (emerald ring) / `warn` (amber) / `block` (red + cursor not-allowed)
+- Cycle detection no re-parent
+
+### M-DnD β — Page Builder Tree mode ✅
+- `APRESENTATION.TREE` adicionado ao enum
+- Botão "Tree" no `NavigationBar` entre Design e Json (default Design)
+- Adapter hook `useTreeCallbacksFromContext` em `generators/ui/hooks/` — mapeia `EditorContext.handleAddChildToComponent` / etc. → `TreeCallbacks`
+- Selection bridges via `currentComponent.component.id`
+- Em Tree mode: monta `<TreeView />` + `<PropsPanel />` lado a lado; saves + JSON round-trip via mesmo path que Design mode
+
+### Sub-tarefas paralelas (não milestones — observações registadas)
+- **Pin concept removido** — palette tab passou a ser drag-source-only; `attachedComponentIds` state + persistence + LLM injection apagados. Engine catalog block já lista todos os componentes, pinning era ruído.
+- **Migração IGRP→shadcn local** (commits `b72d3472..88517c2a`) — primitives instalados em `src/renderer/src/components/ui/*` via shadcn CLI; `IGRPInputPrimitive`/`IGRPToasterPrimitive` etc. continuam exportados pelo design-system. Os ficheiros do `features/manifest-tree/` usam tokens theme-aware (`bg-card`, `bg-destructive/10`, `text-destructive`) — sem hardcoded `bg-red-50` que se partem em dark mode.
+- **Dark mode fixes** — `bg-card/20` em empty states do `DocumentsPanel.tsx` → `bg-background`; cores de erro/aviso no `manifest-tree` feature passam por tokens (`bg-destructive/10`, `text-destructive`).
+
+---
+
+## 16. Estado snapshot (2026-05-23)
+
+### Done & landed
+| Cluster | Estado |
+|---|---|
+| M1 Foundations · M2D Documents · M2L LLM stack · M3 KB+RAG · M4 (Fases 1+2) | ✅ |
+| **M6 Manifest-first** (full) | ✅ |
+| **M7 Skill corpus** (v1.0.14 + 8 baselines) | ✅ |
+| **M8 Auto-retry loop** | ✅ |
+| **M9 Preview seeder** | ✅ |
+| **M-DnD α** — manifest-tree feature extracted | ✅ |
+| **M-DnD β** — Page Builder Tree mode toggle | ✅ |
+
+### Backlog priorizado
+| Item | Esforço | Prioridade |
+|---|---|---|
+| **B.1 — Custom component scaffolding** — quando LLM emite `componentName: "SearchUtente"`, escrever `.tsx` em `(myapp)/components/` + atualizar `igrp.config.ts` | ~3 dias | ⭐⭐⭐ — desbloqueia páginas com search widgets / domain components |
+| **M-DnD Fase 2 — Polish** — drop-zone indicators entre siblings, drag handle, auto-expand on hover, property auto-inflation | ~1-2 dias | ⭐⭐ — melhora UX significativamente |
+| **B.3 — Skill publish automation** — bump version → CI/CLI empurra para Sonatype (hoje é manual via `cp`) | ~0.5 dia | ⭐⭐ — fecha o ciclo dos updates |
+| **B.2 — Detail page autoscaffold** — quando href aponta para `/x/[id]` sem detail page, oferecer geração | ~0.5 dia | ⭐⭐ |
+| **D.1 — Unit tests** — `evaluateDrop`, `buildNewNode`, `patchPageTsx`, `formatEngineError` | ~1 dia | ⭐⭐ |
+| **M-DnD Fase 3** — inline rename, multi-select, undo/redo, context menu | ~2-3 dias | ⭐ |
+| **M4 Fase 3** — devtools webview, cost tracking, branch isolation, hot-reload feedback | ~6-9h | ⭐ Opcional |
+| **M5 Polish** | ~3-4h | ⭐ Baixa |
+
+### Workstreams paradas (revisitar quando estável)
+- **Process Integration** (BPMN) — plano em `process-integration/IMPLEMENTATION_PLAN.md`
+- **Data Models** (entities, ERD) — plano em `data-models-integration/IMPLEMENTATION_PLAN.md` (parcialmente implementado)
+
+### Caveat técnico actual
+- 1 erro TS pré-existente em `generators/ui/components/form-validation-popover.tsx:33` (legado da migração IGRP→shadcn em curso noutro chat — uncommitted). Não afecta runtime do que está landed mas o `tsc` global falha. Fix de 1 linha pendente.
+
+### Princípios de design consolidados (resumo)
+1. **Manifest is the handoff artifact.** LLM emite JSON, engine emite código; ambos os caminhos (chat e drag-drop) produzem o mesmo formato.
+2. **Engine falha em silêncio.** Cada baseline do skill existe porque batemos numa falha silenciosa concreta.
+3. **Chat auto-retries.** LLM raramente acerta engine schema à 1ª; feedback automático é melhor que pedir ao user para retentar.
+4. **Preview separado do handoff.** Mock data vive em `_preview.ts` + `<name>.mock.json` fora do manifest, com markers `/* PREVIEW BEGIN/END */` no `page.tsx` strip-ables.
+5. **Single source of truth para primitives.** `@igrp/igrp-framework-react-design-system` exporta IGRP + shadcn re-exportado; custom components mesmo internalmente importam daí.
+6. **State-agnostic features.** `manifest-tree` não importa Redux nem Context; callbacks decidem. Mesmo feature serve Prototype + Page Builder + futuros generators.
+7. **Provider abstraction.** 3 providers (OpenRouter HTTP, Claude CLI spawn, Ollama CLI spawn) atrás de uma interface uniforme `LLMAdapter`. User troca no model picker sem o resto da app mudar.
+

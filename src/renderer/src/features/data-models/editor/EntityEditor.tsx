@@ -1,12 +1,7 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { AlertTriangle, CheckCircle2, Database, RefreshCw, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -161,7 +156,7 @@ export function EntityEditor({
         <div className="flex flex-col h-full">
             <div className="border-b px-4 py-3 space-y-2">
                 <div className="flex items-center gap-2">
-                    <IGRPInputPrimitive
+                    <Input
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         className="text-base font-semibold flex-1"
@@ -175,7 +170,7 @@ export function EntityEditor({
                                 <Database className="h-3 w-3" />
                                 {t('imported')}
                             </span>
-                            <IGRPButtonPrimitive
+                            <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => void drift.check()}
@@ -186,21 +181,21 @@ export function EntityEditor({
                                     className={`h-3.5 w-3.5 mr-1 ${drift.loading ? 'animate-spin' : ''}`}
                                 />
                                 {t('check_drift')}
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </>
                     )}
-                    <IGRPButtonPrimitive
+                    <Button
                         variant="ghost"
                         size="icon"
                         onClick={handleDelete}
                         title={t('delete_entity')}
                     >
                         <Trash2 className="h-4 w-4 text-destructive" />
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
                 <div>
-                    <IGRPLabelPrimitive className="text-xs">{t('description')}</IGRPLabelPrimitive>
-                    <IGRPInputPrimitive
+                    <Label className="text-xs">{t('description')}</Label>
+                    <Input
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder={t('optional')}
@@ -255,7 +250,7 @@ export function EntityEditor({
                                         </li>
                                     ))}
                                 </ul>
-                                <IGRPButtonPrimitive
+                                <Button
                                     size="sm"
                                     variant="secondary"
                                     onClick={async () => {
@@ -271,37 +266,32 @@ export function EntityEditor({
                                 >
                                     <RefreshCw className="h-3 w-3 mr-1" />
                                     {t('sync_from_db')}
-                                </IGRPButtonPrimitive>
+                                </Button>
                             </div>
                         )}
                     </div>
                 )}
             </div>
 
-            <IGRPTabsPrimitive defaultValue="fields" className="flex-1 flex flex-col">
-                <IGRPTabsListPrimitive className="px-4">
-                    <IGRPTabsTriggerPrimitive value="fields">
+            <Tabs defaultValue="fields" className="flex-1 flex flex-col">
+                <TabsList className="px-4">
+                    <TabsTrigger value="fields">
                         {t('entity_fields')} ({fields.length})
-                    </IGRPTabsTriggerPrimitive>
-                    <IGRPTabsTriggerPrimitive value="relations">
+                    </TabsTrigger>
+                    <TabsTrigger value="relations">
                         {t('relations')} ({relations.length})
-                    </IGRPTabsTriggerPrimitive>
-                    <IGRPTabsTriggerPrimitive value="sql">
-                        {t('sql_preview')}
-                    </IGRPTabsTriggerPrimitive>
-                    <IGRPTabsTriggerPrimitive value="erd">{t('erd')}</IGRPTabsTriggerPrimitive>
-                </IGRPTabsListPrimitive>
-                <IGRPTabsContentPrimitive value="fields" className="flex-1 overflow-auto px-4 py-3">
+                    </TabsTrigger>
+                    <TabsTrigger value="sql">{t('sql_preview')}</TabsTrigger>
+                    <TabsTrigger value="erd">{t('erd')}</TabsTrigger>
+                </TabsList>
+                <TabsContent value="fields" className="flex-1 overflow-auto px-4 py-3">
                     <FieldsTable
                         fields={fields}
                         referenceTargets={referenceTargets}
                         onChange={setFields}
                     />
-                </IGRPTabsContentPrimitive>
-                <IGRPTabsContentPrimitive
-                    value="relations"
-                    className="flex-1 overflow-auto px-4 py-3"
-                >
+                </TabsContent>
+                <TabsContent value="relations" className="flex-1 overflow-auto px-4 py-3">
                     <RelationsList
                         entityId={entityId}
                         relations={relations}
@@ -309,14 +299,14 @@ export function EntityEditor({
                         onChange={setRelations}
                         createJoinEntity={createJoinEntity}
                     />
-                </IGRPTabsContentPrimitive>
-                <IGRPTabsContentPrimitive value="sql" className="flex-1 overflow-auto px-4 py-3">
+                </TabsContent>
+                <TabsContent value="sql" className="flex-1 overflow-auto px-4 py-3">
                     <p className="text-xs text-muted-foreground">{t('ddl_preview_pending')}</p>
-                </IGRPTabsContentPrimitive>
-                <IGRPTabsContentPrimitive value="erd" className="flex-1 overflow-auto px-4 py-3">
+                </TabsContent>
+                <TabsContent value="erd" className="flex-1 overflow-auto px-4 py-3">
                     <p className="text-xs text-muted-foreground">{t('erd_per_entity_pending')}</p>
-                </IGRPTabsContentPrimitive>
-            </IGRPTabsPrimitive>
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }

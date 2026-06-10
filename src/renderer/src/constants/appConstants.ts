@@ -145,6 +145,13 @@ export const projectStructureStyle = [
 
 export enum APRESENTATION {
     DESIGN = 'design',
+    /**
+     * Tree view (M-DnD β) — same drag-drop primitives as the Specification
+     * Prototype canvas, mounted via `features/manifest-tree`. Edits flow
+     * through the existing `EditorContext` handlers via the adapter hook
+     * (`useTreeCallbacksFromContext`).
+     */
+    TREE = 'tree',
     CODE = 'code',
     JSON = 'json'
 }

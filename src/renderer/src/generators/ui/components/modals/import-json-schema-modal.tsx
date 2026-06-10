@@ -1,16 +1,15 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPLabelPrimitive,
-    IGRPRadioGroupItemPrimitive,
-    IGRPRadioGroupPrimitive,
-    IGRPTextAreaPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Label } from '@renderer/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@renderer/components/ui/radio-group'
+import { Textarea } from '@renderer/components/ui/textarea'
 import useToast from '@renderer/hooks/useToast'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { getUUID } from '@renderer/utils'
@@ -147,21 +146,17 @@ export function ImportJsonSchemaModal({
     }
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <IGRPDialogContentPrimitive className="sm:max-w-[640px] max-w-[90vw]">
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('import_schema_title')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
-                        {t('import_schema_description')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="sm:max-w-[640px] max-w-[90vw]">
+                <DialogHeader>
+                    <DialogTitle>{t('import_schema_title')}</DialogTitle>
+                    <DialogDescription>{t('import_schema_description')}</DialogDescription>
+                </DialogHeader>
 
                 <div className="space-y-3">
                     <div className="space-y-1">
-                        <IGRPLabelPrimitive htmlFor="schema">
-                            {t('import_schema_label')}
-                        </IGRPLabelPrimitive>
-                        <IGRPTextAreaPrimitive
+                        <Label htmlFor="schema">{t('import_schema_label')}</Label>
+                        <Textarea
                             id="schema"
                             value={raw}
                             onChange={(e) => setRaw(e.target.value)}
@@ -188,38 +183,35 @@ export function ImportJsonSchemaModal({
 
                     {existingChildrenCount > 0 && (
                         <div className="space-y-2 rounded-md border p-3 bg-muted/30">
-                            <IGRPLabelPrimitive className="text-sm">
+                            <Label className="text-sm">
                                 {t('import_schema_mode_label', { count: existingChildrenCount })}
-                            </IGRPLabelPrimitive>
-                            <IGRPRadioGroupPrimitive
+                            </Label>
+                            <RadioGroup
                                 value={mode}
                                 onValueChange={(v) => setMode(v as ImportMode)}
                             >
                                 <label className="flex items-center gap-2 cursor-pointer text-sm">
-                                    <IGRPRadioGroupItemPrimitive
-                                        value="replace"
-                                        id="mode-replace"
-                                    />
+                                    <RadioGroupItem value="replace" id="mode-replace" />
                                     <span>{t('import_schema_mode_replace')}</span>
                                 </label>
                                 <label className="flex items-center gap-2 cursor-pointer text-sm">
-                                    <IGRPRadioGroupItemPrimitive value="append" id="mode-append" />
+                                    <RadioGroupItem value="append" id="mode-append" />
                                     <span>{t('import_schema_mode_append')}</span>
                                 </label>
-                            </IGRPRadioGroupPrimitive>
+                            </RadioGroup>
                         </div>
                     )}
                 </div>
 
-                <IGRPDialogFooterPrimitive>
-                    <IGRPButtonPrimitive variant="outline" onClick={onClose}>
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose}>
                         {t('cancel')}
-                    </IGRPButtonPrimitive>
-                    <IGRPButtonPrimitive onClick={handleConfirm} disabled={!canConfirm}>
+                    </Button>
+                    <Button onClick={handleConfirm} disabled={!canConfirm}>
                         {t('import_schema_confirm')}
-                    </IGRPButtonPrimitive>
-                </IGRPDialogFooterPrimitive>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }

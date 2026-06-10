@@ -1,40 +1,51 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPDialogTriggerPrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPRadioGroupItemPrimitive,
-    IGRPRadioGroupPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@renderer/components/ui/radio-group'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@renderer/components/ui/select'
 import { FrameworkIcon } from '@renderer/components/framework-icon'
 import { LabelRequired } from '@renderer/components/label-required'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
-import { type FormikErrors, useFormik } from 'formik'
+import { errorMessage, useZodForm } from '@renderer/lib/form'
+import { cn } from '@renderer/lib/utils'
 import {
-    ArrowLeft,
-    ArrowRight,
+    Check,
+    ChevronRight,
+    Database,
     FolderOpen,
     Loader2,
     Monitor,
+    Plus,
     PlusCircle,
-    Server,
+    Search,
     Sparkles,
-    Upload
+    Upload,
+    X
 } from 'lucide-react'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import type { FieldErrors } from 'react-hook-form'
+import type { Dependency } from '@igrp/igrp-studio-springboot-engine/types'
 import type { FrameworkType, ProjectData } from 'src/main/types'
+import { DatabaseOptions, ENV_TYPES, projectStructureStyle } from '@renderer/constants/appConstants'
 import { DotNetConfig } from './components/configurations/dotnet-config'
 import { NextConfig } from './components/configurations/next-config'
 import { SpecificationConfig } from './components/configurations/specification-config'
 import { SpringConfig } from './components/configurations/spring-config'
-import { StepButton } from './components/step-button'
 import {
     backendFrameworks,
     frontendFrameworks,
@@ -45,8 +56,14 @@ import {
 import { useProjectValidation } from './validation'
 
 interface ConfigComponentProps {
-    data: any // Replace `any` with a specific type if possible (e.g., `ProjectData`)
-    errors?: FormikErrors<ProjectData>
+    data: any
+    /**
+     * Legacy shape kept stable across the migration: `errors?.config?.field`
+     * is a plain string. The wizard adapts RHF errors into this bag before
+     * passing them down so each config component (next/spring/dotnet/spec)
+     * stays unchanged.
+     */
+    errors?: { config?: Record<string, string | undefined> }
     onChange: (config: any) => void
 }
 
@@ -71,11 +88,61 @@ export const ProjectConfigForm = ({
     return <Component data={data} errors={errors} onChange={onChange} />
 }
 
+/**
+ * Flattens the nested RHF errors for the `config` sub-form into the plain
+ * `{ config: { name, group, artifact, database } }` shape the per-framework
+ * config components have read since the Formik days.
+ */
+function flattenConfigErrors(errors: FieldErrors<ProjectData>): {
+    config?: Record<string, string | undefined>
+} {
+    const config = errors.config as Record<string, { message?: string }> | undefined
+    if (!config) return {}
+    const out: Record<string, string | undefined> = {}
+    for (const [k, v] of Object.entries(config)) {
+        if (v && typeof v === 'object' && 'message' in v && typeof v.message === 'string') {
+            out[k] = v.message
+        }
+    }
+    return { config: out }
+}
+
+// Spring Boot helpers: derive defaults from the project name.
+// `config.name` allows no spaces and no hyphens; `config.artifact` allows
+// hyphens but no spaces.
+const slugifyConfigName = (s: string): string => s.toLowerCase().replace(/[^a-z0-9]/g, '')
+const slugifyArtifact = (s: string): string =>
+    s
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/^-+|-+$/g, '')
+
+// Curated LLM / embeddings model options for the Specification configure tab.
+// The spec engine accepts free model strings; this is a sensible starter set.
+type LlmOption = { provider: string; model: string }
+const llmModels: LlmOption[] = [
+    { provider: 'openrouter', model: 'anthropic/claude-sonnet-4.5' },
+    { provider: 'openrouter', model: 'anthropic/claude-3.5-sonnet' },
+    { provider: 'openai', model: 'gpt-4o' },
+    { provider: 'openai', model: 'gpt-4o-mini' }
+]
+const embeddingsModels: LlmOption[] = [
+    { provider: 'openai', model: 'text-embedding-3-small' },
+    { provider: 'openai', model: 'text-embedding-3-large' }
+]
+
 export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     const [open, setOpen] = React.useState(false)
     const [step, setStep] = React.useState(1)
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null)
     const [isCreatingProject, setIsCreatingProject] = React.useState(false)
+    const [frameworkSearch, setFrameworkSearch] = React.useState('')
+    const [springDependencies, setSpringDependencies] = React.useState<Dependency[]>([])
+    const [springDepSearch, setSpringDepSearch] = React.useState('')
+    const [springDepDropdownOpen, setSpringDepDropdownOpen] = React.useState(false)
+    const springDepRef = React.useRef<HTMLDivElement>(null)
 
     const { t } = useTranslation()
 
@@ -88,8 +155,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         () => ({
             id: '',
             name: '',
-            type: undefined,
-            framework: 'springboot',
+            type: 'frontend',
+            framework: '' as FrameworkType,
             config: {},
             path: '',
             storageMode: 'managed',
@@ -100,86 +167,67 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         [workspace?.id]
     )
 
-    const validationSchema = useProjectValidation({ t, step })
+    const schema = useProjectValidation({ t, step })
 
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues,
-        validationSchema,
-        onSubmit: async (values, actions) => {
-            setIsCreatingProject(true)
-            try {
-                await saveOrOpenProject({
-                    project: {
-                        ...values,
-                        name: values?.name || '',
-                        framework: values?.framework || '',
-                        path: values?.path || '',
-                        config: values?.config || {}
-                    }
-                })
-            } finally {
-                actions.setSubmitting(false)
-                setIsCreatingProject(false)
-            }
-        }
+    // The wizard's form values are a superset of `ProjectData` (free-form
+    // `config` etc.). Use `Record<string, any>` so RHF accepts `setValue`
+    // calls for dynamically-typed fields without `never` mismatches; the
+    // surface is still type-checked through `values` reads below.
+    type ProjectFormValues = Record<string, any> & Partial<ProjectData>
+    const form = useZodForm<ProjectFormValues>({
+        schema: schema as unknown as import('zod').z.ZodType<ProjectFormValues, unknown>,
+        defaultValues: initialValues as ProjectFormValues
     })
+    const { register, watch, setValue, reset, trigger, handleSubmit, formState } = form
+    const { errors, touchedFields, isSubmitting } = formState
+
+    const values = watch()
+    const flattenedErrors = React.useMemo(() => flattenConfigErrors(errors), [errors])
 
     const inputRef = React.useRef<HTMLInputElement>(null)
     const iconUploadRef = React.useRef<HTMLInputElement>(null)
     const wasOpenRef = React.useRef(open)
 
-    React.useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.focus()
-            inputRef.current.select()
-        }
-    }, [])
+    // Wire RHF's ref for the project-name input alongside the autofocus ref.
+    const nameRegister = register('name')
+    const pathRegister = register('path')
+    const nameRefHandler = (el: HTMLInputElement | null): void => {
+        nameRegister.ref(el)
+        inputRef.current = el
+    }
 
     /**
-     * Handles file upload for project icons.
-     * Instead of storing base64 data in JSON (which can be very large for big files),
-     * this function saves the file to disk and stores only the relative path.
-     *
-     * Benefits:
-     * - Reduces JSON file size significantly
-     * - Better performance for large files
-     * - Easier to manage and backup
-     * - Supports larger file sizes
+     * Handles file upload for project icons. Saves the file to disk and
+     * stores only the relative path; keeps JSON small and supports larger
+     * files than embedding base64.
      */
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         if (!file) return
 
         try {
-            // Validate file type
             if (!file.type.startsWith('image/')) {
                 alert('Please select a valid image file.')
                 return
             }
 
-            // Check file size (limit to 5MB for icons)
             const maxSize = 5 * 1024 * 1024 // 5MB
             if (file.size > maxSize) {
                 alert('File size too large. Please select an image smaller than 5MB.')
                 return
             }
 
-            // Validate project name exists
-            if (!formik.values.name || formik.values.name.trim() === '') {
+            if (!values.name || values.name.trim() === '') {
                 alert('Please enter a project name before uploading an icon.')
                 return
             }
 
-            // Create a unique filename
             const fileExtension = file.name.split('.').pop() || 'png'
             const fileName = `icon_${Date.now()}.${fileExtension}`
 
-            // Save file to centralized icons directory
             const iconsPath = `${workspace.path}/icons`
             const filePath = `${iconsPath}/${fileName}`
 
-            // Use electron API to save file
             const result = await window.api.saveProjectIcon({
                 filePath,
                 fileData: await file.arrayBuffer(),
@@ -187,10 +235,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             })
 
             if (result.success) {
-                // Store the relative path instead of base64
                 const relativePath = `icons/${fileName}`
-                formik.setFieldValue('icon', relativePath)
-                // Preview will be updated by useEffect when icon changes
+                setValue('icon', relativePath, { shouldDirty: true })
             } else {
                 console.error('Failed to save icon file:', result.error)
                 alert('Failed to save icon file. Please try again.')
@@ -201,45 +247,28 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         }
     }
 
-    /**
-     * Converts an icon path to a displayable URL.
-     * Handles different path formats:
-     * - Relative paths (icons/filename.ext) -> fetches file securely via IPC
-     * - Legacy assets paths -> fetches file securely via IPC
-     * - Base64 data URLs -> returns as is (for backward compatibility)
-     */
     const getIconPreviewUrl = React.useCallback(
         async (iconPath: string): Promise<string | null> => {
             if (!iconPath) return null
-
-            // If it's a base64 string (for backward compatibility), return as is
-            if (iconPath.startsWith('data:')) {
-                return iconPath
-            }
-
-            // If it's a relative path, fetch the file securely
+            if (iconPath.startsWith('data:')) return iconPath
             if (iconPath.startsWith('icons/') || iconPath.startsWith('assets/')) {
                 try {
                     const result = await window.api.getIconFile(iconPath, workspace.path)
-                    if (result.success) {
-                        return result.data
-                    } else {
-                        console.warn('Failed to load icon file:', result.error)
-                        return null
-                    }
+                    if (result.success) return result.data
+                    console.warn('Failed to load icon file:', result.error)
+                    return null
                 } catch (error) {
                     console.error('Error loading icon file:', error)
                     return null
                 }
             }
-
             return null
         },
         [workspace.path]
     )
 
-    const isFrontend = formik.values.type === 'frontend'
-    const isSpecification = formik.values.type === 'specification'
+    const isFrontend = values.type === 'frontend'
+    const isSpecification = values.type === 'specification'
 
     const frameworks = isSpecification
         ? specificationFrameworks
@@ -247,14 +276,10 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
           ? frontendFrameworks
           : backendFrameworks
 
+    // 2-step flow: step 1 = Project Type + Framework, step 2 = Details + Config.
     const canNavigateToStep = (targetStep: number) => {
         if (targetStep === 1) return true
-        if (targetStep === 2) return !!formik.values.name && !!formik.values.type
-        if (targetStep === 3) return !!formik.values.framework
-        if (targetStep === 4) {
-            return !!formik.values.config
-        }
-        if (targetStep === STEPS.length) return !!formik.values.path.trim()
+        if (targetStep === 2) return !!values.type && !!values.framework
         return false
     }
 
@@ -265,55 +290,57 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
     }
 
     const handleNext = async () => {
-        const errors = await formik.validateForm()
-
-        if (step === 1 && errors.name) return
-
-        if (step === 3 && Object.keys(errors).length !== 0 && errors.config !== undefined) {
-            return
-        }
+        await trigger()
         if (step < STEPS.length && canNavigateToStep(step + 1)) {
             setStep(step + 1)
         }
     }
 
     const handleBack = () => {
-        if (step > 1) {
-            setStep(step - 1)
-        }
+        if (step > 1) setStep(step - 1)
     }
 
     const handleOpenDirectory = async () => {
         const result = await window.api.openDirectory(t('projectDirectory'))
         if (!result.canceled && result.basePath) {
-            formik.setFieldValue('path', result.basePath)
+            setValue('path', result.basePath, { shouldValidate: true })
         }
     }
 
+    // Switching project type or framework restarts the wizard with a clean
+    // slate: Project Name, Description, Path, Icon, storageMode and all
+    // framework-specific config are wiped. Without this, the previously-typed
+    // values bled over into the new selection, which looked like a bug
+    // (PROJECT DETAILS section came pre-filled with stale values).
     const handleChangeType = (value: string) => {
-        if (formik.values.framework !== value) formik.setFieldValue('framework', '')
-        formik.setFieldValue('type', value)
+        if (values.type === value) return
+        reset({
+            ...initialValues,
+            type: value as ProjectData['type']
+        })
+        setFrameworkSearch('')
     }
 
     const handleChangeFramework = (value: string) => {
-        if (formik.values.framework !== value) formik.setFieldValue('config', undefined)
-        formik.setFieldValue('framework', value)
+        if (values.framework === value) return
+        reset({
+            ...initialValues,
+            type: values.type,
+            framework: value as FrameworkType
+        })
     }
 
-    const SelectedComponent = formik.values?.framework
-        ? componentsMap[formik.values?.framework]
-        : null
+    const SelectedComponent = values?.framework ? componentsMap[values?.framework] : null
 
+    // Reset only when the dialog transitions from open -> closed.
     React.useEffect(() => {
         const wasOpen = wasOpenRef.current
         wasOpenRef.current = open
-
-        // Reset only when the dialog transitions from open -> closed
         if (wasOpen && !open) {
-            formik.resetForm({ values: initialValues })
+            reset(initialValues)
             setStep(1)
         }
-    }, [formik.resetForm, initialValues, open])
+    }, [reset, initialValues, open])
 
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -322,74 +349,369 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                 setOpen(true)
             }
         }
-
         document.addEventListener('keydown', handleKeyDown)
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown)
-        }
+        return () => document.removeEventListener('keydown', handleKeyDown)
     }, [])
 
+    // Auto-compute `path` while the project is managed by the workspace.
     React.useEffect(() => {
-        // Only auto-compute the path while the project is managed by the
-        // workspace. In linked mode the user picks the location via the
-        // Browse button, so we must not overwrite their selection.
-        if (formik.values.storageMode === 'linked') return
+        if (values.storageMode === 'linked') return
 
-        const targetPath = `${workspace.path}/projects/${
-            formik.values?.config?.name ?? formik.values.name
-        }`
+        const targetPath = `${workspace.path}/projects/${values?.config?.name ?? values.name}`
 
-        if (formik.values.path !== targetPath) {
-            formik.setFieldValue('path', targetPath, false)
+        if (values.path !== targetPath) {
+            setValue('path', targetPath, { shouldValidate: false })
         }
     }, [
-        formik.setFieldValue,
-        formik.values?.config?.name,
-        formik.values.name,
-        formik.values.path,
-        formik.values.storageMode,
+        setValue,
+        values?.config?.name,
+        values.name,
+        values.path,
+        values.storageMode,
         workspace.path
     ])
 
-    // Update preview when icon changes
+    // Update icon preview.
     React.useEffect(() => {
         const updatePreview = async () => {
-            if (formik.values.icon) {
-                const previewUrl = await getIconPreviewUrl(formik.values.icon)
-                setPreviewUrl(previewUrl)
+            if (values.icon) {
+                const url = await getIconPreviewUrl(values.icon)
+                setPreviewUrl(url)
             } else {
                 setPreviewUrl(null)
             }
         }
-
         updatePreview()
-    }, [formik.values.icon, getIconPreviewUrl])
+    }, [values.icon, getIconPreviewUrl])
 
-    const renderStep1 = () => (
+    // Lazy-load the Spring Boot dependency list when the modal opens.
+    React.useEffect(() => {
+        if (!open) return
+        let cancelled = false
+        ;(async () => {
+            try {
+                const { result } = await window.engine.getDependencies(ENV_TYPES.SPRING)
+                if (!cancelled) setSpringDependencies(result ?? [])
+            } catch (err) {
+                console.error('Failed to load Spring dependencies:', err)
+            }
+        })()
+        return () => {
+            cancelled = true
+        }
+    }, [open])
+
+    // Close the Spring dependency dropdown on outside click.
+    React.useEffect(() => {
+        const handler = (event: MouseEvent) => {
+            if (
+                springDepRef.current &&
+                !springDepRef.current.contains(event.target as Node)
+            ) {
+                setSpringDepDropdownOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handler)
+        return () => document.removeEventListener('mousedown', handler)
+    }, [])
+
+    // Auto-populate Spring Boot config defaults (group, db, structure) and
+    // sync config.name from the project name (no UI for config.name). Auto-fill
+    // artifact only while empty so the user can override.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: values.config is intentionally omitted; including it would re-run on every setValue('config', …) and risk a feedback loop
+    React.useEffect(() => {
+        if (values.framework !== 'springboot') return
+        const current = (values.config ?? {}) as Record<string, unknown>
+        const updates: Record<string, unknown> = {}
+        if (!current.group) updates.group = 'cv.igrp'
+        if (!current.database) updates.database = 'Postgresql'
+        if (!current.projectStructureStyle) updates.projectStructureStyle = 'technical'
+        const expectedConfigName = slugifyConfigName(values.name || '')
+        if (current.name !== expectedConfigName) updates.name = expectedConfigName
+        if (!current.artifact && values.name) updates.artifact = slugifyArtifact(values.name)
+        if (Object.keys(updates).length > 0) {
+            setValue('config', { ...current, ...updates }, { shouldDirty: false })
+        }
+    }, [values.framework, values.name, setValue])
+
+    // Auto-populate Specification config defaults (LLM, embeddings) and keep
+    // the Application Name (config.name) continuously synced with the project
+    // name as a hyphen-cased slug — matches the Next.js behavior so the user
+    // doesn't double-type the name.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: same rationale as the Spring Boot effect above; values.config is read but excluded to avoid a setValue feedback loop
+    React.useEffect(() => {
+        if (values.framework !== 'specification') return
+        const current = (values.config ?? {}) as Record<string, unknown>
+        const updates: Record<string, unknown> = {}
+        if (!current.defaultLLM) updates.defaultLLM = llmModels[0]
+        if (!current.embeddings) updates.embeddings = embeddingsModels[0]
+        const expectedAppName = slugifyArtifact(values.name || '')
+        if (current.name !== expectedAppName) updates.name = expectedAppName
+        if (Object.keys(updates).length > 0) {
+            setValue('config', { ...current, ...updates }, { shouldDirty: false })
+        }
+    }, [values.framework, values.name, setValue])
+
+    // Auto-populate Next.js config defaults. The pre-redesign `NextConfig`
+    // component used a DEFAULT_NEXT_CONFIG object that always shipped
+    // `description: ''` and `displayName` filled. The new wizard initialises
+    // `config: {}` and only writes fields the user touches, which left
+    // optional fields as `undefined` — the engine's downstream code does
+    // `someField.toLowerCase()` on a couple of optional fields without
+    // guards, producing "Cannot read properties of undefined (reading
+    // 'toLowerCase')" at create time. Defaulting them here restores the
+    // pre-redesign behavior.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: same rationale as the Spring Boot effect above; values.config is read but excluded to avoid a setValue feedback loop
+    React.useEffect(() => {
+        if (values.framework !== 'nextjs') return
+        const current = (values.config ?? {}) as Record<string, unknown>
+        const updates: Record<string, unknown> = {}
+        if (current.description === undefined) updates.description = ''
+        // Keep displayName in sync with the project name as the user types
+        // (was freezing at the first character because of an `!current.displayName`
+        // guard that short-circuited on every subsequent keystroke).
+        if (values.name && current.displayName !== values.name) {
+            updates.displayName = values.name
+        }
+        // Keep the Application Name (config.name) in sync with the project name
+        // as a hyphen-cased slug ("My Awesome App" → "my-awesome-app"). User
+        // visible in the renderNextJsStep2 "Application Name" field; the field
+        // tracks the project name automatically so the user doesn't have to
+        // double-type it.
+        const expectedAppName = slugifyArtifact(values.name || '')
+        if (current.name !== expectedAppName) updates.name = expectedAppName
+        if (Object.keys(updates).length > 0) {
+            setValue('config', { ...current, ...updates }, { shouldDirty: false })
+        }
+    }, [values.framework, values.name, setValue])
+
+    const onFormSubmit = handleSubmit(async (submitted) => {
+        setIsCreatingProject(true)
+        try {
+            await saveOrOpenProject({
+                project: {
+                    ...(submitted as ProjectData),
+                    name: submitted?.name || '',
+                    framework: (submitted?.framework || '') as FrameworkType,
+                    path: submitted?.path || '',
+                    config: submitted?.config || {}
+                }
+            })
+        } finally {
+            setIsCreatingProject(false)
+        }
+    })
+
+    const nameError = errorMessage(errors.name as never)
+    const typeError = errorMessage(errors.type as never)
+    const frameworkError = errorMessage(errors.framework as never)
+    const pathError = errorMessage(errors.path as never)
+
+    // ---- Step content (regrouped into 2 steps) ----
+
+    const renderProjectType = () => {
+        const types: Array<{
+            id: 'frontend' | 'backend' | 'specification'
+            label: string
+            description: string
+            Icon: typeof Monitor
+        }> = [
+            {
+                id: 'frontend',
+                label: t('frontend'),
+                description: t('frontendDescription'),
+                Icon: Monitor
+            },
+            {
+                id: 'backend',
+                label: t('backend'),
+                description: t('backendDescription'),
+                Icon: Database
+            },
+            {
+                id: 'specification',
+                label: t('specification', { defaultValue: 'Specification' }),
+                description: t('specificationDescription', {
+                    defaultValue: 'Document and prototype using AI'
+                }),
+                Icon: Sparkles
+            }
+        ]
+        return (
+            <div className="space-y-2">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    {t('projectType')}
+                </p>
+                <RadioGroup
+                    name="type"
+                    value={values.type}
+                    onValueChange={(value) => handleChangeType(value)}
+                    className="mt-2 grid grid-cols-3 gap-4"
+                >
+                    {types.map(({ id, label, description, Icon }) => {
+                        const active = values.type === id
+                        return (
+                            <div
+                                key={id}
+                                className={cn(
+                                    'cursor-pointer rounded-sm border p-3 transition-colors',
+                                    active
+                                        ? 'border-primary bg-primary/5'
+                                        : 'border-border hover:border-primary/40'
+                                )}
+                            >
+                                <RadioGroupItem value={id} id={id} className="sr-only" />
+                                <Label
+                                    htmlFor={id}
+                                    className="flex cursor-pointer flex-col items-start gap-2"
+                                >
+                                    <Icon
+                                        className={cn(
+                                            'h-5 w-5',
+                                            active ? 'text-primary' : 'text-muted-foreground'
+                                        )}
+                                    />
+                                    <div className="space-y-0.5">
+                                        <div
+                                            className={cn(
+                                                'text-[11px] font-bold',
+                                                active ? 'text-primary' : 'text-foreground'
+                                            )}
+                                        >
+                                            {label}
+                                        </div>
+                                        <div className="text-[10px] leading-snug text-muted-foreground">
+                                            {description}
+                                        </div>
+                                    </div>
+                                </Label>
+                            </div>
+                        )
+                    })}
+                </RadioGroup>
+                {touchedFields.type && typeError && (
+                    <p className="text-xs text-destructive">{typeError}</p>
+                )}
+            </div>
+        )
+    }
+
+    const renderFrameworkPicker = () => {
+        if (!values.type) return null
+        const query = frameworkSearch.trim().toLowerCase()
+        const filtered = query
+            ? frameworks.filter(
+                  (fw) =>
+                      fw.name.toLowerCase().includes(query) ||
+                      fw.description.toLowerCase().includes(query)
+              )
+            : frameworks
+        return (
+            <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {t('generator', { defaultValue: 'Generator' })}
+                    </p>
+                    <div className="relative w-48">
+                        <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            type="text"
+                            value={frameworkSearch}
+                            onChange={(e) => setFrameworkSearch(e.target.value)}
+                            placeholder={t('searchGenerators', {
+                                defaultValue: 'Search generators...'
+                            })}
+                            className="h-7 rounded-sm border-[0.5px] border-muted-foreground/20 pl-7 text-[11px] shadow-none"
+                        />
+                    </div>
+                </div>
+                <RadioGroup
+                    name="framework"
+                    value={values.framework}
+                    onValueChange={(value) => handleChangeFramework(value)}
+                    className="mt-2 grid gap-4 sm:grid-cols-2"
+                >
+                    {filtered.map((fw) => {
+                        const active = values.framework === fw.id
+                        const disabled = !fw.availableSupport
+                        return (
+                            <div
+                                key={fw.id}
+                                className={cn(
+                                    'cursor-pointer rounded-sm border p-3 transition-colors',
+                                    active
+                                        ? 'border-primary bg-primary/5'
+                                        : 'border-border hover:border-primary/40',
+                                    disabled && 'pointer-events-none cursor-not-allowed opacity-60'
+                                )}
+                            >
+                                <RadioGroupItem
+                                    value={fw.id}
+                                    id={`framework-${fw.id}`}
+                                    className="sr-only"
+                                    disabled={disabled}
+                                />
+                                <Label
+                                    htmlFor={`framework-${fw.id}`}
+                                    className="flex cursor-pointer items-start gap-2.5"
+                                >
+                                    <FrameworkIcon
+                                        framework={fw.id as FrameworkType}
+                                        size={28}
+                                        className="shrink-0 rounded-md"
+                                        alt={fw.name}
+                                    />
+                                    <div className="min-w-0 flex-1 space-y-0.5">
+                                        <div className="flex items-center gap-1.5">
+                                            <span
+                                                className={cn(
+                                                    'truncate text-[11px] font-bold',
+                                                    active ? 'text-primary' : 'text-foreground'
+                                                )}
+                                            >
+                                                {fw.name}
+                                            </span>
+                                            {disabled && (
+                                                <span className="rounded bg-muted px-1 text-[8px] font-black uppercase tracking-wider text-muted-foreground">
+                                                    {t('soon', { defaultValue: 'Soon' })}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-[10px] leading-snug text-muted-foreground">
+                                            {fw.description}
+                                        </p>
+                                    </div>
+                                </Label>
+                            </div>
+                        )
+                    })}
+                </RadioGroup>
+                {touchedFields.framework && frameworkError && (
+                    <p className="text-xs text-destructive">{frameworkError}</p>
+                )}
+            </div>
+        )
+    }
+
+    const renderProjectDetails = () => (
         <div className="space-y-4">
             <div className="space-y-2">
                 <LabelRequired>{t('projectName')}</LabelRequired>
-                <IGRPInputPrimitive
+                <Input
+                    {...nameRegister}
+                    ref={nameRefHandler}
                     id="name"
-                    name="name"
                     placeholder={t('enterProjectName')}
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    ref={inputRef}
-                    autoFocus
                     maxLength={50}
-                    className="mt-2"
                 />
-                {formik.touched.name && formik.errors.name && (
-                    <p className="text-xs text-destructive">{formik.errors.name}</p>
+                {touchedFields.name && nameError && (
+                    <p className="text-xs text-destructive">{nameError}</p>
                 )}
             </div>
 
             {/* Project Icon Upload with Preview */}
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('projectIcon')}</IGRPLabelPrimitive>
+                <Label>{t('projectIcon')}</Label>
                 <input
                     ref={iconUploadRef}
                     type="file"
@@ -399,7 +721,7 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                     className="hidden"
                 />
                 <label htmlFor="icon-upload" className="block">
-                    <div className="border border-dashed rounded-lg p-8 text-center space-y-2 cursor-pointer hover:border-primary/50">
+                    <div className="border border-dashed rounded-lg p-6 text-center space-y-2 cursor-pointer hover:border-primary/50">
                         {previewUrl ? (
                             <div className="flex flex-col items-center gap-2">
                                 <img
@@ -407,27 +729,17 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                                     alt="Project icon preview"
                                     className="w-16 h-16 rounded-full object-cover"
                                 />
-                                <span className="text-sm text-gray-600">
-                                    {t('clickToChangeIcon')}
-                                </span>
+                                <span className="text-sm text-muted-foreground">{t('clickToChangeIcon')}</span>
                             </div>
                         ) : (
                             <>
-                                <Upload className="w-8 h-8 mx-auto text-gray-400" />
-                                <div className="text-sm text-gray-600">
+                                <Upload className="w-7 h-7 mx-auto text-muted-foreground" />
+                                <div className="text-sm text-muted-foreground">
                                     {t('clickOrDragToUploadIcon')}
-                                    <div className="text-xs text-gray-400">
+                                    <div className="text-xs text-muted-foreground">
                                         {t('recommendedSize')}
                                     </div>
                                 </div>
-                                <IGRPButtonPrimitive
-                                    variant="outline"
-                                    size="sm"
-                                    type="button"
-                                    onClick={() => iconUploadRef.current?.click()}
-                                >
-                                    {t('upload')}...
-                                </IGRPButtonPrimitive>
                             </>
                         )}
                     </div>
@@ -435,311 +747,1077 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
             </div>
 
             <div className="space-y-2">
-                <IGRPLabelPrimitive>{t('projectType')}</IGRPLabelPrimitive>
-                <IGRPRadioGroupPrimitive
-                    name="type"
-                    value={formik.values.type}
-                    onValueChange={(value) => handleChangeType(value)}
-                    className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2"
+                <Label>{t('projectLocation')}</Label>
+                <RadioGroup
+                    value={values.storageMode ?? 'managed'}
+                    onValueChange={(value) => {
+                        setValue('storageMode', value as ProjectData['storageMode'], {
+                            shouldValidate: true
+                        })
+                        // Switching back to managed clears any custom path so the
+                        // auto-compute effect can take over again on the next render.
+                        if (value === 'managed') {
+                            setValue('path', '', { shouldValidate: false })
+                        }
+                    }}
+                    className="grid grid-cols-2 gap-2"
                 >
-                    <div
-                        className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
-                            formik.values.type === 'frontend' ? 'border-primary' : ''
-                        }`}
+                    <label
+                        htmlFor="storage-managed"
+                        className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40"
                     >
-                        <IGRPRadioGroupItemPrimitive
-                            value="frontend"
-                            id="frontend"
-                            className="sr-only"
-                        />
-                        <IGRPLabelPrimitive
-                            htmlFor="frontend"
-                            className="flex items-center gap-2 cursor-pointer"
-                        >
-                            <Monitor className="w-5 h-5" />
-                            <div>
-                                <div>{t('frontend')}</div>
-                                <div className="text-sm text-gray-500">
-                                    {t('frontendDescription')}
-                                </div>
-                            </div>
-                        </IGRPLabelPrimitive>
-                    </div>
-                    <div
-                        className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
-                            formik.values.type === 'backend' ? 'border-primary' : ''
-                        }`}
+                        <RadioGroupItem value="managed" id="storage-managed" />
+                        <div className="space-y-0.5">
+                            <p className="text-sm font-medium">{t('projectLocationManaged')}</p>
+                            <p className="text-xs text-muted-foreground">
+                                {t('projectLocationManagedHint')}
+                            </p>
+                        </div>
+                    </label>
+                    <label
+                        htmlFor="storage-linked"
+                        className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40"
                     >
-                        <IGRPRadioGroupItemPrimitive
-                            value="backend"
-                            id="backend"
-                            className="sr-only"
-                        />
-                        <IGRPLabelPrimitive
-                            htmlFor="backend"
-                            className="flex items-center gap-2 cursor-pointer"
-                        >
-                            <Server className="w-5 h-5" />
-                            <div>
-                                <div>{t('backend')}</div>
-                                <div className="text-sm text-gray-500">
-                                    {t('backendDescription')}
-                                </div>
-                            </div>
-                        </IGRPLabelPrimitive>
-                    </div>
-                    <div
-                        className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
-                            formik.values.type === 'specification' ? 'border-primary' : ''
-                        }`}
+                        <RadioGroupItem value="linked" id="storage-linked" />
+                        <div className="space-y-0.5">
+                            <p className="text-sm font-medium">{t('projectLocationLinked')}</p>
+                            <p className="text-xs text-muted-foreground">
+                                {t('projectLocationLinkedHint')}
+                            </p>
+                        </div>
+                    </label>
+                </RadioGroup>
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="path">{t('projectDirectory')}</Label>
+                <div className="flex gap-2">
+                    <Input
+                        {...pathRegister}
+                        id="path"
+                        placeholder={t('enterProjectDirectory')}
+                        readOnly={values.storageMode !== 'linked'}
+                    />
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleOpenDirectory()
+                        }}
+                        disabled={values.storageMode !== 'linked'}
                     >
-                        <IGRPRadioGroupItemPrimitive
-                            value="specification"
-                            id="specification"
-                            className="sr-only"
-                        />
-                        <IGRPLabelPrimitive
-                            htmlFor="specification"
-                            className="flex items-center gap-2 cursor-pointer"
-                        >
-                            <Sparkles className="w-5 h-5" />
-                            <div>
-                                <div>{t('specification', { defaultValue: 'Specification' })}</div>
-                                <div className="text-sm text-gray-500">
-                                    {t('specificationDescription', {
-                                        defaultValue: 'Document and prototype using AI'
-                                    })}
-                                </div>
-                            </div>
-                        </IGRPLabelPrimitive>
-                    </div>
-                </IGRPRadioGroupPrimitive>
-                {formik.touched.type && formik.errors.type && (
-                    <p className="text-xs text-destructive">{formik.errors.type}</p>
+                        <FolderOpen className="h-4 w-4" />
+                    </Button>
+                </div>
+                {touchedFields.path && pathError && (
+                    <p className="text-xs text-destructive">{pathError}</p>
                 )}
+            </div>
+
+            {isFrontend && (
+                <div className="space-y-2">
+                    <Label>{t('themeColor')}</Label>
+                    <div className="grid grid-cols-12 gap-2 mt-2">
+                        {THEME_COLORS.map((color) => (
+                            <button
+                                key={color.value}
+                                type="button"
+                                onClick={() =>
+                                    setValue('themeColor', color.value, { shouldDirty: true })
+                                }
+                                className={`w-8 h-8 rounded-full ${
+                                    values.themeColor === color.value
+                                        ? 'ring-2 ring-offset-2 ring-primary'
+                                        : ''
+                                }`}
+                                style={{ backgroundColor: color.value }}
+                                title={color.name}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+
+    const renderFrameworkConfig = (): React.ReactNode =>
+        SelectedComponent ? (
+            <div className="space-y-3 border-t pt-4">
+                <Label>{t('frameworkConfiguration')}</Label>
+                <ProjectConfigForm
+                    type={values.framework ?? ''}
+                    data={values.config}
+                    errors={flattenedErrors}
+                    onChange={(config) =>
+                        setValue('config', config, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                            shouldTouch: true
+                        })
+                    }
+                />
+            </div>
+        ) : null
+
+    // Scaffold-faithful step-2 layout for Next.js: PROJECT DETAILS (icon
+    // uploader + Name/Description/Location) on top, FRONTEND CONFIGURATION
+    // (Application Name + Theme Color swatch) below. Other frameworks keep
+    // the generic Project Details + framework config layout.
+    const renderNextJsStep2 = () => (
+        <div className="space-y-4">
+            {/* Section 1: PROJECT DETAILS */}
+            <div className="border-b pb-4">
+                <p className="pb-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    {t('projectDetails', { defaultValue: 'Project Details' })}
+                </p>
+                <div className="relative pl-[74px]">
+                {/* Icon uploader (absolutely positioned, 48×48) */}
+                <button
+                    type="button"
+                    onClick={() => iconUploadRef.current?.click()}
+                    aria-label={t('projectIcon')}
+                    className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-dashed bg-muted/30 text-muted-foreground transition-colors hover:border-primary/60 hover:bg-primary/5 hover:text-primary active:scale-95"
+                >
+                    {previewUrl ? (
+                        <img src={previewUrl} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                        <Plus className="h-5 w-5" />
+                    )}
+                </button>
+                <input
+                    ref={iconUploadRef}
+                    type="file"
+                    id="icon-upload"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                />
+
+                {/* Fields */}
+                <div className="space-y-3">
+                    {/* Name */}
+                    <div className="flex items-start gap-3">
+                        <Label
+                            htmlFor="name"
+                            className="w-[82px] shrink-0 pt-1.5 text-[11px] text-muted-foreground"
+                        >
+                            {t('projectName')} <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="max-w-[350px] flex-1">
+                            <Input
+                                {...nameRegister}
+                                ref={nameRefHandler}
+                                id="name"
+                                placeholder={t('enterProjectName', {
+                                    defaultValue: 'e.g. acme-dashboard'
+                                })}
+                                maxLength={50}
+                                className="h-7 rounded-sm text-[11px]"
+                            />
+                            {touchedFields.name && nameError && (
+                                <p className="mt-1 text-xs text-destructive">{nameError}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="flex items-start gap-3">
+                        <Label className="w-[82px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
+                            {t('description', { defaultValue: 'Description' })}
+                        </Label>
+                        <Input
+                            type="text"
+                            value={values.config?.description ?? ''}
+                            onChange={(e) =>
+                                setValue(
+                                    'config',
+                                    { ...(values.config ?? {}), description: e.target.value },
+                                    { shouldDirty: true }
+                                )
+                            }
+                            placeholder={t('projectDescription', {
+                                defaultValue: 'Briefly describe this project...'
+                            })}
+                            className="h-7 max-w-[350px] flex-1 rounded-sm text-[11px]"
+                        />
+                    </div>
+
+                    {/* Location */}
+                    <div className="flex items-start gap-3">
+                        <Label className="w-[82px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
+                            {t('projectLocation')}
+                        </Label>
+                        <div className="max-w-[350px] flex-1 space-y-1.5">
+                            <RadioGroup
+                                value={values.storageMode ?? 'managed'}
+                                onValueChange={(value) => {
+                                    setValue(
+                                        'storageMode',
+                                        value as ProjectData['storageMode'],
+                                        { shouldValidate: true }
+                                    )
+                                    if (value === 'managed') {
+                                        setValue('path', '', { shouldValidate: false })
+                                    }
+                                }}
+                                className="flex gap-4"
+                            >
+                                <label
+                                    htmlFor="storage-managed-next"
+                                    className="flex cursor-pointer items-center gap-1.5 text-[11px] text-foreground"
+                                >
+                                    <RadioGroupItem
+                                        value="managed"
+                                        id="storage-managed-next"
+                                        className="h-3.5 w-3.5"
+                                    />
+                                    {t('projectLocationManaged')}
+                                </label>
+                                <label
+                                    htmlFor="storage-linked-next"
+                                    className="flex cursor-pointer items-center gap-1.5 text-[11px] text-foreground"
+                                >
+                                    <RadioGroupItem
+                                        value="linked"
+                                        id="storage-linked-next"
+                                        className="h-3.5 w-3.5"
+                                    />
+                                    {t('projectLocationLinked')}
+                                </label>
+                            </RadioGroup>
+                            <div className="flex gap-1">
+                                <Input
+                                    {...pathRegister}
+                                    id="path"
+                                    placeholder={t('enterProjectDirectory')}
+                                    disabled={values.storageMode !== 'linked'}
+                                    className="h-7 rounded-sm font-mono text-[10.5px]"
+                                />
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    type="button"
+                                    className="h-7 w-7 rounded-sm"
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        handleOpenDirectory()
+                                    }}
+                                    disabled={values.storageMode !== 'linked'}
+                                >
+                                    <FolderOpen className="h-3.5 w-3.5" />
+                                </Button>
+                            </div>
+                            {touchedFields.path && pathError && (
+                                <p className="text-xs text-destructive">{pathError}</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            {/* Section 2: FRONTEND CONFIGURATION */}
+            <div className="space-y-3 pl-[8px]">
+                <p className="pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    {t('frontendConfiguration', { defaultValue: 'Frontend Configuration' })}
+                </p>
+
+                {/* Application Name */}
+                <div className="flex items-start gap-3">
+                    <Label
+                        htmlFor="app-name"
+                        className="w-[110px] shrink-0 whitespace-nowrap pt-1.5 text-[11px] text-muted-foreground"
+                    >
+                        {t('applicationName')}
+                    </Label>
+                    <div className="max-w-[388px] flex-1">
+                        <Input
+                            id="app-name"
+                            value={values.config?.name ?? ''}
+                            onChange={(e) =>
+                                setValue(
+                                    'config',
+                                    { ...(values.config ?? {}), name: e.target.value },
+                                    { shouldDirty: true, shouldValidate: true }
+                                )
+                            }
+                            placeholder="my-next-app"
+                            maxLength={100}
+                            className="h-7 rounded-sm text-[11px]"
+                        />
+                        {flattenedErrors.config?.name && (
+                            <p className="mt-1 text-xs text-destructive">
+                                {flattenedErrors.config.name}
+                            </p>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     )
 
-    const renderStep2 = () => (
-        <div className="space-y-4">
-            <IGRPLabelPrimitive>{t('selectFramework')}</IGRPLabelPrimitive>
-            <IGRPRadioGroupPrimitive
-                name="framework"
-                value={formik.values.framework}
-                onValueChange={(value) => handleChangeFramework(value)}
-                className="grid gap-4 mt-2"
-            >
-                {frameworks.map((fw) => {
-                    return (
-                        <div
-                            key={fw.id}
-                            className={`border rounded-lg p-4 cursor-pointer hover:border-primary/50 ${
-                                formik.values.framework === fw.id ? 'border-primary' : ''
-                            } ${!fw.availableSupport ? 'pointer-events-none opacity-75' : ''}`}
+    // Scaffold-faithful step-2 layout for Spring Boot: PROJECT DETAILS (icon
+    // uploader + Name/Description/Location) on top, BACKEND CONFIGURATION
+    // (Group/Artifact, DB/Structure, Features, Dependencies) below.
+    const renderSpringBootStep2 = () => {
+        const cfg = (values.config ?? {}) as Record<string, any>
+        const cfgErr = flattenedErrors.config ?? {}
+        const setCfg = (next: Record<string, unknown>) =>
+            setValue(
+                'config',
+                { ...cfg, ...next },
+                { shouldValidate: true, shouldDirty: true, shouldTouch: true }
+            )
+
+        const selectedDeps: Dependency[] = Array.isArray(cfg.dependencies)
+            ? cfg.dependencies
+            : []
+        const depQuery = springDepSearch.trim().toLowerCase()
+        const filteredDeps = springDependencies
+            .filter(
+                (d) =>
+                    !selectedDeps.some(
+                        (s) => s.groupId === d.groupId && s.artifactId === d.artifactId
+                    )
+            )
+            .filter((d) =>
+                depQuery
+                    ? `${d.groupId}:${d.artifactId} ${d.name ?? ''}`
+                          .toLowerCase()
+                          .includes(depQuery)
+                    : true
+            )
+
+        const handleAddDep = (dep: Dependency) => {
+            setCfg({ dependencies: [...selectedDeps, dep] })
+            setSpringDepSearch('')
+            setSpringDepDropdownOpen(false)
+        }
+        const handleRemoveDep = (dep: Dependency) => {
+            setCfg({
+                dependencies: selectedDeps.filter(
+                    (d) => !(d.groupId === dep.groupId && d.artifactId === dep.artifactId)
+                )
+            })
+        }
+
+        const features: Array<{ key: string; label: string }> = [
+            {
+                key: 'enableObservability',
+                label: t('observability', { defaultValue: 'Observability' })
+            },
+            {
+                key: 'enableEntityRevision',
+                label: t('entityRevision', { defaultValue: 'Entity Revision' })
+            },
+            { key: 'enableGraalVm', label: t('graalVm', { defaultValue: 'Graal VM' }) }
+        ]
+
+        return (
+            <div className="space-y-4">
+                {/* Section 1: PROJECT DETAILS (shared scaffold layout) */}
+                <div className="border-b pb-4">
+                    <p className="pb-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {t('projectDetails', { defaultValue: 'Project Details' })}
+                    </p>
+                    <div className="relative pl-[74px]">
+                        <button
+                            type="button"
+                            onClick={() => iconUploadRef.current?.click()}
+                            aria-label={t('projectIcon')}
+                            className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-dashed bg-muted/30 text-muted-foreground transition-colors hover:border-primary/60 hover:bg-primary/5 hover:text-primary active:scale-95"
                         >
-                            <IGRPRadioGroupItemPrimitive
-                                value={fw.id}
-                                id={fw.id}
-                                className="sr-only"
-                                disabled={!fw.availableSupport}
-                            />
-                            <IGRPLabelPrimitive
-                                htmlFor={fw.id}
-                                className="flex items-center gap-4 cursor-pointer"
-                            >
-                                <FrameworkIcon
-                                    framework={fw.id as FrameworkType}
-                                    size={40}
-                                    className="rounded-lg"
-                                    alt={fw.name}
-                                />
-                                <div className="flex-1">
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-medium">{fw.name}</span>
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                        {fw.description}
-                                    </div>
-                                    {!fw.availableSupport && (
-                                        <span className="ml-auto text-xs text-muted-foreground">
-                                            {t('comingSoon')}
-                                        </span>
+                            {previewUrl ? (
+                                <img src={previewUrl} alt="" className="h-full w-full object-cover" />
+                            ) : (
+                                <Plus className="h-5 w-5" />
+                            )}
+                        </button>
+                        <input
+                            ref={iconUploadRef}
+                            type="file"
+                            id="icon-upload"
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                        />
+                        <div className="space-y-3">
+                            <div className="flex items-start gap-3">
+                                <Label
+                                    htmlFor="name"
+                                    className="w-[82px] shrink-0 pt-1.5 text-[11px] text-muted-foreground"
+                                >
+                                    {t('projectName')}{' '}
+                                    <span className="text-destructive">*</span>
+                                </Label>
+                                <div className="max-w-[350px] flex-1">
+                                    <Input
+                                        {...nameRegister}
+                                        ref={nameRefHandler}
+                                        id="name"
+                                        placeholder={t('enterProjectName', {
+                                            defaultValue: 'e.g. acme-dashboard'
+                                        })}
+                                        maxLength={50}
+                                        className="h-7 rounded-sm text-[11px]"
+                                    />
+                                    {touchedFields.name && nameError && (
+                                        <p className="mt-1 text-xs text-destructive">
+                                            {nameError}
+                                        </p>
                                     )}
                                 </div>
-                            </IGRPLabelPrimitive>
-                        </div>
-                    )
-                })}
-            </IGRPRadioGroupPrimitive>
-            {formik.touched.framework && formik.errors.framework && (
-                <p className="text-xs text-destructive">{formik.errors.framework}</p>
-            )}
-        </div>
-    )
-
-    const renderStep3 = (): React.ReactNode => (
-        <div className="space-y-4">
-            {SelectedComponent ? (
-                <>
-                    <IGRPLabelPrimitive>{t('frameworkConfiguration')}</IGRPLabelPrimitive>
-                    <div className="mt-3">
-                        <ProjectConfigForm
-                            type={formik.values.framework}
-                            data={formik.values.config}
-                            errors={formik.errors}
-                            onChange={(config) => formik.setFieldValue('config', config)}
-                        />
-                    </div>
-                </>
-            ) : (
-                <div className="text-center text-muted-foreground pb-8">
-                    {t('configurationComingSoon', {
-                        framework: formik.values.framework
-                    })}
-                </div>
-            )}
-        </div>
-    )
-
-    const renderStep4 = (): React.ReactNode => (
-        <div className="rounded-lg border p-4 space-y-6">
-            <div className="space-y-4">
-                <div className="space-y-2">
-                    <IGRPLabelPrimitive htmlFor="name">{t('projectName')}</IGRPLabelPrimitive>
-                    <IGRPInputPrimitive
-                        id="name"
-                        name="name"
-                        value={formik.values.name}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    />
-                    {formik.touched.name && formik.errors.name && (
-                        <p className="text-xs text-destructive">{formik.errors.name}</p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <IGRPLabelPrimitive>{t('projectLocation')}</IGRPLabelPrimitive>
-                    <IGRPRadioGroupPrimitive
-                        value={formik.values.storageMode ?? 'managed'}
-                        onValueChange={(value) => {
-                            formik.setFieldValue('storageMode', value)
-                            // Switching back to managed clears any custom
-                            // path so the auto-compute effect can take
-                            // over again on the next render.
-                            if (value === 'managed') {
-                                formik.setFieldValue('path', '')
-                            }
-                        }}
-                        className="grid grid-cols-2 gap-2"
-                    >
-                        <label className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40">
-                            <IGRPRadioGroupItemPrimitive value="managed" id="storage-managed" />
-                            <div className="space-y-0.5">
-                                <p className="text-sm font-medium">{t('projectLocationManaged')}</p>
-                                <p className="text-xs text-muted-foreground">
-                                    {t('projectLocationManagedHint')}
-                                </p>
                             </div>
-                        </label>
-                        <label className="flex items-start gap-2 border rounded-md p-3 cursor-pointer hover:bg-muted/40">
-                            <IGRPRadioGroupItemPrimitive value="linked" id="storage-linked" />
-                            <div className="space-y-0.5">
-                                <p className="text-sm font-medium">{t('projectLocationLinked')}</p>
-                                <p className="text-xs text-muted-foreground">
-                                    {t('projectLocationLinkedHint')}
-                                </p>
-                            </div>
-                        </label>
-                    </IGRPRadioGroupPrimitive>
-                </div>
-
-                <div className="space-y-2">
-                    <IGRPLabelPrimitive htmlFor="path">{t('projectDirectory')}</IGRPLabelPrimitive>
-                    <div className="flex gap-2">
-                        <IGRPInputPrimitive
-                            id="path"
-                            name="path"
-                            value={formik.values.path}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            placeholder={t('enterProjectDirectory')}
-                            readOnly={formik.values.storageMode !== 'linked'}
-                        />
-                        <IGRPButtonPrimitive
-                            variant="outline"
-                            size="icon"
-                            type="button"
-                            onClick={(e) => {
-                                e.preventDefault()
-                                handleOpenDirectory()
-                            }}
-                            disabled={formik.values.storageMode !== 'linked'}
-                        >
-                            <FolderOpen className="h-4 w-4" />
-                        </IGRPButtonPrimitive>
-                    </div>
-                    {formik.touched.path && formik.errors.path && (
-                        <p className="text-xs text-destructive">{formik.errors.path}</p>
-                    )}
-                </div>
-
-                {isFrontend && (
-                    <div className="space-y-2">
-                        <IGRPLabelPrimitive>{t('themeColor')}</IGRPLabelPrimitive>
-                        <div className="grid grid-cols-12 gap-2 mt-2">
-                            {THEME_COLORS.map((color) => (
-                                <button
-                                    key={color.value}
-                                    type="button"
-                                    onClick={() => formik.setFieldValue('themeColor', color.value)}
-                                    className={`
-                      w-8 h-8 rounded-full 
-                      ${formik.values.themeColor === color.value ? 'ring-2 ring-offset-2 ring-primary' : ''}
-                    `}
-                                    style={{
-                                        backgroundColor: color.value
-                                    }}
-                                    title={color.name}
+                            <div className="flex items-start gap-3">
+                                <Label className="w-[82px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
+                                    {t('description', { defaultValue: 'Description' })}
+                                </Label>
+                                <Input
+                                    type="text"
+                                    value={cfg.description ?? ''}
+                                    onChange={(e) => setCfg({ description: e.target.value })}
+                                    placeholder={t('projectDescription', {
+                                        defaultValue: 'Briefly describe this project...'
+                                    })}
+                                    className="h-7 max-w-[350px] flex-1 rounded-sm text-[11px]"
                                 />
-                            ))}
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <Label className="w-[82px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
+                                    {t('projectLocation')}
+                                </Label>
+                                <div className="max-w-[350px] flex-1 space-y-1.5">
+                                    <RadioGroup
+                                        value={values.storageMode ?? 'managed'}
+                                        onValueChange={(value) => {
+                                            setValue(
+                                                'storageMode',
+                                                value as ProjectData['storageMode'],
+                                                { shouldValidate: true }
+                                            )
+                                            if (value === 'managed') {
+                                                setValue('path', '', { shouldValidate: false })
+                                            }
+                                        }}
+                                        className="flex gap-4"
+                                    >
+                                        <label
+                                            htmlFor="storage-managed"
+                                            className="flex cursor-pointer items-center gap-1.5 text-[11px] text-foreground"
+                                        >
+                                            <RadioGroupItem
+                                                value="managed"
+                                                id="storage-managed"
+                                                className="h-3.5 w-3.5"
+                                            />
+                                            {t('projectLocationManaged')}
+                                        </label>
+                                        <label
+                                            htmlFor="storage-linked"
+                                            className="flex cursor-pointer items-center gap-1.5 text-[11px] text-foreground"
+                                        >
+                                            <RadioGroupItem
+                                                value="linked"
+                                                id="storage-linked"
+                                                className="h-3.5 w-3.5"
+                                            />
+                                            {t('projectLocationLinked')}
+                                        </label>
+                                    </RadioGroup>
+                                    <div className="flex gap-1">
+                                        <Input
+                                            {...pathRegister}
+                                            id="path"
+                                            placeholder={t('enterProjectDirectory')}
+                                            disabled={values.storageMode !== 'linked'}
+                                            className="h-7 rounded-sm font-mono text-[10.5px]"
+                                        />
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            type="button"
+                                            className="h-7 w-7 rounded-sm"
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                handleOpenDirectory()
+                                            }}
+                                            disabled={values.storageMode !== 'linked'}
+                                        >
+                                            <FolderOpen className="h-3.5 w-3.5" />
+                                        </Button>
+                                    </div>
+                                    {touchedFields.path && pathError && (
+                                        <p className="text-xs text-destructive">{pathError}</p>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                )}
+                </div>
+
+                {/* Section 2: BACKEND CONFIGURATION */}
+                <div className="space-y-3 pl-[8px]">
+                    <p className="pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {t('backendConfiguration', { defaultValue: 'Backend Configuration' })}
+                    </p>
+
+                    {/* Group + Artifact */}
+                    <div className="flex items-start gap-3">
+                        <Label
+                            htmlFor="group"
+                            className="w-[72px] shrink-0 pt-1.5 text-[11px] text-muted-foreground"
+                        >
+                            {t('group', { defaultValue: 'Group' })}
+                        </Label>
+                        <div className="flex max-w-[426px] flex-1 items-start gap-3">
+                            <div className="w-[150px]">
+                                <Input
+                                    id="group"
+                                    value={(cfg.group as string) ?? ''}
+                                    onChange={(e) => setCfg({ group: e.target.value })}
+                                    placeholder="cv.igrp"
+                                    maxLength={100}
+                                    className="h-7 rounded-sm text-[11px]"
+                                />
+                                {cfgErr.group && (
+                                    <p className="mt-1 text-xs text-destructive">{cfgErr.group}</p>
+                                )}
+                            </div>
+                            <Label
+                                htmlFor="artifact"
+                                className="ml-auto w-[64px] shrink-0 pt-1.5 text-[11px] text-muted-foreground"
+                            >
+                                {t('artifact', { defaultValue: 'Artifact' })}{' '}
+                                <span className="text-destructive">*</span>
+                            </Label>
+                            <div className="w-[150px]">
+                                <Input
+                                    id="artifact"
+                                    value={(cfg.artifact as string) ?? ''}
+                                    onChange={(e) => setCfg({ artifact: e.target.value })}
+                                    placeholder={t('enterArtifact', {
+                                        defaultValue: 'acme-dashboard'
+                                    })}
+                                    maxLength={50}
+                                    className="h-7 rounded-sm text-[11px]"
+                                />
+                                {cfgErr.artifact && (
+                                    <p className="mt-1 text-xs text-destructive">{cfgErr.artifact}</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* DB Engine + Structure Style */}
+                    <div className="flex items-start gap-3">
+                        <Label className="w-[72px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
+                            {t('dbEngine', { defaultValue: 'DB Engine' })}{' '}
+                            <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="flex max-w-[426px] flex-1 items-start gap-3">
+                            <div className="w-[150px]">
+                                <Select
+                                    value={(cfg.database as string) ?? ''}
+                                    onValueChange={(value) => setCfg({ database: value })}
+                                >
+                                    <SelectTrigger
+                                        size="sm"
+                                        className="h-7 w-full rounded-sm border-input bg-background px-2 text-[11px] shadow-none [&>svg]:size-3"
+                                    >
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {DatabaseOptions.map((opt) => (
+                                            <SelectItem
+                                                key={opt.value}
+                                                value={opt.value}
+                                                className="text-[11px]"
+                                            >
+                                                {opt.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {cfgErr.database && (
+                                    <p className="mt-1 text-xs text-destructive">{cfgErr.database}</p>
+                                )}
+                            </div>
+                            <Label className="ml-auto w-[64px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
+                                {t('structureStyle', { defaultValue: 'Structure Style' })}
+                            </Label>
+                            <div className="w-[150px]">
+                                <Select
+                                    value={(cfg.projectStructureStyle as string) ?? 'technical'}
+                                    onValueChange={(value) =>
+                                        setCfg({ projectStructureStyle: value })
+                                    }
+                                >
+                                    <SelectTrigger
+                                        size="sm"
+                                        className="h-7 w-full rounded-sm border-input bg-background px-2 text-[11px] shadow-none [&>svg]:size-3"
+                                    >
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {projectStructureStyle.map((opt) => (
+                                            <SelectItem
+                                                key={opt.value}
+                                                value={opt.value}
+                                                className="text-[11px]"
+                                            >
+                                                {opt.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Features */}
+                    <div className="flex items-start gap-3">
+                        <Label className="w-[72px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
+                            {t('features', { defaultValue: 'Features' })}
+                        </Label>
+                        <div className="flex max-w-[426px] flex-1 gap-1.5">
+                            {features.map(({ key, label }) => {
+                                const checked = Boolean(cfg[key])
+                                return (
+                                    <button
+                                        key={key}
+                                        type="button"
+                                        onClick={() => setCfg({ [key]: !checked })}
+                                        className={cn(
+                                            'flex flex-1 items-center justify-between rounded-sm border px-2 py-1 text-left transition-colors',
+                                            checked
+                                                ? 'border-primary bg-primary/5 text-foreground'
+                                                : 'border-border bg-background text-muted-foreground hover:bg-muted/50'
+                                        )}
+                                    >
+                                        <span className="text-[10px] font-medium">{label}</span>
+                                        <span
+                                            className={cn(
+                                                'flex h-3 w-3 shrink-0 items-center justify-center rounded-sm border',
+                                                checked
+                                                    ? 'border-primary bg-primary text-primary-foreground'
+                                                    : 'border-border bg-background'
+                                            )}
+                                        >
+                                            {checked && <Check className="h-2.5 w-2.5" />}
+                                        </span>
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="my-3 border-t" />
+
+                    {/* Dependencies */}
+                    <p className="pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {t('dependencies', { defaultValue: 'Dependencies' })}
+                    </p>
+                    <div className="flex items-start gap-3">
+                        <Label className="w-[72px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
+                            {t('furtherDependencies', { defaultValue: 'Further dependencies' })}
+                        </Label>
+                        <div className="max-w-[426px] flex-1 space-y-2">
+                            <div className="relative" ref={springDepRef}>
+                                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                                <Input
+                                    type="text"
+                                    value={springDepSearch}
+                                    onChange={(e) => {
+                                        setSpringDepSearch(e.target.value)
+                                        setSpringDepDropdownOpen(true)
+                                    }}
+                                    onFocus={() => setSpringDepDropdownOpen(true)}
+                                    placeholder={t('searchDependenciesPlaceholder', {
+                                        defaultValue:
+                                            'Type to filter, for example starter, devtools, commons, ...'
+                                    })}
+                                    className="h-7 rounded-sm pl-8 text-[11px]"
+                                />
+                                {springDepDropdownOpen && filteredDeps.length > 0 && (
+                                    <div className="absolute bottom-full left-0 right-0 z-20 mb-1 max-h-[140px] overflow-y-auto rounded-sm border bg-background shadow-lg">
+                                        {filteredDeps.map((dep) => (
+                                            <button
+                                                key={`${dep.groupId}-${dep.artifactId}`}
+                                                type="button"
+                                                onClick={() => handleAddDep(dep)}
+                                                className="flex w-full cursor-pointer items-center justify-between px-2 py-1.5 text-left hover:bg-muted/50"
+                                            >
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="truncate font-mono text-[10px] font-bold text-foreground">
+                                                        {dep.groupId}:{dep.artifactId}
+                                                    </div>
+                                                    {dep.name && (
+                                                        <div className="truncate font-mono text-[9px] text-muted-foreground">
+                                                            {dep.name}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-sm hover:bg-muted">
+                                                    <Plus className="h-3 w-3" />
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            {selectedDeps.length > 0 && (
+                                <div className="flex flex-wrap gap-1">
+                                    {selectedDeps.map((dep) => {
+                                        const shortName = dep.artifactId || dep.groupId
+                                        return (
+                                            <span
+                                                key={`${dep.groupId}-${dep.artifactId}`}
+                                                title={`${dep.groupId}:${dep.artifactId}`}
+                                                className="flex max-w-[180px] items-center gap-1 rounded-sm border border-primary/30 bg-primary/5 py-0.5 pl-2 pr-1 font-mono text-[9px] font-medium text-foreground"
+                                            >
+                                                <span className="truncate">{shortName}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveDep(dep)}
+                                                    className="flex h-3.5 w-3.5 items-center justify-center rounded-sm hover:bg-muted"
+                                                >
+                                                    <X className="h-2.5 w-2.5" />
+                                                </button>
+                                            </span>
+                                        )
+                                    })}
+                                </div>
+                            )}
+                            <p className="text-[10px] leading-tight text-muted-foreground">
+                                {t('igrpStudioInfo', {
+                                    defaultValue:
+                                        'IGRP Studio already adds required dependencies. Add your custom dependencies here.'
+                                })}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    )
+        )
+    }
+
+    // Scaffold-faithful step-2 layout for Specification: PROJECT DETAILS on
+    // top, AI SPECIFICATION SETTINGS (Application Name + Default LLM +
+    // Embeddings model) below.
+    const renderSpecificationStep2 = () => {
+        const cfg = (values.config ?? {}) as Record<string, any>
+        const cfgErr = flattenedErrors.config ?? {}
+        const setCfg = (next: Record<string, unknown>) =>
+            setValue(
+                'config',
+                { ...cfg, ...next },
+                { shouldValidate: true, shouldDirty: true, shouldTouch: true }
+            )
+
+        const currentLlm = (cfg.defaultLLM as LlmOption | undefined) ?? llmModels[0]
+        const currentEmb = (cfg.embeddings as LlmOption | undefined) ?? embeddingsModels[0]
+
+        return (
+            <div className="space-y-4">
+                {/* Section 1: PROJECT DETAILS (shared scaffold layout) */}
+                <div className="border-b pb-4">
+                    <p className="pb-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {t('projectDetails', { defaultValue: 'Project Details' })}
+                    </p>
+                    <div className="relative pl-[74px]">
+                        <button
+                            type="button"
+                            onClick={() => iconUploadRef.current?.click()}
+                            aria-label={t('projectIcon')}
+                            className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-dashed bg-muted/30 text-muted-foreground transition-colors hover:border-primary/60 hover:bg-primary/5 hover:text-primary active:scale-95"
+                        >
+                            {previewUrl ? (
+                                <img src={previewUrl} alt="" className="h-full w-full object-cover" />
+                            ) : (
+                                <Plus className="h-5 w-5" />
+                            )}
+                        </button>
+                        <input
+                            ref={iconUploadRef}
+                            type="file"
+                            id="icon-upload"
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                        />
+                        <div className="space-y-3">
+                            <div className="flex items-start gap-3">
+                                <Label
+                                    htmlFor="name"
+                                    className="w-[82px] shrink-0 pt-1.5 text-[11px] text-muted-foreground"
+                                >
+                                    {t('projectName')}{' '}
+                                    <span className="text-destructive">*</span>
+                                </Label>
+                                <div className="max-w-[350px] flex-1">
+                                    <Input
+                                        {...nameRegister}
+                                        ref={nameRefHandler}
+                                        id="name"
+                                        placeholder={t('enterProjectName', {
+                                            defaultValue: 'e.g. acme-dashboard'
+                                        })}
+                                        maxLength={50}
+                                        className="h-7 rounded-sm text-[11px]"
+                                    />
+                                    {touchedFields.name && nameError && (
+                                        <p className="mt-1 text-xs text-destructive">
+                                            {nameError}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <Label className="w-[82px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
+                                    {t('description', { defaultValue: 'Description' })}
+                                </Label>
+                                <Input
+                                    type="text"
+                                    value={cfg.description ?? ''}
+                                    onChange={(e) => setCfg({ description: e.target.value })}
+                                    placeholder={t('projectDescription', {
+                                        defaultValue: 'Briefly describe this project...'
+                                    })}
+                                    className="h-7 max-w-[350px] flex-1 rounded-sm text-[11px]"
+                                />
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <Label className="w-[82px] shrink-0 pt-1.5 text-[11px] text-muted-foreground">
+                                    {t('projectLocation')}
+                                </Label>
+                                <div className="max-w-[350px] flex-1 space-y-1.5">
+                                    <RadioGroup
+                                        value={values.storageMode ?? 'managed'}
+                                        onValueChange={(value) => {
+                                            setValue(
+                                                'storageMode',
+                                                value as ProjectData['storageMode'],
+                                                { shouldValidate: true }
+                                            )
+                                            if (value === 'managed') {
+                                                setValue('path', '', { shouldValidate: false })
+                                            }
+                                        }}
+                                        className="flex gap-4"
+                                    >
+                                        <label
+                                            htmlFor="storage-managed"
+                                            className="flex cursor-pointer items-center gap-1.5 text-[11px] text-foreground"
+                                        >
+                                            <RadioGroupItem
+                                                value="managed"
+                                                id="storage-managed"
+                                                className="h-3.5 w-3.5"
+                                            />
+                                            {t('projectLocationManaged')}
+                                        </label>
+                                        <label
+                                            htmlFor="storage-linked"
+                                            className="flex cursor-pointer items-center gap-1.5 text-[11px] text-foreground"
+                                        >
+                                            <RadioGroupItem
+                                                value="linked"
+                                                id="storage-linked"
+                                                className="h-3.5 w-3.5"
+                                            />
+                                            {t('projectLocationLinked')}
+                                        </label>
+                                    </RadioGroup>
+                                    <div className="flex gap-1">
+                                        <Input
+                                            {...pathRegister}
+                                            id="path"
+                                            placeholder={t('enterProjectDirectory')}
+                                            disabled={values.storageMode !== 'linked'}
+                                            className="h-7 rounded-sm font-mono text-[10.5px]"
+                                        />
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            type="button"
+                                            className="h-7 w-7 rounded-sm"
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                handleOpenDirectory()
+                                            }}
+                                            disabled={values.storageMode !== 'linked'}
+                                        >
+                                            <FolderOpen className="h-3.5 w-3.5" />
+                                        </Button>
+                                    </div>
+                                    {touchedFields.path && pathError && (
+                                        <p className="text-xs text-destructive">{pathError}</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Section 2: AI SPECIFICATION SETTINGS */}
+                <div className="space-y-3 pl-[8px]">
+                    <p className="pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {t('aiSpecificationSettings', { defaultValue: 'AI Specification Settings' })}
+                    </p>
+
+                    {/* Application Name */}
+                    <div className="flex items-start gap-3">
+                        <Label
+                            htmlFor="app-name"
+                            className="w-[110px] shrink-0 whitespace-nowrap pt-1.5 text-[11px] text-muted-foreground"
+                        >
+                            {t('applicationName')}
+                        </Label>
+                        <div className="max-w-[388px] flex-1">
+                            <Input
+                                id="app-name"
+                                value={(cfg.name as string) ?? ''}
+                                onChange={(e) => setCfg({ name: e.target.value })}
+                                placeholder="my-spec-project"
+                                maxLength={100}
+                                className="h-7 rounded-sm text-[11px]"
+                            />
+                            {cfgErr.name && (
+                                <p className="mt-1 text-xs text-destructive">{cfgErr.name}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Default LLM + Embeddings model */}
+                    <div className="flex items-start gap-3">
+                        <Label className="w-[80px] shrink-0 pt-1.5 text-[11px] leading-tight text-muted-foreground">
+                            {t('defaultLLM', { defaultValue: 'Default LLM' })}
+                        </Label>
+                        <div className="flex max-w-[418px] flex-1 items-start gap-3">
+                            <div className="w-[140px]">
+                                <Select
+                                    value={currentLlm.model}
+                                    onValueChange={(value) => {
+                                        const sel = llmModels.find((m) => m.model === value)
+                                        if (sel) setCfg({ defaultLLM: sel })
+                                    }}
+                                >
+                                    <SelectTrigger
+                                        size="sm"
+                                        className="h-7 w-full rounded-sm border-input bg-background px-2 text-[11px] shadow-none [&>svg]:size-3"
+                                    >
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {llmModels.map((m) => (
+                                            <SelectItem
+                                                key={m.model}
+                                                value={m.model}
+                                                className="text-[11px]"
+                                            >
+                                                {m.model}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Label className="ml-auto w-[100px] shrink-0 pt-1.5 text-[11px] leading-tight text-muted-foreground">
+                                {t('embeddingsModel', { defaultValue: 'Embeddings model' })}
+                            </Label>
+                            <div className="w-[140px]">
+                                <Select
+                                    value={currentEmb.model}
+                                    onValueChange={(value) => {
+                                        const sel = embeddingsModels.find((m) => m.model === value)
+                                        if (sel) setCfg({ embeddings: sel })
+                                    }}
+                                >
+                                    <SelectTrigger
+                                        size="sm"
+                                        className="h-7 w-full rounded-sm border-input bg-background px-2 text-[11px] shadow-none [&>svg]:size-3"
+                                    >
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {embeddingsModels.map((m) => (
+                                            <SelectItem
+                                                key={m.model}
+                                                value={m.model}
+                                                className="text-[11px]"
+                                            >
+                                                {m.model}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     const renderStepContent = () => {
-        switch (step) {
-            case 1:
-                return renderStep1()
-            case 2:
-                return renderStep2()
-            case 3:
-                return renderStep3()
-            case 4:
-                return renderStep4()
-            default:
-                return null
+        if (step === 1) {
+            return (
+                <div className="space-y-6">
+                    {renderProjectType()}
+                    {renderFrameworkPicker()}
+                </div>
+            )
         }
+        // Step 2: Next.js gets the scaffold-matching custom layout; other
+        // frameworks keep the generic Project Details + framework config.
+        if (values.framework === 'nextjs') {
+            return renderNextJsStep2()
+        }
+        if (values.framework === 'springboot') {
+            return renderSpringBootStep2()
+        }
+        if (values.framework === 'specification') {
+            return renderSpecificationStep2()
+        }
+        return (
+            <div className="space-y-6">
+                {renderProjectDetails()}
+                {renderFrameworkConfig()}
+            </div>
+        )
+    }
+
+    // ---- Sidebar stage summaries ----
+    const typeLabel =
+        values.type === 'frontend'
+            ? t('frontend')
+            : values.type === 'backend'
+              ? t('backend')
+              : values.type === 'specification'
+                ? t('specification', { defaultValue: 'Specification' })
+                : ''
+    const selectedFramework = frameworks.find((f) => f.id === values.framework)
+    const stageSummary: Record<number, string> = {
+        1: [typeLabel, selectedFramework?.name].filter(Boolean).join(' · '),
+        2: values.name || ''
     }
 
     return (
-        <IGRPDialogPrimitive>
-            <IGRPDialogTriggerPrimitive asChild>
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
                 {children ? (
                     children
                 ) : (
-                    <IGRPButtonPrimitive>
+                    <Button>
                         <PlusCircle className="w-4 h-4" />
                         {t('createNewProject')}
-                    </IGRPButtonPrimitive>
+                    </Button>
                 )}
-            </IGRPDialogTriggerPrimitive>
-            <IGRPDialogContentPrimitive
-                className="flex min-h-0 max-h-[min(90vh,calc(100dvh-2rem))] w-[calc(100vw-2rem)] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:max-w-[700px] lg:max-w-[800px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            </DialogTrigger>
+            <DialogContent
+                className="flex min-h-0 h-[700px] w-[768px] max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-2rem)] flex-col gap-0 overflow-hidden rounded-md p-0 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 onInteractOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >
@@ -747,79 +1825,124 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
                     <div className="absolute inset-0 z-[70] flex items-center justify-center rounded-[inherit] bg-background/85 backdrop-blur-[1px]">
                         <div className="flex items-center gap-2 text-sm font-medium">
                             <Loader2 className="h-4 w-4 animate-spin" />
-                            <span>A criar projeto e a abrir...</span>
+                            <span>{t('createProject')}...</span>
                         </div>
                     </div>
                 )}
-                <IGRPDialogHeaderPrimitive className="shrink-0 border-b border-border px-4 py-3 sm:px-6">
-                    <IGRPDialogTitlePrimitive>{t('newProject')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
+
+                {/* Header bar */}
+                <DialogHeader className="shrink-0 flex-row items-center gap-2 space-y-0 border-b bg-muted/30 py-2 pl-3 pr-10">
+                    <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-primary-foreground">
+                        <Plus className="h-3 w-3" strokeWidth={3} />
+                    </span>
+                    <DialogTitle className="text-sm font-medium tracking-tight">
                         {t('newProject')}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
-                <form onSubmit={formik.handleSubmit} className="flex min-h-0 flex-1 flex-col">
-                    <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-4 sm:px-6">
-                        <div className="relative mb-6">
-                            <div className="absolute top-5 left-0 right-0 h-[2px] bg-muted" />
-                            <div className="relative flex justify-between">
-                                {STEPS.map((s) => (
-                                    <StepButton
+                    </DialogTitle>
+                    <DialogDescription className="sr-only">{t('newProject')}</DialogDescription>
+                </DialogHeader>
+
+                <form onSubmit={onFormSubmit} className="flex min-h-0 flex-1 flex-col">
+                    {/* Body: sidebar + content */}
+                    <div className="flex min-h-0 flex-1 overflow-hidden">
+                        {/* Stage sidebar */}
+                        <aside className="flex w-[180px] shrink-0 flex-col gap-1 border-r bg-muted/20 p-3">
+                            <p className="mb-1 px-1 text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                                {t('stages', { defaultValue: 'Stages' })}
+                            </p>
+                            {STEPS.map((s) => {
+                                const isActive = step === s.id
+                                const isDone = step > s.id
+                                const reachable = canNavigateToStep(s.id)
+                                return (
+                                    <button
                                         key={s.id}
-                                        step={s.id}
-                                        currentStep={step}
+                                        type="button"
+                                        disabled={!reachable}
                                         onClick={() => handleStepClick(s.id)}
-                                        disabled={!canNavigateToStep(s.id)}
+                                        className={cn(
+                                            'flex items-center gap-2 border-l-2 px-2 py-1.5 text-left transition-colors',
+                                            isActive
+                                                ? 'border-primary bg-background font-semibold text-primary shadow-xs'
+                                                : 'border-transparent text-muted-foreground hover:bg-muted/50',
+                                            !reachable && 'cursor-not-allowed opacity-50'
+                                        )}
                                     >
-                                        {t(s.label)}
-                                    </StepButton>
-                                ))}
-                            </div>
+                                        <span
+                                            className={cn(
+                                                'flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
+                                                isActive
+                                                    ? 'bg-primary text-primary-foreground'
+                                                    : isDone
+                                                      ? 'bg-primary/15 text-primary'
+                                                      : 'bg-muted text-muted-foreground'
+                                            )}
+                                        >
+                                            {isDone ? <Check className="h-3 w-3" /> : s.id}
+                                        </span>
+                                        <span className="min-w-0">
+                                            <span className="block truncate text-[11px]">
+                                                {t(s.label)}
+                                            </span>
+                                            {stageSummary[s.id] && (
+                                                <span className="block truncate text-[9.5px] font-normal text-muted-foreground">
+                                                    {stageSummary[s.id]}
+                                                </span>
+                                            )}
+                                        </span>
+                                    </button>
+                                )
+                            })}
+                        </aside>
+
+                        {/* Step content */}
+                        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-5">
+                            {renderStepContent()}
                         </div>
-                        <div className="pb-2">{renderStepContent()}</div>
                     </div>
 
-                    <IGRPDialogFooterPrimitive className="mt-0 shrink-0 border-t border-border bg-background px-4 py-3 sm:px-6">
-                        <div className="flex w-full justify-between gap-2">
-                            {step > 1 ? (
-                                <IGRPButtonPrimitive
-                                    type="button"
-                                    variant="outline"
-                                    onClick={handleBack}
-                                    disabled={isCreatingProject}
-                                >
-                                    <ArrowLeft className="w-4 h-4 mr-2" />
-                                    {t('back')}
-                                </IGRPButtonPrimitive>
-                            ) : (
-                                <div />
-                            )}
-                            {step < STEPS.length ? (
-                                <IGRPButtonPrimitive
-                                    type="button"
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        handleNext()
-                                    }}
-                                    disabled={!canNavigateToStep(step + 1) || isCreatingProject}
-                                >
-                                    {t('next')}
-                                    <ArrowRight className="w-4 h-4 ml-2" />
-                                </IGRPButtonPrimitive>
-                            ) : (
-                                <IGRPButtonPrimitive
-                                    type="submit"
-                                    disabled={formik.isSubmitting || isCreatingProject}
-                                >
-                                    {(formik.isSubmitting || isCreatingProject) && (
-                                        <Loader2 className="animate-spin" />
-                                    )}
-                                    {isCreatingProject ? 'A criar...' : t('createProject')}
-                                </IGRPButtonPrimitive>
-                            )}
-                        </div>
-                    </IGRPDialogFooterPrimitive>
+                    {/* Footer nav */}
+                    <div className="flex shrink-0 items-center justify-end gap-2 border-t bg-muted/30 px-4 py-2.5">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => (step > 1 ? handleBack() : setOpen(false))}
+                            disabled={isCreatingProject}
+                        >
+                            {step > 1 ? t('back') : t('cancel', { defaultValue: 'Cancel' })}
+                        </Button>
+                        {step < STEPS.length ? (
+                            <Button
+                                type="button"
+                                size="sm"
+                                className="min-w-[110px]"
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    handleNext()
+                                }}
+                                disabled={!canNavigateToStep(step + 1) || isCreatingProject}
+                            >
+                                {t('next')}
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        ) : (
+                            <Button
+                                type="submit"
+                                size="sm"
+                                className="min-w-[110px]"
+                                disabled={isSubmitting || isCreatingProject}
+                            >
+                                {isSubmitting || isCreatingProject ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Check className="h-4 w-4" />
+                                )}
+                                {t('createProject')}
+                            </Button>
+                        )}
+                    </div>
                 </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }

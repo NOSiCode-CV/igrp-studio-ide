@@ -110,10 +110,7 @@ export async function listInstalledSkills(basePath: string): Promise<InstalledSk
     return out.sort((a, b) => a.name.localeCompare(b.name))
 }
 
-async function loadSkill(
-    folderPath: string,
-    name: string
-): Promise<InstalledSkill | null> {
+async function loadSkill(folderPath: string, name: string): Promise<InstalledSkill | null> {
     const skillMdPath = join(folderPath, SKILL_MD)
     if (!fs.existsSync(skillMdPath)) return null
     let content: string
@@ -272,8 +269,7 @@ export async function installSkill(
 // should each get a fresh check on demand.
 
 /** Default registry — kept in sync with `studio/packages/cli/src/commands/skill/shared/paths.js`. */
-const DEFAULT_SKILL_REGISTRY =
-    'https://sonatype.nosi.cv/repository/igrp-templates/@igrp/skills/'
+const DEFAULT_SKILL_REGISTRY = 'https://sonatype.nosi.cv/repository/igrp-templates/@igrp/skills/'
 
 function resolveSkillRegistry(): string {
     return process.env.IGRP_SKILL_REGISTRY || DEFAULT_SKILL_REGISTRY
@@ -395,11 +391,10 @@ export async function updateSkill(
     return new Promise((resolve) => {
         let proc
         try {
-            proc = spawn(
-                'igrp',
-                ['skill', 'update', skillName, '--project', basePath, '--quiet'],
-                { cwd: basePath, shell: false }
-            )
+            proc = spawn('igrp', ['skill', 'update', skillName, '--project', basePath, '--quiet'], {
+                cwd: basePath,
+                shell: false
+            })
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err)
             resolve({

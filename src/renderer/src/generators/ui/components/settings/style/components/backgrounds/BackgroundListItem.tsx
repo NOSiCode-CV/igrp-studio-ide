@@ -1,4 +1,4 @@
-import { IGRPButtonPrimitive } from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
 import { Trash2 } from 'lucide-react'
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -77,7 +77,7 @@ export function BackgroundListItem({
                     onChange={onChange}
                     onEdit={onEdit}
                 />
-                <IGRPButtonPrimitive
+                <Button
                     variant={'ghost'}
                     size={'icon'}
                     onClick={(e) => {
@@ -86,7 +86,7 @@ export function BackgroundListItem({
                     }}
                 >
                     <Trash2 size={10} />
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
         </div>
     )

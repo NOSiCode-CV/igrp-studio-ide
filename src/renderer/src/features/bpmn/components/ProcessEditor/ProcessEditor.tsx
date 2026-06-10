@@ -1,7 +1,5 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPSkeletonPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Skeleton } from '@renderer/components/ui/skeleton'
 import { AlertTriangle, BookOpen, MessageSquare, RotateCcw, X } from 'lucide-react'
 import { type JSX, useCallback, useEffect, useMemo, useState } from 'react'
 import {
@@ -50,8 +48,8 @@ type EditorTab = 'diagram' | 'xml'
 
 const TabSkeleton = (): JSX.Element => (
     <div className="space-y-3 p-4">
-        <IGRPSkeletonPrimitive className="h-4 w-1/3" />
-        <IGRPSkeletonPrimitive className="h-[60vh] w-full" />
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="h-[60vh] w-full" />
     </div>
 )
 
@@ -64,10 +62,10 @@ const ErrorState = ({ message, onRetry }: ErrorStateProps): JSX.Element => (
     <div className="flex h-full flex-col items-center justify-center gap-3 text-sm">
         <AlertTriangle className="h-8 w-8 text-destructive" />
         <p className="max-w-md text-center text-muted-foreground">{message}</p>
-        <IGRPButtonPrimitive variant="outline" size="sm" onClick={onRetry}>
+        <Button variant="outline" size="sm" onClick={onRetry}>
             <RotateCcw className="mr-1 h-4 w-4" />
             Retry
-        </IGRPButtonPrimitive>
+        </Button>
     </div>
 )
 
@@ -142,7 +140,7 @@ export function ProcessEditor({
                         </IGRPTabsList>
                         <div className="flex items-center gap-2">
                             {tab === 'diagram' && (
-                                <IGRPButtonPrimitive
+                                <Button
                                     variant={helperOpen ? 'default' : 'outline'}
                                     size="sm"
                                     onClick={() =>
@@ -153,9 +151,9 @@ export function ProcessEditor({
                                 >
                                     <BookOpen className="mr-1 h-4 w-4" />
                                     Delegates reference
-                                </IGRPButtonPrimitive>
+                                </Button>
                             )}
-                            <IGRPButtonPrimitive
+                            <Button
                                 variant={chatOpen ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() =>
@@ -164,7 +162,7 @@ export function ProcessEditor({
                             >
                                 <MessageSquare className="mr-1 h-4 w-4" />
                                 Assistant
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </div>
                     </div>
                     <IGRPTabsContent value="diagram" className="flex-1 overflow-hidden p-0">
@@ -203,14 +201,14 @@ export function ProcessEditor({
                     <aside className="flex w-[360px] shrink-0 flex-col border-l bg-background">
                         <div className="flex items-center justify-between border-b px-3 py-2">
                             <h3 className="text-sm font-semibold">AI Assistant</h3>
-                            <IGRPButtonPrimitive
+                            <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setSidePanel('closed')}
                                 aria-label="Close assistant"
                             >
                                 <X className="h-4 w-4" />
-                            </IGRPButtonPrimitive>
+                            </Button>
                         </div>
                         <div className="flex-1 overflow-hidden">
                             <AIAssistant

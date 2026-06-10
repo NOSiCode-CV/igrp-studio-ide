@@ -7,9 +7,9 @@ import { useGit } from '@renderer/hooks/use-git'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useKeyPress } from '@renderer/hooks/useKeyDown'
 import useToast from '@renderer/hooks/useToast'
+import { useFormikCompat, useZodForm } from '@renderer/lib/form'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
 import { getId } from '@renderer/utils'
-import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -37,13 +37,12 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
     // namespace differs between Spring (`'java'`) and .NET (`'dotnet'`). The
     // dotnet-engine's JSON-schema rejects `'java'` so seeding the right value
     // up front avoids "objectType must be one of ..." errors on save.
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues: getInitialValues(framework),
-        validationSchema,
-        onSubmit: async (values) => {
-            await handleSave(values)
-        }
+    const rhfForm = useZodForm<any>({
+        schema: validationSchema as never,
+        defaultValues: getInitialValues(framework)
+    })
+    const formik = useFormikCompat(rhfForm, async (values: any) => {
+        await handleSave(values)
     })
 
     useEffect(() => {

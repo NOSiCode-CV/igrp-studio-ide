@@ -1,15 +1,15 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogOverlayPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPTextarea
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogOverlay,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { IGRPTextarea } from '@igrp/igrp-framework-react-design-system'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
 import {
@@ -175,10 +175,10 @@ const CreateWorkspace = ({
     const formFieldsContent = (
         <div className="grid gap-5 py-4">
             <div className="compact-form-field space-y-2">
-                <IGRPLabelPrimitive htmlFor="workspaceName">
+                <Label htmlFor="workspaceName">
                     {t('workspace.nameLabel')} <span className="text-red-500">*</span>
-                </IGRPLabelPrimitive>
-                <IGRPInputPrimitive
+                </Label>
+                <Input
                     ref={inputRef}
                     id="workspaceName"
                     value={workspaceName}
@@ -189,10 +189,10 @@ const CreateWorkspace = ({
             </div>
             <div className="compact-form-field space-y-2">
                 <div className="compact-form-field space-y-2">
-                    <IGRPLabelPrimitive htmlFor="slug">
+                    <Label htmlFor="slug">
                         {t('workspace.slug')} <span className="text-red-500">*</span>
-                    </IGRPLabelPrimitive>
-                    <IGRPInputPrimitive
+                    </Label>
+                    <Input
                         id="slug"
                         value={slug}
                         onChange={(e) => setSlug(normalizeSlug(e.target.value))}
@@ -205,7 +205,7 @@ const CreateWorkspace = ({
             </div>
 
             <div className="compact-form-field space-y-2">
-                <IGRPLabelPrimitive htmlFor="description">{t('description')}</IGRPLabelPrimitive>
+                <Label htmlFor="description">{t('description')}</Label>
                 <IGRPTextarea
                     id="description"
                     name="description"
@@ -217,17 +217,17 @@ const CreateWorkspace = ({
             </div>
 
             <div className="space-y-2">
-                <IGRPLabelPrimitive>
+                <Label>
                     {t('workspace.locationLabel')} <span className="text-red-500">*</span>
-                </IGRPLabelPrimitive>
+                </Label>
                 <div className="flex gap-2">
-                    <IGRPInputPrimitive
+                    <Input
                         value={directoryPath}
                         readOnly
                         placeholder={t('workspace.locationPlaceholder')}
                         className="w-full flex-1"
                     />
-                    <IGRPButtonPrimitive
+                    <Button
                         variant="outline"
                         size="icon"
                         onClick={handleSelectDirectory}
@@ -236,7 +236,7 @@ const CreateWorkspace = ({
                     >
                         <FolderOpen className="h-4 w-4" />
                         <span className="sr-only">{t('workspace.browseButton')}</span>
-                    </IGRPButtonPrimitive>
+                    </Button>
                 </div>
             </div>
         </div>
@@ -342,7 +342,7 @@ const CreateWorkspace = ({
                                         {platformGuide.command}
                                     </span>
                                 </code>
-                                <IGRPButtonPrimitive
+                                <Button
                                     type="button"
                                     variant="secondary"
                                     className="box-border flex h-10 min-h-10 max-h-10 w-10 shrink-0 items-center justify-center rounded-none border-0 bg-foreground p-0 leading-none text-background"
@@ -351,7 +351,7 @@ const CreateWorkspace = ({
                                     title={t('copy')}
                                 >
                                     <Copy className="h-4 w-4 shrink-0" />
-                                </IGRPButtonPrimitive>
+                                </Button>
                             </div>
                             <p className="text-[10px] text-primary mt-2 font-medium">
                                 Add: 127.0.0.1 {slug}
@@ -396,9 +396,9 @@ const CreateWorkspace = ({
         <div className="grid gap-5 py-4">
             {formFieldsContent}
             <div className="flex justify-end pt-2">
-                <IGRPButtonPrimitive onClick={handleCreate} disabled={isCreateDisabled}>
+                <Button onClick={handleCreate} disabled={isCreateDisabled}>
                     {isCreating ? t('creating') : t('workspace.createButton')}
-                </IGRPButtonPrimitive>
+                </Button>
             </div>
         </div>
     )
@@ -423,9 +423,9 @@ const CreateWorkspace = ({
     }
 
     return (
-        <IGRPDialogPrimitive open={open} onOpenChange={handleDialogOpenChange} modal>
-            <IGRPDialogOverlayPrimitive className="bg-background/70 backdrop-blur-[2px]" />
-            <IGRPDialogContentPrimitive
+        <Dialog open={open} onOpenChange={handleDialogOpenChange} modal>
+            <DialogOverlay className="bg-background/70 backdrop-blur-[2px]" />
+            <DialogContent
                 className="max-w-[560px]"
                 {...(preventDismiss
                     ? {
@@ -435,18 +435,18 @@ const CreateWorkspace = ({
                       }
                     : {})}
             >
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>
+                <DialogHeader>
+                    <DialogTitle>
                         {dialogStep === 0
                             ? t('workspace.createTitle')
                             : infoSteps[dialogStep - 1].title}
-                    </IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive>
+                    </DialogTitle>
+                    <DialogDescription>
                         {dialogStep === 0
                             ? t('createWorkspaceInfo')
                             : infoSteps[dialogStep - 1].description}
-                    </IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+                    </DialogDescription>
+                </DialogHeader>
                 {dialogStep === 0 ? formFieldsContent : infoSteps[dialogStep - 1].content}
 
                 <div className="pt-4 border-t border-border flex items-center justify-between">
@@ -462,7 +462,7 @@ const CreateWorkspace = ({
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <IGRPButtonPrimitive
+                        <Button
                             type="button"
                             variant="outline"
                             onClick={() => setDialogStep((prev) => Math.max(prev - 1, 0))}
@@ -470,10 +470,10 @@ const CreateWorkspace = ({
                         >
                             <ChevronLeft className="w-4 h-4" />
                             Previous
-                        </IGRPButtonPrimitive>
+                        </Button>
 
                         {dialogStep < totalSteps - 1 ? (
-                            <IGRPButtonPrimitive
+                            <Button
                                 type="button"
                                 disabled={dialogStep === 0 && !isFormStepValid}
                                 onClick={() =>
@@ -482,20 +482,20 @@ const CreateWorkspace = ({
                             >
                                 Next
                                 <ChevronRight className="w-4 h-4" />
-                            </IGRPButtonPrimitive>
+                            </Button>
                         ) : (
-                            <IGRPButtonPrimitive
+                            <Button
                                 type="button"
                                 onClick={handleCreate}
                                 disabled={isCreateDisabled}
                             >
                                 {isCreating ? t('creating') : t('workspace.createButton')}
-                            </IGRPButtonPrimitive>
+                            </Button>
                         )}
                     </div>
                 </div>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }
 

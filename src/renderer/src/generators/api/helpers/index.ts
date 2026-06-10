@@ -1,6 +1,18 @@
 import { isSharedModuleName } from '@renderer/constants/appConstants'
-import type { FormikValues } from 'formik'
 import type { FileTree } from 'src/main/types'
+
+/**
+ * Minimal shape of a form controller that the array-row helpers below need.
+ * Both Formik (`useFormik({...})`) and React Hook Form (after wrapping with
+ * `toRowFormAdapter` from `@renderer/lib/form`) satisfy this surface, so
+ * callers can pick either library. Phase 4.1 of the dependency cleanup is
+ * gradually moving everything to RHF, and these helpers stay generic so the
+ * intermediate state compiles.
+ */
+export interface RowFormController {
+    values: Record<string, any>
+    setFieldValue: (field: string, value: any) => void | Promise<unknown>
+}
 
 export function formatMethods(
     elements: string[],
@@ -41,11 +53,11 @@ export function getOptionsByObject(objects: any, module: string, currentItem: st
         : []
 }
 
-export const addNewRow = (formik: FormikValues, field: string, defaultValue: any): void => {
+export const addNewRow = (formik: RowFormController, field: string, defaultValue: any): void => {
     formik.setFieldValue(field, [...formik.values[field], defaultValue])
 }
 
-export const removeRow = (formik: FormikValues, field: string, position: number): void => {
+export const removeRow = (formik: RowFormController, field: string, position: number): void => {
     formik.setFieldValue(
         field,
         formik.values[field].filter((_: any, index: number) => index !== position)
@@ -53,7 +65,7 @@ export const removeRow = (formik: FormikValues, field: string, position: number)
 }
 
 export const changeValue = (
-    formik: FormikValues,
+    formik: RowFormController,
     element: string,
     position: number,
     value: any,
@@ -68,7 +80,7 @@ export const changeValue = (
 }
 
 export const handleChangeValueObject = (
-    formik: FormikValues,
+    formik: RowFormController,
     element: string,
     position: number,
     result: any,

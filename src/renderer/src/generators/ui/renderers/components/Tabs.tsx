@@ -1,9 +1,4 @@
-import {
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import Draggable from '@renderer/lib/dnd/Draggable'
 import Droppable from '@renderer/lib/dnd/Droppable'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
@@ -51,7 +46,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({ comp, onDragEnd }: CardC
                     mode="MOVE"
                     layout="horizontal"
                 >
-                    <IGRPTabsTriggerPrimitive
+                    <TabsTrigger
                         value={child.id}
                         key={index}
                         className="min-w-fit max-w-full flex-shrink-0 flex flex-wrap break-words h-auto min-h-[36px] px-3 py-2"
@@ -72,7 +67,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({ comp, onDragEnd }: CardC
                                 <span>{label || componentName}</span>
                             </BoxField>
                         </div>
-                    </IGRPTabsTriggerPrimitive>
+                    </TabsTrigger>
                 </Draggable>
             )
         })
@@ -83,7 +78,7 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({ comp, onDragEnd }: CardC
             const { children: components, id: componentId } = child
 
             return (
-                <IGRPTabsContentPrimitive value={child.id} key={index} asChild className="mt-4">
+                <TabsContent value={child.id} key={index} asChild className="mt-4">
                     <Droppable
                         onDrop={onDragEnd}
                         component={child}
@@ -114,25 +109,25 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({ comp, onDragEnd }: CardC
                                 )
                             })}
                     </Droppable>
-                </IGRPTabsContentPrimitive>
+                </TabsContent>
             )
         })
     }
 
     return (
-        <IGRPTabsPrimitive defaultValue={components[0].id} className="w-full">
+        <Tabs defaultValue={components[0].id} className="w-full">
             <Droppable
                 className={cn('flex w-full flex-col gap-6', className)}
                 onDrop={onDragEnd}
                 component={comp}
                 path="tabs"
             >
-                <IGRPTabsListPrimitive className="flex-wrap overflow-x-auto max-w-full h-auto min-h-[40px]">
+                <TabsList className="flex-wrap overflow-x-auto max-w-full h-auto min-h-[40px]">
                     {renderTriggers()}
-                </IGRPTabsListPrimitive>
+                </TabsList>
             </Droppable>
             {renderContent()}
-        </IGRPTabsPrimitive>
+        </Tabs>
     )
 }
 

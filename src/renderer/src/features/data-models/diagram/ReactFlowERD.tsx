@@ -1,12 +1,13 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import { useTheme } from '@renderer/components/theme-provider'
 import { Database, KeyRound, MoreVertical, Plus, Trash2 } from 'lucide-react'
 import { type FC, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -55,14 +56,17 @@ const EDGE_MARKERS: Record<
     }
 }
 
-interface EntityNodeData {
+// `@xyflow/react` v12 requires Node data to satisfy `Record<string, unknown>`.
+// Use a type alias with intersection so the constraint is met without losing
+// the named fields.
+type EntityNodeData = {
     entity: Entity
     readOnly?: boolean
     onAddField?: (entityId: string) => void
     onDelete?: (entityId: string) => void
     onRename?: (entityId: string) => void
     onOpen?: (entityId: string) => void
-}
+} & Record<string, unknown>
 
 const EntityNode: FC<{ data: EntityNodeData; selected: boolean }> = memo(({ data, selected }) => {
     const { entity, readOnly, onAddField, onDelete, onRename, onOpen } = data
@@ -77,12 +81,12 @@ const EntityNode: FC<{ data: EntityNodeData; selected: boolean }> = memo(({ data
             <Handle
                 type="target"
                 position={Position.Left}
-                style={{ background: '#888', border: 'none' }}
+                style={{ background: 'var(--muted-foreground)', border: 'none' }}
             />
             <Handle
                 type="source"
                 position={Position.Right}
-                style={{ background: '#888', border: 'none' }}
+                style={{ background: 'var(--muted-foreground)', border: 'none' }}
             />
             <div
                 className="flex items-center justify-between gap-1 px-2 py-1.5 bg-muted/60 border-b cursor-pointer"
@@ -95,8 +99,8 @@ const EntityNode: FC<{ data: EntityNodeData; selected: boolean }> = memo(({ data
                     <span className="text-sm font-semibold truncate">{entity.name}</span>
                 </div>
                 {!readOnly && (
-                    <IGRPDropdownMenuPrimitive>
-                        <IGRPDropdownMenuTriggerPrimitive asChild>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
                             <button
                                 type="button"
                                 className="p-0.5 rounded hover:bg-muted"
@@ -104,27 +108,27 @@ const EntityNode: FC<{ data: EntityNodeData; selected: boolean }> = memo(({ data
                             >
                                 <MoreVertical className="h-3.5 w-3.5" />
                             </button>
-                        </IGRPDropdownMenuTriggerPrimitive>
-                        <IGRPDropdownMenuContentPrimitive align="end">
-                            <IGRPDropdownMenuItemPrimitive onClick={() => onOpen?.(entity.id)}>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => onOpen?.(entity.id)}>
                                 {t('open_in_editor')}
-                            </IGRPDropdownMenuItemPrimitive>
-                            <IGRPDropdownMenuItemPrimitive onClick={() => onAddField?.(entity.id)}>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onAddField?.(entity.id)}>
                                 <Plus className="h-3.5 w-3.5 mr-2" />
                                 {t('add_field')}
-                            </IGRPDropdownMenuItemPrimitive>
-                            <IGRPDropdownMenuItemPrimitive onClick={() => onRename?.(entity.id)}>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onRename?.(entity.id)}>
                                 {t('rename_entity')}
-                            </IGRPDropdownMenuItemPrimitive>
-                            <IGRPDropdownMenuItemPrimitive
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
                                 onClick={() => onDelete?.(entity.id)}
                                 className="text-destructive"
                             >
                                 <Trash2 className="h-3.5 w-3.5 mr-2" />
                                 {t('delete_entity')}
-                            </IGRPDropdownMenuItemPrimitive>
-                        </IGRPDropdownMenuContentPrimitive>
-                    </IGRPDropdownMenuPrimitive>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 )}
             </div>
             <ul className="divide-y text-xs">
@@ -185,6 +189,10 @@ function ReactFlowERDInner({
     onNewEntity
 }: ReactFlowERDProps): React.ReactNode {
     const { t } = useTranslation()
+    // ReactFlow v12 has a built-in `colorMode` prop that swaps edge/control/
+    // background defaults between light + dark palettes. Wire it to the app's
+    // ThemeProvider so the ERD canvas tracks the global toggle automatically.
+    const { theme } = useTheme()
     const writeable = !readOnly && !!basePath
     const { entities: summaries } = useEntities(writeable ? basePath : undefined)
     const [hydrated, setHydrated] = useState<Entity[]>([])
@@ -320,8 +328,8 @@ function ReactFlowERDInner({
         [entities, idToName]
     )
 
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+    const [nodes, setNodes, onNodesChange] = useNodesState<Node<EntityNodeData>>(initialNodes)
+    const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(initialEdges)
 
     // Re-sync when underlying data changes (broadcasts, refresh, etc.).
     useEffect(() => {
@@ -347,7 +355,7 @@ function ReactFlowERDInner({
     }, [basePath, writeable])
 
     const handleNodesChange = useCallback(
-        (changes: NodeChange[]) => {
+        (changes: NodeChange<Node<EntityNodeData>>[]) => {
             onNodesChange(changes)
             if (!writeable) return
             for (const change of changes) {
@@ -384,16 +392,17 @@ function ReactFlowERDInner({
                 onNodesChange={handleNodesChange}
                 onEdgesChange={onEdgesChange}
                 fitView
+                colorMode={theme}
                 proOptions={{ hideAttribution: true }}
             >
                 <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
                 <Controls />
                 {onNewEntity && (
                     <div className="absolute top-2 left-2 z-10">
-                        <IGRPButtonPrimitive size="sm" onClick={onNewEntity}>
+                        <Button size="sm" onClick={onNewEntity}>
                             <Plus className="h-4 w-4 mr-1" />
                             {t('new_entity')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     </div>
                 )}
             </ReactFlow>

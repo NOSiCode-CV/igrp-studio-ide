@@ -1,9 +1,9 @@
 import {
-    IGRPAccordionContentPrimitive,
-    IGRPAccordionItemPrimitive,
-    IGRPAccordionPrimitive,
-    IGRPAccordionTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger
+} from '@renderer/components/ui/accordion'
 import Draggable from '@renderer/lib/dnd/Draggable'
 import Droppable from '@renderer/lib/dnd/Droppable'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
@@ -52,15 +52,11 @@ const IGRPStudioAccordion: React.FC<CardComponentProps> = ({
                     className={cn('bg-muted/0', className)}
                     mode="MOVE"
                 >
-                    <IGRPAccordionItemPrimitive value={componentId} key={index}>
+                    <AccordionItem value={componentId} key={index}>
                         <div className="relative group/accordion-trigger">
-                            <IGRPAccordionTriggerPrimitive
-                                iconName="ChevronDown"
-                                showIcon
-                                iconPlacement="end"
-                            >
+                            <AccordionTrigger iconName="ChevronDown" showIcon iconPlacement="end">
                                 <span>{title || componentName}</span>
-                            </IGRPAccordionTriggerPrimitive>
+                            </AccordionTrigger>
                             <div
                                 className={cn(
                                     'absolute top-0 mt-1 bg-gray-600 text-white rounded opacity-0 group-hover/accordion-trigger:opacity-100 transition-opacity duration-200 shadow-lg left-0 right-auto'
@@ -75,7 +71,7 @@ const IGRPStudioAccordion: React.FC<CardComponentProps> = ({
                                 />
                             </div>
                         </div>
-                        <IGRPAccordionContentPrimitive key={index} asChild>
+                        <AccordionContent key={index} asChild>
                             <Droppable
                                 onDrop={onDragEnd}
                                 component={child}
@@ -109,15 +105,15 @@ const IGRPStudioAccordion: React.FC<CardComponentProps> = ({
                                         )
                                     })}
                             </Droppable>
-                        </IGRPAccordionContentPrimitive>
-                    </IGRPAccordionItemPrimitive>
+                        </AccordionContent>
+                    </AccordionItem>
                 </Draggable>
             )
         })
     }
 
     return (
-        <IGRPAccordionPrimitive
+        <Accordion
             defaultValue={components[0]?.id || ''}
             className="w-full"
             type="single"
@@ -131,7 +127,7 @@ const IGRPStudioAccordion: React.FC<CardComponentProps> = ({
             >
                 {renderContent()}
             </Droppable>
-        </IGRPAccordionPrimitive>
+        </Accordion>
     )
 }
 
