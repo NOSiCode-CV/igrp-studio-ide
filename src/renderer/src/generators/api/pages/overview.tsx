@@ -13,6 +13,7 @@ import {
     IGRPTabsTriggerPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { FrameworkIcon } from '@renderer/components/framework-icon'
+import { isSharedModuleName } from '@renderer/constants/appConstants'
 import { GitContributors } from '@renderer/components/git/git-contributors'
 import { VersionAlert } from '@renderer/components/version-alert'
 import { springEngineChangelog } from '@renderer/components/version-alert-resume'
@@ -73,7 +74,7 @@ const Overview = () => {
     useEffect(() => {
         const newStats = { modules: 0, controllers: 0, models: 0, dto: 0 }
 
-        newStats.modules = filesThree.filter((file) => file.name !== 'shared').length
+        newStats.modules = filesThree.filter((file) => !isSharedModuleName(file.name)).length
 
         filesThree.forEach((file: any) => {
             if (!file.children) return

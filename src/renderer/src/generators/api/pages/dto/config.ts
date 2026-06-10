@@ -35,7 +35,14 @@ export const getInitialValues = (framework: ENV_TYPES): DTOConfig => ({
     attributes: [
         {
             name: '',
-            objectType: nativeTypeNamespace(framework),
+            // `nativeTypeNamespace` yields 'dotnet' for .NET projects — a value
+            // the shared Spring `DTOConfig` union (`JavaAttribute.objectType`)
+            // doesn't enumerate. It's correct at runtime (the .NET engine's
+            // schema requires 'dotnet'); assert to the declared union so this
+            // cross-engine form state still satisfies `DTOConfig`.
+            objectType: nativeTypeNamespace(
+                framework
+            ) as DTOConfig['attributes'][number]['objectType'],
             type: 'string',
             required: false,
             before: false,

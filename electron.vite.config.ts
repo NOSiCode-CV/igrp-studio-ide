@@ -2,6 +2,24 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import { resolve } from 'path'
 
+// Vite dev injects an inline React-Refresh runtime and uses `eval` for HMR.
+// The shipped CSP (`script-src 'self'`) blocks both, leaving the renderer as a
+// blank page. Relax script-src ONLY for `vite dev` — production builds keep
+// the strict CSP from index.html untouched.
+const devCspPlugin = () => ({
+    name: 'igrp-dev-csp',
+    apply: 'serve' as const,
+    transformIndexHtml: {
+        order: 'pre' as const,
+        handler(html: string) {
+            return html.replace(
+                /script-src 'self';/,
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval';"
+            )
+        }
+    }
+})
+
 export default defineConfig({
     main: {
         plugins: [externalizeDepsPlugin()],
@@ -41,7 +59,7 @@ export default defineConfig({
             ),
             'import.meta.env.VITE_SENTRY_TEST': JSON.stringify(process.env.VITE_SENTRY_TEST || '')
         },
-        plugins: [react()],
+        plugins: [react(), devCspPlugin()],
         optimizeDeps: {
             exclude: ['monaco-editor']
         },

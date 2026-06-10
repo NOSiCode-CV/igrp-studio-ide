@@ -10,7 +10,7 @@ import {
     IGRPTextAreaPrimitive
 } from '@igrp/igrp-framework-react-design-system'
 import { LabelRequired } from '@renderer/components/label-required'
-import { DatabaseOptions } from '@renderer/constants/appConstants'
+import { DotnetDatabaseOptions } from '@renderer/constants/appConstants'
 import type { FormikErrors } from 'formik'
 import { useTranslation } from 'react-i18next'
 import type { DotNetConfigData, ProjectData } from 'src/main/types'
@@ -80,7 +80,7 @@ export function DotNetConfig({
                     <IGRPCombobox
                         value={data.database}
                         onChange={(value) => onChange({ ...data, database: value })}
-                        options={DatabaseOptions}
+                        options={DotnetDatabaseOptions}
                         className="w-full"
                     />
                 </div>

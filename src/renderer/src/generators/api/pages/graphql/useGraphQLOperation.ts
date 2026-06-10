@@ -1,6 +1,7 @@
 import { useTabs } from '@renderer/components/navigation/TabContext'
 import { OPTION_TYPE } from '@renderer/constants/appConstants'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
+import { useFramework } from '@renderer/hooks/use-framework'
 import useToast from '@renderer/hooks/useToast'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
 import { useFormik } from 'formik'
@@ -106,6 +107,7 @@ export const useGraphQLOperation = ({
 }) => {
     const dispatch: any = useDispatch()
     const { handleRenameTab } = useTabs()
+    const framework = useFramework()
     const { showErrorToast, showSuccessToast } = useToast()
     const { dto, models, responses, enums, basePath, filesThree } = useStudioAPI(
         currentItem?.module
@@ -141,12 +143,14 @@ export const useGraphQLOperation = ({
                     ? await GraphQLService.updateGraphQLOperation(
                           basePath,
                           currentItem.module,
+                          framework,
                           savedOperation.id,
                           values
                       )
                     : await GraphQLService.createGraphQLOperation(
                           basePath,
                           currentItem.module,
+                          framework,
                           values
                       )
 
@@ -171,6 +175,7 @@ export const useGraphQLOperation = ({
             await GraphQLService.deleteGraphQLOperation(
                 basePath,
                 currentItem.module,
+                framework,
                 savedOperation.id
             )
             dispatch(onSetChangeStatus(true))

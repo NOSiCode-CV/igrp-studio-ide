@@ -102,11 +102,40 @@ export enum ENV_TYPES {
     SPECIFICATION = 'specification'
 }
 
+/**
+ * Canonical folder name for the cross-module "shared" components bucket.
+ * The Spring engine writes it lowercase (`.igrpstudio/shared/...`), the
+ * .NET engine writes it PascalCase (`.igrpstudio/Shared/...`). Studio's UI
+ * treats this folder specially — different icon, the "Components" label,
+ * a reduced dropdown menu, and excluded from module counts/dropdowns. Use
+ * `isSharedModuleName(name)` everywhere instead of comparing against the
+ * raw string so .NET projects light up the same UI affordances as Spring.
+ */
+export const SHARED_MODULE_FOLDER = 'shared'
+export const isSharedModuleName = (name: string | undefined | null): boolean =>
+    !!name && name.toLowerCase() === SHARED_MODULE_FOLDER
+
 export const DatabaseOptions = [
     { value: 'MySQL', label: 'MySQL' },
     { value: 'Oracle', label: 'Oracle' },
     { value: 'Postgresql', label: 'PostgreSQL' },
     { value: 'SqlServer', label: 'SQL Server' }
+]
+
+/**
+ * Database options scoped to .NET projects. Mirrors `DATABASE_TYPES` exported
+ * by `@igrp/dotnet-engine` (`["MySQL", "Oracle", "Postgresql", "SqlServer",
+ * "Sqlite"]`). Kept separate from the Spring-facing `DatabaseOptions` because
+ * the two engines support different DB sets — Spring lacks SQLite/SqlServer
+ * and instead supports H2. Update both lists in lock-step with the engine
+ * constants when adding a new backend.
+ */
+export const DotnetDatabaseOptions = [
+    { value: 'MySQL', label: 'MySQL' },
+    { value: 'Oracle', label: 'Oracle' },
+    { value: 'Postgresql', label: 'PostgreSQL' },
+    { value: 'SqlServer', label: 'SQL Server' },
+    { value: 'Sqlite', label: 'SQLite' }
 ]
 
 export const projectStructureStyle = [

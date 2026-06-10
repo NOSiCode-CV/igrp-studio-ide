@@ -1,4 +1,9 @@
-import { OPTION_TYPE, type OptionType } from '@renderer/constants/appConstants'
+import {
+    isSharedModuleName,
+    OPTION_TYPE,
+    SHARED_MODULE_FOLDER,
+    type OptionType
+} from '@renderer/constants/appConstants'
 import { setCurrentItem as onSetCurrentItem } from '@renderer/redux/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import { getBadgeColor, getIcon } from '@renderer/utils'
@@ -236,7 +241,7 @@ const useNavdata = (filesThree: FileTree[]) => {
         return filesThree
             .filter((folder) => !IGNORED_PATHS.has(folder.name))
             .map((folder: any) => {
-                const isShared = folder.name === 'shared'
+                const isShared = isSharedModuleName(folder.name)
 
                 const dropdownMenus = isShared
                     ? [...dropdownConfigs.baseDropdownMenus]
@@ -248,7 +253,11 @@ const useNavdata = (filesThree: FileTree[]) => {
 
                 const folderMenuItem: MenuItem = {
                     icon: isShared ? Layers : Box,
-                    label: isShared ? t(folder.name) : folder.name,
+                    // Use the canonical lowercase i18n key when the folder
+                    // is the shared bucket — `t('Shared')` would otherwise
+                    // miss the translation and render literal "Shared"
+                    // (which is what .NET projects were showing).
+                    label: isShared ? t(SHARED_MODULE_FOLDER) : folder.name,
                     module: folder.name,
                     subItems: [],
                     dropdownclick: onClickItem,

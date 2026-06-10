@@ -68,10 +68,9 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
 
         if (type === OPTION_TYPE.MODEL) {
             setId(getId())
-            const baseAttributeFields = initialValues.attributes[0]
-                ? Object.keys(initialValues.attributes[0])
-                : []
-            const baseAttributeDefaults = initialValues.attributes[0] || {}
+            const seedAttributes = getInitialValues(framework).attributes
+            const baseAttributeFields = seedAttributes[0] ? Object.keys(seedAttributes[0]) : []
+            const baseAttributeDefaults = seedAttributes[0] || {}
 
             const mergedAttributes = attributes.map((attr: any) => {
                 const mergedAttr = { ...baseAttributeDefaults }
@@ -85,7 +84,7 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
 
             formik.setFieldValue(
                 'attributes',
-                mergedAttributes.length ? mergedAttributes : initialValues.attributes
+                mergedAttributes.length ? mergedAttributes : seedAttributes
             )
         }
     }, [data])

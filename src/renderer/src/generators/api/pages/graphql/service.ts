@@ -2,37 +2,48 @@ import { ENV_TYPES } from '@renderer/constants/appConstants'
 import { toGraphQLOperationPayload } from './mapper'
 import type { GraphQLOperationFormValues, GraphQLPersistedOperation } from './types'
 
-const PRIMITIVES = new Set(['Boolean', 'String', 'Int', 'Float', 'ID'])
+const PRIMITIVES = new Set(['Boolean', 'String', 'Int', 'Float', 'ID', 'boolean', 'string', 'int', 'float', 'id'])
 
 const GQL_TO_ENGINE_TYPE: Record<string, string> = {
     Int: 'integer',
     Float: 'float',
     Boolean: 'boolean',
     String: 'string',
-    ID: 'string'
+    ID: 'string',
+    int: 'integer',
+    float: 'float',
+    boolean: 'boolean',
+    string: 'string',
+    id: 'string'
 }
+
+const primitiveObjectType = (engineType: ENV_TYPES) =>
+    engineType === ENV_TYPES.DOTNET ? ('dotnet' as const) : ('java' as const)
 
 function buildSchemaConfig(
     moduleName: string,
     schemaName: string,
-    ops: GraphQLPersistedOperation[]
+    ops: GraphQLPersistedOperation[],
+    engineType: ENV_TYPES
 ) {
     const queries: object[] = []
     const mutations: object[] = []
+    const primitiveType = primitiveObjectType(engineType)
 
     for (const op of ops) {
         if (op.operationType === 'subscription') continue
 
         const returnObj = PRIMITIVES.has(op.returnType)
             ? {
-                  objectType: 'java' as const,
+                  objectType: primitiveType,
                   type: GQL_TO_ENGINE_TYPE[op.returnType] ?? op.returnType
               }
             : { objectType: 'graphqlType' as const, type: op.returnType }
 
         const baseParams = (op.args ?? []).map((a) => ({
             name: a.name,
-            objectType: (PRIMITIVES.has(a.type) ? 'java' : 'graphqlInput') as
+            objectType: (PRIMITIVES.has(a.type) ? primitiveType : 'graphqlInput') as
+                | 'dotnet'
                 | 'java'
                 | 'graphqlInput',
             type: GQL_TO_ENGINE_TYPE[a.type] ?? a.type,
@@ -80,12 +91,13 @@ export const GraphQLService = {
     async createGraphQLOperation(
         basePath: string,
         moduleName: string,
+        engineType: ENV_TYPES,
         values: GraphQLOperationFormValues
     ): Promise<GraphQLPersistedOperation> {
         const payload = toGraphQLOperationPayload({ ...values, id: undefined })
         const result = await window.graphql.createGraphQLOperation(basePath, moduleName, payload)
         if (payload.operationType !== 'subscription') {
-            await GraphQLService.generateSchemas(basePath, moduleName)
+            await GraphQLService.generateSchemas(basePath, moduleName, engineType)
         }
         return result
     },
@@ -93,6 +105,7 @@ export const GraphQLService = {
     async updateGraphQLOperation(
         basePath: string,
         moduleName: string,
+        engineType: ENV_TYPES,
         operationId: string,
         values: GraphQLOperationFormValues
     ): Promise<GraphQLPersistedOperation> {
@@ -104,7 +117,7 @@ export const GraphQLService = {
             payload
         )
         if (payload.operationType !== 'subscription') {
-            await GraphQLService.generateSchemas(basePath, moduleName)
+            await GraphQLService.generateSchemas(basePath, moduleName, engineType)
         }
         return result
     },
@@ -112,17 +125,18 @@ export const GraphQLService = {
     async deleteGraphQLOperation(
         basePath: string,
         moduleName: string,
+        engineType: ENV_TYPES,
         operationId: string
     ): Promise<void> {
         const allOps = await window.graphql.listGraphQLOperations(basePath, moduleName)
         const target = allOps.find((op) => op.id === operationId)
         await window.graphql.deleteGraphQLOperation(basePath, moduleName, operationId)
         if (target && target.operationType !== 'subscription') {
-            await GraphQLService.generateSchemas(basePath, moduleName)
+            await GraphQLService.generateSchemas(basePath, moduleName, engineType)
         }
     },
 
-    async generateSchemas(basePath: string, moduleName: string): Promise<void> {
+    async generateSchemas(basePath: string, moduleName: string, engineType: ENV_TYPES): Promise<void> {
         const allOps = await window.graphql.listGraphQLOperations(basePath, moduleName)
         const uniqueReturnTypes = new Set(
             allOps
@@ -133,8 +147,8 @@ export const GraphQLService = {
         )
         for (const schemaName of uniqueReturnTypes) {
             const schemaOps = allOps.filter((op) => op.returnType === schemaName)
-            const config = buildSchemaConfig(moduleName, schemaName, schemaOps)
-            await window.engine.createGraphqlSchema(config, ENV_TYPES.SPRING, basePath)
+            const config = buildSchemaConfig(moduleName, schemaName, schemaOps, engineType)
+            await window.engine.createGraphqlSchema(config, engineType, basePath)
         }
     },
 

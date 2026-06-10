@@ -1,3 +1,4 @@
+import { isSharedModuleName } from '@renderer/constants/appConstants'
 import type { FormikValues } from 'formik'
 import type { FileTree } from 'src/main/types'
 
@@ -164,7 +165,7 @@ const mergeFilesByType = (files: FileTree[]): FileTree[] => {
 
 export const getModulesArray = (filesThree: FileTree[]) => {
     return filesThree
-        .filter((item) => item.name !== 'shared') // Exclui a pasta "shared"
+        .filter((item) => !isSharedModuleName(item.name)) // Exclude the shared bucket (Spring `shared`, .NET `Shared`)
         .map((item) => ({
             label: item.name,
             value: item.name
@@ -173,18 +174,22 @@ export const getModulesArray = (filesThree: FileTree[]) => {
 
 export const getMergedFiles = (studio: any, module: string) => {
     const currentModuleData = studio.filesThree.find((item: any) => item.name === module) || {}
-    const sharedModuleData = studio.filesThree.find((item: any) => item.name === 'shared') || {}
+    // Match the shared bucket case-insensitively so the .NET engine's
+    // `Shared` folder merges into module views the same way Spring's
+    // lowercase `shared` does.
+    const sharedModuleData =
+        studio.filesThree.find((item: any) => isSharedModuleName(item.name)) || {}
 
     let mergedFiles: any[] = []
 
-    if (module !== 'shared') {
+    if (!isSharedModuleName(module)) {
         const currentFiles = currentModuleData.children || []
         const sharedFiles = sharedModuleData.children || []
 
         // Use a helper function to merge the files by their type (dto, controllers, models)
         mergedFiles = mergeFilesByType([...currentFiles, ...sharedFiles])
     } else {
-        // If the module is "shared", just use its own files
+        // If the module is the shared bucket, just use its own files
         mergedFiles = sharedModuleData.children || []
     }
 

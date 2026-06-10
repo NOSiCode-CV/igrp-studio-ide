@@ -31,6 +31,82 @@ import type {
     WorkspaceBootstrapResult
 } from '../types'
 
+/**
+ * Map a project's `database` choice (the value persisted on
+ * `Spring/DotNetConfigData.database`, e.g. `"Postgresql"` / `"SqlServer"`) to
+ * the key that identifies the matching docker-compose database service. The
+ * demo workspace ships a single `<slug>-database-postgres` service whose
+ * `labels.name === "postgres"`, so the same vocabulary is used here: we
+ * lowercase the project's choice and emit the substring that appears in the
+ * compose service's labels. SQLite is file-based — returns `null` so the
+ * caller skips `depends_on`.
+ */
+const DATABASE_SERVICE_LABEL: Record<string, string | null> = {
+    postgresql: 'postgres',
+    mysql: 'mysql',
+    oracle: 'oracle',
+    sqlserver: 'sqlserver',
+    sqlite: null
+}
+
+/**
+ * Find the workspace's docker-compose service that hosts the project's chosen
+ * database, so the project entry can declare `depends_on:` against it. Scans
+ * `compose.services` for any entry whose `labels.type === "database"` and
+ * whose `labels.name` (or container_name) matches the engine token (e.g.
+ * `"postgres"`). Returns the service key (the YAML map key) to depend on,
+ * or `null` when the workspace has no matching service or the project uses
+ * SQLite.
+ */
+function resolveWorkspaceDatabaseService(
+    services: Record<string, any>,
+    database: string | undefined
+): string | null {
+    if (!database) return null
+    const engineToken = DATABASE_SERVICE_LABEL[database.toLowerCase()]
+    if (!engineToken) return null
+    for (const [serviceKey, service] of Object.entries(services)) {
+        if (!service || typeof service !== 'object') continue
+        const labels = (service as any).labels ?? {}
+        if (labels.type !== 'database') continue
+        const labelName = String(labels.name ?? '').toLowerCase()
+        const containerName = String((service as any).container_name ?? '').toLowerCase()
+        if (labelName.includes(engineToken) || containerName.includes(engineToken)) {
+            return serviceKey
+        }
+    }
+    return null
+}
+
+/**
+ * Variant of `resolveWorkspaceDatabaseService` that scans the Studio's
+ * `.igrpstudio/workspace.json` shape (services are an array of
+ * `{name, properties: {container_name, labels: [{key, value}]}}`) rather than
+ * the docker-compose map. Returns the `properties.container_name` to use as
+ * the `dependsOn[].service` value, matching how Spring projects already
+ * record their dependency (see Spring entries' `dependsOn` like
+ * `[{service: "testwork-db"}]`).
+ */
+function findWorkspaceJsonDatabaseService(
+    services: any[] | undefined,
+    database: string | undefined
+): string | null {
+    if (!services || !database) return null
+    const engineToken = DATABASE_SERVICE_LABEL[database.toLowerCase()]
+    if (!engineToken) return null
+    for (const service of services) {
+        const labels: Array<{ key: string; value: string }> = service?.properties?.labels ?? []
+        const isDb = labels.some((l) => l.key === 'type' && l.value === 'database')
+        if (!isDb) continue
+        const labelName = labels.find((l) => l.key === 'name')?.value?.toLowerCase() ?? ''
+        const containerName = String(service?.properties?.container_name ?? '').toLowerCase()
+        if (labelName.includes(engineToken) || containerName.includes(engineToken)) {
+            return service?.properties?.container_name ?? null
+        }
+    }
+    return null
+}
+
 const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json')
 const BACKUP_DIR = path.join(app.getPath('userData'), 'backups')
 const DEFAULT_DEMO_WORKSPACE_DIRS = ['demoworkspace', 'demoworkspace-main']
@@ -932,6 +1008,19 @@ export class WorkspaceRepository {
                         )
                     }
                 )
+                // Twin to the compose patch above: the engine writes the
+                // .NET entry into `.igrpstudio/workspace.json` (the Studio's
+                // source-of-truth) with `dependsOn: []`. Mirror what Spring
+                // gets so the Studio UI shows the dependency and any future
+                // compose regeneration carries it across.
+                await this.setDotnetProjectDependsOnInWorkspaceJson(
+                    newProject,
+                    workspace
+                ).catch((err) => {
+                    console.warn(
+                        `[workspace] Failed to set dependsOn on .NET project in workspace.json: ${err?.message ?? err}`
+                    )
+                })
             }
         } else {
             console.log(`Project "${config.name}" already exists in workspace. Skipping addition.`)
@@ -992,6 +1081,17 @@ export class WorkspaceRepository {
         if (compose.services[serviceKey]) return
 
         const workspaceNetwork = `${workspace.slug ?? 'my-workspace'}-network`
+        // Wait for the workspace's database service before the .NET app boots,
+        // so EF Core / Npgsql don't error out mid-startup with "connection
+        // refused". SQLite is file-based — no service to depend on. Match the
+        // project's `database` choice (`Postgresql` / `MySQL` / `Oracle` /
+        // `SqlServer`) to a sibling compose service tagged `labels.type ===
+        // "database"` and whose `labels.name` matches the engine; if none is
+        // present we silently skip `depends_on` so the compose stays valid.
+        const dbDependency = resolveWorkspaceDatabaseService(
+            compose.services,
+            project.config.database
+        )
         compose.services[serviceKey] = {
             build: `./projects/${projectFolder}`,
             container_name: serviceKey,
@@ -999,6 +1099,9 @@ export class WorkspaceRepository {
             ports: [`${servicePort}:${servicePort}`],
             networks: [workspaceNetwork],
             restart: 'unless-stopped',
+            ...(dbDependency
+                ? { depends_on: { [dbDependency]: { condition: 'service_healthy' } } }
+                : {}),
             deploy: { resources: { limits: { memory: '700m' } } },
             labels: {
                 type: 'web',
@@ -1008,6 +1111,55 @@ export class WorkspaceRepository {
         }
 
         await writeFile(composePath, yaml.dump(compose, { lineWidth: 120, noRefs: true }))
+    }
+
+    /**
+     * Populate `.igrpstudio/workspace.json` -> `projects[].dependsOn` for a
+     * newly-added .NET project. The workspace engine's `addProjectToWorkspace`
+     * writes the entry with `dependsOn: []` for `framework === 'dotnet'`
+     * (the Spring branch is the only one that wires it up). The JSON is the
+     * Studio's source-of-truth and feeds the project-grid UI, so without this
+     * patch the .NET card never shows its database dependency.
+     *
+     * The picked service is the workspace's database whose label name matches
+     * the project's `database` choice (Postgresql → `postgres`, MySQL →
+     * `mysql`, …). SQLite is file-based and gets no dependency. If no
+     * matching DB service exists we leave `dependsOn: []` untouched so
+     * subsequent compose regeneration stays valid.
+     */
+    private async setDotnetProjectDependsOnInWorkspaceJson(
+        project: ProjectData,
+        workspace: IWorkspace
+    ): Promise<void> {
+        const jsonPath = path.join(workspace.path, '.igrpstudio', 'workspace.json')
+        let raw: string
+        try {
+            raw = await readFile(jsonPath, 'utf-8')
+        } catch {
+            // The engine didn't write workspace.json (e.g., specification-only
+            // workspaces). Nothing to patch — bail silently.
+            return
+        }
+
+        const wsJson = JSON.parse(raw)
+        if (!Array.isArray(wsJson.projects)) return
+
+        const targetProject = wsJson.projects.find(
+            (p: any) => p?.config?.id === project.id || p?.config?.name === project.config.name
+        )
+        if (!targetProject) return
+        // Don't clobber an already-populated dependsOn (e.g., user edited or
+        // re-create on an existing entry).
+        if (Array.isArray(targetProject.dependsOn) && targetProject.dependsOn.length > 0) return
+
+        const dbServiceName = findWorkspaceJsonDatabaseService(
+            wsJson.services,
+            project.config.database
+        )
+        if (!dbServiceName) return
+
+        targetProject.dependsOn = [{ service: dbServiceName }]
+        await writeFile(jsonPath, JSON.stringify(wsJson))
     }
 
     async updateProject(projectId: string, updates: Partial<ProjectData>): Promise<ProjectData> {

@@ -142,9 +142,9 @@ When the spec and the repo disagree, the repo is the current truth — flag the 
 
 ### GraphQL Pattern
 
-- GraphQL currently does **not** generate backend code in Horizon.
-- GraphQL currently persists a manifest only.
-- GraphQL flow today:
+- GraphQL persists a manifest **and** generates backend code from it. Two
+  distinct steps (verified 2026-06-04 against Spring + .NET engines):
+- Step 1 — manifest CRUD:
   - UI form state
   - UI-side sanitize/map
   - `window.graphql`
@@ -152,12 +152,18 @@ When the spec and the repo disagree, the repo is the current truth — flag the 
   - GraphQL manifest handler
   - GraphQL manifest service
   - `.igrpstudio/<module>/graphql/graphql.json`
+- Step 2 — code generation (on operation save/update/delete; subscriptions skipped):
+  - `GraphQLService.generateSchemas` reads the persisted manifest (`listGraphQLOperations`)
+  - builds a `GraphQLSchemaConfig` per non-primitive return type
+  - `window.engine.createGraphqlSchema(config, engineType, basePath)`
+  - `EngineFactory` → engine `createGraphqlSchema` (Spring or .NET)
+  - engine emits GraphQL backend code (e.g. .NET/HotChocolate `*QueryType.cs`, resolver service, `*.graphqls`)
 
 ### Source of Truth Rules
 
 - For GraphQL, the manifest JSON is the source of truth.
 - UI state is not a source of truth.
-- Generation, when reintroduced later, must read from manifest/config, not live UI state.
+- Generation reads from the manifest/config (`listGraphQLOperations`), not live UI state.
 
 ## Engine Role
 
@@ -185,9 +191,15 @@ When the spec and the repo disagree, the repo is the current truth — flag the 
 ### GraphQL Status Relative to Engine
 
 - GraphQL manifest persistence exists in Horizon.
-- A local Horizon-side schema-only generator was implemented during development and later reverted.
-- There is currently no active `window.engine.createGraphqlSchema(...)` path in the repo.
-- GraphQL generation is therefore **not integrated** at this time.
+- `window.engine.createGraphqlSchema(...)` **is** an active path: wired from
+  the GraphQL Designer (`useGraphQLOperation` → `GraphQLService` → preload →
+  `api-handler` → `EngineFactory` → engine), and framework-aware (Spring + .NET).
+- It is implemented by both `SpringEngine` and `DotNetEngine` (the latter
+  delegates to `@igrp/dotnet-engine`'s `addGraphQLSchema`).
+- .NET schema generation was verified 2026-06-04 to emit HotChocolate artifacts
+  (`*QueryType.cs`, resolver service, `*.graphqls`).
+- NOTE: this corrects an earlier doc state that described GraphQL generation as
+  reverted / not integrated.
 
 ## Core Philosophy
 
@@ -210,10 +222,11 @@ When the spec and the repo disagree, the repo is the current truth — flag the 
   - Phase 1 manifest types/service/handler/persistence
   - Phase 2 UI mapping and Studio integration
   - Phase 3 validation before save
-- Not implemented:
-  - active GraphQL backend generation
-  - resolver generation
-  - runtime GraphQL integration
+  - Active schema/resolver generation via `window.engine.createGraphqlSchema`
+    (Spring + .NET); .NET emits HotChocolate artifacts
+- Not implemented / unverified:
+  - subscription generation (explicitly skipped in `GraphQLService`)
+  - runtime GraphQL behavior beyond compile (no running-server test performed)
 
 ## Important Corrections Already Established
 
@@ -223,7 +236,8 @@ When the spec and the repo disagree, the repo is the current truth — flag the 
   - `igrpstudio`
 - GraphQL should not expose raw `graphql.json` in the sidebar tree.
 - `window.graphql` is for manifest CRUD/persistence only.
-- `window.engine` is the correct generation channel when GraphQL generation is eventually integrated.
+- `window.engine` is the generation channel for GraphQL — `createGraphqlSchema`
+  is wired and active (see "GraphQL Status Relative to Engine").
 
 ## Unknowns
 

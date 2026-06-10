@@ -9,6 +9,7 @@ import {
     IGRPDropdownMenuTriggerPrimitive,
     IGRPScrollAreaPrimitive
 } from '@igrp/igrp-framework-react-design-system'
+import { isSharedModuleName } from '@renderer/constants/appConstants'
 import { cn } from '@renderer/lib/utils'
 import { getLabel } from '@renderer/utils'
 import React from 'react'
@@ -44,7 +45,7 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
         if (module) {
             return (
                 <div className="flex items-center justify-center w-4 h-4 rounded bg-primary/25 text-igrp">
-                    {module === 'shared' ? 'C' : module.charAt(0).toUpperCase()}
+                    {isSharedModuleName(module) ? 'C' : module.charAt(0).toUpperCase()}
                 </div>
             )
         }
