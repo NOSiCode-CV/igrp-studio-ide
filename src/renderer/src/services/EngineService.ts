@@ -75,50 +75,63 @@ export const EngineService = {
         )
 
         const _components: ComponentRegisterConfig[] = appComponents
-            .filter(
-                (component) =>
-                    component.content.scope === 'app' ||
-                    (component.content.scope === 'page' &&
-                        component.content.pageName === currentPage) ||
-                    component.content.name !== currentPage
-            )
-            .map((component: any) => ({
-                name: capitalize(component.content.name),
-                label: component.content.description || getLabel(component.content.name),
-                properties: {
-                    customProperties: {
-                        type: 'object',
-                        properties: convertComponentsToJSONSchema(component.content.args)
-                    }
-                },
-                interactions: convertCompToInteractinsJSONSchema(component.content.args),
-                childrenTypes: [],
-                imports: [
-                    `import ${capitalize(component.content.name)} from '${component.content.pageName ? RENDERER_CONFIG.generatedPath + component.content.pagePath + '/components/' + component.content.name.toLowerCase() : RENDERER_CONFIG.customComponentsPath + component.content.name.toLowerCase()}'`
-                ],
-                defaultValue: false,
-                allowTypes: false,
-                group: 'appComponents',
-                customClassName: component.customClassName,
-                customComponentTag: capitalize(component.content.name),
-                variants: {},
-                propertiesMapping: {},
-                interactionsMapping: {},
-                data: component.data,
-                dataMapping: {},
-                style: component.style,
-                styleMapping: {},
-                rules: convertCompToRulesJSONSchema(),
-                rulesMapping: {},
-                childProperties: {},
-                childPropertiesMapping: {},
-                states: [],
-                acceptedChildren: [],
-                renderer: 'custom',
-                templatePath: '',
-                metadata: component.content,
-                defaultChildren: []
-            }))
+            // Resilient: skip components whose metadata has no resolvable name
+            // (e.g. a malformed / foreign-schema `.igrpstudio` JSON) so a single
+            // bad file can't crash registration and hide ALL components. Accept
+            // the legacy `componentName` field as a fallback for `name`.
+            .filter((component: any) => {
+                const name = component?.content?.name ?? component?.content?.componentName
+                if (!name) {
+                    console.warn('Skipping component with no name in metadata:', component?.content)
+                    return false
+                }
+                const c = component.content
+                return (
+                    c.scope === 'app' ||
+                    (c.scope === 'page' && c.pageName === currentPage) ||
+                    name !== currentPage
+                )
+            })
+            .map((component: any) => {
+                const name: string = component.content.name ?? component.content.componentName
+                return {
+                    name: capitalize(name),
+                    label: component.content.description || getLabel(name),
+                    properties: {
+                        customProperties: {
+                            type: 'object',
+                            properties: convertComponentsToJSONSchema(component.content.args)
+                        }
+                    },
+                    interactions: convertCompToInteractinsJSONSchema(component.content.args),
+                    childrenTypes: [],
+                    imports: [
+                        `import ${capitalize(name)} from '${component.content.pageName ? RENDERER_CONFIG.generatedPath + component.content.pagePath + '/components/' + name.toLowerCase() : RENDERER_CONFIG.customComponentsPath + name.toLowerCase()}'`
+                    ],
+                    defaultValue: false,
+                    allowTypes: false,
+                    group: 'appComponents',
+                    customClassName: component.customClassName,
+                    customComponentTag: capitalize(name),
+                    variants: {},
+                    propertiesMapping: {},
+                    interactionsMapping: {},
+                    data: component.data,
+                    dataMapping: {},
+                    style: component.style,
+                    styleMapping: {},
+                    rules: convertCompToRulesJSONSchema(),
+                    rulesMapping: {},
+                    childProperties: {},
+                    childPropertiesMapping: {},
+                    states: [],
+                    acceptedChildren: [],
+                    renderer: 'custom',
+                    templatePath: '',
+                    metadata: component.content,
+                    defaultChildren: []
+                }
+            })
 
         const componentsToRegister = [...components, ..._components]
 
