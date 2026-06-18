@@ -79,9 +79,7 @@ export function PopoverController({ options, row, changeValue }: PopoverProps) {
                         <IGRPSeparator orientation="horizontal" />
                         {collectionTypes && collectionTypes.length > 0 && (
                             <div className="flex items-center gap-4">
-                                <IGRPLabelPrimitive htmlFor="collectionType">
-                                    {t('collectionType')}
-                                </IGRPLabelPrimitive>
+                                <Label htmlFor="collectionType">{t('collectionType')}</Label>
                                 <IGRPCombobox
                                     className="h-8"
                                     value={row?.['collectionType'] || ''}
