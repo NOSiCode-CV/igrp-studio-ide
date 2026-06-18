@@ -311,13 +311,12 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
             <div className="z-20 shrink-0 bg-white dark:bg-slate-950">
                 <div className="flex min-h-[58px] items-center justify-between gap-4 border-b border-slate-200 px-4 py-2 dark:border-slate-800">
                     <div className="flex items-center gap-2">
-                        <Server className="h-4 w-4 text-primary" strokeWidth={1.8} />
-                        <h2 className="text-sm font-semibold leading-none text-slate-900 dark:text-slate-100">
+                        <Server className="h-4 w-4 text-primary shrink-0" />
+                        <h2 className="text-sm font-bold tracking-tight text-foreground truncate">
                             {t('services')}
                         </h2>
-                        <span className="text-slate-300 dark:text-slate-600">·</span>
-                        <span className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-                            {servicesCountLabel}
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground whitespace-nowrap">
+                            · {servicesCountLabel}
                         </span>
                     </div>
 
