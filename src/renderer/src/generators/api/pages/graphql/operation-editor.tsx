@@ -25,16 +25,17 @@ const argsColumns: IColumnsTabelProps[] = [
         name: 'Type',
         type: 'select',
         options: [
-            { label: 'id', value: 'id' },
-            { label: 'string', value: 'string' },
-            { label: 'int', value: 'int' },
-            { label: 'float', value: 'float' },
-            { label: 'boolean', value: 'boolean' }
+            { label: 'ID', value: 'ID' },
+            { label: 'String', value: 'String' },
+            { label: 'Int', value: 'Int' },
+            { label: 'Float', value: 'Float' },
+            { label: 'Boolean', value: 'Boolean' }
         ]
     },
     { key: 'defaultValue', name: 'Default Value', type: 'text' },
     { key: 'description', name: 'Description', type: 'text' },
-    { key: 'required', name: 'Required', type: 'checkbox' }
+    { key: 'required', name: 'Required', type: 'checkbox' },
+    { key: 'primaryKey', name: 'Primary Key', type: 'checkbox' }
 ]
 
 export const GraphQLOperationEditor = ({
@@ -211,6 +212,7 @@ export const GraphQLOperationEditor = ({
                                     name: '',
                                     type: 'string',
                                     required: false,
+                                    primaryKey: false,
                                     defaultValue: '',
                                     description: ''
                                 })

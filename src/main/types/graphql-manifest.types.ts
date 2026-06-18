@@ -6,6 +6,7 @@ export interface GraphQLArgument {
     name: string
     type: string
     required: boolean
+    primaryKey?: boolean
     defaultValue?: unknown
     description?: string
 }

@@ -24,6 +24,7 @@ const GRAPHQL_NAME_PATTERN = /^[_A-Za-z][_0-9A-Za-z]*$/
 interface ValidateGraphQLOperationOptions {
     operations: GraphQLPersistedOperation[]
     availableTypeValues: string[]
+    availableInputTypeValues: string[]
 }
 
 const isValidGraphQLName = (value: string) => GRAPHQL_NAME_PATTERN.test(value)
@@ -32,7 +33,7 @@ const normalize = (value?: string) => value?.trim() || ''
 
 export async function validateGraphQLOperation(
     values: GraphQLOperationFormValues,
-    { operations, availableTypeValues }: ValidateGraphQLOperationOptions
+    { operations, availableTypeValues, availableInputTypeValues }: ValidateGraphQLOperationOptions
 ): Promise<FormErrors<GraphQLOperationFormValues>> {
     const errors: FormErrors<GraphQLOperationFormValues> = {}
     const operationName = normalize(values.name)
@@ -40,6 +41,7 @@ export async function validateGraphQLOperation(
     const inputType = normalize(values.inputType)
     const eventTopic = normalize(values.eventTopic)
     const availableTypes = new Set(availableTypeValues)
+    const availableInputTypes = new Set(availableInputTypeValues)
     const allowedReturnModes = new Set(['single', 'list'])
     const siblingOperations = operations.filter(
         (operation) =>
@@ -65,10 +67,8 @@ export async function validateGraphQLOperation(
     }
 
     if (values.operationType === 'mutation') {
-        if (inputType.length === 0) {
-            errors.inputType = 'Input type reference is required'
-        } else if (!availableTypes.has(inputType)) {
-            errors.inputType = 'Input type must reference an existing type'
+        if (inputType.length > 0 && !availableInputTypes.has(inputType)) {
+            errors.inputType = 'Input type must reference an existing graphqlInput type'
         }
     }
 

@@ -165,13 +165,14 @@ export function validateManifest(manifest: unknown): GraphQLManifestValidationEr
 
         if (
             typedOperation.operationType === 'mutation' &&
+            typedOperation.inputType !== undefined &&
             (typeof typedOperation.inputType !== 'string' ||
                 typedOperation.inputType.trim().length === 0)
         ) {
             errors.push({
                 field: `${operationField}.inputType`,
-                message: 'Mutation inputType is required',
-                code: 'missing_input_type'
+                message: 'Mutation inputType must be a non-empty string when provided',
+                code: 'invalid_input_type'
             })
         }
 
