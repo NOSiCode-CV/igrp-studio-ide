@@ -1,5 +1,6 @@
 'use client'
 
+import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
 import { Button } from '@renderer/components/ui/button'
 import {
     DropdownMenu,
@@ -8,12 +9,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from '@renderer/components/ui/dropdown-menu'
-import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
-import { cn } from '@renderer/lib/utils'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import { useDocker } from '@renderer/hooks/use-docker'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
+import { cn } from '@renderer/lib/utils'
 import { Edit, ExternalLink, MoreVertical, Repeat, Rocket, Trash } from 'lucide-react'
 import path from 'path'
 import { useState } from 'react'
@@ -160,7 +160,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
 
                     {project.framework === ENV_TYPES.DOTNET && (
                         <DropdownMenuItem onClick={onConvertToSpringBoot} disabled>
-                            <Repeat className="mr-2 h-4 w-4 text-gray-500" />
+                            <Repeat className="mr-2 h-4 w-4 text-muted-foreground" />
                             {t('convertToSpringBoot')}
                             <span className="ml-auto text-xs text-muted-foreground">
                                 {t('comingSoon')}
@@ -170,7 +170,7 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
 
                     {project.framework === ENV_TYPES.SPRING && (
                         <DropdownMenuItem onClick={onConvertToDotNet} disabled>
-                            <Repeat className="mr-2 h-4 w-4 text-gray-500" />
+                            <Repeat className="mr-2 h-4 w-4 text-muted-foreground" />
                             {t('convertToDotNet')}
                             <span className="ml-auto text-xs text-muted-foreground">
                                 {t('comingSoon')}
@@ -198,12 +198,12 @@ export const ProjectActions: React.FC<ProjectDropdownProps> = ({
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem
-                        className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                        className="text-destructive focus:text-destructive focus:bg-destructive/10"
                         onClick={() => {
                             setIsDialogOpen(true)
                         }}
                     >
-                        <Trash className="mr-2 h-4 w-4 text-red-600" />
+                        <Trash className="mr-2 h-4 w-4 text-destructive" />
                         {t('removeProject')}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
