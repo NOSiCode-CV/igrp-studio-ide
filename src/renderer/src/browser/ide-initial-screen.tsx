@@ -96,11 +96,11 @@ const IDEInitialScreen = (): React.JSX.Element => {
                         {workspace && <Resources />}
                     </TabsContent>
 
-                    <TabsContent value="services" className="mt-0 flex h-0 min-h-0 flex-1 flex-col overflow-hidden pt-4">
+                    <TabsContent value="services" className="mt-0 flex h-0 min-h-0 flex-1 flex-col overflow-hidden pt-2">
                         <WorkspaceServices workspaceId={workspace.id} />
                     </TabsContent>
 
-                    <TabsContent value="settings" className="mt-0 flex h-0 min-h-0 flex-1 flex-col overflow-hidden pt-4">
+                    <TabsContent value="settings" className="mt-0 flex h-0 min-h-0 flex-1 flex-col overflow-hidden pt-2">
                         <WorkspaceSettings workspace={workspace} />
                     </TabsContent>
                 </Tabs>
