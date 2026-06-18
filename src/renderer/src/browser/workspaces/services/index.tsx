@@ -71,11 +71,7 @@ export const resolveServiceVisualType = (
     const explicitType = (serviceOrType.labels?.type || '').toLowerCase().trim()
     if (explicitType) return explicitType
 
-    const fingerprint = [
-        serviceOrType.name,
-        serviceOrType.container_name,
-        serviceOrType.image
-    ]
+    const fingerprint = [serviceOrType.name, serviceOrType.container_name, serviceOrType.image]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
@@ -163,7 +159,7 @@ export const getStatusColor = (status: string): string => {
     if (normalized === 'error') {
         return 'bg-rose-50/50 border-rose-100 text-rose-700 dark:bg-rose-900/30 dark:border-rose-800/70 dark:text-rose-300'
     }
-    return 'bg-slate-50/50 border-slate-100 text-slate-500 dark:bg-slate-800/60 dark:border-slate-700 dark:text-slate-300'
+    return 'bg-muted/50 border text-muted-foreground'
 }
 
 export const getStatusDotColor = (status: string): string => {
@@ -174,7 +170,7 @@ export const getStatusDotColor = (status: string): string => {
     if (normalized === 'error') {
         return 'bg-rose-500'
     }
-    return 'bg-slate-300 dark:bg-slate-600'
+    return 'bg-muted'
 }
 
 // Network types

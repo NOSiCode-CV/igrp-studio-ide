@@ -1,3 +1,4 @@
+import { SearchInput } from '@renderer/components/shared-ui'
 import { Button } from '@renderer/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
 import { ToggleGroup, ToggleGroupItem } from '@renderer/components/ui/toggle-group'
@@ -7,10 +8,9 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@renderer/components/ui/tooltip'
-import { SearchInput } from '@renderer/components/shared-ui'
-import { cn } from '@renderer/lib/utils'
 import { useDocker } from '@renderer/hooks/use-docker'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
+import { cn } from '@renderer/lib/utils'
 import {
     Check,
     Container,
@@ -21,15 +21,15 @@ import {
     Play,
     Plus,
     Server,
-    StretchHorizontal,
-    Square
+    Square,
+    StretchHorizontal
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ServiceInfo } from 'src/main/types'
 import { ConfigurationDialog } from './components/configuration-dialog'
-import { DependencyDiagram } from './services/dependency-diagram'
 import { resolveServiceVisualType } from './services'
+import { DependencyDiagram } from './services/dependency-diagram'
 import { ServiceGrid } from './services/service-grid'
 import { SERVICE_LIST_GRID, ServiceList } from './services/service-list'
 import { WorkspaceDocker } from './views/workspace-docker'
@@ -308,9 +308,9 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
     }, [allServices, filteredServices])
 
     return (
-        <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
-            <div className="z-20 shrink-0 bg-white dark:bg-slate-950">
-                <div className="flex min-h-[58px] items-center justify-between gap-4 border-b border-slate-200 px-4 py-2 dark:border-slate-800">
+        <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-b bg-background">
+            <div className="z-20 shrink-0 bg-background">
+                <div className="flex min-h-[58px] items-center justify-between gap-4 border-b px-4 py-2">
                     <div className="flex items-center gap-2">
                         <Server className="h-4 w-4 text-primary shrink-0" />
                         <h2 className="text-sm font-bold tracking-tight text-foreground truncate">
@@ -354,11 +354,11 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                     </PopoverTrigger>
                                     <PopoverContent
                                         align="end"
-                                        className="w-56 rounded-xl border border-slate-200 bg-white p-3 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+                                        className="w-56 rounded-xl border bg-popover text-popover-foreground p-3 shadow-xl"
                                     >
                                         <div className="space-y-3">
                                             <div>
-                                                <div className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">
+                                                <div className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                                                     {t('category')}
                                                 </div>
                                                 <div className="space-y-1">
@@ -375,7 +375,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                                 className={`flex h-8 w-full items-center justify-between rounded-md px-2.5 text-xs transition-colors ${
                                                                     selected
                                                                         ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
-                                                                        : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
+                                                                        : 'text-foreground hover:bg-accent'
                                                                 }`}
                                                             >
                                                                 <span>{option.label}</span>
@@ -388,10 +388,10 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                 </div>
                                             </div>
 
-                                            <div className="h-px bg-slate-100 dark:bg-slate-800" />
+                                            <div className="h-px bg-border" />
 
                                             <div>
-                                                <div className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">
+                                                <div className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                                                     {t('status')}
                                                 </div>
                                                 <div className="space-y-1">
@@ -408,7 +408,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                                 className={`flex h-8 w-full items-center justify-between rounded-md px-2.5 text-xs transition-colors ${
                                                                     selected
                                                                         ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
-                                                                        : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
+                                                                        : 'text-foreground hover:bg-accent'
                                                                 }`}
                                                             >
                                                                 <span>{option.label}</span>
@@ -421,10 +421,10 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                 </div>
                                             </div>
 
-                                            <div className="h-px bg-slate-100 dark:bg-slate-800" />
+                                            <div className="h-px bg-border" />
 
                                             <div>
-                                                <div className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">
+                                                <div className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                                                     {t('type')}
                                                 </div>
                                                 <div className="max-h-[150px] space-y-1 overflow-y-auto pr-1">
@@ -440,7 +440,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                                 className={`flex h-8 w-full items-center justify-between rounded-md px-2.5 text-xs transition-colors ${
                                                                     selected
                                                                         ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
-                                                                        : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
+                                                                        : 'text-foreground hover:bg-accent'
                                                                 }`}
                                                             >
                                                                 <span>{option.label}</span>
@@ -493,7 +493,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1 border-b border-slate-200 bg-white px-3 dark:border-slate-800 dark:bg-slate-950">
+                <div className="flex items-center gap-1 border-b bg-background px-3">
                     {servicesPanelTabs.map((tab) => {
                         const Icon = tab.icon
                         const isActive = activePanelTab === tab.id
@@ -504,8 +504,8 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                 onClick={() => setActivePanelTab(tab.id)}
                                 className={`inline-flex h-11 items-center gap-1.5 border-b-2 px-2 text-sm transition-colors ${
                                     isActive
-                                        ? 'border-b-primary text-slate-900 dark:text-slate-100'
-                                        : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                                        ? 'border-b-primary text-foreground'
+                                        : 'border-transparent text-muted-foreground hover:text-foreground'
                                 }`}
                             >
                                 <Icon className="h-3.5 w-3.5" />
@@ -556,15 +556,15 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                 {activePanelTab === 'overview' && (
                     <div className="h-full overflow-y-auto overflow-x-hidden overscroll-contain p-4">
                         {groupedOverview.length === 0 ? (
-                            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/30 p-8 text-center text-sm text-slate-400 dark:border-slate-700 dark:bg-slate-900/30 dark:text-slate-500">
+                            <div className="rounded-xl border border-dashed bg-muted p-8 text-center text-sm text-muted-foreground">
                                 {t('noServicesFound')}
                             </div>
                         ) : (
                             <div className="space-y-4">
                                 {serviceViewMode === 'list' ? (
-                                    <div className="sticky top-0 z-30 border-b border-[#e5edf5] bg-white dark:border-slate-800 dark:bg-slate-950">
+                                    <div className="sticky top-0 z-30 border-b bg-background">
                                         <div
-                                            className="grid items-center gap-3 px-2 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#8aa0bb] dark:text-slate-400"
+                                            className="grid items-center gap-3 px-2 py-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
                                             style={{
                                                 gridTemplateColumns: SERVICE_LIST_GRID
                                             }}
@@ -579,26 +579,23 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                 ) : null}
 
                                 {groupedOverview.map((group) => (
-                                    <section
-                                        key={group.stack.id}
-                                        className="bg-white dark:bg-slate-950"
-                                    >
+                                    <section key={group.stack.id} className="bg-card">
                                         <div
-                                            className={`sticky z-10 flex min-h-11 items-center justify-between border-b border-[#e5edf5] bg-white px-4 dark:border-slate-800 dark:bg-slate-950 ${
+                                            className={`sticky z-10 flex min-h-11 items-center justify-between border-b bg-card px-4 ${
                                                 serviceViewMode === 'list' ? 'top-[43px]' : 'top-0'
                                             }`}
                                         >
                                             <div className="flex items-center gap-2">
-                                                <h3 className="text-sm font-semibold uppercase tracking-wide text-[#1f2b3d] dark:text-slate-200">
+                                                <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
                                                     {group.stack.title}
                                                 </h3>
                                                 <span className="inline-flex h-6 items-center rounded-md border border-primary/30 bg-primary/10 px-2 text-xs font-semibold text-primary dark:bg-primary/15">
                                                     {group.runningInStack}/{group.totalInStack}
                                                 </span>
-                                                <span className="text-xs text-[#8aa0bb] dark:text-slate-500">
+                                                <span className="text-xs text-muted-foreground">
                                                     -
                                                 </span>
-                                                <span className="text-xs text-[#8aa0bb] dark:text-slate-400">
+                                                <span className="text-xs text-muted-foreground">
                                                     {group.stack.description}
                                                 </span>
                                             </div>
@@ -622,7 +619,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                                         group.stack.id &&
                                                                     stackActionState.action !== null
                                                                 }
-                                                                className="h-7 w-7 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 dark:text-slate-500 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-300"
+                                                                className="h-7 w-7 text-muted-foreground hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-300"
                                                             >
                                                                 <Play className="h-3.5 w-3.5" />
                                                             </Button>
@@ -648,7 +645,7 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                                         group.stack.id &&
                                                                     stackActionState.action !== null
                                                                 }
-                                                                className="h-7 w-7 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-rose-900/30 dark:hover:text-rose-300"
+                                                                className="h-7 w-7 text-muted-foreground hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30 dark:hover:text-rose-300"
                                                             >
                                                                 <Square className="h-3.5 w-3.5" />
                                                             </Button>
@@ -668,11 +665,11 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                                     className="space-y-2"
                                                 >
                                                     <div className="flex items-center gap-2">
-                                                        <span className="h-1.5 w-1.5 rounded-full bg-[#b8c5d8] dark:bg-slate-600" />
-                                                        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[#8aa0bb] dark:text-slate-400">
+                                                        <span className="h-1.5 w-1.5 rounded-full bg-muted" />
+                                                        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                                                             {toLabel(typeGroup.type)}
                                                         </span>
-                                                        <span className="text-xs text-[#a4b3c5] dark:text-slate-500">
+                                                        <span className="text-xs text-muted-foreground">
                                                             ({typeGroup.services.length})
                                                         </span>
                                                     </div>

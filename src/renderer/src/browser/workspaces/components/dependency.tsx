@@ -68,7 +68,8 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
         }
 
         const rect = root.getBoundingClientRect()
-        const overflowRight = rect.left + DEPENDENCY_POPOVER_WIDTH > window.innerWidth - VIEWPORT_SAFE_MARGIN
+        const overflowRight =
+            rect.left + DEPENDENCY_POPOVER_WIDTH > window.innerWidth - VIEWPORT_SAFE_MARGIN
         setPopoverAlign(overflowRight ? 'right' : 'left')
     }, [])
 
@@ -100,7 +101,8 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
         const handleWheel = (event: WheelEvent): void => {
             event.preventDefault()
             event.stopPropagation()
-            const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
+            const delta =
+                Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
             popover.scrollLeft += delta
         }
 
@@ -111,8 +113,7 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
     const handlePopoverWheel = (event: ReactWheelEvent<HTMLDivElement>): void => {
         event.preventDefault()
         event.stopPropagation()
-        const delta =
-            Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
+        const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
         event.currentTarget.scrollLeft += delta
     }
 
@@ -158,21 +159,21 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
                     hiddenCount > 0 && isPopoverOpen ? 'opacity-0' : 'opacity-100'
                 )}
             >
-                <Layers className="h-3.5 w-3.5 shrink-0 text-slate-300 dark:text-slate-600" />
+                <Layers className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                 {dependencies.length === 0 ? (
-                    <span className="text-xs text-slate-400 dark:text-slate-500">{t('none')}</span>
+                    <span className="text-xs text-muted-foreground">{t('none')}</span>
                 ) : (
                     <>
                         <Badge
                             variant="outline"
-                            className="max-w-[130px] truncate border-slate-200 bg-white text-xs font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                            className="max-w-[130px] truncate border bg-card text-xs font-medium text-muted-foreground"
                         >
                             {primaryDependency}
                         </Badge>
                         {hiddenCount > 0 ? (
                             <Badge
                                 variant="outline"
-                                className="shrink-0 border-slate-200 bg-white text-xs font-semibold text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                                className="shrink-0 border bg-card text-xs font-semibold text-muted-foreground"
                             >
                                 +{hiddenCount}
                             </Badge>
@@ -191,7 +192,7 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
                     onPointerUp={handlePopoverPointerUp}
                     onPointerCancel={handlePopoverPointerUp}
                     className={cn(
-                        'absolute top-0 z-30 flex w-[220px] flex-nowrap items-center gap-1.5 overflow-x-scroll overflow-y-hidden overscroll-x-contain overscroll-y-none rounded-xl border border-slate-200 bg-white px-2 py-1.5 shadow-2xl scrollbar-none transition duration-150 ease-out [touch-action:pan-x] dark:border-slate-700 dark:bg-slate-900',
+                        'absolute top-0 z-30 flex w-[220px] flex-nowrap items-center gap-1.5 overflow-x-scroll overflow-y-hidden overscroll-x-contain overscroll-y-none rounded-xl border bg-card px-2 py-1.5 shadow-2xl scrollbar-none transition duration-150 ease-out [touch-action:pan-x]',
                         popoverAlign === 'right' ? 'right-0' : 'left-0',
                         isPopoverOpen
                             ? 'pointer-events-auto scale-100 opacity-100 cursor-grab'
@@ -202,7 +203,7 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
                         <Badge
                             key={`${dependency}-${index}`}
                             variant="outline"
-                            className="shrink-0 border-slate-200 bg-white text-xs font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                            className="shrink-0 border bg-card text-xs font-medium text-muted-foreground"
                         >
                             {dependency}
                         </Badge>
