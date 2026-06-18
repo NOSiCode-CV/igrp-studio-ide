@@ -8,6 +8,7 @@ import {
     TooltipTrigger
 } from '@renderer/components/ui/tooltip'
 import { SearchInput } from '@renderer/components/shared-ui'
+import { cn } from '@renderer/lib/utils'
 import { useDocker } from '@renderer/hooks/use-docker'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import {
@@ -320,27 +321,28 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         {activePanelTab === 'overview' && (
                             <>
                                 <SearchInput
                                     placeholder={`${t('search')}...`}
                                     value={serviceSearchQuery}
                                     onChange={setServiceSearchQuery}
-                                    className="w-[226px]"
-                                    inputClassName="h-8 border-slate-200 bg-white text-xs text-slate-600 placeholder:text-slate-400 focus-visible:border-primary focus-visible:ring-primary/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder:text-slate-500"
-                                    iconClassName="text-slate-400 dark:text-slate-500"
+                                    className="w-[224px] max-w-full"
+                                    inputClassName="rounded-sm focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary/20"
                                 />
                                 <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                                     <PopoverTrigger asChild>
                                         <Button
                                             variant="ghost"
-                                            size="icon"
-                                            className={`relative h-[30px] w-[30px] rounded-md border border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800 ${
-                                                isFilterOpen
-                                                    ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
-                                                    : 'bg-white text-slate-400 dark:bg-slate-900 dark:text-slate-500'
-                                            }`}
+                                            size="icon-sm"
+                                            aria-label={t('filter')}
+                                            title={t('filter')}
+                                            className={cn(
+                                                'relative',
+                                                isFilterOpen &&
+                                                    'bg-primary/10 text-primary focus:bg-primary/10 focus:text-primary'
+                                            )}
                                         >
                                             <ListFilter className="h-4 w-4" />
                                             {activeFiltersCount > 0 && (
@@ -459,19 +461,22 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                                     onValueChange={(value) =>
                                         value && setServiceViewMode(value as ViewMode)
                                     }
-                                    className="hidden rounded-md border border-slate-200 bg-slate-100 md:flex dark:border-slate-700 dark:bg-slate-900"
+                                    spacing={1}
+                                    className="flex shrink-0 items-center gap-0 rounded-sm border bg-muted p-0.5"
                                 >
                                     <ToggleGroupItem
                                         value="grid"
                                         size="sm"
-                                        className="h-8 w-8 rounded-sm px-0 text-slate-400 data-[state=on]:bg-white data-[state=on]:text-primary data-[state=on]:shadow-sm dark:text-slate-500 dark:data-[state=on]:bg-slate-800 dark:data-[state=on]:text-primary"
+                                        aria-label="Grid view"
+                                        className="h-auto min-w-0 rounded-sm p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:shadow-sm"
                                     >
                                         <LayoutGrid className="h-3.5 w-3.5" />
                                     </ToggleGroupItem>
                                     <ToggleGroupItem
                                         value="list"
                                         size="sm"
-                                        className="h-8 w-8 rounded-sm px-0 text-slate-400 data-[state=on]:bg-white data-[state=on]:text-primary data-[state=on]:shadow-sm dark:text-slate-500 dark:data-[state=on]:bg-slate-800 dark:data-[state=on]:text-primary"
+                                        aria-label="List view"
+                                        className="h-auto min-w-0 rounded-sm p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:shadow-sm"
                                     >
                                         <StretchHorizontal className="h-3.5 w-3.5" />
                                     </ToggleGroupItem>
