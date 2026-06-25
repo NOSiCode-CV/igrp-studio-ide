@@ -14,7 +14,7 @@ import { subscribePrototypeEvents } from './redux/specPrototype/thunks'
 import AppRoutes from './routes/Routes'
 import { ThemeService } from './services/ThemeService'
 
-import '@igrp/framework-process-studio-bpmn-editor/dist/src/styles.css'
+import '@igrp/framework-process-studio-bpmn-editor/dist/styles.css'
 
 import '@igrp/igrp-framework-react-design-system/styles'
 import { Toaster } from '@renderer/components/ui/sonner'
