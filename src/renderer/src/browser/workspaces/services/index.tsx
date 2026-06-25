@@ -56,7 +56,19 @@ const monitoringServiceHints = [
     'fluent-bit'
 ]
 
-const workflowServiceHints = ['init-task', 'init_task']
+// Ordered fingerprint heuristics. Single source of truth for service-type
+// detection; first matching entry wins.
+const fingerprintTypeHints: ReadonlyArray<{ type: string; hints: readonly string[] }> = [
+    { type: 'database', hints: ['postgres', 'mysql', 'mariadb', 'mongo', 'db'] },
+    { type: 'proxy', hints: ['gateway', 'proxy', 'nginx', 'traefik', 'init-task', 'init_task'] },
+    { type: 'auth', hints: ['keycloak', 'auth'] },
+    { type: 'service-discovery', hints: ['eureka', 'consul', 'discovery'] },
+    { type: 'cache', hints: ['redis', 'memcached', 'cache'] },
+    { type: 'storage', hints: ['minio', 'storage'] },
+    { type: 'observability', hints: monitoringServiceHints },
+    // Lowest priority: frontends/UI apps without an explicit type → web.
+    { type: 'web', hints: ['frontend', 'webapp', 'portal', 'nextjs', 'angular', 'react', '-ui'] }
+]
 
 export const resolveServiceVisualType = (
     serviceOrType?: ServiceVisualTarget | string | null
@@ -78,12 +90,8 @@ export const resolveServiceVisualType = (
 
     if (!fingerprint) return 'other'
 
-    if (workflowServiceHints.some((hint) => fingerprint.includes(hint))) {
-        return 'proxy'
-    }
-
-    if (monitoringServiceHints.some((hint) => fingerprint.includes(hint))) {
-        return 'observability'
+    for (const { type, hints } of fingerprintTypeHints) {
+        if (hints.some((hint) => fingerprint.includes(hint))) return type
     }
 
     return 'other'

@@ -120,16 +120,15 @@ export function ServiceList({
                                 </div>
                                 <div className="min-w-0">
                                     <div className="flex flex-wrap gap-1 overflow-hidden">
-                                        {service.ports &&
-                                            service.ports.map((port: string, i: number) => (
-                                                <Badge
-                                                    key={i}
-                                                    variant="outline"
-                                                    className="border bg-muted text-[11px] text-muted-foreground"
-                                                >
-                                                    {port}
-                                                </Badge>
-                                            ))}
+                                        {service.ports?.map((port: string) => (
+                                            <span
+                                                key={port}
+                                                title={port}
+                                                className="max-w-full truncate rounded-md border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground"
+                                            >
+                                                {port}
+                                            </span>
+                                        ))}
                                         {(!service.ports || service.ports.length === 0) && (
                                             <span className="text-xs text-muted-foreground">
                                                 {t('none')}

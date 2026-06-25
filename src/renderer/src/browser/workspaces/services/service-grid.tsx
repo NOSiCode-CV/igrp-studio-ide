@@ -119,14 +119,14 @@ export function ServiceGrid({ services, showFilter = true, onActionComplete }: S
                                             </div>
                                             <div className="flex flex-wrap gap-1">
                                                 {service.ports && service.ports.length > 0 ? (
-                                                    service.ports.map((port: string, i: number) => (
-                                                        <Badge
-                                                            key={i}
-                                                            variant="outline"
-                                                            className="border bg-card text-[10px] text-muted-foreground"
+                                                    service.ports.map((port: string) => (
+                                                        <span
+                                                            key={port}
+                                                            title={port}
+                                                            className="max-w-full truncate rounded-md border bg-card px-2 py-0.5 text-[10px] text-muted-foreground"
                                                         >
                                                             {port}
-                                                        </Badge>
+                                                        </span>
                                                     ))
                                                 ) : (
                                                     <span className="text-[11px] text-muted-foreground">

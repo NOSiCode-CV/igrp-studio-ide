@@ -1,6 +1,7 @@
 import { SearchInput } from '@renderer/components/shared-ui'
 import { Button } from '@renderer/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { ToggleGroup, ToggleGroupItem } from '@renderer/components/ui/toggle-group'
 import {
     Tooltip,
@@ -545,159 +546,169 @@ export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): Reac
                 )}
 
                 {activePanelTab === 'docker' && workspace && (
-                    <div className="h-full overflow-y-auto p-4">
-                        <WorkspaceDocker
-                            workspace={workspace}
-                            onStacksChanged={refreshContainers}
-                        />
-                    </div>
+                    <ScrollArea className="h-full">
+                        <div className="p-4">
+                            <WorkspaceDocker
+                                workspace={workspace}
+                                onStacksChanged={refreshContainers}
+                            />
+                        </div>
+                    </ScrollArea>
                 )}
 
                 {activePanelTab === 'overview' && (
-                    <div className="h-full overflow-y-auto overflow-x-hidden overscroll-contain p-4">
-                        {groupedOverview.length === 0 ? (
-                            <div className="rounded-xl border border-dashed bg-muted p-8 text-center text-sm text-muted-foreground">
-                                {t('noServicesFound')}
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                {serviceViewMode === 'list' ? (
-                                    <div className="sticky top-0 z-30 border-b bg-background">
-                                        <div
-                                            className="grid items-center gap-3 px-2 py-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
-                                            style={{
-                                                gridTemplateColumns: SERVICE_LIST_GRID
-                                            }}
-                                        >
-                                            <div>{t('name')}</div>
-                                            <div>{t('ports')}</div>
-                                            <div>{t('dependencies')}</div>
-                                            <div className="w-[80px]">{t('status')}</div>
-                                            <div className="w-[36px]" />
+                    <ScrollArea className="h-full [&>[data-slot=scroll-area-viewport]]:overflow-x-hidden">
+                        <div className="p-4">
+                            {groupedOverview.length === 0 ? (
+                                <div className="rounded-xl border border-dashed bg-muted p-8 text-center text-sm text-muted-foreground">
+                                    {t('noServicesFound')}
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {serviceViewMode === 'list' ? (
+                                        <div className="sticky top-0 z-30 border-b bg-background">
+                                            <div
+                                                className="grid items-center gap-3 px-2 py-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+                                                style={{
+                                                    gridTemplateColumns: SERVICE_LIST_GRID
+                                                }}
+                                            >
+                                                <div>{t('name')}</div>
+                                                <div>{t('ports')}</div>
+                                                <div>{t('dependencies')}</div>
+                                                <div className="w-[80px]">{t('status')}</div>
+                                                <div className="w-[36px]" />
+                                            </div>
                                         </div>
-                                    </div>
-                                ) : null}
+                                    ) : null}
 
-                                {groupedOverview.map((group) => (
-                                    <section key={group.stack.id} className="bg-card">
-                                        <div
-                                            className={`sticky z-10 flex min-h-11 items-center justify-between border-b bg-card px-4 ${
-                                                serviceViewMode === 'list' ? 'top-[43px]' : 'top-0'
-                                            }`}
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
-                                                    {group.stack.title}
-                                                </h3>
-                                                <span className="inline-flex h-6 items-center rounded-md border border-primary/30 bg-primary/10 px-2 text-xs font-semibold text-primary dark:bg-primary/15">
-                                                    {group.runningInStack}/{group.totalInStack}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground">
-                                                    -
-                                                </span>
-                                                <span className="text-xs text-muted-foreground">
-                                                    {group.stack.description}
-                                                </span>
+                                    {groupedOverview.map((group) => (
+                                        <section key={group.stack.id} className="bg-card">
+                                            <div
+                                                className={`sticky z-20 flex min-h-11 items-center justify-between border-b bg-card px-4 ${
+                                                    serviceViewMode === 'list'
+                                                        ? 'top-[43px]'
+                                                        : 'top-0'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
+                                                        {group.stack.title}
+                                                    </h3>
+                                                    <span className="inline-flex h-6 items-center rounded-md border border-primary/30 bg-primary/10 px-2 text-xs font-semibold text-primary dark:bg-primary/15">
+                                                        {group.runningInStack}/{group.totalInStack}
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        -
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {group.stack.description}
+                                                    </span>
+                                                </div>
+
+                                                <TooltipProvider>
+                                                    <div className="flex items-center gap-1">
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() =>
+                                                                        void handleStackAction(
+                                                                            group.stack.id,
+                                                                            'start',
+                                                                            group.stackServiceNames
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        stackActionState.stackId ===
+                                                                            group.stack.id &&
+                                                                        stackActionState.action !==
+                                                                            null
+                                                                    }
+                                                                    className="h-7 w-7 text-muted-foreground hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-300"
+                                                                >
+                                                                    <Play className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p>{t('startGroup')}</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() =>
+                                                                        void handleStackAction(
+                                                                            group.stack.id,
+                                                                            'stop',
+                                                                            group.stackServiceNames
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        stackActionState.stackId ===
+                                                                            group.stack.id &&
+                                                                        stackActionState.action !==
+                                                                            null
+                                                                    }
+                                                                    className="h-7 w-7 text-muted-foreground hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30 dark:hover:text-rose-300"
+                                                                >
+                                                                    <Square className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p>{t('stopGroup')}</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </div>
+                                                </TooltipProvider>
                                             </div>
 
-                                            <TooltipProvider>
-                                                <div className="flex items-center gap-1">
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() =>
-                                                                    void handleStackAction(
-                                                                        group.stack.id,
-                                                                        'start',
-                                                                        group.stackServiceNames
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    stackActionState.stackId ===
-                                                                        group.stack.id &&
-                                                                    stackActionState.action !== null
-                                                                }
-                                                                className="h-7 w-7 text-muted-foreground hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-300"
-                                                            >
-                                                                <Play className="h-3.5 w-3.5" />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <p>{t('startGroup')}</p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() =>
-                                                                    void handleStackAction(
-                                                                        group.stack.id,
-                                                                        'stop',
-                                                                        group.stackServiceNames
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    stackActionState.stackId ===
-                                                                        group.stack.id &&
-                                                                    stackActionState.action !== null
-                                                                }
-                                                                className="h-7 w-7 text-muted-foreground hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30 dark:hover:text-rose-300"
-                                                            >
-                                                                <Square className="h-3.5 w-3.5" />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <p>{t('stopGroup')}</p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </div>
-                                            </TooltipProvider>
-                                        </div>
+                                            <div className="space-y-4 p-4">
+                                                {group.typeGroups.map((typeGroup) => (
+                                                    <div
+                                                        key={`${group.stack.id}-${typeGroup.type}`}
+                                                        className="space-y-2"
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="h-1.5 w-1.5 rounded-full bg-muted" />
+                                                            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                                                {toLabel(typeGroup.type)}
+                                                            </span>
+                                                            <span className="text-xs text-muted-foreground">
+                                                                ({typeGroup.services.length})
+                                                            </span>
+                                                        </div>
 
-                                        <div className="space-y-4 p-4">
-                                            {group.typeGroups.map((typeGroup) => (
-                                                <div
-                                                    key={`${group.stack.id}-${typeGroup.type}`}
-                                                    className="space-y-2"
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="h-1.5 w-1.5 rounded-full bg-muted" />
-                                                        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                                                            {toLabel(typeGroup.type)}
-                                                        </span>
-                                                        <span className="text-xs text-muted-foreground">
-                                                            ({typeGroup.services.length})
-                                                        </span>
+                                                        {serviceViewMode === 'grid' ? (
+                                                            <ServiceGrid
+                                                                services={typeGroup.services}
+                                                                workspaceId={workspaceId}
+                                                                showFilter={false}
+                                                                onActionComplete={refreshContainers}
+                                                            />
+                                                        ) : (
+                                                            <ServiceList
+                                                                services={typeGroup.services}
+                                                                workspaceId={workspaceId}
+                                                                showFilter={false}
+                                                                showHeader={
+                                                                    serviceViewMode !== 'list'
+                                                                }
+                                                                onActionComplete={refreshContainers}
+                                                            />
+                                                        )}
                                                     </div>
-
-                                                    {serviceViewMode === 'grid' ? (
-                                                        <ServiceGrid
-                                                            services={typeGroup.services}
-                                                            workspaceId={workspaceId}
-                                                            showFilter={false}
-                                                            onActionComplete={refreshContainers}
-                                                        />
-                                                    ) : (
-                                                        <ServiceList
-                                                            services={typeGroup.services}
-                                                            workspaceId={workspaceId}
-                                                            showFilter={false}
-                                                            showHeader={serviceViewMode !== 'list'}
-                                                            onActionComplete={refreshContainers}
-                                                        />
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                                                ))}
+                                            </div>
+                                        </section>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </ScrollArea>
                 )}
             </div>
         </div>
