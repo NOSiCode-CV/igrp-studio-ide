@@ -42,7 +42,7 @@
         "@gitbeaker/rest": "^43.8.0",
         "@hookform/resolvers": "^5.2.2",
         "@igrp/dotnet-engine": "^0.0.1-alpha.12",
-        "@igrp/framework-process-studio-bpmn-editor": "0.0.1-beta.16",
+        "@igrp/framework-process-studio-bpmn-editor": "0.1.0-beta.7",
         "@igrp/framework-process-studio-client": "^0.0.1-beta.12",
         "@igrp/framework-process-studio-types": "^0.0.1-beta.12",
         "@igrp/igrp-framework-react-design-system": "0.1.0-beta.103",
