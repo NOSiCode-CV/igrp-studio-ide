@@ -1279,10 +1279,10 @@
     ts-loader "^9.5.1"
     uuid "^9.0.0"
 
-"@igrp/framework-process-studio-bpmn-editor@0.1.0-beta.10":
-  version "0.1.0-beta.10"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/framework-process-studio-bpmn-editor/-/framework-process-studio-bpmn-editor-0.1.0-beta.10.tgz#85245dd37729f27e953d2896c8b83fe30495c09e"
-  integrity sha512-Xbd6eMeTHqaAOqebVCTMrmta43UlQPauSArsl7TyrL0T6KTG07IIZm4LltjmhYtk7UK/cegx+JQIfrBtrAl2/w==
+"@igrp/framework-process-studio-bpmn-editor@0.1.0-beta.11":
+  version "0.1.0-beta.11"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/framework-process-studio-bpmn-editor/-/framework-process-studio-bpmn-editor-0.1.0-beta.11.tgz#17964763293a04d5c774389345d233ffccfff76a"
+  integrity sha512-Ufpk+s19uBfXxcbjRpKHXDOVsfAfjz8WPa48wB/7i28C/EKlBRN9KgQu8n8cni5t3Gjb7rDqOiKp6AYlkRz+/Q==
   dependencies:
     "@bpmn-io/cm-theme" "^0.2.0"
     "@bpmn-io/feel-editor" "^2.6.0"
