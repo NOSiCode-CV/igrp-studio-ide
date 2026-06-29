@@ -87,14 +87,18 @@ const CreateWorkspace = ({
     const totalSteps = stepKeys.length
 
     const normalizeSlug = useCallback((value: string): string => {
-        return value
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[_\s]+/g, '-')
-            .replace(/[^a-zA-Z-]/g, '')
-            .replace(/-+/g, '-')
-            .replace(/^-+|-+$/g, '')
-            .toLowerCase()
+        return (
+            value
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[_\s]+/g, '-')
+                // Keep digits: a Docker compose project/container name and an
+                // RFC-1123 hostname both allow [a-z0-9-].
+                .replace(/[^a-zA-Z0-9-]/g, '')
+                .replace(/-+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .toLowerCase()
+        )
     }, [])
 
     const inputRef = useRef<HTMLInputElement>(null)
@@ -118,8 +122,10 @@ const CreateWorkspace = ({
             return
         }
 
-        if (!/^[a-zA-Z-]+$/.test(slug)) {
-            showErrorToast('Slug must contain only letters and hyphens (a-z, A-Z, -)')
+        // Docker compose project / container / network name and RFC-1123
+        // hostname: lowercase alphanumeric, hyphens allowed only in the middle.
+        if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(slug)) {
+            showErrorToast('Slug must be lowercase letters, digits and hyphens (e.g. inss-2024)')
             return
         }
 
