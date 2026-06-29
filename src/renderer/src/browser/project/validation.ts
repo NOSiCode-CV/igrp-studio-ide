@@ -62,7 +62,7 @@ export function useProjectValidation({ t, step }: { t: any; step: number }) {
             if (!cfg.group) {
                 setError('group', t('thisFieldRequired', { name: t('group') }))
             } else {
-                if (!PATTERNS.NO_SPACE_AND_HYPHEN.test(cfg.group)) {
+                if (!PATTERNS.JAVA_PACKAGE.test(cfg.group)) {
                     setError('group', t('msgInfoAccpet'))
                 }
                 if (cfg.group.length > 100) {
@@ -73,7 +73,7 @@ export function useProjectValidation({ t, step }: { t: any; step: number }) {
             if (!cfg.artifact) {
                 setError('artifact', t('thisFieldRequired', { name: t('artifact') }))
             } else {
-                if (!PATTERNS.NO_SPACE_BUT_ALLOW_HYPHEN.test(cfg.artifact)) {
+                if (!PATTERNS.MAVEN_ARTIFACT.test(cfg.artifact)) {
                     setError('artifact', t('msgNoSpacesAllowed'))
                 }
                 if (cfg.artifact.length > 50) {
