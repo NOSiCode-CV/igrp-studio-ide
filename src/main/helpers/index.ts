@@ -49,7 +49,9 @@ export async function checkAndReadBaseApi(
             if (baseApiPath.endsWith('baseApi.json')) {
                 config = {
                     id,
-                    name: parsedConfig.apiName,
+                    // Persisted baseApi.json uses `name`; keep apiName as a
+                    // fallback for older/legacy files.
+                    name: parsedConfig.name ?? parsedConfig.apiName,
                     type: 'backend',
                     framework: type,
                     config: { ...parsedConfig },
@@ -59,7 +61,9 @@ export async function checkAndReadBaseApi(
             } else if (baseApiPath.endsWith('baseApp.json')) {
                 config = {
                     id,
-                    name: parsedConfig.appName,
+                    // Persisted baseApp.json uses `name`; keep appName as a
+                    // fallback for older/legacy files.
+                    name: parsedConfig.name ?? parsedConfig.appName,
                     type: 'frontend',
                     framework: type,
                     config: { ...parsedConfig },

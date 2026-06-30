@@ -726,11 +726,7 @@ export class WorkspaceRepository {
             throw new Error(`Workspace ${workspaceId} not found`)
         }
 
-        await this.copyOptionalStacksFromTemplate(
-            workspace,
-            normalizedOptions,
-            bootstrapResult
-        )
+        await this.copyOptionalStacksFromTemplate(workspace, normalizedOptions, bootstrapResult)
 
         if (
             normalizedOptions.installMonitoringStack &&
@@ -1008,18 +1004,26 @@ export class WorkspaceRepository {
                 throw new Error(`Workspace ${workspaceId} not found`)
             }
 
-            if (!framework || !project.name) {
+            // Name may live on the nested config (`project`) or on the project
+            // top-level (`updates.name`), depending on the source.
+            const resolvedName = project?.name ?? updates.name
+
+            if (!framework || !resolvedName) {
                 throw new Error(`Invalid project configuration`)
             }
 
             const updatedProject: ProjectData = {
-                name: project.name || 'Unnamed Project',
+                name: resolvedName || 'Unnamed Project',
                 path: projectPath as string,
                 type,
                 workspaceId: workspaceId as string,
                 framework: framework as FrameworkType,
                 updatedAt: new Date().toISOString(),
-                id: uuidv4(),
+                // Preserve the project's existing id (from its baseApi/baseApp
+                // metadata) when opening/importing; only mint a new one as a
+                // last resort so the workspace registry stays in sync with the
+                // on-disk project identity.
+                id: updates.id ?? uuidv4(),
                 config: project || {}
             }
 
