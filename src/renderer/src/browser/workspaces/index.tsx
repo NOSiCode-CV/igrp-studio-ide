@@ -196,28 +196,34 @@ const Resources = () => {
         state: { changeStatus }
     } = useWorkspace()
 
-    const { services, refreshContainers } = useDocker({
+    // `services` (docker status) is fetched and polled internally by useDocker
+    // (keyed on workspace.path + changeStatus) — no need to also drive it from
+    // here, which duplicated the docker `status` call.
+    const { services } = useDocker({
         workspace,
         changeStatus
     })
 
+    // Projects and the workspace list come from JSON metadata; they don't change
+    // with container status, so only reload them when the active workspace
+    // changes (not on every changeStatus toggle).
     useEffect(() => {
         fetchProjects()
         refreshWorkspaces()
-        refreshContainers()
-    }, [workspace, changeStatus])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workspace])
 
     useEffect(() => {
         const handler = () => {
             fetchProjects()
             refreshWorkspaces()
-            refreshContainers()
         }
         window.addEventListener('igrp:workspace:refresh', handler)
         return () => {
             window.removeEventListener('igrp:workspace:refresh', handler)
         }
-    }, [workspace, changeStatus])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workspace])
 
     const fetchProjects = async () => {
         await findAllProjects().then((data) => {
