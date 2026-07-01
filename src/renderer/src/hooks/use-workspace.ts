@@ -8,7 +8,7 @@ import useToast from '@renderer/hooks/useToast'
 import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import yaml from 'js-yaml'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { type NavigateFunction, useNavigate } from 'react-router-dom'
@@ -88,6 +88,10 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     const { showSuccessToast, showErrorToast } = useToast()
     const [workspaces, setWorkspaces] = useState<IWorkspace[]>([])
     const [loading, setLoading] = useState(true)
+    // Only the first workspaces load drives the full-screen loader; later
+    // background refreshes (changeStatus, events, opening a workspace) must not
+    // flash the whole screen.
+    const hasLoadedWorkspacesRef = useRef(false)
     const dispatch: any = useDispatch()
     const navigate = useNavigate()
 
@@ -137,7 +141,8 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     }
 
     const refreshWorkspaces = async (): Promise<void> => {
-        setLoading(true)
+        const isInitialLoad = !hasLoadedWorkspacesRef.current
+        if (isInitialLoad) setLoading(true)
         try {
             const data = await getWorkspaces()
             setWorkspaces(data)
@@ -151,7 +156,10 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             console.error(err)
             showErrorToast('Failed to load workspaces')
         } finally {
-            setLoading(false)
+            if (isInitialLoad) {
+                setLoading(false)
+                hasLoadedWorkspacesRef.current = true
+            }
         }
     }
 
