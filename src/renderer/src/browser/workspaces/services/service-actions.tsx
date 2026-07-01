@@ -23,8 +23,11 @@ export const ServiceActions = ({ service, services, onActionComplete }: ServiceA
     const [isEditService, setEditService] = useState(false)
     const { workspace } = useWorkspace()
 
+    // Action-only consumer: skip status fetch/polling so each service card
+    // doesn't spawn its own `docker compose ps` on mount.
     const { getServiceUrl, stopService, restartService, startContainers } = useDocker({
-        workspace
+        workspace,
+        watchStatus: false
     })
 
     const serviceUrl = getServiceUrl(service)

@@ -13,10 +13,17 @@ type NginxRouting = { listenPort: number; routes: NginxRoute[] }
 
 export function useDocker({
     workspace,
-    changeStatus = false
+    changeStatus = false,
+    watchStatus = true
 }: {
     workspace?: IWorkspace | null
     changeStatus?: boolean
+    /**
+     * When false, skip the on-mount `docker compose ps` and the periodic
+     * status polling. Action-only consumers (e.g. per-service action menus)
+     * should pass `false` so N cards don't each spawn their own `docker ps`.
+     */
+    watchStatus?: boolean
 }): {
     fileContent: string | null
     composeConfig: DockerComposeConfig | null
@@ -422,7 +429,7 @@ export function useDocker({
     }, [handleDockerOperation])
 
     useEffect(() => {
-        if (!workspace?.path) return
+        if (!workspace?.path || !watchStatus) return
 
         const refreshOnce = async (): Promise<void> => {
             try {
@@ -435,10 +442,10 @@ export function useDocker({
 
         void refreshOnce()
         return
-    }, [workspace?.path])
+    }, [workspace?.path, watchStatus])
 
     useEffect(() => {
-        if (!workspace?.path || !changeStatus) return
+        if (!workspace?.path || !changeStatus || !watchStatus) return
 
         let intervalId: number | undefined
         let inFlight = false
@@ -463,7 +470,7 @@ export function useDocker({
                 window.clearInterval(intervalId)
             }
         }
-    }, [workspace?.path, changeStatus])
+    }, [workspace?.path, changeStatus, watchStatus])
 
     useEffect(() => {
         if (!workspace?.path) return
