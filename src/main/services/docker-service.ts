@@ -1003,11 +1003,18 @@ export class DockerService {
         if (!envFilePath || !fs.existsSync(envFilePath)) return
         if (!envFilePath.endsWith('.env_process')) return
 
-        const workspaceSlug = path.basename(projectPath).trim()
-        if (!workspaceSlug) return
-
         const mainEnvPath = path.join(projectPath, '.env')
         const mainEnv = this.parseEnvFile(mainEnvPath)
+
+        // The workspace slug is authoritative in the main .env (WORKSPACE_SLUG);
+        // the folder name is only a last-resort fallback. Deriving it from the
+        // folder name broke the process stack whenever the folder name differed
+        // from the slug — services pointed at `<folder>-database-postgres` /
+        // `<folder>-eureka`, which don't exist (the real ones use the slug).
+        const workspaceSlug =
+            mainEnv.WORKSPACE_SLUG || mainEnv.DOCKER_IP || path.basename(projectPath).trim()
+        if (!workspaceSlug) return
+
         const processEnv = this.parseEnvFile(envFilePath)
         const resolvedNginxPort = this.resolveHttpPort({
             ...processEnv,
