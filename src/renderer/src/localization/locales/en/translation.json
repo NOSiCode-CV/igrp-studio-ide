@@ -370,6 +370,7 @@
     "isRequired": "Is Required?",
     "header": "Header",
     "widgetPalette": "Widget Palette",
+    "customCode": "Custom Code",
     "addPage": "Add Page",
     "seachPages": "Search pages or components...",
     "addComponents": "Add Components",

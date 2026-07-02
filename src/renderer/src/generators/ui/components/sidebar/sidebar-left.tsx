@@ -93,7 +93,7 @@ export function AppSidebar({
 
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
-        { icon: SquareFunction, label: t('Custom Code'), id: 'customCode' },
+        { icon: SquareFunction, label: t('customCode'), id: 'customCode' },
         { icon: FolderTree, label: t('navigator'), id: 'navigator' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
         { icon: Badge, label: t('settings'), id: 'settings' },
@@ -139,7 +139,9 @@ export function AppSidebar({
                                     <SidebarMenuItem key={item.id}>
                                         <SidebarMenuButton
                                             tooltip={{
-                                                children: t(item.label),
+                                                // item.label is already translated in the
+                                                // navegations array — don't re-translate.
+                                                children: item.label,
                                                 hidden: false
                                             }}
                                             onClick={() => {
@@ -178,7 +180,7 @@ export function AppSidebar({
                         <div className="flex flex-1 space-x-2  items-center">
                             <activeMenuGroup.icon size={20} />
                             <div className="text-base font-medium text-foreground">
-                                {t(activeMenuGroup.label)}
+                                {activeMenuGroup.label}
                             </div>
                         </div>
                         {activeMenuGroup.id === 'customCode' && <CustomCodeMenu />}
