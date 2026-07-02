@@ -261,11 +261,14 @@ export function AppSidebar({
                                                                     )}
                                                                     <GripHorizontal className="w-4 h-4 text-gray-400" />
 
-                                                                    <div className="flex flex-col items-center gap-2">
+                                                                    <div className="flex w-full min-w-0 flex-col items-center gap-2">
                                                                         {subItem.icon && (
-                                                                            <subItem.icon className="w-6 h-6" />
+                                                                            <subItem.icon className="w-6 h-6 shrink-0" />
                                                                         )}
-                                                                        <span className="text-center">
+                                                                        <span
+                                                                            title={subItem.label}
+                                                                            className="line-clamp-2 w-full break-words text-center"
+                                                                        >
                                                                             {subItem.label}
                                                                         </span>
                                                                     </div>
