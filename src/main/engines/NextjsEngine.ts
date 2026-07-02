@@ -13,6 +13,7 @@ import {
     newProcess,
     newProcessStep,
     registerComponents,
+    resetComponents,
     setEngineConfiguration
 } from '@igrp/igrp-studio-nextjs-engine'
 import type {
@@ -62,6 +63,13 @@ export class NextjsEngine implements BaseEngine {
 
     registerComponent(config: ComponentRegistrationConfig): void {
         registerComponents(config)
+    }
+
+    // Drop custom/app registrations and keep only the built-ins (snapshot taken
+    // in initComponents). Call before registering another project's components
+    // so custom components don't leak across projects.
+    resetComponents(): void {
+        resetComponents()
     }
 
     getCodeSnippets(): CodeSnippetsRegistrationConfig {

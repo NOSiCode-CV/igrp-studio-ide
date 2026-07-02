@@ -9,6 +9,11 @@ import {
 } from '@renderer/utils/register-schema'
 import type { FileTree, HandlerResponse } from 'src/main/types'
 
+// Tracks the project whose custom/app components are currently registered in
+// the (global) engine registry. When it changes we reset the registry so
+// components from the previous project don't leak into the new one.
+let lastRegisteredProjectPath: string | null = null
+
 export const EngineService = {
     async getAppMetadata(basePath: string): Promise<HandlerResponse> {
         return await window.engine.getAppMetadata(ENV_TYPES.NEXTJS, basePath)
@@ -22,16 +27,23 @@ export const EngineService = {
         return await window.engine.getCodeSnippets(ENV_TYPES.NEXTJS)
     },
 
+    async resetComponents(): Promise<void> {
+        await window.engine.resetComponents(ENV_TYPES.NEXTJS)
+        lastRegisteredProjectPath = null
+    },
+
     async registerComponent({
         customComponents,
         appComponents,
         currentPage,
-        loadRegistryComponent
+        loadRegistryComponent,
+        basePath
     }: {
         customComponents: ComponentDef[]
         appComponents: FileTree[]
         currentPage: string
         loadRegistryComponent: () => void
+        basePath?: string
     }): Promise<void> {
         const components: ComponentRegisterConfig[] = customComponents.map(
             (component: ComponentDef) => ({
@@ -121,6 +133,14 @@ export const EngineService = {
             }))
 
         const componentsToRegister = [...components, ..._components]
+
+        // Switching project: drop the previous project's custom/app components
+        // from the (global) engine registry before registering this project's,
+        // so they don't leak across projects. Built-ins are preserved.
+        if (basePath && basePath !== lastRegisteredProjectPath) {
+            await window.engine.resetComponents(ENV_TYPES.NEXTJS)
+            lastRegisteredProjectPath = basePath
+        }
 
         const { result, error } = await window.engine.registerComponent(ENV_TYPES.NEXTJS, {
             components: componentsToRegister

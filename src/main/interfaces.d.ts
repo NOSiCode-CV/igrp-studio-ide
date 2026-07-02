@@ -112,6 +112,7 @@ export interface BaseEngine {
     getCodeSnippets?(): CodeSnippetsRegistrationConfig
 
     registerComponent?(config: ComponentRegistrationConfig): void
+    resetComponents?(): void
 
     createProcess?: (process: ProcessConfig, basePath: string) => Promise<void>
     createProcessStep?: (step: ProcessStepConfig, basePath: string) => Promise<void>
@@ -167,6 +168,7 @@ export interface IBaseEngine {
         engineType: string,
         config: ComponentRegistrationConfig
     ) => Promise<HandlerResponse>
+    resetComponents: (engineType: string) => Promise<HandlerResponse>
 
     createProcess: (process: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     createProcessStep: (step: any, engineType: string, basePath: string) => Promise<HandlerResponse>

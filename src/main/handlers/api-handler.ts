@@ -170,6 +170,11 @@ handleWithCustomErrors(
     }
 )
 
+handleWithCustomErrors(EVENTS.NEXT.RESET_COMPONENT, async (_event, engineType: string) => {
+    const engine = EngineFactory.getEngine(engineType)
+    return engine.resetComponents?.()
+})
+
 handleWithCustomErrors(
     EVENTS.NEXT.CREATE_PROCESS,
     async (_event, process: ProcessConfig, engineType: string, basePath: string) => {

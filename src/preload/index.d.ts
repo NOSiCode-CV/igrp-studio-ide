@@ -101,6 +101,7 @@ declare const engine: {
         engineType: string,
         config: ComponentRegistrationConfig
     ) => Promise<HandlerResponse>
+    resetComponents: (engineType: string) => Promise<HandlerResponse>
     getService: (engineType: string) => Promise<HandlerResponse>
     getDependencies: (engineType: string) => Promise<HandlerResponse>
     getAppMetadata: (engineType: string, basePath: string) => Promise<HandlerResponse>

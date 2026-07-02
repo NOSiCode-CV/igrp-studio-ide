@@ -339,6 +339,14 @@ const engine = {
         }
     },
 
+    resetComponents: async (engineType: string): Promise<HandlerResponse> => {
+        try {
+            return await ipcRenderer.invoke(EVENTS.NEXT.RESET_COMPONENT, engineType)
+        } catch (error) {
+            return handleError(error)
+        }
+    },
+
     getService: async (engineType: string): Promise<HandlerResponse> => {
         try {
             return await ipcRenderer.invoke(EVENTS.NEXT.GET_SERVICE, engineType)
