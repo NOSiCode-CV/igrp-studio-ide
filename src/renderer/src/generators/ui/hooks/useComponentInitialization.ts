@@ -34,13 +34,13 @@ export const useComponentInitialization = ({
             const mainComponent = isPage
                 ? COMPONENT.PageContent
                 : isBpmnProcess
-                  ? COMPONENT.ProcessStep
+                  ? COMPONENT.ProcessStepContent
                   : COMPONENT.ComponentContent
 
             let pageCompRegister
 
             if (isBpmnProcess) {
-                pageCompRegister = await findComponent('process', COMPONENT.ProcessStep)
+                pageCompRegister = await findComponent('process', COMPONENT.ProcessStepContent)
             } else {
                 pageCompRegister = await findComponentById(mainComponent)
             }

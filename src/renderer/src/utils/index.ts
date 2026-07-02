@@ -69,7 +69,10 @@ export function getUUID() {
 export function generateId(componentName: string) {
     // Generate a random string with 8 characters
     const randomStr = Math.random().toString(36).slice(2, 8)
-    return `${componentName.toLowerCase()}_${randomStr}`
+    // Defensive: never crash the whole component init if a caller passes an
+    // undefined/empty name (e.g. an unknown COMPONENT.* key).
+    const base = (componentName || 'component').toLowerCase()
+    return `${base}_${randomStr}`
 }
 
 export function findComponentItem(menus: Array<any>, idFind: string) {
