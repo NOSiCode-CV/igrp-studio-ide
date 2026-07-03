@@ -253,6 +253,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                 variant="h3"
                 title={project?.name}
                 description={project.config?.description}
+                className='flex-row'
             />
 
             <VersionAlert

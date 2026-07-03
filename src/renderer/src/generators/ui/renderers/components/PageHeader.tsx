@@ -56,6 +56,7 @@ const IGRPStudioPageHeader: React.FC<PageHeaderProps> = ({ comp, onDragEnd }: Pa
             title={title || label || componentName}
             {...properties}
             showBackButton={false}
+            className='flex-row'
         >
             <Droppable
                 component={comp}

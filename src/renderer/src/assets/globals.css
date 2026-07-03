@@ -1,5 +1,14 @@
 @import "tailwindcss";
+/* Design-system-only tokens (success, warning, info, indigo, highlight,
+   chart-6..8, process-active, process-completed, sidebar-active) that the
+   app's own @theme does not define. Imported BEFORE themes.css and :root so the
+   app's brand values still win on shared tokens and only the DS extras leak in. */
+@import "@igrp/igrp-framework-react-design-system/tokens";
 @import "./themes.css";
+
+/* v0.1.0-beta.141 dropped the precompiled `/styles` export; consumers own
+   Tailwind and generate the component utilities by scanning the DS source. */
+@source "../../../../node_modules/@igrp/igrp-framework-react-design-system/dist";
 
 @plugin "tailwindcss-animate";
 @plugin "@tailwindcss/typography";
