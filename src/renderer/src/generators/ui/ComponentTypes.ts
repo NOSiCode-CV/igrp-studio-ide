@@ -82,6 +82,7 @@ import IGRPStudioCardDetails from './renderers/components/CardDetails'
 import IGRPStudioColumn from './renderers/components/Column'
 import IGRPStudioColumns from './renderers/components/Columns'
 import IGRPStudioContainer from './renderers/components/Container'
+import IGRPStudioDropdown from './renderers/components/Dropdown'
 import IGRPStudioFlex from './renderers/components/Flex'
 import IGRPStudioForm from './renderers/components/Form'
 import IGRPStudioFormList from './renderers/components/FormList'
@@ -89,6 +90,7 @@ import IGRPStudioFragment from './renderers/components/Fragment'
 import IGRPStudioGrid from './renderers/components/Grid'
 import IGRPStudioInfoCard from './renderers/components/InfoCard'
 import IGRPStudioPage from './renderers/components/MainComponent'
+import IGRPStudioMenubar from './renderers/components/Menubar'
 import IGRPStudioMenuNavigation from './renderers/components/MenuNavigation'
 import {
     IGRPSTudioDialogFooter,
@@ -98,10 +100,28 @@ import {
     IGRPStudioDialogTrigger,
     IGRPStudioModalDialog
 } from './renderers/components/ModalDialog'
+import {
+    IGRPStudioDrawer,
+    IGRPStudioHoverCard,
+    IGRPStudioPopover,
+    IGRPStudioSheet,
+    IGRPStudioTooltip
+} from './renderers/components/OverlayPreviews'
 import IGRPStudioPageHeader from './renderers/components/PageHeader'
 import IGRPStudioParagraph from './renderers/components/Paragraph'
 import IGRPStudioRepetitive from './renderers/components/RepetitiveList'
 import IGRPStudioSection from './renderers/components/Section'
+import {
+    IGRPStudioBanner,
+    IGRPStudioBreadcrumb,
+    IGRPStudioEmpty,
+    IGRPStudioImageCropper,
+    IGRPStudioInputGroup,
+    IGRPStudioInputOTP,
+    IGRPStudioNavigationMenu,
+    IGRPStudioPagination,
+    IGRPStudioStepper
+} from './renderers/components/StaticElementPreviews'
 import IGRPStudioTable from './renderers/components/Table'
 import IGRPStudioTabs from './renderers/components/Tabs'
 import IGRPStudioTextList from './renderers/components/TextList'
@@ -260,7 +280,22 @@ export const COMPONENT: Record<string, string> = {
     Skeleton: 'skeleton',
     Kbd: 'kbd',
     FieldDescription: 'fieldDescription',
-    Toggle: 'toggle'
+    Toggle: 'toggle',
+    Menubar: 'menubar',
+    Popover: 'popover',
+    HoverCard: 'hoverCard',
+    Sheet: 'sheet',
+    Drawer: 'drawer',
+    Breadcrumb: 'breadcrumb',
+    Pagination: 'pagination',
+    InputOTP: 'inputOTP',
+    InputGroup: 'inputGroup',
+    NavigationMenu: 'navigationMenu',
+    Empty: 'empty',
+    ImageCropper: 'imageCropper',
+    StepperUI: 'stepperUI',
+    Banner: 'banner',
+    Tooltip: 'tooltip'
 } as const
 
 // Icon mapping is the source-of-truth for `componentName → lucide icon`.
@@ -384,5 +419,27 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Skeleton]: IGRPStudioSkeleton,
     [COMPONENT.Kbd]: IGRPStudioKbd,
     [COMPONENT.FieldDescription]: IGRPStudioFieldDescription,
-    [COMPONENT.Toggle]: IGRPStudioToggle
+    [COMPONENT.Toggle]: IGRPStudioToggle,
+
+    // Group B — engine containers with a Studio preview wrapper (children
+    // stay droppable/editable on the canvas).
+    [COMPONENT.Dropdown]: IGRPStudioDropdown,
+    [COMPONENT.Menubar]: IGRPStudioMenubar,
+
+    // Group B — engine leaf components rendered as static canvas previews
+    // (real internal structure is generated code, not canvas-editable).
+    [COMPONENT.Popover]: IGRPStudioPopover,
+    [COMPONENT.HoverCard]: IGRPStudioHoverCard,
+    [COMPONENT.Sheet]: IGRPStudioSheet,
+    [COMPONENT.Drawer]: IGRPStudioDrawer,
+    [COMPONENT.Breadcrumb]: IGRPStudioBreadcrumb,
+    [COMPONENT.Pagination]: IGRPStudioPagination,
+    [COMPONENT.InputOTP]: IGRPStudioInputOTP,
+    [COMPONENT.InputGroup]: IGRPStudioInputGroup,
+    [COMPONENT.NavigationMenu]: IGRPStudioNavigationMenu,
+    [COMPONENT.Empty]: IGRPStudioEmpty,
+    [COMPONENT.ImageCropper]: IGRPStudioImageCropper,
+    [COMPONENT.StepperUI]: IGRPStudioStepper,
+    [COMPONENT.Banner]: IGRPStudioBanner,
+    [COMPONENT.Tooltip]: IGRPStudioTooltip
 }
