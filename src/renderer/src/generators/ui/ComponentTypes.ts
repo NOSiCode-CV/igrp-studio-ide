@@ -1,4 +1,5 @@
 import {
+    IGRPAlertDialog,
     IGRPAreaChart,
     IGRPAvatar,
     IGRPBadge,
@@ -9,8 +10,10 @@ import {
     IGRPCalendarRangeTime,
     IGRPCalendarSingle,
     IGRPCalendarSingleTime,
+    IGRPChat,
     IGRPCheckbox,
     IGRPCombobox,
+    IGRPCommand,
     IGRPCopyTo,
     IGRPDataTableFilterDate,
     IGRPDataTableFilterDropdown,
@@ -22,12 +25,15 @@ import {
     IGRPDatePickerMultiple,
     IGRPDatePickerRange,
     IGRPDatePickerSingle,
+    IGRPDateTimeInput,
     IGRPHeadline,
     IGRPHorizontalBarChart,
     IGRPIcon,
+    IGRPImage,
     IGRPInputAddOn,
     IGRPInputColor,
     IGRPInputFile,
+    IGRPInputHidden,
     IGRPInputNumber,
     IGRPInputPassword,
     IGRPInputPhone,
@@ -37,6 +43,9 @@ import {
     IGRPInputUrl,
     IGRPLabel,
     IGRPLineChart,
+    IGRPLoadingSpinner,
+    IGRPNotification,
+    IGRPPageHeaderBackButton,
     IGRPPdfViewer,
     IGRPPieChart,
     IGRPRadarChart,
@@ -45,10 +54,23 @@ import {
     IGRPSelect,
     IGRPSeparator,
     IGRPStatsCard,
+    IGRPStatsCardMini,
+    IGRPStatsCardTopBorderColored,
     IGRPStatusBanner,
+    // Unprefixed (shadcn-style) design-system exports, aliased for clarity.
+    AspectRatio as IGRPStudioAspectRatio,
+    FieldDescription as IGRPStudioFieldDescription,
+    Kbd as IGRPStudioKbd,
+    // `progress` is exported unprefixed (shadcn-style) in the design-system.
+    Progress as IGRPStudioProgress,
+    ScrollArea as IGRPStudioScrollArea,
+    Skeleton as IGRPStudioSkeleton,
+    Toggle as IGRPStudioToggle,
     IGRPSwitch,
     IGRPText,
     IGRPTextarea,
+    IGRPToaster,
+    IGRPUserAvatar,
     IGRPVerticalBarChart,
     IGRPVideoEmbed
 } from '@igrp/igrp-framework-react-design-system'
@@ -218,7 +240,27 @@ export const COMPONENT: Record<string, string> = {
     DatePickerMultiple: 'datePickerMultiple',
     InputDatePickerSingle: 'inputDatePickerSingle',
     Accordion: 'accordion',
-    CardDetails: 'cardDetails'
+    CardDetails: 'cardDetails',
+
+    // Group A — engine default components mapped directly to design-system
+    // components (leaf, always-render). Keys mirror the engine's registered names.
+    Command: 'command',
+    DateTimeInput: 'dateTimeInput',
+    Progress: 'progress',
+    StatsCardMini: 'statsCardMini',
+    LoadingSpinner: 'loadingSpinner',
+    Notification: 'notification',
+    PageHeaderBackButton: 'pageHeaderBackButton',
+    StatsCardTopBorderColored: 'statsCardTopBorderColored',
+    Toaster: 'toaster',
+    UserAvatar: 'userAvatar',
+    Spinner: 'spinner',
+    ScrollArea: 'scrollArea',
+    AspectRatio: 'aspectRatio',
+    Skeleton: 'skeleton',
+    Kbd: 'kbd',
+    FieldDescription: 'fieldDescription',
+    Toggle: 'toggle'
 } as const
 
 // Icon mapping is the source-of-truth for `componentName → lucide icon`.
@@ -316,5 +358,31 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.ModalDialogDescription]: IGRPStudioDialogDescription,
     [COMPONENT.ModalDialogFooter]: IGRPSTudioDialogFooter,
     [COMPONENT.Accordion]: IGRPStudioAccordion,
-    [COMPONENT.CardDetails]: IGRPStudioCardDetails
+    [COMPONENT.CardDetails]: IGRPStudioCardDetails,
+
+    // Group A — engine default components mapped directly to design-system
+    // components (leaf, render standalone). `span` maps to IGRPText.
+    [COMPONENT.AlertDialog]: IGRPAlertDialog,
+    [COMPONENT.Chat]: IGRPChat,
+    [COMPONENT.Command]: IGRPCommand,
+    [COMPONENT.DateTimeInput]: IGRPDateTimeInput,
+    [COMPONENT.Progress]: IGRPStudioProgress,
+    [COMPONENT.Image]: IGRPImage,
+    [COMPONENT.Hidden]: IGRPInputHidden,
+    [COMPONENT.LoadingSpinner]: IGRPLoadingSpinner,
+    [COMPONENT.Notification]: IGRPNotification,
+    [COMPONENT.PageHeaderBackButton]: IGRPPageHeaderBackButton,
+    [COMPONENT.StatsCardMini]: IGRPStatsCardMini,
+    [COMPONENT.StatsCardTopBorderColored]: IGRPStatsCardTopBorderColored,
+    [COMPONENT.Toaster]: IGRPToaster,
+    [COMPONENT.UserAvatar]: IGRPUserAvatar,
+    [COMPONENT.Span]: IGRPText,
+    // `spinner` is a duplicate of `loadingSpinner` in the engine registry.
+    [COMPONENT.Spinner]: IGRPLoadingSpinner,
+    [COMPONENT.ScrollArea]: IGRPStudioScrollArea,
+    [COMPONENT.AspectRatio]: IGRPStudioAspectRatio,
+    [COMPONENT.Skeleton]: IGRPStudioSkeleton,
+    [COMPONENT.Kbd]: IGRPStudioKbd,
+    [COMPONENT.FieldDescription]: IGRPStudioFieldDescription,
+    [COMPONENT.Toggle]: IGRPStudioToggle
 }
