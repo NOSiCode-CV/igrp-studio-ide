@@ -13,10 +13,11 @@
  */
 
 import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import { resolveIcon } from '@renderer/features/component-icons'
 import type React from 'react'
 import { useMemo } from 'react'
-import { resolveIcon } from '@renderer/features/component-icons'
-import { HIDDEN_COMPONENT_NAMES, resolveGroupLabel } from './groups'
+import { useTranslation } from 'react-i18next'
+import { HIDDEN_COMPONENT_NAMES, translateGroupLabel } from './groups'
 
 export interface EnginePaletteComponent {
     /** Component name as the engine emits it — stable identifier. */
@@ -49,6 +50,8 @@ export interface UseEnginePaletteResult {
 export const useEnginePalette = (
     components: ComponentRegisterConfig[] | undefined | null
 ): UseEnginePaletteResult => {
+    const { t } = useTranslation()
+
     return useMemo(() => {
         if (!components || components.length === 0) {
             return { all: [], groups: [] }
@@ -65,7 +68,7 @@ export const useEnginePalette = (
                 id: component.name,
                 name: component.label || component.name,
                 groupKey,
-                groupLabel: resolveGroupLabel(groupKey),
+                groupLabel: translateGroupLabel(groupKey, t),
                 icon: resolveIcon(component.name),
                 deprecated: component.deprecated
             }
@@ -81,5 +84,5 @@ export const useEnginePalette = (
         }
 
         return { all, groups: Array.from(groupMap.values()) }
-    }, [components])
+    }, [components, t])
 }

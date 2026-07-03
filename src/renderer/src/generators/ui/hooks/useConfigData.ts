@@ -10,11 +10,14 @@
  */
 
 import type { ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
-import { useMemo } from 'react'
-import { GROUP_LABELS, HIDDEN_COMPONENT_NAMES } from '@renderer/features/component-palette'
 import { ICON_MAP } from '@renderer/features/component-icons'
+import { HIDDEN_COMPONENT_NAMES, translateGroupLabel } from '@renderer/features/component-palette'
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const useConfigdata = (components: ComponentRegisterConfig[]) => {
+    const { t } = useTranslation()
+
     const menuItems = useMemo(() => {
         if (!components || components.length === 0) return []
 
@@ -23,7 +26,7 @@ const useConfigdata = (components: ComponentRegisterConfig[]) => {
                 acc: Record<string, ComponentRegisterConfig[]>,
                 component: ComponentRegisterConfig
             ) => {
-                const group = component.group || 'Others'
+                const group = component.group || 'others'
                 if (!acc[group]) {
                     acc[group] = []
                 }
@@ -35,7 +38,7 @@ const useConfigdata = (components: ComponentRegisterConfig[]) => {
 
         return Object.keys(groupedComponents).map((group: string) => ({
             id: group,
-            label: GROUP_LABELS[group] || group,
+            label: translateGroupLabel(group, t),
             type: 'group',
             subItems: groupedComponents[group]
                 .filter(
@@ -56,7 +59,7 @@ const useConfigdata = (components: ComponentRegisterConfig[]) => {
                     allowChildren: component.allowChildren
                 }))
         }))
-    }, [components])
+    }, [components, t])
 
     return { menuItems }
 }

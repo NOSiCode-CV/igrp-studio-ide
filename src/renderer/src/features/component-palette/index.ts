@@ -16,29 +16,26 @@
  * `./groups`.
  */
 
-export { PALETTE, PALETTE_BY_ID } from './catalog'
 export type { PaletteCategory, PaletteComponent } from './catalog'
-
+export { PALETTE, PALETTE_BY_ID } from './catalog'
+export {
+    GROUP_COMPONET,
+    GROUP_LABELS,
+    HIDDEN_COMPONENT_NAMES,
+    isHiddenComponent,
+    resolveGroupLabel,
+    translateGroupLabel
+} from './groups'
+export type { PaletteComponentCardProps } from './PaletteComponentCard'
+export { PaletteComponentCard } from './PaletteComponentCard'
+export type { ComponentPersistenceOptions } from './persistence'
 export {
     readPersistedComponentIds,
     writePersistedComponentIds
 } from './persistence'
-export type { ComponentPersistenceOptions } from './persistence'
-
-export { useEnginePalette } from './useEnginePalette'
 export type {
     EnginePaletteComponent,
     EnginePaletteGroup,
     UseEnginePaletteResult
 } from './useEnginePalette'
-
-export {
-    GROUP_LABELS,
-    GROUP_COMPONET,
-    HIDDEN_COMPONENT_NAMES,
-    isHiddenComponent,
-    resolveGroupLabel
-} from './groups'
-
-export { PaletteComponentCard } from './PaletteComponentCard'
-export type { PaletteComponentCardProps } from './PaletteComponentCard'
+export { useEnginePalette } from './useEnginePalette'
