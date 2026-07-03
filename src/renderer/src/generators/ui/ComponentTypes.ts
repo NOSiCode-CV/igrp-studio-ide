@@ -58,12 +58,10 @@ import {
     IGRPStatsCardTopBorderColored,
     IGRPStatusBanner,
     // Unprefixed (shadcn-style) design-system exports, aliased for clarity.
-    AspectRatio as IGRPStudioAspectRatio,
     FieldDescription as IGRPStudioFieldDescription,
     Kbd as IGRPStudioKbd,
     // `progress` is exported unprefixed (shadcn-style) in the design-system.
     Progress as IGRPStudioProgress,
-    ScrollArea as IGRPStudioScrollArea,
     Skeleton as IGRPStudioSkeleton,
     Toggle as IGRPStudioToggle,
     IGRPSwitch,
@@ -83,6 +81,10 @@ import IGRPStudioColumn from './renderers/components/Column'
 import IGRPStudioColumns from './renderers/components/Columns'
 import IGRPStudioContainer from './renderers/components/Container'
 import IGRPStudioDropdown from './renderers/components/Dropdown'
+import {
+    IGRPStudioAspectRatioContainer,
+    IGRPStudioScrollAreaContainer
+} from './renderers/components/DroppableShells'
 import IGRPStudioFlex from './renderers/components/Flex'
 import IGRPStudioForm from './renderers/components/Form'
 import IGRPStudioFormList from './renderers/components/FormList'
@@ -414,8 +416,9 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.Span]: IGRPText,
     // `spinner` is a duplicate of `loadingSpinner` in the engine registry.
     [COMPONENT.Spinner]: IGRPLoadingSpinner,
-    [COMPONENT.ScrollArea]: IGRPStudioScrollArea,
-    [COMPONENT.AspectRatio]: IGRPStudioAspectRatio,
+    // Generic child-wrappers — droppable shells, like container/section/flex.
+    [COMPONENT.ScrollArea]: IGRPStudioScrollAreaContainer,
+    [COMPONENT.AspectRatio]: IGRPStudioAspectRatioContainer,
     [COMPONENT.Skeleton]: IGRPStudioSkeleton,
     [COMPONENT.Kbd]: IGRPStudioKbd,
     [COMPONENT.FieldDescription]: IGRPStudioFieldDescription,
