@@ -13,6 +13,7 @@ import {
     PageTypeIcon
 } from '@renderer/generators/ui/browser/components/page-actions'
 import { cn } from '@renderer/lib/utils'
+import { formatFileDate } from '@renderer/utils'
 import { ChevronRight, ComponentIcon } from 'lucide-react'
 import { useState } from 'react'
 import type { PageDefinition } from './page-manager'
@@ -92,6 +93,11 @@ export function PageCardView({
                                         /{pagePath}
                                         {!isPage && 'components'}
                                     </div>
+                                    {page.modifiedAt ? (
+                                        <div className="text-xs text-muted-foreground">
+                                            {formatFileDate(page.modifiedAt)}
+                                        </div>
+                                    ) : null}
                                     {/* Show counts */}{' '}
                                     {subPages && subPages.length > 0 && (
                                         <span className="text-xs text-purple-600 font-medium pr-2">

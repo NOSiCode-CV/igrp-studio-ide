@@ -5,6 +5,13 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from '@renderer/components/ui/dropdown-menu'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@renderer/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@renderer/components/ui/toggle-group'
 import { IGRPPageHeader } from '@igrp/igrp-framework-react-design-system'
@@ -40,10 +47,14 @@ export interface PageDefinition {
     pagePath: string
     status: string
     created: string
+    createdAt?: number
+    modifiedAt?: number
     pageName: string
     isPage: boolean
     content: { [key: string]: string }
 }
+
+export type PageSortOption = 'modified' | 'created' | 'name'
 
 interface PageBuilderContentProps {
     onPageClick?: (pageFile: PageDefinition | FileTree) => void
@@ -70,6 +81,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
     const [loadingTable, isLoadingTable] = useState<boolean>(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [viewMode, setViewMode] = useState<'card' | 'table'>('card')
+    const [sortBy, setSortBy] = useState<PageSortOption>('modified')
 
     const [pageToDuplicate, setPageToDuplicate] = useState<PageDefinition>()
     const [activeTab, setActiveTab] = useState<string>('pages')
@@ -233,6 +245,16 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
             }))
     ]
 
+    const sortedTableData = [...tableData].sort((a, b) => {
+        if (sortBy === 'name') {
+            return (a.description || a.pageName || '').localeCompare(
+                b.description || b.pageName || ''
+            )
+        }
+        const key = sortBy === 'modified' ? 'modifiedAt' : 'createdAt'
+        return (b[key] ?? 0) - (a[key] ?? 0)
+    })
+
     const pageOptions = tableData
         .filter((p) => p.isPage)
         .map(({ description, pageName, content }) => ({
@@ -296,6 +318,25 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                                     onChange={(value) => setSearchTerm(value)}
                                     className="lg:w-[250px]"
                                 />
+                                <Select
+                                    value={sortBy}
+                                    onValueChange={(value) =>
+                                        value && setSortBy(value as PageSortOption)
+                                    }
+                                >
+                                    <SelectTrigger className="w-[180px]" size="sm">
+                                        <SelectValue placeholder={t('sortBy')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="modified">
+                                            {t('sortLastModified')}
+                                        </SelectItem>
+                                        <SelectItem value="created">
+                                            {t('sortCreatedDate')}
+                                        </SelectItem>
+                                        <SelectItem value="name">{t('sortName')}</SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 <ToggleGroup
                                     type="single"
                                     value={viewMode}
@@ -347,9 +388,9 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                         </div>
 
                         {viewMode === 'card' ? (
-                            tableData.length > 0 ? (
+                            sortedTableData.length > 0 ? (
                                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 items-start">
-                                    {tableData.map((page): React.JSX.Element => {
+                                    {sortedTableData.map((page): React.JSX.Element => {
                                         const components = getPageComponent(page.pageName)
                                         const subPages = getSubPages(page.pageName)
                                         return (
@@ -380,7 +421,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                             )
                         ) : (
                             <PageTable
-                                tableData={tableData}
+                                tableData={sortedTableData}
                                 components={components}
                                 getPageComponent={getPageComponent}
                                 getSubPages={getSubPages}

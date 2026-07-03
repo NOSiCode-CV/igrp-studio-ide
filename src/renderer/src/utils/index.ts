@@ -1,4 +1,5 @@
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants'
+import { formatDistanceToNow } from 'date-fns'
 import { enUS, pt } from 'date-fns/locale'
 import i18next from 'i18next'
 import {
@@ -153,6 +154,13 @@ export const getLocale = () => {
         default:
             return enUS
     }
+}
+
+// Formats a filesystem timestamp (ms) as relative time ("2 days ago").
+// Returns '-' when missing or epoch 0 (birthtime unavailable on some Linux filesystems).
+export function formatFileDate(timestamp?: number): string {
+    if (!timestamp) return '-'
+    return formatDistanceToNow(timestamp, { addSuffix: true, locale: getLocale() })
 }
 
 /**

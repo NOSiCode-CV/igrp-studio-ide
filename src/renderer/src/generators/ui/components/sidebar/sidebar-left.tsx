@@ -35,7 +35,6 @@ import {
     Badge,
     ChevronRight,
     FileText,
-    FolderTree,
     GitBranch,
     GripHorizontal,
     Home,
@@ -47,7 +46,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { MenuItem } from 'src/main/types'
 import { CustomCodeMenu, SidebarAppCustomCode } from './custom-code/sidebar-app-custom-code'
-import NavigatorSidebar from './sidebar-navigator'
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>
@@ -94,7 +92,6 @@ export function AppSidebar({
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
         { icon: SquareFunction, label: t('customCode'), id: 'customCode' },
-        { icon: FolderTree, label: t('navigator'), id: 'navigator' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
         { icon: Badge, label: t('settings'), id: 'settings' },
         { icon: GitBranch, label: t('git'), id: 'git' }
@@ -196,8 +193,6 @@ export function AppSidebar({
                     <ScrollArea className="h-[calc(100vh-230px)] w-[300px]">
                         {activeMenuGroup.id === 'explorer' ? (
                             <FileExplorerSidebar basePath={basePath} searchTerm={searchQuery} />
-                        ) : activeMenuGroup.id === 'navigator' ? (
-                            <NavigatorSidebar basePath={basePath} searchTerm={searchQuery} />
                         ) : activeMenuGroup.id === 'git' ? (
                             <GitCommitsSidebar
                                 basePath={basePath}

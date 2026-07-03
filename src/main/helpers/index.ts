@@ -137,6 +137,8 @@ export const readIgrpStudioDirectory = (basePath: string): FileTree[] => {
                         name: file,
                         path: filePath,
                         isDirectory: true,
+                        createdAt: stats.birthtimeMs,
+                        modifiedAt: stats.mtimeMs,
                         children: readIgrpStudioDirectory(filePath) // Leitura recursiva
                     }
                 } else {
@@ -151,6 +153,8 @@ export const readIgrpStudioDirectory = (basePath: string): FileTree[] => {
                         name: file,
                         path: filePath,
                         isDirectory: false,
+                        createdAt: stats.birthtimeMs,
+                        modifiedAt: stats.mtimeMs,
                         content // Inclui o conteúdo do arquivo
                     }
                 }

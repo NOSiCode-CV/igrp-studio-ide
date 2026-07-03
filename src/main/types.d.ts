@@ -165,6 +165,8 @@ export interface FileTree {
     name: string // Name of the file or folder
     path: string // Full path of the file or folder
     isDirectory: boolean // Whether it's a directory
+    createdAt?: number // Creation time in ms (birthtime; may be unreliable on some Linux filesystems)
+    modifiedAt?: number // Last modification time in ms (mtime)
     children?: FileTree[] // Array of children (only for directories)
     content?: any
 }
