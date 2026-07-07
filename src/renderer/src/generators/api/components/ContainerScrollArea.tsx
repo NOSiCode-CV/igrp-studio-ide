@@ -6,20 +6,14 @@ interface ContainerScrollAreaProps {
     children: React.ReactNode
     size?: 'sm' | 'lg'
     className?: string
-    /** Allow content to grow horizontally so the ScrollArea scrolls on the X axis. */
-    growX?: boolean
 }
 
 export const ContainerScrollArea: React.FC<ContainerScrollAreaProps> = ({
     children,
-    className,
-    growX
+    className
 }) => {
     return (
-        <ScrollArea
-            growX={growX}
-            className={cn('h-[calc(100svh-var(--header-height-three))]', className)}
-        >
+        <ScrollArea className={cn('h-[calc(100svh-var(--header-height-three))]', className)}>
             {children}
         </ScrollArea>
     )

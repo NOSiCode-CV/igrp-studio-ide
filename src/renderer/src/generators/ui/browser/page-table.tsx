@@ -12,6 +12,7 @@ import {
     PageActionMenu,
     PageTypeIcon
 } from '@renderer/generators/ui/browser/components/page-actions'
+import { formatFileDate } from '@renderer/utils'
 import { ChevronDown, ChevronRight, Component, FileText } from 'lucide-react'
 import React, { useState } from 'react'
 import type { PageDefinition } from './page-manager'
@@ -73,6 +74,7 @@ export const PageTable = ({
                         <TableHead>Path</TableHead>
                         <TableHead>Type</TableHead>
                         <TableHead>Subpages/Components</TableHead>
+                        <TableHead>Modified</TableHead>
                         <TableHead>Actions</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -161,6 +163,11 @@ export const PageTable = ({
                                         </div>
                                     </TableCell>
                                     <TableCell>
+                                        <span className="text-xs text-muted-foreground">
+                                            {formatFileDate(page.modifiedAt)}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell>
                                         <PageActionMenu
                                             page={page}
                                             onEdit={() => void 0}
@@ -205,6 +212,11 @@ export const PageTable = ({
                                                 </Badge>
                                             </TableCell>
                                             <TableCell></TableCell>
+                                            <TableCell>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {formatFileDate(comp.modifiedAt)}
+                                                </span>
+                                            </TableCell>
                                             <TableCell>
                                                 <PageActionMenu
                                                     page={comp}
@@ -255,6 +267,11 @@ export const PageTable = ({
                                                 </Badge>
                                             </TableCell>
                                             <TableCell></TableCell>
+                                            <TableCell>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {formatFileDate(subPage.modifiedAt)}
+                                                </span>
+                                            </TableCell>
                                             <TableCell>
                                                 <PageActionMenu
                                                     page={subPage}

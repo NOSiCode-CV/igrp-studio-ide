@@ -56,7 +56,19 @@ const monitoringServiceHints = [
     'fluent-bit'
 ]
 
-const workflowServiceHints = ['init-task', 'init_task']
+// Ordered fingerprint heuristics. Single source of truth for service-type
+// detection; first matching entry wins.
+const fingerprintTypeHints: ReadonlyArray<{ type: string; hints: readonly string[] }> = [
+    { type: 'database', hints: ['postgres', 'mysql', 'mariadb', 'mongo', 'db'] },
+    { type: 'proxy', hints: ['gateway', 'proxy', 'nginx', 'traefik', 'init-task', 'init_task'] },
+    { type: 'auth', hints: ['keycloak', 'auth'] },
+    { type: 'service-discovery', hints: ['eureka', 'consul', 'discovery'] },
+    { type: 'cache', hints: ['redis', 'memcached', 'cache'] },
+    { type: 'storage', hints: ['minio', 'storage'] },
+    { type: 'observability', hints: monitoringServiceHints },
+    // Lowest priority: frontends/UI apps without an explicit type → web.
+    { type: 'web', hints: ['frontend', 'webapp', 'portal', 'nextjs', 'angular', 'react', '-ui'] }
+]
 
 export const resolveServiceVisualType = (
     serviceOrType?: ServiceVisualTarget | string | null
@@ -71,23 +83,15 @@ export const resolveServiceVisualType = (
     const explicitType = (serviceOrType.labels?.type || '').toLowerCase().trim()
     if (explicitType) return explicitType
 
-    const fingerprint = [
-        serviceOrType.name,
-        serviceOrType.container_name,
-        serviceOrType.image
-    ]
+    const fingerprint = [serviceOrType.name, serviceOrType.container_name, serviceOrType.image]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
 
     if (!fingerprint) return 'other'
 
-    if (workflowServiceHints.some((hint) => fingerprint.includes(hint))) {
-        return 'proxy'
-    }
-
-    if (monitoringServiceHints.some((hint) => fingerprint.includes(hint))) {
-        return 'observability'
+    for (const { type, hints } of fingerprintTypeHints) {
+        if (hints.some((hint) => fingerprint.includes(hint))) return type
     }
 
     return 'other'
@@ -163,7 +167,7 @@ export const getStatusColor = (status: string): string => {
     if (normalized === 'error') {
         return 'bg-rose-50/50 border-rose-100 text-rose-700 dark:bg-rose-900/30 dark:border-rose-800/70 dark:text-rose-300'
     }
-    return 'bg-slate-50/50 border-slate-100 text-slate-500 dark:bg-slate-800/60 dark:border-slate-700 dark:text-slate-300'
+    return 'bg-muted/50 border text-muted-foreground'
 }
 
 export const getStatusDotColor = (status: string): string => {
@@ -174,7 +178,7 @@ export const getStatusDotColor = (status: string): string => {
     if (normalized === 'error') {
         return 'bg-rose-500'
     }
-    return 'bg-slate-300 dark:bg-slate-600'
+    return 'bg-muted'
 }
 
 // Network types

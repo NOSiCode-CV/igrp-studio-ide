@@ -1,4 +1,5 @@
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants'
+import { formatDistanceToNow } from 'date-fns'
 import { enUS, pt } from 'date-fns/locale'
 import i18next from 'i18next'
 import {
@@ -70,7 +71,10 @@ export function getUUID() {
 export function generateId(componentName: string) {
     // Generate a random string with 8 characters
     const randomStr = Math.random().toString(36).slice(2, 8)
-    return `${componentName.toLowerCase()}_${randomStr}`
+    // Defensive: never crash the whole component init if a caller passes an
+    // undefined/empty name (e.g. an unknown COMPONENT.* key).
+    const base = (componentName || 'component').toLowerCase()
+    return `${base}_${randomStr}`
 }
 
 export function findComponentItem(menus: Array<any>, idFind: string) {
@@ -129,6 +133,10 @@ export function toFullCamelCaseFromSnakeCase(str: string) {
     )
 }
 
+// Mirrors the engine's `getLabel` export (nextjs-engine ≥0.2.0-beta.22) —
+// same heuristic, kept as a local copy because the engine bundle is
+// Node-only (fs-extra/prettier at module top-level) and can't be imported
+// by the renderer. If the engine changes its heuristic, sync this.
 export function getLabel(name: string): string {
     if (!name) return '' // Handle empty string
 
@@ -151,6 +159,13 @@ export const getLocale = () => {
         default:
             return enUS
     }
+}
+
+// Formats a filesystem timestamp (ms) as relative time ("2 days ago").
+// Returns '-' when missing or epoch 0 (birthtime unavailable on some Linux filesystems).
+export function formatFileDate(timestamp?: number): string {
+    if (!timestamp) return '-'
+    return formatDistanceToNow(timestamp, { addSuffix: true, locale: getLocale() })
 }
 
 /**

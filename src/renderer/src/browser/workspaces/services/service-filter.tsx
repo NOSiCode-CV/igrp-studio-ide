@@ -118,7 +118,7 @@ export function ServiceFilter({ onFilterChange, totalServices }: ServiceFilterPr
                         className={`flex items-center gap-2 ${
                             activeCategory === category.id
                                 ? `${category.color} text-white hover:opacity-90`
-                                : 'hover:bg-muted dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
+                                : 'border text-muted-foreground hover:bg-accent'
                         }`}
                     >
                         {category.icon}

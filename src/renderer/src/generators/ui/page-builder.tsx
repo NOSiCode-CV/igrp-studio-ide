@@ -1,5 +1,5 @@
-import Loader from '@renderer/components/loader'
 import { SidebarInset } from '@renderer/components/ui/sidebar'
+import Loader from '@renderer/components/loader'
 import { APRESENTATION } from '@renderer/constants/appConstants'
 import { PropsPanel, TreeView } from '@renderer/features/manifest-tree'
 import { AppSidebar } from '@renderer/generators/ui/components/sidebar/sidebar-left'
@@ -9,11 +9,9 @@ import type { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types
 import RENDERER_CONFIG from '@renderer/renderer.config'
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 import { ContainerScrollArea } from '../api/components/ContainerScrollArea'
-import type { PageDefinition } from './browser/page-manager'
 import { CodeContentJson, CodeContentTS } from './components/CodeContent'
-import SidebarRight from './components/sidebar/sidebar-right'
-import { useDroppedComponents } from './contexts/EditorContext'
 import { handleDragEnd } from './dnd/DraggableItemManager'
+import { useDroppedComponents } from './contexts/EditorContext'
 import { useComponentInitialization } from './hooks/useComponentInitialization'
 // Custom hooks for better organization
 import { useComponentRegistration } from './hooks/useComponentRegistration'
@@ -22,6 +20,7 @@ import useCustomCode from './hooks/useCustomCode'
 import { usePageSave } from './hooks/usePageSave'
 import { useTagManager } from './hooks/useTagManager'
 import { useTreeCallbacksFromContext } from './hooks/useTreeCallbacksFromContext'
+import type { PageDefinition } from './browser/page-manager'
 import IGRPStudioMainComponent from './renderers/components/MainComponent'
 
 interface PageBuilderProps {
@@ -159,23 +158,10 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                 try {
                     if (pagePath === undefined) return
 
-                    // This tab's slice already holds (possibly edited) content —
-                    // don't reload from disk over it. Prevents losing unsaved
-                    // edits when the page prop identity changes (e.g. reopen).
-                    if (components?.componentName) return
-
                     setIsLoading(true)
 
                     const data = await window.api?.getJsonContent(pagePath)
-                    const {
-                        components: loadedComponents,
-                        args,
-                        types,
-                        functions,
-                        states,
-                        imports,
-                        ...rest
-                    } = data
+                    const { components, args, types, functions, states, imports, ...rest } = data
 
                     setAllArguments(args)
                     setAllTypes(types)
@@ -184,7 +170,7 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                     setAllImports(imports)
                     setAllRestData(rest)
 
-                    if (loadedComponents) setAllComponents(loadedComponents)
+                    if (components) setAllComponents(components)
                 } catch (error) {
                     console.error('Failed to load JSON content:', error)
                 } finally {
@@ -237,7 +223,9 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
                             engineCatalog={componentsRegistered}
                             onUpdate={treeCallbacks.onUpdate}
                             onRemove={treeCallbacks.onRemove}
-                            canDelete={Boolean(selectedNode && root && root.id !== selectedNode.id)}
+                            canDelete={Boolean(
+                                selectedNode && root && root.id !== selectedNode.id
+                            )}
                         />
                     </div>
                 )
@@ -289,22 +277,11 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
         return (
             <div className="flex flex-1 overflow-hidden">
                 <AppSidebar data={menuItems} basePath={basePath} />
-                {/* min-w-0 lets the canvas column shrink below its content's
-                    intrinsic width, so wide content (e.g. a pageHeader/table with
-                    many items) scrolls INSIDE the canvas instead of expanding the
-                    layout or pushing the panel. */}
-                <SidebarInset className="min-w-0 overflow-hidden">
-                    <div className="flex flex-1 flex-col gap-4 p-2 min-w-0 overflow-hidden">
+                <SidebarInset>
+                    <div className="flex flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>{renderContent}</ContainerScrollArea>
                     </div>
                 </SidebarInset>
-                {/* Settings panel is an in-flow flex sibling docked on the right
-                    (shrink-0 keeps its width). It sits BESIDE the canvas — never
-                    overlapping it — so it can't cover the canvas action toolbars.
-                    Lives inside THIS tab's provider. */}
-                {currentComponent && (
-                    <SidebarRight className="shrink-0 border-l border-sidebar-border" />
-                )}
             </div>
         )
     }

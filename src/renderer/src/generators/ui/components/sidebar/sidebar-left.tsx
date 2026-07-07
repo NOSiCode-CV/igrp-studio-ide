@@ -35,7 +35,6 @@ import {
     Badge,
     ChevronRight,
     FileText,
-    FolderTree,
     GitBranch,
     GripHorizontal,
     Home,
@@ -47,7 +46,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { MenuItem } from 'src/main/types'
 import { CustomCodeMenu, SidebarAppCustomCode } from './custom-code/sidebar-app-custom-code'
-import NavigatorSidebar from './sidebar-navigator'
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     data: Array<any>
@@ -93,8 +91,7 @@ export function AppSidebar({
 
     const navegations: MenuItem[] = [
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
-        { icon: SquareFunction, label: t('Custom Code'), id: 'customCode' },
-        { icon: FolderTree, label: t('navigator'), id: 'navigator' },
+        { icon: SquareFunction, label: t('customCode'), id: 'customCode' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
         { icon: Badge, label: t('settings'), id: 'settings' },
         { icon: GitBranch, label: t('git'), id: 'git' }
@@ -139,7 +136,9 @@ export function AppSidebar({
                                     <SidebarMenuItem key={item.id}>
                                         <SidebarMenuButton
                                             tooltip={{
-                                                children: t(item.label),
+                                                // item.label is already translated in the
+                                                // navegations array — don't re-translate.
+                                                children: item.label,
                                                 hidden: false
                                             }}
                                             onClick={() => {
@@ -178,7 +177,7 @@ export function AppSidebar({
                         <div className="flex flex-1 space-x-2  items-center">
                             <activeMenuGroup.icon size={20} />
                             <div className="text-base font-medium text-foreground">
-                                {t(activeMenuGroup.label)}
+                                {activeMenuGroup.label}
                             </div>
                         </div>
                         {activeMenuGroup.id === 'customCode' && <CustomCodeMenu />}
@@ -194,8 +193,6 @@ export function AppSidebar({
                     <ScrollArea className="h-[calc(100vh-230px)] w-[300px]">
                         {activeMenuGroup.id === 'explorer' ? (
                             <FileExplorerSidebar basePath={basePath} searchTerm={searchQuery} />
-                        ) : activeMenuGroup.id === 'navigator' ? (
-                            <NavigatorSidebar basePath={basePath} searchTerm={searchQuery} />
                         ) : activeMenuGroup.id === 'git' ? (
                             <GitCommitsSidebar
                                 basePath={basePath}
@@ -259,11 +256,14 @@ export function AppSidebar({
                                                                     )}
                                                                     <GripHorizontal className="w-4 h-4 text-gray-400" />
 
-                                                                    <div className="flex flex-col items-center gap-2">
+                                                                    <div className="flex w-full min-w-0 flex-col items-center gap-2">
                                                                         {subItem.icon && (
-                                                                            <subItem.icon className="w-6 h-6" />
+                                                                            <subItem.icon className="w-6 h-6 shrink-0" />
                                                                         )}
-                                                                        <span className="text-center">
+                                                                        <span
+                                                                            title={subItem.label}
+                                                                            className="line-clamp-2 w-full break-words text-center"
+                                                                        >
                                                                             {subItem.label}
                                                                         </span>
                                                                     </div>

@@ -33,6 +33,8 @@ export const EVENTS = {
         GET_CODE_SNIPPET: 'engine:get-code-snippet',
         LOAD_METADATA: 'engine:load-metadata',
         REGISTER_COMPONENT: 'engine:register-component',
+        RESET_COMPONENT: 'engine:reset-component',
+        BUILD_COMPONENT_REGISTRY: 'engine:build-component-registry',
         CREATE_PROCESS_STEP: 'engine:create-process-step',
         CONVERT_JSON_SCHEMA: 'next-engine:convert-json-schema'
     },

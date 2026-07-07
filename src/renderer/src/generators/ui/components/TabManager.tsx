@@ -1,18 +1,23 @@
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
 import { TAB_DEFAULT, useTabs } from '@renderer/components/navigation/TabContext'
 import TabsNavigation from '@renderer/components/navigation/tabs-navigation'
-import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
 import { APRESENTATION, OPTION_TYPE } from '@renderer/constants/appConstants'
-import { DragProvider } from '@renderer/features/dnd/drag-drop-context'
 import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea'
 import { EditorLayout } from '@renderer/generators/api/pages/EditorLayout'
+import { DragProvider } from '@renderer/features/dnd/drag-drop-context'
 import { cn } from '@renderer/lib/utils'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FileTree } from 'src/main/types'
+import {
+    DroppedComponentsProvider,
+    useDroppedComponents,
+    useDroppedComponentsAdmin
+} from '../contexts/EditorContext'
 import PageManager, { type PageDefinition } from '../browser/page-manager'
 import { convertFileTreeToPageDefinition } from '../browser/processes/utils/bpmn-helpers'
-import { DroppedComponentsProvider } from '../contexts/EditorContext'
 import FormEngine from '../page-builder'
 import NavigationBar from './NavigationBar'
+import SidebarRight from './sidebar/sidebar-right'
 
 interface ContentProps {
     basePath: string
@@ -20,6 +25,35 @@ interface ContentProps {
 
 interface FormEngineRef {
     handleSave: () => Promise<void>
+}
+
+/**
+ * Renders SidebarRight when the currently active tab has a component selected.
+ * Lives at the TabManager level so we have a single instance across tabs.
+ */
+function SidebarRightSlot() {
+    const { currentComponent } = useDroppedComponents()
+    if (!currentComponent) return null
+    return <SidebarRight />
+}
+
+/**
+ * Subscribes to the tabs list and drops state slices for tabs that no longer
+ * exist. Keeps the DroppedComponentsContext from leaking memory across opens.
+ */
+function TabsCleanup({ tabIds }: { tabIds: string[] }) {
+    const { removeTab } = useDroppedComponentsAdmin()
+    const knownRef = useRef<Set<string>>(new Set())
+
+    useEffect(() => {
+        const current = new Set(tabIds)
+        knownRef.current.forEach((id) => {
+            if (!current.has(id)) removeTab(id)
+        })
+        knownRef.current = current
+    }, [tabIds, removeTab])
+
+    return null
 }
 
 export default function TabManager({ basePath }: ContentProps): React.JSX.Element {
@@ -61,7 +95,7 @@ export default function TabManager({ basePath }: ContentProps): React.JSX.Elemen
     }
 
     return (
-        <div className="flex-1 min-w-0">
+        <div className="flex-1">
             <TabsNavigation
                 tabs={tabs}
                 activeTab={activeTab}
@@ -87,28 +121,26 @@ export default function TabManager({ basePath }: ContentProps): React.JSX.Elemen
                     } as React.CSSProperties
                 }
             >
-                <div className="flex flex-1 min-w-0">
-                    {tabs.map((tab) => (
-                        <div
-                            key={tab.id}
-                            className={cn(
-                                'flex flex-1 min-w-0',
-                                activeTab === tab.id ? 'block' : 'hidden'
-                            )}
-                        >
-                            {tab.id === TAB_DEFAULT ? (
-                                <SidebarInset>
-                                    <ContainerScrollArea>
-                                        <PageManager onPageClick={handleClickOpenGerador} />
-                                    </ContainerScrollArea>
-                                </SidebarInset>
-                            ) : tab.open === OPTION_TYPE.FILE_THREE ? (
-                                <EditorLayout currentItem={tab.item} />
-                            ) : (
-                                // One independent store PER TAB — each open page
-                                // owns its own state, so editing/switching never
-                                // leaks or loses another tab's unsaved content.
-                                <DroppedComponentsProvider>
+                <DroppedComponentsProvider activeTabId={activeTab}>
+                    <TabsCleanup tabIds={tabs.map((t) => t.id)} />
+                    <div className="flex flex-1">
+                        {tabs.map((tab) => (
+                            <div
+                                key={tab.id}
+                                className={cn(
+                                    'flex flex-1',
+                                    activeTab === tab.id ? 'block' : 'hidden'
+                                )}
+                            >
+                                {tab.id === TAB_DEFAULT ? (
+                                    <SidebarInset>
+                                        <ContainerScrollArea>
+                                            <PageManager onPageClick={handleClickOpenGerador} />
+                                        </ContainerScrollArea>
+                                    </SidebarInset>
+                                ) : tab.open === OPTION_TYPE.FILE_THREE ? (
+                                    <EditorLayout currentItem={tab.item} />
+                                ) : (
                                     <DragProvider>
                                         <FormEngine
                                             ref={(ref) => {
@@ -122,11 +154,12 @@ export default function TabManager({ basePath }: ContentProps): React.JSX.Elemen
                                             onSave={handleSave}
                                         />
                                     </DragProvider>
-                                </DroppedComponentsProvider>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                                )}
+                            </div>
+                        ))}
+                        <SidebarRightSlot />
+                    </div>
+                </DroppedComponentsProvider>
             </SidebarProvider>
         </div>
     )

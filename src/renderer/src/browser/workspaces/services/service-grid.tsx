@@ -65,9 +65,9 @@ export function ServiceGrid({ services, showFilter = true, onActionComplete }: S
                     return (
                         <div
                             key={index}
-                            className="group relative overflow-visible rounded-lg border border-slate-200 bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900 dark:hover:shadow-black/25"
+                            className="group relative overflow-visible rounded-lg border bg-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-black/25"
                         >
-                            <div className="relative z-10 flex items-start justify-between gap-2 border-b border-slate-100 px-3 py-3 dark:border-slate-700">
+                            <div className="relative z-10 flex items-start justify-between gap-2 border-b px-3 py-3">
                                 <div className="flex min-w-0 items-center gap-2">
                                     <span
                                         className={`h-1.5 w-1.5 rounded-full ${getStatusDotColor(
@@ -80,10 +80,10 @@ export function ServiceGrid({ services, showFilter = true, onActionComplete }: S
                                         {getServiceIcon(visualType)}
                                     </div>
                                     <div className="min-w-0">
-                                        <div className="truncate text-sm font-semibold text-slate-800 transition-colors duration-200 group-hover:text-primary dark:text-slate-100 dark:group-hover:text-primary">
+                                        <div className="truncate text-sm font-semibold text-foreground transition-colors duration-200 group-hover:text-primary dark:group-hover:text-primary">
                                             {service.name}
                                         </div>
-                                        <div className="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                                        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
                                             {serviceTypeLabel}
                                         </div>
                                     </div>
@@ -111,25 +111,25 @@ export function ServiceGrid({ services, showFilter = true, onActionComplete }: S
                             </div>
 
                             <div className="relative z-10 px-3 py-3">
-                                <div className="rounded-lg bg-white p-2.5 transition-colors duration-200 group-hover:bg-white dark:bg-slate-900 dark:group-hover:bg-slate-900">
+                                <div className="rounded-lg bg-card p-2.5 transition-colors duration-200 group-hover:bg-card">
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="min-w-0">
-                                            <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                                            <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                                                 {t('ports')}
                                             </div>
                                             <div className="flex flex-wrap gap-1">
                                                 {service.ports && service.ports.length > 0 ? (
-                                                    service.ports.map((port: string, i: number) => (
-                                                        <Badge
-                                                            key={i}
-                                                            variant="outline"
-                                                            className="border-slate-200 bg-white text-[10px] text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                                                    service.ports.map((port: string) => (
+                                                        <span
+                                                            key={port}
+                                                            title={port}
+                                                            className="max-w-full truncate rounded-md border bg-card px-2 py-0.5 text-[10px] text-muted-foreground"
                                                         >
                                                             {port}
-                                                        </Badge>
+                                                        </span>
                                                     ))
                                                 ) : (
-                                                    <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                                                    <span className="text-[11px] text-muted-foreground">
                                                         {t('none')}
                                                     </span>
                                                 )}
@@ -137,7 +137,7 @@ export function ServiceGrid({ services, showFilter = true, onActionComplete }: S
                                         </div>
 
                                         <div className="min-w-0">
-                                            <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                                            <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                                                 {t('dependencies')}
                                             </div>
                                             <DependencySummary dependsOn={service.dependsOn} />

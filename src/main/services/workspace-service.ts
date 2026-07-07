@@ -604,7 +604,9 @@ export class WorkspaceRepository {
         try {
             return JSON.parse(raw)
         } catch (err) {
-            // If JSON is corrupted (e.g., trailing characters), back it up and reset to a safe default
+            // If JSON is corrupted (e.g., truncated write), back it up, then
+            // salvage whatever complete workspaces survive instead of wiping
+            // everything to an empty registry.
             try {
                 if (!fs.existsSync(BACKUP_DIR)) {
                     await mkdir(BACKUP_DIR, { recursive: true })
@@ -615,13 +617,84 @@ export class WorkspaceRepository {
             } catch (backupErr) {
                 // ignore backup errors to avoid blocking app startup
             }
-            await writeFile(WORKSPACE_FILE, JSON.stringify({ workspaces: [] }, null, 2))
-            return { workspaces: [] }
+            const salvaged = this.salvageWorkspaces(raw)
+            const recovered = { workspaces: salvaged }
+            await this.saveData(recovered)
+            return recovered
         }
     }
 
+    private saveChain: Promise<unknown> = Promise.resolve()
+    private saveSeq = 0
+
     private async saveData(data: { workspaces: IWorkspace[] }): Promise<void> {
-        await writeFile(WORKSPACE_FILE, JSON.stringify(data, null, 2))
+        const write = async (): Promise<void> => {
+            const json = JSON.stringify(data, null, 2)
+            // Atomic write: serialize to a unique temp file then rename over the
+            // target. rename() is atomic on the same filesystem, so a concurrent
+            // or interrupted write can never leave a truncated JSON — that was the
+            // bug that corrupted the workspaces registry at ~64KB write chunks.
+            const tmp = `${WORKSPACE_FILE}.${process.pid}.${this.saveSeq++}.tmp`
+            await writeFile(tmp, json)
+            await fs.promises.rename(tmp, WORKSPACE_FILE)
+        }
+        // Serialize writes so overlapping load→mutate→save cycles don't race.
+        const next = this.saveChain.then(write, write)
+        this.saveChain = next.catch(() => undefined)
+        return next
+    }
+
+    // Best-effort recovery of complete workspace objects from a partially
+    // written / truncated registry, so corruption degrades gracefully instead
+    // of wiping everything.
+    private salvageWorkspaces(raw: string): IWorkspace[] {
+        try {
+            const marker = raw.indexOf('"workspaces"')
+            if (marker < 0) return []
+            const arrStart = raw.indexOf('[', marker)
+            if (arrStart < 0) return []
+
+            const objects: string[] = []
+            let depth = 0
+            let objStart = -1
+            let inStr = false
+            let esc = false
+            for (let i = arrStart + 1; i < raw.length; i++) {
+                const c = raw[i]
+                if (inStr) {
+                    if (esc) esc = false
+                    else if (c === '\\') esc = true
+                    else if (c === '"') inStr = false
+                    continue
+                }
+                if (c === '"') {
+                    inStr = true
+                    continue
+                }
+                if (c === '{') {
+                    if (depth === 0) objStart = i
+                    depth++
+                } else if (c === '}') {
+                    depth--
+                    if (depth === 0 && objStart >= 0) {
+                        objects.push(raw.slice(objStart, i + 1))
+                        objStart = -1
+                    }
+                }
+            }
+
+            const salvaged: IWorkspace[] = []
+            for (const obj of objects) {
+                try {
+                    salvaged.push(JSON.parse(obj) as IWorkspace)
+                } catch {
+                    // skip an unparseable (truncated) object
+                }
+            }
+            return salvaged
+        } catch {
+            return []
+        }
     }
 
     async initialize(): Promise<void> {
@@ -726,11 +799,7 @@ export class WorkspaceRepository {
             throw new Error(`Workspace ${workspaceId} not found`)
         }
 
-        await this.copyOptionalStacksFromTemplate(
-            workspace,
-            normalizedOptions,
-            bootstrapResult
-        )
+        await this.copyOptionalStacksFromTemplate(workspace, normalizedOptions, bootstrapResult)
 
         if (
             normalizedOptions.installMonitoringStack &&
@@ -1008,18 +1077,26 @@ export class WorkspaceRepository {
                 throw new Error(`Workspace ${workspaceId} not found`)
             }
 
-            if (!framework || !project.name) {
+            // Name may live on the nested config (`project`) or on the project
+            // top-level (`updates.name`), depending on the source.
+            const resolvedName = project?.name ?? updates.name
+
+            if (!framework || !resolvedName) {
                 throw new Error(`Invalid project configuration`)
             }
 
             const updatedProject: ProjectData = {
-                name: project.name || 'Unnamed Project',
+                name: resolvedName || 'Unnamed Project',
                 path: projectPath as string,
                 type,
                 workspaceId: workspaceId as string,
                 framework: framework as FrameworkType,
                 updatedAt: new Date().toISOString(),
-                id: uuidv4(),
+                // Preserve the project's existing id (from its baseApi/baseApp
+                // metadata) when opening/importing; only mint a new one as a
+                // last resort so the workspace registry stays in sync with the
+                // on-disk project identity.
+                id: updates.id ?? uuidv4(),
                 config: project || {}
             }
 

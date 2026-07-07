@@ -88,8 +88,13 @@ export function PaletteComponentCard({
             )}
             {showGripHint && <GripHorizontal className="h-4 w-4 text-muted-foreground/50" />}
             <div className="flex flex-col items-center gap-1.5">
-                {Icon && <Icon className="h-6 w-6" />}
-                <span className="text-center text-[11px] font-medium leading-tight">{label}</span>
+                {Icon && <Icon className="h-6 w-6 shrink-0" />}
+                <span
+                    title={label}
+                    className="line-clamp-2 w-full break-words text-center text-[11px] font-medium leading-tight"
+                >
+                    {label}
+                </span>
                 {hint && (
                     <span className="line-clamp-2 text-center text-[9px] leading-tight text-muted-foreground">
                         {hint}

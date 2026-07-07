@@ -62,7 +62,7 @@ import { mainBindings } from 'i18next-electron-fs-backend'
 import { NextjsEngine } from './engines/NextjsEngine'
 import { SpringEngine } from './engines/SpringEngine'
 import AppUpdater, { applyUpdateChannelConfig } from './helpers/electron-updater'
-import { detectInstalledIDEs, type IDEDetails, IDES } from './helpers/ideDetection'
+import { detectInstalledIDEs, getShellEnv, type IDEDetails, IDES } from './helpers/ideDetection'
 import { IGRPStudioSettings } from './helpers/igrp-studio-settings'
 import NextJsManager from './helpers/nextjsManager'
 import { buildTaskbar } from './helpers/taskbar'
@@ -531,11 +531,20 @@ ipcMain.handle(
         const ideConfig = IDES[ideType]
         const command = `${ideConfig.command} "${basePath}"`
 
-        exec(command, (err): void => {
+        exec(command, { env: getShellEnv() }, (err): void => {
             if (err) {
                 console.error(`Error opening ${ideConfig.name}:`, err)
             }
         })
+    }
+)
+
+ipcMain.handle(
+    'igrp-studio:open-in-file-manager',
+    async (_event, basePath: string): Promise<string> => {
+        if (!basePath) return 'No path provided'
+        // Finder on macOS, Explorer on Windows, default file manager on Linux.
+        return await shell.openPath(basePath)
     }
 )
 

@@ -10,6 +10,7 @@ import {
     BPMNConfig,
     WorkspaceBootstrapOptions
 } from '../main/types'
+import { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
 import { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
@@ -43,6 +44,7 @@ declare const api: {
     readProjectFile: (filePath: string) => Promise<any>
     openIDE: ({ basePath, ideType }: { basePath: string; ideType: string }) => Promise<any>
     getIDEs: () => Promise<any>
+    openInFileManager: (basePath: string) => Promise<string>
     getVersions: (endpoint: string) => Promise<any>
     fetchData: (endpoint: string, headers: object) => Promise<any>
     i18nextElectronBackend: {
@@ -100,6 +102,11 @@ declare const engine: {
     registerComponent: (
         engineType: string,
         config: ComponentRegistrationConfig
+    ) => Promise<HandlerResponse>
+    resetComponents: (engineType: string) => Promise<HandlerResponse>
+    buildComponentRegistry: (
+        engineType: string,
+        input: BuildComponentRegistryInput
     ) => Promise<HandlerResponse>
     getService: (engineType: string) => Promise<HandlerResponse>
     getDependencies: (engineType: string) => Promise<HandlerResponse>

@@ -14,7 +14,14 @@ export const PATTERNS = {
     SPECIAL_CHARACTERS: /^[a-zA-Z0-9\s]*$/,
     SPECIAL_CHARACTERS_PROJECT_NAME: /^[a-zA-ZÀ-ÿ0-9\s]+$/,
     NO_SPACE_BUT_ALLOW_HYPHEN: /^[^\s]+$/,
-    NAME_APP_VALIDATION: /^[a-zA-Z_-]+$/,
+    // Next.js app name: letters, digits, hyphen and underscore (the engine
+    // accepts any name — digits were wrongly rejected before).
+    NAME_APP_VALIDATION: /^[a-zA-Z0-9_-]+$/,
+    // Spring Boot groupId → valid Java package: dot-separated identifiers,
+    // no hyphens/spaces (matches what the Spring engine scaffolds).
+    JAVA_PACKAGE: /^[a-zA-Z_$][\w$]*(\.[a-zA-Z_$][\w$]*)*$/,
+    // Spring Boot artifactId → Maven-safe charset (letters, digits, . _ -).
+    MAVEN_ARTIFACT: /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/,
     // Next.js route segment validation (improved readability)
     VALID_SEGMENT_PATTERN: (() => {
         const segmentPatterns = [

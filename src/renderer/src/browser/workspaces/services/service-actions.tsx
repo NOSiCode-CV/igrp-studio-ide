@@ -23,8 +23,11 @@ export const ServiceActions = ({ service, services, onActionComplete }: ServiceA
     const [isEditService, setEditService] = useState(false)
     const { workspace } = useWorkspace()
 
+    // Action-only consumer: skip status fetch/polling so each service card
+    // doesn't spawn its own `docker compose ps` on mount.
     const { getServiceUrl, stopService, restartService, startContainers } = useDocker({
-        workspace
+        workspace,
+        watchStatus: false
     })
 
     const serviceUrl = getServiceUrl(service)
@@ -42,14 +45,14 @@ export const ServiceActions = ({ service, services, onActionComplete }: ServiceA
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                        className="h-7 w-7 text-muted-foreground hover:bg-accent hover:text-foreground"
                     >
                         <MoreVertical className="h-3.5 w-3.5" />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                     align="end"
-                    className="w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-[0_22px_56px_-16px_rgba(15,23,42,0.5)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                    className="w-44 rounded-xl border bg-card p-1 text-foreground shadow-[0_22px_56px_-16px_rgba(15,23,42,0.5)]"
                 >
                     {service.status === 'running' ? (
                         <DropdownMenuItem
@@ -84,7 +87,7 @@ export const ServiceActions = ({ service, services, onActionComplete }: ServiceA
                     )}
 
                     <DropdownMenuItem
-                        className="focus:bg-slate-50 dark:focus:bg-slate-800"
+                        className="focus:bg-accent"
                         onClick={() => {
                             setEditService(true)
                         }}
@@ -94,7 +97,7 @@ export const ServiceActions = ({ service, services, onActionComplete }: ServiceA
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
-                        className="focus:bg-slate-50 dark:focus:bg-slate-800"
+                        className="focus:bg-accent"
                         onClick={handleServiceUrl}
                         disabled={!serviceUrl}
                     >

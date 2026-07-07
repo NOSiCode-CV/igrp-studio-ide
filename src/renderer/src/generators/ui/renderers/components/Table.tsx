@@ -16,7 +16,7 @@ import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { cn } from '@renderer/lib/utils'
 import { Ellipsis, Settings2 } from 'lucide-react'
 import type React from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { COMPONENT } from '../../ComponentTypes'
 import { AddComponentModal } from '../../components/modals/add-components-modal'
 import { useDroppedComponents } from '../../contexts/EditorContext'
@@ -156,6 +156,12 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
 
     const tableColumns = components.filter((comp) => comp.componentName === COMPONENT.TableColumn)
 
+    // Optional expanded-row child (engine: `tableRowSubcomponent`, isDefault
+    // false — not created on drop, added via the strip below).
+    const tableRowSubs = components.filter(
+        (comp) => comp.componentName === COMPONENT.TableRowSubcomponent
+    )
+
     return (
         <div className="w-full flex flex-col space-y-3 pt-2">
             {/* Always-visible entry point to manage columns in a large modal,
@@ -243,6 +249,24 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                     </>
                 )
             })}
+
+            {/* Expanded-row subcomponent (optional; added via the table's
+                "Add Comp" toolbar — engine acceptedChildren) */}
+            {tableRowSubs.map((tableComp) => (
+                <Fragment key={tableComp.id}>
+                    <TableTool
+                        parentComp={comp}
+                        comp={tableComp}
+                        onEdit={() => handleEdit(tableComp, componentName)}
+                        group="group/table-rowsub"
+                        className="opacity-0 group-hover/table-rowsub:opacity-100"
+                        index={components.indexOf(tableComp)}
+                    />
+                    <div className="group/table">
+                        <CardComponent comp={tableComp} onDragEnd={onDragEnd} />
+                    </div>
+                </Fragment>
+            ))}
         </div>
     )
 }

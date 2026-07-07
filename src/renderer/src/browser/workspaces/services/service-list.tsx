@@ -66,10 +66,10 @@ export function ServiceList({
             ) : null}
 
             {/* Services Table */}
-            <div className="w-full overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+            <div className="w-full overflow-hidden rounded-lg border bg-card">
                 {showHeader ? (
                     <div
-                        className={`grid items-center gap-3 border-b border-slate-200 bg-slate-50/70 p-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400 ${
+                        className={`grid items-center gap-3 border-b bg-muted p-2.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground ${
                             stickyHeader ? 'sticky top-0 z-20' : ''
                         }`}
                         style={{ gridTemplateColumns: SERVICE_LIST_GRID }}
@@ -83,7 +83,7 @@ export function ServiceList({
                 ) : null}
 
                 {/* Body */}
-                <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                <div className="divide-y divide-border">
                     {filteredServices.map((service, index) => {
                         const visualType = resolveServiceVisualType(service)
                         const serviceTypeLabel =
@@ -93,7 +93,7 @@ export function ServiceList({
                         return (
                             <div
                                 key={index}
-                                className="group grid cursor-pointer items-center gap-3 px-3 py-2.5 hover:bg-slate-50/80 dark:hover:bg-slate-800/50"
+                                className="group grid cursor-pointer items-center gap-3 px-3 py-2.5 hover:bg-accent"
                                 style={{ gridTemplateColumns: SERVICE_LIST_GRID }}
                             >
                                 <div className="min-w-0 font-medium">
@@ -109,10 +109,10 @@ export function ServiceList({
                                             {getServiceIcon(visualType)}
                                         </div>
                                         <div className="min-w-0">
-                                            <div className="truncate text-xs font-semibold text-slate-800 transition-colors duration-200 group-hover:text-primary dark:text-slate-100 dark:group-hover:text-primary">
+                                            <div className="truncate text-xs font-semibold text-foreground transition-colors duration-200 group-hover:text-primary dark:group-hover:text-primary">
                                                 {service.name}
                                             </div>
-                                            <div className="text-[11px] text-slate-500 capitalize dark:text-slate-400">
+                                            <div className="text-[11px] text-muted-foreground capitalize">
                                                 {serviceTypeLabel}
                                             </div>
                                         </div>
@@ -120,18 +120,17 @@ export function ServiceList({
                                 </div>
                                 <div className="min-w-0">
                                     <div className="flex flex-wrap gap-1 overflow-hidden">
-                                        {service.ports &&
-                                            service.ports.map((port: string, i: number) => (
-                                                <Badge
-                                                    key={i}
-                                                    variant="outline"
-                                                    className="border-slate-200 bg-slate-50 text-[11px] text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                                                >
-                                                    {port}
-                                                </Badge>
-                                            ))}
+                                        {service.ports?.map((port: string) => (
+                                            <span
+                                                key={port}
+                                                title={port}
+                                                className="max-w-full truncate rounded-md border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground"
+                                            >
+                                                {port}
+                                            </span>
+                                        ))}
                                         {(!service.ports || service.ports.length === 0) && (
-                                            <span className="text-xs text-slate-400 dark:text-slate-500">
+                                            <span className="text-xs text-muted-foreground">
                                                 {t('none')}
                                             </span>
                                         )}

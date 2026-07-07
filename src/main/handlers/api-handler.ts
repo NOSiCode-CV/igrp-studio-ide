@@ -1,5 +1,6 @@
 // handlers/apiHandler.ts
 
+import type { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
 import { convertJsonSchemaToForm } from '@igrp/igrp-studio-nextjs-engine'
 import type {
     ComponentRegistrationConfig,
@@ -167,6 +168,19 @@ handleWithCustomErrors(
     async (_event, engineType: string, config: ComponentRegistrationConfig) => {
         const engine = EngineFactory.getEngine(engineType)
         return engine.registerComponent?.(config)
+    }
+)
+
+handleWithCustomErrors(EVENTS.NEXT.RESET_COMPONENT, async (_event, engineType: string) => {
+    const engine = EngineFactory.getEngine(engineType)
+    return engine.resetComponents?.()
+})
+
+handleWithCustomErrors(
+    EVENTS.NEXT.BUILD_COMPONENT_REGISTRY,
+    async (_event, engineType: string, input: BuildComponentRegistryInput) => {
+        const engine = EngineFactory.getEngine(engineType)
+        return engine.buildComponentRegistry?.(input)
     }
 )
 

@@ -26,7 +26,7 @@ const IGRPStudioMainComponent = ({ onDragEnd, component }: PageProps) => {
     }
 
     return (
-        <div className="group/page relative !bg-custom-pattern min-h-[calc(100svh-var(--header-height-three))] overflow-x-auto [&::-webkit-scrollbar]:h-2.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/40">
+        <div className="group/page relative !bg-custom-pattern min-h-[calc(100svh-var(--header-height-three))] overflow-x-auto">
             <PageTools onEdit={() => handleEditClick(component)} />
             {isProcess ? (
                 <IGRPStudioProcess comp={component} onDragEnd={onDragEnd} />

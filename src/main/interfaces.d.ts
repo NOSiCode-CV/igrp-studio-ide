@@ -15,7 +15,11 @@ import {
 
 import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes'
 import { Connection, HandlerResponse, PageableProjects, ProjectData } from './types'
-import { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
+import {
+    ComponentRegisterConfig,
+    ComponentRegistrationConfig
+} from '@igrp/igrp-studio-nextjs-engine/types'
 import {
     DockerServiceRegistrationConfig,
     ProjectWorkspace,
@@ -112,6 +116,8 @@ export interface BaseEngine {
     getCodeSnippets?(): CodeSnippetsRegistrationConfig
 
     registerComponent?(config: ComponentRegistrationConfig): void
+    resetComponents?(): void
+    buildComponentRegistry?(input: BuildComponentRegistryInput): ComponentRegisterConfig[]
 
     createProcess?: (process: ProcessConfig, basePath: string) => Promise<void>
     createProcessStep?: (step: ProcessStepConfig, basePath: string) => Promise<void>
@@ -166,6 +172,11 @@ export interface IBaseEngine {
     registerComponent: (
         engineType: string,
         config: ComponentRegistrationConfig
+    ) => Promise<HandlerResponse>
+    resetComponents: (engineType: string) => Promise<HandlerResponse>
+    buildComponentRegistry: (
+        engineType: string,
+        input: BuildComponentRegistryInput
     ) => Promise<HandlerResponse>
 
     createProcess: (process: any, engineType: string, basePath: string) => Promise<HandlerResponse>

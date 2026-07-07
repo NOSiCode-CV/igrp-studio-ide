@@ -1,18 +1,18 @@
 'use client'
 
-import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import * as React from 'react'
+
 import { cn } from '@renderer/lib/utils'
-import type * as React from 'react'
 
 function Table({ className, ...props }: React.ComponentProps<'table'>) {
     return (
-        <ScrollArea data-slot="table-container" className="relative w-full">
+        <div data-slot="table-container" className="relative w-full overflow-x-auto">
             <table
                 data-slot="table"
                 className={cn('w-full caption-bottom text-sm', className)}
                 {...props}
             />
-        </ScrollArea>
+        </div>
     )
 }
 
