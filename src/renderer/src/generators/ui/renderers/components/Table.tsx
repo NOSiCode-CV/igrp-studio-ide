@@ -14,10 +14,11 @@ import Draggable from '@renderer/lib/dnd/Draggable'
 import Droppable from '@renderer/lib/dnd/Droppable'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { cn } from '@renderer/lib/utils'
-import { Ellipsis } from 'lucide-react'
+import { Ellipsis, Settings2 } from 'lucide-react'
 import type React from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { COMPONENT } from '../../ComponentTypes'
+import { AddComponentModal } from '../../components/modals/add-components-modal'
 import { useDroppedComponents } from '../../contexts/EditorContext'
 import { useFakedata } from '../../hooks/useFakeData'
 import CardComponent, { type CardComponentProps } from '../CardComponent'
@@ -28,6 +29,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     const { children: components, componentName } = comp
     const [columns, setColumns] = useState<StructuredComponent[]>([])
     const [filters, setFilters] = useState<StructuredComponent[]>([])
+    const [manageColumnsOpen, setManageColumnsOpen] = useState(false)
 
     const { setEditingComponent } = useDroppedComponents()
     const { getDataTableFake } = useFakedata()
@@ -114,7 +116,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     const renderTableFilters = useCallback(
         (compName: string, dropTargetId: string) => {
             return (
-                <div className="flex flex-1">
+                <div className="flex flex-1 flex-wrap items-center gap-2">
                     {filters.map((child, index) => {
                         // Construct the path for tracking origin
                         const path = `${componentName}/${compName}`
@@ -154,8 +156,35 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
 
     const tableColumns = components.filter((comp) => comp.componentName === COMPONENT.TableColumn)
 
+    // Optional expanded-row child (engine: `tableRowSubcomponent`, isDefault
+    // false — not created on drop, added via the strip below).
+    const tableRowSubs = components.filter(
+        (comp) => comp.componentName === COMPONENT.TableRowSubcomponent
+    )
+
     return (
         <div className="w-full flex flex-col space-y-3 pt-2">
+            {/* Always-visible entry point to manage columns in a large modal,
+                so editing does not depend on the cramped hover toolbars. */}
+            {tableColumns.length > 0 && (
+                <div className="flex justify-end">
+                    <Button variant="outline" size="sm" onClick={() => setManageColumnsOpen(true)}>
+                        <Settings2 className="mr-2 h-4 w-4" />
+                        Manage Columns
+                    </Button>
+                </div>
+            )}
+
+            {manageColumnsOpen && tableColumns[0] && (
+                <AddComponentModal
+                    open={manageColumnsOpen}
+                    setOpen={setManageColumnsOpen}
+                    comp={tableColumns[0]}
+                    parentComp={comp}
+                    path={componentName}
+                />
+            )}
+
             {/* Render TableFilter first */}
             {tableFilters.map((tableComp, index) => {
                 const { componentName: compName, id } = tableComp
@@ -205,7 +234,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                             path={componentName}
                         >
                             {columns.length > 0 && (
-                                <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                <div className="relative overflow-hidden shadow-md sm:rounded-lg">
                                     <Table className="w-full text-sm text-left rtl:text-right table-fixed">
                                         <TableHeader>
                                             <TableRow>
@@ -220,6 +249,24 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                     </>
                 )
             })}
+
+            {/* Expanded-row subcomponent (optional; added via the table's
+                "Add Comp" toolbar — engine acceptedChildren) */}
+            {tableRowSubs.map((tableComp) => (
+                <Fragment key={tableComp.id}>
+                    <TableTool
+                        parentComp={comp}
+                        comp={tableComp}
+                        onEdit={() => handleEdit(tableComp, componentName)}
+                        group="group/table-rowsub"
+                        className="opacity-0 group-hover/table-rowsub:opacity-100"
+                        index={components.indexOf(tableComp)}
+                    />
+                    <div className="group/table">
+                        <CardComponent comp={tableComp} onDragEnd={onDragEnd} />
+                    </div>
+                </Fragment>
+            ))}
         </div>
     )
 }

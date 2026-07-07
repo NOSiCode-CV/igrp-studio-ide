@@ -15,7 +15,6 @@ import {
     IGRPCombobox,
     IGRPCommand,
     IGRPCopyTo,
-    IGRPDataTableFilterDate,
     IGRPDataTableFilterDropdown,
     IGRPDataTableFilterFaceted,
     IGRPDataTableFilterInput,
@@ -125,6 +124,8 @@ import {
     IGRPStudioStepper
 } from './renderers/components/StaticElementPreviews'
 import IGRPStudioTable from './renderers/components/Table'
+import IGRPStudioTableDateFilterPreview from './renderers/components/TableDateFilterPreview'
+import IGRPStudioTableRowSubcomponent from './renderers/components/TableRowSubcomponent'
 import IGRPStudioTabs from './renderers/components/Tabs'
 import IGRPStudioTextList from './renderers/components/TextList'
 
@@ -180,6 +181,7 @@ export const COMPONENT: Record<string, string> = {
     Dropdown: 'dropdown',
     TableColumn: 'tableColumns',
     TableFilter: 'tableFilters',
+    TableRowSubcomponent: 'tableRowSubcomponent',
 
     TableActionListCell: 'tableActionListCell',
     TableAmountCell: 'tableAmountCell',
@@ -347,7 +349,9 @@ export const COMPONENT_MAP: Record<string, any> = {
 
     [COMPONENT.TableInputFilter]: IGRPDataTableFilterInput,
     [COMPONENT.TableMinMaxFilter]: IGRPDataTableFilterMinMax,
-    [COMPONENT.TableFilterDate]: IGRPDataTableFilterDate,
+    // Editor-only preview: the DS IGRPDataTableFilterDate currently renders
+    // null on the canvas (real picker is TODO upstream) — see the preview file.
+    [COMPONENT.TableFilterDate]: IGRPStudioTableDateFilterPreview,
     [COMPONENT.TableSelectFilter]: IGRPDataTableFilterSelect,
     [COMPONENT.TableFacetedFilter]: IGRPDataTableFilterFaceted,
     [COMPONENT.TableFilterDropdown]: IGRPDataTableFilterDropdown,
@@ -444,5 +448,6 @@ export const COMPONENT_MAP: Record<string, any> = {
     [COMPONENT.ImageCropper]: IGRPStudioImageCropper,
     [COMPONENT.StepperUI]: IGRPStudioStepper,
     [COMPONENT.Banner]: IGRPStudioBanner,
-    [COMPONENT.Tooltip]: IGRPStudioTooltip
+    [COMPONENT.Tooltip]: IGRPStudioTooltip,
+    [COMPONENT.TableRowSubcomponent]: IGRPStudioTableRowSubcomponent
 }

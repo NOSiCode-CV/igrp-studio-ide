@@ -46,12 +46,30 @@ export const EngineService = {
         // renderer reaches it through IPC (main process) rather than importing
         // it directly. `FileTree` is Electron-world — narrow it to the engine's
         // `AppComponentEntry` shape before crossing the bridge.
-        const appEntries: AppComponentEntry[] = appComponents.map((entry) => ({
-            content: entry.content,
-            customClassName: (entry as { customClassName?: string }).customClassName,
-            data: (entry as { data?: Record<string, unknown> }).data,
-            style: (entry as { style?: Record<string, unknown> }).style
-        }))
+        //
+        // Resilient: skip entries whose metadata has no resolvable name (e.g.
+        // a malformed / foreign-schema `.igrpstudio` JSON) so a single bad
+        // file can't crash registration and hide ALL components. Accept the
+        // legacy `componentName` field as a fallback for `name` — the engine's
+        // buildComponentRegistry reads `content.name` only.
+        const appEntries: AppComponentEntry[] = appComponents
+            .filter((entry) => {
+                const name = entry?.content?.name ?? entry?.content?.componentName
+                if (!name) {
+                    console.warn('Skipping component with no name in metadata:', entry?.content)
+                    return false
+                }
+                return true
+            })
+            .map((entry) => ({
+                content: {
+                    ...entry.content,
+                    name: entry.content.name ?? entry.content.componentName
+                },
+                customClassName: (entry as { customClassName?: string }).customClassName,
+                data: (entry as { data?: Record<string, unknown> }).data,
+                style: (entry as { style?: Record<string, unknown> }).style
+            }))
 
         const { result: componentsToRegister, error: buildError } =
             await window.engine.buildComponentRegistry(ENV_TYPES.NEXTJS, {

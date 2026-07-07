@@ -112,6 +112,7 @@ import {
     ToggleLeft,
     ToggleRight,
     TrendingUp,
+    UnfoldVertical,
     Upload,
     Video,
     WrapText
@@ -237,6 +238,7 @@ export const ICON_MAP: Record<string, React.ElementType> = {
     tableTextCell: FormInput,
     tableExpanderCell: ChevronDown,
     tableBadgeCell: Badge,
+    tableRowSubcomponent: UnfoldVertical,
     copyTo: Copy,
     avatar: CircleUser,
     // `accordion` previously mapped twice; ListCollapse wins (last-write).
