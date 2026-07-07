@@ -1,11 +1,11 @@
 import { electronAPI } from '@electron-toolkit/preload'
+import type { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
 import type { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import type { ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { preloadBindings } from 'i18next-electron-fs-backend'
 import { EVENTS } from '../main/constants/events'
 import type { WatchEvent } from '../main/helpers/watch-folder'
-import type { GraphQLOperation } from '../main/types/graphql-manifest.types'
 import type {
     BPMNConfig,
     Connection,
@@ -17,6 +17,7 @@ import type {
     ToolCheck,
     WorkspaceBootstrapOptions
 } from '../main/types'
+import type { GraphQLOperation } from '../main/types/graphql-manifest.types'
 
 const handleError = (error: unknown): HandlerResponse => ({
     error: (error as Error).message || 'An unknown error occurred'
@@ -342,6 +343,17 @@ const engine = {
     resetComponents: async (engineType: string): Promise<HandlerResponse> => {
         try {
             return await ipcRenderer.invoke(EVENTS.NEXT.RESET_COMPONENT, engineType)
+        } catch (error) {
+            return handleError(error)
+        }
+    },
+
+    buildComponentRegistry: async (
+        engineType: string,
+        input: BuildComponentRegistryInput
+    ): Promise<HandlerResponse> => {
+        try {
+            return await ipcRenderer.invoke(EVENTS.NEXT.BUILD_COMPONENT_REGISTRY, engineType, input)
         } catch (error) {
             return handleError(error)
         }

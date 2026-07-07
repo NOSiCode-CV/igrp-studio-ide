@@ -10,6 +10,7 @@ import {
     BPMNConfig,
     WorkspaceBootstrapOptions
 } from '../main/types'
+import { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
 import { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
@@ -102,6 +103,10 @@ declare const engine: {
         config: ComponentRegistrationConfig
     ) => Promise<HandlerResponse>
     resetComponents: (engineType: string) => Promise<HandlerResponse>
+    buildComponentRegistry: (
+        engineType: string,
+        input: BuildComponentRegistryInput
+    ) => Promise<HandlerResponse>
     getService: (engineType: string) => Promise<HandlerResponse>
     getDependencies: (engineType: string) => Promise<HandlerResponse>
     getAppMetadata: (engineType: string, basePath: string) => Promise<HandlerResponse>

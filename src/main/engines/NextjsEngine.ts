@@ -1,5 +1,8 @@
 // engines/NextjsEngine.ts
+
+import type { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
 import {
+    buildComponentRegistry,
     deleteElement,
     initCodeSnippets,
     initComponents,
@@ -21,6 +24,7 @@ import type {
     AppExportsConfig,
     CodeSnippetsRegistrationConfig,
     ComponentConfig,
+    ComponentRegisterConfig,
     ComponentRegistrationConfig,
     DeleteConfig,
     PageConfig,
@@ -70,6 +74,14 @@ export class NextjsEngine implements BaseEngine {
     // so custom components don't leak across projects.
     resetComponents(): void {
         resetComponents()
+    }
+
+    // Pure composition (engine ≥0.2.0-beta.22): ComponentDef[] + parsed
+    // .igrpstudio manifests → ComponentRegisterConfig[]. Runs in main because
+    // the engine bundle is Node-only (fs-extra/prettier at module top-level)
+    // and must not be imported by the renderer.
+    buildComponentRegistry(input: BuildComponentRegistryInput): ComponentRegisterConfig[] {
+        return buildComponentRegistry(input)
     }
 
     getCodeSnippets(): CodeSnippetsRegistrationConfig {

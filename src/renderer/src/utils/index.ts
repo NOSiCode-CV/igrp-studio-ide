@@ -132,6 +132,10 @@ export function toFullCamelCaseFromSnakeCase(str: string) {
     )
 }
 
+// Mirrors the engine's `getLabel` export (nextjs-engine ≥0.2.0-beta.22) —
+// same heuristic, kept as a local copy because the engine bundle is
+// Node-only (fs-extra/prettier at module top-level) and can't be imported
+// by the renderer. If the engine changes its heuristic, sync this.
 export function getLabel(name: string): string {
     if (!name) return '' // Handle empty string
 

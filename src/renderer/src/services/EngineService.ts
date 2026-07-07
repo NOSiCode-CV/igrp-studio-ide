@@ -1,12 +1,7 @@
-import type { ComponentDef, ComponentRegisterConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import type { AppComponentEntry } from '@igrp/igrp-studio-nextjs-engine'
+import type { ComponentDef } from '@igrp/igrp-studio-nextjs-engine/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import RENDERER_CONFIG from '@renderer/renderer.config'
-import { capitalize, getLabel } from '@renderer/utils'
-import {
-    convertComponentsToJSONSchema,
-    convertCompToInteractinsJSONSchema,
-    convertCompToRulesJSONSchema
-} from '@renderer/utils/register-schema'
 import type { FileTree, HandlerResponse } from 'src/main/types'
 
 // Tracks the project whose custom/app components are currently registered in
@@ -45,94 +40,32 @@ export const EngineService = {
         loadRegistryComponent: () => void
         basePath?: string
     }): Promise<void> {
-        const components: ComponentRegisterConfig[] = customComponents.map(
-            (component: ComponentDef) => ({
-                name: component.name,
-                label: getLabel(component.name),
-                properties: {
-                    customProperties: {
-                        type: 'object',
-                        properties: convertComponentsToJSONSchema(component.props)
-                    }
-                },
-                interactions: convertCompToInteractinsJSONSchema(component.props),
-                childrenTypes: [],
-                imports: component.path
-                    ? [`import {${component.name}} from '${component.path}'`]
-                    : [],
-                defaultValue: false,
-                allowTypes: false,
-                group: 'customComponents',
-                customClassName: '',
-                customComponentTag: component.name,
-                variants: {},
-                propertiesMapping: {},
-                interactionsMapping: {},
-                data: {},
-                dataMapping: {},
-                style: {},
-                styleMapping: {},
-                rules: convertCompToRulesJSONSchema(),
-                rulesMapping: {},
-                childProperties: {},
-                childPropertiesMapping: {},
-                states: [],
-                acceptedChildren: [],
-                renderer: 'custom',
-                templatePath: '',
-                defaultChildren: [],
-                allowChildren: component.allowChildren ?? false,
-                metadata: {}
+        // The ComponentRegisterConfig[] composition lives in the engine since
+        // 0.2.0-beta.22 (`buildComponentRegistry`) so headless consumers (CLI)
+        // share the exact pipeline. The engine bundle is Node-only, so the
+        // renderer reaches it through IPC (main process) rather than importing
+        // it directly. `FileTree` is Electron-world — narrow it to the engine's
+        // `AppComponentEntry` shape before crossing the bridge.
+        const appEntries: AppComponentEntry[] = appComponents.map((entry) => ({
+            content: entry.content,
+            customClassName: (entry as { customClassName?: string }).customClassName,
+            data: (entry as { data?: Record<string, unknown> }).data,
+            style: (entry as { style?: Record<string, unknown> }).style
+        }))
+
+        const { result: componentsToRegister, error: buildError } =
+            await window.engine.buildComponentRegistry(ENV_TYPES.NEXTJS, {
+                customComponents,
+                appComponents: appEntries,
+                currentPage,
+                generatedPath: RENDERER_CONFIG.generatedPath,
+                customComponentsPath: RENDERER_CONFIG.customComponentsPath
             })
-        )
 
-        const _components: ComponentRegisterConfig[] = appComponents
-            .filter(
-                (component) =>
-                    component.content.scope === 'app' ||
-                    (component.content.scope === 'page' &&
-                        component.content.pageName === currentPage) ||
-                    component.content.name !== currentPage
-            )
-            .map((component: any) => ({
-                name: capitalize(component.content.name),
-                label: component.content.description || getLabel(component.content.name),
-                properties: {
-                    customProperties: {
-                        type: 'object',
-                        properties: convertComponentsToJSONSchema(component.content.args)
-                    }
-                },
-                interactions: convertCompToInteractinsJSONSchema(component.content.args),
-                childrenTypes: [],
-                imports: [
-                    `import ${capitalize(component.content.name)} from '${component.content.pageName ? RENDERER_CONFIG.generatedPath + component.content.pagePath + '/components/' + component.content.name.toLowerCase() : RENDERER_CONFIG.customComponentsPath + component.content.name.toLowerCase()}'`
-                ],
-                defaultValue: false,
-                allowTypes: false,
-                group: 'appComponents',
-                customClassName: component.customClassName,
-                customComponentTag: capitalize(component.content.name),
-                variants: {},
-                propertiesMapping: {},
-                interactionsMapping: {},
-                data: component.data,
-                dataMapping: {},
-                style: component.style,
-                styleMapping: {},
-                rules: convertCompToRulesJSONSchema(),
-                rulesMapping: {},
-                childProperties: {},
-                childPropertiesMapping: {},
-                states: [],
-                acceptedChildren: [],
-                renderer: 'custom',
-                templatePath: '',
-                metadata: component.content,
-                defaultChildren: []
-            }))
-
-        const componentsToRegister = [...components, ..._components]
+        if (buildError) {
+            console.error('buildComponentRegistry failed:', buildError)
+            return
+        }
 
         // Switching project: drop the previous project's custom/app components
         // from the (global) engine registry before registering this project's,
