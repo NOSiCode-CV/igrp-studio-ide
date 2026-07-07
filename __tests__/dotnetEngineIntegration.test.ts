@@ -17,21 +17,32 @@ import os from 'os'
 import path from 'path'
 import { app } from 'electron'
 import { DotNetEngine } from '../src/main/engines/DotNetEngine'
-import type {
-    ControllerConfig,
-    ModelConfig,
-    ModuleConfig
-} from '@igrp/dotnet-engine/types'
+import type { ControllerConfig, ModelConfig, ModuleConfig } from '@igrp/dotnet-engine/types'
 import type { DotNetConfigData, ProjectData } from '../src/main/types'
 
 const mkTempDir = (label: string): string => {
-    const root = path.join(os.tmpdir(), `igrp-studio-dotnet-smoke-${label}-${process.pid}-${Date.now()}`)
+    const root = path.join(
+        os.tmpdir(),
+        `igrp-studio-dotnet-smoke-${label}-${process.pid}-${Date.now()}`
+    )
     fs.mkdirSync(root, { recursive: true })
     return root
 }
 
 const rmRf = (dir: string) => {
     if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true })
+}
+
+/** Recursively collect file paths under `dir` whose basename matches. */
+const findFiles = (dir: string, match: (name: string) => boolean): string[] => {
+    if (!fs.existsSync(dir)) return []
+    const out: string[] = []
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name)
+        if (entry.isDirectory()) out.push(...findFiles(full, match))
+        else if (match(entry.name)) out.push(full)
+    }
+    return out
 }
 
 describe('Studio ↔ dotnet-engine integration', () => {
@@ -130,7 +141,14 @@ describe('Studio ↔ dotnet-engine integration', () => {
             crud: true,
             audit: false,
             attributes: [
-                { type: 'integer', name: 'id', nullable: false, unique: true, primaryKey: true, generationType: 'Identity' },
+                {
+                    type: 'integer',
+                    name: 'id',
+                    nullable: false,
+                    unique: true,
+                    primaryKey: true,
+                    generationType: 'Identity'
+                },
                 { type: 'string', name: 'name', length: 120, nullable: false, unique: true }
             ]
         }
@@ -169,13 +187,178 @@ describe('Studio ↔ dotnet-engine integration', () => {
         await engine.createController(customController, outDir)
 
         // CRUD runtime emitted for Department (technical style: Controllers/Department/...)
-        expect(fs.existsSync(path.join(outDir, 'Controllers', 'Department', 'DepartmentController.cs'))).toBe(true)
+        expect(
+            fs.existsSync(path.join(outDir, 'Controllers', 'Department', 'DepartmentController.cs'))
+        ).toBe(true)
         expect(fs.existsSync(path.join(outDir, 'Services', 'DepartmentService.cs'))).toBe(true)
         expect(fs.existsSync(path.join(outDir, 'Models', 'Department', 'Department.cs'))).toBe(true)
-        expect(fs.existsSync(path.join(outDir, 'Data', 'Repositories', 'Department', 'DepartmentCrudRepository.cs'))).toBe(true)
+        expect(
+            fs.existsSync(
+                path.join(
+                    outDir,
+                    'Data',
+                    'Repositories',
+                    'Department',
+                    'DepartmentCrudRepository.cs'
+                )
+            )
+        ).toBe(true)
 
         // Custom controller emitted for HealthCheck
-        expect(fs.existsSync(path.join(outDir, 'Controllers', 'HealthCheck', 'HealthCheckController.cs'))).toBe(true)
+        expect(
+            fs.existsSync(
+                path.join(outDir, 'Controllers', 'HealthCheck', 'HealthCheckController.cs')
+            )
+        ).toBe(true)
+    })
+
+    it('accepts the exact response payload Studio sends (type field + 4xx exception)', async () => {
+        // Regression: the engine's response schema (`requestConfig.ts`) lacked
+        // a `type` property while being `additionalProperties: false`, so the
+        // `type: 'response'` field that Studio's editor always includes made
+        // AJV reject EVERY response saved from the UI.
+        const engine = new DotNetEngine()
+
+        const project: ProjectData = {
+            id: 'smoke-project-id',
+            name: 'Studio Smoke API',
+            type: 'backend',
+            framework: 'dotnet',
+            path: outDir,
+            workspaceId: 'smoke-workspace-id',
+            config: {
+                artifact: 'studio-smoke-api',
+                database: 'Postgresql',
+                projectStructureStyle: 'technical',
+                name: 'Studio Smoke API',
+                enableObservability: false,
+                enableEntityRevision: false
+            } satisfies DotNetConfigData
+        }
+        await engine.createProject(project, outDir)
+        await engine.createModule({ type: 'module', name: 'Hr' }, outDir)
+
+        // Mirrors useResponse.handleSave: formik values + module + tab id.
+        const studioResponsePayload = {
+            type: 'response',
+            statusCode: '404',
+            name: 'NotFound',
+            template: 'classic',
+            description: '',
+            module: 'Hr',
+            id: 'new-action-hr-abc123',
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            message: { type: 'string' }
+                        }
+                    }
+                }
+            }
+        }
+
+        await engine.createResponse(studioResponsePayload as never, outDir)
+
+        // Manifest persisted with `type` so the sidebar can classify it.
+        const manifestPath = path.join(outDir, '.igrpstudio', 'Hr', 'responses', 'NotFound.json')
+        expect(fs.existsSync(manifestPath)).toBe(true)
+        expect(JSON.parse(fs.readFileSync(manifestPath, 'utf-8')).type).toBe('response')
+
+        // DTO emitted, and a 404 status also emits the matching exception.
+        expect(findFiles(outDir, (n) => n === 'NotFoundDto.cs').length).toBeGreaterThan(0)
+        expect(findFiles(outDir, (n) => n === 'NotFoundException.cs').length).toBeGreaterThan(0)
+
+        // A response saved with no content must fail with the AJV message,
+        // not the raw TypeError the unguarded content access used to throw.
+        await expect(
+            engine.createResponse(
+                { ...studioResponsePayload, name: 'Empty', content: {} } as never,
+                outDir
+            )
+        ).rejects.toThrow(/content/i)
+    })
+
+    it('keeps both models when two CRUD schemas are created with distinct ids', async () => {
+        // Regression for the "adding another schema replaces the last one"
+        // bug: the sidebar minted the SAME `new-action-<node>` id for every
+        // artifact created from a module node, and the engine treats
+        // "same id, different name" as a rename — deleting the previous
+        // model and its whole CRUD surface. Studio now mints unique ids;
+        // this pins the engine behavior for both halves of that contract.
+        const engine = new DotNetEngine()
+
+        const project: ProjectData = {
+            id: 'smoke-project-id',
+            name: 'Studio Smoke API',
+            type: 'backend',
+            framework: 'dotnet',
+            path: outDir,
+            workspaceId: 'smoke-workspace-id',
+            config: {
+                artifact: 'studio-smoke-api',
+                database: 'Postgresql',
+                projectStructureStyle: 'technical',
+                name: 'Studio Smoke API',
+                enableObservability: false,
+                enableEntityRevision: false
+            } satisfies DotNetConfigData
+        }
+        await engine.createProject(project, outDir)
+        await engine.createModule({ type: 'module', name: 'Hr' }, outDir)
+
+        const crudModel = (name: string, tableName: string, id: string): ModelConfig =>
+            ({
+                type: 'model',
+                module: 'Hr',
+                name,
+                tableName,
+                id,
+                primaryKey: [],
+                crud: true,
+                audit: false,
+                attributes: [
+                    {
+                        type: 'integer',
+                        name: 'id',
+                        nullable: false,
+                        unique: true,
+                        primaryKey: true,
+                        generationType: 'Identity'
+                    },
+                    { type: 'string', name: 'name', length: 120, nullable: false, unique: false }
+                ]
+            }) as unknown as ModelConfig
+
+        // Two distinct schemas, distinct ids (what Studio sends post-fix).
+        await engine.createModel(crudModel('Department', 'departments', 'id-dept'), outDir)
+        await engine.createModel(crudModel('Employee', 'employees', 'id-emp'), outDir)
+
+        const modelsDir = path.join(outDir, '.igrpstudio', 'Hr', 'models')
+        expect(fs.existsSync(path.join(modelsDir, 'Department.json'))).toBe(true)
+        expect(fs.existsSync(path.join(modelsDir, 'Employee.json'))).toBe(true)
+        expect(
+            fs.existsSync(path.join(outDir, 'Controllers', 'Department', 'DepartmentController.cs'))
+        ).toBe(true)
+        expect(
+            fs.existsSync(path.join(outDir, 'Controllers', 'Employee', 'EmployeeController.cs'))
+        ).toBe(true)
+
+        // Same id + different name stays a RENAME: Employee's artifacts are
+        // swept and regenerated as Customer. This is the engine contract that
+        // made the old duplicated-id Studio bug destructive.
+        await engine.createModel(crudModel('Customer', 'customers', 'id-emp'), outDir)
+        expect(fs.existsSync(path.join(modelsDir, 'Employee.json'))).toBe(false)
+        expect(fs.existsSync(path.join(modelsDir, 'Customer.json'))).toBe(true)
+        expect(
+            fs.existsSync(path.join(outDir, 'Controllers', 'Employee', 'EmployeeController.cs'))
+        ).toBe(false)
+        expect(
+            fs.existsSync(path.join(outDir, 'Controllers', 'Customer', 'CustomerController.cs'))
+        ).toBe(true)
+        // Department untouched throughout.
+        expect(fs.existsSync(path.join(modelsDir, 'Department.json'))).toBe(true)
     })
 
     it('forwards workspace identity and emits deployment files for a workspace project', async () => {
@@ -224,6 +407,29 @@ describe('Studio ↔ dotnet-engine integration', () => {
         expect(baseApi.workspaceId).toBe('smoke-workspace-id')
         expect(baseApi.authMode).toBe('autentika')
         expect(baseApi.version).toBe(app.getVersion())
+
+        // Gateway parity (Studio-driven == direct engine). The workspace env
+        // publishes this API under the gateway prefix (name = lowercased
+        // apiName), never re-emits the removed inert SWAGGER_GATEWAY_PATH...
+        const envContent = fs.readFileSync(path.join(outDir, envFile as string), 'utf-8')
+        expect(envContent).toContain('IGRP_GATEWAY_PATH=/gateway-api/studiosmokeapi')
+        expect(envContent).not.toContain('SWAGGER_GATEWAY_PATH')
+
+        // ...and the generated runtime actually consumes it: the pipeline
+        // extension reads IGRP_GATEWAY_PATH, serves Swagger at a relative spec
+        // URL that survives the stripped gateway prefix, and honors forwarded
+        // headers. It also applies the Spring springdoc.swagger-ui defaults
+        // (operationsSorter consumed, try-it-out on, docs collapsed).
+        const bootstrap = fs.readFileSync(
+            path.join(outDir, 'Infrastructure', 'Pipeline', 'IgrpApplicationBuilderExtensions.cs'),
+            'utf-8'
+        )
+        expect(bootstrap).toContain('IGRP_GATEWAY_PATH')
+        expect(bootstrap).toContain('SwaggerEndpoint("v1/swagger.json"')
+        expect(bootstrap).toContain('UseForwardedHeaders')
+        expect(bootstrap).toContain('AdditionalItems["operationsSorter"]')
+        expect(bootstrap).toContain('EnableTryItOutByDefault()')
+        expect(bootstrap).toContain('DocExpansion(DocExpansion.None)')
     })
 
     it('throws Method-not-implemented sentinel error from no operation (regression: stubs are gone)', () => {
