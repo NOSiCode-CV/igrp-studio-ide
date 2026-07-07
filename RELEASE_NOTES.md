@@ -1,0 +1,177 @@
+## 0.2.0-beta.16
+
+- feat(release): ship release notes inside the S3 update feed
+- fix(workspace): refresh projects list after delete/update
+- fix(workspace): make project deletion idempotent on registry/workspace desync
+- feat(ide): open project in file manager + safe PATH-aware IDE detection
+- feat(page-builder): table row subcomponent + recover master-only table UX
+- refactor(engine): delegate component-registry composition to engine beta.22
+- feat(file-metadata): add creation and modification timestamps to FileTree interface and update related components
+- feat(page-builder): droppable children in scrollArea/aspectRatio/overlay panels
+- feat(page-builder): Group B — canvas previews for composable engine components
+- feat(palette): translate component group labels + map missing engine groups
+- feat(page-builder): map 22 engine default components to canvas + palette icons
+- chore(deps): bump design-system to 0.1.0-beta.141 + adapt CSS consumption
+- fix(palette): clamp long component names in the UI-generator palette
+- feat(components): isolate custom/app components per project (nextjs-engine beta.20)
+- fix(palette): clamp long component names in the palette cards
+- i18n: add missing project-form keys (stages, specification, generator, ...)
+- fix(sidebar): stop double-translating labels + add customCode key
+- fix(page-builder): use COMPONENT.ProcessStepContent for BPMN process init
+- fix(docker): derive workspace slug from WORKSPACE_SLUG, not the folder name
+- fix(workspace): atomic registry writes + salvage corrupt registry
+- perf(services): stop per-card `docker compose ps` on the Services tab
+- perf(workspace): only show full-screen loader on first workspaces load
+- perf(projects-view): stop over-refetching on the projects view
+- fix(open-project): read correct base metadata fields & preserve project id
+- fix(workspace-create): allow digits in workspace slug
+- fix(project-create): align Next.js & Spring input validation with engine contract
+- fix(bpmn): update bpmn-editor styles import to dist/styles.css
+- fix(ui-generator): wrap long page-card titles instead of overflowing
+- fix(workspaces): Services overview polish — scroll, z-index, deps, ports, type detection
+- style(workspaces): match Services header height/padding with Projects
+- style(workspaces): tokenize Projects actions colors
+- style(workspaces): tokenize Services area colors
+- style(workspaces): align Services toolbar controls with Projects
+- style(workspaces): align Services header typography with Projects
+- fix(controller): use local Label after merge into dev
+- fix(ui): balance vertical spacing around projects toolbar
+- style(theme): unify border radius on --radius token (0.5rem)
+- feat(services): add tooltips to stack run/stop buttons
+- refactor(header): remove global Docker controls from app header
+- fix(ui): theme dark-mode header border + zero radius
+- chore(deps): update @igrp/igrp-studio-nextjs-engine to version 0.2.0-beta.14 in package.json and yarn.lock
+- workspace settings: clean up nav panel
+- refactor(prototype): P7 — ship: clean up moved-to breadcrumbs
+- refactor(prototype): P6 — extract chat chrome + footer
+- fix(project tab fixes): fix forms and improve icon storage
+- refactor(prototype): P5 — extract panes (Preview / Files / Logs / History)
+- refactor(prototype): P4 — extract preview chrome
+- refactor(prototype): P3 — extract banners (Install/Update/FirstRun)
+- refactor(prototype): P2 — extract pure helper functions
+- refactor(prototype): P1 — extract pure constants from PrototypePanel
+- fix(ui): set bg-background on Specification main + KB empty state
+- improve workspace settings
+- fix(ui): set explicit bg tokens on Data Models chat aside (dark mode)
+- Scroll inside Services view and Theme & colors
+- fix(ui-redesign): resolve followups and fix bugs
+- fix(ui): replace native title tooltip on Specification rail with shadcn Tooltip
+- fix(ui): align dark mode in data-models ERD and doc toolbar
+- chore(deps): bump @igrp/igrp-studio-nextjs-engine to 0.2.0-beta.13
+- fix(ui): align dark mode in data-models ERD and doc toolbar
+- chore(deps): bump @igrp/igrp-studio-nextjs-engine to 0.2.0-beta.13
+- docs(ui-redesign): register 9 follow-ups for post-merge polish
+- Reorganize workspace navigation tabs and remove top border
+- service improvements
+- refactor(projects-view-ui): implement studio IDE projects view UI redesign
+- redesign services
+- Improve visual proportions and sync pt translations
+- refactor(workspace-settings): redesign settings panel
+- chore(deps): update @igrp/igrp-studio-nextjs-engine to version 0.2.0-beta.11
+- chore(env): update publish channel to beta and remove unused workspace files
+- fix(sidebar): route the IGRP horizon hook + provider to local shadcn
+- fix(ui): normalise shadcn primitive imports to @renderer/ alias
+- refactor(ui): replace IGRP*Primitive with shadcn primitives across the renderer
+- feat(ui): install shadcn primitives locally for the IGRP migration
+- refactor(spec-config): drop the LLM and embeddings inputs from the wizard
+- fix(form-compat): fall back to target.id when reading the field name
+- fix(form-compat): surface validation errors after a failed submit
+- fix(form-compat): align touched semantics with Formik
+- fix(form-compat): stabilise useFormikCompat.values reference across renders
+- refactor(forms): finish phase 4.1 — drop formik + yup
+- refactor(api-hooks): RHF+Zod with Formik-shaped compat for the 6 API hooks
+- refactor(project-wizard): migrate project-form + dotnet-config to RHF+Zod
+- refactor(forms): RHF+Zod phase 4.1 PRs A + B (helpers, edit-project, connection)
+- docs(plano-limpeza): mark phase 4.1 etapas 1-3a done, flag remaining as blocked
+- refactor(api-dialogs): migrate create-module/create-endpoint to RHF+Zod
+- refactor(page/component-modals): migrate to RHF+Zod (phase 4.1 etapa 2)
+- refactor(duplicate-page-modal): migrate from Formik+Yup to RHF+Zod
+- feat(form): scaffold React Hook Form + Zod setup for phase 4.1
+- feat(spec-export): replace html-to-docx with a native docx pipeline
+- docs(plano-limpeza): freeze phase 2.3 and close the xyflow 3.1 follow-up
+- fix(workspace): drop dead boolean branches in stack resolvers and an unused t()
+- feat(graphql): add primary key support and operation improvements
+- fix(diagrams): satisfy @xyflow/react v12 type constraints
+- Revert "fix(binding-modal): always start with empty fields so auto-extract wins"
+- docs(plano-limpeza): record phases 1.5/2/3 progress and sync yarn.lock
+- fix(binding-modal): always start with empty fields so auto-extract wins
+- feat(prototype): implement manifest management and skill integration
+- fix(binding-modal): derive field name from label when tag is missing
+- fix(binding-modal): resolve name after compType spread so it is never blank
+- feat(controller): add path variable and collection type selectors
+- feat(specification): enhance prototype features and user experience
+- feat(specification): enhance document handling and prototype integration
+- fix/ui-corrections
+- wip(specification): add Monaco file viewer with diff-vs-HEAD~1 in PrototypePanel
+- fix(workspace): remove reload button and stop refresh cascade
+- reuse FormList in GraphQL editor and fix sidebar button clipping
+- initial commit
+- feat(specification): implement multi-document tab support and resizable right pane
+- fix: resolve build errors (merge conflict, unused imports, type fixes) and apply biome formatting
+- build
+- feat(specification): implement interactive document editing with SEARCH/REPLACE
+- docs: add GraphQL A-Z flow documentation with implementation status and known engine bugs
+- fix: correct GraphQL schema config mapping for engine generation
+- feat(prototype): enhance dev server status with installation tracking
+- feat: implement Phase 4 GraphQL schema generation and sidebar fixes
+- docs(plano-limpeza): record vite-alias lesson from path-browserify regression
+- fix(deps): restore path-browserify — required by vite renderer alias
+- feat(data-models): refactor data model components and integrate ReactFlow for ERD visualization
+- chore(deps): phase 1 cleanup — remove unused deps and consolidate redux/reselect
+- feat(data-models): introduce spec data management features
+- feat(connection): implement ConnectionForm, ConnectionManager, and TablePicker components
+- Add Kind combobox to Contract editor for GraphQL types
+- feat(specification): introduce Specification project type and related features
+- refactor(modals): comment out unused JSX elements in BindingConfigurationModal and Form components
+- fix(form): render import button as sibling of Droppable
+- fix(form): convert JSON Schema in main process to avoid renderer crash
+- feat(form): import a JSON Schema into a form via the engine converter
+- feat(binding): wire up advanced TypeDef fields (R6) and gate codegen options
+- feat(binding): expose TypeDef.definitionType (zod / json-schema / auto)
+- fix(binding-form-list): align header with rows via shared grid template
+- feat(binding): isEnum types + complete FieldValidation coverage
+- fix(binding): align field types with engine and expose isKey
+- feat(project): allow creating projects at custom paths in linked mode
+- ui(browser): rename "Add components" to "Open editor" and emphasise
+- feat(browser): move page + create scoped component from page actions
+- fix(git): collapse duplicate token-expired toasts
+- fix(main): recover Electron windows after hibernate / display changes
+- feat(git): paginate repo lists, cache results and surface rate limits
+- feat(git): detect expired OAuth tokens and prompt to reconnect
+- feat(git): declarative provider catalog and Zod validation
+- i18n(connected-accounts): add GitHub provider config strings
+- feat(git): GitHub Enterprise + dynamic OAuth via configurable instances
+- fix(env): load .env before modules that read process.env at import time
+- feat(git): generalize provider config storage and IPC
+- fix(git): encrypt tokens with safeStorage and wire missing IPC handlers
+- refactor(pages): standardize entry points, kebab-case and section folders
+- refactor(generators-ui): rename page/ to browser/ and split BPMN to processes/
+- refactor(generators-ui): rename misleading folders + collocate modals
+- refactor(ui-generator): single dropped-components store + lifted SidebarRight
+- perf(generators-ui): break the components-registration re-render storm
+- refactor(sidebar-right): extract data-loading effects into useSidebarRightState
+- refactor(sidebar-right): extract header, identity and properties panel
+- Update @igrp/igrp-studio-nextjs-engine to version 0.2.0-beta.6 in package.json and yarn.lock for improved features and fixes.
+- refactor(usePageSave): enhance error handling in getSaveErrorMessage and update error types
+- feat: implement GraphQL designer phases 1-3 and rename DTO UI to Contract
+- Update @igrp/igrp-studio-nextjs-engine to version 0.2.0-beta.5 in package.json and yarn.lock for improved features and fixes.
+- Enhance MarkItDown integration and update dependencies
+- Update package dependencies to latest versions
+- Update dependencies and refactor workspace integration
+- feat: add MarkItDown converter (sidebar, secondary window, history, doctor)
+- Enhance project configuration and dependency management
+- Remove package-lock.json and enhance welcome onboarding page with new features
+- Implement Git repository root detection and update project handling in workspace
+- Add project storage mode and update project handling in workspace service
+- Enhance error handling and reporting in renderer components
+- Add onboarding completion handling and integrate framer-motion for animations
+- Refactor integrated terminal and Git components for improved state management and IPC handling. Extract selectors for base and workspace paths in IntegratedTerminal. Update CloneProjectModal and GitProject to use useCallback for event handlers, enhancing performance. Simplify event listener management in RepositoryList and use-git-auth. Adjust project creation and editing modals for better user experience and state handling.
+- Implement session renaming functionality in IntegratedTerminal component. Add state management for renaming sessions, including input handling and context menu integration. Update UI to allow users to rename terminal sessions directly.
+- Implement integrated terminal functionality with pty support in Electron app. Add terminal management IPC methods for creating, resizing, and destroying terminal sessions. Update package.json and yarn.lock to include necessary dependencies for terminal integration. Enhance UI layouts to incorporate IntegratedTerminal component and add terminal toggle functionality in the footer.
+- Integrate Sentry for error monitoring in main and renderer processes, updating logger initialization and error reporting mechanisms. Enhance environment configuration with SENTRY_DSN and related settings in .env and electron.vite.config.ts. Add new scripts for Docker monitoring in package.json. Remove outdated documentation files related to release notes and build processes.
+- Enhance release notes fetching in AppUpdater by integrating GitHub API token support and updating related documentation. Add new test scripts in package.json for release notes verification.
+- fix(ui): remove unexpected dropzone from binding and dto forms
+- fix(ui): remove static badge color and variant from preview fake data
+- fix(navigation): ensure unique tab ids and force editor remount
+- fix(api): keep body request as none without reverting to json
+- fix(ui): replace fixed colors with semantic theme tokens

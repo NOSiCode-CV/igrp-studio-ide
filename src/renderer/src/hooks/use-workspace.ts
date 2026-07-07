@@ -456,6 +456,10 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             await window.igrpStudio.workspace.deleteProject(project.id, workspace.path)
             dispatch(setChangeStatus(true))
             showSuccessToast(t('deletedSuccess', { name: project.name }))
+            // The Resources screen only refetches projects on workspace change
+            // (perf: not on every changeStatus toggle) + on this event — fire
+            // it so the deleted card leaves the screen without a manual refresh.
+            window.dispatchEvent(new Event('igrp:workspace:refresh'))
         } catch (error: unknown) {
             showErrorToast(error)
         }
@@ -470,6 +474,9 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
             showSuccessToast(t('updatedSuccessfully', { name: updates.name || 'Project' }))
             dispatch(setChangeStatus(true))
+            // Same as removeProject: the projects list only refetches on
+            // workspace change + this event.
+            window.dispatchEvent(new Event('igrp:workspace:refresh'))
             return result
         } catch (error: unknown) {
             showErrorToast(error)

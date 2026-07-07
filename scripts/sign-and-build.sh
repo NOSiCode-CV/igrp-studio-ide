@@ -16,6 +16,10 @@ else
     exit 1
 fi
 
+# Release notes for the update feed (embedded into the channel yml
+# via build.releaseInfo.releaseNotesFile)
+node scripts/generate-release-notes.mjs
+
 # Run the build
 echo "Building with notarization..."
 electron-vite build && electron-builder --mac "$@" --config

@@ -1173,7 +1173,23 @@ export class WorkspaceRepository {
             }
         }
 
-        await removeProjectFromWorkspace(projectId, basePath)
+        // Engine-side cleanup: removes the entry from the workspace folder's
+        // own metadata (.igrpstudio/workspace.json) and regenerates composes.
+        // Deletion must be idempotent: if that file no longer knows the
+        // project (registry/workspace desync — e.g. a recovered registry or a
+        // failed write when the project was added), the engine half is
+        // already in the desired state, so don't let its "not found" abort
+        // the registry-side delete and leave the project undeletable.
+        try {
+            await removeProjectFromWorkspace(projectId, basePath)
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error)
+            if (/not found in workspace/i.test(message)) {
+                console.warn(`deleteProject: ${message} — continuing with registry removal`)
+            } else {
+                throw error
+            }
+        }
 
         // Clean up project icon files
         if (projectToDelete && projectToDelete.icon) {
