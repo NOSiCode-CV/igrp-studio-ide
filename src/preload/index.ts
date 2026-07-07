@@ -72,6 +72,8 @@ const api = {
     openIDE: ({ basePath, ideType }: { basePath: string; ideType: string }) =>
         ipcRenderer.invoke('igrp-studio:open-ide', { basePath, ideType }),
     getIDEs: () => ipcRenderer.invoke('igrp-studio:ides'),
+    openInFileManager: (basePath: string) =>
+        ipcRenderer.invoke('igrp-studio:open-in-file-manager', basePath),
 
     getVersions: (endpoint: string) => ipcRenderer.invoke('get-versions', endpoint),
 

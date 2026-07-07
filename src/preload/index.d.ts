@@ -44,6 +44,7 @@ declare const api: {
     readProjectFile: (filePath: string) => Promise<any>
     openIDE: ({ basePath, ideType }: { basePath: string; ideType: string }) => Promise<any>
     getIDEs: () => Promise<any>
+    openInFileManager: (basePath: string) => Promise<string>
     getVersions: (endpoint: string) => Promise<any>
     fetchData: (endpoint: string, headers: object) => Promise<any>
     i18nextElectronBackend: {

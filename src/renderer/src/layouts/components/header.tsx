@@ -11,6 +11,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger
 } from '@renderer/components/ui/dropdown-menu'
 import {
@@ -32,7 +33,7 @@ import { SettingsDialog } from '@renderer/browser/settings'
 import type { RootState } from '@renderer/redux'
 import { getFileThree as onGetPages } from '@renderer/redux/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { ArrowLeft, Code, Maximize2, Minus, Square, X } from 'lucide-react'
+import { ArrowLeft, Code, FolderOpen, Maximize2, Minus, Square, X } from 'lucide-react'
 import { type JSX, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -81,6 +82,23 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         if (!path) return
         try {
             await window.api.openIDE({ basePath: path, ideType })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const platform = window.api.i18nextElectronBackend.clientOptions.platform
+    const fileManagerLabel = isMac
+        ? t('openInFinder')
+        : platform === 'win32'
+          ? t('openInExplorer')
+          : t('openInFileManager')
+
+    const openInFileManager = async (): Promise<void> => {
+        const path = basePath || workspace.path
+        if (!path) return
+        try {
+            await window.api.openInFileManager(path)
         } catch (error) {
             console.error(error)
         }
@@ -259,6 +277,14 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     </TooltipContent>
                                 </Tooltip>
                                 <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                        onClick={openInFileManager}
+                                        className="flex items-center"
+                                    >
+                                        <FolderOpen />
+                                        {fileManagerLabel}
+                                    </DropdownMenuItem>
+                                    {installedIDEs.length > 0 && <DropdownMenuSeparator />}
                                     {installedIDEs.map(({ key, config }): React.ReactNode => {
                                         return (
                                             <DropdownMenuItem
