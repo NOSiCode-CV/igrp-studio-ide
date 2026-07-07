@@ -1,0 +1,32 @@
+## 0.2.0-beta.13
+
+- fix(ci): sync yarn.lock to nextjs-engine beta.15 and ignore engines
+- fix(ui): balance vertical spacing around projects toolbar
+- style(theme): unify border radius on --radius token (0.5rem)
+- feat(services): add tooltips to stack run/stop buttons
+- refactor(header): remove global Docker controls from app header
+- fix(ui): theme dark-mode header border + zero radius
+- chore(deps): update @igrp/igrp-studio-nextjs-engine to version 0.2.0-beta.14 in package.json and yarn.lock
+- workspace settings: clean up nav panel
+- refactor(prototype): P7 — ship: clean up moved-to breadcrumbs
+- refactor(prototype): P6 — extract chat chrome + footer
+- fix(project tab fixes): fix forms and improve icon storage
+- refactor(prototype): P5 — extract panes (Preview / Files / Logs / History)
+- refactor(prototype): P4 — extract preview chrome
+- refactor(prototype): P3 — extract banners (Install/Update/FirstRun)
+- refactor(prototype): P2 — extract pure helper functions
+- refactor(prototype): P1 — extract pure constants from PrototypePanel
+- fix(ui): set bg-background on Specification main + KB empty state
+- improve workspace settings
+- fix(ui): set explicit bg tokens on Data Models chat aside (dark mode)
+- Scroll inside Services view and Theme & colors
+- fix(ui-redesign): resolve followups and fix bugs
+- fix(ui): align dark mode in data-models ERD and doc toolbar
+- chore(deps): bump @igrp/igrp-studio-nextjs-engine to 0.2.0-beta.13
+- docs(ui-redesign): register 9 follow-ups for post-merge polish
+- Reorganize workspace navigation tabs and remove top border
+- service improvements
+- refactor(projects-view-ui): implement studio IDE projects view UI redesign
+- redesign services
+- Improve visual proportions and sync pt translations
+- refactor(workspace-settings): redesign settings panel
