@@ -15,6 +15,7 @@
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
+import { app } from 'electron'
 import { DotNetEngine } from '../src/main/engines/DotNetEngine'
 import type {
     ControllerConfig,
@@ -84,8 +85,16 @@ describe('Studio ↔ dotnet-engine integration', () => {
         expect(baseApi.apiName).toBe('StudioSmokeAPI')
         expect(baseApi.igrpCoreVersion).toMatch(/^\d+\.\d+\.\d+(-[A-Za-z0-9.-]+)?$/)
         expect(baseApi.enableEntityRevision).toBe(false)
-        // The disallowed `version` field must NOT appear in the persisted config.
-        expect(Object.prototype.hasOwnProperty.call(baseApi, 'version')).toBe(false)
+        // `version` is forwarded from `app.getVersion()` and persisted for
+        // round-trip parity with spring-engine; `workspaceId` round-trips too.
+        expect(baseApi.version).toBe(app.getVersion())
+        expect(baseApi.workspaceId).toBe('smoke-workspace-id')
+        // No `workspaceSlug` on this project → the engine persists no
+        // workspaceSlug key and emits no workspace deployment files.
+        expect(Object.prototype.hasOwnProperty.call(baseApi, 'workspaceSlug')).toBe(false)
+        const topLevel = fs.readdirSync(outDir)
+        expect(topLevel.some((f) => /^igrp-compose-.+\.yaml$/.test(f))).toBe(false)
+        expect(topLevel.some((f) => /^\.igrp\..+\.env$/.test(f))).toBe(false)
     })
 
     it('routes secondary operations (createModule / createModel / createController) through the engine', async () => {
@@ -167,6 +176,54 @@ describe('Studio ↔ dotnet-engine integration', () => {
 
         // Custom controller emitted for HealthCheck
         expect(fs.existsSync(path.join(outDir, 'Controllers', 'HealthCheck', 'HealthCheckController.cs'))).toBe(true)
+    })
+
+    it('forwards workspace identity and emits deployment files for a workspace project', async () => {
+        // Wave 10 parity: when the project config carries a `workspaceSlug`
+        // (Studio injects it from `IWorkspace.slug` in workspace-service), the
+        // engine emits the workspace deployment files and persists the workspace
+        // identity + Studio version into baseApi.json. `authMode` selects the
+        // identity provider (here: autentika).
+        const engine = new DotNetEngine()
+
+        const project: ProjectData = {
+            id: 'smoke-project-id',
+            name: 'Studio Smoke API',
+            type: 'backend',
+            framework: 'dotnet',
+            path: outDir,
+            workspaceId: 'smoke-workspace-id',
+            config: {
+                artifact: 'studio-smoke-api',
+                database: 'Postgresql',
+                projectStructureStyle: 'technical',
+                name: 'Studio Smoke API',
+                enableObservability: false,
+                enableEntityRevision: false,
+                workspaceSlug: 'acme',
+                authMode: 'autentika'
+            } satisfies DotNetConfigData
+        }
+        await engine.createProject(project, outDir)
+
+        // The engine emits the two workspace deployment files, named after the
+        // engine `apiName` lowercased (Studio omits the human-readable `name`):
+        // deriveApiName('studio-smoke-api', 'Studio Smoke API') → 'StudioSmokeAPI'
+        // → 'studiosmokeapi'.
+        const topLevel = fs.readdirSync(outDir)
+        const composeFile = topLevel.find((f) => /^igrp-compose-.+\.yaml$/.test(f))
+        const envFile = topLevel.find((f) => /^\.igrp\..+\.env$/.test(f))
+        expect(composeFile).toBe('igrp-compose-studiosmokeapi.yaml')
+        expect(envFile).toBe('.igrp.studiosmokeapi.env')
+
+        // Workspace identity + version round-trip into baseApi.json.
+        const baseApi = JSON.parse(
+            fs.readFileSync(path.join(outDir, '.igrpstudio', 'baseApi.json'), 'utf-8')
+        )
+        expect(baseApi.workspaceSlug).toBe('acme')
+        expect(baseApi.workspaceId).toBe('smoke-workspace-id')
+        expect(baseApi.authMode).toBe('autentika')
+        expect(baseApi.version).toBe(app.getVersion())
     })
 
     it('throws Method-not-implemented sentinel error from no operation (regression: stubs are gone)', () => {

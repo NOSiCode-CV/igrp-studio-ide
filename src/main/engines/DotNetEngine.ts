@@ -27,6 +27,7 @@ import type {
     PermissionConfig,
     ResponseConfig
 } from '@igrp/dotnet-engine/types'
+import { app } from 'electron'
 import { ensureDirectoryExists } from '../helpers'
 import type { BaseEngine } from '../interfaces'
 import type { DotNetConfigData, ProjectData } from '../types'
@@ -108,7 +109,18 @@ export class DotNetEngine implements BaseEngine {
             // contain spaces; passing it through breaks template rendering.
             enableObservability: !!config.enableObservability,
             enableEntityRevision: !!config.enableEntityRevision,
-            igrpCoreVersion: IGRP_CORE_VERSION
+            igrpCoreVersion: IGRP_CORE_VERSION,
+            // iGRP workspace identity + Studio manifest version (Spring parity —
+            // see SpringEngine.createProject). `workspaceSlug`, when present,
+            // additionally triggers the engine's workspace deployment files
+            // (`igrp-compose-<name>.yaml` + `.igrp.<name>.env`) and CI
+            // `REGISTRY_PROJECT`; `authMode` selects the identity provider (the
+            // engine defaults to keycloak when omitted). All are round-trip-only
+            // for the engine and are omitted from baseApi.json when undefined.
+            workspaceId: project.workspaceId,
+            workspaceSlug: config.workspaceSlug,
+            version: app.getVersion(),
+            authMode: config.authMode
         }
 
         await ensureDirectoryExists(basePath)

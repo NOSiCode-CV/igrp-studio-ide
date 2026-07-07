@@ -35,6 +35,21 @@ export interface DotNetConfigData {
      * Studio UI yet — safe-defaults to `false` in `DEFAULT_DOTNET_CONFIG`.
      */
     enableEntityRevision: boolean
+    /**
+     * iGRP workspace slug (workspace metadata, not a UUID). When present,
+     * `@igrp/dotnet-engine` additionally emits the workspace deployment files
+     * (`igrp-compose-<name>.yaml` + `.igrp.<name>.env`) and wires the CI
+     * `REGISTRY_PROJECT`. Not collected by the Studio config form; injected from
+     * `IWorkspace.slug` by `workspace-service.addProject` so the feature is not
+     * inert through Studio.
+     */
+    workspaceSlug?: string
+    /**
+     * Identity provider the generated .NET app validates JWTs against (Spring
+     * parity). Forwarded to the engine only when the config carries it; the
+     * engine defaults to `'keycloak'` when omitted.
+     */
+    authMode?: 'keycloak' | 'autentika'
 }
 
 export interface SpringConfigData {

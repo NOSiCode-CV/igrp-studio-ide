@@ -969,6 +969,16 @@ export class WorkspaceRepository {
 
         await this.addProjectToStudioWorkspace(workspace, newProject, false)
 
+        // .NET Wave 10: `@igrp/dotnet-engine` emits the workspace deployment
+        // files (`igrp-compose-<name>.yaml` + `.igrp.<name>.env`) and wires the
+        // CI `REGISTRY_PROJECT` only when it receives the workspace slug. The
+        // project-config form never collects it, so source it from workspace
+        // metadata here — mirroring docker-service's workspaceSlug convention.
+        // Scoped to .NET so the springboot engine's config contract is untouched.
+        if (newProject.framework === 'dotnet' && workspace.slug) {
+            newProject.config = { ...(newProject.config ?? {}), workspaceSlug: workspace.slug }
+        }
+
         const engine = EngineFactory.getEngine(project.framework)
         await engine.createProject(newProject, project.path)
 
