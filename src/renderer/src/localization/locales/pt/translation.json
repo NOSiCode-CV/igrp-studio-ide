@@ -487,6 +487,8 @@
     "versionAvailable": "Nova versão disponível {{version}}",
     "convertToDTO": "Converter para DTO",
     "openOnEditor": "Abrir no Editor",
+    "switchComponent": "Trocar componente",
+    "switchComponentDroppedProps": "Propriedades não suportadas pelo novo componente foram removidas: {{keys}}",
     "componentGroups": {
         "structure": "Estrutura",
         "containers": "Contentores",

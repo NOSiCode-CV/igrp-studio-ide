@@ -488,6 +488,8 @@
     "versionAvailable": "New version available {{version}}",
     "convertToDTO": "Convert To DTO",
     "openOnEditor": "Open on Editor",
+    "switchComponent": "Switch component",
+    "switchComponentDroppedProps": "Properties not supported by the new component were removed: {{keys}}",
     "componentGroups": {
         "structure": "Structure",
         "containers": "Containers",

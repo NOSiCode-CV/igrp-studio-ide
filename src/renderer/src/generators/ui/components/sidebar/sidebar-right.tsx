@@ -1,7 +1,7 @@
-import { Sidebar, SidebarContent } from '@renderer/components/ui/sidebar'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { EmptyList } from '@renderer/components/empty-list'
 import Loader from '@renderer/components/loader'
+import { Sidebar, SidebarContent } from '@renderer/components/ui/sidebar'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import useStudio from '@renderer/hooks/use-studio'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { Settings } from 'lucide-react'
@@ -12,8 +12,8 @@ import { useSidebarRightState } from '../../hooks/useSidebarRightState'
 import Interactions from '../settings/Interactions'
 import { StyleTab } from '../settings/style'
 import CopyContent from './copy-content'
-import ComponentIdentitySection from './sidebar-right-identity'
 import SidebarRightHeader from './sidebar-right-header'
+import ComponentIdentitySection from './sidebar-right-identity'
 import PropertiesPanel from './sidebar-right-properties-panel'
 
 interface SidebarRightProps extends ComponentProps<typeof Sidebar> {
@@ -40,6 +40,8 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
         childformValues,
         columnsOptions,
         isLoading,
+        switchTargets,
+        handleSwitchComponent,
         handleUpdateChildComponent,
         restData,
         handleComponentPropertyChange,
@@ -87,6 +89,8 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                                 tag={tempEditingComponent.tag}
                                 isRootComponent={isRootComponent}
                                 useClient={restData?.useClient ?? true}
+                                switchTargets={switchTargets}
+                                onSwitchComponent={handleSwitchComponent}
                                 onTagChange={handleTagChange}
                                 onUseClientChange={handleUseClientChange}
                             />
