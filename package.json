@@ -155,7 +155,7 @@
       "region": "praia",
       "endpoint": "https://storage-api.nosi.cv",
       "channel": "${env.PUBLISH_CHANNEL}",
-      "path": "${platform}/${arch}/"
+      "path": "${platform}/${arch}"
     },
     "win": {
       "icon": "resources/icons/icon.ico",
@@ -184,7 +184,7 @@
         "region": "praia",
         "endpoint": "https://storage-api.nosi.cv",
         "channel": "${env.PUBLISH_CHANNEL}",
-        "path": "win32/${arch}/"
+        "path": "win32/x64"
       }
     },
     "mac": {
