@@ -82,11 +82,61 @@ export class DjangoEngine implements BaseEngine {
         await addModel(config, basePath)
     }
 
+    /**
+     * `@igrp/django-engine` backs only project scaffolding (`addBaseApi` →
+     * `createProject`) and model generation (`addModel` → `createModel`). Every
+     * other API Designer operation has no Django implementation in the package.
+     *
+     * The IPC handlers invoke most engine operations via optional chaining
+     * (`engine.createDto?.(...)`), so an *absent* method silently no-ops: the
+     * handler resolves successfully and the renderer believes the artifact was
+     * generated. That silent lie is worse than an error. Implement the
+     * unsupported operations as explicit failures instead — `handleWithCustomErrors`
+     * turns the throw into `{ error }`, which the API Designer surfaces to the
+     * user. (delete/duplicate are required by `BaseEngine`, so they were
+     * previously no-op stubs; same fail-clear treatment applies.)
+     */
+    private notSupported(operation: string): never {
+        throw new Error(
+            `"${operation}" is not supported for Django projects. @igrp/django-engine ` +
+                `generates only the base project (createProject) and models (createModel). ` +
+                `This action was blocked instead of silently doing nothing.`
+        )
+    }
+
+    async createModule(_config: any, _basePath: string): Promise<void> {
+        this.notSupported('createModule')
+    }
+
+    async createDto(_config: any, _basePath: string): Promise<void> {
+        this.notSupported('createDto')
+    }
+
+    async createEnum(_config: any, _basePath: string): Promise<void> {
+        this.notSupported('createEnum')
+    }
+
+    async createController(_config: any, _basePath: string): Promise<void> {
+        this.notSupported('createController')
+    }
+
+    async createResponse(_config: any, _basePath: string): Promise<void> {
+        this.notSupported('createResponse')
+    }
+
+    async createGraphqlSchema(_config: any, _basePath: string): Promise<void> {
+        this.notSupported('createGraphqlSchema')
+    }
+
+    async serializeElement(_config: any, _basePath: string): Promise<void> {
+        this.notSupported('serializeElement')
+    }
+
     async delete(_config: any, _basePath: string): Promise<void> {
-        // Element deletion not yet implemented for Django projects.
+        this.notSupported('delete')
     }
 
     async duplicate(_config: any, _basePath: string): Promise<void> {
-        // Element duplication not yet implemented for Django projects.
+        this.notSupported('duplicate')
     }
 }

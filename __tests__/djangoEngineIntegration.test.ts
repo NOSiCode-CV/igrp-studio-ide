@@ -517,4 +517,31 @@ describe('Studio ↔ django-engine integration', () => {
             expect(typeof engine[op]).toBe('function')
         }
     })
+
+    it('fails clearly for unsupported operations instead of silently no-opping', async () => {
+        // @igrp/django-engine backs only createProject + createModel. Every
+        // other API Designer op must throw (fail-clear) rather than silently
+        // succeed — the IPC layer invokes several via optional chaining, so an
+        // absent method would resolve as a no-op the user reads as success.
+        const engine = new DjangoEngine() as unknown as Record<
+            string,
+            (config: unknown, basePath: string) => Promise<void>
+        >
+        const unsupported = [
+            'createModule',
+            'createDto',
+            'createEnum',
+            'createController',
+            'createResponse',
+            'createGraphqlSchema',
+            'serializeElement',
+            'delete',
+            'duplicate'
+        ]
+        for (const op of unsupported) {
+            await expect(engine[op]({}, '/tmp/django-unsupported')).rejects.toThrow(
+                /not supported for Django/
+            )
+        }
+    })
 })
