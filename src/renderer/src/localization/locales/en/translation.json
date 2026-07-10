@@ -143,6 +143,7 @@
     "technical": "Technical",
     "domainDriven": "Domain-Driven Design (DDD)",
     "enableObservability": "Enable Observability",
+    "enableGraphQL": "Enable GraphQL",
     "convertToSpringBoot": "Convert to Spring Boot",
     "convertToDotNet": "Convert to .NET",
     "removeProject": "Remove Project",

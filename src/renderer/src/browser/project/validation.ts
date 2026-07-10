@@ -85,5 +85,67 @@ export function useProjectValidation({ t, step }: { t: any; step: number }) {
                 setError('database', t('thisFieldRequired', { name: t('database') }))
             }
         }
+
+        if (framework === ENV_TYPES.DOTNET) {
+            if (!cfg.artifact) {
+                setError('artifact', t('thisFieldRequired', { name: t('artifact') }))
+            } else {
+                if (!PATTERNS.NO_SPACE_BUT_ALLOW_HYPHEN.test(cfg.artifact)) {
+                    setError('artifact', t('msgNoSpacesAllowed'))
+                }
+                if (cfg.artifact.length > 50) {
+                    setError('artifact', t('maxLengthExceeded', { max: 50 }))
+                }
+            }
+
+            if (!cfg.database) {
+                setError('database', t('thisFieldRequired', { name: t('database') }))
+            }
+
+            if (!cfg.projectStructureStyle) {
+                setError(
+                    'projectStructureStyle',
+                    t('thisFieldRequired', { name: 'Project Structure' })
+                )
+            }
+        }
+
+        if (framework === ENV_TYPES.DJANGO) {
+            // Explicit Django rules — no silent fall-through to another framework.
+            validateNameField(PATTERNS.SPECIAL_CHARACTERS_PROJECT_NAME, 20)
+
+            // artifact = Python package name: letter-initial, alphanumerics/underscore
+            // only (matches @igrp/django-engine's BaseApiConfig.artifact pattern).
+            if (!cfg.artifact) {
+                setError('artifact', t('thisFieldRequired', { name: t('artifact') }))
+            } else {
+                if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(cfg.artifact)) {
+                    setError('artifact', t('msgInfoAccpet'))
+                }
+                if (cfg.artifact.length > 20) {
+                    setError('artifact', t('maxLengthExceeded', { max: 20 }))
+                }
+            }
+
+            if (!cfg.database) {
+                setError('database', t('thisFieldRequired', { name: t('database') }))
+            }
+
+            if (
+                cfg.projectStructureStyle !== 'technical' &&
+                cfg.projectStructureStyle !== 'domain'
+            ) {
+                setError(
+                    'projectStructureStyle',
+                    t('thisFieldRequired', { name: 'Project Structure' })
+                )
+            }
+
+            const enableGraphQL = (values.config as Record<string, unknown> | undefined)
+                ?.enableGraphQL
+            if (enableGraphQL !== undefined && typeof enableGraphQL !== 'boolean') {
+                setError('enableGraphQL', t('msgInfoAccpet'))
+            }
+        }
     })
 }

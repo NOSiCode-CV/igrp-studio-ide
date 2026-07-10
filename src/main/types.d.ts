@@ -9,7 +9,7 @@ type HandlerResponse<T = any> = {
 
 export type ProjectType = 'frontend' | 'backend' | 'specification'
 
-export type FrameworkType = 'springboot' | 'nextjs' | 'dotnet' | 'specification'
+export type FrameworkType = 'springboot' | 'nextjs' | 'dotnet' | 'specification' | 'django'
 
 export type ProjectStorageMode = 'managed' | 'linked'
 
@@ -19,6 +19,18 @@ export interface NextConfigData {
     workspaceId: string
     id: string
     version: string
+}
+
+export interface DjangoConfigData {
+    artifact: string
+    database: 'PostgreSQL' | 'MySQL' | 'SQLite' | 'Oracle'
+    description?: string
+    projectStructureStyle: 'technical' | 'domain'
+    name?: string
+    enableObservability: boolean
+    enableEntityRevision: boolean
+    /** Opt-in Strawberry GraphQL scaffolding (forwarded to @igrp/django-engine). */
+    enableGraphQL?: boolean
 }
 
 export interface DotNetConfigData {
@@ -86,6 +98,7 @@ export type ConfigData =
     | NextConfigData
     | DotNetConfigData
     | SpecificationConfigData
+    | DjangoConfigData
 
 export interface ProjectData {
     id: string
@@ -128,6 +141,8 @@ export interface IWorkspace {
     projects?: ProjectData[]
     services?: WorkspaceService[]
     pinned?: boolean
+    /** Actual Postgres database name — read from workspace .env IGRP_DATABASE_NAME at load time. Not persisted to disk. */
+    databaseName?: string
 }
 
 export interface WorkspaceBootstrapOptions {
