@@ -42,7 +42,8 @@ import type { FieldErrors } from 'react-hook-form'
 import type { Dependency } from '@igrp/igrp-studio-springboot-engine/types'
 import type { FrameworkType, ProjectData } from 'src/main/types'
 import { DatabaseOptions, ENV_TYPES, projectStructureStyle } from '@renderer/constants/appConstants'
-import { DotNetConfig } from './components/configurations/dotnet-config'
+import { DEFAULT_DJANGO_CONFIG, DjangoConfig } from './components/configurations/django-config'
+import { DEFAULT_DOTNET_CONFIG, DotNetConfig } from './components/configurations/dotnet-config'
 import { NextConfig } from './components/configurations/next-config'
 import { SpecificationConfig } from './components/configurations/specification-config'
 import { SpringConfig } from './components/configurations/spring-config'
@@ -73,7 +74,29 @@ const componentsMap: Record<string, ConfigComponent> = {
     springboot: SpringConfig,
     nextjs: NextConfig,
     dotnet: DotNetConfig,
-    specification: SpecificationConfig
+    specification: SpecificationConfig,
+    django: DjangoConfig
+}
+
+/**
+ * Initial `config` form state when a framework is selected in the wizard.
+ *
+ * .NET gets its concrete defaults seeded into form state immediately so the
+ * rendered UI (database pre-selected, structure style pre-checked) and the
+ * submitted/validated values can never disagree. The pre-RHF Formik code
+ * achieved the same by resetting `config` to `undefined` and relying on
+ * `DotNetConfig`'s `data = DEFAULT_DOTNET_CONFIG` default parameter — but a
+ * default parameter only fires while the user interacts with the component,
+ * leaving `values.config` empty when they don't.
+ *
+ * Spring/Next.js/Specification keep `undefined`: each has an auto-populate
+ * effect (or component-level default) that owns its seeding, and `undefined`
+ * matches the original Formik reset behavior for them.
+ */
+const getDefaultConfigByFramework = (framework: string): Record<string, unknown> | undefined => {
+    if (framework === ENV_TYPES.DOTNET) return { ...DEFAULT_DOTNET_CONFIG }
+    if (framework === ENV_TYPES.DJANGO) return { ...DEFAULT_DJANGO_CONFIG }
+    return undefined
 }
 
 export const ProjectConfigForm = ({
@@ -326,7 +349,8 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         reset({
             ...initialValues,
             type: values.type,
-            framework: value as FrameworkType
+            framework: value as FrameworkType,
+            config: getDefaultConfigByFramework(value)
         })
     }
 

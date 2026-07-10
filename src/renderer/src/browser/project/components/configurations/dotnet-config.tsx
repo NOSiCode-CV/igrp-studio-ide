@@ -23,7 +23,7 @@ interface DotNetConfigProps {
     onChange: (data: DotNetConfigData) => void
 }
 
-const DEFAULT_DOTNET_CONFIG: DotNetConfigData = {
+export const DEFAULT_DOTNET_CONFIG: DotNetConfigData = {
     name: '',
     description: '',
     artifact: '',
@@ -38,6 +38,7 @@ const DEFAULT_DOTNET_CONFIG: DotNetConfigData = {
 
 export function DotNetConfig({
     data = DEFAULT_DOTNET_CONFIG,
+    errors,
     onChange
 }: DotNetConfigProps): React.ReactNode {
     const { t } = useTranslation()
@@ -53,6 +54,9 @@ export function DotNetConfig({
                     placeholder={t('enterProjectName')}
                     maxLength={20}
                 />
+                {errors?.config?.name && (
+                    <p className="text-xs text-destructive">{errors.config.name}</p>
+                )}
             </div>
 
             <div className="space-y-2">
@@ -74,6 +78,9 @@ export function DotNetConfig({
                     placeholder={t('enterArtifact')}
                     maxLength={20}
                 />
+                {errors?.config?.artifact && (
+                    <p className="text-xs text-destructive">{errors.config.artifact}</p>
+                )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -85,6 +92,9 @@ export function DotNetConfig({
                         options={DotnetDatabaseOptions}
                         className="w-full"
                     />
+                    {errors?.config?.database && (
+                        <p className="text-xs text-destructive">{errors.config.database}</p>
+                    )}
                 </div>
             </div>
 
@@ -110,6 +120,11 @@ export function DotNetConfig({
                             <Label htmlFor="domain">{t('domainDriven')}</Label>
                         </div>
                     </RadioGroup>
+                    {errors?.config?.projectStructureStyle && (
+                        <p className="text-xs text-destructive">
+                            {errors.config.projectStructureStyle}
+                        </p>
+                    )}
                 </div>
 
                 <div className="flex items-center space-x-2">
