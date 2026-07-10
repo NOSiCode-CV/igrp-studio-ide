@@ -1,5 +1,6 @@
 // engines/EngineFactory.ts
 import type { BaseEngine } from '../interfaces'
+import { DjangoEngine } from './DjangoEngine'
 import { DotNetEngine } from './DotNetEngine'
 import { NextjsEngine } from './NextjsEngine'
 import { SpecificationEngine } from './SpecificationEngine'
@@ -9,7 +10,8 @@ export enum ENV_TYPES {
     NEXTJS = 'baseApp',
     SPRING = 'baseApi',
     DOTNET = 'dotnet',
-    SPECIFICATION = 'baseSpec'
+    SPECIFICATION = 'baseSpec',
+    DJANGO = 'django'
 }
 
 export class EngineFactory {
@@ -23,6 +25,8 @@ export class EngineFactory {
                 return new NextjsEngine()
             case 'specification':
                 return new SpecificationEngine()
+            case 'django':
+                return new DjangoEngine()
             default:
                 throw new Error(`Unsupported engine type: ${type}`)
         }

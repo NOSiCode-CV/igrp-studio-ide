@@ -99,7 +99,8 @@ export enum ENV_TYPES {
     NEXTJS = 'nextjs',
     SPRING = 'springboot',
     DOTNET = 'dotnet',
-    SPECIFICATION = 'specification'
+    SPECIFICATION = 'specification',
+    DJANGO = 'django'
 }
 
 /**
@@ -136,6 +137,13 @@ export const DotnetDatabaseOptions = [
     { value: 'Postgresql', label: 'PostgreSQL' },
     { value: 'SqlServer', label: 'SQL Server' },
     { value: 'Sqlite', label: 'SQLite' }
+]
+
+export const DjangoDatabaseOptions = [
+    { value: 'PostgreSQL', label: 'PostgreSQL' },
+    { value: 'MySQL', label: 'MySQL' },
+    { value: 'SQLite', label: 'SQLite' },
+    { value: 'Oracle', label: 'Oracle' }
 ]
 
 export const projectStructureStyle = [

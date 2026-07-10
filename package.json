@@ -41,6 +41,7 @@
         "@faker-js/faker": "^10.3.0",
         "@gitbeaker/rest": "^43.8.0",
         "@hookform/resolvers": "^5.2.2",
+        "@igrp/django-engine": "file:../../django-engine/igrp-django-engine-0.1.0-alpha.2.tgz",
         "@igrp/dotnet-engine": "file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-alpha.1-local.tgz",
         "@igrp/framework-process-studio-bpmn-editor": "0.0.1-beta.16",
         "@igrp/framework-process-studio-client": "^0.0.1-beta.12",
