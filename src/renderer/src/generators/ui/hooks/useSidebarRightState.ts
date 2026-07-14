@@ -1,10 +1,13 @@
-import { type IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system'
+import type { IGRPOptionsProps } from '@igrp/igrp-framework-react-design-system'
 import type { State } from '@igrp/igrp-studio-nextjs-engine/types'
 import useStudio from '@renderer/hooks/use-studio'
+import useToast from '@renderer/hooks/useToast'
 import type { DataValue, StructuredComponent } from '@renderer/lib/dnd/types'
 import { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDroppedComponents } from '../contexts/EditorContext'
 import { getRequiredDataSchema } from '../dnd/helpers'
+import { getSwitchTargets, switchComponentType } from '../utils/switchComponentType'
 import { useComponents } from './useComponents'
 
 interface UseSidebarRightStateArgs {
@@ -45,14 +48,22 @@ const setNestedValue = (
  * SidebarRight. Keeps the orchestrator component focused on layout.
  */
 export function useSidebarRightState({ comp, parentComp, path }: UseSidebarRightStateArgs) {
-    const { getPropertiesComponent, getDataComponent, getChildPropertiesComponent } = useStudio()
+    const {
+        getPropertiesComponent,
+        getDataComponent,
+        getChildPropertiesComponent,
+        componentsRegistered
+    } = useStudio()
     const {
         currentComponent: editingComponentParams,
         handleUpdateChildComponent,
         clearEditingComponent,
+        setEditingComponent,
         setAllRestData,
         restData
     } = useDroppedComponents()
+    const { showWarningToast } = useToast()
+    const { t } = useTranslation()
     const { getArqumentsOptions } = useComponents()
     const argumentsOptions = getArqumentsOptions()
 
@@ -338,6 +349,47 @@ export function useSidebarRightState({ comp, parentComp, path }: UseSidebarRight
         [componentId, tempEditingComponent]
     )
 
+    // "Switch component" — convert the editing component to a same-group
+    // sibling in place (keep id/tag/label + every value the target schema
+    // accepts). Updating the store AND the editing selection makes the
+    // schema-loading effects above reload the panel for the new type.
+    const switchTargets = useMemo(
+        () => (isRootComponent ? [] : getSwitchTargets(componentsRegistered, currentComp)),
+        [componentsRegistered, currentComp, isRootComponent]
+    )
+
+    const handleSwitchComponent = useCallback(
+        (targetName: string) => {
+            if (!componentId || !currentComp) return
+            const target = componentsRegistered.find((entry) => entry.name === targetName)
+            if (!target) return
+
+            const { component: converted, droppedKeys } = switchComponentType(currentComp, target)
+
+            handleUpdateChildComponent(componentId, converted)
+            setEditingComponent({ path: currentPath, component: converted })
+
+            if (droppedKeys.length > 0) {
+                showWarningToast(
+                    t('switchComponentDroppedProps', {
+                        keys: droppedKeys.join(', '),
+                        defaultValue: `Properties not supported by the new component were removed: ${droppedKeys.join(', ')}`
+                    })
+                )
+            }
+        },
+        [
+            componentId,
+            currentComp,
+            componentsRegistered,
+            currentPath,
+            handleUpdateChildComponent,
+            setEditingComponent,
+            showWarningToast,
+            t
+        ]
+    )
+
     return {
         // derived
         currentComp,
@@ -346,6 +398,8 @@ export function useSidebarRightState({ comp, parentComp, path }: UseSidebarRight
         label,
         componentName,
         componentId,
+        switchTargets,
+        handleSwitchComponent,
         // state
         tempEditingComponent,
         propsComponent,

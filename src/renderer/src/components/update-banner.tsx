@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@renderer/components/ui/button'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import {
     Dialog,
     DialogContent,
@@ -233,11 +234,11 @@ export function UpdateModalBottomLeft(): JSX.Element | null {
                     {updateInfo?.releaseNotes && (
                         <div className="mt-4 space-y-2">
                             <h4 className="font-semibold text-sm">{t('whats_new')}</h4>
-                            <div className="bg-muted/50 rounded-md p-4 max-h-[400px] overflow-y-auto">
-                                <div className="prose prose-sm dark:prose-invert max-w-none">
+                            <ScrollArea className="bg-muted/50 rounded-md max-h-[400px] [&>[data-slot=scroll-area-viewport]]:max-h-[400px]">
+                                <div className="prose prose-sm dark:prose-invert max-w-none p-4">
                                     {formatReleaseNotes(updateInfo.releaseNotes)}
                                 </div>
-                            </div>
+                            </ScrollArea>
                         </div>
                     )}
 
