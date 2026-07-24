@@ -7,6 +7,7 @@ import {
     dismissCliUpdate
 } from '@renderer/hooks/useIgrpCliUpdateCheck'
 import useToast from '@renderer/hooks/useToast'
+import { installIgrpCli } from '@renderer/services/igrp-cli'
 import { cn } from '@renderer/lib/utils'
 import {
     markAllNotificationsRead,
@@ -43,11 +44,11 @@ const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Ele
     const getNotificationIcon = (type: NotificationType): string => {
         switch (type) {
             case 'success':
-                return 'CheckCircle'
+                return 'CircleCheck'
             case 'warning':
-                return 'AlertTriangle'
+                return 'TriangleAlert'
             case 'error':
-                return 'XCircle'
+                return 'CircleX'
             case 'info':
             default:
                 return 'Info'
@@ -76,11 +77,11 @@ const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Ele
     }
 
     const handleUpdateCli = async (notification: AppNotification): Promise<void> => {
-        if (!window.api?.installIGRPCLI) return
         setUpdatingId(notification.id)
         dispatch(markNotificationRead(notification.id))
         try {
-            const result = await window.api.installIGRPCLI()
+            // Reuses the same install path as onboarding (`installIgrpCli` IPC).
+            const result = await installIgrpCli(notification.meta?.latest)
             if (!result.success) {
                 showErrorToast(result.error || t('cliUpdateFailed'))
                 return

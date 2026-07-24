@@ -6,6 +6,10 @@ import { useWorkspace } from '@renderer/hooks/use-workspace'
 import CreateWorkspace from '@renderer/browser/workspaces/components/create-workspace'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import {
+    buildIgrpCliInstallCommand,
+    installIgrpCli
+} from '@renderer/services/igrp-cli'
+import {
     ArrowRight,
     CheckCircle2,
     ChevronLeft,
@@ -161,15 +165,8 @@ export default function WelcomeSwipe() {
         setIsCliInstallModalOpen(true)
 
         try {
-            const result = await (
-                window.api as typeof window.api & {
-                    installIGRPCLI: () => Promise<{
-                        success: boolean
-                        output?: string
-                        error?: string
-                    }>
-                }
-            ).installIGRPCLI()
+            // Same IPC + main install path as the CLI update notification.
+            const result = await installIgrpCli()
             if (!result.success) {
                 setCliInstallError(result.error || 'Failed to install @igrp/cli.')
                 return
@@ -398,7 +395,7 @@ export default function WelcomeSwipe() {
                                                     Terminal -- igrp-cli
                                                 </span>
                                             </div>
-                                            <IGRPCopyTo value="npm install -g @igrp/cli --registry=https://sonatype.nosi.cv/repository/npm-group/" />
+                                            <IGRPCopyTo value={buildIgrpCliInstallCommand()} />
                                         </div>
                                         <div className="p-4 font-mono text-[11px] leading-relaxed text-slate-200">
                                             <div className="flex gap-2">

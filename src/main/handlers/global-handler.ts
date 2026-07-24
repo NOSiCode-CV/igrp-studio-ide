@@ -24,8 +24,8 @@ ipcMain.handle('check-igrp-cli', async () => {
     return checkIgrpCli()
 })
 
-ipcMain.handle('install-igrp-cli', async () => {
-    return installIgrpCli()
+ipcMain.handle('install-igrp-cli', async (_event, version?: string) => {
+    return installIgrpCli(typeof version === 'string' ? version : undefined)
 })
 
 // Save project icon file

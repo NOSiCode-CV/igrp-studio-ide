@@ -66,7 +66,9 @@ declare const api: {
         missing: boolean
         error?: string
     }>
-    installIGRPCLI: () => Promise<{ success: boolean; output?: string; error?: string }>
+    installIGRPCLI: (
+        version?: string
+    ) => Promise<{ success: boolean; output?: string; error?: string }>
     saveProjectIcon: (data: {
         filePath: string
         fileData: ArrayBuffer

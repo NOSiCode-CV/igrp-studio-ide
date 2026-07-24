@@ -91,8 +91,10 @@ const api = {
         missing: boolean
         error?: string
     }> => ipcRenderer.invoke('check-igrp-cli'),
-    installIGRPCLI: (): Promise<{ success: boolean; output?: string; error?: string }> =>
-        ipcRenderer.invoke('install-igrp-cli'),
+    installIGRPCLI: (
+        version?: string
+    ): Promise<{ success: boolean; output?: string; error?: string }> =>
+        ipcRenderer.invoke('install-igrp-cli', version),
 
     saveProjectIcon: (data: { filePath: string; fileData: ArrayBuffer; assetsPath: string }) =>
         ipcRenderer.invoke('save-project-icon', data),
