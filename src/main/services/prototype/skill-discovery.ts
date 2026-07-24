@@ -22,6 +22,7 @@ import { spawn } from 'node:child_process'
 import fs from 'node:fs'
 import { promises as fsp } from 'node:fs'
 import { join, normalize, relative } from 'node:path'
+import { buildIgrpCliInstallCommand } from '@shared/igrp-cli'
 
 const SKILLS_DIR = '.agents/skills'
 /** Companion-file paths exposed to the renderer. Anything outside this list
@@ -53,11 +54,39 @@ export interface InstalledSkill {
     /** Companion `.md` files in the same folder, alphabetically sorted. */
     companions: InstalledSkillCompanion[]
     /**
-     * Installed version, read from `skill.json` next to `SKILL.md`. `null`
-     * when the manifest is absent / malformed — caller treats that as
-     * "unknown, skip update check".
+     * Installed version used for update suggestions.
+     * Prefer `.agents/skills/.installed.json` (CLI ledger from
+     * `igrp skill add|update`) and fall back to `skill.json`. `null` when
+     * neither has a version — skip update check.
      */
     version: string | null
+}
+
+interface InstalledLedgerEntry {
+    version?: string
+}
+
+interface InstalledLedger {
+    skills?: Record<string, InstalledLedgerEntry>
+}
+
+/**
+ * Reads the CLI project ledger at `.agents/skills/.installed.json`.
+ * Same source of truth `igrp skill update` uses for version compares.
+ */
+async function readInstalledLedger(
+    basePath: string
+): Promise<Record<string, InstalledLedgerEntry>> {
+    const path = join(basePath, SKILLS_DIR, '.installed.json')
+    if (!fs.existsSync(path)) return {}
+    try {
+        const raw = await fsp.readFile(path, 'utf-8')
+        if (!raw.trim()) return {}
+        const parsed = JSON.parse(raw) as InstalledLedger
+        return parsed.skills && typeof parsed.skills === 'object' ? parsed.skills : {}
+    } catch {
+        return {}
+    }
 }
 
 /**
@@ -98,19 +127,24 @@ export async function listInstalledSkills(basePath: string): Promise<InstalledSk
     } catch {
         return []
     }
+    const ledger = await readInstalledLedger(basePath)
     const out: InstalledSkill[] = []
     for (const name of entries) {
         if (name.startsWith('.')) continue // skip `.installed.json` and friends
         const folderPath = join(skillsRoot, name)
         const stat = await fsp.stat(folderPath).catch(() => null)
         if (!stat?.isDirectory()) continue
-        const skill = await loadSkill(folderPath, name)
+        const skill = await loadSkill(folderPath, name, ledger[name]?.version)
         if (skill) out.push(skill)
     }
     return out.sort((a, b) => a.name.localeCompare(b.name))
 }
 
-async function loadSkill(folderPath: string, name: string): Promise<InstalledSkill | null> {
+async function loadSkill(
+    folderPath: string,
+    name: string,
+    ledgerVersion?: string
+): Promise<InstalledSkill | null> {
     const skillMdPath = join(folderPath, SKILL_MD)
     if (!fs.existsSync(skillMdPath)) return null
     let content: string
@@ -139,15 +173,16 @@ async function loadSkill(folderPath: string, name: string): Promise<InstalledSki
         }
     }
     companions.sort((a, b) => a.filename.localeCompare(b.filename))
-    const version = await readSkillJsonVersion(folderPath)
+    // Prefer CLI ledger — same version `igrp skill update` compares against.
+    const fromLedger =
+        typeof ledgerVersion === 'string' && ledgerVersion.trim() ? ledgerVersion.trim() : null
+    const version = fromLedger ?? (await readSkillJsonVersion(folderPath))
     return { name, folderPath, frontmatter, skillMdBody: body, companions, version }
 }
 
 /**
- * Reads `skill.json` next to `SKILL.md` and returns its `version` field.
- * Returns `null` when the file is missing, unparseable, or has no version —
- * we don't want to fail discovery just because a hand-authored skill lacks
- * a manifest.
+ * Fallback: reads `skill.json` next to `SKILL.md` when `.installed.json`
+ * has no entry (e.g. hand-authored skill folders).
  */
 async function readSkillJsonVersion(folderPath: string): Promise<string | null> {
     const path = join(folderPath, 'skill.json')
@@ -228,7 +263,7 @@ export async function installSkill(
             const msg = err instanceof Error ? err.message : String(err)
             resolve({
                 ok: false,
-                error: `Could not spawn \`igrp\` — is it on PATH? (${msg}). Install via: npm i -g @igrp/cli --registry=https://sonatype.nosi.cv/repository/npm-group/`
+                error: `Could not spawn \`igrp\` — is it on PATH? (${msg}). Install via: ${buildIgrpCliInstallCommand()}`
             })
             return
         }
@@ -245,7 +280,7 @@ export async function installSkill(
         proc.on('error', (err) => {
             resolve({
                 ok: false,
-                error: `\`igrp\` spawn failed: ${err.message}. Install via: npm i -g @igrp/cli --registry=https://sonatype.nosi.cv/repository/npm-group/`
+                error: `\`igrp\` spawn failed: ${err.message}. Install via: ${buildIgrpCliInstallCommand()}`
             })
         })
         proc.on('exit', (code) => {
@@ -321,8 +356,8 @@ export interface SkillUpdateInfo {
 
 /**
  * For every installed skill, ask the registry whether a newer version is
- * available. Returns one entry per installed skill — even when there's no
- * update — so the renderer can render a "checked at …" indicator.
+ * available. Installed versions come from `.installed.json` (via
+ * `listInstalledSkills`) — same ledger the CLI update command uses.
  *
  * Failure mode: a registry error is reported per-skill (`error` field) and
  * `hasUpdate` stays `false`. The caller renders no banner in that case
@@ -367,6 +402,7 @@ export async function checkSkillUpdates(basePath: string): Promise<SkillUpdateIn
         }
         const installedV = skill.version
         const latest = entry.latest
+        // Without a ledger/manifest version we cannot safely suggest an update.
         const hasUpdate = !!installedV && isNewerVersion(latest, installedV)
         return { name: skill.name, installed: installedV, latest, hasUpdate }
     })

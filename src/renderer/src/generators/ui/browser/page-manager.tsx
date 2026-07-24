@@ -26,6 +26,7 @@ import { CreateComponentModal } from '@renderer/generators/ui/browser/components
 import { CreatePageModal } from '@renderer/generators/ui/browser/components/create-page-modal'
 import { DuplicatePageModal } from '@renderer/generators/ui/browser/components/duplicate-page-modal'
 import { MovePageModal } from '@renderer/generators/ui/browser/components/move-page-modal'
+import { SkillProjectAlert } from '@renderer/generators/ui/browser/skill-project-alert'
 import useStudio from '@renderer/hooks/use-studio'
 import ProjectSettings from '@renderer/browser/project'
 import { getFileThree as onGetPages } from '@renderer/redux/thunks'
@@ -283,6 +284,8 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                 className="mb-4"
                 changelogContent={nextjsEngineChangelog}
             />
+
+            <SkillProjectAlert basePath={basePath} className="mb-4" />
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList>

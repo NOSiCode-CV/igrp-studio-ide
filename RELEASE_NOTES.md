@@ -1,39 +1,6 @@
-## 0.2.0-beta.16
+## 0.2.0-beta.18
 
-- feat(release): ship release notes inside the S3 update feed
-- fix(workspace): refresh projects list after delete/update
-- fix(workspace): make project deletion idempotent on registry/workspace desync
-- feat(ide): open project in file manager + safe PATH-aware IDE detection
-- feat(page-builder): table row subcomponent + recover master-only table UX
-- refactor(engine): delegate component-registry composition to engine beta.22
-- feat(file-metadata): add creation and modification timestamps to FileTree interface and update related components
-- feat(page-builder): droppable children in scrollArea/aspectRatio/overlay panels
-- feat(page-builder): Group B — canvas previews for composable engine components
-- feat(palette): translate component group labels + map missing engine groups
-- feat(page-builder): map 22 engine default components to canvas + palette icons
-- chore(deps): bump design-system to 0.1.0-beta.141 + adapt CSS consumption
-- fix(palette): clamp long component names in the UI-generator palette
-- feat(components): isolate custom/app components per project (nextjs-engine beta.20)
-- fix(palette): clamp long component names in the palette cards
-- i18n: add missing project-form keys (stages, specification, generator, ...)
-- fix(sidebar): stop double-translating labels + add customCode key
-- fix(page-builder): use COMPONENT.ProcessStepContent for BPMN process init
-- fix(docker): derive workspace slug from WORKSPACE_SLUG, not the folder name
-- fix(workspace): atomic registry writes + salvage corrupt registry
-- perf(services): stop per-card `docker compose ps` on the Services tab
-- perf(workspace): only show full-screen loader on first workspaces load
-- perf(projects-view): stop over-refetching on the projects view
-- fix(open-project): read correct base metadata fields & preserve project id
-- fix(workspace-create): allow digits in workspace slug
-- fix(project-create): align Next.js & Spring input validation with engine contract
-- fix(bpmn): update bpmn-editor styles import to dist/styles.css
-- fix(ui-generator): wrap long page-card titles instead of overflowing
-- fix(workspaces): Services overview polish — scroll, z-index, deps, ports, type detection
-- style(workspaces): match Services header height/padding with Projects
-- style(workspaces): tokenize Projects actions colors
-- style(workspaces): tokenize Services area colors
-- style(workspaces): align Services toolbar controls with Projects
-- style(workspaces): align Services header typography with Projects
-- fix(controller): use local Label after merge into dev
-- feat(graphql): add primary key support and operation improvements
-- feat(controller): add path variable and collection type selectors
+- feat(shared): enhance project structure with shared module and CLI installation improvements
+- feat(cli): implement IGRP CLI update checks and installation
+- Update @igrp/igrp-studio-nextjs-engine to version 0.2.0-beta.27 in package.json and yarn.lock
+- Update @igrp/igrp-studio-nextjs-engine to version 0.2.0-beta.25 in package.json and yarn.lock

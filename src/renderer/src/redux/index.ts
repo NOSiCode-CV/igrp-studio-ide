@@ -1,5 +1,6 @@
 import { combineReducers, type Reducer } from '@reduxjs/toolkit'
 import gitSlice, { type GitState } from './git/reducer'
+import notificationsReducer, { type NotificationsState } from './notifications/reducer'
 import PageBuilderReducer, { type StudioState } from './pageBuilder/reducer'
 import specDataReducer, { type SpecDataState } from './specData/reducer'
 import specDocsReducer, { type SpecDocsState } from './specDocs/reducer'
@@ -12,6 +13,7 @@ import specPrototypeManifestReducer, {
 export type RootState = {
     PageBuilder: StudioState
     git: GitState
+    notifications: NotificationsState
     specKB: SpecKBState
     specDocs: SpecDocsState
     specPrototype: SpecPrototypeState
@@ -22,6 +24,7 @@ export type RootState = {
 const rootReducer: Reducer<RootState> = combineReducers({
     PageBuilder: PageBuilderReducer,
     git: gitSlice,
+    notifications: notificationsReducer,
     specKB: specKBReducer,
     specDocs: specDocsReducer,
     specPrototype: specPrototypeReducer,
