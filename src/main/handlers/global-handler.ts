@@ -1,10 +1,10 @@
 import { ipcMain } from 'electron'
-import { exec } from 'node:child_process'
 import fs from 'fs'
 import path from 'path'
 import { EVENTS } from '../constants/events'
 import { IGRPStudioSettings } from '../helpers/igrp-studio-settings'
 import { DoctorService } from '../services/doctor-service'
+import { checkIgrpCli, installIgrpCli } from '../services/igrp-cli-service'
 import type { BPMNConfig, ToolCheck } from '../types'
 
 ipcMain.handle('theme:get', async () => {
@@ -20,38 +20,12 @@ ipcMain.handle('run-doctor-checks', async (): Promise<ToolCheck[]> => {
     return DoctorService.run()
 })
 
+ipcMain.handle('check-igrp-cli', async () => {
+    return checkIgrpCli()
+})
+
 ipcMain.handle('install-igrp-cli', async () => {
-    const command =
-        'npm install -g @igrp/cli --registry=https://sonatype.nosi.cv/repository/npm-group/'
-
-    try {
-        const result = await new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
-            exec(command, { timeout: 10 * 60 * 1000 }, (error, stdout, stderr) => {
-                if (error) {
-                    reject(
-                        new Error(
-                            stderr?.trim() ||
-                                stdout?.trim() ||
-                                error.message ||
-                                'Failed to install @igrp/cli'
-                        )
-                    )
-                    return
-                }
-                resolve({ stdout, stderr })
-            })
-        })
-
-        return {
-            success: true,
-            output: [result.stdout, result.stderr].filter(Boolean).join('\n').trim()
-        }
-    } catch (error) {
-        return {
-            success: false,
-            error: error instanceof Error ? error.message : 'Failed to install @igrp/cli'
-        }
-    }
+    return installIgrpCli()
 })
 
 // Save project icon file

@@ -84,6 +84,13 @@ const api = {
 
     runDoctorChecks: (): Promise<ToolCheck[]> => ipcRenderer.invoke('run-doctor-checks'),
     saveDoctorReport: (results) => ipcRenderer.invoke('save-doctor-report', results),
+    checkIGRPCLI: (): Promise<{
+        installed: string | null
+        latest: string | null
+        hasUpdate: boolean
+        missing: boolean
+        error?: string
+    }> => ipcRenderer.invoke('check-igrp-cli'),
     installIGRPCLI: (): Promise<{ success: boolean; output?: string; error?: string }> =>
         ipcRenderer.invoke('install-igrp-cli'),
 

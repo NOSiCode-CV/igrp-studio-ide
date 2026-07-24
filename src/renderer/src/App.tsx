@@ -6,6 +6,7 @@ import { ActiveThemeProvider } from './components/active-theme-provider'
 import { ThemeProvider } from './components/theme-provider'
 import { ProcessStudioClientProvider } from './features/bpmn'
 import { EngineCatalogProvider } from './features/engine-catalog'
+import { useIgrpCliUpdateCheck } from './hooks/useIgrpCliUpdateCheck'
 import rootReducer from './redux'
 import { subscribeToSpecDataChunks } from './redux/specData/thunks'
 import { subscribeDocsChanged } from './redux/specDocs/thunks'
@@ -55,6 +56,12 @@ if (typeof window !== 'undefined' && (window as any).specData) {
     subscribeToSpecDataChunks(store.dispatch)
 }
 
+/** Runs CLI update checks inside the Redux + i18n tree. */
+function IgrpCliUpdateWatcher(): null {
+    useIgrpCliUpdateCheck()
+    return null
+}
+
 const App = (): JSX.Element => {
     const [activeThemeValue, setActiveThemeValue] = useState<string>('igrp')
 
@@ -77,6 +84,7 @@ const App = (): JSX.Element => {
                         <React.Fragment>
                             <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
                                 <ActiveThemeProvider initialTheme={activeThemeValue}>
+                                    <IgrpCliUpdateWatcher />
                                     <Toaster richColors closeButton expand />
                                     <AppRoutes />
                                 </ActiveThemeProvider>

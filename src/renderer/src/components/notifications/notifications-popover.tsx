@@ -1,19 +1,28 @@
 import { Button } from '@renderer/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
 import { IGRPIcon } from '@igrp/igrp-framework-react-design-system'
+import {
+    CLI_UPDATE_NOTIFICATION_ID,
+    clearCliUpdateDismiss,
+    dismissCliUpdate
+} from '@renderer/hooks/useIgrpCliUpdateCheck'
+import useToast from '@renderer/hooks/useToast'
 import { cn } from '@renderer/lib/utils'
-import { Bell, Check, MoreHorizontal } from 'lucide-react'
-import type { JSX } from 'react'
+import {
+    markAllNotificationsRead,
+    markNotificationRead,
+    removeNotification,
+    type AppNotification,
+    type NotificationType
+} from '@renderer/redux/notifications/reducer'
+import {
+    selectNotifications,
+    selectUnreadNotificationCount
+} from '@renderer/redux/notifications/selectors'
+import { Bell, Check, Download, Loader2, X } from 'lucide-react'
+import { type JSX, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
-interface Notification {
-    id: string
-    title: string
-    message: string
-    timestamp: Date
-    read: boolean
-    type: 'info' | 'warning' | 'error' | 'success'
-}
+import { useDispatch, useSelector } from 'react-redux'
 
 interface NotificationsPopoverProps {
     className?: string
@@ -21,17 +30,17 @@ interface NotificationsPopoverProps {
 
 const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Element => {
     const { t } = useTranslation()
-
-    // Mock data - in real implementation, this would come from a state management system
-    const notifications: Notification[] = []
-    const unreadCount = notifications.filter((n) => !n.read).length
+    const dispatch = useDispatch()
+    const { showSuccessToast, showErrorToast } = useToast()
+    const notifications = useSelector(selectNotifications)
+    const unreadCount = useSelector(selectUnreadNotificationCount)
+    const [updatingId, setUpdatingId] = useState<string | null>(null)
 
     const markAllAsRead = (): void => {
-        // In real implementation, this would dispatch an action to mark all notifications as read
-        console.log('Mark all as read')
+        dispatch(markAllNotificationsRead())
     }
 
-    const getNotificationIcon = (type: Notification['type']): string => {
+    const getNotificationIcon = (type: NotificationType): string => {
         switch (type) {
             case 'success':
                 return 'CheckCircle'
@@ -45,7 +54,7 @@ const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Ele
         }
     }
 
-    const getNotificationColor = (type: Notification['type']): string => {
+    const getNotificationColor = (type: NotificationType): string => {
         switch (type) {
             case 'success':
                 return 'text-green-600'
@@ -56,6 +65,37 @@ const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Ele
             case 'info':
             default:
                 return 'text-blue-600'
+        }
+    }
+
+    const dismissNotification = (notification: AppNotification): void => {
+        if (notification.id === CLI_UPDATE_NOTIFICATION_ID && notification.meta?.latest) {
+            dismissCliUpdate(notification.meta.latest)
+        }
+        dispatch(removeNotification(notification.id))
+    }
+
+    const handleUpdateCli = async (notification: AppNotification): Promise<void> => {
+        if (!window.api?.installIGRPCLI) return
+        setUpdatingId(notification.id)
+        dispatch(markNotificationRead(notification.id))
+        try {
+            const result = await window.api.installIGRPCLI()
+            if (!result.success) {
+                showErrorToast(result.error || t('cliUpdateFailed'))
+                return
+            }
+            clearCliUpdateDismiss()
+            dispatch(removeNotification(notification.id))
+            showSuccessToast(
+                t('cliUpdateSuccess', {
+                    version: notification.meta?.latest ?? ''
+                })
+            )
+        } catch (error) {
+            showErrorToast(error instanceof Error ? error.message : t('cliUpdateFailed'))
+        } finally {
+            setUpdatingId(null)
         }
     }
 
@@ -102,63 +142,107 @@ const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Ele
                         </div>
                     ) : (
                         <div className="divide-y">
-                            {notifications.map((notification) => (
-                                <div
-                                    key={notification.id}
-                                    className={cn(
-                                        'p-4 hover:bg-muted/50 transition-colors',
-                                        !notification.read && 'bg-blue-50/50'
-                                    )}
-                                >
-                                    <div className="flex items-start gap-3">
-                                        <IGRPIcon
-                                            iconName={getNotificationIcon(notification.type)}
-                                            className={cn(
-                                                'w-5 h-5 mt-0.5 flex-shrink-0',
-                                                getNotificationColor(notification.type)
-                                            )}
-                                        />
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <div className="flex-1">
-                                                    <h5 className="text-sm font-medium text-foreground">
-                                                        {notification.title}
-                                                    </h5>
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        {notification.message}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground mt-2">
-                                                        {notification.timestamp.toLocaleTimeString()}
-                                                    </p>
-                                                </div>
-                                                <div className="flex items-center gap-1">
-                                                    {!notification.read && (
-                                                        <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
-                                                    )}
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-6 w-6 p-0"
-                                                    >
-                                                        <MoreHorizontal className="w-3 h-3" />
-                                                    </Button>
+                            {notifications.map((notification) => {
+                                const isUpdating = updatingId === notification.id
+                                return (
+                                    <div
+                                        key={notification.id}
+                                        className={cn(
+                                            'p-4 hover:bg-muted/50 transition-colors',
+                                            !notification.read &&
+                                                'bg-blue-50/50 dark:bg-blue-950/20'
+                                        )}
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <IGRPIcon
+                                                iconName={getNotificationIcon(notification.type)}
+                                                className={cn(
+                                                    'w-5 h-5 mt-0.5 flex-shrink-0',
+                                                    getNotificationColor(notification.type)
+                                                )}
+                                            />
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div className="flex-1">
+                                                        <h5 className="text-sm font-medium text-foreground">
+                                                            {notification.title}
+                                                        </h5>
+                                                        <p className="text-xs text-muted-foreground mt-1">
+                                                            {notification.message}
+                                                        </p>
+                                                        <p className="text-xs text-muted-foreground mt-2">
+                                                            {new Date(
+                                                                notification.timestamp
+                                                            ).toLocaleTimeString()}
+                                                        </p>
+                                                        {notification.action?.type ===
+                                                            'update-igrp-cli' && (
+                                                            <div className="mt-3 flex items-center gap-2">
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    className="h-7 text-xs"
+                                                                    disabled={isUpdating}
+                                                                    onClick={() =>
+                                                                        void handleUpdateCli(
+                                                                            notification
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {isUpdating ? (
+                                                                        <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                                                    ) : (
+                                                                        <Download className="w-3 h-3 mr-1" />
+                                                                    )}
+                                                                    {isUpdating
+                                                                        ? t('cliUpdating')
+                                                                        : t(
+                                                                              notification.action
+                                                                                  .labelKey ||
+                                                                                  'cliUpdateAction'
+                                                                          )}
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="ghost"
+                                                                    className="h-7 text-xs"
+                                                                    disabled={isUpdating}
+                                                                    onClick={() =>
+                                                                        dismissNotification(
+                                                                            notification
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {t('dismiss')}
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        {!notification.read && (
+                                                            <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+                                                        )}
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-6 w-6 p-0"
+                                                            title={t('dismiss')}
+                                                            onClick={() =>
+                                                                dismissNotification(notification)
+                                                            }
+                                                        >
+                                                            <X className="w-3 h-3" />
+                                                        </Button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
                     )}
                 </div>
-
-                {notifications.length > 0 && (
-                    <div className="border-t p-3">
-                        <Button variant="ghost" className="w-full text-sm">
-                            {t('viewAllNotifications')}
-                        </Button>
-                    </div>
-                )}
             </PopoverContent>
         </Popover>
     )
