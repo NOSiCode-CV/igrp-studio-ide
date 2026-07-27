@@ -44,7 +44,7 @@ export function PermissionList({
     }
 
     return (
-        <div className="overflow-hidden rounded-xl border border-border dark:border-slate-800/80">
+        <div className="min-w-0 max-w-full rounded-xl border border-border dark:border-slate-800/80">
             <Table>
                 <TableHeader>
                     <TableRow>

@@ -104,6 +104,13 @@ declare const engine: {
     createEnum: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    getPermissions: (engineType: string, basePath: string) => Promise<HandlerResponse>
+    savePermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    deletePermission: (
+        id: string,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>
     createPage: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     convertJsonSchema: (schema: unknown) => Promise<HandlerResponse>
     registry: (engineType: string) => Promise<HandlerResponse>

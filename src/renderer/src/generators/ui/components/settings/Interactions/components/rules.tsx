@@ -181,7 +181,7 @@ const Rules = ({
             return
         }
         const source = `${pageName ?? 'page'} / ${ruleContext.tag}`
-        ensureKeys(result.rule.permission ?? [], source)
+        void ensureKeys(result.rule.permission ?? [], source)
         touchRecent(result.rule.permission ?? [])
         const next = [...allRules]
         if (editor.index === null) next.push(result.rule)
@@ -456,172 +456,181 @@ const PermissionRuleEditor = ({
 
     return (
         <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-            <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
-                <DialogHeader>
-                    <div className="flex items-start justify-between gap-2">
-                        <div className="space-y-1">
-                            <DialogTitle>
-                                {t('permissionRuleEditor', 'Permission rule')}
-                            </DialogTitle>
-                            <DialogDescription>
-                                {t(
-                                    'permissionRuleEditorDesc',
-                                    'Gate this node by user permissions. Use bare suffixes (delete_invoice) or dept.suffix.'
-                                )}
-                            </DialogDescription>
-                        </div>
-                        <Button type="button" onClick={onSave}>
-                            {t('save', 'Save')}
-                        </Button>
-                    </div>
-                </DialogHeader>
-
-                {errors.length > 0 && (
-                    <ul className="text-sm text-destructive space-y-1 rounded border border-destructive/30 bg-destructive/5 p-2">
-                        {errors.map((err) => (
-                            <li key={err}>{err}</li>
-                        ))}
-                    </ul>
-                )}
-
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label>
-                            {t('permissions', 'Permissions')}
-                            <span className="text-destructive">*</span>
-                        </Label>
-                        <PermissionPicker
-                            value={permissions}
-                            suggestionContext={suggestionContext}
-                            onChange={(keys) => onChange({ ...draft, permission: keys })}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            {t(
-                                'permissionConventionHint',
-                                'Bare suffix resolves against the active org; use dept.suffix for cross-department.'
-                            )}
-                        </p>
-                    </div>
-
-                    {permissions.length >= 2 && (
-                        <div className="space-y-2">
-                            <Label>{t('permissionMatch', 'Match')}</Label>
-                            <RadioGroup
-                                value={draft.mode ?? 'all'}
-                                onValueChange={(value) =>
-                                    onChange({
-                                        ...draft,
-                                        mode: value as 'all' | 'any'
-                                    })
-                                }
-                                className="flex gap-4"
-                            >
-                                <div className="flex items-center gap-2">
-                                    <RadioGroupItem value="all" id="perm-mode-all" />
-                                    <Label htmlFor="perm-mode-all" className="font-normal">
-                                        {t('permissionMatchAll', 'All')}
-                                    </Label>
+            <DialogContent className="sm:max-w-lg gap-0 overflow-hidden p-0">
+                <ScrollArea className="max-h-[85vh]">
+                    <div className="space-y-4 p-6">
+                        <DialogHeader>
+                            <div className="flex items-start justify-between gap-2">
+                                <div className="space-y-1">
+                                    <DialogTitle>
+                                        {t('permissionRuleEditor', 'Permission rule')}
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        {t(
+                                            'permissionRuleEditorDesc',
+                                            'Gate this node by user permissions. Use bare suffixes (delete_invoice) or dept.suffix.'
+                                        )}
+                                    </DialogDescription>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <RadioGroupItem value="any" id="perm-mode-any" />
-                                    <Label htmlFor="perm-mode-any" className="font-normal">
-                                        {t('permissionMatchAny', 'Any')}
-                                    </Label>
-                                </div>
-                            </RadioGroup>
-                        </div>
-                    )}
+                                <Button type="button" onClick={onSave}>
+                                    {t('save', 'Save')}
+                                </Button>
+                            </div>
+                        </DialogHeader>
 
-                    <div className="space-y-2">
-                        <Label>{t('permissionAction', 'Action')}</Label>
-                        <Select value={action} onValueChange={(v) => setAction(v as typeof action)}>
-                            <SelectTrigger className="w-full">
-                                <SelectValue />
-                            </SelectTrigger>
-                            {/* popper avoids item-aligned onPlaced loops inside Dialog */}
-                            <SelectContent position="popper">
-                                <SelectItem value="hide">{t('permissionActionHide', 'Hide')}</SelectItem>
-                                <SelectItem value="disable">
-                                    {t('permissionActionDisable', 'Disable')}
-                                </SelectItem>
-                                <SelectItem value="replace">
-                                    {t('permissionActionReplace', 'Replace with…')}
-                                </SelectItem>
-                                <SelectItem value="assert" disabled={!isRootComponent}>
-                                    {t(
-                                        'permissionActionAssert',
-                                        'Assert (root only)'
-                                    )}
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                        {!isRootComponent && (
-                            <p className="text-xs text-muted-foreground">
-                                {t(
-                                    'permissionAssertRootHint',
-                                    'Assert is only available on page, component, or processStep roots.'
-                                )}
-                            </p>
-                        )}
-                    </div>
-
-                    {action === 'disable' && (
-                        <div className="space-y-2 rounded border p-3">
-                            <Label>{t('disabledProp', 'Bind to prop')}</Label>
-                            <Input
-                                list="disabled-prop-hints"
-                                value={draft.disabledProp ?? DEFAULT_DISABLED_PROP}
-                                onChange={(e) =>
-                                    onChange({
-                                        ...draft,
-                                        disabledProp: e.target.value
-                                    })
-                                }
-                                placeholder={DEFAULT_DISABLED_PROP}
-                            />
-                            <datalist id="disabled-prop-hints">
-                                {DISABLED_PROP_HINTS.map((hint) => (
-                                    <option key={hint} value={hint} />
+                        {errors.length > 0 && (
+                            <ul className="text-sm text-destructive space-y-1 rounded border border-destructive/30 bg-destructive/5 p-2">
+                                {errors.map((err) => (
+                                    <li key={err}>{err}</li>
                                 ))}
-                            </datalist>
-                            <p className="text-xs text-muted-foreground">
-                                {t(
-                                    'disabledPropHint',
-                                    'Defaults to disabled. Leave as default to keep JSON clean.'
-                                )}
-                            </p>
-                        </div>
-                    )}
+                            </ul>
+                        )}
 
-                    {action === 'replace' && (
-                        <div className="space-y-2 rounded border p-3">
-                            <Label>
-                                {t('fallbackLabel', 'Fallback label')}
-                                <span className="text-destructive">*</span>
-                            </Label>
-                            <Input
-                                value={fallbackLabel}
-                                onChange={(e) => applyFallbackLabel(e.target.value)}
-                                placeholder={t(
-                                    'fallbackLabelPlaceholder',
-                                    'e.g. Request approval'
-                                )}
-                            />
-                            <p className="text-xs text-muted-foreground">
-                                {t(
-                                    'fallbackM1Hint',
-                                    'M1: creates a simple disabled ghost button. Full fallback canvas comes in M2.'
-                                )}
-                            </p>
-                            {draft.fallback && (
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label>
+                                    {t('permissions', 'Permissions')}
+                                    <span className="text-destructive">*</span>
+                                </Label>
+                                <PermissionPicker
+                                    value={permissions}
+                                    suggestionContext={suggestionContext}
+                                    onChange={(keys) => onChange({ ...draft, permission: keys })}
+                                />
                                 <p className="text-xs text-muted-foreground">
-                                    {t('fallbackSet', 'Fallback set')}:{' '}
-                                    <code>{draft.fallback.componentName}</code>
+                                    {t(
+                                        'permissionConventionHint',
+                                        'Bare suffix resolves against the active org; use dept.suffix for cross-department.'
+                                    )}
                                 </p>
+                            </div>
+
+                            {permissions.length >= 2 && (
+                                <div className="space-y-2">
+                                    <Label>{t('permissionMatch', 'Match')}</Label>
+                                    <RadioGroup
+                                        value={draft.mode ?? 'all'}
+                                        onValueChange={(value) =>
+                                            onChange({
+                                                ...draft,
+                                                mode: value as 'all' | 'any'
+                                            })
+                                        }
+                                        className="flex gap-4"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <RadioGroupItem value="all" id="perm-mode-all" />
+                                            <Label htmlFor="perm-mode-all" className="font-normal">
+                                                {t('permissionMatchAll', 'All')}
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <RadioGroupItem value="any" id="perm-mode-any" />
+                                            <Label htmlFor="perm-mode-any" className="font-normal">
+                                                {t('permissionMatchAny', 'Any')}
+                                            </Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
+                            )}
+
+                            <div className="space-y-2">
+                                <Label>{t('permissionAction', 'Action')}</Label>
+                                <Select
+                                    value={action}
+                                    onValueChange={(v) => setAction(v as typeof action)}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    {/* popper avoids item-aligned onPlaced loops inside Dialog */}
+                                    <SelectContent position="popper">
+                                        <SelectItem value="hide">
+                                            {t('permissionActionHide', 'Hide')}
+                                        </SelectItem>
+                                        <SelectItem value="disable">
+                                            {t('permissionActionDisable', 'Disable')}
+                                        </SelectItem>
+                                        <SelectItem value="replace">
+                                            {t('permissionActionReplace', 'Replace with…')}
+                                        </SelectItem>
+                                        <SelectItem value="assert" disabled={!isRootComponent}>
+                                            {t(
+                                                'permissionActionAssert',
+                                                'Assert (root only)'
+                                            )}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                {!isRootComponent && (
+                                    <p className="text-xs text-muted-foreground">
+                                        {t(
+                                            'permissionAssertRootHint',
+                                            'Assert is only available on page, component, or processStep roots.'
+                                        )}
+                                    </p>
+                                )}
+                            </div>
+
+                            {action === 'disable' && (
+                                <div className="space-y-2 rounded border p-3">
+                                    <Label>{t('disabledProp', 'Bind to prop')}</Label>
+                                    <Input
+                                        list="disabled-prop-hints"
+                                        value={draft.disabledProp ?? DEFAULT_DISABLED_PROP}
+                                        onChange={(e) =>
+                                            onChange({
+                                                ...draft,
+                                                disabledProp: e.target.value
+                                            })
+                                        }
+                                        placeholder={DEFAULT_DISABLED_PROP}
+                                    />
+                                    <datalist id="disabled-prop-hints">
+                                        {DISABLED_PROP_HINTS.map((hint) => (
+                                            <option key={hint} value={hint} />
+                                        ))}
+                                    </datalist>
+                                    <p className="text-xs text-muted-foreground">
+                                        {t(
+                                            'disabledPropHint',
+                                            'Defaults to disabled. Leave as default to keep JSON clean.'
+                                        )}
+                                    </p>
+                                </div>
+                            )}
+
+                            {action === 'replace' && (
+                                <div className="space-y-2 rounded border p-3">
+                                    <Label>
+                                        {t('fallbackLabel', 'Fallback label')}
+                                        <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input
+                                        value={fallbackLabel}
+                                        onChange={(e) => applyFallbackLabel(e.target.value)}
+                                        placeholder={t(
+                                            'fallbackLabelPlaceholder',
+                                            'e.g. Request approval'
+                                        )}
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        {t(
+                                            'fallbackM1Hint',
+                                            'M1: creates a simple disabled ghost button. Full fallback canvas comes in M2.'
+                                        )}
+                                    </p>
+                                    {draft.fallback && (
+                                        <p className="text-xs text-muted-foreground">
+                                            {t('fallbackSet', 'Fallback set')}:{' '}
+                                            <code>{draft.fallback.componentName}</code>
+                                        </p>
+                                    )}
+                                </div>
                             )}
                         </div>
-                    )}
-                </div>
+                    </div>
+                </ScrollArea>
             </DialogContent>
         </Dialog>
     )

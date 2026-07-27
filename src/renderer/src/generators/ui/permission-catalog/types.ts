@@ -2,9 +2,11 @@ import type { PermissionRuleDefinition } from '@igrp/igrp-studio-nextjs-engine/t
 
 export interface PermissionCatalogEntry {
     id: string
+    /** Permission key — maps to engine `PermissionConfig.name`. */
     key: string
     label: string
     description?: string
+    enabled?: boolean
     usageCount: number
     sources?: string[]
     createdAt: string

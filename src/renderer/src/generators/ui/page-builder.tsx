@@ -275,10 +275,10 @@ const PageBuilder = forwardRef<PageBuilderRef, PageBuilderProps>(
         ])
 
         return (
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 min-w-0 overflow-hidden">
                 <AppSidebar data={menuItems} basePath={basePath} />
-                <SidebarInset>
-                    <div className="flex flex-1 flex-col gap-4 p-2">
+                <SidebarInset className="min-w-0">
+                    <div className="flex min-w-0 flex-1 flex-col gap-4 p-2">
                         <ContainerScrollArea>{renderContent}</ContainerScrollArea>
                     </div>
                 </SidebarInset>

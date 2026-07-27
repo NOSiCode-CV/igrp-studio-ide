@@ -304,6 +304,48 @@ const engine = {
         }
     },
 
+    getPermissions: async (engineType: string, basePath: string): Promise<HandlerResponse> => {
+        try {
+            return await ipcRenderer.invoke(EVENTS.ENGINE.GET_PERMISSIONS, engineType, basePath)
+        } catch (error) {
+            return handleError(error)
+        }
+    },
+
+    savePermission: async (
+        data: any,
+        engineType: string,
+        basePath: string
+    ): Promise<HandlerResponse> => {
+        try {
+            return await ipcRenderer.invoke(
+                EVENTS.ENGINE.SAVE_PERMISSION,
+                data,
+                engineType,
+                basePath
+            )
+        } catch (error) {
+            return handleError(error)
+        }
+    },
+
+    deletePermission: async (
+        id: string,
+        engineType: string,
+        basePath: string
+    ): Promise<HandlerResponse> => {
+        try {
+            return await ipcRenderer.invoke(
+                EVENTS.ENGINE.DELETE_PERMISSION,
+                id,
+                engineType,
+                basePath
+            )
+        } catch (error) {
+            return handleError(error)
+        }
+    },
+
     createPage: async (
         data: any,
         engineType: string,

@@ -163,7 +163,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
     )
 
     return (
-        <div className="w-full flex flex-col space-y-3 pt-2">
+        <div className="flex w-full min-w-0 max-w-full flex-col space-y-3 pt-2">
             {/* Always-visible entry point to manage columns in a large modal,
                 so editing does not depend on the cramped hover toolbars. */}
             {tableColumns.length > 0 && (
@@ -228,14 +228,14 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                         />
                         <Droppable
                             key={index}
-                            className="bg-card rounded-lg border border-dashed border-gray-400 group/table"
+                            className="group/table min-w-0 max-w-full rounded-lg border border-dashed border-gray-400 bg-card"
                             component={tableComp}
                             onDrop={onDragEnd}
                             path={componentName}
                         >
                             {columns.length > 0 && (
-                                <div className="relative overflow-hidden shadow-md sm:rounded-lg">
-                                    <Table className="w-full text-sm text-left rtl:text-right table-fixed">
+                                <div className="relative rounded-lg shadow-md">
+                                    <Table className="text-left text-sm rtl:text-right">
                                         <TableHeader>
                                             <TableRow>
                                                 {renderTableHeaders(compName, id, tableComp)}

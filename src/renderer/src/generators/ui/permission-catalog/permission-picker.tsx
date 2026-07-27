@@ -83,19 +83,17 @@ export function PermissionPicker({
         [suggestedKeys, catalog]
     )
 
-    const allEntries = useMemo(() => {
-        const seen = new Set<string>()
-        const ordered: PermissionCatalogEntry[] = []
-        for (const list of [suggestedEntries, recentEntries, catalog]) {
-            for (const e of list) {
-                if (!seen.has(e.key)) {
-                    seen.add(e.key)
-                    ordered.push(e)
-                }
-            }
-        }
-        return ordered
-    }, [catalog, recentEntries, suggestedEntries])
+    const pinnedKeys = useMemo(() => {
+        const keys = new Set<string>()
+        suggestedEntries.forEach((e) => keys.add(e.key))
+        recentEntries.forEach((e) => keys.add(e.key))
+        return keys
+    }, [suggestedEntries, recentEntries])
+
+    const remainingEntries = useMemo(
+        () => catalog.filter((e) => !pinnedKeys.has(e.key)),
+        [catalog, pinnedKeys]
+    )
 
     const toggle = (key: string) => {
         onChange(value.includes(key) ? value.filter((k) => k !== key) : [...value, key])
@@ -147,25 +145,14 @@ export function PermissionPicker({
                 >
                     <Command>
                         <CommandInput placeholder={t('searchPermissions', 'Search catalog…')} />
-                        <CommandList>
-                            <CommandEmpty>{t('noItemFound', 'No items found')}</CommandEmpty>
-                            {suggestedEntries.length > 0 && (
-                                <CommandGroup heading={t('suggestedPermissions', 'Suggested')}>
-                                    {suggestedEntries.map((entry) => (
-                                        <CatalogItem
-                                            key={entry.id}
-                                            entry={entry}
-                                            selected={value.includes(entry.key)}
-                                            onToggle={() => toggle(entry.key)}
-                                        />
-                                    ))}
-                                </CommandGroup>
-                            )}
-                            {recentEntries.length > 0 && (
-                                <>
-                                    <CommandSeparator />
-                                    <CommandGroup heading={t('recentPermissions', 'Recently used')}>
-                                        {recentEntries.map((entry) => (
+                        <ScrollArea className="h-72">
+                            <CommandList className="max-h-none overflow-visible">
+                                <CommandEmpty>{t('noItemFound', 'No items found')}</CommandEmpty>
+                                {suggestedEntries.length > 0 && (
+                                    <CommandGroup
+                                        heading={t('suggestedPermissions', 'Suggested')}
+                                    >
+                                        {suggestedEntries.map((entry) => (
                                             <CatalogItem
                                                 key={entry.id}
                                                 entry={entry}
@@ -174,22 +161,44 @@ export function PermissionPicker({
                                             />
                                         ))}
                                     </CommandGroup>
-                                </>
-                            )}
-                            <CommandSeparator />
-                            <CommandGroup heading={t('allPermissions', 'All permissions')}>
-                                <ScrollArea className="max-h-48">
-                                    {allEntries.map((entry) => (
-                                        <CatalogItem
-                                            key={`all-${entry.id}`}
-                                            entry={entry}
-                                            selected={value.includes(entry.key)}
-                                            onToggle={() => toggle(entry.key)}
-                                        />
-                                    ))}
-                                </ScrollArea>
-                            </CommandGroup>
-                        </CommandList>
+                                )}
+                                {recentEntries.length > 0 && (
+                                    <>
+                                        {suggestedEntries.length > 0 && <CommandSeparator />}
+                                        <CommandGroup
+                                            heading={t('recentPermissions', 'Recently used')}
+                                        >
+                                            {recentEntries.map((entry) => (
+                                                <CatalogItem
+                                                    key={entry.id}
+                                                    entry={entry}
+                                                    selected={value.includes(entry.key)}
+                                                    onToggle={() => toggle(entry.key)}
+                                                />
+                                            ))}
+                                        </CommandGroup>
+                                    </>
+                                )}
+                                {remainingEntries.length > 0 && (
+                                    <>
+                                        {(suggestedEntries.length > 0 ||
+                                            recentEntries.length > 0) && <CommandSeparator />}
+                                        <CommandGroup
+                                            heading={t('allPermissions', 'All permissions')}
+                                        >
+                                            {remainingEntries.map((entry) => (
+                                                <CatalogItem
+                                                    key={`all-${entry.id}`}
+                                                    entry={entry}
+                                                    selected={value.includes(entry.key)}
+                                                    onToggle={() => toggle(entry.key)}
+                                                />
+                                            ))}
+                                        </CommandGroup>
+                                    </>
+                                )}
+                            </CommandList>
+                        </ScrollArea>
                         <div className="border-t p-2">
                             <Button
                                 type="button"
@@ -210,8 +219,8 @@ export function PermissionPicker({
                 open={createOpen}
                 onOpenChange={setCreateOpen}
                 suggestionContext={suggestionContext}
-                onCreated={(input) => {
-                    const entry = addPermission(input)
+                onCreated={async (input) => {
+                    const entry = await addPermission(input)
                     handleCreated(entry.key)
                 }}
             />

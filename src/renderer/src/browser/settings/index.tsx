@@ -127,7 +127,7 @@ export function SettingsDialog({ triggerClassName }: { triggerClassName?: string
                                 </div>
                             </header>
 
-                            <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 pt-0">
+                            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                                 {data.nav.find((item) => item.name === activeItem)?.component ? (
                                     React.createElement(
                                         data.nav.find((item) => item.name === activeItem)!

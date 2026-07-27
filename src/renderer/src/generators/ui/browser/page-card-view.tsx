@@ -8,6 +8,7 @@ import {
     CollapsibleTrigger
 } from '@renderer/components/ui/collapsible'
 import { Separator } from '@renderer/components/ui/separator'
+import { browserCardClassName } from '@renderer/generators/ui/browser/browser-card-styles'
 import {
     PageActionMenu,
     PageTypeIcon
@@ -51,62 +52,61 @@ export function PageCardView({
     const hasChild = (components && components.length > 0) || (subPages && subPages.length > 0)
 
     return (
-        <Card className="">
-            <CardContent className="group">
+        <Card className={browserCardClassName('gap-0 py-4')}>
+            <CardContent className="group px-4">
                 <Collapsible
                     className="flex w-full flex-col gap-2 group/collapsible"
                     open={isOpen}
                     onOpenChange={setIsOpen}
                 >
                     <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-start min-w-0 flex-1">
+                        <div className="flex min-w-0 flex-1 items-start">
                             {hasChild && (
                                 <CollapsibleTrigger asChild>
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-5 w-5 p-0 mr-1 shrink-0"
+                                        className="mr-1 h-5 w-5 shrink-0 p-0 text-slate-400 hover:text-emerald-400"
                                     >
                                         <ChevronRight
                                             className={cn(
                                                 'transition-transform group-data-[state=open]/collapsible:rotate-90',
-                                                'text-purple-600'
+                                                'text-slate-500 group-hover:text-emerald-400'
                                             )}
                                         />
                                         <span className="sr-only">Toggle</span>
                                     </Button>
                                 </CollapsibleTrigger>
                             )}
-                            <div className="flex items-start gap-2 flex-1 min-w-0">
-                                <div className="flex items-center gap-1 shrink-0">
+                            <div className="flex min-w-0 flex-1 items-start gap-2">
+                                <div className="flex shrink-0 items-center gap-1">
                                     <PageTypeIcon
                                         isOpen={isOpen}
                                         compCount={components ? components.length : 0}
                                         page={page}
                                     />
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="font-medium text-sm break-words">
+                                <div className="min-w-0 flex-1">
+                                    <div className="break-words text-sm font-medium text-slate-100">
                                         {description || pageName}
                                     </div>
-                                    <div className="text-xs text-muted-foreground break-all">
+                                    <div className="break-all font-mono text-xs text-slate-400">
                                         /{pagePath}
                                         {!isPage && 'components'}
                                     </div>
                                     {page.modifiedAt ? (
-                                        <div className="text-xs text-muted-foreground">
+                                        <div className="text-[11px] text-slate-500">
                                             {formatFileDate(page.modifiedAt)}
                                         </div>
                                     ) : null}
-                                    {/* Show counts */}{' '}
                                     {subPages && subPages.length > 0 && (
-                                        <span className="text-xs text-purple-600 font-medium pr-2">
+                                        <span className="pr-2 text-xs font-medium text-emerald-400/80">
                                             {subPages.length} page
                                             {subPages.length !== 1 ? 's' : ''}
                                         </span>
                                     )}
                                     {components && components.length > 0 && (
-                                        <span className="text-xs text-purple-600 font-medium">
+                                        <span className="text-xs font-medium text-emerald-400/80">
                                             {components.length} component
                                             {components.length !== 1 ? 's' : ''}
                                         </span>
@@ -114,12 +114,11 @@ export function PageCardView({
                                 </div>
                             </div>
                         </div>
-                        {/** Main page */}
                         <div className="flex shrink-0 items-center justify-end">
-                            <div className="flex items-center gap-1 justify-end">
+                            <div className="flex items-center justify-end gap-1">
                                 <Badge
                                     variant={page.type === 'page' ? 'default' : 'secondary'}
-                                    className="text-xs h-5"
+                                    className="h-5 text-xs"
                                 >
                                     {page.type === 'page' ? 'P' : 'C'}
                                 </Badge>
@@ -140,28 +139,26 @@ export function PageCardView({
                     <CollapsibleContent className="flex flex-col gap-2">
                         {subPages && subPages.length > 0 && (
                             <>
-                                <Separator />
-
-                                <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
+                                <Separator className="bg-slate-800/60" />
+                                <div className="mb-1 flex items-center gap-1 text-xs font-medium text-emerald-400/80">
                                     <ComponentIcon className="h-3 w-3" />
                                     Pages
                                 </div>
                             </>
                         )}
 
-                        {/* subpages */}
                         {subPages && subPages.length > 0 && (
                             <div className="space-y-1">
                                 {subPages.map((subpage) => (
                                     <div
                                         key={subpage.name}
-                                        className="flex items-center justify-between text-xs p-1 rounded hover:bg-muted"
+                                        className="flex items-center justify-between rounded p-1 text-xs hover:bg-slate-800/60"
                                     >
-                                        <div className="flex items-center gap-1 flex-1 min-w-0">
-                                            <span className="truncate">
+                                        <div className="flex min-w-0 flex-1 items-center gap-1">
+                                            <span className="truncate text-slate-200">
                                                 {subpage.description || subpage.pageName}
                                             </span>
-                                            <span className="truncate text-muted-foreground">
+                                            <span className="truncate text-slate-500">
                                                 [{subpage.content?.path}]
                                             </span>
                                         </div>
@@ -180,23 +177,22 @@ export function PageCardView({
 
                         {components && components.length > 0 && (
                             <>
-                                <Separator />
-                                <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
+                                <Separator className="bg-slate-800/60" />
+                                <div className="mb-1 flex items-center gap-1 text-xs font-medium text-emerald-400/80">
                                     <ComponentIcon className="h-3 w-3" />
                                     Components
                                 </div>
                             </>
                         )}
-                        {/* Subcomponents */}
                         {components && components.length > 0 && (
                             <div className="space-y-1">
                                 {components.map((subpage) => (
                                     <div
                                         key={subpage.name}
-                                        className="flex items-center justify-between text-xs p-1 rounded hover:bg-muted"
+                                        className="flex items-center justify-between rounded p-1 text-xs hover:bg-slate-800/60"
                                     >
-                                        <div className="flex items-center gap-1 flex-1 min-w-0">
-                                            <span className="truncate">
+                                        <div className="flex min-w-0 flex-1 items-center gap-1">
+                                            <span className="truncate text-slate-200">
                                                 {subpage.description || subpage.pageName}
                                             </span>
                                         </div>

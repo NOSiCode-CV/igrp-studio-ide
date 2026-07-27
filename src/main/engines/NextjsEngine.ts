@@ -4,6 +4,8 @@ import type { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engin
 import {
     buildComponentRegistry,
     deleteElement,
+    deletePermission,
+    getPermissions,
     initCodeSnippets,
     initComponents,
     loadAppExports,
@@ -17,6 +19,7 @@ import {
     newProcessStep,
     registerComponents,
     resetComponents,
+    savePermission,
     setEngineConfiguration
 } from '@igrp/igrp-studio-nextjs-engine'
 import type {
@@ -28,6 +31,7 @@ import type {
     ComponentRegistrationConfig,
     DeleteConfig,
     PageConfig,
+    PermissionConfig,
     ProcessConfig,
     ProcessStepConfig
 } from '@igrp/igrp-studio-nextjs-engine/types'
@@ -145,5 +149,22 @@ export class NextjsEngine implements BaseEngine {
 
     async createProcessStep(step: ProcessStepConfig, basePath: string): Promise<void> {
         await newProcessStep(step, basePath)
+    }
+
+    async getPermissions(basePath: string): Promise<PermissionConfig[]> {
+        return getPermissions(basePath)
+    }
+
+    async savePermission(config: PermissionConfig, basePath: string): Promise<void> {
+        await savePermission(config, basePath)
+    }
+
+    /** Upsert — same as savePermission (engine API). */
+    async createPermission(config: PermissionConfig, basePath: string): Promise<void> {
+        await savePermission(config, basePath)
+    }
+
+    async deletePermission(id: string, basePath: string): Promise<void> {
+        await deletePermission(id, basePath)
     }
 }

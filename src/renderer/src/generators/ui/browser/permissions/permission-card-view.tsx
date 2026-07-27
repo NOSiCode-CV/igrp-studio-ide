@@ -1,6 +1,7 @@
 import {
     PermissionActionMenu
 } from '@renderer/generators/ui/browser/components/permission-actions'
+import { browserCardClassName } from '@renderer/generators/ui/browser/browser-card-styles'
 import type { PermissionCatalogEntry } from '@renderer/generators/ui/permission-catalog/types'
 import { cn } from '@renderer/lib/utils'
 import { formatFileDate } from '@renderer/utils'
@@ -36,8 +37,8 @@ export function PermissionCardView({
                 }
             }}
             className={cn(
-                'group relative flex min-h-[132px] cursor-pointer flex-col justify-between overflow-hidden rounded-xl border p-4 shadow-sm transition-all duration-200',
-                'border-slate-800/80 bg-[#121824] hover:border-slate-700 hover:bg-[#161f30]'
+                'group relative flex min-h-[132px] cursor-pointer flex-col justify-between overflow-hidden rounded-xl border p-4',
+                browserCardClassName()
             )}
         >
             <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500/0 transition-all duration-300 group-hover:bg-emerald-500/80" />

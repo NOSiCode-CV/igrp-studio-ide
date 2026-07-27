@@ -1,4 +1,13 @@
-import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from '@renderer/components/ui/alert-dialog'
 import { EmptyList } from '@renderer/components/empty-list'
 import { CreatePermissionDialog } from '@renderer/generators/ui/permission-catalog/create-permission-dialog'
 import { usePermissionCatalog } from '@renderer/generators/ui/permission-catalog/PermissionCatalogContext'
@@ -8,7 +17,7 @@ import useToast from '@renderer/hooks/useToast'
 import useStudio from '@renderer/hooks/use-studio'
 import { cn } from '@renderer/lib/utils'
 import { KeyRound, LayoutGrid, Plus, Search, TableIcon } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PermissionCardView } from './permission-card-view'
 import { PermissionList } from './permission-list'
@@ -18,9 +27,14 @@ export type PermissionStatusFilter = 'ALL' | 'IN_USE' | 'UNUSED'
 
 export function PermissionManager(): React.JSX.Element {
     const { t } = useTranslation()
-    const { showSuccessToast } = useToast()
+    const { showSuccessToast, showErrorToast } = useToast()
     const { config } = useStudio()
-    const { catalog, addPermission, updatePermission, deletePermission } = usePermissionCatalog()
+    const { catalog, addPermission, updatePermission, deletePermission, loading, refresh } =
+        usePermissionCatalog()
+
+    useEffect(() => {
+        void refresh()
+    }, [refresh])
 
     const suggestionContext = useMemo<PermissionKeySuggestionContext>(
         () => ({ projectName: config?.name }),
@@ -69,8 +83,22 @@ export function PermissionManager(): React.JSX.Element {
     )
 
     const confirmDelete = (): void => {
-        if (deleteTarget) deletePermission(deleteTarget.id)
+        if (!deleteTarget) return
+        const target = deleteTarget
+        const removeFromRules = target.usageCount > 0
         setDeleteTarget(null)
+        void deletePermission(target.id, { removeFromRules })
+            .then(() =>
+                showSuccessToast(
+                    removeFromRules
+                        ? t(
+                              'permissionDeletedAndCleaned',
+                              'Permission deleted and removed from rules'
+                          )
+                        : t('permissionDeleted', 'Permission deleted')
+                )
+            )
+            .catch((err) => showErrorToast(err instanceof Error ? err.message : String(err)))
     }
 
     const emptyState =
@@ -175,7 +203,11 @@ export function PermissionManager(): React.JSX.Element {
                 </div>
             </div>
 
-            {filtered.length === 0 ? (
+            {loading && catalog.length === 0 ? (
+                <p className="py-12 text-center text-sm text-slate-400">
+                    {t('loading', 'Loading…')}
+                </p>
+            ) : filtered.length === 0 ? (
                 emptyState
             ) : viewMode === 'card' ? (
                 <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
@@ -202,7 +234,10 @@ export function PermissionManager(): React.JSX.Element {
                 open={createOpen}
                 onOpenChange={setCreateOpen}
                 suggestionContext={suggestionContext}
-                onCreated={(input) => addPermission(input)}
+                onCreated={async (input) => {
+                    await addPermission(input)
+                    showSuccessToast(t('savedSuccessfully', { name: input.key }))
+                }}
             />
 
             <CreatePermissionDialog
@@ -212,25 +247,68 @@ export function PermissionManager(): React.JSX.Element {
                 initialKey={editing?.key ?? ''}
                 initialLabel={editing?.label ?? ''}
                 initialDescription={editing?.description ?? ''}
-                onCreated={(input) => {
+                onCreated={async (input) => {
                     if (editing) {
-                        updatePermission(editing.id, {
+                        await updatePermission(editing.id, {
                             key: input.key,
                             label: input.label,
                             description: input.description
                         })
+                        showSuccessToast(t('savedSuccessfully', { name: input.key }))
                     }
                     setEditing(null)
                 }}
             />
 
-            <AlertDialogDelete
-                isOpen={!!deleteTarget}
-                onClose={() => setDeleteTarget(null)}
-                onConfirm={confirmDelete}
-                hasTrigger={false}
-                recordId={deleteTarget?.key}
-            />
+            <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('areYouAbsolutelySure')}</AlertDialogTitle>
+                        <AlertDialogDescription asChild>
+                            <div className="space-y-2 text-sm text-muted-foreground">
+                                <p>
+                                    {t('confirmRemoveRecord')}{' '}
+                                    <code className="font-mono text-foreground">
+                                        {deleteTarget?.key}
+                                    </code>
+                                    ?
+                                </p>
+                                {deleteTarget && deleteTarget.usageCount > 0 && (
+                                    <div className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-amber-200">
+                                        <p className="font-medium text-amber-100">
+                                            {t(
+                                                'permissionDeleteInUseWarning',
+                                                'Used in {{count}} rule(s). Confirming will remove this key from those rules, then delete it from the catalog.',
+                                                { count: deleteTarget.usageCount }
+                                            )}
+                                        </p>
+                                        {(deleteTarget.sources?.length ?? 0) > 0 && (
+                                            <ul className="mt-2 list-disc space-y-0.5 pl-4 font-mono text-xs">
+                                                {deleteTarget.sources!.slice(0, 8).map((source) => (
+                                                    <li key={source}>{source}</li>
+                                                ))}
+                                                {deleteTarget.sources!.length > 8 && (
+                                                    <li>
+                                                        +{deleteTarget.sources!.length - 8} more
+                                                    </li>
+                                                )}
+                                            </ul>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete}>
+                            {deleteTarget && deleteTarget.usageCount > 0
+                                ? t('deleteAndCleanRules', 'Delete & clean rules')
+                                : t('continue')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }

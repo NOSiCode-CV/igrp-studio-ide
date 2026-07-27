@@ -50,11 +50,14 @@ export function PermissionActionMenu({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                     className="text-destructive"
-                    disabled={entry.usageCount > 0}
                     onClick={() => onDelete(entry)}
                 >
                     <Trash2 />
-                    <span>{t('delete')}</span>
+                    <span>
+                        {entry.usageCount > 0
+                            ? t('deletePermissionInUse', 'Delete (in use)…')
+                            : t('delete')}
+                    </span>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

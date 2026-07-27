@@ -27,9 +27,15 @@ import { CreatePageModal } from '@renderer/generators/ui/browser/components/crea
 import { DuplicatePageModal } from '@renderer/generators/ui/browser/components/duplicate-page-modal'
 import { MovePageModal } from '@renderer/generators/ui/browser/components/move-page-modal'
 import { SkillProjectAlert } from '@renderer/generators/ui/browser/skill-project-alert'
+import {
+    BROWSER_TAB_BADGE,
+    BROWSER_TAB_TRIGGER
+} from '@renderer/generators/ui/browser/browser-card-styles'
+import { usePermissionCatalog } from '@renderer/generators/ui/permission-catalog/PermissionCatalogContext'
 import useStudio from '@renderer/hooks/use-studio'
 import ProjectSettings from '@renderer/browser/project'
 import { getFileThree as onGetPages } from '@renderer/redux/thunks'
+import { cn } from '@renderer/lib/utils'
 import { FileCode, Key, LayoutGrid, Plus, Settings, TableIcon, Workflow } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -67,6 +73,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
     const dispatch: any = useDispatch()
 
     const { basePath, files, config: project } = useStudio()
+    const { catalog } = usePermissionCatalog()
 
     const [content, setContent] = useState<any>([])
     const [components, setComponents] = useState<any>([])
@@ -289,24 +296,32 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
             <SkillProjectAlert basePath={basePath} className="mb-4" />
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList>
-                    <TabsTrigger value="pages">
-                        <FileCode className="h-4 w-4 mr-2" />
-                        {t('pages')}
-                    </TabsTrigger>
-                    <TabsTrigger value="bpmn">
-                        <Workflow className="h-4 w-4 mr-2" />
-                        BPMN
-                    </TabsTrigger>
-                    <TabsTrigger value="permissions">
-                        <Key className="h-4 w-4 mr-2" />
-                        {t('permissionsManager', 'Permissions')}
-                    </TabsTrigger>
-                    <TabsTrigger value="settings">
-                        <Settings className="h-4 w-4 mr-2" />
-                        {t('settings')}
-                    </TabsTrigger>
-                </TabsList>
+                <div className="border-b border-slate-800/80 pb-3">
+                    <TabsList className="h-auto gap-1 bg-transparent p-0">
+                        <TabsTrigger value="pages" className={cn('group', BROWSER_TAB_TRIGGER)}>
+                            <FileCode className="mr-2 h-4 w-4" />
+                            {t('pages')}
+                            <span className={BROWSER_TAB_BADGE}>{filteredPages.length}</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="bpmn" className={cn('group', BROWSER_TAB_TRIGGER)}>
+                            <Workflow className="mr-2 h-4 w-4" />
+                            BPMN
+                            <span className={BROWSER_TAB_BADGE}>{bpmnProcesses.length}</span>
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="permissions"
+                            className={cn('group', BROWSER_TAB_TRIGGER)}
+                        >
+                            <Key className="mr-2 h-4 w-4" />
+                            {t('permissionsManager', 'Permissions')}
+                            <span className={BROWSER_TAB_BADGE}>{catalog.length}</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="settings" className={cn('group', BROWSER_TAB_TRIGGER)}>
+                            <Settings className="mr-2 h-4 w-4" />
+                            {t('settings')}
+                        </TabsTrigger>
+                    </TabsList>
+                </div>
                 <TabsContent value="pages" className="space-y-4 pt-3 group">
                     <>
                         <div className="flex justify-between">

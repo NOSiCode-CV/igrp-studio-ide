@@ -1341,10 +1341,10 @@
     tailwindcss "4.3.1"
     vaul "1.1.2"
 
-"@igrp/igrp-studio-nextjs-engine@0.2.0-beta.27":
-  version "0.2.0-beta.27"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.2.0-beta.27.tgz#cf53ab3616bd1f6d52947c1a76ddf93108c6429a"
-  integrity sha512-Jpk0R6/wBnFHCEJhOYH9fghyk3adPfve2T1dmS4WovCpAG3TC54jQnp3xHr7q0J10t4s2G922YDqUjw70H2DkQ==
+"@igrp/igrp-studio-nextjs-engine@0.2.0-beta.28":
+  version "0.2.0-beta.28"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.2.0-beta.28.tgz#4c7b543f368fe6931b7ac00e2f909e7c839fb0d0"
+  integrity sha512-kI84UYDqOTuN5/YSw/UbK89LwozDG+8CekApK4s4oFNannISCD18CdEIhnOfbNkYMhwhzy/XY106Vnq0ZA6kFA==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"

@@ -21,7 +21,7 @@ import type { CreatePermissionInput } from './types'
 interface CreatePermissionDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    onCreated: (input: CreatePermissionInput) => void
+    onCreated: (input: CreatePermissionInput) => void | Promise<void>
     title?: string
     initialKey?: string
     initialLabel?: string
@@ -52,6 +52,7 @@ export function CreatePermissionDialog({
     const [label, setLabel] = useState(initialLabel)
     const [description, setDescription] = useState('')
     const [error, setError] = useState('')
+    const [saving, setSaving] = useState(false)
 
     useEffect(() => {
         if (open) {
@@ -59,10 +60,11 @@ export function CreatePermissionDialog({
             setLabel(initialLabel || suggestion.label)
             setDescription(initialDescription)
             setError('')
+            setSaving(false)
         }
     }, [open, initialKey, initialLabel, initialDescription, suggestion.key, suggestion.label])
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const trimmedKey = key.trim()
         if (!trimmedKey) {
             setError(t('permissionKeyRequired', 'Permission key is required.'))
@@ -81,11 +83,20 @@ export function CreatePermissionDialog({
             setError(t('permissionLabelRequired', 'Label is required.'))
             return
         }
-        onCreated({
-            key: trimmedKey,
-            label: label.trim(),
-            description: description.trim() || undefined
-        })
+        setSaving(true)
+        setError('')
+        try {
+            await onCreated({
+                key: trimmedKey,
+                label: label.trim(),
+                description: description.trim() || undefined
+            })
+            onOpenChange(false)
+        } catch (err) {
+            setError(err instanceof Error ? err.message : String(err))
+        } finally {
+            setSaving(false)
+        }
     }
 
     return (
@@ -98,7 +109,7 @@ export function CreatePermissionDialog({
                     <DialogDescription>
                         {t(
                             'createPermissionDesc',
-                            'Adds to the project catalog (mock). Future: saved to .igrpstudio/permissions.json.'
+                            'Saves to .igrpstudio/permissions.json in the project.'
                         )}
                     </DialogDescription>
                 </DialogHeader>
@@ -150,8 +161,8 @@ export function CreatePermissionDialog({
                     <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                         {t('cancel', 'Cancel')}
                     </Button>
-                    <Button type="button" onClick={handleSave}>
-                        {t('save', 'Save')}
+                    <Button type="button" onClick={handleSave} disabled={saving}>
+                        {saving ? t('saving', 'Saving…') : t('save', 'Save')}
                     </Button>
                 </DialogFooter>
             </DialogContent>
