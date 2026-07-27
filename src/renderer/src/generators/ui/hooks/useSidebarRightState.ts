@@ -349,6 +349,26 @@ export function useSidebarRightState({ comp, parentComp, path }: UseSidebarRight
         [componentId, tempEditingComponent]
     )
 
+    /**
+     * Partial updates (interactions, rules, styles) must go through
+     * tempEditingComponent so the sync effect doesn't overwrite them with a
+     * stale snapshot. Empty `rules` omits the key from the node JSON.
+     */
+    const handlePartialComponentUpdate = useCallback(
+        (id: string, updates: Partial<StructuredComponent>) => {
+            if (!id) return
+            setTempEditingComponent((prev) => {
+                if (!prev || prev.id !== id) return prev
+                const next: StructuredComponent = { ...prev, ...updates }
+                if ('rules' in updates && (!updates.rules || updates.rules.length === 0)) {
+                    delete next.rules
+                }
+                return next
+            })
+        },
+        []
+    )
+
     // "Switch component" — convert the editing component to a same-group
     // sibling in place (keep id/tag/label + every value the target schema
     // accepts). Updating the store AND the editing selection makes the
@@ -407,16 +427,17 @@ export function useSidebarRightState({ comp, parentComp, path }: UseSidebarRight
         childformValues,
         columnsOptions,
         isLoading,
-        // dropped components passthroughs (for tabs that need them downstream)
-        handleUpdateChildComponent,
-        restData,
         // handlers
         handleComponentPropertyChange,
         handleChildPropertyChange,
         handleSelectState,
+        handlePartialComponentUpdate,
         handleTagChange,
         handleUseClientChange,
         resetTempData,
-        handleClose
+        handleClose,
+        // dropped components passthroughs (for tabs that need them downstream)
+        handleUpdateChildComponent,
+        restData
     }
 }

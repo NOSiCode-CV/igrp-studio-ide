@@ -43,6 +43,7 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
         switchTargets,
         handleSwitchComponent,
         handleUpdateChildComponent,
+        handlePartialComponentUpdate,
         restData,
         handleComponentPropertyChange,
         handleChildPropertyChange,
@@ -129,7 +130,12 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                                     <Interactions
                                         comp={tempEditingComponent}
                                         path={currentPath}
-                                        onInteranctionsChange={handleUpdateChildComponent}
+                                        isRootComponent={isRootComponent}
+                                        pageName={
+                                            (restData?.pageName as string | undefined) ??
+                                            (restData?.name as string | undefined)
+                                        }
+                                        onInteranctionsChange={handlePartialComponentUpdate}
                                         columnsOptions={columnsOptions}
                                     />
                                 </TabsContent>

@@ -1,4 +1,5 @@
 import { SidebarProvider } from '@renderer/components/ui/sidebar'
+import { PermissionCatalogProvider } from '@renderer/generators/ui/permission-catalog/PermissionCatalogContext'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
@@ -49,9 +50,11 @@ const Layout = (props: LayoutProps): React.JSX.Element => {
                     <Header config={config} basePath={basePath} />
 
                     <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">
-                        {React.cloneElement(props.children, {
-                            basePath: basePath
-                        })}
+                        <PermissionCatalogProvider>
+                            {React.cloneElement(props.children, {
+                                basePath: basePath
+                            })}
+                        </PermissionCatalogProvider>
                     </div>
                     <Footer />
                     <IntegratedTerminal />

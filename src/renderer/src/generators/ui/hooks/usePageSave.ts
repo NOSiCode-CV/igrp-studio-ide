@@ -8,6 +8,7 @@ import { ENV_TYPES } from '@renderer/constants/appConstants'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
 import type { StructuredLayout } from '@renderer/lib/dnd/types'
+import { sanitizeLayoutRules } from '@renderer/generators/ui/utils/permissionRules'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
@@ -111,19 +112,28 @@ export const usePageSave = ({
 
             const isBpmnProcess = restData.type === 'processStep'
 
-            console.log('Saving configuration:', restData)
+            const components = restData.components
+                ? sanitizeLayoutRules(restData.components as StructuredLayout)
+                : restData.components
+
+            const payload = {
+                ...restData,
+                components
+            }
+
+            console.log('Saving configuration:', payload)
 
             let error: unknown
 
             if (isBpmnProcess) {
                 const result = await window.engine.createProcessStep(
-                    restData,
+                    payload,
                     ENV_TYPES.NEXTJS,
                     basePath
                 )
                 error = result.error
             } else {
-                const result = await window.engine.createPage(restData, ENV_TYPES.NEXTJS, basePath)
+                const result = await window.engine.createPage(payload, ENV_TYPES.NEXTJS, basePath)
                 error = result.error
             }
 

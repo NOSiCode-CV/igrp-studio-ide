@@ -32,13 +32,15 @@ interface BranchSwitcherProps {
     onError?: (message: string) => void
     onSuccess?: (message: string) => void
     onBranchChange?: (branchName: string) => void
+    triggerClassName?: string
 }
 
 export function BranchSwitcher({
     projectPath,
     onError,
     onSuccess,
-    onBranchChange
+    onBranchChange,
+    triggerClassName
 }: BranchSwitcherProps) {
     const dispatch = useDispatch()
     const { t } = useTranslation()
@@ -103,8 +105,12 @@ export function BranchSwitcher({
         return (
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button variant={'outline'} onClick={handleInitGit} className="h-6 text-xs">
-                        <GitFork className="h-3 w-3" />
+                    <Button
+                        variant="outline"
+                        onClick={handleInitGit}
+                        className="h-8 rounded-full border-dashed px-3 text-xs"
+                    >
+                        <GitFork className="h-3.5 w-3.5" />
                         {t('initGit')}
                     </Button>
                 </TooltipTrigger>
@@ -154,10 +160,14 @@ export function BranchSwitcher({
 
     if (isLoading) {
         return (
-            <Button variant="outline" className="w-[250px] justify-between" disabled>
-                <GitBranch className="mr-2 h-4 w-4" />
+            <Button
+                variant="outline"
+                className="h-8 min-w-[120px] justify-between rounded-full px-3 text-xs"
+                disabled
+            >
+                <GitBranch className="mr-1.5 h-3.5 w-3.5 shrink-0" />
                 {t('loadingBranches')}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <ChevronsUpDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
             </Button>
         )
     }
@@ -166,14 +176,19 @@ export function BranchSwitcher({
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
-                    variant={'outline'}
+                    variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="h-6 text-xs space-x-1"
+                    className={cn(
+                        'h-8 max-w-[180px] justify-between gap-1 rounded-md px-2.5 py-1 text-xs font-medium shadow-none',
+                        triggerClassName
+                    )}
                 >
-                    <GitBranch className="h-3 w-3 " />
-                    <span>{activeBranch || t('selectBranch')}</span>
-                    <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+                    <GitBranch className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                    <span className="truncate font-mono font-medium">
+                        {activeBranch || t('selectBranch')}
+                    </span>
+                    <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[300px] p-0">

@@ -30,12 +30,13 @@ import { SkillProjectAlert } from '@renderer/generators/ui/browser/skill-project
 import useStudio from '@renderer/hooks/use-studio'
 import ProjectSettings from '@renderer/browser/project'
 import { getFileThree as onGetPages } from '@renderer/redux/thunks'
-import { FileCode, LayoutGrid, Plus, Settings, TableIcon, Workflow } from 'lucide-react'
+import { FileCode, Key, LayoutGrid, Plus, Settings, TableIcon, Workflow } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import type { FileTree } from 'src/main/types'
 import { BPMNManager } from './processes/bpmn-manager'
+import { PermissionManager } from './permissions/permission-manager'
 import { PageCardView } from './page-card-view'
 import { PageTable } from './page-table'
 
@@ -297,6 +298,10 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                         <Workflow className="h-4 w-4 mr-2" />
                         BPMN
                     </TabsTrigger>
+                    <TabsTrigger value="permissions">
+                        <Key className="h-4 w-4 mr-2" />
+                        {t('permissionsManager', 'Permissions')}
+                    </TabsTrigger>
                     <TabsTrigger value="settings">
                         <Settings className="h-4 w-4 mr-2" />
                         {t('settings')}
@@ -445,6 +450,9 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                         bpmnProcesses={bpmnProcesses}
                         basePath={basePath}
                     />
+                </TabsContent>
+                <TabsContent value="permissions" className="space-y-4 pt-3">
+                    <PermissionManager />
                 </TabsContent>
                 <TabsContent value="settings" className="space-y-4">
                     <ProjectSettings
