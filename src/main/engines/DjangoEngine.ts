@@ -83,6 +83,50 @@ export class DjangoEngine implements BaseEngine {
     }
 
     /**
+     * Selector universe for the API Designer. `@igrp/django-engine` publishes
+     * no `engineTypes` export (unlike the Spring/.NET packages), and the
+     * FETCH_SELECTORS handler resolves `engine.engineTypes?.(...)` — an absent
+     * method returns `undefined`, which crashes the Model editor's
+     * `selectors.find(...)` before the user can type anything. Publish the
+     * static universe here instead.
+     *
+     * ATTRIBUTE_TYPES mirrors the `Attribute.type` enum accepted by the
+     * engine's AJV model schema (dist/schema/modelConfig). GENERATION_TYPES is
+     * empty on purpose: Django PKs are AutoField, and the engine accepts an
+     * absent/empty generationType. The remaining keys exist so the (Django-
+     * unsupported) DTO/Controller editors degrade to empty dropdowns instead
+     * of crashing — saving there still fail-clears via notSupported().
+     */
+    async engineTypes(_module: string, _basePath: string): Promise<Array<Record<string, any>>> {
+        return [
+            {
+                ATTRIBUTE_TYPES: [
+                    'string',
+                    'text',
+                    'integer',
+                    'long',
+                    'decimal',
+                    'boolean',
+                    'date',
+                    'datetime',
+                    'timestamp',
+                    'email',
+                    'url',
+                    'uuid',
+                    'file',
+                    'binary',
+                    'json'
+                ]
+            },
+            { GENERATION_TYPES: [] },
+            { RELATIONSHIP_TYPES: ['OneToOne', 'OneToMany', 'ManyToOne', 'ManyToMany'] },
+            { SCHEMA_TYPES: [] },
+            { COLLECTION_TYPES: [] },
+            { METHODS: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] }
+        ]
+    }
+
+    /**
      * `@igrp/django-engine` backs only project scaffolding (`addBaseApi` →
      * `createProject`) and model generation (`addModel` → `createModel`). Every
      * other API Designer operation has no Django implementation in the package.

@@ -544,4 +544,22 @@ describe('Studio ↔ django-engine integration', () => {
             )
         }
     })
+
+    it('publishes the selector universe the API Designer needs (engineTypes)', async () => {
+        // FETCH_SELECTORS resolves `engine.engineTypes?.(...)`; without this
+        // method the Model editor receives `undefined` and crashes on
+        // `selectors.find(...)`. The engine package exports no engineTypes, so
+        // DjangoEngine publishes a static universe mirroring the AJV model
+        // schema in @igrp/django-engine.
+        const engine = new DjangoEngine()
+        const selectors = await engine.engineTypes('shared', '/tmp/django-selectors')
+
+        expect(Array.isArray(selectors)).toBe(true)
+        const attributeTypes = selectors.find((s) => 'ATTRIBUTE_TYPES' in s)?.ATTRIBUTE_TYPES
+        expect(attributeTypes).toEqual(
+            expect.arrayContaining(['string', 'integer', 'decimal', 'boolean', 'datetime', 'uuid'])
+        )
+        // Model editor also dereferences GENERATION_TYPES — must exist (may be empty).
+        expect(selectors.some((s) => 'GENERATION_TYPES' in s)).toBe(true)
+    })
 })
