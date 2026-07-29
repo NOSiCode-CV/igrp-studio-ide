@@ -1304,7 +1304,7 @@
 
 "@igrp/django-engine@file:../../django-engine/igrp-django-engine-0.1.0-alpha.2.tgz":
   version "0.1.0-alpha.2"
-  resolved "file:../../django-engine/igrp-django-engine-0.1.0-alpha.2.tgz#d0b359605ee584927956f565cd291644b9bb5d93"
+  resolved "file:../../django-engine/igrp-django-engine-0.1.0-alpha.2.tgz#a15523435fcbd371672121d41fb762054312b60a"
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
@@ -1315,7 +1315,7 @@
 
 "@igrp/dotnet-engine@file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-alpha.1-local.tgz":
   version "0.1.0-alpha.1"
-  resolved "file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-alpha.1-local.tgz#45ddbcd6285776778ef40710081acd371d378867"
+  resolved "file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-alpha.1-local.tgz#0874b7b084c1f622d76b03fd5fc55abd3dafea6f"
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
