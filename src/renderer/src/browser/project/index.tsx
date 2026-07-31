@@ -11,6 +11,8 @@ interface PageProps {
     project?: ProjectData
     className?: string
     hasTitle?: boolean
+    /** Compact layout for narrow sidebars (skips outer ContainerScrollArea). */
+    embedded?: boolean
 }
 
 interface SettingsRowProps {
@@ -18,16 +20,27 @@ interface SettingsRowProps {
     value: React.ReactNode
     description?: React.ReactNode
     onEdit?: () => void
+    compact?: boolean
 }
 
-function SettingsRow({ label, value, description, onEdit }: SettingsRowProps) {
+function SettingsRow({ label, value, description, onEdit, compact }: SettingsRowProps) {
     const { t } = useTranslation()
 
     return (
-        <div className="flex items-start justify-between py-4">
-            <div className="space-x-6 flex flex-1 items-center">
+        <div
+            className={cn(
+                'flex justify-between py-4',
+                compact ? 'flex-col items-start gap-1.5' : 'items-start'
+            )}
+        >
+            <div
+                className={cn(
+                    'flex flex-1',
+                    compact ? 'flex-col items-start gap-1' : 'items-center space-x-6'
+                )}
+            >
                 <p className="text-sm font-medium leading-none">{t(label)}</p>
-                <div className="flex items-center gap-2 text-muted-foreground">{value}</div>
+                <div className="flex items-center gap-2 break-all text-muted-foreground">{value}</div>
                 {description && <p className="text-sm text-muted-foreground">{description}</p>}
             </div>
             {onEdit && (
@@ -39,56 +52,69 @@ function SettingsRow({ label, value, description, onEdit }: SettingsRowProps) {
     )
 }
 
-export default function ProjectSettings({ project, className, hasTitle = true }: PageProps) {
+export default function ProjectSettings({
+    project,
+    className,
+    hasTitle = true,
+    embedded = false
+}: PageProps) {
     const { t } = useTranslation()
 
     if (!project) return null
     const { name, framework, config } = project
-    return (
-        <ContainerScrollArea>
-            <div className={cn('w-full max-w-3xl mx-auto space-y-8 p-6 mb-10', className)}>
-                {hasTitle && <h1 className="text-3xl font-semibold">{t('basic_settings')}</h1>}
 
-                <Card className="border-border/50">
-                    <CardHeader>
-                        <CardTitle>{t('general_info')}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-0 divide-y divide-border/50">
+    const content = (
+        <div
+            className={cn(
+                'w-full space-y-8',
+                embedded ? 'max-w-none space-y-4 p-3' : 'mx-auto mb-10 max-w-3xl p-6',
+                className
+            )}
+        >
+            {hasTitle && (
+                <h1 className={cn('font-semibold', embedded ? 'text-lg' : 'text-3xl')}>
+                    {t('basic_settings')}
+                </h1>
+            )}
+
+            <Card className="border-border/50">
+                <CardHeader className={cn(embedded && 'px-3 py-3')}>
+                    <CardTitle className={cn(embedded && 'text-sm')}>{t('general_info')}</CardTitle>
+                </CardHeader>
+                <CardContent
+                    className={cn(
+                        'space-y-0 divide-y divide-border/50',
+                        embedded && 'px-3 pb-3'
+                    )}
+                >
+                    <SettingsRow compact={embedded} label="project_name" value={name} />
+                    <SettingsRow
+                        compact={embedded}
+                        label="icon"
+                        value={
+                            <FrameworkIcon
+                                framework={framework as any}
+                                size={16}
+                                className="h-12 w-12 rounded-lg bg-muted p-2"
+                                alt={`${project.framework} logo`}
+                            />
+                        }
+                    />
+                    <SettingsRow compact={embedded} label="framework" value={framework} />
+                    {Object.keys(config || {}).map((key) => (
                         <SettingsRow
-                            label="project_name"
-                            value={name}
-                            onEdit={() => console.log(t('edit', { context: 'project_name' }))}
+                            key={key}
+                            compact={embedded}
+                            label={key}
+                            value={String(config[key] ?? '')}
                         />
-                        <SettingsRow
-                            label="icon"
-                            value={
-                                <FrameworkIcon
-                                    framework={framework as any}
-                                    size={16}
-                                    className="h-12 w-12 rounded-lg bg-muted p-2"
-                                    alt={`${project.framework} logo`}
-                                />
-                            }
-                            onEdit={() => console.log(t('edit', { context: 'icon' }))}
-                        />
-                        <SettingsRow
-                            label="framework"
-                            value={framework}
-                            onEdit={() => console.log(t('edit', { context: 'framework' }))}
-                        />
-                        {Object.keys(config).map((key) => {
-                            return (
-                                <SettingsRow
-                                    key={key}
-                                    label={key}
-                                    value={config[key]} // Access the value using the key
-                                    onEdit={() => console.log(t('edit', { context: key }))}
-                                />
-                            )
-                        })}
-                    </CardContent>
-                </Card>
-            </div>
-        </ContainerScrollArea>
+                    ))}
+                </CardContent>
+            </Card>
+        </div>
     )
+
+    if (embedded) return content
+
+    return <ContainerScrollArea>{content}</ContainerScrollArea>
 }

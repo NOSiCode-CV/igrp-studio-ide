@@ -21,11 +21,13 @@ import { useSidebar } from '@renderer/components/ui/sidebar'
 import FileExplorerIGRPSidebar from '@renderer/components/fileExplorer'
 import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits'
 import { cn } from '@renderer/lib/utils'
+import { leaveStudioProject } from '@renderer/redux/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import { filterSubItems } from '@renderer/utils'
 import { ChevronRight, FileText, GitBranch, Home, Server } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import type { MenuItem, ProjectData } from 'src/main/types'
 import { AppSidebarHeader } from './app-sidebar-header'
@@ -47,6 +49,8 @@ export function AppIGRPSidebar({
     header
 }: AppIGRPSidebarProps): React.ReactNode {
     const { t } = useTranslation()
+    const dispatch: any = useDispatch()
+    const navigate = useNavigate()
     const { setOpen } = useSidebar()
     const { state: sidebarState } = useSidebar()
     const [searchQuery, setSearchQuery] = useState('')
@@ -62,6 +66,12 @@ export function AppIGRPSidebar({
         }
         return []
     }, [activeMenuGroup, menuApp, t])
+
+    const goHome = (event?: React.MouseEvent): void => {
+        event?.preventDefault()
+        dispatch(leaveStudioProject())
+        navigate(ROUTES.PATH_IDE_INITIAL_SCREEN)
+    }
 
     const handleSearch = (value: string): void => {
         setSearchQuery(value)
@@ -107,7 +117,11 @@ export function AppIGRPSidebar({
                                     asChild
                                     className="md:h-8 md:p-0 items-center justify-center"
                                 >
-                                    <a href={ROUTES.HOME}>
+                                    <a
+                                        href={ROUTES.PATH_IDE_INITIAL_SCREEN}
+                                        onClick={goHome}
+                                        title={t('backToHome', 'Voltar ao início')}
+                                    >
                                         <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                             <Home className="size-4" />
                                         </div>

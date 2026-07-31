@@ -8,7 +8,6 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger
 } from '@renderer/components/ui/dropdown-menu'
-import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { cn } from '@renderer/lib/utils'
 import { getLabel } from '@renderer/utils'
 import React from 'react'
@@ -64,38 +63,36 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                         return (
                             <React.Fragment key={value}>
                                 {items && typeof items === 'object' && !Array.isArray(items) ? (
-                                    // When items is an object (like your example)
+                                    // Categorized types: Data Types → Category → Type (3 levels, horizontal)
                                     <DropdownMenuSub>
                                         <DropdownMenuSubTrigger>{label}</DropdownMenuSubTrigger>
-                                        <DropdownMenuSubContent className="min-w-50">
-                                            <ScrollArea>
-                                                <div className="max-h-[60svh]">
-                                                    {Object.entries(items).map(
-                                                        ([category, subItems]) => (
-                                                            <React.Fragment key={category}>
-                                                                <DropdownMenuItem disabled>
-                                                                    {getLabel(category)}
-                                                                </DropdownMenuItem>
-                                                                {(subItems as string[]).map(
-                                                                    (subItemValue, key) => (
-                                                                        <DropdownMenuItem
-                                                                            key={key}
-                                                                            onClick={() =>
-                                                                                onTypeChange({
-                                                                                    type: value,
-                                                                                    value: subItemValue
-                                                                                } as any)
-                                                                            }
-                                                                        >
-                                                                            {getLabel(subItemValue)}
-                                                                        </DropdownMenuItem>
-                                                                    )
-                                                                )}
-                                                            </React.Fragment>
-                                                        )
-                                                    )}
-                                                </div>
-                                            </ScrollArea>
+                                        <DropdownMenuSubContent className="min-w-40 max-h-[60svh] overflow-y-auto">
+                                            {Object.entries(items).map(
+                                                ([category, subItems]) => (
+                                                    <DropdownMenuSub key={category}>
+                                                        <DropdownMenuSubTrigger>
+                                                            {getLabel(category)}
+                                                        </DropdownMenuSubTrigger>
+                                                        <DropdownMenuSubContent className="min-w-40 max-h-[60svh] overflow-y-auto">
+                                                            {(subItems as string[]).map(
+                                                                (subItemValue, key) => (
+                                                                    <DropdownMenuItem
+                                                                        key={key}
+                                                                        onClick={() =>
+                                                                            onTypeChange({
+                                                                                type: value,
+                                                                                value: subItemValue
+                                                                            } as any)
+                                                                        }
+                                                                    >
+                                                                        {getLabel(subItemValue)}
+                                                                    </DropdownMenuItem>
+                                                                )
+                                                            )}
+                                                        </DropdownMenuSubContent>
+                                                    </DropdownMenuSub>
+                                                )
+                                            )}
                                         </DropdownMenuSubContent>
                                     </DropdownMenuSub>
                                 ) : items && Array.isArray(items) && items.length > 0 ? (
@@ -103,25 +100,23 @@ export const TypeSelectorDropdown: React.FC<TypeSelectorDropdownProps> = ({
                                     <DropdownMenuSub>
                                         <DropdownMenuSubTrigger>{label}</DropdownMenuSubTrigger>
                                         <DropdownMenuSubContent className="min-w-50">
-                                            <ScrollArea>
-                                                <div className="max-h-[60svh]">
-                                                    {items.map((subItem, key) => (
-                                                        <DropdownMenuItem
-                                                            key={key}
-                                                            onClick={() =>
-                                                                onTypeChange({
-                                                                    type: value,
-                                                                    value: subItem.value,
-                                                                    module: subItem.module
-                                                                } as any)
-                                                            }
-                                                        >
-                                                            {renderIcon(subItem)}
-                                                            {subItem.label}
-                                                        </DropdownMenuItem>
-                                                    ))}
-                                                </div>
-                                            </ScrollArea>
+                                            <div className="max-h-[60svh] overflow-y-auto">
+                                                {items.map((subItem, key) => (
+                                                    <DropdownMenuItem
+                                                        key={key}
+                                                        onClick={() =>
+                                                            onTypeChange({
+                                                                type: value,
+                                                                value: subItem.value,
+                                                                module: subItem.module
+                                                            } as any)
+                                                        }
+                                                    >
+                                                        {renderIcon(subItem)}
+                                                        {subItem.label}
+                                                    </DropdownMenuItem>
+                                                ))}
+                                            </div>
                                         </DropdownMenuSubContent>
                                     </DropdownMenuSub>
                                 ) : (

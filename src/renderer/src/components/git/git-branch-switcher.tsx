@@ -184,7 +184,7 @@ export function BranchSwitcher({
                         triggerClassName
                     )}
                 >
-                    <GitBranch className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                    <GitBranch className="h-3.5 w-3.5 shrink-0 text-primary" />
                     <span className="truncate font-mono font-medium">
                         {activeBranch || t('selectBranch')}
                     </span>

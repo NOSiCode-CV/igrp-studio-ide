@@ -13,10 +13,11 @@ import {
     PageActionMenu,
     PageTypeIcon
 } from '@renderer/generators/ui/browser/components/page-actions'
+import { getRouteGroup } from '@renderer/generators/ui/components/settings/properties/route-parser'
 import { cn } from '@renderer/lib/utils'
 import { formatFileDate } from '@renderer/utils'
 import { ChevronRight, ComponentIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { PageDefinition } from './page-manager'
 
 export interface PageCardProps {
@@ -31,6 +32,7 @@ export interface PageCardProps {
     onCreateScopedComponent?: (page: PageDefinition) => void
     onMove?: (page: PageDefinition) => void
     setIsSubPage: (isSubPage: boolean) => void
+    defaultOpen?: boolean
 }
 
 export function PageCardView({
@@ -44,15 +46,21 @@ export function PageCardView({
     onDuplicate,
     onCreateScopedComponent,
     onMove,
-    setIsSubPage
+    setIsSubPage,
+    defaultOpen = false
 }: PageCardProps) {
     const { isPage, description, pageName, pagePath } = page
-    const [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(defaultOpen)
+    const routeGroup = getRouteGroup(pagePath)
+
+    useEffect(() => {
+        if (defaultOpen) setIsOpen(true)
+    }, [defaultOpen])
 
     const hasChild = (components && components.length > 0) || (subPages && subPages.length > 0)
 
     return (
-        <Card className={browserCardClassName('gap-0 py-4')}>
+        <Card className={browserCardClassName('h-full gap-0 overflow-hidden py-4')}>
             <CardContent className="group px-4">
                 <Collapsible
                     className="flex w-full flex-col gap-2 group/collapsible"
@@ -60,18 +68,18 @@ export function PageCardView({
                     onOpenChange={setIsOpen}
                 >
                     <div className="flex items-start justify-between gap-2">
-                        <div className="flex min-w-0 flex-1 items-start">
+                        <div className="flex min-w-0 flex-1 items-start overflow-hidden">
                             {hasChild && (
                                 <CollapsibleTrigger asChild>
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="mr-1 h-5 w-5 shrink-0 p-0 text-slate-400 hover:text-emerald-400"
+                                        className="mr-1 h-5 w-5 shrink-0 p-0 text-muted-foreground hover:text-primary"
                                     >
                                         <ChevronRight
                                             className={cn(
                                                 'transition-transform group-data-[state=open]/collapsible:rotate-90',
-                                                'text-slate-500 group-hover:text-emerald-400'
+                                                'text-muted-foreground group-hover:text-primary'
                                             )}
                                         />
                                         <span className="sr-only">Toggle</span>
@@ -86,27 +94,38 @@ export function PageCardView({
                                         page={page}
                                     />
                                 </div>
-                                <div className="min-w-0 flex-1">
-                                    <div className="break-words text-sm font-medium text-slate-100">
+                                <div className="min-w-0 flex-1 overflow-hidden">
+                                    {routeGroup ? (
+                                        <div className="mb-0.5 truncate font-mono text-[10px] font-medium text-primary">
+                                            ({routeGroup})
+                                        </div>
+                                    ) : null}
+                                    <div
+                                        className="truncate text-sm font-medium text-foreground"
+                                        title={description || pageName}
+                                    >
                                         {description || pageName}
                                     </div>
-                                    <div className="break-all font-mono text-xs text-slate-400">
+                                    <div
+                                        className="truncate font-mono text-xs text-muted-foreground"
+                                        title={`/${pagePath}${!isPage ? 'components' : ''}`}
+                                    >
                                         /{pagePath}
                                         {!isPage && 'components'}
                                     </div>
                                     {page.modifiedAt ? (
-                                        <div className="text-[11px] text-slate-500">
+                                        <div className="truncate text-[11px] text-muted-foreground">
                                             {formatFileDate(page.modifiedAt)}
                                         </div>
                                     ) : null}
                                     {subPages && subPages.length > 0 && (
-                                        <span className="pr-2 text-xs font-medium text-emerald-400/80">
+                                        <span className="pr-2 text-xs font-medium text-primary">
                                             {subPages.length} page
                                             {subPages.length !== 1 ? 's' : ''}
                                         </span>
                                     )}
                                     {components && components.length > 0 && (
-                                        <span className="text-xs font-medium text-emerald-400/80">
+                                        <span className="text-xs font-medium text-primary">
                                             {components.length} component
                                             {components.length !== 1 ? 's' : ''}
                                         </span>
@@ -139,8 +158,8 @@ export function PageCardView({
                     <CollapsibleContent className="flex flex-col gap-2">
                         {subPages && subPages.length > 0 && (
                             <>
-                                <Separator className="bg-slate-800/60" />
-                                <div className="mb-1 flex items-center gap-1 text-xs font-medium text-emerald-400/80">
+                                <Separator />
+                                <div className="mb-1 flex items-center gap-1 text-xs font-medium text-primary">
                                     <ComponentIcon className="h-3 w-3" />
                                     Pages
                                 </div>
@@ -152,13 +171,13 @@ export function PageCardView({
                                 {subPages.map((subpage) => (
                                     <div
                                         key={subpage.name}
-                                        className="flex items-center justify-between rounded p-1 text-xs hover:bg-slate-800/60"
+                                        className="flex items-center justify-between rounded p-1 text-xs hover:bg-accent"
                                     >
                                         <div className="flex min-w-0 flex-1 items-center gap-1">
-                                            <span className="truncate text-slate-200">
+                                            <span className="truncate text-foreground">
                                                 {subpage.description || subpage.pageName}
                                             </span>
-                                            <span className="truncate text-slate-500">
+                                            <span className="truncate text-muted-foreground">
                                                 [{subpage.content?.path}]
                                             </span>
                                         </div>
@@ -177,8 +196,8 @@ export function PageCardView({
 
                         {components && components.length > 0 && (
                             <>
-                                <Separator className="bg-slate-800/60" />
-                                <div className="mb-1 flex items-center gap-1 text-xs font-medium text-emerald-400/80">
+                                <Separator />
+                                <div className="mb-1 flex items-center gap-1 text-xs font-medium text-primary">
                                     <ComponentIcon className="h-3 w-3" />
                                     Components
                                 </div>
@@ -189,10 +208,10 @@ export function PageCardView({
                                 {components.map((subpage) => (
                                     <div
                                         key={subpage.name}
-                                        className="flex items-center justify-between rounded p-1 text-xs hover:bg-slate-800/60"
+                                        className="flex items-center justify-between rounded p-1 text-xs hover:bg-accent"
                                     >
                                         <div className="flex min-w-0 flex-1 items-center gap-1">
-                                            <span className="truncate text-slate-200">
+                                            <span className="truncate text-foreground">
                                                 {subpage.description || subpage.pageName}
                                             </span>
                                         </div>

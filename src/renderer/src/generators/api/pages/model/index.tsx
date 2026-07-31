@@ -128,15 +128,6 @@ const ModelLayout = ({ selectors, currentItem, onCloseTab }: ModelProps): React.
                                     <Label htmlFor="Crud">{t('crud')}</Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <Checkbox id="graphql" disabled />
-                                    <Label htmlFor="graphql">
-                                        {t('graphql')}
-                                        <span className="ml-2 text-xs text-muted-foreground">
-                                            ({t('comingSoon')})
-                                        </span>
-                                    </Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
                                     <Checkbox id="odata" disabled />
                                     <Label htmlFor="odata">
                                         {t('odata')}

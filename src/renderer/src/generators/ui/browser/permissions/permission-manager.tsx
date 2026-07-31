@@ -124,13 +124,13 @@ export function PermissionManager(): React.JSX.Element {
 
     return (
         <div className="space-y-5">
-            <div className="flex justify-between gap-4 border-b border-slate-800/80 pb-4">
+            <div className="flex justify-between gap-4 border-b border-border pb-4">
                 <div className="min-w-0 shrink-0">
-                    <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-white">
-                        <KeyRound className="h-5 w-5 text-emerald-400" />
+                    <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-foreground">
+                        <KeyRound className="h-5 w-5 text-primary" />
                         {t('permissionLists', 'Permission catalog')}
                     </h2>
-                    <p className="mt-0.5 font-mono text-xs text-slate-400">
+                    <p className="mt-0.5 font-mono text-xs text-muted-foreground">
                         {catalog.length}{' '}
                         {catalog.length === 1
                             ? t('permissionSingular', 'permission')
@@ -141,13 +141,13 @@ export function PermissionManager(): React.JSX.Element {
 
                 <div className="flex flex-wrap items-center justify-end gap-2.5">
                     <div className="relative min-w-[220px]">
-                        <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
+                        <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                         <input
                             type="text"
                             placeholder={t('searchPermissions', 'Search catalog…')}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-lg border border-slate-800 bg-slate-900/90 py-1.5 pl-9 pr-3 text-xs text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            className="w-full rounded-lg border border-input bg-background py-1.5 pl-9 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                         />
                     </div>
 
@@ -156,14 +156,14 @@ export function PermissionManager(): React.JSX.Element {
                         onChange={(e) =>
                             setStatusFilter(e.target.value as PermissionStatusFilter)
                         }
-                        className="cursor-pointer rounded-lg border border-slate-800 bg-slate-900/90 px-3 py-1.5 text-xs text-slate-300 focus:border-emerald-500 focus:outline-none"
+                        className="cursor-pointer rounded-lg border border-input bg-background px-3 py-1.5 text-xs text-foreground focus:border-ring focus:outline-none"
                     >
                         <option value="ALL">{t('permissionStatusAll', 'All status')}</option>
                         <option value="IN_USE">{t('permissionFilterUsed', 'In use')}</option>
                         <option value="UNUSED">{t('permissionFilterUnused', 'Unused')}</option>
                     </select>
 
-                    <div className="flex items-center rounded-lg border border-slate-800 bg-slate-900/90 p-0.5">
+                    <div className="flex items-center rounded-lg border border-border bg-muted/40 p-0.5">
                         <button
                             type="button"
                             title={t('cardView', 'Card view')}
@@ -171,8 +171,8 @@ export function PermissionManager(): React.JSX.Element {
                             className={cn(
                                 'rounded-md p-1.5 transition-all',
                                 viewMode === 'card'
-                                    ? 'bg-slate-800 text-emerald-400 shadow-sm'
-                                    : 'text-slate-400 hover:text-white'
+                                    ? 'bg-background text-primary shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground'
                             )}
                         >
                             <LayoutGrid className="h-3.5 w-3.5" />
@@ -184,8 +184,8 @@ export function PermissionManager(): React.JSX.Element {
                             className={cn(
                                 'rounded-md p-1.5 transition-all',
                                 viewMode === 'table'
-                                    ? 'bg-slate-800 text-emerald-400 shadow-sm'
-                                    : 'text-slate-400 hover:text-white'
+                                    ? 'bg-background text-primary shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground'
                             )}
                         >
                             <TableIcon className="h-3.5 w-3.5" />
@@ -195,7 +195,7 @@ export function PermissionManager(): React.JSX.Element {
                     <button
                         type="button"
                         onClick={() => setCreateOpen(true)}
-                        className="flex cursor-pointer items-center gap-1.5 rounded-md bg-emerald-500 px-3.5 py-1.5 text-xs font-semibold text-slate-950 shadow-md shadow-emerald-500/10 transition-colors hover:bg-emerald-600 active:scale-95"
+                        className="flex cursor-pointer items-center gap-1.5 rounded-md bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 active:scale-95"
                     >
                         <Plus className="h-4 w-4 stroke-[2.5]" />
                         {t('permissionAddKey', 'Add Key')}
@@ -204,7 +204,7 @@ export function PermissionManager(): React.JSX.Element {
             </div>
 
             {loading && catalog.length === 0 ? (
-                <p className="py-12 text-center text-sm text-slate-400">
+                <p className="py-12 text-center text-sm text-muted-foreground">
                     {t('loading', 'Loading…')}
                 </p>
             ) : filtered.length === 0 ? (

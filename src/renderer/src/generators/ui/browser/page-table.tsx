@@ -12,9 +12,10 @@ import {
     PageActionMenu,
     PageTypeIcon
 } from '@renderer/generators/ui/browser/components/page-actions'
+import { getRouteGroup } from '@renderer/generators/ui/components/settings/properties/route-parser'
 import { formatFileDate } from '@renderer/utils'
 import { ChevronDown, ChevronRight, Component, FileText } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import type { PageDefinition } from './page-manager'
 
 interface PageTableProps {
@@ -29,6 +30,8 @@ interface PageTableProps {
     handleMove?: (page: PageDefinition) => void
     handleCreateScopedComponent?: (page: PageDefinition) => void
     setIsSubPage: (isSubPage: boolean) => void
+    expandMatching?: boolean
+    searchTerm?: string
 }
 
 export const PageTable = ({
@@ -42,9 +45,28 @@ export const PageTable = ({
     handleDuplicate,
     handleMove,
     handleCreateScopedComponent,
-    setIsSubPage
+    setIsSubPage,
+    expandMatching = false,
+    searchTerm = ''
 }: PageTableProps) => {
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
+
+    useEffect(() => {
+        if (!expandMatching) return
+
+        const next = new Set<string>()
+        tableData.forEach((page) => {
+            if (!page.isPage) return
+            const pageComponents = getPageComponent(page.pageName)
+            const pageSubPages = getSubPages(page.pageName)
+            if (pageComponents.length > 0 || pageSubPages.length > 0) {
+                next.add(page.pageName)
+            }
+        })
+        setExpandedRows(next)
+        // Expand once when the search query changes, not on every parent re-render.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [expandMatching, searchTerm])
 
     const toggleRowExpansion = (pageName: string) => {
         const newExpandedRows = new Set(expandedRows)
@@ -105,13 +127,22 @@ export const PageTable = ({
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex min-w-0 items-center gap-2">
                                             <PageTypeIcon
                                                 isOpen={false}
                                                 compCount={components ? components.length : 0}
                                                 page={page}
                                             />
-                                            <span>{page.description || page.pageName}</span>
+                                            <div className="min-w-0">
+                                                {getRouteGroup(page.pagePath) ? (
+                                                    <div className="truncate font-mono text-[10px] text-primary">
+                                                        ({getRouteGroup(page.pagePath)})
+                                                    </div>
+                                                ) : null}
+                                                <span className="truncate">
+                                                    {page.description || page.pageName}
+                                                </span>
+                                            </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>

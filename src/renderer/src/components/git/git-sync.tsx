@@ -62,7 +62,7 @@ const SyncButton = ({
                         variant="ghost"
                         size="icon"
                         className={cn(
-                            'h-auto w-auto shrink-0 rounded-md p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white dark:hover:bg-slate-800',
+                            'h-auto w-auto shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground',
                             buttonClassName
                         )}
                         onClick={() => setShowConfirm(true)}

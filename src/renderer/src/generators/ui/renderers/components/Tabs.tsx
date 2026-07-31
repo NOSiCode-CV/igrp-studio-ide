@@ -1,3 +1,4 @@
+import { ScrollArea, ScrollBar } from '@renderer/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import Draggable from '@renderer/lib/dnd/Draggable'
 import Droppable from '@renderer/lib/dnd/Droppable'
@@ -29,7 +30,6 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({ comp, onDragEnd }: CardC
     }
 
     const renderTriggers = () => {
-        //i want to break line when the trigger is too long
         return components.map((child: StructuredComponent, index: number) => {
             const { properties, componentName } = child
 
@@ -42,14 +42,14 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({ comp, onDragEnd }: CardC
                     index={index}
                     dropTargetId={componentId}
                     dropZone={true}
-                    className={cn('p-0 bg-muted/0', className)}
+                    className={cn('shrink-0 p-0 bg-muted/0', className)}
                     mode="MOVE"
                     layout="horizontal"
                 >
                     <TabsTrigger
                         value={child.id}
                         key={index}
-                        className="min-w-fit max-w-full flex-shrink-0 flex flex-wrap break-words h-auto min-h-[36px] px-3 py-2"
+                        className="h-auto min-h-9 shrink-0 grow-0 whitespace-nowrap px-3 py-2"
                         asChild
                     >
                         <div>
@@ -117,14 +117,17 @@ const IGRPStudioTabs: React.FC<CardComponentProps> = ({ comp, onDragEnd }: CardC
     return (
         <Tabs defaultValue={components[0].id} className="w-full">
             <Droppable
-                className={cn('flex w-full flex-col gap-6', className)}
+                className={cn('flex w-full min-w-0 flex-col gap-6', className)}
                 onDrop={onDragEnd}
                 component={comp}
                 path="tabs"
             >
-                <TabsList className="flex-wrap overflow-x-auto max-w-full h-auto min-h-[40px]">
-                    {renderTriggers()}
-                </TabsList>
+                <ScrollArea className="w-full min-w-0 whitespace-nowrap pb-2.5 [&>[data-slot=scroll-area-scrollbar][data-orientation=vertical]]:hidden">
+                    <TabsList className="inline-flex h-auto min-h-9 w-max max-w-none flex-nowrap justify-start gap-1">
+                        {renderTriggers()}
+                    </TabsList>
+                    <ScrollBar orientation="horizontal" className="h-2" />
+                </ScrollArea>
             </Droppable>
             {renderContent()}
         </Tabs>

@@ -1,17 +1,17 @@
 import { cn } from '@renderer/lib/utils'
 
-/** Dark surface used by Permission / Page / BPMN browser cards. */
+/** Theme-aware surface for Permission / Page / BPMN browser cards (shadcn tokens). */
 export const BROWSER_CARD_SURFACE =
-    'border-slate-800/80 bg-[#121824] text-slate-100 shadow-sm transition-all duration-200 hover:border-slate-700 hover:bg-[#161f30]'
+    'border-border bg-card text-card-foreground shadow-sm transition-all duration-200 hover:border-primary/30 hover:bg-accent/40'
 
 export function browserCardClassName(...extra: Array<string | false | null | undefined>): string {
     return cn(BROWSER_CARD_SURFACE, ...extra)
 }
 
-/** Active tab chip — dark surface + emerald accent (Page Manager). */
+/** Active tab chip — follows theme (Page Manager). */
 export const BROWSER_TAB_TRIGGER =
-    'rounded-lg border border-transparent px-3 text-slate-400 hover:text-slate-200 data-[state=active]:border-slate-700/80 data-[state=active]:bg-[#1e2632] data-[state=active]:text-emerald-400 data-[state=active]:shadow-none dark:data-[state=active]:border-slate-700/80 dark:data-[state=active]:bg-[#1e2632] dark:data-[state=active]:text-emerald-400'
+    'rounded-lg border border-transparent px-3 text-muted-foreground hover:text-foreground data-[state=active]:border-border data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=active]:shadow-none'
 
 /** Count pill inside a tab trigger (`group` on TabsTrigger). */
 export const BROWSER_TAB_BADGE =
-    'ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full border border-slate-700 bg-slate-800/60 px-1.5 font-mono text-[10px] text-slate-400 group-data-[state=active]:border-emerald-500/20 group-data-[state=active]:bg-emerald-500/10 group-data-[state=active]:text-emerald-400/90'
+    'ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full border border-border bg-muted px-1.5 font-mono text-[10px] text-muted-foreground group-data-[state=active]:border-primary/30 group-data-[state=active]:bg-primary/10 group-data-[state=active]:text-primary'

@@ -25,20 +25,22 @@ import { GitCommitsSidebar } from '@renderer/components/git/git-list-commits'
 import { KeyboardKey, SHORTCUTS } from '@renderer/constants/shortcut'
 //import SidebarAppComponents from './sidebar-app-components';
 import { useKeyPress } from '@renderer/hooks/useKeyDown'
+import useStudio from '@renderer/hooks/use-studio'
 import Draggable from '@renderer/lib/dnd/Draggable'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { cn } from '@renderer/lib/utils'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import { filterSubItems } from '@renderer/utils'
+import ProjectSettings from '@renderer/browser/project'
 import {
     AlertTriangle,
-    Badge,
     ChevronRight,
     FileText,
     GitBranch,
     GripHorizontal,
     Home,
     ListTodo,
+    Settings,
     SquareFunction
 } from 'lucide-react'
 import type React from 'react'
@@ -59,6 +61,7 @@ export function AppSidebar({
 }: AppSidebarProps): React.ReactNode {
     const { setOpen } = useSidebar()
     const { t } = useTranslation()
+    const { config: project } = useStudio()
 
     const [activeMenuGroup, setActiveMenuGroup] = useState<MenuItem>({
         icon: ListTodo,
@@ -93,9 +96,14 @@ export function AppSidebar({
         { icon: ListTodo, label: t('widgetPalette'), id: 'widgetPalette' },
         { icon: SquareFunction, label: t('customCode'), id: 'customCode' },
         { icon: FileText, label: t('explorer'), id: 'explorer' },
-        { icon: Badge, label: t('settings'), id: 'settings' },
+        { icon: Settings, label: t('settings'), id: 'settings' },
         { icon: GitBranch, label: t('git'), id: 'git' }
     ]
+
+    const showSearch =
+        activeMenuGroup.id === 'widgetPalette' ||
+        activeMenuGroup.id === 'customCode' ||
+        activeMenuGroup.id === 'explorer'
 
     return (
         <Sidebar
@@ -182,12 +190,14 @@ export function AppSidebar({
                         </div>
                         {activeMenuGroup.id === 'customCode' && <CustomCodeMenu />}
                     </div>
-                    <SidebarInput
-                        placeholder={`Search (${SHORTCUTS.FIND})`}
-                        value={searchQuery}
-                        onChange={handleInputChange}
-                        ref={searchInputRef}
-                    />
+                    {showSearch && (
+                        <SidebarInput
+                            placeholder={`Search (${SHORTCUTS.FIND})`}
+                            value={searchQuery}
+                            onChange={handleInputChange}
+                            ref={searchInputRef}
+                        />
+                    )}
                 </SidebarHeader>
                 <SidebarContent className="overflow-hidden">
                     <ScrollArea className="h-[calc(100vh-230px)] w-[300px]">
@@ -203,6 +213,8 @@ export function AppSidebar({
                             />
                         ) : activeMenuGroup.id === 'customCode' ? (
                             <SidebarAppCustomCode searchTerm={searchQuery} />
+                        ) : activeMenuGroup.id === 'settings' ? (
+                            <ProjectSettings project={project} hasTitle={false} embedded />
                         ) : (
                             filteredData.map((item, index) => (
                                 <Collapsible

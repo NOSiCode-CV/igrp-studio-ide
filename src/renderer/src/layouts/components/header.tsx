@@ -23,7 +23,7 @@ import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
 import { cn } from '@renderer/lib/utils'
 import type { RootState } from '@renderer/redux'
-import { getFileThree as onGetPages } from '@renderer/redux/thunks'
+import { getFileThree as onGetPages, leaveStudioProject } from '@renderer/redux/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import {
     ArrowLeft,
@@ -37,9 +37,10 @@ import {
     Sun,
     X
 } from 'lucide-react'
-import { type JSX, useEffect, useState } from 'react'
+import { type JSX, type MouseEvent, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
 import type { ProjectData } from 'src/main/types'
 import { BranchSwitcher } from '../../components/git/git-branch-switcher'
 
@@ -49,14 +50,17 @@ interface HeaderProps {
 }
 
 const headerIconBtn =
-    'h-auto w-auto rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white dark:hover:bg-slate-800'
+    'h-auto w-auto rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground'
 
 const branchTriggerClass =
-    'flex h-auto items-center gap-1.5 border-slate-800 bg-slate-900 text-slate-300 hover:border-slate-700 hover:bg-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
+    'flex h-auto items-center gap-1.5 border-border bg-muted/60 text-foreground hover:bg-muted'
+
+const homePath = ROUTES.PATH_IDE_INITIAL_SCREEN
 
 const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     const { t } = useTranslation()
     const dispatch: any = useDispatch()
+    const navigate = useNavigate()
     const isGitEnabled = useSelector((state: RootState) => state.git.isGitEnabled)
     const isMac = window.api.i18nextElectronBackend.clientOptions.platform === 'darwin'
     const { theme, setTheme } = useTheme()
@@ -156,14 +160,19 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         !!config?.gitRootPath &&
         config.gitRootPath !== basePath
 
+    const goHome = (event?: MouseEvent): void => {
+        event?.preventDefault()
+        dispatch(leaveStudioProject())
+        navigate(homePath)
+    }
+
     return (
         <TooltipProvider delayDuration={300}>
             <header
                 className={cn(
                     'sticky top-0 z-40 w-full border-b',
                     'h-(--header-height)',
-                    'bg-background text-foreground border-border',
-                    'dark:bg-[#0A0D14] dark:text-slate-200 dark:border-slate-800/80'
+                    'bg-background text-foreground border-border'
                 )}
             >
                 <div
@@ -173,43 +182,55 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                     )}
                 >
                 {/* Left: brand + breadcrumbs */}
-                <div className="flex min-w-0 items-center gap-2 text-sm">
-                    <a
-                        href={ROUTES.HOME}
-                        className="flex shrink-0 items-center gap-1.5 rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold tracking-wide text-emerald-400 transition-colors hover:bg-emerald-500/15"
+                <div className="home flex min-w-0 items-center gap-2 text-sm">
+                    <Link
+                        to={homePath}
+                        onClick={goHome}
+                        title={t('backToHome', 'Voltar ao início')}
+                        className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-1.5 py-1 text-xs font-semibold tracking-wide text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                     >
-                        <img src={logo} alt="" className="h-3.5 w-auto shrink-0" />
+                        <img
+                            src={logo}
+                            alt={import.meta.env.VITE_APP_TITLE || 'IGRP Studio'}
+                            className="h-3.5 w-auto shrink-0"
+                        />
                         <span className="leading-none">{import.meta.env.VITE_APP_TITLE}</span>
-                    </a>
+                    </Link>
 
                     {isProjectActive && (
                         <>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <a
-                                        href={ROUTES.HOME}
-                                        title={t('backToProject', 'Voltar ao Projeto')}
-                                        className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-800/60 hover:text-white dark:hover:bg-slate-800/60"
+                                    <Link
+                                        to={homePath}
+                                        onClick={goHome}
+                                        title={t('backToHome', 'Voltar ao início')}
+                                        className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                                     >
                                         <ArrowLeft className="h-4 w-4" />
-                                    </a>
+                                    </Link>
                                 </TooltipTrigger>
-                                <TooltipContent>{t('backToProject', 'Voltar ao Projeto')}</TooltipContent>
+                                <TooltipContent>{t('backToHome', 'Voltar ao início')}</TooltipContent>
                             </Tooltip>
 
-                            <div className="hidden min-w-0 items-center gap-1.5 text-xs font-medium text-slate-400 md:flex">
-                                <a
-                                    href={ROUTES.HOME}
-                                    className="truncate transition-colors hover:text-slate-200"
-                                >
-                                    {workspace.name}
-                                </a>
-                                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-600" />
+                            <div className="hidden min-w-0 items-center gap-1.5 text-xs font-medium text-muted-foreground md:flex">
+                                {workspace?.name ? (
+                                    <Link
+                                        to={homePath}
+                                        onClick={goHome}
+                                        className="truncate transition-colors hover:text-foreground"
+                                    >
+                                        {workspace.name}
+                                    </Link>
+                                ) : null}
+                                {workspace?.name ? (
+                                    <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
+                                ) : null}
                                 <span
-                                    className="truncate rounded border border-slate-800 bg-slate-900/80 px-2 py-0.5 font-mono text-xs font-semibold text-emerald-400"
-                                    title={config.name}
+                                    className="truncate rounded border border-border bg-muted px-2 py-0.5 font-mono text-xs font-semibold text-foreground"
+                                    title={config?.name}
                                 >
-                                    {config.name}
+                                    {config?.name}
                                 </span>
                             </div>
                         </>
@@ -309,7 +330,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                 type="button"
                                 variant="ghost"
                                 size="icon"
-                                className={cn(headerIconBtn, 'hover:text-amber-400')}
+                                className={cn(headerIconBtn, 'hover:text-foreground')}
                                 onClick={toggleTheme}
                             >
                                 {isDarkMode ? (
@@ -331,13 +352,13 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
 
                     <NotificationsPopover triggerClassName={headerIconBtn} />
 
-                    <div className="mx-1 hidden h-4 w-px bg-slate-800 sm:block" />
+                    <div className="mx-1 hidden h-4 w-px bg-border sm:block" />
 
                     <GitConnectionMenu variant="header" />
 
                     {!isMac && (
                         <>
-                            <div className="mx-1 h-4 w-px bg-slate-800" />
+                            <div className="mx-1 h-4 w-px bg-border" />
                             <div className="flex items-center gap-0.5">
                                 <Button
                                     type="button"
@@ -369,7 +390,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     size="icon"
                                     className={cn(
                                         headerIconBtn,
-                                        'hover:bg-red-500/90 hover:text-white'
+                                        'hover:bg-destructive hover:text-destructive-foreground'
                                     )}
                                     onClick={handleClose}
                                     title={t('close')}

@@ -234,7 +234,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                             path={componentName}
                         >
                             {columns.length > 0 && (
-                                <div className="relative rounded-lg shadow-md">
+                                <div className="relative w-full min-w-0 max-w-full overflow-hidden rounded-lg shadow-md">
                                     <Table className="text-left text-sm rtl:text-right">
                                         <TableHeader>
                                             <TableRow>

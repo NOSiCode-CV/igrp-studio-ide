@@ -52,7 +52,7 @@ function GitConnectionMenu({
                             className={cn(
                                 'shrink-0',
                                 isHeader
-                                    ? 'h-7 w-7 ring-2 ring-emerald-500/20 transition-all group-hover:ring-emerald-500/50'
+                                    ? 'h-7 w-7 ring-2 ring-border transition-all group-hover:ring-primary/40'
                                     : 'h-7 w-7'
                             )}
                         >
@@ -63,7 +63,7 @@ function GitConnectionMenu({
                             <AvatarFallback
                                 className={cn(
                                     isHeader
-                                        ? 'bg-emerald-600 text-xs font-bold text-white'
+                                        ? 'bg-primary text-xs font-bold text-primary-foreground'
                                         : 'bg-primary/15 text-xs text-primary'
                                 )}
                             >
@@ -75,7 +75,7 @@ function GitConnectionMenu({
                                 className={cn(
                                     'hidden truncate text-sm font-medium lg:inline',
                                     isHeader
-                                        ? 'text-xs text-slate-300 group-hover:text-white'
+                                        ? 'text-xs text-muted-foreground group-hover:text-foreground'
                                         : ''
                                 )}
                             >
@@ -89,7 +89,7 @@ function GitConnectionMenu({
                         size="icon"
                         className={cn(
                             isHeader
-                                ? 'h-auto w-auto rounded-md p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white'
+                                ? 'h-auto w-auto rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                                 : 'h-9 w-9 rounded-full',
                             triggerClassName
                         )}
