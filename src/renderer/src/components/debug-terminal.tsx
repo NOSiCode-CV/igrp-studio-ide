@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui
 import { Bug, Copy, Trash } from 'lucide-react'
 import { type JSX, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { subscribeIpc } from '@renderer/lib/subscribe-ipc'
 import { IGRPTabs, IGRPTabsContent, IGRPTabsList, IGRPTabsTrigger } from './tabs'
 
 interface ConsoleMessage {
@@ -93,11 +94,7 @@ function TabConsole(): JSX.Element {
             })
         }
 
-        window.electron.ipcRenderer.on('log', handleLog)
-
-        return () => {
-            window.electron.ipcRenderer.removeListener('log', handleLog)
-        }
+        return subscribeIpc('log', handleLog)
     }, [])
 
     const { t } = useTranslation()

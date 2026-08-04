@@ -8,6 +8,7 @@ import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import useToast from './useToast'
+import { subscribeIpc } from '@renderer/lib/subscribe-ipc'
 
 interface TokenExpiredPayload {
     providerType: 'github' | 'gitlab'
@@ -82,12 +83,12 @@ export function useGitTokenExpiredToast(): void {
             showErrorToast(t('rate_limited', { provider: labelFor(payload.providerType) }))
         }
 
-        window.electron.ipcRenderer.on('git-token-expired', onTokenExpired)
-        window.electron.ipcRenderer.on('git-rate-limited', onRateLimited)
+        const offExpired = subscribeIpc('git-token-expired', onTokenExpired)
+        const offRate = subscribeIpc('git-rate-limited', onRateLimited)
 
         return () => {
-            window.electron.ipcRenderer.removeListener('git-token-expired', onTokenExpired)
-            window.electron.ipcRenderer.removeListener('git-rate-limited', onRateLimited)
+            offExpired()
+            offRate()
         }
     }, [activeProviderId, dispatch, showErrorToast, t])
 }

@@ -41,7 +41,7 @@ type ExtendedElectronAPI = typeof electronAPI & {
     setUpdateChannel: (channel: UpdateChannel) => Promise<void>
     reconfigureUpdateChannel: () => Promise<void>
     watchFolder: (folderPath: string) => Promise<void>
-    onFolderChange: (callback: (event: WatchEvent) => void) => void
+    onFolderChange: (callback: (event: WatchEvent) => void) => () => void
     reportError: (error: Error) => void
 }
 
@@ -1008,7 +1008,10 @@ if (process.contextIsolated) {
             reconfigureUpdateChannel: () => ipcRenderer.invoke('update:reconfigure-channel'),
             watchFolder: (folderPath: string) => ipcRenderer.invoke('watch-folder', folderPath),
             onFolderChange: (callback: (event: WatchEvent) => void) => {
-                ipcRenderer.on('folder-change', (_, data: WatchEvent) => callback(data))
+                const subscription = (_: Electron.IpcRendererEvent, data: WatchEvent): void =>
+                    callback(data)
+                ipcRenderer.on('folder-change', subscription)
+                return () => ipcRenderer.removeListener('folder-change', subscription)
             },
             reportError: (error: Error) =>
                 ipcRenderer.send('report-error', serializeErrorForIpc(error))
@@ -1044,7 +1047,10 @@ if (process.contextIsolated) {
         reconfigureUpdateChannel: () => ipcRenderer.invoke('update:reconfigure-channel'),
         watchFolder: (folderPath: string) => ipcRenderer.invoke('watch-folder', folderPath),
         onFolderChange: (callback: (event: WatchEvent) => void) => {
-            ipcRenderer.on('folder-change', (_, data: WatchEvent) => callback(data))
+            const subscription = (_: Electron.IpcRendererEvent, data: WatchEvent): void =>
+                callback(data)
+            ipcRenderer.on('folder-change', subscription)
+            return () => ipcRenderer.removeListener('folder-change', subscription)
         },
         reportError: (error: Error) => ipcRenderer.send('report-error', serializeErrorForIpc(error))
     }

@@ -8,6 +8,7 @@ import { IGRPCombobox, IGRPSeparator } from '@igrp/igrp-framework-react-design-s
 import logo from '@renderer/assets/images/igrp-green.svg'
 import { SHOW_UPDATE_MODAL_EVENT } from '@renderer/components/update-banner'
 import useToast from '@renderer/hooks/useToast'
+import { subscribeIpc } from '@renderer/lib/subscribe-ipc'
 import { CircleArrowUp, Download, Loader2, RefreshCw } from 'lucide-react'
 import { type JSX, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -116,11 +117,7 @@ export function AboutSettings(): JSX.Element {
             }
         }
 
-        window.electron.ipcRenderer.on('message-update', handleUpdateMessage)
-
-        return () => {
-            window.electron.ipcRenderer.removeListener('message-update', handleUpdateMessage)
-        }
+        return subscribeIpc('message-update', handleUpdateMessage)
     }, [])
 
     return (

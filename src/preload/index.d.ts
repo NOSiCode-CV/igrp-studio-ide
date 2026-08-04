@@ -26,7 +26,7 @@ type ExtendedElectronAPI = typeof electronAPI & {
     setUpdateChannel: (channel: UpdateChannel) => Promise<void>
     reconfigureUpdateChannel: () => Promise<void>
     watchFolder: (folderPath: string) => Promise<void>
-    onFolderChange: (callback: (event: WatchEvent) => void) => void
+    onFolderChange: (callback: (event: WatchEvent) => void) => () => void
     reportError: (error: Error) => void
 }
 declare const api: {

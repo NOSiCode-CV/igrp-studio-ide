@@ -14,6 +14,7 @@ import { DebugTerminal } from '@renderer/components/debug-terminal'
 import { TERMINAL_TOGGLE_EVENT } from '@renderer/components/integrated-terminal'
 import Doctor from '@renderer/components/doctor'
 import { SHOW_UPDATE_MODAL_EVENT } from '@renderer/components/update-banner'
+import { subscribeIpc } from '@renderer/lib/subscribe-ipc'
 import { AlertCircle, HelpCircle, Stethoscope, Terminal, Wifi, WifiOff } from 'lucide-react'
 import { type JSX, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -64,11 +65,7 @@ export function Footer(): JSX.Element {
             if (data.version) setNewVersion(data.version)
         }
 
-        window.electron.ipcRenderer.on('message-update', handleUpdateMessage)
-
-        return () => {
-            window.electron.ipcRenderer.removeListener('message-update', handleUpdateMessage)
-        }
+        return subscribeIpc('message-update', handleUpdateMessage)
     }, [])
 
     useEffect(() => {
