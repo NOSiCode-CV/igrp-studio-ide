@@ -18,11 +18,11 @@
  * embedded `GOLDEN_LIST_PAGE_EXAMPLE` when discovery / install fails.
  */
 
-import { spawn } from 'node:child_process'
 import fs from 'node:fs'
 import { promises as fsp } from 'node:fs'
 import { join, normalize, relative } from 'node:path'
 import { buildIgrpCliInstallCommand } from '@shared/igrp-cli'
+import { spawnIgrpCli } from '../igrp-cli-service'
 
 const SKILLS_DIR = '.agents/skills'
 /** Companion-file paths exposed to the renderer. Anything outside this list
@@ -252,21 +252,15 @@ export async function installSkill(
     if (!fs.existsSync(basePath)) {
         return { ok: false, error: `Project path does not exist: ${basePath}` }
     }
+    const spawned = await spawnIgrpCli(
+        ['skill', 'add', skillName, '--project', basePath, '--quiet'],
+        { cwd: basePath }
+    )
+    if (!spawned.ok) {
+        return { ok: false, error: spawned.error }
+    }
+    const proc = spawned.proc
     return new Promise((resolve) => {
-        let proc
-        try {
-            proc = spawn('igrp', ['skill', 'add', skillName, '--project', basePath, '--quiet'], {
-                cwd: basePath,
-                shell: false
-            })
-        } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err)
-            resolve({
-                ok: false,
-                error: `Could not spawn \`igrp\` — is it on PATH? (${msg}). Install via: ${buildIgrpCliInstallCommand()}`
-            })
-            return
-        }
         const drain = (level: 'info' | 'warn' | 'error') => (chunk: Buffer) => {
             chunk
                 .toString()
@@ -424,21 +418,15 @@ export async function updateSkill(
     if (!fs.existsSync(basePath)) {
         return { ok: false, error: `Project path does not exist: ${basePath}` }
     }
+    const spawned = await spawnIgrpCli(
+        ['skill', 'update', skillName, '--project', basePath, '--quiet'],
+        { cwd: basePath }
+    )
+    if (!spawned.ok) {
+        return { ok: false, error: spawned.error }
+    }
+    const proc = spawned.proc
     return new Promise((resolve) => {
-        let proc
-        try {
-            proc = spawn('igrp', ['skill', 'update', skillName, '--project', basePath, '--quiet'], {
-                cwd: basePath,
-                shell: false
-            })
-        } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err)
-            resolve({
-                ok: false,
-                error: `Could not spawn \`igrp\` — is it on PATH? (${msg}).`
-            })
-            return
-        }
         const drain = (level: 'info' | 'warn' | 'error') => (chunk: Buffer) => {
             chunk
                 .toString()
@@ -450,7 +438,10 @@ export async function updateSkill(
         proc.stdout?.on('data', drain('info'))
         proc.stderr?.on('data', drain('warn'))
         proc.on('error', (err) => {
-            resolve({ ok: false, error: `\`igrp\` spawn failed: ${err.message}.` })
+            resolve({
+                ok: false,
+                error: `\`igrp\` spawn failed: ${err.message}. Install via: ${buildIgrpCliInstallCommand()}`
+            })
         })
         proc.on('exit', (code) => {
             if (code === 0) resolve({ ok: true })
