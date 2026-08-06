@@ -1,6 +1,8 @@
-## 0.2.0-beta.18
+## 0.2.0-beta.19
 
-- feat(shared): enhance project structure with shared module and CLI installation improvements
-- feat(cli): implement IGRP CLI update checks and installation
-- Update @igrp/igrp-studio-nextjs-engine to version 0.2.0-beta.27 in package.json and yarn.lock
-- Update @igrp/igrp-studio-nextjs-engine to version 0.2.0-beta.25 in package.json and yarn.lock
+- feat(cli): enhance IGRP CLI integration with Windows support and improved error handling
+- chore: update dependencies and improve IPC subscription handling
+- chore: ignore package-lock.json; project uses yarn
+- feat(ui): theme-aware chrome, session restore, and route-group context
+- feat(permissions): add permission management features and update UI components
+- feat(ui): enhance components with triggerClassName prop for better styling
