@@ -23,7 +23,10 @@
     }
 
     header button,
-    header .home {
+    header a,
+    header input,
+    header .home,
+    header [data-no-drag] {
         -webkit-app-region: no-drag;
     }
 }

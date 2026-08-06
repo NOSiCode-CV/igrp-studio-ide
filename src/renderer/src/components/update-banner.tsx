@@ -13,6 +13,7 @@ import {
 import { Download, Package, RefreshCw } from 'lucide-react'
 import { type JSX, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { subscribeIpc } from '@renderer/lib/subscribe-ipc'
 
 const STORAGE_KEY = 'igrp-studio-update-dismissed'
 export const SHOW_UPDATE_MODAL_EVENT = 'igrp-studio:show-update-modal'
@@ -113,10 +114,7 @@ export function UpdateModalBottomLeft(): JSX.Element | null {
             // Não restaurar dismissedVersion do sessionStorage: ao abrir a app o modal deve mostrar
             // quando há atualização. "Later" só esconde até o utilizador clicar no footer ou reabrir a app.
         }
-        window.electron?.ipcRenderer?.on('message-update', handleUpdateMessage)
-        return () => {
-            window.electron?.ipcRenderer?.removeListener('message-update', handleUpdateMessage)
-        }
+        return subscribeIpc('message-update', handleUpdateMessage)
     }, [])
 
     useEffect(() => {

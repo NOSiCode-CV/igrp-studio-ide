@@ -1,5 +1,6 @@
 import { cn } from '@renderer/lib/utils'
 import type React from 'react'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import type { CardComponentProps } from '../CardComponent'
 import IGRPStudioContainer from './Container'
 
@@ -19,7 +20,7 @@ export const IGRPStudioScrollAreaContainer = ({
     onDragEnd,
     className
 }: CardComponentProps): React.ReactElement => (
-    <div className={cn('h-48 w-full overflow-y-auto rounded-md border', className)}>
+    <ScrollArea className={cn('h-48 w-full rounded-md border', className)}>
         <IGRPStudioContainer
             comp={comp}
             group={group}
@@ -27,7 +28,7 @@ export const IGRPStudioScrollAreaContainer = ({
             onDragEnd={onDragEnd}
             className="min-h-full"
         />
-    </div>
+    </ScrollArea>
 )
 
 export const IGRPStudioAspectRatioContainer = ({

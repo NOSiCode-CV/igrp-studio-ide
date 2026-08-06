@@ -8,14 +8,16 @@ import {
     CollapsibleTrigger
 } from '@renderer/components/ui/collapsible'
 import { Separator } from '@renderer/components/ui/separator'
+import { browserCardClassName } from '@renderer/generators/ui/browser/browser-card-styles'
 import {
     PageActionMenu,
     PageTypeIcon
 } from '@renderer/generators/ui/browser/components/page-actions'
+import { getRouteGroup } from '@renderer/generators/ui/components/settings/properties/route-parser'
 import { cn } from '@renderer/lib/utils'
 import { formatFileDate } from '@renderer/utils'
 import { ChevronRight, ComponentIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { PageDefinition } from './page-manager'
 
 export interface PageCardProps {
@@ -30,6 +32,7 @@ export interface PageCardProps {
     onCreateScopedComponent?: (page: PageDefinition) => void
     onMove?: (page: PageDefinition) => void
     setIsSubPage: (isSubPage: boolean) => void
+    defaultOpen?: boolean
 }
 
 export function PageCardView({
@@ -43,70 +46,86 @@ export function PageCardView({
     onDuplicate,
     onCreateScopedComponent,
     onMove,
-    setIsSubPage
+    setIsSubPage,
+    defaultOpen = false
 }: PageCardProps) {
     const { isPage, description, pageName, pagePath } = page
-    const [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(defaultOpen)
+    const routeGroup = getRouteGroup(pagePath)
+
+    useEffect(() => {
+        if (defaultOpen) setIsOpen(true)
+    }, [defaultOpen])
 
     const hasChild = (components && components.length > 0) || (subPages && subPages.length > 0)
 
     return (
-        <Card className="">
-            <CardContent className="group">
+        <Card className={browserCardClassName('h-full gap-0 overflow-hidden py-4')}>
+            <CardContent className="group px-4">
                 <Collapsible
                     className="flex w-full flex-col gap-2 group/collapsible"
                     open={isOpen}
                     onOpenChange={setIsOpen}
                 >
                     <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-start min-w-0 flex-1">
+                        <div className="flex min-w-0 flex-1 items-start overflow-hidden">
                             {hasChild && (
                                 <CollapsibleTrigger asChild>
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-5 w-5 p-0 mr-1 shrink-0"
+                                        className="mr-1 h-5 w-5 shrink-0 p-0 text-muted-foreground hover:text-primary"
                                     >
                                         <ChevronRight
                                             className={cn(
                                                 'transition-transform group-data-[state=open]/collapsible:rotate-90',
-                                                'text-purple-600'
+                                                'text-muted-foreground group-hover:text-primary'
                                             )}
                                         />
                                         <span className="sr-only">Toggle</span>
                                     </Button>
                                 </CollapsibleTrigger>
                             )}
-                            <div className="flex items-start gap-2 flex-1 min-w-0">
-                                <div className="flex items-center gap-1 shrink-0">
+                            <div className="flex min-w-0 flex-1 items-start gap-2">
+                                <div className="flex shrink-0 items-center gap-1">
                                     <PageTypeIcon
                                         isOpen={isOpen}
                                         compCount={components ? components.length : 0}
                                         page={page}
                                     />
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="font-medium text-sm break-words">
+                                <div className="min-w-0 flex-1 overflow-hidden">
+                                    {routeGroup ? (
+                                        <div className="mb-0.5 truncate font-mono text-[10px] font-medium text-primary">
+                                            ({routeGroup})
+                                        </div>
+                                    ) : null}
+                                    <div
+                                        className="truncate text-sm font-medium text-foreground"
+                                        title={description || pageName}
+                                    >
                                         {description || pageName}
                                     </div>
-                                    <div className="text-xs text-muted-foreground break-all">
+                                    <div
+                                        className="truncate font-mono text-xs text-muted-foreground"
+                                        title={`/${pagePath}${!isPage ? 'components' : ''}`}
+                                    >
                                         /{pagePath}
                                         {!isPage && 'components'}
                                     </div>
                                     {page.modifiedAt ? (
-                                        <div className="text-xs text-muted-foreground">
+                                        <div className="truncate text-[11px] text-muted-foreground">
                                             {formatFileDate(page.modifiedAt)}
                                         </div>
                                     ) : null}
-                                    {/* Show counts */}{' '}
                                     {subPages && subPages.length > 0 && (
-                                        <span className="text-xs text-purple-600 font-medium pr-2">
+                                        <span className="pr-2 text-xs font-medium text-primary">
                                             {subPages.length} page
                                             {subPages.length !== 1 ? 's' : ''}
                                         </span>
                                     )}
                                     {components && components.length > 0 && (
-                                        <span className="text-xs text-purple-600 font-medium">
+                                        <span className="text-xs font-medium text-primary">
                                             {components.length} component
                                             {components.length !== 1 ? 's' : ''}
                                         </span>
@@ -114,12 +133,11 @@ export function PageCardView({
                                 </div>
                             </div>
                         </div>
-                        {/** Main page */}
                         <div className="flex shrink-0 items-center justify-end">
-                            <div className="flex items-center gap-1 justify-end">
+                            <div className="flex items-center justify-end gap-1">
                                 <Badge
                                     variant={page.type === 'page' ? 'default' : 'secondary'}
-                                    className="text-xs h-5"
+                                    className="h-5 text-xs"
                                 >
                                     {page.type === 'page' ? 'P' : 'C'}
                                 </Badge>
@@ -141,24 +159,22 @@ export function PageCardView({
                         {subPages && subPages.length > 0 && (
                             <>
                                 <Separator />
-
-                                <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
+                                <div className="mb-1 flex items-center gap-1 text-xs font-medium text-primary">
                                     <ComponentIcon className="h-3 w-3" />
                                     Pages
                                 </div>
                             </>
                         )}
 
-                        {/* subpages */}
                         {subPages && subPages.length > 0 && (
                             <div className="space-y-1">
                                 {subPages.map((subpage) => (
                                     <div
                                         key={subpage.name}
-                                        className="flex items-center justify-between text-xs p-1 rounded hover:bg-muted"
+                                        className="flex items-center justify-between rounded p-1 text-xs hover:bg-accent"
                                     >
-                                        <div className="flex items-center gap-1 flex-1 min-w-0">
-                                            <span className="truncate">
+                                        <div className="flex min-w-0 flex-1 items-center gap-1">
+                                            <span className="truncate text-foreground">
                                                 {subpage.description || subpage.pageName}
                                             </span>
                                             <span className="truncate text-muted-foreground">
@@ -181,22 +197,21 @@ export function PageCardView({
                         {components && components.length > 0 && (
                             <>
                                 <Separator />
-                                <div className="text-xs font-medium text-purple-600 mb-1 flex items-center gap-1">
+                                <div className="mb-1 flex items-center gap-1 text-xs font-medium text-primary">
                                     <ComponentIcon className="h-3 w-3" />
                                     Components
                                 </div>
                             </>
                         )}
-                        {/* Subcomponents */}
                         {components && components.length > 0 && (
                             <div className="space-y-1">
                                 {components.map((subpage) => (
                                     <div
                                         key={subpage.name}
-                                        className="flex items-center justify-between text-xs p-1 rounded hover:bg-muted"
+                                        className="flex items-center justify-between rounded p-1 text-xs hover:bg-accent"
                                     >
-                                        <div className="flex items-center gap-1 flex-1 min-w-0">
-                                            <span className="truncate">
+                                        <div className="flex min-w-0 flex-1 items-center gap-1">
+                                            <span className="truncate text-foreground">
                                                 {subpage.description || subpage.pageName}
                                             </span>
                                         </div>

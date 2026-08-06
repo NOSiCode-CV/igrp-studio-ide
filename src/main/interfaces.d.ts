@@ -102,6 +102,9 @@ export interface BaseEngine {
 
     serializeElement?: (data: any, basePath: string) => Promise<void>
     createPermission?: (data: any, basePath: string) => Promise<void>
+    getPermissions?: (basePath: string) => Promise<any[]>
+    savePermission?: (data: any, basePath: string) => Promise<void>
+    deletePermission?: (id: string, basePath: string) => Promise<void>
 
     createPage?(pageConfig: PageConfig, basePath: string): Promise<void>
 
@@ -155,6 +158,9 @@ export interface IBaseEngine {
     ) => Promise<HandlerResponse>
 
     createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    getPermissions: (engineType: string, basePath: string) => Promise<HandlerResponse>
+    savePermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    deletePermission: (id: string, engineType: string, basePath: string) => Promise<HandlerResponse>
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     duplicate: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>

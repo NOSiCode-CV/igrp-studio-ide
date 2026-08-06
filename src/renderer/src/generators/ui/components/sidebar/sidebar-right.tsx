@@ -1,5 +1,6 @@
 import { EmptyList } from '@renderer/components/empty-list'
 import Loader from '@renderer/components/loader'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { Sidebar, SidebarContent } from '@renderer/components/ui/sidebar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import useStudio from '@renderer/hooks/use-studio'
@@ -43,6 +44,7 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
         switchTargets,
         handleSwitchComponent,
         handleUpdateChildComponent,
+        handlePartialComponentUpdate,
         restData,
         handleComponentPropertyChange,
         handleChildPropertyChange,
@@ -70,76 +72,83 @@ const SidebarRight = ({ comp, path, parentComp, ...props }: SidebarRightProps) =
                 onReset={resetTempData}
                 onClose={handleClose}
             />
-            <SidebarContent>
-                <div className="space-y-4 p-2 px-3">
-                    {isLoading ? (
-                        <Loader />
-                    ) : !tempEditingComponent ? (
-                        <EmptyList
-                            icon={<Settings />}
-                            title={t('settingsComponents')}
-                            description={t('selectComponentToEdit')}
-                        />
-                    ) : (
-                        <>
-                            <ComponentIdentitySection
-                                label={label}
-                                componentName={componentName}
-                                componentId={componentId}
-                                tag={tempEditingComponent.tag}
-                                isRootComponent={isRootComponent}
-                                useClient={restData?.useClient ?? true}
-                                switchTargets={switchTargets}
-                                onSwitchComponent={handleSwitchComponent}
-                                onTagChange={handleTagChange}
-                                onUseClientChange={handleUseClientChange}
+            <SidebarContent className="overflow-hidden">
+                <ScrollArea className="h-full">
+                    <div className="space-y-4 p-2 px-3">
+                        {isLoading ? (
+                            <Loader />
+                        ) : !tempEditingComponent ? (
+                            <EmptyList
+                                icon={<Settings />}
+                                title={t('settingsComponents')}
+                                description={t('selectComponentToEdit')}
                             />
-                            <Tabs className="flex-1" defaultValue="props">
-                                <TabsList className="grid w-full grid-cols-4">
-                                    <TabsTrigger value="props">{t('props')}</TabsTrigger>
-                                    <TabsTrigger value="styles">{t('style')}</TabsTrigger>
-                                    <TabsTrigger value="interactions">
-                                        {t('interactions')}
-                                    </TabsTrigger>
-                                    <TabsTrigger value="copy-content">{t('copy')}</TabsTrigger>
-                                </TabsList>
+                        ) : (
+                            <>
+                                <ComponentIdentitySection
+                                    label={label}
+                                    componentName={componentName}
+                                    componentId={componentId}
+                                    tag={tempEditingComponent.tag}
+                                    isRootComponent={isRootComponent}
+                                    useClient={restData?.useClient ?? true}
+                                    switchTargets={switchTargets}
+                                    onSwitchComponent={handleSwitchComponent}
+                                    onTagChange={handleTagChange}
+                                    onUseClientChange={handleUseClientChange}
+                                />
+                                <Tabs className="flex-1" defaultValue="props">
+                                    <TabsList className="grid w-full grid-cols-4">
+                                        <TabsTrigger value="props">{t('props')}</TabsTrigger>
+                                        <TabsTrigger value="styles">{t('style')}</TabsTrigger>
+                                        <TabsTrigger value="interactions">
+                                            {t('interactions')}
+                                        </TabsTrigger>
+                                        <TabsTrigger value="copy-content">{t('copy')}</TabsTrigger>
+                                    </TabsList>
 
-                                <TabsContent value="props" className="space-y-6">
-                                    <PropertiesPanel
-                                        propsComponent={propsComponent}
-                                        propsComponentChild={propsComponentChild}
-                                        tempEditingComponent={tempEditingComponent}
-                                        childformValues={childformValues}
-                                        pageOptions={pageOptions}
-                                        statesOptions={statesOptions}
-                                        columnsOptions={columnsOptions}
-                                        onComponentPropertyChange={handleComponentPropertyChange}
-                                        onChildPropertyChange={handleChildPropertyChange}
-                                        onSelectState={handleSelectState}
-                                    />
-                                </TabsContent>
-                                <TabsContent value="styles" className="space-y-6">
-                                    <StyleTab
-                                        comp={tempEditingComponent}
-                                        path={currentPath}
-                                        onInteranctionsChange={handleUpdateChildComponent}
-                                    />
-                                </TabsContent>
-                                <TabsContent value="interactions" className="space-y-6">
-                                    <Interactions
-                                        comp={tempEditingComponent}
-                                        path={currentPath}
-                                        onInteranctionsChange={handleUpdateChildComponent}
-                                        columnsOptions={columnsOptions}
-                                    />
-                                </TabsContent>
-                                <TabsContent value="copy-content" className="space-y-6">
-                                    <CopyContent currentComp={currentComp} />
-                                </TabsContent>
-                            </Tabs>
-                        </>
-                    )}
-                </div>
+                                    <TabsContent value="props" className="space-y-6">
+                                        <PropertiesPanel
+                                            propsComponent={propsComponent}
+                                            propsComponentChild={propsComponentChild}
+                                            tempEditingComponent={tempEditingComponent}
+                                            childformValues={childformValues}
+                                            pageOptions={pageOptions}
+                                            statesOptions={statesOptions}
+                                            columnsOptions={columnsOptions}
+                                            onComponentPropertyChange={handleComponentPropertyChange}
+                                            onChildPropertyChange={handleChildPropertyChange}
+                                            onSelectState={handleSelectState}
+                                        />
+                                    </TabsContent>
+                                    <TabsContent value="styles" className="space-y-6">
+                                        <StyleTab
+                                            comp={tempEditingComponent}
+                                            path={currentPath}
+                                            onInteranctionsChange={handleUpdateChildComponent}
+                                        />
+                                    </TabsContent>
+                                    <TabsContent value="interactions" className="space-y-6">
+                                        <Interactions
+                                            comp={tempEditingComponent}
+                                            path={currentPath}
+                                            isRootComponent={isRootComponent}
+                                            pageName={
+                                                (restData?.pageName as string | undefined) ??
+                                                (restData?.name as string | undefined)
+                                            }
+                                            onInteranctionsChange={handlePartialComponentUpdate}
+                                            columnsOptions={columnsOptions}
+                                        />
+                                    </TabsContent>
+                                    <TabsContent value="copy-content" className="space-y-6">
+                                        <CopyContent currentComp={currentComp} />
+                                    </TabsContent>
+                                </Tabs>
+                            </>
+                        )}
+                    </div>
+                </ScrollArea>
             </SidebarContent>
         </Sidebar>
     )

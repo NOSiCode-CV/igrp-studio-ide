@@ -27,9 +27,13 @@ import { useDispatch, useSelector } from 'react-redux'
 
 interface NotificationsPopoverProps {
     className?: string
+    triggerClassName?: string
 }
 
-const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Element => {
+const NotificationsPopover = ({
+    className,
+    triggerClassName
+}: NotificationsPopoverProps): JSX.Element => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
     const { showSuccessToast, showErrorToast } = useToast()
@@ -103,12 +107,14 @@ const NotificationsPopover = ({ className }: NotificationsPopoverProps): JSX.Ele
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className={cn('relative', className)}>
-                    <Bell className="w-5 h-5" />
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn('relative', triggerClassName, className)}
+                >
+                    <Bell className="h-3.5 w-3.5" />
                     {unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-xs text-white flex items-center justify-center">
-                            {unreadCount > 9 ? '9+' : unreadCount}
-                        </span>
+                        <span className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-emerald-500 ring-2 ring-[#0A0D14] animate-pulse" />
                     )}
                     <span className="sr-only">{t('notifications')}</span>
                 </Button>

@@ -9,7 +9,11 @@ import {
 import type { PageConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { ENV_TYPES, PATTERNS } from '@renderer/constants/appConstants'
 import { CheckboxInput, TextInput } from '@renderer/generators/api/components/inputs-form'
-import { getDynamicSegments } from '@renderer/generators/ui/components/settings/properties/route-parser'
+import {
+    getDynamicSegments,
+    getRouteGroup,
+    withRouteGroup
+} from '@renderer/generators/ui/components/settings/properties/route-parser'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
 import { Controller, errorMessage, useZodForm } from '@renderer/lib/form'
@@ -18,6 +22,15 @@ import { type FocusEvent, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import type { PageDefinition } from '../page-manager'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@renderer/components/ui/select'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
 
 const initialValues: PageConfig = {
     type: 'page',
@@ -39,9 +52,14 @@ interface CreatePageModalProps {
     basePath: string
     isSubPage?: boolean
     currentComponent?: PageDefinition
+    availableGroups?: string[]
+    preferredGroup?: string | null
     onClose: () => void
     onConfirm: (createdPage?: PageDefinition) => void
 }
+
+const NO_GROUP = '__none__'
+const NEW_GROUP = '__new__'
 
 export function CreatePageModal({
     isOpen,
@@ -49,13 +67,17 @@ export function CreatePageModal({
     onClose,
     onConfirm,
     isSubPage,
-    currentComponent
+    currentComponent,
+    availableGroups = [],
+    preferredGroup = null
 }: CreatePageModalProps): React.JSX.Element {
     const { t } = useTranslation()
     const { createGitCommit } = useGit()
     const { showErrorToast, showSuccessToast } = useToast()
 
     const [formInitialValues, setFormInitialValues] = useState<PageConfig>(initialValues)
+    const [groupChoice, setGroupChoice] = useState<string>(NO_GROUP)
+    const [newGroupName, setNewGroupName] = useState('')
 
     // Schema validates the three text fields; the other PageConfig props
     // (forceDynamic, useClient, args, types, …) pass through untouched.
@@ -132,7 +154,39 @@ export function CreatePageModal({
     // (`enableReinitialize: true` equivalent).
     useEffect(() => {
         reset(formInitialValues)
-    }, [formInitialValues, reset])
+        const fromPath = getRouteGroup(formInitialValues.path)
+        if (fromPath) {
+            setGroupChoice(fromPath)
+            setNewGroupName('')
+        } else if (preferredGroup && !isSubPage && !formInitialValues.id) {
+            setGroupChoice(preferredGroup)
+            setNewGroupName('')
+        } else {
+            setGroupChoice(NO_GROUP)
+            setNewGroupName('')
+        }
+    }, [formInitialValues, reset, preferredGroup, isSubPage])
+
+    const resolvedGroup = useMemo(() => {
+        if (isSubPage) return null
+        if (groupChoice === NO_GROUP) return null
+        if (groupChoice === NEW_GROUP) {
+            const slug = newGroupName.replace(/[()]/g, '').trim().toLowerCase().replace(/\s+/g, '-')
+            return slug || null
+        }
+        return groupChoice
+    }, [groupChoice, newGroupName, isSubPage])
+
+    useEffect(() => {
+        if (!isOpen || isSubPage) return
+        const current = watch('path') || ''
+        if (!current) return
+        const next = withRouteGroup(current, resolvedGroup)
+        if (next !== current) {
+            setValue('path', next, { shouldValidate: true, shouldTouch: true })
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [resolvedGroup, isOpen, isSubPage])
 
     const handleConfirm = async (pageConfig: PageConfig): Promise<void> => {
         try {
@@ -213,7 +267,10 @@ export function CreatePageModal({
         onBlur: () => {
             if (watch('path')) return
             const generatedPath = watch('pageName').toLowerCase().replace(/\s+/g, '-')
-            setValue('path', generatedPath, { shouldValidate: true, shouldTouch: true })
+            setValue('path', withRouteGroup(generatedPath, resolvedGroup), {
+                shouldValidate: true,
+                shouldTouch: true
+            })
         }
     })
 
@@ -286,6 +343,69 @@ export function CreatePageModal({
                             placeholder="TodoList"
                             isRequired
                         />
+
+                        {!isSubPage && (
+                            <div className="space-y-2">
+                                <Label htmlFor="route-group">
+                                    {t('routeGroup', 'Grupo')}{' '}
+                                    <span className="font-normal text-muted-foreground">
+                                        ({t('optional', 'opcional')})
+                                    </span>
+                                </Label>
+                                <Select
+                                    value={groupChoice}
+                                    onValueChange={(value) => {
+                                        if (!value) return
+                                        setGroupChoice(value)
+                                        if (value !== NEW_GROUP) setNewGroupName('')
+                                    }}
+                                >
+                                    <SelectTrigger id="route-group" className="w-full">
+                                        <SelectValue
+                                            placeholder={t('selectGroup', 'Selecionar grupo')}
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={NO_GROUP}>
+                                            {t('noGroup', 'Sem grupo')}
+                                        </SelectItem>
+                                        {availableGroups.map((group) => (
+                                            <SelectItem key={group} value={group}>
+                                                ({group})
+                                            </SelectItem>
+                                        ))}
+                                        {groupChoice !== NO_GROUP &&
+                                            groupChoice !== NEW_GROUP &&
+                                            !availableGroups.includes(groupChoice) && (
+                                                <SelectItem value={groupChoice}>
+                                                    ({groupChoice})
+                                                </SelectItem>
+                                            )}
+                                        <SelectItem value={NEW_GROUP}>
+                                            {t('newGroup', 'Novo grupo…')}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                {groupChoice === NEW_GROUP && (
+                                    <Input
+                                        value={newGroupName}
+                                        onChange={(e) => setNewGroupName(e.target.value)}
+                                        placeholder={t(
+                                            'newGroupPlaceholder',
+                                            'ex.: contribuicoes'
+                                        )}
+                                        className="font-mono text-sm"
+                                    />
+                                )}
+                                <p className="text-xs text-muted-foreground">
+                                    {t(
+                                        'routeGroupHint',
+                                        'Usa route groups do Next.js: (nome)/path — não aparece no URL.'
+                                    )}
+                                </p>
+                            </div>
+                        )}
+
                         <TextInput
                             id="path"
                             label="Path"

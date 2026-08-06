@@ -13,7 +13,8 @@ import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import type { ProcessStepConfig } from '@igrp/igrp-studio-nextjs-engine/types'
 import { EmptyList } from '@renderer/components/empty-list'
 import { SearchInput } from '@renderer/components/shared-ui'
-import { Cloud, HardDrive, PenSquare, UserCog } from 'lucide-react'
+import useToast from '@renderer/hooks/useToast'
+import { ClipboardCopy, Cloud, HardDrive, PenSquare, UserCog } from 'lucide-react'
 import type { JSX } from 'react'
 import type { BPMNProjectArtifact, BPMNProjectProcessDefinition, FileTree } from 'src/main/types'
 import type { PageDefinition } from '../../page-manager'
@@ -67,7 +68,22 @@ export const BpmnLocalView = ({
     oldProcessFound,
     onConfirmStepProcess
 }: BpmnLocalViewProps): JSX.Element => {
+    const { showSuccessToast, showErrorToast } = useToast()
     const hasLocalProcesses = bpmnProcesses.length > 0
+
+    const handleCopyTaskKey = async (taskKey?: string): Promise<void> => {
+        if (!taskKey) {
+            showErrorToast('Task key is missing')
+            return
+        }
+
+        try {
+            await navigator.clipboard.writeText(taskKey)
+            showSuccessToast('Task key copied')
+        } catch {
+            showErrorToast('Failed to copy task key')
+        }
+    }
 
     if (!hasLocalProcesses) {
         return (
@@ -329,8 +345,33 @@ export const BpmnLocalView = ({
                                                                                 ?.description
                                                                         }
                                                                     </CardTitle>
-                                                                    <div className="text-sm text-muted-foreground mt-1">
-                                                                        {artifact.content?.taskKey}
+                                                                    <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
+                                                                        <span className="truncate font-mono">
+                                                                            {
+                                                                                artifact.content
+                                                                                    ?.taskKey
+                                                                            }
+                                                                        </span>
+                                                                        {artifact.content
+                                                                            ?.taskKey && (
+                                                                            <Button
+                                                                                type="button"
+                                                                                variant="ghost"
+                                                                                size="sm"
+                                                                                className="h-6 w-6 shrink-0 p-0"
+                                                                                title="Copy task key"
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation()
+                                                                                    void handleCopyTaskKey(
+                                                                                        artifact
+                                                                                            .content
+                                                                                            ?.taskKey
+                                                                                    )
+                                                                                }}
+                                                                            >
+                                                                                <ClipboardCopy className="h-3.5 w-3.5" />
+                                                                            </Button>
+                                                                        )}
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex flex-col items-end space-y-2">

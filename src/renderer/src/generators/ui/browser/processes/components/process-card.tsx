@@ -2,6 +2,7 @@ import { Badge } from '@renderer/components/ui/badge'
 import { Button } from '@renderer/components/ui/button'
 import { Card, CardContent, CardDescription, CardTitle } from '@renderer/components/ui/card'
 import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { browserCardClassName } from '@renderer/generators/ui/browser/browser-card-styles'
 import { Calendar, Info, UserCog } from 'lucide-react'
 import type { JSX } from 'react/jsx-runtime'
 import type { BPMNAuditUser, BPMNDateLike, BPMNProjectProcessDefinition } from 'src/main/types'
@@ -104,32 +105,39 @@ export const ProcessCard = ({
 
     return (
         <Card
-            className={`hover:shadow-md transition-all cursor-pointer ${
-                isSelected ? 'ring-2 ring-primary ' : 'hover:bg-muted/30'
-            }`}
+            className={browserCardClassName(
+                'cursor-pointer gap-0 py-4',
+                isSelected && 'ring-2 ring-primary/40 hover:border-primary/40'
+            )}
             onClick={() => {
                 onSelectProcess(process)
             }}
         >
-            <CardContent>
+            <CardContent className="px-4">
                 <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                        <CardTitle className="text-base font-medium">{process.title}</CardTitle>
-                        <CardDescription>{process.processKey}</CardDescription>
+                    <div className="min-w-0 flex-1">
+                        <CardTitle className="text-base font-medium text-foreground">
+                            {process.title}
+                        </CardTitle>
+                        <CardDescription className="font-mono text-muted-foreground">
+                            {process.processKey}
+                        </CardDescription>
                         {process.deploymentDate && (
-                            <div className="flex items-center space-x-2 mt-2 text-sm text-muted-foreground">
-                                <Calendar className="w-4 h-4" />
+                            <div className="mt-2 flex items-center space-x-2 text-sm text-muted-foreground">
+                                <Calendar className="h-4 w-4" />
                                 <span>{`Deployed on ${formatDate(process.deploymentDate)}`}</span>
                             </div>
                         )}
-                        <div className="flex items-center space-x-2 mt-1 text-sm text-muted-foreground">
-                            <UserCog className="w-4 h-4" />
+                        <div className="mt-1 flex items-center space-x-2 text-sm text-muted-foreground">
+                            <UserCog className="h-4 w-4" />
                             <span>{process.processArtifacts?.length || 0} artifacts</span>
                         </div>
                     </div>
-                    <div className="flex flex-col items-end space-y-2 shrink-0">
+                    <div className="flex shrink-0 flex-col items-end space-y-2">
                         <div className="flex items-center gap-1">
-                            <Badge variant={'outline'}>v{process.version || 'N/A'}</Badge>
+                            <Badge variant={'outline'}>
+                                v{process.version || 'N/A'}
+                            </Badge>
                             {hasAudit && (
                                 <Popover>
                                     <PopoverTrigger asChild>

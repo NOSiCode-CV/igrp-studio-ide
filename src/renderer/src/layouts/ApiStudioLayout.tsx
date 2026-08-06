@@ -1,14 +1,14 @@
 import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
+import Loader from '@renderer/components/loader'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
+import { useRestoreStudioSession } from '@renderer/hooks/use-restore-studio-session'
 
 import {
     getFileThree as onGetFolderFiles,
     setChangeStatus as onSetChangeStatus
 } from '@renderer/redux/thunks'
-import { ROUTES } from '@renderer/routes/routeConstants'
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 import type { ProjectData } from 'src/main/types'
 import { IntegratedTerminal } from '../components/integrated-terminal'
 import { AppIGRPSidebar } from './components/app-sidebar'
@@ -26,30 +26,34 @@ interface LayoutProps {
 
 const Layout = (props: LayoutProps): React.ReactNode => {
     const dispatch: any = useDispatch()
-    const navigate = useNavigate()
+    const { restoring, basePath: restoredBasePath } = useRestoreStudioSession()
 
     const { currentItem, changeStatus, config, basePath, filesThree } = useStudioAPI()
+    const activeBasePath = basePath || restoredBasePath
 
     useEffect(() => {
-        dispatch(onGetFolderFiles(basePath))
-    }, [basePath, dispatch])
+        if (!activeBasePath) return
+        dispatch(onGetFolderFiles(activeBasePath))
+    }, [activeBasePath, dispatch])
 
     useEffect(() => {
-        if (changeStatus) {
-            dispatch(onGetFolderFiles(basePath))
+        if (changeStatus && activeBasePath) {
+            dispatch(onGetFolderFiles(activeBasePath))
             dispatch(onSetChangeStatus(false))
         }
         return undefined
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [changeStatus, basePath, dispatch])
+    }, [changeStatus, activeBasePath, dispatch])
 
     const { menuItems } = useNavdata(filesThree)
 
-    useEffect(() => {
-        if (!basePath) {
-            navigate(ROUTES.HOME)
-        }
-    }, [basePath, navigate])
+    if (restoring || !activeBasePath) {
+        return (
+            <div className="flex h-screen w-full items-center justify-center bg-background">
+                <Loader variant="fullscreen" className="h-screen w-full" />
+            </div>
+        )
+    }
 
     return (
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))] [--header-height-three:calc(--spacing(30))]">
@@ -61,18 +65,18 @@ const Layout = (props: LayoutProps): React.ReactNode => {
                 }
             >
                 <div className="h-screen flex flex-col w-full">
-                    <Header config={config} basePath={basePath} />
+                    <Header config={config} basePath={activeBasePath} />
 
                     <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">
                         <AppIGRPSidebar
                             menuItems={menuItems}
                             config={config}
-                            basePath={basePath}
+                            basePath={activeBasePath}
                             header
                         />
                         <SidebarInset className="flex-1">
                             {React.cloneElement(props.children, {
-                                basePath,
+                                basePath: activeBasePath,
                                 currentItem,
                                 project: config
                             })}

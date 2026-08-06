@@ -10,7 +10,7 @@ import { useTheme } from '@renderer/components/theme-provider'
 import { Moon, Sun } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-export function ModeToggle() {
+export function ModeToggle({ className }: { className?: string }) {
     const { t } = useTranslation()
     const { setTheme } = useTheme()
 
@@ -19,7 +19,7 @@ export function ModeToggle() {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" className={className}>
                             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                             <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                             <span className="sr-only">Toggle theme</span>

@@ -6,6 +6,7 @@ import type {
 import { useDroppedComponents } from '@renderer/generators/ui/contexts/EditorContext'
 import useStudio from '@renderer/hooks/use-studio'
 import { EngineService } from '@renderer/services/EngineService'
+import { subscribeIpc } from '@renderer/lib/subscribe-ipc'
 import { useEffect, useMemo, useState } from 'react'
 import { useComponents } from './useComponents'
 
@@ -138,11 +139,7 @@ const useCustomCode = (): CustomCodeHook => {
         fetchData()
 
         const handleFolderChange = (): Promise<void> => fetchData()
-        window.electron.ipcRenderer.on('folder-change', handleFolderChange)
-
-        return () => {
-            window.electron.ipcRenderer.removeListener('folder-change', handleFolderChange)
-        }
+        return subscribeIpc('folder-change', handleFolderChange)
     }, [basePath])
 
     return {

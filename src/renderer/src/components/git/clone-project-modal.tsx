@@ -5,6 +5,8 @@ import { useGit } from '@renderer/hooks/use-git'
 import useGitAuth from '@renderer/hooks/use-git-auth'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
+import { claimCloneSuccess } from '@renderer/lib/clone-success-guard'
+import { subscribeIpc } from '@renderer/lib/subscribe-ipc'
 import { getUUID } from '@renderer/utils'
 import {
     AlertCircle,
@@ -300,16 +302,38 @@ export function CloneProjectModal({
         }
     }
 
+    const selectedRepoIdRef = useRef(selectedRepoId)
+    selectedRepoIdRef.current = selectedRepoId
+
+    const resetFormRef = useRef(resetForm)
+    resetFormRef.current = resetForm
+    const saveOrOpenProjectRef = useRef(saveOrOpenProject)
+    saveOrOpenProjectRef.current = saveOrOpenProject
+    const showSuccessToastRef = useRef(showSuccessToast)
+    showSuccessToastRef.current = showSuccessToast
+    const showErrorToastRef = useRef(showErrorToast)
+    showErrorToastRef.current = showErrorToast
+
     useEffect(() => {
-        const onCloneProgress = async (_event: any, data: any) => {
+        if (!isOpen) {
+            return
+        }
+
+        const onCloneProgress = async (_event: unknown, data: any) => {
             if (data.status === 'success') {
-                resetForm()
-                showSuccessToast(`Repository cloned successfully to ${data.path}`)
+                // Guard against duplicate handlers across surfaces / leaked listeners.
+                if (!claimCloneSuccess(data.path)) return
+
+                resetFormRef.current()
+                showSuccessToastRef.current(
+                    `Repository cloned successfully to ${data.path}`
+                )
                 try {
                     const { project, path } = data
                     const { config, type } = project
+                    const repoId = selectedRepoIdRef.current
 
-                    await saveOrOpenProject({
+                    await saveOrOpenProjectRef.current({
                         project: {
                             workspaceId: workspace.id,
                             name: config.name,
@@ -319,45 +343,35 @@ export function CloneProjectModal({
                             path,
                             config
                         },
+                        openProject: true,
                         onSuccess: async () => {
-                            if (selectedRepoId) {
+                            if (repoId) {
                                 await window.electron.ipcRenderer.invoke(
                                     'add-cloned-repo',
-                                    selectedRepoId
+                                    repoId
                                 )
                                 await window.electron.ipcRenderer.invoke('set-project-path', {
-                                    repoId: selectedRepoId,
+                                    repoId,
                                     path: data.path
                                 })
-                                setClonedRepos((prevRepos) => [...prevRepos, selectedRepoId])
+                                setClonedRepos((prevRepos) => [...prevRepos, repoId])
                             }
                         }
                     })
                 } catch (error) {
-                    showErrorToast('Failed to open project after cloning')
+                    showErrorToastRef.current('Failed to open project after cloning')
                     console.error('Error opening project', error)
                 }
             } else if (data.status === 'error') {
-                showErrorToast(`Failed to clone repository: ${data.message}`)
+                showErrorToastRef.current(`Failed to clone repository: ${data.message}`)
             }
             if (data.status === 'success' || data.status === 'error') {
                 setIsCloning(false)
             }
         }
 
-        window.electron.ipcRenderer.on('clone-progress', onCloneProgress)
-
-        return () => {
-            window.electron.ipcRenderer.removeListener('clone-progress', onCloneProgress)
-        }
-    }, [
-        resetForm,
-        saveOrOpenProject,
-        showErrorToast,
-        showSuccessToast,
-        workspace.id,
-        selectedRepoId
-    ])
+        return subscribeIpc('clone-progress', onCloneProgress)
+    }, [isOpen, workspace.id])
 
     if (!isOpen || typeof document === 'undefined') return null
 

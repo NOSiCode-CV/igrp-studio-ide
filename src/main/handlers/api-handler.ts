@@ -200,6 +200,38 @@ handleWithCustomErrors(
     }
 )
 
+handleWithCustomErrors(
+    EVENTS.ENGINE.GET_PERMISSIONS,
+    async (_event, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        return (await engine.getPermissions?.(basePath)) ?? []
+    }
+)
+
+handleWithCustomErrors(
+    EVENTS.ENGINE.SAVE_PERMISSION,
+    async (_event, config: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        await engine.savePermission?.(config, basePath)
+    }
+)
+
+handleWithCustomErrors(
+    EVENTS.ENGINE.CREATE_PERMISSION,
+    async (_event, config: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        await engine.createPermission?.(config, basePath)
+    }
+)
+
+handleWithCustomErrors(
+    EVENTS.ENGINE.DELETE_PERMISSION,
+    async (_event, id: string, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        await engine.deletePermission?.(id, basePath)
+    }
+)
+
 ipcMain.handle(EVENTS.SPRING.FETCH_SELECTORS, async (_event, module: string, basePath: string) => {
     return await engineTypes(module, basePath)
 })

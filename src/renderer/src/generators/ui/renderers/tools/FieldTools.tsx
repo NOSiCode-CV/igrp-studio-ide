@@ -109,6 +109,7 @@ const FieldTools = ({ parentComp, comp, index, path, onEdit }: ToolsProps) => {
                             title="Edit"
                             onClick={(e) => {
                                 e.preventDefault()
+                                e.stopPropagation()
                                 onEdit()
                             }}
                         >

@@ -15,7 +15,9 @@
  * Selection model: `EditorContext` stores the full component in
  * `currentComponent.component`, not just an id. We derive `selectedId`
  * from that, and on `onSelect(id)` we look up the node and call
- * `setEditingComponent({ component })`.
+ * `setEditingComponent({ path, component })` — `path` is required for
+ * nested registry children (e.g. `menuNavigationItem` under
+ * `menuNavigation`) so the properties schema resolves.
  *
  * The `findSourceOf` helper is needed because the Context's
  * `handleReorderChildInComponent` expects an explicit `source` location
@@ -26,7 +28,15 @@
 import { useMemo } from 'react'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import type { TreeCallbacks } from '@renderer/features/manifest-tree'
+import { COMPONENT } from '../ComponentTypes'
 import { useDroppedComponents } from '../contexts/EditorContext'
+
+const CONTENT_ROOTS = new Set([
+    COMPONENT.PageContent,
+    COMPONENT.ComponentContent,
+    COMPONENT.ProcessContent,
+    COMPONENT.ProcessStepContent
+])
 
 /**
  * Build a stable `TreeCallbacks` value that proxies to the active tab's
@@ -84,9 +94,12 @@ export function useTreeCallbacksFromContext(): TreeCallbacks {
                     clearEditingComponent()
                     return
                 }
-                const node = findNodeById(root as StructuredComponent, id)
-                if (node) {
-                    setEditingComponent({ component: node })
+                const hit = findNodeWithRegistryPath(root as StructuredComponent, id)
+                if (hit) {
+                    setEditingComponent({
+                        path: hit.path || undefined,
+                        component: hit.node
+                    })
                 }
             }
         }),
@@ -109,6 +122,11 @@ interface SourceLocation {
     index: number
 }
 
+interface NodeWithPath {
+    node: StructuredComponent
+    path: string
+}
+
 function findSourceOf(
     root: StructuredComponent | null,
     childId: string
@@ -123,17 +141,31 @@ function findSourceOf(
     return null
 }
 
-function findNodeById(
+/**
+ * Locate a node and the registry path used by `findComponent` /
+ * `getPropertiesComponent`. Path is the slash-joined `componentName`
+ * chain of ancestors (excluding page/component content roots).
+ */
+function findNodeWithRegistryPath(
     root: StructuredComponent | null,
-    id: string
-): StructuredComponent | null {
+    id: string,
+    parentPath = ''
+): NodeWithPath | null {
     if (!root) return null
-    if (root.id === id) return root
-    if (Array.isArray(root.children)) {
-        for (const c of root.children) {
-            const hit = findNodeById(c, id)
-            if (hit) return hit
-        }
+    if (root.id === id) return { node: root, path: parentPath }
+
+    if (!Array.isArray(root.children)) return null
+
+    for (const child of root.children) {
+        const nextPath = CONTENT_ROOTS.has(root.componentName)
+            ? parentPath
+            : parentPath
+              ? `${parentPath}/${root.componentName}`
+              : root.componentName
+
+        const hit = findNodeWithRegistryPath(child, id, nextPath)
+        if (hit) return hit
     }
+
     return null
 }

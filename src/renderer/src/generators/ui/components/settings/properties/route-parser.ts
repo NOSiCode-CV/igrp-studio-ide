@@ -5,6 +5,9 @@ export interface RouteSegment {
     originalSegment: string
 }
 
+/** Sentinel for pages/components with no `(group)` prefix. */
+export const UNGROUPED_ROUTE_GROUP = '__ungrouped__'
+
 export function parseRoutePath(path: string): RouteSegment[] {
     // Remove leading slash and split by /
     const segments = path.replace(/^\//, '').split('/').filter(Boolean)
@@ -77,4 +80,49 @@ export function getDynamicSegments(path?: string): RouteSegment[] {
 export function getStaticSegments(path: string): RouteSegment[] {
     const segments = parseRoutePath(path)
     return segments.filter((segment) => segment.type === 'static')
+}
+
+/** First Next.js route-group name in the path, e.g. `(contribuicoes)/x` → `contribuicoes`. */
+export function getRouteGroup(path?: string | null): string | null {
+    if (!path) return null
+    const group = parseRoutePath(path).find((segment) => segment.type === 'route-group')
+    return group?.name || null
+}
+
+/** Strip a leading `(group)/` (or lone `(group)`) from a path. */
+export function stripRouteGroup(path?: string | null): string {
+    if (!path) return ''
+    return path
+        .replace(/^\//, '')
+        .replace(/^\([^/)]+\)\//, '')
+        .replace(/^\([^/)]+\)$/, '')
+}
+
+/**
+ * Prefix path with `(group)/` when a group is set.
+ * Replaces any existing leading route-group.
+ */
+export function withRouteGroup(path: string, group: string | null | undefined): string {
+    const rest = stripRouteGroup(path)
+    if (!group) return rest
+    const slug = group.replace(/[()]/g, '').trim()
+    if (!slug) return rest
+    return rest ? `(${slug})/${rest}` : `(${slug})`
+}
+
+export function pathBelongsToGroup(path: string | null | undefined, filter: string): boolean {
+    if (!filter || filter === 'all') return true
+    const group = getRouteGroup(path)
+    if (filter === UNGROUPED_ROUTE_GROUP) return !group
+    return group === filter
+}
+
+/** Unique sorted route-group names found across page/component paths. */
+export function listRouteGroups(paths: Array<string | null | undefined>): string[] {
+    const set = new Set<string>()
+    for (const path of paths) {
+        const group = getRouteGroup(path)
+        if (group) set.add(group)
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b))
 }

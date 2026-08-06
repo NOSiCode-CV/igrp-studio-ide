@@ -22,7 +22,7 @@ import {
     SKILL_BANNER_DISMISS_KEY_PREFIX,
     SKILL_UPDATE_DISMISS_KEY_PREFIX
 } from '@renderer/generators/specification/components/prototype/persistence/skill-banner-dismiss'
-import { Download, Library, Loader2, RefreshCw, X } from 'lucide-react'
+import { Download, Loader2, RefreshCw, Sparkles, X } from 'lucide-react'
 import { useMemo, useState, type JSX } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -143,31 +143,32 @@ export function SkillProjectAlert({
         if (!result.ok) setError(result.error ?? t('skillAlertUpdateFailed'))
     }
 
+    // Alert reserves an icon column only for direct `>svg`; our icon sits in a div.
+    const alertLayout =
+        '!grid-cols-[auto_1fr] gap-x-3 items-center border-border bg-card text-card-foreground shadow-sm'
+
     // 1) Update available
     if (updateCandidate) {
         return (
             <Alert
-                className={cn(
-                    'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20',
-                    className
-                )}
+                className={cn(alertLayout, 'border-l-4 border-l-amber-500', className)}
             >
-                <RefreshCw className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                <div className="col-start-2 flex min-w-0 flex-1 items-start justify-between gap-3">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-amber-500/20 bg-amber-500/10">
+                    <RefreshCw className="size-4 text-amber-500" />
+                </div>
+                <div className="flex min-w-0 items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                        <AlertTitle className="text-amber-800 dark:text-amber-200">
+                        <AlertTitle className="col-start-auto text-foreground">
                             {t('skillAlertUpdateTitle')}
                         </AlertTitle>
-                        <AlertDescription className="text-amber-700 dark:text-amber-300">
+                        <AlertDescription className="col-start-auto text-muted-foreground">
                             {t('skillAlertUpdateDescription', {
                                 name: updateCandidate.name,
                                 installed: updateCandidate.installed ?? '?',
                                 latest: updateCandidate.latest
                             })}
                             {error && (
-                                <span className="mt-1 block text-red-600 dark:text-red-400">
-                                    {error}
-                                </span>
+                                <span className="mt-1 block text-destructive">{error}</span>
                             )}
                         </AlertDescription>
                     </div>
@@ -177,7 +178,7 @@ export function SkillProjectAlert({
                             size="sm"
                             disabled={busy}
                             onClick={() => void handleUpdate()}
-                            className="border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/30"
+                            className="border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-200"
                         >
                             {busy ? (
                                 <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
@@ -189,7 +190,7 @@ export function SkillProjectAlert({
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 text-amber-600 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-900/30"
+                            className="h-8 w-8 p-0 text-muted-foreground hover:bg-accent hover:text-foreground"
                             onClick={dismissUpdate}
                             title={t('dismiss')}
                         >
@@ -205,23 +206,20 @@ export function SkillProjectAlert({
     if (!hasCanonical && !installDismissed) {
         return (
             <Alert
-                className={cn(
-                    'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20',
-                    className
-                )}
+                className={cn(alertLayout, 'border-l-4 border-l-primary', className)}
             >
-                <Library className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <div className="col-start-2 flex min-w-0 flex-1 items-start justify-between gap-3">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10">
+                    <Sparkles className="size-4 text-primary" />
+                </div>
+                <div className="flex min-w-0 items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                        <AlertTitle className="text-blue-800 dark:text-blue-200">
+                        <AlertTitle className="col-start-auto text-foreground">
                             {t('skillAlertInstallTitle')}
                         </AlertTitle>
-                        <AlertDescription className="text-blue-700 dark:text-blue-300">
+                        <AlertDescription className="col-start-auto text-muted-foreground">
                             {t('skillAlertInstallDescription', { name: CANONICAL_SKILL })}
                             {error && (
-                                <span className="mt-1 block text-red-600 dark:text-red-400">
-                                    {error}
-                                </span>
+                                <span className="mt-1 block text-destructive">{error}</span>
                             )}
                         </AlertDescription>
                     </div>
@@ -231,7 +229,7 @@ export function SkillProjectAlert({
                             size="sm"
                             disabled={busy}
                             onClick={() => void handleInstall()}
-                            className="border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:text-blue-300 dark:hover:bg-blue-900/30"
+                            className="border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"
                         >
                             {busy ? (
                                 <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
@@ -243,7 +241,7 @@ export function SkillProjectAlert({
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                            className="h-8 w-8 p-0 text-muted-foreground hover:bg-accent hover:text-foreground"
                             onClick={dismissInstall}
                             title={t('dismiss')}
                         >
@@ -255,33 +253,43 @@ export function SkillProjectAlert({
         )
     }
 
-    // 3) Soft awareness when skills already exist — semantic tokens for theme safety
+    // 3) Soft awareness when skills already exist
     if (skills.length > 0 && !infoDismissed) {
-        const names = skills.map((s) => s.name).join(', ')
         return (
             <Alert
                 className={cn(
-                    'border-border bg-muted/40 dark:bg-muted/20',
+                    alertLayout,
+                    'border-l-4 border-l-primary py-2.5',
                     className
                 )}
             >
-                <Library className="h-4 w-4 text-muted-foreground" />
-                <div className="col-start-2 flex min-w-0 flex-1 items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                        <AlertTitle className="text-foreground">
-                            {t('skillAlertPresentTitle')}
-                        </AlertTitle>
-                        <AlertDescription className="text-muted-foreground">
-                            {t('skillAlertPresentDescription', {
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10">
+                    <Sparkles className="size-4 text-primary" />
+                </div>
+                <div className="flex min-w-0 items-center justify-between gap-3">
+                    <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+                        <span className="font-semibold text-foreground">
+                            {t('skillAlertPresentTitle')}:
+                        </span>
+                        <span className="text-muted-foreground">
+                            {t('skillAlertPresentCount', {
                                 count: skills.length,
-                                names
+                                defaultValue: 'This project has {{count}} skill(s):'
                             })}
-                        </AlertDescription>
+                        </span>
+                        {skills.map((skill) => (
+                            <span
+                                key={skill.name}
+                                className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 font-mono text-[11px] text-primary"
+                            >
+                                {skill.name}
+                            </span>
+                        ))}
                     </div>
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 shrink-0 p-0 text-muted-foreground hover:bg-muted dark:hover:bg-muted/60"
+                        className="h-8 w-8 shrink-0 p-0 text-muted-foreground hover:bg-accent hover:text-foreground"
                         onClick={dismissInfo}
                         title={t('dismiss')}
                     >

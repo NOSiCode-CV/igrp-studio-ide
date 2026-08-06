@@ -104,6 +104,16 @@ function envWithBinFirst(binaryPath: string): NodeJS.ProcessEnv {
 
 function listKnownBinPaths(name: string): string[] {
     const home = homedir()
+    if (process.platform === 'win32') {
+        const appData = process.env.APPDATA || join(home, 'AppData', 'Roaming')
+        const localAppData = process.env.LOCALAPPDATA || join(home, 'AppData', 'Local')
+        return [
+            join(appData, 'npm', `${name}.cmd`),
+            join(appData, 'npm', name),
+            join(localAppData, 'npm', `${name}.cmd`),
+            join(localAppData, 'npm', name)
+        ]
+    }
     const candidates = [
         join(home, '.npm-global', 'bin', name),
         join(home, '.local', 'bin', name),
@@ -123,6 +133,45 @@ function listKnownBinPaths(name: string): string[] {
         // ignore filesystem hiccups
     }
     return candidates
+}
+
+/** Resolves the `igrp` binary on PATH / known install locations (nvm, npm-global). */
+export async function resolveIgrpBinary(): Promise<string | null> {
+    return resolveBinary('igrp')
+}
+
+/**
+ * Spawns the IGRP CLI with Windows-safe PATH + shell handling.
+ *
+ * On Windows, npm global bins are `igrp.cmd` shims — `spawn('igrp', …, { shell: false })`
+ * yields ENOENT. We resolve the absolute path when possible and always use
+ * `shell: true` on win32 (same pattern as `cli-llm-service`).
+ */
+export async function spawnIgrpCli(
+    args: string[],
+    opts: { cwd?: string } = {}
+): Promise<
+    | { ok: true; proc: ReturnType<typeof spawn>; bin: string }
+    | { ok: false; error: string }
+> {
+    const resolved = await resolveBinary('igrp')
+    const bin = resolved || 'igrp'
+    const isWin = process.platform === 'win32'
+    try {
+        const proc = spawn(bin, args, {
+            cwd: opts.cwd,
+            shell: isWin,
+            env: resolved ? envWithBinFirst(resolved) : getShellEnv(),
+            windowsHide: true
+        })
+        return { ok: true, proc, bin }
+    } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err)
+        return {
+            ok: false,
+            error: `Could not spawn \`igrp\` — is it on PATH? (${msg}). Install via: ${buildIgrpCliInstallCommand()}`
+        }
+    }
 }
 
 async function resolveBinary(name: string): Promise<string | null> {

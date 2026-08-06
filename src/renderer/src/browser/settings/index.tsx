@@ -56,7 +56,7 @@ const data = {
     ]
 }
 
-export function SettingsDialog() {
+export function SettingsDialog({ triggerClassName }: { triggerClassName?: string }) {
     const [activeItem, setActiveItem] = React.useState('about')
     const { t } = useTranslation()
     const [open, setOpen] = React.useState(false)
@@ -66,8 +66,8 @@ export function SettingsDialog() {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DialogTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                            <Settings className="w-5 h-5" />
+                        <Button variant="ghost" size="icon" className={triggerClassName}>
+                            <Settings className="h-3.5 w-3.5" />
                             <span className="sr-only">{t('settings')}</span>
                         </Button>
                     </DialogTrigger>
@@ -127,7 +127,7 @@ export function SettingsDialog() {
                                 </div>
                             </header>
 
-                            <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 pt-0">
+                            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                                 {data.nav.find((item) => item.name === activeItem)?.component ? (
                                     React.createElement(
                                         data.nav.find((item) => item.name === activeItem)!

@@ -1,6 +1,8 @@
 'use client'
 
 import { Button } from '@renderer/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import {
     Tooltip,
     TooltipContent,
@@ -12,7 +14,7 @@ import { DebugTerminal } from '@renderer/components/debug-terminal'
 import { TERMINAL_TOGGLE_EVENT } from '@renderer/components/integrated-terminal'
 import Doctor from '@renderer/components/doctor'
 import { SHOW_UPDATE_MODAL_EVENT } from '@renderer/components/update-banner'
-import { captureRendererException } from '@renderer/init-sentry'
+import { subscribeIpc } from '@renderer/lib/subscribe-ipc'
 import { AlertCircle, HelpCircle, Stethoscope, Terminal, Wifi, WifiOff } from 'lucide-react'
 import { type JSX, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -63,11 +65,7 @@ export function Footer(): JSX.Element {
             if (data.version) setNewVersion(data.version)
         }
 
-        window.electron.ipcRenderer.on('message-update', handleUpdateMessage)
-
-        return () => {
-            window.electron.ipcRenderer.removeListener('message-update', handleUpdateMessage)
-        }
+        return subscribeIpc('message-update', handleUpdateMessage)
     }, [])
 
     useEffect(() => {
@@ -103,24 +101,10 @@ export function Footer(): JSX.Element {
         if (appVersion) handleCheckUpdate()
     }, [appVersion, t])
 
-    /** Dev-only: exercise GlitchTip/Sentry (renderer SDK + main via IPC). */
-    const runMonitoringTestError = (): void => {
-        const error = new Error('IGRP Studio: monitoring test (footer, simulated)')
-        error.name = 'MonitoringTestError'
-
-        captureRendererException(error, {
-            source: 'footer-monitoring-test',
-            simulated: true
-        })
-
-        if (window.electron?.reportError) {
-            window.electron.reportError(error)
-            setLog(t('monitoringTestSent'))
-        } else {
-            setLog(t('monitoringTestNoBridge'))
-            console.warn('[Monitoring test] window.electron.reportError not available')
-        }
-    }
+    const updateErrorDetails = (updateError || log || t('update_check_failed')).replace(
+        /\\n/g,
+        '\n'
+    )
 
     return (
         <TooltipProvider>
@@ -130,17 +114,35 @@ export function Footer(): JSX.Element {
                         {`${import.meta.env.VITE_APP_TITLE}`} &copy; {new Date().getFullYear()}
                     </span>
 
-                    <span className="text-muted-foreground">
+                    <span className="text-muted-foreground min-w-0">
                         {lastUpdateType === 'error' ? (
-                            <span
-                                className="flex items-center space-x-1 text-destructive"
-                                title={updateError || log}
-                            >
-                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                <span className="truncate max-w-[calc(100vw-500px)]">
-                                    {updateError || log}
-                                </span>
-                            </span>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <button
+                                        type="button"
+                                        className="flex max-w-[min(28rem,calc(100vw-28rem))] items-center gap-1.5 rounded text-destructive hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-destructive/30"
+                                    >
+                                        <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                                        <span className="truncate">
+                                            {t('update_check_failed')}
+                                        </span>
+                                    </button>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                    side="top"
+                                    align="start"
+                                    className="z-[60] w-[min(28rem,calc(100vw-2rem))] gap-2 border-border bg-popover p-3 text-popover-foreground shadow-lg"
+                                >
+                                    <p className="text-sm font-medium text-destructive">
+                                        {t('update_check_failed')}
+                                    </p>
+                                    <ScrollArea className="h-48 rounded-md border border-border bg-muted">
+                                        <pre className="whitespace-pre-wrap break-words p-2 font-mono text-[11px] leading-snug text-muted-foreground">
+                                            {updateErrorDetails}
+                                        </pre>
+                                    </ScrollArea>
+                                </PopoverContent>
+                            </Popover>
                         ) : lastUpdateType === 'available' ||
                           lastUpdateType === 'progress' ||
                           lastUpdateType === 'downloaded' ? (
@@ -149,19 +151,19 @@ export function Footer(): JSX.Element {
                                 onClick={() =>
                                     window.dispatchEvent(new CustomEvent(SHOW_UPDATE_MODAL_EVENT))
                                 }
-                                className="flex items-center space-x-1 text-amber-600 hover:text-amber-700 hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 rounded"
+                                className="flex max-w-[min(28rem,calc(100vw-28rem))] items-center gap-1.5 text-amber-600 hover:text-amber-700 hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 rounded"
                                 title={
                                     newVersion
                                         ? `${t('new_update_available')} (${newVersion})`
                                         : t('new_update_available')
                                 }
                             >
-                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                <span className="truncate max-w-[calc(100vw-500px)]">{log}</span>
+                                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                                <span className="truncate">{log}</span>
                             </button>
                         ) : lastUpdateType === 'checking' ? (
-                            <span className="flex items-center space-x-1 text-muted-foreground">
-                                <span className="truncate max-w-[calc(100vw-500px)]">{log}</span>
+                            <span className="flex max-w-[min(28rem,calc(100vw-28rem))] items-center gap-1.5 text-muted-foreground">
+                                <span className="truncate">{log}</span>
                             </span>
                         ) : (
                             `v${appVersion}`
@@ -171,25 +173,6 @@ export function Footer(): JSX.Element {
 
                 <div className="flex items-center space-x-3">
                     <IGRPSeparator orientation="vertical" className="h-4" />
-
-                    {import.meta.env.DEV ? (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-6 text-xs px-2"
-                                    onClick={runMonitoringTestError}
-                                >
-                                    {t('monitoringTestButton')}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top">
-                                <p className="max-w-xs">{t('monitoringTestTooltip')}</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    ) : null}
 
                     <Tooltip>
                         <TooltipTrigger asChild>

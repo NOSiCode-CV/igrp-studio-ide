@@ -1,3 +1,4 @@
+import { IGRPIcon } from '@igrp/igrp-framework-react-design-system'
 import { Badge } from '@renderer/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import Draggable from '@renderer/lib/dnd/Draggable'
@@ -5,7 +6,7 @@ import Droppable from '@renderer/lib/dnd/Droppable'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { cn } from '@renderer/lib/utils'
 import { getLabel } from '@renderer/utils'
-import { ArrowRight, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import type React from 'react'
 import { useState } from 'react'
 import { GenNoInfoComp } from '../../components/GenNoInfoComp'
@@ -26,13 +27,13 @@ const IGRPStudioMenuNavigation: React.FC<CardComponentProps> = ({
         id: componentId
     } = comp
 
-    const { title, content } = properties || {}
+    const { title, badgeContent, showChevron = true, className } = properties || {}
 
     const { setEditingComponent } = useDroppedComponents()
 
-    const handleEditClick = (component: StructuredComponent, componentName: string) => {
+    const handleEditClick = (component: StructuredComponent, path: string) => {
         setEditingComponent({
-            path: componentName,
+            path,
             component
         })
     }
@@ -43,9 +44,11 @@ const IGRPStudioMenuNavigation: React.FC<CardComponentProps> = ({
 
     const renderContent = () => {
         return components.map((child: StructuredComponent, index: number) => {
-            const { properties } = child
-            const { title, label, iconProperties, ...rest } = properties || {}
-            const { icon: Icon } = iconProperties || {}
+            const { properties: childProperties } = child
+            const { label, iconProperties, disabled } = childProperties || {}
+            const iconName =
+                typeof iconProperties?.icon === 'string' ? iconProperties.icon : 'ArrowRight'
+
             return (
                 <Draggable
                     key={child.id}
@@ -59,6 +62,7 @@ const IGRPStudioMenuNavigation: React.FC<CardComponentProps> = ({
                     <BoxField
                         comp={child}
                         parentComp={comp}
+                        path={parentComponentName}
                         index={index}
                         onEdit={() => handleEditClick(child, parentComponentName)}
                         group="group/tab-menu"
@@ -67,29 +71,31 @@ const IGRPStudioMenuNavigation: React.FC<CardComponentProps> = ({
                         )}
                     >
                         <button
-                            {...rest}
-                            key={child.id}
                             type="button"
+                            disabled={Boolean(disabled)}
                             onClick={() => scrollToSection(child.id)}
                             className={cn(
                                 'flex items-center justify-between w-full py-2.5 px-4 text-sm text-left transition-colors',
                                 activeSection === child.id
                                     ? 'bg-primary/5 text-primary font-medium'
-                                    : 'hover:bg-muted/30 text-muted-foreground'
+                                    : 'hover:bg-muted/30 text-muted-foreground',
+                                disabled && 'pointer-events-none opacity-50'
                             )}
                         >
                             <div className="flex items-center gap-2">
-                                {Icon ? <Icon className="h-4 w-4" /> : <ArrowRight />}
-                                <span>{title || label}</span>
+                                <IGRPIcon iconName={iconName} className="h-4 w-4" />
+                                <span>{label || getLabel(child.componentName)}</span>
                             </div>
-                            <ChevronRight
-                                className={cn(
-                                    'h-4 w-4 transition-colors',
-                                    activeSection === child.id
-                                        ? 'text-primary'
-                                        : 'text-muted-foreground'
-                                )}
-                            />
+                            {showChevron && (
+                                <ChevronRight
+                                    className={cn(
+                                        'h-4 w-4 transition-colors',
+                                        activeSection === child.id
+                                            ? 'text-primary'
+                                            : 'text-muted-foreground'
+                                    )}
+                                />
+                            )}
                         </button>
                     </BoxField>
                 </Draggable>
@@ -98,14 +104,16 @@ const IGRPStudioMenuNavigation: React.FC<CardComponentProps> = ({
     }
 
     return (
-        <Droppable className={cn('p-0')} onDrop={onDragEnd} component={comp}>
+        <Droppable className={cn('p-0', className)} onDrop={onDragEnd} component={comp}>
             {components.length > 0 ? (
                 <Card className="shadow-sm py-0 gap-0">
-                    <CardHeader className="px-4  pt-2">
+                    <CardHeader className="px-4 pt-2">
                         <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                            <CardTitle className="text-sm font-medium">
+                                {title || 'Menu'}
+                            </CardTitle>
                             <Badge variant="outline" className="font-normal text-xs">
-                                {content || 'New'}
+                                {badgeContent || '#'}
                             </Badge>
                         </div>
                     </CardHeader>

@@ -18,9 +18,10 @@ import {
     selectUserGitHub,
     selectUserGitLab
 } from '@renderer/redux/git/selectors'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import type { Repository } from 'src/main/types'
+import { subscribeIpc } from '@renderer/lib/subscribe-ipc'
 
 const useGitAuth = () => {
     const dispatch = useDispatch()
@@ -113,6 +114,11 @@ const useGitAuth = () => {
         setIsLoading(false)
     }, [activeProviderId, dispatch])
 
+    const loadGithubDataRef = useRef(loadGithubData)
+    loadGithubDataRef.current = loadGithubData
+    const activeProviderIdRef = useRef(activeProviderId)
+    activeProviderIdRef.current = activeProviderId
+
     useEffect(() => {
         const onGitHubOAuthSuccess = async (_event: any, data: any): Promise<void> => {
             await window.electron.ipcRenderer.invoke(
@@ -121,11 +127,11 @@ const useGitAuth = () => {
                 data.baseUrl
             )
             dispatch(setActiveProvider('github'))
-            await loadGithubData()
+            await loadGithubDataRef.current()
         }
 
         const onGitLabOAuthSuccess = async (_event: any, data: any): Promise<void> => {
-            const providerId = data.providerId || activeProviderId
+            const providerId = data.providerId || activeProviderIdRef.current
             if (providerId && providerId !== 'github') {
                 await window.electron.ipcRenderer.invoke(
                     'gitlab-initialize',
@@ -133,7 +139,7 @@ const useGitAuth = () => {
                     providerId
                 )
                 dispatch(setActiveProvider(providerId))
-                await loadGithubData()
+                await loadGithubDataRef.current()
             }
         }
 
@@ -142,18 +148,18 @@ const useGitAuth = () => {
         // layout level). Forwarding them from here would multiply the
         // toast by the number of useGitAuth consumers.
 
-        window.electron.ipcRenderer.on('github-oauth-success', onGitHubOAuthSuccess)
-        window.electron.ipcRenderer.on('gitlab-oauth-success', onGitLabOAuthSuccess)
+        const offGithub = subscribeIpc('github-oauth-success', onGitHubOAuthSuccess)
+        const offGitlab = subscribeIpc('gitlab-oauth-success', onGitLabOAuthSuccess)
 
         if (!isInitialized) {
-            loadGithubData()
+            loadGithubDataRef.current()
         }
 
         return () => {
-            window.electron.ipcRenderer.removeListener('github-oauth-success', onGitHubOAuthSuccess)
-            window.electron.ipcRenderer.removeListener('gitlab-oauth-success', onGitLabOAuthSuccess)
+            offGithub()
+            offGitlab()
         }
-    }, [isInitialized, dispatch, activeProviderId, loadGithubData])
+    }, [isInitialized, dispatch])
 
     const handleLoginGithub = (): void => {
         dispatch(setActiveProvider('github'))
