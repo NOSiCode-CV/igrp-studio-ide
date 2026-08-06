@@ -1,15 +1,29 @@
 import useToast from '@renderer/hooks/useToast'
 import yaml from 'js-yaml'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import path from 'path'
 import type { IDocker } from 'src/main/interfaces'
-import type { DockerComposeConfig, IWorkspace, ServiceInfo } from 'src/main/types'
+import type { DockerComposeConfig, IWorkspace, ProjectData, ServiceInfo } from 'src/main/types'
+
+const AUTO_REFRESH_INTERVAL_MS = 5000
+const ACTION_STATUS_REFRESH_ATTEMPTS = 6
+const ACTION_STATUS_REFRESH_DELAY_MS = 900
+type NginxRoute = { route: string; upstreamHost: string }
+type NginxRouting = { listenPort: number; routes: NginxRoute[] }
 
 export function useDocker({
     workspace,
-    changeStatus = false
+    changeStatus = false,
+    watchStatus = true
 }: {
-    workspace: IWorkspace
+    workspace?: IWorkspace | null
     changeStatus?: boolean
+    /**
+     * When false, skip the on-mount `docker compose ps` and the periodic
+     * status polling. Action-only consumers (e.g. per-service action menus)
+     * should pass `false` so N cards don't each spawn their own `docker ps`.
+     */
+    watchStatus?: boolean
 }): {
     fileContent: string | null
     composeConfig: DockerComposeConfig | null
@@ -18,6 +32,7 @@ export function useDocker({
     loading: boolean
     isDockerRunning: boolean
     getServiceUrl: (service: ServiceInfo) => string | null
+    getProjectBrowserUrl: (project: ProjectData, service?: ServiceInfo) => string | null
     loadComposeFile: (projectPath: string) => Promise<void>
     startContainers: () => Promise<void>
     stopContainers: (dropVolume: boolean) => Promise<void>
@@ -32,6 +47,8 @@ export function useDocker({
     const [loading, setLoading] = useState<boolean>(false)
     const [composeConfig, setComposeConfig] = useState<DockerComposeConfig | null>(null)
     const [error, setError] = useState<Error | null>(null)
+    const [nginxRouting, setNginxRouting] = useState<NginxRouting | null>(null)
+    const [workspaceNginxPort, setWorkspaceNginxPort] = useState<number | null>(null)
 
     const { showErrorToast } = useToast()
 
@@ -124,6 +141,9 @@ export function useDocker({
             }
 
             try {
+                if (!workspace?.path) {
+                    throw new Error('No active workspace selected')
+                }
                 return await dockerOperations[operation](workspace.path, {
                     services: services ?? [],
                     timeout,
@@ -146,28 +166,239 @@ export function useDocker({
         [isDockerRunning, dockerOperations, checkDocker, workspace?.path]
     )
 
-    const getServiceUrl = (service: ServiceInfo): string | null => {
-        if (
-            service.status !== 'running' ||
-            !service.ports ||
-            service.ports.length === 0 ||
-            !['file', 'web'].some((type) => service.labels?.type?.includes(type))
-        )
-            return null
+    const fetchStatus = useCallback(async (): Promise<ServiceInfo[]> => {
+        if (!workspace?.path) return []
+        return await dockerOperations.status(workspace.path)
+    }, [dockerOperations, workspace?.path])
 
-        const normalizedPorts = service.ports.map((port) => {
-            if (typeof port === 'string') {
-                const [published, target] = port.split(':')
-                return {
-                    published: parseInt(published),
-                    target: parseInt(target)
+    const refreshUntilStatusChanges = useCallback(
+        async (targetServiceNames?: string[]): Promise<void> => {
+            const tracked = (targetServiceNames || [])
+                .map((name) => name?.trim())
+                .filter((name): name is string => Boolean(name))
+
+            const previousStatusByService = new Map<string, string>()
+            if (tracked.length > 0) {
+                tracked.forEach((name) => {
+                    const previous = services.find((svc) => svc.name === name)?.status || 'unknown'
+                    previousStatusByService.set(name, previous)
+                })
+            }
+
+            for (let attempt = 0; attempt < ACTION_STATUS_REFRESH_ATTEMPTS; attempt++) {
+                const nextServices = await fetchStatus()
+
+                if (previousStatusByService.size === 0) {
+                    if (attempt === 0) return
+                } else {
+                    const changed = Array.from(previousStatusByService.entries()).some(
+                        ([name, previousStatus]) => {
+                            const currentStatus =
+                                nextServices.find((svc) => svc.name === name)?.status || 'unknown'
+                            return currentStatus !== previousStatus
+                        }
+                    )
+
+                    if (changed) return
+                }
+
+                if (attempt < ACTION_STATUS_REFRESH_ATTEMPTS - 1) {
+                    await new Promise((resolve) =>
+                        window.setTimeout(resolve, ACTION_STATUS_REFRESH_DELAY_MS)
+                    )
                 }
             }
-            return port
-        })
+        },
+        [fetchStatus, services]
+    )
 
-        // Fallback to first port with HTTP
-        return `http://localhost:${normalizedPorts[0].published}`
+    const getServiceUrl = (service: ServiceInfo): string | null => {
+        const serviceName = (service?.name || '').toLowerCase()
+        if (serviceName.includes('prometheus')) return null
+
+        const browserHost = workspace?.slug || 'localhost'
+        const parsePublishedToken = (value: string | number | undefined): number | null => {
+            if (typeof value === 'number') {
+                return Number.isNaN(value) ? null : value
+            }
+            if (!value) return null
+            const direct = Number.parseInt(value, 10)
+            if (!Number.isNaN(direct)) return direct
+            const defaultMatch = value.match(/:-([0-9]+)\}/)
+            if (defaultMatch) {
+                const fromDefault = Number.parseInt(defaultMatch[1], 10)
+                return Number.isNaN(fromDefault) ? null : fromDefault
+            }
+            return null
+        }
+
+        const normalizePublishedPort = (candidate: ServiceInfo): number | null => {
+            if (!candidate.ports || candidate.ports.length === 0) return null
+            const normalizedPorts = candidate.ports.map((port) => {
+                if (typeof port === 'string') {
+                    const [published, target] = port.split(':')
+                    return {
+                        published: parsePublishedToken(published),
+                        target: parsePublishedToken(target)
+                    }
+                }
+                return port
+            })
+
+            const firstPublished = normalizedPorts.find(
+                (port) => typeof port?.published === 'number' && !Number.isNaN(port.published)
+            )
+            return firstPublished?.published ?? null
+        }
+
+        const nginxService = services.find(
+            (svc) =>
+                svc.name?.toLowerCase().includes('nginx') &&
+                Array.isArray(svc.ports) &&
+                svc.ports.length > 0
+        )
+        const nginxPublishedPort = nginxService ? normalizePublishedPort(nginxService) : null
+        const resolvedNginxPort =
+            typeof nginxPublishedPort === 'number' && nginxPublishedPort > 0
+                ? nginxPublishedPort
+                : workspaceNginxPort && workspaceNginxPort > 0
+                  ? workspaceNginxPort
+                  : 2575
+        const composeFile = (service.composeFile || '').toLowerCase()
+        const isWorkspaceProjectService = composeFile.includes('igrp-projects-compose.yml')
+        if (isWorkspaceProjectService && service.name) {
+            return `http://${browserHost}:${resolvedNginxPort}/gateway-api/${service.name}/v3/api-docs`
+        }
+
+        if (nginxRouting) {
+            const directMatch = nginxRouting.routes.find((route) =>
+                route.upstreamHost.toLowerCase().includes(serviceName)
+            )
+            if (directMatch) {
+                return `http://${browserHost}:${resolvedNginxPort}${directMatch.route}`
+            }
+
+            // Common aliases from nginx.conf patterns
+            const aliases: Array<{ key: string; route: string }> = [
+                { key: 'pgadmin', route: '/pgadmin/' },
+                { key: 'grafana', route: '/grafana/' },
+                { key: 'keycloak', route: '/auth/' },
+                { key: 'minio', route: '/minio/' },
+                { key: 'eureka', route: '/eureka/' },
+                { key: 'gateway', route: '/gateway-api/' },
+                { key: 'application-center', route: '/' }
+            ]
+            const alias = aliases.find((item) => serviceName.includes(item.key))
+            if (alias) {
+                return `http://${browserHost}:${resolvedNginxPort}${alias.route}`
+            }
+
+            if (service.name === nginxService?.name) {
+                return `http://${browserHost}:${resolvedNginxPort}/`
+            }
+
+            // Fallback for app services proxied through nginx dynamic route /apps/<service>/...
+            const isProcessService = composeFile.includes('igrp-process-compose.yaml')
+            if (isProcessService && service.name) {
+                const serviceNameLower = service.name.toLowerCase()
+                if (
+                    serviceNameLower.includes('-api') ||
+                    serviceNameLower.includes('api-') ||
+                    serviceNameLower.endsWith('api')
+                ) {
+                    return `http://${browserHost}:${resolvedNginxPort}/gateway-api/${service.name}/swagger-ui/index.html`
+                }
+                return `http://${browserHost}:${resolvedNginxPort}/gateway-api/${service.name}`
+            }
+
+            // Generic fallback for project services attached to main stack/nginx:
+            // - API-like services through gateway
+            // - Frontend-like services through /apps/<service>
+            const labelsType = (service.labels?.type || '').toLowerCase()
+            if (service.stack === 'main' && service.name) {
+                const serviceNameLower = service.name.toLowerCase()
+                const looksLikeApi =
+                    labelsType.includes('api') ||
+                    serviceNameLower.includes('-api') ||
+                    serviceNameLower.includes('api-') ||
+                    serviceNameLower.endsWith('api')
+                if (looksLikeApi) {
+                    return `http://${browserHost}:${resolvedNginxPort}/gateway-api/${service.name}/swagger-ui/index.html`
+                }
+                return `http://${browserHost}:${resolvedNginxPort}/apps/${service.name}`
+            }
+        }
+
+        const published = normalizePublishedPort(service)
+        if (!published) return null
+        return `http://${browserHost}:${published}`
+    }
+
+    const getProjectBrowserUrl = (project: ProjectData, service?: ServiceInfo): string | null => {
+        if (service) return getServiceUrl(service)
+        const browserHost = workspace?.slug || 'localhost'
+        const resolvedNginxPort =
+            workspaceNginxPort && workspaceNginxPort > 0 ? workspaceNginxPort : 2575
+        const projectDir = path
+            .basename(project.path || '')
+            .toLowerCase()
+            .trim()
+        if (!projectDir) return null
+        const inferredServiceName = `${browserHost}-${projectDir}`
+        return `http://${browserHost}:${resolvedNginxPort}/gateway-api/${inferredServiceName}/v3/api-docs`
+    }
+
+    useEffect(() => {
+        const loadWorkspaceNginxPort = async (): Promise<void> => {
+            if (!workspace?.path) {
+                setWorkspaceNginxPort(null)
+                return
+            }
+            try {
+                const envPath = `${workspace.path}/.env`
+                const raw = await window.api.getFileContent(envPath)
+                const envContent = typeof raw === 'string' ? raw : ''
+                const lines = envContent.split('\n')
+                const hostPortLine = lines.find((line) => line.startsWith('HOST_NGINX_HTTP_PORT='))
+                const nginxPortLine = lines.find((line) => line.startsWith('NGINX_HTTP_PORT='))
+                const rawValue = (hostPortLine || nginxPortLine || '').split('=')[1]?.trim()
+                const parsed = rawValue ? Number.parseInt(rawValue, 10) : Number.NaN
+                setWorkspaceNginxPort(Number.isNaN(parsed) ? null : parsed)
+            } catch {
+                setWorkspaceNginxPort(null)
+            }
+        }
+
+        void loadWorkspaceNginxPort()
+    }, [workspace?.path])
+
+    const parseNginxRouting = (nginxConf: string): NginxRouting | null => {
+        const listenMatch = nginxConf.match(/listen\s+(\d+)\s+default_server;/)
+        const listenPort = listenMatch ? parseInt(listenMatch[1]) : 80
+        if (Number.isNaN(listenPort)) return null
+
+        const routes: NginxRoute[] = []
+        const locationRegex = /location\s+([^{]+)\{([\s\S]*?)\}/g
+        let locationMatch: RegExpExecArray | null = locationRegex.exec(nginxConf)
+        while (locationMatch) {
+            const rawLocation = locationMatch[1].trim()
+            const block = locationMatch[2]
+            const upstreamMatch = block.match(/set\s+\$upstream\s+([^:;\s]+):\d+;/)
+            if (upstreamMatch) {
+                const upstreamHost = upstreamMatch[1].trim()
+                const locationPathMatch = rawLocation.match(/(\/[^\s]*)/)
+                const route = locationPathMatch
+                    ? locationPathMatch[1].replace(/\^~/g, '').trim()
+                    : '/'
+                routes.push({
+                    route: route.endsWith('/') ? route : `${route}/`,
+                    upstreamHost
+                })
+            }
+            locationMatch = locationRegex.exec(nginxConf)
+        }
+
+        return { listenPort, routes }
     }
 
     useEffect(() => {
@@ -177,21 +408,91 @@ export function useDocker({
     }, [error, showErrorToast])
 
     const loadComposeFile = useCallback(async (projectPath: string): Promise<void> => {
-        const fileContent = await window.api.getFileContent(`${projectPath}/igrp-compose.yaml`)
+        const composePath = `${projectPath}/igrp-compose.yaml`
+        const raw = await window.api.getFileContent(composePath)
+        const fileContent = typeof raw === 'string' ? raw : null
+
+        if (!fileContent) {
+            setFileContent(null)
+            setComposeConfig(null)
+            return
+        }
 
         const composeConfig = yaml.load(fileContent) as DockerComposeConfig
-
         setFileContent(fileContent)
         setComposeConfig(composeConfig)
     }, [])
 
+    const dockerOpRef = useRef(handleDockerOperation)
     useEffect(() => {
-        const refreshContainers = async (): Promise<void> => {
-            handleDockerOperation('status')
+        dockerOpRef.current = handleDockerOperation
+    }, [handleDockerOperation])
+
+    useEffect(() => {
+        if (!workspace?.path || !watchStatus) return
+
+        const refreshOnce = async (): Promise<void> => {
+            try {
+                if (document.visibilityState === 'hidden') return
+                await dockerOpRef.current('status')
+            } catch {
+                // non-blocking
+            }
         }
 
-        if (workspace && changeStatus) refreshContainers()
-    }, [workspace, changeStatus, handleDockerOperation])
+        void refreshOnce()
+        return
+    }, [workspace?.path, watchStatus])
+
+    useEffect(() => {
+        if (!workspace?.path || !changeStatus || !watchStatus) return
+
+        let intervalId: number | undefined
+        let inFlight = false
+
+        const refreshContainers = async (): Promise<void> => {
+            if (inFlight || document.visibilityState === 'hidden') return
+            inFlight = true
+            try {
+                await dockerOpRef.current('status')
+            } finally {
+                inFlight = false
+            }
+        }
+
+        void refreshContainers()
+        intervalId = window.setInterval(() => {
+            void refreshContainers()
+        }, AUTO_REFRESH_INTERVAL_MS)
+
+        return () => {
+            if (intervalId !== undefined) {
+                window.clearInterval(intervalId)
+            }
+        }
+    }, [workspace?.path, changeStatus, watchStatus])
+
+    useEffect(() => {
+        if (!workspace?.path) return
+        let mounted = true
+
+        const loadNginxRouting = async (): Promise<void> => {
+            try {
+                const nginxPath = `${workspace.path}/nginx.conf`
+                const raw = await window.api.getFileContent(nginxPath)
+                const nginxConf = typeof raw === 'string' ? raw : null
+                if (!mounted || !nginxConf) return
+                setNginxRouting(parseNginxRouting(nginxConf))
+            } catch {
+                if (mounted) setNginxRouting(null)
+            }
+        }
+
+        void loadNginxRouting()
+        return () => {
+            mounted = false
+        }
+    }, [workspace?.path])
 
     return {
         fileContent,
@@ -201,21 +502,26 @@ export function useDocker({
         loading,
         isDockerRunning,
         getServiceUrl,
+        getProjectBrowserUrl,
         loadComposeFile,
         startContainers: async () => {
             await handleDockerOperation('up')
+            await refreshUntilStatusChanges()
         },
         stopContainers: async (dropVolume: boolean) => {
             await handleDockerOperation('down', { dropVolume })
+            await refreshUntilStatusChanges()
         },
         refreshContainers: async () => {
-            await handleDockerOperation('status')
+            await fetchStatus()
         },
         stopService: async (services?: string[]) => {
             await handleDockerOperation('stop', { services })
+            await refreshUntilStatusChanges(services)
         },
         restartService: async (services?: string[], timeout?: number) => {
             await handleDockerOperation('restart', { services, timeout })
+            await refreshUntilStatusChanges(services)
         }
     }
 }

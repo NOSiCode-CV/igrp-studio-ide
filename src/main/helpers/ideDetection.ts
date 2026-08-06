@@ -1,13 +1,12 @@
 // utils/ideDetection.ts
 import { exec } from 'child_process'
-import { BrowserWindow } from 'electron'
+import * as os from 'os'
+import path from 'path'
 import { promisify } from 'util'
-import { ERROR_CODES, EVENTS } from '../constants/events'
 
 export interface IDEDetails {
     command: string
     name: string
-    detectionCommand?: string
     icon?: string
 }
 
@@ -20,55 +19,67 @@ export const IDES: IDEConfig = {
     vscode: {
         command: 'code',
         name: 'VS Code',
-        detectionCommand: 'code --version',
         icon: 'Code'
     },
     intellij: {
         command: 'idea',
         name: 'IntelliJ IDEA',
-        detectionCommand: 'idea --version',
         icon: 'Lightbulb'
     },
     sublime: {
         command: 'subl',
         name: 'Sublime Text',
-        detectionCommand: 'subl --version',
         icon: 'Type' // or "FileText" depending on your icon set
     },
     cursor: {
         command: 'cursor',
         name: 'Cursor',
-        detectionCommand: 'cursor --version',
         icon: 'MousePointer2' // or "Pointer" depending on your icon set
     }
 }
 
 const execAsync = promisify(exec)
 
+// GUI-launched Electron apps inherit a minimal PATH on macOS/Linux (no
+// /usr/local/bin, Homebrew or JetBrains Toolbox launcher dirs), so IDE
+// launchers installed there would never be found when the Studio is
+// started from Finder/Dock. Extend PATH for detection and for opening.
+export function getShellEnv(): NodeJS.ProcessEnv {
+    if (process.platform === 'win32') return process.env
+
+    const extraDirs = [
+        '/usr/local/bin',
+        '/opt/homebrew/bin',
+        path.join(os.homedir(), '.local', 'bin'),
+        path.join(os.homedir(), 'Library/Application Support/JetBrains/Toolbox/scripts')
+    ]
+    const current = (process.env.PATH || '').split(path.delimiter).filter(Boolean)
+    const merged = [...current, ...extraDirs.filter((dir) => !current.includes(dir))]
+    return { ...process.env, PATH: merged.join(path.delimiter) }
+}
+
+// Checks that a launcher exists on PATH WITHOUT executing it. Running the
+// launcher to probe it (e.g. `idea --version`) is not safe: JetBrains'
+// `idea` treats any invocation as "open the IDE" and boots IntelliJ.
+async function isCommandAvailable(command: string): Promise<boolean> {
+    const probe =
+        process.platform === 'win32' ? `where ${command}` : `command -v ${command}`
+    try {
+        await execAsync(probe, { env: getShellEnv() })
+        return true
+    } catch {
+        // Non-zero exit simply means "not installed" — expected, not an error.
+        return false
+    }
+}
+
 export async function detectInstalledIDEs(): Promise<Array<{ key: string; config: IDEDetails }>> {
-    const installedIDEs: Array<{ key: string; config: IDEDetails }> = []
-
-    await Promise.all(
-        Object.entries(IDES).map(async ([ideKey, ideConfig]) => {
-            try {
-                if (ideConfig.detectionCommand) {
-                    await execAsync(ideConfig.detectionCommand)
-                    installedIDEs.push({ key: ideKey, config: ideConfig })
-                }
-            } catch (error: any) {
-                console.error(`Error detecting ${ideKey} IDE:`, error.message)
-
-                // Send log to renderer process
-                const mainWindow = BrowserWindow.getFocusedWindow()
-                if (mainWindow) {
-                    mainWindow.webContents.send(EVENTS.LOG, {
-                        code: ERROR_CODES.ERROR,
-                        message: `Error detecting ${ideKey} IDE: ${error.message}`
-                    })
-                }
-            }
-        })
+    const results = await Promise.all(
+        Object.entries(IDES).map(async ([key, config]) => ({
+            key,
+            config,
+            installed: await isCommandAvailable(config.command)
+        }))
     )
-
-    return installedIDEs
+    return results.filter((r) => r.installed).map(({ key, config }) => ({ key, config }))
 }

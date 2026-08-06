@@ -1,16 +1,16 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPCombobox,
-    IGRPDialogClosePrimitive,
-    IGRPDialogContentPrimitive,
-    IGRPDialogDescriptionPrimitive,
-    IGRPDialogFooterPrimitive,
-    IGRPDialogHeaderPrimitive,
-    IGRPDialogPrimitive,
-    IGRPDialogTitlePrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@renderer/components/ui/dialog'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import { httpStatusCodes } from '@renderer/constants/appConstants'
 import { getStatusLabel } from '@renderer/utils'
 import type React from 'react'
@@ -52,12 +52,12 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
     }
 
     return (
-        <IGRPDialogPrimitive open={isOpen} onOpenChange={onClose}>
-            <IGRPDialogContentPrimitive>
-                <IGRPDialogHeaderPrimitive>
-                    <IGRPDialogTitlePrimitive>{t('addResponse')}</IGRPDialogTitlePrimitive>
-                    <IGRPDialogDescriptionPrimitive></IGRPDialogDescriptionPrimitive>
-                </IGRPDialogHeaderPrimitive>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{t('addResponse')}</DialogTitle>
+                    <DialogDescription></DialogDescription>
+                </DialogHeader>
                 <form
                     onSubmit={(e) => {
                         e.preventDefault()
@@ -66,7 +66,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                 >
                     <div className="space-y-4">
                         <div className="flex flex-col gap-3">
-                            <IGRPLabelPrimitive>{t('httpStatusCode')}</IGRPLabelPrimitive>
+                            <Label>{t('httpStatusCode')}</Label>
                             <IGRPCombobox
                                 options={httpStatusCodes}
                                 value={statusCode}
@@ -78,8 +78,8 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                             />
                         </div>
                         <div className="flex flex-col gap-3">
-                            <IGRPLabelPrimitive className="">{t('name')}</IGRPLabelPrimitive>
-                            <IGRPInputPrimitive
+                            <Label className="">{t('name')}</Label>
+                            <Input
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
@@ -88,7 +88,7 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                             />
                         </div>
                         <div className="flex flex-col gap-3">
-                            <IGRPLabelPrimitive className="">{t('contentType')}</IGRPLabelPrimitive>
+                            <Label className="">{t('contentType')}</Label>
                             <IGRPCombobox
                                 options={contentTypes}
                                 value={contentType}
@@ -97,18 +97,18 @@ const AddResponseModal: React.FC<AddResponseModalProps> = ({
                             />
                         </div>
 
-                        <IGRPDialogFooterPrimitive>
-                            <IGRPDialogClosePrimitive asChild>
-                                <IGRPButtonPrimitive type="button" variant="secondary">
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">
                                     {t('close')}
-                                </IGRPButtonPrimitive>
-                            </IGRPDialogClosePrimitive>
-                            <IGRPButtonPrimitive type="submit">{t('save')}</IGRPButtonPrimitive>
-                        </IGRPDialogFooterPrimitive>
+                                </Button>
+                            </DialogClose>
+                            <Button type="submit">{t('save')}</Button>
+                        </DialogFooter>
                     </div>
                 </form>
-            </IGRPDialogContentPrimitive>
-        </IGRPDialogPrimitive>
+            </DialogContent>
+        </Dialog>
     )
 }
 

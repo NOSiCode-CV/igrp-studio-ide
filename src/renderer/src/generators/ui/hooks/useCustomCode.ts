@@ -3,9 +3,10 @@ import type {
     CustomFunctionConfig,
     State
 } from '@igrp/igrp-studio-nextjs-engine/types'
-import { useDroppedComponents } from '@renderer/generators/ui/dnd/DroppedComponentsContext'
+import { useDroppedComponents } from '@renderer/generators/ui/contexts/EditorContext'
 import useStudio from '@renderer/hooks/use-studio'
 import { EngineService } from '@renderer/services/EngineService'
+import { subscribeIpc } from '@renderer/lib/subscribe-ipc'
 import { useEffect, useMemo, useState } from 'react'
 import { useComponents } from './useComponents'
 
@@ -114,7 +115,19 @@ const useCustomCode = (): CustomCodeHook => {
                         ...(result.hooks || [])
                     ])
                     setTypes(result.types || [])
-                    setCustomComponents(result.components || [])
+                    const nextComponents = result.components || []
+                    setCustomComponents((prev) => {
+                        // Keep reference stable when content is unchanged so
+                        // downstream effects (useComponentRegistration) don't
+                        // re-fire on every fetch.
+                        if (prev.length === nextComponents.length) {
+                            const sameContent = prev.every(
+                                (c: any, i: number) => c?.name === nextComponents[i]?.name
+                            )
+                            if (sameContent) return prev
+                        }
+                        return nextComponents
+                    })
                 }
             } catch (err) {
                 setError(err instanceof Error ? err : new Error('Failed to load resources'))
@@ -126,11 +139,7 @@ const useCustomCode = (): CustomCodeHook => {
         fetchData()
 
         const handleFolderChange = (): Promise<void> => fetchData()
-        window.electron.ipcRenderer.on('folder-change', handleFolderChange)
-
-        return () => {
-            window.electron.ipcRenderer.removeListener('folder-change', handleFolderChange)
-        }
+        return subscribeIpc('folder-change', handleFolderChange)
     }, [basePath])
 
     return {

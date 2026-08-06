@@ -6,7 +6,8 @@ import type { FileTree, Handler, IOpenProject, ProjectData } from '../types'
 
 export async function openDirectory(buttonLabel?: string): Promise<IOpenProject> {
     const result = await dialog.showOpenDialog({
-        properties: ['openDirectory'],
+        // Match `open-directory-dialog` in main: allows "New Folder" / create directory in the picker (macOS; ignored where unsupported)
+        properties: ['openDirectory', 'createDirectory'],
         buttonLabel: buttonLabel ?? 'Select Destination Folder'
     })
 
@@ -48,7 +49,9 @@ export async function checkAndReadBaseApi(
             if (baseApiPath.endsWith('baseApi.json')) {
                 config = {
                     id,
-                    name: parsedConfig.apiName,
+                    // Persisted baseApi.json uses `name`; keep apiName as a
+                    // fallback for older/legacy files.
+                    name: parsedConfig.name ?? parsedConfig.apiName,
                     type: 'backend',
                     framework: type,
                     config: { ...parsedConfig },
@@ -58,7 +61,9 @@ export async function checkAndReadBaseApi(
             } else if (baseApiPath.endsWith('baseApp.json')) {
                 config = {
                     id,
-                    name: parsedConfig.appName,
+                    // Persisted baseApp.json uses `name`; keep appName as a
+                    // fallback for older/legacy files.
+                    name: parsedConfig.name ?? parsedConfig.appName,
                     type: 'frontend',
                     framework: type,
                     config: { ...parsedConfig },
@@ -102,6 +107,10 @@ export const handleWithCustomErrors = (channel: string, handler: Handler) => {
                 result: await Promise.resolve(handler(event, ...args))
             }
         } catch (e) {
+            // Print full stack to main-process terminal — only the message
+            // survives IPC serialization, so without this the renderer never
+            // sees a stack and the terminal stays silent on engine throws.
+            console.error(`[ipc:${channel}]`, e)
             return { error: e }
         }
     })
@@ -128,6 +137,8 @@ export const readIgrpStudioDirectory = (basePath: string): FileTree[] => {
                         name: file,
                         path: filePath,
                         isDirectory: true,
+                        createdAt: stats.birthtimeMs,
+                        modifiedAt: stats.mtimeMs,
                         children: readIgrpStudioDirectory(filePath) // Leitura recursiva
                     }
                 } else {
@@ -142,6 +153,8 @@ export const readIgrpStudioDirectory = (basePath: string): FileTree[] => {
                         name: file,
                         path: filePath,
                         isDirectory: false,
+                        createdAt: stats.birthtimeMs,
+                        modifiedAt: stats.mtimeMs,
                         content // Inclui o conteúdo do arquivo
                     }
                 }

@@ -1,17 +1,21 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import {
-    IGRPButtonPrimitive,
-    IGRPSeparator,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
+import { IGRPSeparator } from '@igrp/igrp-framework-react-design-system'
 import { DebugTerminal } from '@renderer/components/debug-terminal'
+import { TERMINAL_TOGGLE_EVENT } from '@renderer/components/integrated-terminal'
 import Doctor from '@renderer/components/doctor'
 import { SHOW_UPDATE_MODAL_EVENT } from '@renderer/components/update-banner'
-import { AlertCircle, HelpCircle, Stethoscope, Wifi, WifiOff } from 'lucide-react'
+import { subscribeIpc } from '@renderer/lib/subscribe-ipc'
+import { AlertCircle, HelpCircle, Stethoscope, Terminal, Wifi, WifiOff } from 'lucide-react'
 import { type JSX, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -61,11 +65,7 @@ export function Footer(): JSX.Element {
             if (data.version) setNewVersion(data.version)
         }
 
-        window.electron.ipcRenderer.on('message-update', handleUpdateMessage)
-
-        return () => {
-            window.electron.ipcRenderer.removeListener('message-update', handleUpdateMessage)
-        }
+        return subscribeIpc('message-update', handleUpdateMessage)
     }, [])
 
     useEffect(() => {
@@ -101,37 +101,48 @@ export function Footer(): JSX.Element {
         if (appVersion) handleCheckUpdate()
     }, [appVersion, t])
 
-    /*  const simulateError = (): void => {
-    const error = new Error('This is a simulated error from the renderer process.')
-
-    if (window.electron?.reportError) {
-      window.electron.reportError(error)
-      setLog('Simulated error sent to logger')
-    } else {
-      console.error('Electron reportError bridge is not available')
-      throw error
-    }
-  } */
+    const updateErrorDetails = (updateError || log || t('update_check_failed')).replace(
+        /\\n/g,
+        '\n'
+    )
 
     return (
-        <IGRPTooltipProviderPrimitive>
+        <TooltipProvider>
             <footer className="h-8 border-t bg-card flex items-center px-3 justify-between text-xs fixed bottom-0 left-0 right-0 z-50">
                 <div className="flex items-center space-x-3">
                     <span className="text-muted-foreground whitespace-nowrap flex-none">
                         {`${import.meta.env.VITE_APP_TITLE}`} &copy; {new Date().getFullYear()}
                     </span>
 
-                    <span className="text-muted-foreground">
+                    <span className="text-muted-foreground min-w-0">
                         {lastUpdateType === 'error' ? (
-                            <span
-                                className="flex items-center space-x-1 text-destructive"
-                                title={updateError || log}
-                            >
-                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                <span className="truncate max-w-[calc(100vw-500px)]">
-                                    {updateError || log}
-                                </span>
-                            </span>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <button
+                                        type="button"
+                                        className="flex max-w-[min(28rem,calc(100vw-28rem))] items-center gap-1.5 rounded text-destructive hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-destructive/30"
+                                    >
+                                        <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                                        <span className="truncate">
+                                            {t('update_check_failed')}
+                                        </span>
+                                    </button>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                    side="top"
+                                    align="start"
+                                    className="z-[60] w-[min(28rem,calc(100vw-2rem))] gap-2 border-border bg-popover p-3 text-popover-foreground shadow-lg"
+                                >
+                                    <p className="text-sm font-medium text-destructive">
+                                        {t('update_check_failed')}
+                                    </p>
+                                    <ScrollArea className="h-48 rounded-md border border-border bg-muted">
+                                        <pre className="whitespace-pre-wrap break-words p-2 font-mono text-[11px] leading-snug text-muted-foreground">
+                                            {updateErrorDetails}
+                                        </pre>
+                                    </ScrollArea>
+                                </PopoverContent>
+                            </Popover>
                         ) : lastUpdateType === 'available' ||
                           lastUpdateType === 'progress' ||
                           lastUpdateType === 'downloaded' ? (
@@ -140,19 +151,19 @@ export function Footer(): JSX.Element {
                                 onClick={() =>
                                     window.dispatchEvent(new CustomEvent(SHOW_UPDATE_MODAL_EVENT))
                                 }
-                                className="flex items-center space-x-1 text-amber-600 hover:text-amber-700 hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 rounded"
+                                className="flex max-w-[min(28rem,calc(100vw-28rem))] items-center gap-1.5 text-amber-600 hover:text-amber-700 hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 rounded"
                                 title={
                                     newVersion
                                         ? `${t('new_update_available')} (${newVersion})`
                                         : t('new_update_available')
                                 }
                             >
-                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                <span className="truncate max-w-[calc(100vw-500px)]">{log}</span>
+                                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                                <span className="truncate">{log}</span>
                             </button>
                         ) : lastUpdateType === 'checking' ? (
-                            <span className="flex items-center space-x-1 text-muted-foreground">
-                                <span className="truncate max-w-[calc(100vw-500px)]">{log}</span>
+                            <span className="flex max-w-[min(28rem,calc(100vw-28rem))] items-center gap-1.5 text-muted-foreground">
+                                <span className="truncate">{log}</span>
                             </span>
                         ) : (
                             `v${appVersion}`
@@ -163,28 +174,40 @@ export function Footer(): JSX.Element {
                 <div className="flex items-center space-x-3">
                     <IGRPSeparator orientation="vertical" className="h-4" />
 
-                    {/*  <button onClick={simulateError} className="">
-            Simulate Error
-          </button> */}
-
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
-                            <IGRPButtonPrimitive
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
                                 size={'icon'}
                                 variant={'ghost'}
                                 className="h-6 w-6"
                                 onClick={() => setOpen(!open)}
                             >
                                 <Stethoscope className="text-muted-foreground" />
-                            </IGRPButtonPrimitive>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive side="top">Doctor</IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">Doctor</TooltipContent>
+                    </Tooltip>
 
                     <DebugTerminal />
 
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-6 w-6"
+                                onClick={() =>
+                                    window.dispatchEvent(new Event(TERMINAL_TOGGLE_EVENT))
+                                }
+                            >
+                                <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">Terminal (Ctrl+`)</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                        <TooltipTrigger asChild>
                             <div className="flex items-center space-x-1">
                                 {isOnline ? (
                                     <Wifi className="h-3.5 w-3.5 text-green-500" />
@@ -195,26 +218,26 @@ export function Footer(): JSX.Element {
                                     {isOnline ? 'Online' : 'Offline'}
                                 </span>
                             </div>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive side="top">
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
                             <p>{t('networkStatus')}</p>
-                        </IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                        </TooltipContent>
+                    </Tooltip>
 
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
-                            <IGRPButtonPrimitive variant="ghost" size="icon" className="h-6 w-6">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
                                 <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
-                            </IGRPButtonPrimitive>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive side="top">
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
                             <p>{t('helpCenter')}</p>
-                        </IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                        </TooltipContent>
+                    </Tooltip>
 
                     <Doctor open={open} setOpen={setOpen} />
                 </div>
             </footer>
-        </IGRPTooltipProviderPrimitive>
+        </TooltipProvider>
     )
 }

@@ -1,9 +1,5 @@
-import {
-    IGRPButtonPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Button } from '@renderer/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import { useGit } from '@renderer/hooks/use-git'
 import { cn } from '@renderer/lib/utils'
 import type { RootState } from '@renderer/redux'
@@ -15,7 +11,13 @@ import useToast from '../../hooks/useToast'
 import AlertDialogSync from './alert-dialog'
 import { RemoteUrlDialog } from './remote-url-dialog'
 
-const SyncButton = ({ basePath }: { basePath: string }) => {
+const SyncButton = ({
+    basePath,
+    buttonClassName
+}: {
+    basePath: string
+    buttonClassName?: string
+}) => {
     const { t } = useTranslation()
     const { syncChanges } = useGit()
     const { activeBranch } = useSelector((state: RootState) => state.git)
@@ -54,22 +56,29 @@ const SyncButton = ({ basePath }: { basePath: string }) => {
 
     return (
         <>
-            <IGRPTooltipPrimitive>
-                <IGRPTooltipTriggerPrimitive asChild>
-                    <IGRPButtonPrimitive
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
                         variant="ghost"
-                        size="sm"
+                        size="icon"
+                        className={cn(
+                            'h-auto w-auto shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                            buttonClassName
+                        )}
                         onClick={() => setShowConfirm(true)}
                         disabled={isSyncing}
+                        aria-label={t('pullAndPushChanges')}
                     >
-                        <RefreshCw className={cn('h-4 w-4', isSyncing && 'animate-spin')} />
-                        {isSyncing && t('syncing')}
-                    </IGRPButtonPrimitive>
-                </IGRPTooltipTriggerPrimitive>
-                <IGRPTooltipContentPrimitive>
+                        <RefreshCw className={cn('h-3.5 w-3.5', isSyncing && 'animate-spin')} />
+                        <span className="sr-only">
+                            {isSyncing ? t('syncing') : t('pullAndPushChanges')}
+                        </span>
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
                     <p>{t('pullAndPushChanges')}</p>
-                </IGRPTooltipContentPrimitive>
-            </IGRPTooltipPrimitive>
+                </TooltipContent>
+            </Tooltip>
 
             <AlertDialogSync
                 isOpen={showConfirm}

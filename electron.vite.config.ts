@@ -2,9 +2,16 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import { resolve } from 'path'
 
+const sharedAlias = {
+    '@shared': resolve('src/shared')
+}
+
 export default defineConfig({
     main: {
         plugins: [externalizeDepsPlugin()],
+        resolve: {
+            alias: sharedAlias
+        },
         build: {
             outDir: 'out/main',
             rollupOptions: {
@@ -25,6 +32,7 @@ export default defineConfig({
         resolve: {
             alias: {
                 '@renderer': resolve('src/renderer/src'),
+                ...sharedAlias,
                 path: 'path-browserify',
                 'next/link': resolve(__dirname, 'src/renderer/src/__mocks__/next-link.js'),
                 'next/image': resolve(__dirname, 'src/renderer/src/__mocks__/next-image.js'),
@@ -35,7 +43,11 @@ export default defineConfig({
             }
         },
         define: {
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+            'import.meta.env.VITE_SENTRY_DSN': JSON.stringify(
+                process.env.SENTRY_DSN || process.env.VITE_SENTRY_DSN || ''
+            ),
+            'import.meta.env.VITE_SENTRY_TEST': JSON.stringify(process.env.VITE_SENTRY_TEST || '')
         },
         plugins: [react()],
         optimizeDeps: {

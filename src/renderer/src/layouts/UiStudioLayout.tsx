@@ -1,9 +1,11 @@
-import { IGRPSidebarProvider } from '@igrp/igrp-framework-react-design-system'
-import { ROUTES } from '@renderer/routes/routeConstants'
-import React, { useEffect } from 'react'
+import { SidebarProvider } from '@renderer/components/ui/sidebar'
+import Loader from '@renderer/components/loader'
+import { PermissionCatalogProvider } from '@renderer/generators/ui/permission-catalog/PermissionCatalogContext'
+import { useRestoreStudioSession } from '@renderer/hooks/use-restore-studio-session'
+import React from 'react'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
+import { IntegratedTerminal } from '../components/integrated-terminal'
 import { Footer } from './components/footer'
 import Header from './components/header'
 
@@ -25,19 +27,21 @@ const Layout = (props: LayoutProps): React.JSX.Element => {
         basePath: studio.basePath
     }))
 
-    const navigate = useNavigate()
-
+    const { restoring, basePath: restoredBasePath } = useRestoreStudioSession()
     const { config, basePath } = useSelector(selectStudioProperties)
+    const activeBasePath = basePath || restoredBasePath
 
-    useEffect(() => {
-        if (!basePath) {
-            navigate(ROUTES.IDE_INITIAL_SCREEN, { replace: true })
-        }
-    }, [navigate, basePath])
+    if (restoring || !activeBasePath) {
+        return (
+            <div className="flex h-screen w-full items-center justify-center bg-background">
+                <Loader variant="fullscreen" className="h-screen w-full" />
+            </div>
+        )
+    }
 
     return (
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(20))] [--header-height-three:calc(--spacing(28))]">
-            <IGRPSidebarProvider
+            <SidebarProvider
                 style={
                     {
                         '--sidebar-width': '380px'
@@ -45,16 +49,19 @@ const Layout = (props: LayoutProps): React.JSX.Element => {
                 }
             >
                 <div className="h-screen flex flex-col w-full">
-                    <Header config={config} basePath={basePath} />
+                    <Header config={config} basePath={activeBasePath} />
 
                     <div className="flex flex-1 overflow-hidden h-[calc(100svh-var(--header-height))]">
-                        {React.cloneElement(props.children, {
-                            basePath: basePath
-                        })}
+                        <PermissionCatalogProvider>
+                            {React.cloneElement(props.children, {
+                                basePath: activeBasePath
+                            })}
+                        </PermissionCatalogProvider>
                     </div>
                     <Footer />
+                    <IntegratedTerminal />
                 </div>
-            </IGRPSidebarProvider>
+            </SidebarProvider>
         </div>
     )
 }

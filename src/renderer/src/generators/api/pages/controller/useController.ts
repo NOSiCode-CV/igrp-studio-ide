@@ -6,8 +6,8 @@ import { useGit } from '@renderer/hooks/use-git'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useKeyPress } from '@renderer/hooks/useKeyDown'
 import useToast from '@renderer/hooks/useToast'
+import { useFormikCompat, useZodForm } from '@renderer/lib/form'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
-import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -56,14 +56,12 @@ export const useController = ({
     }>({})
 
     const validationSchema = useActionValidation({ t })
-    const formik: any = useFormik({
-        enableReinitialize: true,
-        initialValues,
-        validationSchema,
-        onSubmit: (_values, actions) => {
-            actions.setSubmitting(false)
-            handleSave()
-        }
+    const rhfForm = useZodForm<any>({
+        schema: validationSchema as never,
+        defaultValues: initialValues
+    })
+    const formik: any = useFormikCompat(rhfForm, async () => {
+        await handleSave()
     })
 
     const loadAction = (content: ControllerAction) => {

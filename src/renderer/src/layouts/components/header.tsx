@@ -1,39 +1,46 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPBreadcrumbItemPrimitive,
-    IGRPBreadcrumbLinkPrimitive,
-    IGRPBreadcrumbListPrimitive,
-    IGRPBreadcrumbPagePrimitive,
-    IGRPBreadcrumbPrimitive,
-    IGRPBreadcrumbSeparatorPrimitive,
-    IGRPButtonPrimitive,
-    IGRPDropdownMenuContentPrimitive,
-    IGRPDropdownMenuItemPrimitive,
-    IGRPDropdownMenuPrimitive,
-    IGRPDropdownMenuTriggerPrimitive,
-    IGRPIcon,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from '@renderer/components/ui/dropdown-menu'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
+import { useTheme } from '@renderer/components/theme-provider'
+import { IGRPIcon } from '@igrp/igrp-framework-react-design-system'
 import logo from '@renderer/assets/images/igrp-green.svg'
-import DockerControls from '@renderer/components/docker-controls'
 import SyncButton from '@renderer/components/git/git-sync'
-import { ModeToggle } from '@renderer/components/mode-toogle'
 import NotificationsPopover from '@renderer/components/notifications/notifications-popover'
 import GitConnectionMenu from '@renderer/components/user-auth'
-import { useDocker } from '@renderer/hooks/use-docker'
+import { SettingsDialog } from '@renderer/browser/settings'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
 import { cn } from '@renderer/lib/utils'
-import { SettingsDialog } from '@renderer/pages/settings/settings-dialog'
 import type { RootState } from '@renderer/redux'
-import { getFileThree as onGetPages } from '@renderer/redux/thunks'
+import { getFileThree as onGetPages, leaveStudioProject } from '@renderer/redux/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import { ArrowLeft, Code, Maximize2, Minus, Square, X } from 'lucide-react'
-import { type JSX, useEffect, useState } from 'react'
+import {
+    ArrowLeft,
+    ChevronRight,
+    Code,
+    FolderOpen,
+    Maximize2,
+    Minus,
+    Moon,
+    Square,
+    Sun,
+    X
+} from 'lucide-react'
+import { type JSX, type MouseEvent, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
 import type { ProjectData } from 'src/main/types'
 import { BranchSwitcher } from '../../components/git/git-branch-switcher'
 
@@ -42,34 +49,60 @@ interface HeaderProps {
     basePath?: string
 }
 
+const headerIconBtn =
+    'h-auto w-auto rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground'
+
+const branchTriggerClass =
+    'flex h-auto items-center gap-1.5 border-border bg-muted/60 text-foreground hover:bg-muted'
+
+const homePath = ROUTES.PATH_IDE_INITIAL_SCREEN
+
 const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
     const { t } = useTranslation()
     const dispatch: any = useDispatch()
-    const { isGitEnabled } = useSelector((state: RootState) => state.git)
+    const navigate = useNavigate()
+    const isGitEnabled = useSelector((state: RootState) => state.git.isGitEnabled)
     const isMac = window.api.i18nextElectronBackend.clientOptions.platform === 'darwin'
-
+    const { theme, setTheme } = useTheme()
     const { workspace } = useWorkspace()
-
-    const { loading, startContainers, stopContainers, stopService } = useDocker({ workspace })
-
     const [installedIDEs, setInstalledIDEs] = useState<Array<any>>([])
-
     const [isMaximized, setIsMaximized] = useState(false)
+    const [isDarkMode, setIsDarkMode] = useState(
+        () =>
+            document.documentElement.classList.contains('dark') ||
+            (theme === 'system' &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches)
+    )
 
     const { showErrorToast, showSuccessToast } = useToast()
 
+    useEffect(() => {
+        const root = document.documentElement
+        const sync = (): void => {
+            setIsDarkMode(
+                root.classList.contains('dark') ||
+                    (theme === 'system' &&
+                        window.matchMedia('(prefers-color-scheme: dark)').matches)
+            )
+        }
+        sync()
+        const observer = new MutationObserver(sync)
+        observer.observe(root, { attributes: true, attributeFilter: ['class'] })
+        return () => observer.disconnect()
+    }, [theme])
+
+    const toggleTheme = (): void => {
+        setTheme(isDarkMode ? 'light' : 'dark')
+    }
+
     const handleMinimize = (): void => {
         window.menu.minimizeWindow()
-        window.menu.isMaximized().then((maximized) => {
-            setIsMaximized(maximized)
-        })
+        window.menu.isMaximized().then(setIsMaximized)
     }
 
     const handleMaximize = (): void => {
         window.menu.maximizeWindow()
-        window.menu.isMaximized().then((maximized) => {
-            setIsMaximized(maximized)
-        })
+        window.menu.isMaximized().then(setIsMaximized)
     }
 
     const handleClose = (): void => {
@@ -86,210 +119,291 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
         }
     }
 
-    useEffect(() => {
-        const laodIdes = async (): Promise<void> => {
-            await window.api.getIDEs().then((data) => {
-                setInstalledIDEs(data)
-            })
+    const platform = window.api.i18nextElectronBackend.clientOptions.platform
+    const fileManagerLabel = isMac
+        ? t('openInFinder')
+        : platform === 'win32'
+          ? t('openInExplorer')
+          : t('openInFileManager')
+
+    const openInFileManager = async (): Promise<void> => {
+        const path = basePath || workspace.path
+        if (!path) return
+        try {
+            await window.api.openInFileManager(path)
+        } catch (error) {
+            console.error(error)
         }
-        laodIdes()
+    }
+
+    useEffect(() => {
+        void window.api.getIDEs().then(setInstalledIDEs)
     }, [])
 
     useEffect(() => {
         const checkMaximized = async (): Promise<void> => {
             try {
-                const maximized = await window.menu.isMaximized()
-                setIsMaximized(maximized)
-            } catch (error) {
-                console.error(error)
+                setIsMaximized(await window.menu.isMaximized())
+            } catch {
                 setIsMaximized(false)
             }
         }
-
-        checkMaximized()
-
-        // Optional: Add listeners for window state changes
-        const updateState = (): Promise<void> => checkMaximized()
-        window.addEventListener('resize', updateState)
-
-        return () => {
-            window.removeEventListener('resize', updateState)
-        }
+        void checkMaximized()
+        window.addEventListener('resize', checkMaximized)
+        return () => window.removeEventListener('resize', checkMaximized)
     }, [])
 
-    const WindowButton = ({
-        onClick,
-        icon,
-        label,
-        className
-    }: {
-        onClick: () => void
-        icon: React.ReactNode
-        label: string
-        className?: string
-    }): JSX.Element => (
-        <button
-            onClick={onClick}
-            className={cn(
-                'flex items-center justify-center w-6 h-6 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300',
-                className
-            )}
-            title={label}
-        >
-            {icon}
-            <span className="sr-only">{label}</span>
-        </button>
-    )
+    const isProjectActive = config?.name !== undefined && config?.name !== null
+    const isMonorepoLinked =
+        !!basePath &&
+        config?.storageMode === 'linked' &&
+        !!config?.gitRootPath &&
+        config.gitRootPath !== basePath
 
-    const handleRun = async (): Promise<void> => {
-        await startContainers()
+    const goHome = (event?: MouseEvent): void => {
+        event?.preventDefault()
+        dispatch(leaveStudioProject())
+        navigate(homePath)
     }
 
-    const handleDowm = async (dropVolume: boolean): Promise<void> => {
-        await stopContainers(dropVolume)
-    }
-
-    const handleStop = async (): Promise<void> => {
-        await stopService()
-    }
-
-    const isProjectAtive = config?.name !== undefined && config?.name !== null
     return (
-        <>
-            <IGRPTooltipProviderPrimitive>
-                <header className="fle sticky top-0 z-50 w-full items-center border-b bg-background">
-                    <div className="flex h-(--header-height) w-full items-center  px-4 justify-between">
-                        <div className="flex items-center space-x-4 home">
-                            <a
-                                href={ROUTES.HOME}
-                                className={cn(
-                                    'flex items-center gap-2',
-                                    isMac && isMaximized && 'pl-12'
-                                )}
-                            >
-                                <img src={logo} alt="Logo" className="h-6 w-auto" />
-                                <p className="text-sm font-medium">
-                                    {import.meta.env.VITE_APP_TITLE}
-                                </p>
-                            </a>
+        <TooltipProvider delayDuration={300}>
+            <header
+                className={cn(
+                    'sticky top-0 z-40 w-full border-b',
+                    'h-(--header-height)',
+                    'bg-background text-foreground border-border'
+                )}
+            >
+                <div
+                    className={cn(
+                        'flex h-full w-full items-center justify-between gap-2',
+                        isMac ? 'pl-[76px] pr-4' : 'px-4'
+                    )}
+                >
+                {/* Left: brand + breadcrumbs */}
+                <div className="home flex min-w-0 items-center gap-2 text-sm">
+                    <Link
+                        to={homePath}
+                        onClick={goHome}
+                        title={t('backToHome', 'Voltar ao início')}
+                        className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-1.5 py-1 text-xs font-semibold tracking-wide text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                    >
+                        <img
+                            src={logo}
+                            alt={import.meta.env.VITE_APP_TITLE || 'IGRP Studio'}
+                            className="h-3.5 w-auto shrink-0"
+                        />
+                        <span className="leading-none">{import.meta.env.VITE_APP_TITLE}</span>
+                    </Link>
 
-                            {isProjectAtive && (
-                                <IGRPBreadcrumbPrimitive className="hidden lg:flex">
-                                    <IGRPBreadcrumbListPrimitive>
-                                        <IGRPBreadcrumbItemPrimitive>
-                                            <IGRPBreadcrumbLinkPrimitive href={ROUTES.HOME}>
-                                                <ArrowLeft className="h-4 w-4" />
-                                            </IGRPBreadcrumbLinkPrimitive>
-                                        </IGRPBreadcrumbItemPrimitive>
-                                        <IGRPBreadcrumbItemPrimitive className="md:hidden lg:flex">
-                                            <IGRPBreadcrumbPagePrimitive>
-                                                {workspace.name}
-                                            </IGRPBreadcrumbPagePrimitive>
-                                        </IGRPBreadcrumbItemPrimitive>
-                                        <IGRPBreadcrumbSeparatorPrimitive />
-                                        <IGRPBreadcrumbItemPrimitive>
-                                            <IGRPBreadcrumbPagePrimitive className="truncate">
-                                                {config.name}
-                                            </IGRPBreadcrumbPagePrimitive>
-                                        </IGRPBreadcrumbItemPrimitive>
-                                    </IGRPBreadcrumbListPrimitive>
-                                </IGRPBreadcrumbPrimitive>
-                            )}
-                        </div>
-                        <div className="flex items-center space-x-2 ">
-                            {!basePath && (
-                                <DockerControls
-                                    loading={loading}
-                                    onRun={handleRun}
-                                    onDropAll={handleDowm}
-                                    onStopAll={handleStop}
+                    {isProjectActive && (
+                        <>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Link
+                                        to={homePath}
+                                        onClick={goHome}
+                                        title={t('backToHome', 'Voltar ao início')}
+                                        className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                                    >
+                                        <ArrowLeft className="h-4 w-4" />
+                                    </Link>
+                                </TooltipTrigger>
+                                <TooltipContent>{t('backToHome', 'Voltar ao início')}</TooltipContent>
+                            </Tooltip>
+
+                            <div className="hidden min-w-0 items-center gap-1.5 text-xs font-medium text-muted-foreground md:flex">
+                                {workspace?.name ? (
+                                    <Link
+                                        to={homePath}
+                                        onClick={goHome}
+                                        className="truncate transition-colors hover:text-foreground"
+                                    >
+                                        {workspace.name}
+                                    </Link>
+                                ) : null}
+                                {workspace?.name ? (
+                                    <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
+                                ) : null}
+                                <span
+                                    className="truncate rounded border border-border bg-muted px-2 py-0.5 font-mono text-xs font-semibold text-foreground"
+                                    title={config?.name}
+                                >
+                                    {config?.name}
+                                </span>
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                {/* Right: dev controls + profile */}
+                <div className="flex shrink-0 items-center gap-1.5 text-xs">
+                    {basePath && (
+                        <>
+                            {isMonorepoLinked ? (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div>
+                                            <BranchSwitcher
+                                                projectPath={basePath}
+                                                triggerClassName={branchTriggerClass}
+                                                onError={showErrorToast}
+                                                onSuccess={showSuccessToast}
+                                                onBranchChange={() =>
+                                                    dispatch(onGetPages(basePath))
+                                                }
+                                            />
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        {t('gitRepoRootDetected', {
+                                            root: config?.gitRootPath
+                                        })}
+                                    </TooltipContent>
+                                </Tooltip>
+                            ) : (
+                                <BranchSwitcher
+                                    projectPath={basePath}
+                                    triggerClassName={branchTriggerClass}
+                                    onError={showErrorToast}
+                                    onSuccess={showSuccessToast}
+                                    onBranchChange={() => dispatch(onGetPages(basePath))}
                                 />
                             )}
 
-                            {basePath && (
-                                <>
-                                    <BranchSwitcher
-                                        projectPath={basePath || ''}
-                                        onError={showErrorToast}
-                                        onSuccess={showSuccessToast}
-                                        onBranchChange={() => {
-                                            dispatch(onGetPages(basePath || ''))
-                                        }}
+                            {isGitEnabled &&
+                                (isMonorepoLinked ? (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <div>
+                                                <SyncButton
+                                                    basePath={basePath}
+                                                    buttonClassName={headerIconBtn}
+                                                />
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {t('gitSyncRepoRootWarning', {
+                                                root: config?.gitRootPath
+                                            })}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                ) : (
+                                    <SyncButton
+                                        basePath={basePath}
+                                        buttonClassName={headerIconBtn}
                                     />
-                                    {isGitEnabled && <SyncButton basePath={basePath || ''} />}
-                                </>
-                            )}
+                                ))}
+                        </>
+                    )}
 
-                            <IGRPDropdownMenuPrimitive>
-                                <IGRPTooltipPrimitive>
-                                    <IGRPTooltipTriggerPrimitive asChild>
-                                        <IGRPDropdownMenuTriggerPrimitive asChild>
-                                            <IGRPButtonPrimitive variant="ghost">
-                                                <Code />
-                                            </IGRPButtonPrimitive>
-                                        </IGRPDropdownMenuTriggerPrimitive>
-                                    </IGRPTooltipTriggerPrimitive>
-                                    <IGRPTooltipContentPrimitive>
-                                        <p>{t('openOnEditor')}</p>
-                                    </IGRPTooltipContentPrimitive>
-                                </IGRPTooltipPrimitive>
-                                <IGRPDropdownMenuContentPrimitive align="end">
-                                    {installedIDEs.map(
-                                        ({ key, config }, index): React.ReactNode => {
-                                            return (
-                                                <IGRPDropdownMenuItemPrimitive
-                                                    key={index}
-                                                    onClick={() => openIDE(key)}
-                                                    className="flex items-center"
-                                                >
-                                                    <IGRPIcon iconName={config.icon} />
-                                                    {config.name}
-                                                </IGRPDropdownMenuItemPrimitive>
-                                            )
-                                        }
-                                    )}
-                                </IGRPDropdownMenuContentPrimitive>
-                            </IGRPDropdownMenuPrimitive>
+                    <DropdownMenu>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className={headerIconBtn}>
+                                        <Code className="h-3.5 w-3.5" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent>{t('openOnEditor')}</TooltipContent>
+                        </Tooltip>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={openInFileManager}>
+                                <FolderOpen />
+                                {fileManagerLabel}
+                            </DropdownMenuItem>
+                            {installedIDEs.length > 0 && <DropdownMenuSeparator />}
+                            {installedIDEs.map(({ key, config: ideConfig }) => (
+                                <DropdownMenuItem key={key} onClick={() => openIDE(key)}>
+                                    <IGRPIcon iconName={ideConfig.icon} />
+                                    {ideConfig.name}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
-                            <ModeToggle />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className={cn(headerIconBtn, 'hover:text-foreground')}
+                                onClick={toggleTheme}
+                            >
+                                {isDarkMode ? (
+                                    <Sun className="h-3.5 w-3.5" />
+                                ) : (
+                                    <Moon className="h-3.5 w-3.5" />
+                                )}
+                                <span className="sr-only">{t('toggleTheme')}</span>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            {isDarkMode ? t('light') : t('dark')}
+                        </TooltipContent>
+                    </Tooltip>
 
-                            <SettingsDialog />
-
-                            <NotificationsPopover />
-
-                            <GitConnectionMenu />
-
-                            {!isMac && (
-                                <>
-                                    <WindowButton
-                                        onClick={handleMinimize}
-                                        icon={<Minus className="h-4 w-4" />}
-                                        label={t('minimize')}
-                                    />
-                                    <WindowButton
-                                        onClick={handleMaximize}
-                                        icon={
-                                            isMaximized ? (
-                                                <Square className="h-4 w-4" />
-                                            ) : (
-                                                <Maximize2 className="h-4 w-4" />
-                                            )
-                                        }
-                                        label={isMaximized ? t('restore') : t('maximize')}
-                                    />
-                                    <WindowButton
-                                        onClick={handleClose}
-                                        icon={<X className="h-4 w-4" />}
-                                        label={t('close')}
-                                        className="hover:bg-red-500 hover:text-white"
-                                    />
-                                </>
-                            )}
-                        </div>
+                    <div className="hidden sm:block">
+                        <SettingsDialog triggerClassName={headerIconBtn} />
                     </div>
-                </header>
-            </IGRPTooltipProviderPrimitive>
-        </>
+
+                    <NotificationsPopover triggerClassName={headerIconBtn} />
+
+                    <div className="mx-1 hidden h-4 w-px bg-border sm:block" />
+
+                    <GitConnectionMenu variant="header" />
+
+                    {!isMac && (
+                        <>
+                            <div className="mx-1 h-4 w-px bg-border" />
+                            <div className="flex items-center gap-0.5">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className={headerIconBtn}
+                                    onClick={handleMinimize}
+                                    title={t('minimize')}
+                                >
+                                    <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className={headerIconBtn}
+                                    onClick={handleMaximize}
+                                    title={isMaximized ? t('restore') : t('maximize')}
+                                >
+                                    {isMaximized ? (
+                                        <Square className="h-3 w-3" />
+                                    ) : (
+                                        <Maximize2 className="h-3.5 w-3.5" />
+                                    )}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className={cn(
+                                        headerIconBtn,
+                                        'hover:bg-destructive hover:text-destructive-foreground'
+                                    )}
+                                    onClick={handleClose}
+                                    title={t('close')}
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </div>
+                </div>
+            </header>
+        </TooltipProvider>
     )
 }
 

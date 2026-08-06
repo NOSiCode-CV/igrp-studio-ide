@@ -1,19 +1,18 @@
-import {
-    IGRPScrollAreaPrimitive,
-    IGRPSidebarInsetPrimitive,
-    IGRPSidebarProviderPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
 import { UpdateModalBottomLeft } from '@renderer/components/update-banner'
+import { IntegratedTerminal } from '@renderer/components/integrated-terminal'
+import { useGitTokenExpiredToast } from '@renderer/hooks/use-git-token-expired-toast'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter
 } from '@renderer/layouts/components/app-sidebar-default'
-import { Database } from 'lucide-react'
+import { FileText } from 'lucide-react'
 import type React from 'react'
 import { useMemo } from 'react'
-import { WorkspaceSwitcher } from '../pages/workspaces/components/workspace-switch'
+import { WorkspaceSwitcher } from '../browser/workspaces/components/workspace-switch'
 import { Footer } from './components/footer'
 import FooterSidebar from './components/footer-sidebar'
 import Header from './components/header'
@@ -23,6 +22,7 @@ interface LayoutProps {
 }
 
 const MainLayout = (props: LayoutProps): React.ReactElement => {
+    useGitTokenExpiredToast()
     const {
         workspace,
         actions: { switchWorkspace }
@@ -31,10 +31,10 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
     const navData = useMemo(
         () => [
             {
-                name: 'Database',
+                name: 'Markdown Converter',
                 type: 'item' as const,
-                icon: Database,
-                href: '#/connections'
+                icon: FileText,
+                onClick: () => window.markitdown?.openWindow()
             }
         ],
         []
@@ -42,7 +42,7 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
 
     return (
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))]">
-            <IGRPSidebarProviderPrimitive>
+            <SidebarProvider>
                 <div className="flex flex-col w-full h-screen">
                     <Header />
 
@@ -63,16 +63,17 @@ const MainLayout = (props: LayoutProps): React.ReactElement => {
                                 <FooterSidebar />
                             </SidebarFooter>
                         </Sidebar>
-                        <IGRPSidebarInsetPrimitive className="flex-1">
-                            <IGRPScrollAreaPrimitive className="h-[calc(100svh-var(--header-height-two))]">
+                        <SidebarInset className="flex-1">
+                            <ScrollArea className="h-[calc(100svh-var(--header-height-two))]">
                                 {props.children}
-                            </IGRPScrollAreaPrimitive>
-                        </IGRPSidebarInsetPrimitive>
+                            </ScrollArea>
+                        </SidebarInset>
                     </div>
                     <Footer />
+                    <IntegratedTerminal />
                     <UpdateModalBottomLeft />
                 </div>
-            </IGRPSidebarProviderPrimitive>
+            </SidebarProvider>
         </div>
     )
 }

@@ -4,14 +4,15 @@ import {
     DatabaseResponse,
     HandlerResponse,
     IWorkspace,
+    OptionalStacksStatus,
     ProjectData,
     ToolCheck,
-    BPMNConfig
+    BPMNConfig,
+    WorkspaceBootstrapOptions
 } from '../main/types'
-import {
-    ComponentRegistrationConfig,
-    ServiceWorkspace
-} from '@igrp/igrp-studio-nextjs-engine/types'
+import { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
+import { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
+import { ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
 
 type UpdateChannel = 'stable' | 'beta'
@@ -25,7 +26,7 @@ type ExtendedElectronAPI = typeof electronAPI & {
     setUpdateChannel: (channel: UpdateChannel) => Promise<void>
     reconfigureUpdateChannel: () => Promise<void>
     watchFolder: (folderPath: string) => Promise<void>
-    onFolderChange: (callback: (event: WatchEvent) => void) => void
+    onFolderChange: (callback: (event: WatchEvent) => void) => () => void
     reportError: (error: Error) => void
 }
 declare const api: {
@@ -35,10 +36,15 @@ declare const api: {
     fetchFiles: (basePath: string) => Promise<any>
     getJsonContent: (filePath: string) => Promise<any>
     getFileContent: (filePath: string) => Promise<any>
+    setPageParent: (
+        jsonPath: string,
+        parentName: string | null
+    ) => Promise<{ success: boolean; error?: string }>
     readDirectory: (basePath: string) => Promise<any>
     readProjectFile: (filePath: string) => Promise<any>
     openIDE: ({ basePath, ideType }: { basePath: string; ideType: string }) => Promise<any>
     getIDEs: () => Promise<any>
+    openInFileManager: (basePath: string) => Promise<string>
     getVersions: (endpoint: string) => Promise<any>
     fetchData: (endpoint: string, headers: object) => Promise<any>
     i18nextElectronBackend: {
@@ -53,6 +59,16 @@ declare const api: {
     }
     runDoctorChecks: () => Promise<ToolCheck[]>
     saveDoctorReport: (results: any) => Promise<any>
+    checkIGRPCLI: () => Promise<{
+        installed: string | null
+        latest: string | null
+        hasUpdate: boolean
+        missing: boolean
+        error?: string
+    }>
+    installIGRPCLI: (
+        version?: string
+    ) => Promise<{ success: boolean; output?: string; error?: string }>
     saveProjectIcon: (data: {
         filePath: string
         fileData: ArrayBuffer
@@ -88,12 +104,25 @@ declare const engine: {
     createEnum: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    getPermissions: (engineType: string, basePath: string) => Promise<HandlerResponse>
+    savePermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    deletePermission: (
+        id: string,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>
     createPage: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    convertJsonSchema: (schema: unknown) => Promise<HandlerResponse>
     registry: (engineType: string) => Promise<HandlerResponse>
     getComponent: (engineType: string) => Promise<HandlerResponse>
     registerComponent: (
         engineType: string,
         config: ComponentRegistrationConfig
+    ) => Promise<HandlerResponse>
+    resetComponents: (engineType: string) => Promise<HandlerResponse>
+    buildComponentRegistry: (
+        engineType: string,
+        input: BuildComponentRegistryInput
     ) => Promise<HandlerResponse>
     getService: (engineType: string) => Promise<HandlerResponse>
     getDependencies: (engineType: string) => Promise<HandlerResponse>
@@ -101,6 +130,11 @@ declare const engine: {
     getCodeSnippets: (engineType: string) => Promise<HandlerResponse>
     createProcess: (process: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     createProcessStep: (step: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    createGraphqlSchema: (
+        config: any,
+        engineType: string,
+        basePath: string
+    ) => Promise<HandlerResponse>
 }
 declare const repo: {
     workspace: {
@@ -119,8 +153,14 @@ declare const repo: {
         findAllWorkspaces: () => Promise<any>
         findRecentWorkspaces: (limit?: number) => Promise<any>
         createWorkspace: (
-            workspace: Omit<IWorkspace, 'id' | 'createdAt'>
+            workspace: Omit<IWorkspace, 'id' | 'createdAt'>,
+            options?: WorkspaceBootstrapOptions
         ) => Promise<HandlerResponse>
+        installOptionalStacks: (
+            workspaceId: string,
+            options: WorkspaceBootstrapOptions
+        ) => Promise<HandlerResponse>
+        getOptionalStacksStatus: (workspacePath: string) => Promise<OptionalStacksStatus>
         updateWorkspace: (workspaceId: string, updates: Partial<IWorkspace>) => Promise<any>
         deleteWorkspace: (workspaceId: string) => Promise<any>
         getWorkspace: (workspaceId: string) => Promise<any>
@@ -150,6 +190,7 @@ declare const repo: {
     }
     docker: {
         up: (projectPath: string) => Promise<any>
+        deployProject: (projectPath: string) => Promise<any>
         down: (
             projectPath: string,
             options: {
@@ -210,6 +251,8 @@ declare const igrpStudioSettings: {
     getSelectedBPMNProject: () => Promise<string | undefined>
     setSelectedBPMNProcess: (processDefinitionId: string) => Promise<any>
     getSelectedBPMNProcess: () => Promise<string | undefined>
+    getWelcomeOnboardingCompleted: () => Promise<boolean>
+    setWelcomeOnboardingCompleted: (completed: boolean) => Promise<boolean>
 }
 declare global {
     interface Window {

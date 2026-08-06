@@ -1,5 +1,4 @@
 import { useIGRPToast } from '@igrp/igrp-framework-react-design-system'
-
 const MAX_LENGTH = 300
 
 const useToast = (): {

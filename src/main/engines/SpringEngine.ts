@@ -3,6 +3,7 @@ import {
     addController,
     addDTO,
     addEnum,
+    addGraphQLSchema,
     addModel,
     addModule,
     addResponse,
@@ -20,6 +21,7 @@ import type {
     Dependency,
     DTOConfig,
     EnumConfig,
+    GraphQLSchemaConfig,
     ModelConfig,
     ModuleConfig,
     ResponseConfig
@@ -110,6 +112,10 @@ export class SpringEngine implements BaseEngine {
 
     async createEnum(data: EnumConfig, basePath: string): Promise<void> {
         await addEnum(data, basePath)
+    }
+
+    async createGraphqlSchema(config: GraphQLSchemaConfig, basePath: string): Promise<void> {
+        await addGraphQLSchema(config, basePath)
     }
 
     async serializeElement(data: any, basePath: string): Promise<void> {

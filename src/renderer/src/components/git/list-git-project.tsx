@@ -1,12 +1,12 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
 import { AlertCircle, Calendar, ExternalLink, FolderOpen, GitFork, Lock } from 'lucide-react'
@@ -70,7 +70,7 @@ export function ListGitProject({
     }
 
     return (
-        <IGRPTooltipProviderPrimitive>
+        <TooltipProvider>
             <div className="flex items-center justify-between py-3 px-4 hover:bg-muted transition-colors">
                 <div className="flex-1 min-w-0 mr-4">
                     <div className="flex items-center gap-2">
@@ -80,28 +80,25 @@ export function ListGitProject({
                         />
                         <div className="flex-1 min-w-0 max-w-70">
                             <div className="flex items-center gap-2">
-                                <IGRPTooltipPrimitive>
-                                    <IGRPTooltipTriggerPrimitive asChild>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
                                         <h3 className="font-medium text-base truncate">
                                             {repo.full_name}
                                         </h3>
-                                    </IGRPTooltipTriggerPrimitive>
-                                    <IGRPTooltipContentPrimitive>
-                                        {' '}
-                                        {repo.full_name}
-                                    </IGRPTooltipContentPrimitive>
-                                </IGRPTooltipPrimitive>
+                                    </TooltipTrigger>
+                                    <TooltipContent> {repo.full_name}</TooltipContent>
+                                </Tooltip>
                                 {repo.private && (
-                                    <IGRPTooltipPrimitive>
-                                        <IGRPTooltipTriggerPrimitive asChild>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
                                             <span>
                                                 <Lock className="h-3.5 w-3.5 text-blue-600 flex-shrink-0" />
                                             </span>
-                                        </IGRPTooltipTriggerPrimitive>
-                                        <IGRPTooltipContentPrimitive>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
                                             <p>{t('privateRepository')}</p>
-                                        </IGRPTooltipContentPrimitive>
-                                    </IGRPTooltipPrimitive>
+                                        </TooltipContent>
+                                    </Tooltip>
                                 )}
                             </div>
                             <p className="text-sm text-gray-600 truncate">
@@ -124,29 +121,29 @@ export function ListGitProject({
                 )}
 
                 <div className="flex items-center gap-2 flex-shrink-0">
-                    <IGRPTooltipPrimitive>
-                        <IGRPTooltipTriggerPrimitive asChild>
-                            <IGRPButtonPrimitive
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => window.open(repo.html_url)}
                             >
                                 <ExternalLink className="h-4 w-4" />
                                 <span className="sr-only">{t('view')}</span>
-                            </IGRPButtonPrimitive>
-                        </IGRPTooltipTriggerPrimitive>
-                        <IGRPTooltipContentPrimitive>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
                             <p>{t('viewRepository')}</p>
-                        </IGRPTooltipContentPrimitive>
-                    </IGRPTooltipPrimitive>
+                        </TooltipContent>
+                    </Tooltip>
 
                     {isCloned ? (
-                        <IGRPButtonPrimitive size="sm" variant="secondary" onClick={handleOpen}>
+                        <Button size="sm" variant="secondary" onClick={handleOpen}>
                             <FolderOpen className="h-4 w-4 mr-2" />
                             {t('open')}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     ) : (
-                        <IGRPButtonPrimitive
+                        <Button
                             size="sm"
                             variant="outline"
                             onClick={() => handleClone(repo)}
@@ -154,10 +151,10 @@ export function ListGitProject({
                         >
                             <GitFork className="h-4 w-4 mr-2" />
                             {isCloning ? 'Cloning...' : 'Clone'}
-                        </IGRPButtonPrimitive>
+                        </Button>
                     )}
                 </div>
             </div>
-        </IGRPTooltipProviderPrimitive>
+        </TooltipProvider>
     )
 }

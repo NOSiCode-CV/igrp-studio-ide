@@ -1,16 +1,16 @@
 'use client'
 
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
 import {
-    IGRPButtonPrimitive,
-    IGRPCombobox,
-    IGRPInputPrimitive,
-    IGRPTableBodyPrimitive,
-    IGRPTableCellPrimitive,
-    IGRPTableHeaderPrimitive,
-    IGRPTableHeadPrimitive,
-    IGRPTablePrimitive,
-    IGRPTableRowPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@renderer/components/ui/table'
+import { IGRPCombobox } from '@igrp/igrp-framework-react-design-system'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -121,16 +121,14 @@ export default function DynamicKeyValueForm({
 
     return (
         <div className="w-full border bg-card rounded-lg space-y-6 px-2">
-            <IGRPTablePrimitive>
-                <IGRPTableHeaderPrimitive>
-                    <IGRPTableRowPrimitive>
+            <Table>
+                <TableHeader>
+                    <TableRow>
                         {fieldPairs.map((pair) => (
-                            <IGRPTableHeadPrimitive key={pair.key}>
-                                {t(pair.label)}
-                            </IGRPTableHeadPrimitive>
+                            <TableHead key={pair.key}>{t(pair.label)}</TableHead>
                         ))}
-                        <IGRPTableHeadPrimitive>
-                            <IGRPButtonPrimitive
+                        <TableHead>
+                            <Button
                                 onClick={addItem}
                                 size="sm"
                                 variant={'ghost'}
@@ -139,15 +137,15 @@ export default function DynamicKeyValueForm({
                             >
                                 <Plus className="h-4 w-4" />
                                 <span className="sr-only">{t('addRow')}</span>
-                            </IGRPButtonPrimitive>
-                        </IGRPTableHeadPrimitive>
-                    </IGRPTableRowPrimitive>
-                </IGRPTableHeaderPrimitive>
-                <IGRPTableBodyPrimitive>
+                            </Button>
+                        </TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
                     {items.map((item) => (
-                        <IGRPTableRowPrimitive key={item.id}>
+                        <TableRow key={item.id}>
                             {fieldPairs.map((pair) => (
-                                <IGRPTableCellPrimitive key={`${item.id}-${pair.key}`}>
+                                <TableCell key={`${item.id}-${pair.key}`}>
                                     <div className="flex flex-col">
                                         {pair.options && pair.options.length > 0 ? (
                                             <IGRPCombobox
@@ -159,7 +157,7 @@ export default function DynamicKeyValueForm({
                                                 placeholder={pair.placeholder}
                                             />
                                         ) : (
-                                            <IGRPInputPrimitive
+                                            <Input
                                                 value={item[pair.key] || ''}
                                                 onChange={(e) =>
                                                     updateItem(item.id, pair.key, e.target.value)
@@ -174,10 +172,10 @@ export default function DynamicKeyValueForm({
                                             />
                                         )}
                                     </div>
-                                </IGRPTableCellPrimitive>
+                                </TableCell>
                             ))}
-                            <IGRPTableCellPrimitive>
-                                <IGRPButtonPrimitive
+                            <TableCell>
+                                <Button
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => removeItem(item.id)}
@@ -186,12 +184,12 @@ export default function DynamicKeyValueForm({
                                     disabled={required && items.length <= 1}
                                 >
                                     <Trash2 className="h-4 w-4 text-destructive" />
-                                </IGRPButtonPrimitive>
-                            </IGRPTableCellPrimitive>
-                        </IGRPTableRowPrimitive>
+                                </Button>
+                            </TableCell>
+                        </TableRow>
                     ))}
-                </IGRPTableBodyPrimitive>
-            </IGRPTablePrimitive>
+                </TableBody>
+            </Table>
             {Object.values(errors).length > 0 && (
                 <div className="text-sm text-red-500 px-4 pb-2">
                     {Object.values(errors).map((error, index) => (

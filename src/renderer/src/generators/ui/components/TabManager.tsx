@@ -1,21 +1,23 @@
-import {
-    IGRPSidebarInsetPrimitive,
-    IGRPSidebarProviderPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
 import { TAB_DEFAULT, useTabs } from '@renderer/components/navigation/TabContext'
 import TabsNavigation from '@renderer/components/navigation/tabs-navigation'
 import { APRESENTATION, OPTION_TYPE } from '@renderer/constants/appConstants'
 import { ContainerScrollArea } from '@renderer/generators/api/components/ContainerScrollArea'
 import { EditorLayout } from '@renderer/generators/api/pages/EditorLayout'
-import { DragProvider } from '@renderer/lib/dnd/drag-drop-context'
+import { DragProvider } from '@renderer/features/dnd/drag-drop-context'
 import { cn } from '@renderer/lib/utils'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FileTree } from 'src/main/types'
-import { DroppedComponentsProvider } from '../dnd/DroppedComponentsContext'
-import PageManager, { type PageDefinition } from '../page/page-manager'
-import { convertFileTreeToPageDefinition } from '../page/utils/bpmn-helpers'
+import {
+    DroppedComponentsProvider,
+    useDroppedComponents,
+    useDroppedComponentsAdmin
+} from '../contexts/EditorContext'
+import PageManager, { type PageDefinition } from '../browser/page-manager'
+import { convertFileTreeToPageDefinition } from '../browser/processes/utils/bpmn-helpers'
 import FormEngine from '../page-builder'
 import NavigationBar from './NavigationBar'
+import SidebarRight from './sidebar/sidebar-right'
 
 interface ContentProps {
     basePath: string
@@ -25,21 +27,47 @@ interface FormEngineRef {
     handleSave: () => Promise<void>
 }
 
+/**
+ * Renders SidebarRight when the currently active tab has a component selected.
+ * Lives at the TabManager level so we have a single instance across tabs.
+ */
+function SidebarRightSlot() {
+    const { currentComponent } = useDroppedComponents()
+    if (!currentComponent) return null
+    return <SidebarRight />
+}
+
+/**
+ * Subscribes to the tabs list and drops state slices for tabs that no longer
+ * exist. Keeps the DroppedComponentsContext from leaking memory across opens.
+ */
+function TabsCleanup({ tabIds }: { tabIds: string[] }) {
+    const { removeTab } = useDroppedComponentsAdmin()
+    const knownRef = useRef<Set<string>>(new Set())
+
+    useEffect(() => {
+        const current = new Set(tabIds)
+        knownRef.current.forEach((id) => {
+            if (!current.has(id)) removeTab(id)
+        })
+        knownRef.current = current
+    }, [tabIds, removeTab])
+
+    return null
+}
+
 export default function TabManager({ basePath }: ContentProps): React.JSX.Element {
     const { activeTab, tabs, initializeTabFromCurrentItem, setActiveTab, newTab } = useTabs()
 
-    // Track the isDesign state for each tab
     const [activePresentation, setAtivePresentation] = useState<{
         [key: string]: string
     }>({})
 
-    // Ref to hold the handleSave function from FormEngine
     const formEngineRefs = useRef<{
         [key: string]: FormEngineRef | null
     }>({})
 
     const handleClickOpenGerador = (page: PageDefinition | FileTree): void => {
-        // Check if it's a FileTree without proper content
         const pageDefinition =
             'content' in page && page.content
                 ? (page as PageDefinition)
@@ -86,27 +114,31 @@ export default function TabManager({ basePath }: ContentProps): React.JSX.Elemen
                 )}
             </TabsNavigation>
 
-            {tabs.map((tab) => (
-                <div
-                    key={tab.id}
-                    className={cn('flex flex-1', activeTab === tab.id ? 'block' : 'hidden')}
-                >
-                    {tab.id === TAB_DEFAULT ? (
-                        <IGRPSidebarInsetPrimitive>
-                            <ContainerScrollArea>
-                                <PageManager onPageClick={handleClickOpenGerador} />
-                            </ContainerScrollArea>
-                        </IGRPSidebarInsetPrimitive>
-                    ) : (
-                        <DroppedComponentsProvider>
-                            <IGRPSidebarProviderPrimitive
-                                style={
-                                    {
-                                        '--sidebar-width': '380px'
-                                    } as React.CSSProperties
-                                }
+            <SidebarProvider
+                style={
+                    {
+                        '--sidebar-width': '380px'
+                    } as React.CSSProperties
+                }
+            >
+                <DroppedComponentsProvider activeTabId={activeTab}>
+                    <TabsCleanup tabIds={tabs.map((t) => t.id)} />
+                    <div className="flex flex-1">
+                        {tabs.map((tab) => (
+                            <div
+                                key={tab.id}
+                                className={cn(
+                                    'flex flex-1',
+                                    activeTab === tab.id ? 'block' : 'hidden'
+                                )}
                             >
-                                {tab.open === OPTION_TYPE.FILE_THREE ? (
+                                {tab.id === TAB_DEFAULT ? (
+                                    <SidebarInset>
+                                        <ContainerScrollArea>
+                                            <PageManager onPageClick={handleClickOpenGerador} />
+                                        </ContainerScrollArea>
+                                    </SidebarInset>
+                                ) : tab.open === OPTION_TYPE.FILE_THREE ? (
                                     <EditorLayout currentItem={tab.item} />
                                 ) : (
                                     <DragProvider>
@@ -123,11 +155,12 @@ export default function TabManager({ basePath }: ContentProps): React.JSX.Elemen
                                         />
                                     </DragProvider>
                                 )}
-                            </IGRPSidebarProviderPrimitive>
-                        </DroppedComponentsProvider>
-                    )}
-                </div>
-            ))}
+                            </div>
+                        ))}
+                        <SidebarRightSlot />
+                    </div>
+                </DroppedComponentsProvider>
+            </SidebarProvider>
         </div>
     )
 }

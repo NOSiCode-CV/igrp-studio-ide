@@ -1,17 +1,14 @@
+import { Button } from '@renderer/components/ui/button'
 import {
-    IGRPButtonPrimitive,
-    IGRPCardContentPrimitive,
-    IGRPCardDescriptionPrimitive,
-    IGRPCardHeaderPrimitive,
-    IGRPCardPrimitive,
-    IGRPCardTitlePrimitive,
-    IGRPInputPrimitive,
-    IGRPLabelPrimitive,
-    IGRPTabsContentPrimitive,
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from '@renderer/components/ui/card'
+import { Input } from '@renderer/components/ui/input'
+import { Label } from '@renderer/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { FrameworkIcon } from '@renderer/components/framework-icon'
 import { GitContributors } from '@renderer/components/git/git-contributors'
 import { VersionAlert } from '@renderer/components/version-alert'
@@ -19,8 +16,8 @@ import { springEngineChangelog } from '@renderer/components/version-alert-resume
 import { useGit } from '@renderer/hooks/use-git'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
-import { ProjectConfigForm } from '@renderer/pages/project'
-import Dependency from '@renderer/pages/workspaces/components/dependency'
+import { ProjectConfigForm } from '@renderer/browser/project/project-form'
+import Dependency from '@renderer/browser/workspaces/components/dependency'
 import type { RootState } from '@renderer/redux'
 import { Check, Copy, GitBranch, GitBranchIcon, Package, Server } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -98,16 +95,16 @@ const Overview = () => {
 
     return (
         <div className="w-full mx-auto space-y-8 p-6">
-            <IGRPTabsPrimitive defaultValue="overview" className="compact-tabs">
-                <IGRPTabsListPrimitive className="mb-3">
-                    <IGRPTabsTriggerPrimitive value="overview" className="text-xs">
+            <Tabs defaultValue="overview" className="compact-tabs">
+                <TabsList className="mb-3">
+                    <TabsTrigger value="overview" className="text-xs">
                         {t('overview')}
-                    </IGRPTabsTriggerPrimitive>
-                    <IGRPTabsTriggerPrimitive value="settings" className="text-xs">
+                    </TabsTrigger>
+                    <TabsTrigger value="settings" className="text-xs">
                         {t('settings')}
-                    </IGRPTabsTriggerPrimitive>
-                </IGRPTabsListPrimitive>
-                <IGRPTabsContentPrimitive value="overview" className="mt-0 space-y-4">
+                    </TabsTrigger>
+                </TabsList>
+                <TabsContent value="overview" className="mt-0 space-y-4">
                     {project && (
                         <>
                             <div className="space-x-3 flex items-center justify-between">
@@ -230,31 +227,27 @@ const Overview = () => {
                             <DashboardOverview stats={stats} />
                         </>
                     )}
-                </IGRPTabsContentPrimitive>
-                <IGRPTabsContentPrimitive value="settings" className="mt-0 space-y-4">
-                    <IGRPCardPrimitive>
-                        <IGRPCardHeaderPrimitive className="compact-card-header">
-                            <IGRPCardTitlePrimitive className="text-sm">
-                                {t('projectSettings')}
-                            </IGRPCardTitlePrimitive>
-                            <IGRPCardDescriptionPrimitive className="text-xs">
+                </TabsContent>
+                <TabsContent value="settings" className="mt-0 space-y-4">
+                    <Card>
+                        <CardHeader className="compact-card-header">
+                            <CardTitle className="text-sm">{t('projectSettings')}</CardTitle>
+                            <CardDescription className="text-xs">
                                 {t('configureProjectSettings')}
-                            </IGRPCardDescriptionPrimitive>
-                        </IGRPCardHeaderPrimitive>
-                        <IGRPCardContentPrimitive className="compact-card-content space-y-3">
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="compact-card-content space-y-3">
                             {projectId && (
                                 <div className="space-y-2">
-                                    <IGRPLabelPrimitive htmlFor="project-id">
-                                        {t('projectId')}
-                                    </IGRPLabelPrimitive>
+                                    <Label htmlFor="project-id">{t('projectId')}</Label>
                                     <div className="flex space-x-2">
-                                        <IGRPInputPrimitive
+                                        <Input
                                             id="project-id"
                                             value={projectId}
                                             readOnly
                                             className="h-8 font-mono bg-muted/50 flex-1 rounded-r-none"
                                         />
-                                        <IGRPButtonPrimitive
+                                        <Button
                                             variant="outline"
                                             size="sm"
                                             className="h-8 rounded-l-none border-l-0"
@@ -265,7 +258,7 @@ const Overview = () => {
                                             ) : (
                                                 <Copy className="h-3.5 w-3.5" />
                                             )}
-                                        </IGRPButtonPrimitive>
+                                        </Button>
                                     </div>
                                     <p className="text-[10px] text-muted-foreground mt-1">
                                         {t('projectIdDescription')}
@@ -279,14 +272,12 @@ const Overview = () => {
                                 onChange={setData}
                             />
                             <div className="pt-2">
-                                <IGRPButtonPrimitive onClick={handleSave}>
-                                    {t('saveSettings')}
-                                </IGRPButtonPrimitive>
+                                <Button onClick={handleSave}>{t('saveSettings')}</Button>
                             </div>
-                        </IGRPCardContentPrimitive>
-                    </IGRPCardPrimitive>
-                </IGRPTabsContentPrimitive>
-            </IGRPTabsPrimitive>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }

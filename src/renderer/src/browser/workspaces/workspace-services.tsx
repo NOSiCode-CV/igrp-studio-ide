@@ -1,0 +1,716 @@
+import { SearchInput } from '@renderer/components/shared-ui'
+import { Button } from '@renderer/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
+import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { ToggleGroup, ToggleGroupItem } from '@renderer/components/ui/toggle-group'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
+import { useDocker } from '@renderer/hooks/use-docker'
+import { useWorkspace } from '@renderer/hooks/use-workspace'
+import { cn } from '@renderer/lib/utils'
+import {
+    Check,
+    Container,
+    LayoutDashboard,
+    LayoutGrid,
+    ListFilter,
+    Network,
+    Play,
+    Plus,
+    Server,
+    Square,
+    StretchHorizontal
+} from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import type { ServiceInfo } from 'src/main/types'
+import { ConfigurationDialog } from './components/configuration-dialog'
+import { resolveServiceVisualType } from './services'
+import { DependencyDiagram } from './services/dependency-diagram'
+import { ServiceGrid } from './services/service-grid'
+import { SERVICE_LIST_GRID, ServiceList } from './services/service-list'
+import { WorkspaceDocker } from './views/workspace-docker'
+
+type ViewMode = 'grid' | 'list'
+type StackId = 'main' | 'monitoring' | 'process' | 'project'
+type ServicesPanelTab = 'overview' | 'diagram' | 'docker'
+
+interface StackBlock {
+    id: StackId
+    title: string
+    description: string
+}
+
+const stackBlocks: StackBlock[] = [
+    { id: 'main', title: 'IGRP Stack', description: 'Core workspace services' },
+    { id: 'monitoring', title: 'Monitoring', description: 'Observability services' },
+    { id: 'process', title: 'Process', description: 'Process engine services' },
+    { id: 'project', title: 'Project', description: 'Project-level services' }
+]
+
+const ALL_FILTER_VALUE = 'all'
+
+const resolveServiceStack = (service: ServiceInfo): StackId => {
+    if (service.labels?.is_project === 'true') {
+        return 'project'
+    }
+
+    const composeFile = service.composeFile?.toLowerCase() || ''
+    if (
+        composeFile.includes('igrp-monitoring-compose.yaml') ||
+        composeFile.includes('compose-monitoring.yaml')
+    ) {
+        return 'monitoring'
+    }
+    if (
+        composeFile.includes('igrp-process-compose.yaml') ||
+        composeFile.includes('compose-process.yaml')
+    ) {
+        return 'process'
+    }
+    if (composeFile.includes('igrp-compose.yaml')) {
+        return 'main'
+    }
+    return service.stack ?? 'main'
+}
+
+const resolveServiceStatusFilterKey = (service: ServiceInfo): string => {
+    const status = (service.status || '').toLowerCase()
+    if (status === 'running') return 'running'
+    if (status === 'error') return 'error'
+    if (
+        status === 'stopped' ||
+        status === 'exited' ||
+        status === 'dead' ||
+        status === 'created' ||
+        status === 'removing'
+    ) {
+        return 'stopped'
+    }
+    return status || 'other'
+}
+
+const resolveServiceTypeKey = (service: ServiceInfo): string => {
+    return resolveServiceVisualType(service)
+}
+
+const toLabel = (value: string): string => {
+    if (!value) return ''
+    return value
+        .split(/[-_\s]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ')
+}
+
+interface WorkspaceServicesProps {
+    workspaceId: string
+}
+
+const servicesPanelTabs: Array<{
+    id: ServicesPanelTab
+    labelKey: 'overview' | 'diagram' | 'docker'
+    icon: typeof LayoutDashboard
+}> = [
+    { id: 'overview', labelKey: 'overview', icon: LayoutDashboard },
+    { id: 'diagram', labelKey: 'diagram', icon: Network },
+    { id: 'docker', labelKey: 'docker', icon: Container }
+]
+
+export function WorkspaceServices({ workspaceId }: WorkspaceServicesProps): React.JSX.Element {
+    const { t } = useTranslation()
+    const [serviceViewMode, setServiceViewMode] = useState<ViewMode>('grid')
+    const [serviceSearchQuery, setServiceSearchQuery] = useState('')
+    const [categoryFilter, setCategoryFilter] = useState<string>(ALL_FILTER_VALUE)
+    const [statusFilter, setStatusFilter] = useState<string>(ALL_FILTER_VALUE)
+    const [typeFilter, setTypeFilter] = useState<string>(ALL_FILTER_VALUE)
+    const [activePanelTab, setActivePanelTab] = useState<ServicesPanelTab>('overview')
+    const [isFilterOpen, setIsFilterOpen] = useState(false)
+    const [stackActionState, setStackActionState] = useState<{
+        stackId: StackId | null
+        action: 'start' | 'stop' | null
+    }>({ stackId: null, action: null })
+
+    const {
+        workspace,
+        state: { changeStatus }
+    } = useWorkspace()
+
+    const { services, refreshContainers, restartService, stopService, startContainers } = useDocker(
+        {
+            workspace: workspace!,
+            changeStatus
+        }
+    )
+
+    useEffect(() => {
+        // Intentionally keyed only by workspaceId to avoid render loops:
+        // `refreshContainers` is not referentially stable across renders.
+        void refreshContainers()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workspaceId])
+
+    const allServices = useMemo(() => services, [services])
+
+    const availableTypeFilters = useMemo(() => {
+        const types = new Set<string>()
+        for (const service of allServices) {
+            const value = resolveServiceTypeKey(service)
+            if (value && value !== ALL_FILTER_VALUE) types.add(value)
+        }
+        return Array.from(types).sort((a, b) => a.localeCompare(b))
+    }, [allServices])
+
+    const availableStatusFilters = useMemo(() => {
+        const statuses = new Set<string>()
+        for (const service of allServices) {
+            const value = resolveServiceStatusFilterKey(service)
+            if (value && value !== ALL_FILTER_VALUE) statuses.add(value)
+        }
+        const priority = ['running', 'stopped', 'error']
+        return Array.from(statuses).sort((a, b) => {
+            const ia = priority.indexOf(a)
+            const ib = priority.indexOf(b)
+            if (ia >= 0 && ib >= 0) return ia - ib
+            if (ia >= 0) return -1
+            if (ib >= 0) return 1
+            return a.localeCompare(b)
+        })
+    }, [allServices])
+
+    const filteredServices = useMemo(() => {
+        const query = serviceSearchQuery.toLowerCase().trim()
+        return allServices.filter((service) => {
+            const matchesSearch =
+                !query ||
+                service.container_name?.toLowerCase().includes(query) ||
+                service.name?.toLowerCase().includes(query) ||
+                service.labels?.type?.toLowerCase().includes(query)
+
+            const matchesCategory =
+                categoryFilter === ALL_FILTER_VALUE ||
+                resolveServiceStack(service) === categoryFilter
+
+            const matchesStatus =
+                statusFilter === ALL_FILTER_VALUE ||
+                resolveServiceStatusFilterKey(service) === statusFilter
+
+            const matchesType =
+                typeFilter === ALL_FILTER_VALUE || resolveServiceTypeKey(service) === typeFilter
+
+            return matchesSearch && matchesCategory && matchesStatus && matchesType
+        })
+    }, [allServices, categoryFilter, serviceSearchQuery, statusFilter, typeFilter])
+
+    useEffect(() => {
+        if (statusFilter !== ALL_FILTER_VALUE && !availableStatusFilters.includes(statusFilter)) {
+            setStatusFilter(ALL_FILTER_VALUE)
+        }
+    }, [availableStatusFilters, statusFilter])
+
+    useEffect(() => {
+        if (typeFilter !== ALL_FILTER_VALUE && !availableTypeFilters.includes(typeFilter)) {
+            setTypeFilter(ALL_FILTER_VALUE)
+        }
+    }, [availableTypeFilters, typeFilter])
+
+    const servicesCountLabel = `${allServices.length} ${t('services').toUpperCase()}`
+    const activeFiltersCount = [categoryFilter, statusFilter, typeFilter].filter(
+        (value) => value !== ALL_FILTER_VALUE
+    ).length
+
+    const categoryOptions = useMemo(
+        () => [
+            { value: ALL_FILTER_VALUE, label: t('allCategories') },
+            ...stackBlocks.map((stack) => ({ value: stack.id, label: stack.title }))
+        ],
+        [t]
+    )
+
+    const statusOptions = useMemo(
+        () => [
+            { value: ALL_FILTER_VALUE, label: t('all') },
+            ...availableStatusFilters.map((status) => ({ value: status, label: toLabel(status) }))
+        ],
+        [availableStatusFilters, t]
+    )
+
+    const typeOptions = useMemo(
+        () => [
+            { value: ALL_FILTER_VALUE, label: t('allTypes') },
+            ...availableTypeFilters.map((type) => ({ value: type, label: toLabel(type) }))
+        ],
+        [availableTypeFilters, t]
+    )
+
+    const handleStackAction = async (
+        stackId: StackId,
+        action: 'start' | 'stop',
+        serviceNames: string[]
+    ): Promise<void> => {
+        if (serviceNames.length === 0) return
+
+        setStackActionState({ stackId, action })
+        try {
+            if (action === 'start') {
+                await restartService(serviceNames, 300)
+            } else {
+                await stopService(serviceNames)
+            }
+            await refreshContainers()
+        } finally {
+            setStackActionState({ stackId: null, action: null })
+        }
+    }
+
+    const groupedOverview = useMemo(() => {
+        return stackBlocks
+            .map((stack) => {
+                const allStackServices = allServices.filter(
+                    (service) => resolveServiceStack(service) === stack.id
+                )
+                const stackServices = filteredServices.filter(
+                    (service) => resolveServiceStack(service) === stack.id
+                )
+                const totalInStack = allStackServices.length
+                const runningInStack = allStackServices.filter(
+                    (service) => resolveServiceStatusFilterKey(service) === 'running'
+                ).length
+                const stackServiceNames = allStackServices
+                    .map((service) => service.name)
+                    .filter((name): name is string => Boolean(name))
+
+                const byType = new Map<string, ServiceInfo[]>()
+                for (const service of stackServices) {
+                    const typeKey = resolveServiceTypeKey(service)
+                    const current = byType.get(typeKey) || []
+                    current.push(service)
+                    byType.set(typeKey, current)
+                }
+
+                const typeGroups = Array.from(byType.entries())
+                    .sort(([a], [b]) => a.localeCompare(b))
+                    .map(([type, services]) => ({ type, services }))
+
+                return {
+                    stack,
+                    totalInStack,
+                    runningInStack,
+                    visibleInStack: stackServices.length,
+                    stackServiceNames,
+                    typeGroups
+                }
+            })
+            .filter((group) => group.visibleInStack > 0)
+    }, [allServices, filteredServices])
+
+    return (
+        <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden border-b bg-background">
+            <div className="z-20 shrink-0 bg-background">
+                <div className="flex items-center justify-between gap-3 border-b px-4 py-2">
+                    <div className="flex items-center gap-2">
+                        <Server className="h-4 w-4 text-primary shrink-0" />
+                        <h2 className="text-sm font-bold tracking-tight text-foreground truncate">
+                            {t('services')}
+                        </h2>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground whitespace-nowrap">
+                            · {servicesCountLabel}
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {activePanelTab === 'overview' && (
+                            <>
+                                <SearchInput
+                                    placeholder={`${t('search')}...`}
+                                    value={serviceSearchQuery}
+                                    onChange={setServiceSearchQuery}
+                                    className="w-[224px] max-w-full"
+                                    inputClassName="rounded-sm focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary/20"
+                                />
+                                <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon-sm"
+                                            aria-label={t('filter')}
+                                            title={t('filter')}
+                                            className={cn(
+                                                'relative',
+                                                isFilterOpen &&
+                                                    'bg-primary/10 text-primary focus:bg-primary/10 focus:text-primary'
+                                            )}
+                                        >
+                                            <ListFilter className="h-4 w-4" />
+                                            {activeFiltersCount > 0 && (
+                                                <span className="absolute -top-1 -right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                                                    {activeFiltersCount}
+                                                </span>
+                                            )}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent
+                                        align="end"
+                                        className="w-56 rounded-xl border bg-popover text-popover-foreground p-3 shadow-xl"
+                                    >
+                                        <div className="space-y-3">
+                                            <div>
+                                                <div className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                                    {t('category')}
+                                                </div>
+                                                <div className="space-y-1">
+                                                    {categoryOptions.map((option) => {
+                                                        const selected =
+                                                            categoryFilter === option.value
+                                                        return (
+                                                            <button
+                                                                key={option.value}
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    setCategoryFilter(option.value)
+                                                                }
+                                                                className={`flex h-8 w-full items-center justify-between rounded-md px-2.5 text-xs transition-colors ${
+                                                                    selected
+                                                                        ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
+                                                                        : 'text-foreground hover:bg-accent'
+                                                                }`}
+                                                            >
+                                                                <span>{option.label}</span>
+                                                                {selected && (
+                                                                    <Check className="h-4 w-4 text-primary" />
+                                                                )}
+                                                            </button>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
+
+                                            <div className="h-px bg-border" />
+
+                                            <div>
+                                                <div className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                                    {t('status')}
+                                                </div>
+                                                <div className="space-y-1">
+                                                    {statusOptions.map((option) => {
+                                                        const selected =
+                                                            statusFilter === option.value
+                                                        return (
+                                                            <button
+                                                                key={option.value}
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    setStatusFilter(option.value)
+                                                                }
+                                                                className={`flex h-8 w-full items-center justify-between rounded-md px-2.5 text-xs transition-colors ${
+                                                                    selected
+                                                                        ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
+                                                                        : 'text-foreground hover:bg-accent'
+                                                                }`}
+                                                            >
+                                                                <span>{option.label}</span>
+                                                                {selected && (
+                                                                    <Check className="h-4 w-4 text-primary" />
+                                                                )}
+                                                            </button>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
+
+                                            <div className="h-px bg-border" />
+
+                                            <div>
+                                                <div className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                                    {t('type')}
+                                                </div>
+                                                <div className="max-h-[150px] space-y-1 overflow-y-auto pr-1">
+                                                    {typeOptions.map((option) => {
+                                                        const selected = typeFilter === option.value
+                                                        return (
+                                                            <button
+                                                                key={option.value}
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    setTypeFilter(option.value)
+                                                                }
+                                                                className={`flex h-8 w-full items-center justify-between rounded-md px-2.5 text-xs transition-colors ${
+                                                                    selected
+                                                                        ? 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary'
+                                                                        : 'text-foreground hover:bg-accent'
+                                                                }`}
+                                                            >
+                                                                <span>{option.label}</span>
+                                                                {selected && (
+                                                                    <Check className="h-4 w-4 text-primary" />
+                                                                )}
+                                                            </button>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                                <ToggleGroup
+                                    type="single"
+                                    value={serviceViewMode}
+                                    onValueChange={(value) =>
+                                        value && setServiceViewMode(value as ViewMode)
+                                    }
+                                    spacing={1}
+                                    className="flex shrink-0 items-center gap-0 rounded-sm border bg-muted p-0.5"
+                                >
+                                    <ToggleGroupItem
+                                        value="grid"
+                                        size="sm"
+                                        aria-label="Grid view"
+                                        className="h-auto min-w-0 rounded-sm p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:shadow-sm"
+                                    >
+                                        <LayoutGrid className="h-3.5 w-3.5" />
+                                    </ToggleGroupItem>
+                                    <ToggleGroupItem
+                                        value="list"
+                                        size="sm"
+                                        aria-label="List view"
+                                        className="h-auto min-w-0 rounded-sm p-1 text-muted-foreground transition-all hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:shadow-sm"
+                                    >
+                                        <StretchHorizontal className="h-3.5 w-3.5" />
+                                    </ToggleGroupItem>
+                                </ToggleGroup>
+                            </>
+                        )}
+
+                        <ConfigurationDialog services={allServices} isNew={true}>
+                            <Button size="sm" className="h-8 gap-1.5 rounded-sm">
+                                <Plus className="h-3.5 w-3.5" />
+                                {t('newService')}
+                            </Button>
+                        </ConfigurationDialog>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-1 border-b bg-background px-3">
+                    {servicesPanelTabs.map((tab) => {
+                        const Icon = tab.icon
+                        const isActive = activePanelTab === tab.id
+                        return (
+                            <button
+                                key={tab.id}
+                                type="button"
+                                onClick={() => setActivePanelTab(tab.id)}
+                                className={`inline-flex h-11 items-center gap-1.5 border-b-2 px-2 text-sm transition-colors ${
+                                    isActive
+                                        ? 'border-b-primary text-foreground'
+                                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                <Icon className="h-3.5 w-3.5" />
+                                {t(tab.labelKey)}
+                            </button>
+                        )
+                    })}
+                </div>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-hidden">
+                {activePanelTab === 'diagram' && workspace && (
+                    <div className="h-full overflow-y-auto p-4">
+                        <DependencyDiagram
+                            services={filteredServices}
+                            onStart={async (serviceName) => {
+                                try {
+                                    await restartService([serviceName], 300)
+                                } catch {
+                                    await startContainers()
+                                }
+                                await refreshContainers()
+                            }}
+                            onStop={async (serviceName) => {
+                                await stopService([serviceName])
+                                await refreshContainers()
+                            }}
+                            onRestart={async (serviceName) => {
+                                await restartService([serviceName])
+                                await refreshContainers()
+                            }}
+                            onRefresh={async () => {
+                                await refreshContainers()
+                            }}
+                        />
+                    </div>
+                )}
+
+                {activePanelTab === 'docker' && workspace && (
+                    <ScrollArea className="h-full">
+                        <div className="p-4">
+                            <WorkspaceDocker
+                                workspace={workspace}
+                                onStacksChanged={refreshContainers}
+                            />
+                        </div>
+                    </ScrollArea>
+                )}
+
+                {activePanelTab === 'overview' && (
+                    <ScrollArea className="h-full [&>[data-slot=scroll-area-viewport]]:overflow-x-hidden">
+                        <div className="p-4">
+                            {groupedOverview.length === 0 ? (
+                                <div className="rounded-xl border border-dashed bg-muted p-8 text-center text-sm text-muted-foreground">
+                                    {t('noServicesFound')}
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {serviceViewMode === 'list' ? (
+                                        <div className="sticky top-0 z-30 border-b bg-background">
+                                            <div
+                                                className="grid items-center gap-3 px-2 py-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+                                                style={{
+                                                    gridTemplateColumns: SERVICE_LIST_GRID
+                                                }}
+                                            >
+                                                <div>{t('name')}</div>
+                                                <div>{t('ports')}</div>
+                                                <div>{t('dependencies')}</div>
+                                                <div className="w-[80px]">{t('status')}</div>
+                                                <div className="w-[36px]" />
+                                            </div>
+                                        </div>
+                                    ) : null}
+
+                                    {groupedOverview.map((group) => (
+                                        <section key={group.stack.id} className="bg-card">
+                                            <div
+                                                className={`sticky z-20 flex min-h-11 items-center justify-between border-b bg-card px-4 ${
+                                                    serviceViewMode === 'list'
+                                                        ? 'top-[43px]'
+                                                        : 'top-0'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
+                                                        {group.stack.title}
+                                                    </h3>
+                                                    <span className="inline-flex h-6 items-center rounded-md border border-primary/30 bg-primary/10 px-2 text-xs font-semibold text-primary dark:bg-primary/15">
+                                                        {group.runningInStack}/{group.totalInStack}
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        -
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {group.stack.description}
+                                                    </span>
+                                                </div>
+
+                                                <TooltipProvider>
+                                                    <div className="flex items-center gap-1">
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() =>
+                                                                        void handleStackAction(
+                                                                            group.stack.id,
+                                                                            'start',
+                                                                            group.stackServiceNames
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        stackActionState.stackId ===
+                                                                            group.stack.id &&
+                                                                        stackActionState.action !==
+                                                                            null
+                                                                    }
+                                                                    className="h-7 w-7 text-muted-foreground hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-300"
+                                                                >
+                                                                    <Play className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p>{t('startGroup')}</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() =>
+                                                                        void handleStackAction(
+                                                                            group.stack.id,
+                                                                            'stop',
+                                                                            group.stackServiceNames
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        stackActionState.stackId ===
+                                                                            group.stack.id &&
+                                                                        stackActionState.action !==
+                                                                            null
+                                                                    }
+                                                                    className="h-7 w-7 text-muted-foreground hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30 dark:hover:text-rose-300"
+                                                                >
+                                                                    <Square className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p>{t('stopGroup')}</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </div>
+                                                </TooltipProvider>
+                                            </div>
+
+                                            <div className="space-y-4 p-4">
+                                                {group.typeGroups.map((typeGroup) => (
+                                                    <div
+                                                        key={`${group.stack.id}-${typeGroup.type}`}
+                                                        className="space-y-2"
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="h-1.5 w-1.5 rounded-full bg-muted" />
+                                                            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                                                {toLabel(typeGroup.type)}
+                                                            </span>
+                                                            <span className="text-xs text-muted-foreground">
+                                                                ({typeGroup.services.length})
+                                                            </span>
+                                                        </div>
+
+                                                        {serviceViewMode === 'grid' ? (
+                                                            <ServiceGrid
+                                                                services={typeGroup.services}
+                                                                workspaceId={workspaceId}
+                                                                showFilter={false}
+                                                                onActionComplete={refreshContainers}
+                                                            />
+                                                        ) : (
+                                                            <ServiceList
+                                                                services={typeGroup.services}
+                                                                workspaceId={workspaceId}
+                                                                showFilter={false}
+                                                                showHeader={
+                                                                    serviceViewMode !== 'list'
+                                                                }
+                                                                onActionComplete={refreshContainers}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </section>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </ScrollArea>
+                )}
+            </div>
+        </div>
+    )
+}

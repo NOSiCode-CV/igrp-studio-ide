@@ -1,8 +1,10 @@
 import { httpMethods, httpStatusCodes } from '@renderer/constants/appConstants'
+import { formatDistanceToNow } from 'date-fns'
 import { enUS, pt } from 'date-fns/locale'
 import i18next from 'i18next'
 import {
     Activity,
+    Cable,
     Circle,
     Database,
     FileKey,
@@ -13,6 +15,7 @@ import {
 } from 'lucide-react'
 
 export function capitalize(str: string): string {
+    if (!str) return ''
     return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
@@ -68,7 +71,10 @@ export function getUUID() {
 export function generateId(componentName: string) {
     // Generate a random string with 8 characters
     const randomStr = Math.random().toString(36).slice(2, 8)
-    return `${componentName.toLowerCase()}_${randomStr}`
+    // Defensive: never crash the whole component init if a caller passes an
+    // undefined/empty name (e.g. an unknown COMPONENT.* key).
+    const base = (componentName || 'component').toLowerCase()
+    return `${base}_${randomStr}`
 }
 
 export function findComponentItem(menus: Array<any>, idFind: string) {
@@ -96,6 +102,8 @@ export const getIcon = (folderName: string): LucideIcon => {
     switch (folderName.toLowerCase()) {
         case 'controllers':
             return Activity
+        case 'graphql':
+            return Cable
         case 'models':
             return Database
         case 'dto':
@@ -125,6 +133,10 @@ export function toFullCamelCaseFromSnakeCase(str: string) {
     )
 }
 
+// Mirrors the engine's `getLabel` export (nextjs-engine ≥0.2.0-beta.22) —
+// same heuristic, kept as a local copy because the engine bundle is
+// Node-only (fs-extra/prettier at module top-level) and can't be imported
+// by the renderer. If the engine changes its heuristic, sync this.
 export function getLabel(name: string): string {
     if (!name) return '' // Handle empty string
 
@@ -147,4 +159,37 @@ export const getLocale = () => {
         default:
             return enUS
     }
+}
+
+// Formats a filesystem timestamp (ms) as relative time ("2 days ago").
+// Returns '-' when missing or epoch 0 (birthtime unavailable on some Linux filesystems).
+export function formatFileDate(timestamp?: number): string {
+    if (!timestamp) return '-'
+    return formatDistanceToNow(timestamp, { addSuffix: true, locale: getLocale() })
+}
+
+/**
+ * Lightweight camelCase implementation — replaces lodash-es#camelCase for the
+ * limited usage we have (page/component names). Splits on non-alphanumerics
+ * and on lower-to-upper boundaries, then joins as `firstWordLower + Pascal`.
+ *
+ * Examples:
+ *   camelCase('hello world')   -> 'helloWorld'
+ *   camelCase('my-page-name')  -> 'myPageName'
+ *   camelCase('My_File.Name')  -> 'myFileName'
+ *   camelCase('XMLHttpRequest')-> 'xmlHttpRequest'
+ */
+export function camelCase(input: string): string {
+    if (!input) return ''
+    const words = String(input)
+        .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+        .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+        .split(/[^a-zA-Z0-9]+/)
+        .filter(Boolean)
+    if (words.length === 0) return ''
+    return words
+        .map((w, i) =>
+            i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+        )
+        .join('')
 }

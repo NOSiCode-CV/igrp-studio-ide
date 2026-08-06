@@ -1,20 +1,25 @@
 // engines/NextjsEngine.ts
+
+import type { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
 import {
+    buildComponentRegistry,
     deleteElement,
+    deletePermission,
+    getPermissions,
     initCodeSnippets,
     initComponents,
-    initServices,
     loadAppExports,
     loadCodeSnippetsRegistry,
     loadEngineConfiguration,
     loadRegistry,
-    loadServiceRegistry,
     newApp,
     newComponent,
     newPage,
     newProcess,
     newProcessStep,
     registerComponents,
+    resetComponents,
+    savePermission,
     setEngineConfiguration
 } from '@igrp/igrp-studio-nextjs-engine'
 import type {
@@ -22,13 +27,16 @@ import type {
     AppExportsConfig,
     CodeSnippetsRegistrationConfig,
     ComponentConfig,
+    ComponentRegisterConfig,
     ComponentRegistrationConfig,
     DeleteConfig,
-    DockerServiceRegistrationConfig,
     PageConfig,
+    PermissionConfig,
     ProcessConfig,
     ProcessStepConfig
 } from '@igrp/igrp-studio-nextjs-engine/types'
+import { initServices, loadServiceRegistry } from '@igrp/igrp-studio-workspace-engine'
+import type { DockerServiceRegistrationConfig } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { app } from 'electron'
 import { ensureDirectoryExists } from '../helpers'
 import type { BaseEngine } from '../interfaces'
@@ -63,6 +71,21 @@ export class NextjsEngine implements BaseEngine {
 
     registerComponent(config: ComponentRegistrationConfig): void {
         registerComponents(config)
+    }
+
+    // Drop custom/app registrations and keep only the built-ins (snapshot taken
+    // in initComponents). Call before registering another project's components
+    // so custom components don't leak across projects.
+    resetComponents(): void {
+        resetComponents()
+    }
+
+    // Pure composition (engine ≥0.2.0-beta.22): ComponentDef[] + parsed
+    // .igrpstudio manifests → ComponentRegisterConfig[]. Runs in main because
+    // the engine bundle is Node-only (fs-extra/prettier at module top-level)
+    // and must not be imported by the renderer.
+    buildComponentRegistry(input: BuildComponentRegistryInput): ComponentRegisterConfig[] {
+        return buildComponentRegistry(input)
     }
 
     getCodeSnippets(): CodeSnippetsRegistrationConfig {
@@ -126,5 +149,22 @@ export class NextjsEngine implements BaseEngine {
 
     async createProcessStep(step: ProcessStepConfig, basePath: string): Promise<void> {
         await newProcessStep(step, basePath)
+    }
+
+    async getPermissions(basePath: string): Promise<PermissionConfig[]> {
+        return getPermissions(basePath)
+    }
+
+    async savePermission(config: PermissionConfig, basePath: string): Promise<void> {
+        await savePermission(config, basePath)
+    }
+
+    /** Upsert — same as savePermission (engine API). */
+    async createPermission(config: PermissionConfig, basePath: string): Promise<void> {
+        await savePermission(config, basePath)
+    }
+
+    async deletePermission(id: string, basePath: string): Promise<void> {
+        await deletePermission(id, basePath)
     }
 }

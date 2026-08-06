@@ -1,9 +1,12 @@
-import type { ProjectWorkspace, ServiceWorkspace } from '@igrp/igrp-studio-nextjs-engine/types'
+import type {
+    ProjectWorkspace,
+    ServiceWorkspace
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { ipcMain } from 'electron'
 import { ERROR_CODES, EVENTS } from '../constants/events'
 import { handleWithCustomErrors } from '../helpers'
 import { WorkspaceRepository } from '../services/workspace-service'
-import type { IWorkspace, ProjectData } from '../types'
+import type { IWorkspace, ProjectData, WorkspaceBootstrapOptions } from '../types'
 
 const repo = new WorkspaceRepository()
 
@@ -35,9 +38,13 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.GET_CURRENT, async (event) => {
 
 handleWithCustomErrors(
     EVENTS.REPOSITORY.WORKSPACE.CREATE,
-    async (event, workspace: Omit<IWorkspace, 'id' | 'createdAt'>) => {
+    async (
+        event,
+        workspace: Omit<IWorkspace, 'id' | 'createdAt'>,
+        options?: WorkspaceBootstrapOptions
+    ) => {
         try {
-            return await repo.createWorkspace(workspace)
+            return await repo.createWorkspace(workspace, options)
         } catch (error) {
             event.sender.send(EVENTS.LOG, {
                 code: ERROR_CODES.WORKSPACE.CREATE_FAILED,
@@ -109,6 +116,20 @@ ipcMain.handle(
     EVENTS.REPOSITORY.WORKSPACE.SAVE_CUSTOM_YAML,
     async (_, yaml: object, basePath: string) => {
         return await repo.saveCustomCompose(yaml, basePath)
+    }
+)
+
+ipcMain.handle(
+    EVENTS.REPOSITORY.WORKSPACE.GET_OPTIONAL_STACKS_STATUS,
+    async (_, workspacePath: string) => {
+        return await repo.getOptionalStacksStatus(workspacePath)
+    }
+)
+
+ipcMain.handle(
+    EVENTS.REPOSITORY.WORKSPACE.INSTALL_OPTIONAL_STACKS,
+    async (_, workspaceId: string, options: WorkspaceBootstrapOptions) => {
+        return await repo.installOptionalStacks(workspaceId, options)
     }
 )
 

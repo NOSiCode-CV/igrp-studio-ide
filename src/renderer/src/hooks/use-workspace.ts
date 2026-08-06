@@ -2,18 +2,25 @@ import type {
     ProjectWorkspace,
     ServiceWorkspace,
     WorkspaceService
-} from '@igrp/igrp-studio-nextjs-engine/types'
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import useToast from '@renderer/hooks/useToast'
 import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import yaml from 'js-yaml'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { type NavigateFunction, useNavigate } from 'react-router-dom'
-import { createSelector } from 'reselect'
-import type { HandlerResponse, IWorkspace, ProjectData, ServiceInfo } from 'src/main/types'
+import { createSelector } from '@reduxjs/toolkit'
+import type {
+    HandlerResponse,
+    IWorkspace,
+    OptionalStacksStatus,
+    ProjectData,
+    ServiceInfo,
+    WorkspaceBootstrapOptions
+} from 'src/main/types'
 
 interface RootState {
     PageBuilder: {
@@ -36,8 +43,16 @@ interface UseWorkspaceReturn {
     loading: boolean
     actions: {
         createWorkspace: (
-            workspace: Omit<IWorkspace, 'id' | 'createdAt'>
+            workspace: Omit<IWorkspace, 'id' | 'createdAt'>,
+            options?: WorkspaceBootstrapOptions
         ) => Promise<IWorkspace | null>
+        installOptionalStacks: (
+            options: Pick<
+                WorkspaceBootstrapOptions,
+                'installMonitoringStack' | 'installProcessStack'
+            >
+        ) => Promise<HandlerResponse>
+        getOptionalStacksStatus: () => Promise<OptionalStacksStatus>
         updateWorkspace: (id: string, updates: Partial<IWorkspace>) => Promise<IWorkspace | null>
         deleteWorkspace: (id: string) => Promise<void>
         switchWorkspace: (upWorkspace: IWorkspace) => Promise<void>
@@ -73,6 +88,10 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     const { showSuccessToast, showErrorToast } = useToast()
     const [workspaces, setWorkspaces] = useState<IWorkspace[]>([])
     const [loading, setLoading] = useState(true)
+    // Only the first workspaces load drives the full-screen loader; later
+    // background refreshes (changeStatus, events, opening a workspace) must not
+    // flash the whole screen.
+    const hasLoadedWorkspacesRef = useRef(false)
     const dispatch: any = useDispatch()
     const navigate = useNavigate()
 
@@ -122,7 +141,8 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     }
 
     const refreshWorkspaces = async (): Promise<void> => {
-        setLoading(true)
+        const isInitialLoad = !hasLoadedWorkspacesRef.current
+        if (isInitialLoad) setLoading(true)
         try {
             const data = await getWorkspaces()
             setWorkspaces(data)
@@ -136,17 +156,24 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             console.error(err)
             showErrorToast('Failed to load workspaces')
         } finally {
-            setLoading(false)
+            if (isInitialLoad) {
+                setLoading(false)
+                hasLoadedWorkspacesRef.current = true
+            }
         }
     }
 
     const createWorkspace = async (
-        workspaceData: Omit<IWorkspace, 'id' | 'createdAt'>
+        workspaceData: Omit<IWorkspace, 'id' | 'createdAt'>,
+        options?: WorkspaceBootstrapOptions
     ): Promise<IWorkspace | null> => {
         try {
-            const { result, error } = await window.igrpStudio.workspace.createWorkspace({
-                ...workspaceData
-            })
+            const { result, error } = await window.igrpStudio.workspace.createWorkspace(
+                {
+                    ...workspaceData
+                },
+                options
+            )
 
             if (error) {
                 showErrorToast(error)
@@ -155,15 +182,41 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
             showSuccessToast(`Workspace "${result.name}" created`)
 
+            const bootstrapErrors = (result as any)?.bootstrap?.errors
+            if (Array.isArray(bootstrapErrors) && bootstrapErrors.length > 0) {
+                showErrorToast(bootstrapErrors.join('\n'))
+            }
+
             dispatch(setWorkspace(result))
 
             dispatch(setChangeStatus(true))
+
+            try {
+                await window.igrpStudioSettings.setWelcomeOnboardingCompleted(true)
+            } catch {
+                // non-blocking
+            }
 
             return result
         } catch (err) {
             showErrorToast(err)
             throw err
         }
+    }
+
+    const installOptionalStacks = async (
+        options: Pick<WorkspaceBootstrapOptions, 'installMonitoringStack' | 'installProcessStack'>
+    ): Promise<HandlerResponse> => {
+        try {
+            return await window.igrpStudio.workspace.installOptionalStacks(workspace.id, options)
+        } catch (error) {
+            showErrorToast(error)
+            return { error: error as string }
+        }
+    }
+
+    const getOptionalStacksStatus = async (): Promise<OptionalStacksStatus> => {
+        return await window.igrpStudio.workspace.getOptionalStacksStatus(workspace.path)
     }
 
     const markWorkspaceAccessed = async (workspaces: IWorkspace[]): Promise<void> => {
@@ -233,6 +286,10 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         onSuccess
     }: openProjectProps): Promise<void> => {
         try {
+            if (!workspace?.id) {
+                showErrorToast('Nenhum workspace ativo selecionado.')
+                return
+            }
             const { id } = project
             let response: HandlerResponse = {}
             setLoading(true)
@@ -240,7 +297,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             console.log('project to save', project)
 
             if (id) response = await window.igrpStudio.workspace.updateProject(id, project)
-            else response = await window.igrpStudio.workspace.createProject(workspace?.id, project)
+            else response = await window.igrpStudio.workspace.createProject(workspace.id, project)
 
             const { result, error } = response
 
@@ -251,7 +308,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             }
 
             await findAllServices().then((data) => {
-                result.service = data.find((s) => s.labels.uuid === result.id)
+                result.service = data.find((s) => s?.labels?.uuid === result.id)
                 return data
             })
 
@@ -260,6 +317,30 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             dispatch(setBasePath(result.path))
 
             dispatch(setConfig(result))
+
+            // Detect git repo root (monorepo support) and persist on the project
+            try {
+                const repoRoot: string | null = await window.electron.ipcRenderer.invoke(
+                    'git-repo-root',
+                    result.path
+                )
+                if (
+                    repoRoot &&
+                    (result.gitRootPath !== repoRoot || !result.gitRepoRootDetectedAt)
+                ) {
+                    const nowIso = new Date().toISOString()
+                    const patch = {
+                        gitRootPath: repoRoot,
+                        gitRepoRootDetectedAt: nowIso
+                    }
+                    // Persist + update store config to keep UI consistent
+                    await window.igrpStudio.workspace.updateProject(result.id, patch)
+                    const updatedResult = { ...result, ...patch }
+                    dispatch(setConfig(updatedResult))
+                }
+            } catch {
+                // non-blocking: git may be unavailable or folder is not a repo
+            }
 
             onSuccess?.()
 
@@ -278,7 +359,8 @@ export const useWorkspace = (): UseWorkspaceReturn => {
     ): Promise<void> => {
         const navigationMap = {
             [ENV_TYPES.NEXTJS]: ROUTES.PATH_PAGE_BUILDER_UI,
-            [ENV_TYPES.SPRING]: ROUTES.PATH_PAGE_BUILDER_API
+            [ENV_TYPES.SPRING]: ROUTES.PATH_PAGE_BUILDER_API,
+            [ENV_TYPES.SPECIFICATION]: ROUTES.PATH_PAGE_BUILDER_SPECIFICATION
         }
         const path = navigationMap[appConfig.framework as keyof typeof navigationMap]
         if (path) navigate(path)
@@ -374,6 +456,10 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             await window.igrpStudio.workspace.deleteProject(project.id, workspace.path)
             dispatch(setChangeStatus(true))
             showSuccessToast(t('deletedSuccess', { name: project.name }))
+            // The Resources screen only refetches projects on workspace change
+            // (perf: not on every changeStatus toggle) + on this event — fire
+            // it so the deleted card leaves the screen without a manual refresh.
+            window.dispatchEvent(new Event('igrp:workspace:refresh'))
         } catch (error: unknown) {
             showErrorToast(error)
         }
@@ -388,6 +474,9 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
             showSuccessToast(t('updatedSuccessfully', { name: updates.name || 'Project' }))
             dispatch(setChangeStatus(true))
+            // Same as removeProject: the projects list only refetches on
+            // workspace change + this event.
+            window.dispatchEvent(new Event('igrp:workspace:refresh'))
             return result
         } catch (error: unknown) {
             showErrorToast(error)
@@ -427,12 +516,19 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         refreshWorkspaces()
     }, [])
 
+    useEffect(() => {
+        if (!changeStatus) return
+        refreshWorkspaces().finally(() => dispatch(setChangeStatus(false)))
+    }, [changeStatus])
+
     return {
         workspaces,
         workspace,
         loading,
         actions: {
             createWorkspace,
+            installOptionalStacks,
+            getOptionalStacksStatus,
             updateWorkspace,
             deleteWorkspace,
             switchWorkspace,

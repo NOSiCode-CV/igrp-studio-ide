@@ -5,29 +5,30 @@ import { type JSX, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ComponentsLoader } from './components/ComponentsLoader'
 import TabManager from './components/TabManager'
-import { ComponentsProvider } from './contexts/ComponentsContext'
 
 interface PageBuilderProps {
     basePath?: string
 }
 
+// EngineCatalogProvider is mounted at the App root (see `src/renderer/src/App.tsx`)
+// so non-UI surfaces (Specification Prototype, future generators) can read the
+// engine catalog without bouncing through this generator. `ComponentsLoader`
+// triggers the actual fetch when the UI generator opens.
 const GeneratorUI = ({ basePath }: PageBuilderProps): JSX.Element => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (basePath == '' || basePath === undefined) {
+        if (basePath === '' || basePath === undefined) {
             navigate(ROUTES.HOME)
         }
 
         if (basePath) EngineService.startWatching(basePath)
-    }, [basePath])
+    }, [basePath, navigate])
 
     return (
         <TabProvider>
-            <ComponentsProvider>
-                <ComponentsLoader />
-                {basePath && <TabManager basePath={basePath} />}
-            </ComponentsProvider>
+            <ComponentsLoader />
+            {basePath && <TabManager basePath={basePath} />}
         </TabProvider>
     )
 }

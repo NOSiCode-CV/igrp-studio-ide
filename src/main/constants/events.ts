@@ -2,6 +2,9 @@ export const EVENTS = {
     ENGINE: {
         CREATE_PROJECT: 'engine:create-project',
         CREATE_PERMISSION: 'engine:create-permission',
+        GET_PERMISSIONS: 'engine:get-permissions',
+        SAVE_PERMISSION: 'engine:save-permission',
+        DELETE_PERMISSION: 'engine:delete-permission',
         DELETE_ELEMENT: 'engine:delete-element',
         DUPLICATE_ELEMENT: 'engine:duplicate-element',
         SERIALIZE_ELEMENT: 'engine:serialize-element',
@@ -14,7 +17,14 @@ export const EVENTS = {
         CREATE_ENUM: 'spring-engine:create-enum',
         CREATE_RESPONSE: 'spring-engine:create-response',
         CREATE_CONTROLLER: 'spring-engine:create-controller',
+        CREATE_GRAPHQL_SCHEMA: 'spring-engine:create-graphql-schema',
         FETCH_SELECTORS: 'spring-engine:fetch-selectors'
+    },
+    GRAPHQL: {
+        CREATE_OPERATION: 'graphql:create-operation',
+        UPDATE_OPERATION: 'graphql:update-operation',
+        DELETE_OPERATION: 'graphql:delete-operation',
+        LIST_OPERATIONS: 'graphql:list-operations'
     },
     NEXT: {
         CREATE_PAGE: 'next-engine:create-page',
@@ -26,7 +36,10 @@ export const EVENTS = {
         GET_CODE_SNIPPET: 'engine:get-code-snippet',
         LOAD_METADATA: 'engine:load-metadata',
         REGISTER_COMPONENT: 'engine:register-component',
-        CREATE_PROCESS_STEP: 'engine:create-process-step'
+        RESET_COMPONENT: 'engine:reset-component',
+        BUILD_COMPONENT_REGISTRY: 'engine:build-component-registry',
+        CREATE_PROCESS_STEP: 'engine:create-process-step',
+        CONVERT_JSON_SCHEMA: 'next-engine:convert-json-schema'
     },
     REPOSITORY: {
         INITIALIZE: 'repository:initialize',
@@ -39,6 +52,8 @@ export const EVENTS = {
             FIND_ALL: 'repository:workspace:find-all',
             FIND_RECENT: 'repository:workspace:find-recent',
             OPEN: 'repository:workspace:open',
+            INSTALL_OPTIONAL_STACKS: 'repository:workspace:install-optional-stacks',
+            GET_OPTIONAL_STACKS_STATUS: 'repository:workspace:get-optional-stacks-status',
             SAVE_CUSTOM_YAML: 'engine:save-custom-ymal'
         },
         PROJECT: {
@@ -91,6 +106,10 @@ export const EVENTS = {
         GET_LANGUAGE: 'igrp-studio-settings:get-language',
         SET_LANGUAGE: 'igrp-studio-settings:set-language'
     },
+    ONBOARDING: {
+        GET_WELCOME_COMPLETED: 'igrp-studio-settings:get-welcome-onboarding-completed',
+        SET_WELCOME_COMPLETED: 'igrp-studio-settings:set-welcome-onboarding-completed'
+    },
     CONNECTION: {
         GET_CONNECTIONS: 'igrp-studio-settings:get-connections',
         SAVE_CONNECTION: 'igrp-studio-settings:save-connection',
@@ -101,12 +120,100 @@ export const EVENTS = {
     },
     DOCKER: {
         UP: 'docker-up',
+        DEPLOY_PROJECT: 'docker-deploy-project',
         DOWN: 'docker-down',
         STATUS: 'docker-status',
         STOP: 'docker-stop',
         RESTART: 'docker-restart',
         CHECK: 'docker-check',
         DAEMON_STATUS: 'docker-daemon-status'
+    },
+    MARKITDOWN: {
+        OPEN_WINDOW: 'markitdown:open-window',
+        CONVERT: 'markitdown:convert',
+        PICK_FILE: 'markitdown:pick-file',
+        SAVE_MARKDOWN: 'markitdown:save-markdown',
+        GET_HISTORY: 'markitdown:get-history',
+        DELETE_HISTORY_ITEM: 'markitdown:delete-history-item',
+        CLEAR_HISTORY: 'markitdown:clear-history'
+    },
+    SPEC_KB: {
+        ADD_FILE: 'spec:kb:add-file',
+        ADD_URL: 'spec:kb:add-url',
+        LIST: 'spec:kb:list',
+        GET: 'spec:kb:get',
+        REMOVE: 'spec:kb:remove',
+        REINDEX: 'spec:kb:reindex',
+        SEARCH: 'spec:kb:search',
+        PROGRESS: 'spec:kb:progress'
+    },
+    SPEC_LLM: {
+        STATUSES: 'spec:llm:statuses',
+        LIST_MODELS: 'spec:llm:list-models',
+        CHAT_START: 'spec:llm:chat-start',
+        CHAT_CANCEL: 'spec:llm:chat-cancel',
+        CHAT_CHUNK: 'spec:llm:chat-chunk',
+        DETECT_CLIS: 'spec:llm:detect-clis'
+    },
+    SPEC_SETTINGS: {
+        GET_SECRETS_STATUS: 'spec:settings:get-secrets-status',
+        SET_SECRET: 'spec:settings:set-secret',
+        TEST_SECRET: 'spec:settings:test-secret',
+        GET_PREFERENCES: 'spec:settings:get-preferences',
+        SET_PREFERENCES: 'spec:settings:set-preferences'
+    },
+    SPEC_DOC: {
+        LIST: 'spec:doc:list',
+        READ: 'spec:doc:read',
+        CREATE: 'spec:doc:create',
+        UPDATE: 'spec:doc:update',
+        MOVE: 'spec:doc:move',
+        REMOVE: 'spec:doc:remove',
+        CONVERT_AND_INSERT: 'spec:doc:convert-and-insert',
+        EXPORT: 'spec:doc:export',
+        CHANGED: 'spec:doc:changed'
+    },
+    SPEC_DATA: {
+        LIST: 'spec:data:list',
+        GET: 'spec:data:get',
+        CREATE: 'spec:data:create',
+        UPDATE: 'spec:data:update',
+        REMOVE: 'spec:data:remove',
+        REORDER: 'spec:data:reorder',
+        APPLY_OPS: 'spec:data:apply-ops',
+        IMPORT_FROM_DB: 'spec:data:import-from-db',
+        DIFF_WITH_DB: 'spec:data:diff-with-db',
+        EXPORT_DDL: 'spec:data:export-ddl',
+        GENERATE_START: 'spec:data:generate-start',
+        GENERATE_CANCEL: 'spec:data:generate-cancel',
+        GENERATE_CHUNK: 'spec:data:generate-chunk',
+        CHANGED: 'spec:data:changed'
+    },
+    SPEC_PROTOTYPE: {
+        GENERATE_START: 'spec:prototype:generate-start',
+        GENERATE_CANCEL: 'spec:prototype:generate-cancel',
+        GENERATE_CHUNK: 'spec:prototype:generate-chunk',
+        APPLY_OPS: 'spec:prototype:apply-ops',
+        LIST_FILES: 'spec:prototype:list-files',
+        READ_FILE: 'spec:prototype:read-file',
+        READ_FILE_AT: 'spec:prototype:read-file-at',
+        START_DEV: 'spec:prototype:start-dev',
+        STOP_DEV: 'spec:prototype:stop-dev',
+        DEV_STATUS: 'spec:prototype:dev-status',
+        DEV_LOG: 'spec:prototype:dev-log',
+        GET_DEV_LOG_BUFFER: 'spec:prototype:get-dev-log-buffer',
+        LIST_SNAPSHOTS: 'spec:prototype:list-snapshots',
+        RESTORE_SNAPSHOT: 'spec:prototype:restore-snapshot',
+        EXPORT: 'spec:prototype:export',
+        OPEN_FOLDER: 'spec:prototype:open-folder',
+        READ_MANIFEST: 'spec:prototype:read-manifest',
+        APPLY_MANIFEST: 'spec:prototype:apply-manifest',
+        LIST_SKILLS: 'spec:prototype:list-skills',
+        READ_SKILL_FILE: 'spec:prototype:read-skill-file',
+        INSTALL_SKILL: 'spec:prototype:install-skill',
+        CHECK_SKILL_UPDATES: 'spec:prototype:check-skill-updates',
+        UPDATE_SKILL: 'spec:prototype:update-skill',
+        TREE_CHANGED: 'spec:prototype:tree-changed'
     },
     ERROR: 'error',
     LOG: 'log'

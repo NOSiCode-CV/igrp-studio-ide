@@ -11,6 +11,8 @@ import { type Action, TriggerControls } from './components/trigger-controls'
 interface InteractionProps {
     comp: StructuredComponent
     path: string
+    isRootComponent?: boolean
+    pageName?: string
     onInteranctionsChange: (componentId: string, updates: Partial<StructuredComponent>) => void
     columnsOptions?: (IGRPOptionsProps & { type?: 'pageParam' | 'column' })[]
 }
@@ -18,23 +20,22 @@ interface InteractionProps {
 const Interactions = ({
     comp,
     path,
+    isRootComponent = false,
+    pageName,
     onInteranctionsChange,
     columnsOptions = []
 }: InteractionProps) => {
-    const { getInteractionsComponent, getRulesComponent } = useStudio()
+    const { getInteractionsComponent } = useStudio()
 
     const [interactionsType, setInteractionsType] = useState({})
-
-    const [rulesProperties, setRulesProperties] = useState({})
 
     const { componentName, interactions, id: componentId, tag, rules } = comp
 
     useEffect(() => {
         if (componentName) {
             getInteractionsComponent(path, componentName).then((data) => setInteractionsType(data))
-            getRulesComponent(path, componentName).then((data) => setRulesProperties(data))
         }
-    }, [getInteractionsComponent, comp, componentName, path, getRulesComponent])
+    }, [getInteractionsComponent, componentName, path])
 
     const handleInteractionsChange = (data: Record<string, Action>) => {
         if (componentId)
@@ -44,10 +45,10 @@ const Interactions = ({
     }
 
     const handleRulesChange = (data: RuleDefinition[]) => {
-        if (componentId)
-            onInteranctionsChange(componentId, {
-                rules: data
-            })
+        if (!componentId) return
+        onInteranctionsChange(componentId, {
+            rules: data.length > 0 ? data : undefined
+        })
     }
 
     return (
@@ -68,9 +69,10 @@ const Interactions = ({
                 />
             )}
             <Rules
-                rulesProperties={rulesProperties}
                 rules={rules}
-                componentTag={tag}
+                isRootComponent={isRootComponent}
+                ruleContext={comp}
+                pageName={pageName}
                 onRulesChange={handleRulesChange}
             />
         </div>

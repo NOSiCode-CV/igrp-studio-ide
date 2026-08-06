@@ -1,3 +1,13 @@
+/**
+ * UI-generator façade over `@renderer/features/dnd`.
+ *
+ * Re-exports the generic DnD types and adds the `StructuredComponent`
+ * manifest model used by the visual page builder. New generators should
+ * either reuse `StructuredComponent` (when their manifest matches) or
+ * import the generic primitives from `@renderer/features/dnd` directly
+ * with their own typed adapter.
+ */
+
 import type {
     Arguments,
     ComponentRegisterConfig,
@@ -9,37 +19,17 @@ import type {
     TypeDef
 } from '@igrp/igrp-studio-nextjs-engine/types'
 import type { StyleComponent } from '@renderer/generators/ui/components/settings/style/types'
+import type {
+    DragEndResult as GenericDragEndResult,
+    Destination,
+    DropPosition,
+    DropZone,
+    LayoutMode,
+    SidebarItem,
+    Source as GenericSource
+} from '@renderer/features/dnd/types'
 
-export type LayoutMode = 'vertical' | 'horizontal'
-export type DropPosition = 'top' | 'bottom' | 'left' | 'right' | 'inside'
-
-export interface DropZone {
-    id: string
-    position: DropPosition
-    dropTargetId?: string
-    cellIndex?: number
-    countItems: number
-}
-
-export interface SidebarItem {
-    id: string
-    title: string
-    url: string
-    items?: {
-        id: string
-        title: string
-        url: string
-        isActive?: boolean
-    }[]
-}
-
-export interface DragEndResult {
-    draggableId: string
-    type: string
-    source: Source
-    destination?: Destination | null
-    mode: 'MOVE' | 'DROP'
-}
+export type { Destination, DropPosition, DropZone, LayoutMode, SidebarItem }
 
 export interface ComponentConfig {
     gridCol?: number
@@ -93,16 +83,12 @@ export interface StructuredComponent {
 
 export type StructuredLayout = StructuredComponent
 
-export interface Destination {
-    droppableId: string
-    index: number
-    droppableName?: string
-    droppablePath?: string
-}
-
-export interface Source {
-    droppableId: string
-    index: number
+/**
+ * UI-generator extension of the generic `Source` carrying manifest fields
+ * (`childrenTypes`, `defaultChildren`, `data`) that the visual page builder
+ * consumes after a drop.
+ */
+export interface Source extends GenericSource {
     label: string
     properties: {
         className?: string
@@ -117,6 +103,14 @@ export interface Source {
     allowTypes: boolean
     data?: RegisterState[]
     componentName?: string
+}
+
+/**
+ * UI-generator drag end result. Pins the source type to the manifest-aware
+ * `Source` above so existing consumers keep their typing without churn.
+ */
+export interface DragEndResult extends Omit<GenericDragEndResult, 'source'> {
+    source: Source
 }
 
 export interface EditingComponentParams {

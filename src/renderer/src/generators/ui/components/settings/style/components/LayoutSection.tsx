@@ -1,8 +1,4 @@
-import {
-    IGRPTabsListPrimitive,
-    IGRPTabsPrimitive,
-    IGRPTabsTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import { AlignCenter, ChevronDown, LayoutGrid, Plus, Square, XSquare } from 'lucide-react'
 import React, { useEffect } from 'react'
 import type { LayoutStyle, SectionProps } from '../types'
@@ -203,10 +199,10 @@ export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
             <div className="space-y-0.5 relative">
                 <label className="text-xs text-gray-500 dark:text-gray-400">Display</label>
 
-                <IGRPTabsPrimitive defaultValue="block" value={layoutStyle.type}>
-                    <IGRPTabsListPrimitive className="grid w-full grid-cols-4">
+                <Tabs defaultValue="block" value={layoutStyle.type}>
+                    <TabsList className="grid w-full grid-cols-4">
                         {layoutTypes.main.map((option) => (
-                            <IGRPTabsTriggerPrimitive
+                            <TabsTrigger
                                 key={option.value}
                                 value={option.value}
                                 onClick={() => handleDisplayChange(option.value)}
@@ -220,9 +216,9 @@ export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
                                     {option.icon}
                                 </div>
                                 <span className="font-medium">{option.label}</span>
-                            </IGRPTabsTriggerPrimitive>
+                            </TabsTrigger>
                         ))}
-                    </IGRPTabsListPrimitive>
+                    </TabsList>
 
                     <div className="relative mt-0.5">
                         <button
@@ -303,7 +299,7 @@ export function LayoutSection({ onChangeStyles, styles }: SectionProps) {
                     {isBlock && renderBlockControls()}
                     {isFlex && renderFlexControls()}
                     {isGrid && renderGridControls()}
-                </IGRPTabsPrimitive>
+                </Tabs>
             </div>
         </div>
     )

@@ -23,7 +23,7 @@ const StudioSlice = createSlice({
     name: 'Studio',
     initialState,
     reducers: {
-        setConfigAction(state, action: PayloadAction<ProjectData>) {
+        setConfigAction(state, action: PayloadAction<ProjectData | undefined>) {
             state.config = action.payload
         },
         setBasePathAction(state, action: PayloadAction<string>) {
@@ -40,6 +40,13 @@ const StudioSlice = createSlice({
         },
         setWorkspaceAction(state, action: PayloadAction<IWorkspace | null>) {
             state.workspace = action.payload
+        },
+        clearStudioProjectAction(state) {
+            state.config = undefined
+            state.basePath = ''
+            state.filesThree = []
+            state.currentItem = null
+            state.changeStatus = false
         }
     }
 })
@@ -50,7 +57,8 @@ export const {
     setFilesThreeAction,
     setChangeStatusAction,
     setCurrentItemAction,
-    setWorkspaceAction
+    setWorkspaceAction,
+    clearStudioProjectAction
 } = StudioSlice.actions
 
 export default StudioSlice.reducer

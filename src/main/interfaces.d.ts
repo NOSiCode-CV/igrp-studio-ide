@@ -15,19 +15,24 @@ import {
 
 import { Dependency } from '@igrp/igrp-studio-springboot-engine/dist/interfaces/springDependencyTypes'
 import { Connection, HandlerResponse, PageableProjects, ProjectData } from './types'
+import { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
 import {
-    ComponentRegistrationConfig,
+    ComponentRegisterConfig,
+    ComponentRegistrationConfig
+} from '@igrp/igrp-studio-nextjs-engine/types'
+import {
     DockerServiceRegistrationConfig,
     ProjectWorkspace,
-    ServiceWorkspace
-} from '@igrp/igrp-studio-nextjs-engine/types'
-import { IWorkspace, DatabaseResponse } from 'src/main/types'
-import { WorkspaceService } from '@igrp/igrp-studio-nextjs-engine/types'
+    ServiceWorkspace,
+    WorkspaceService
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import { IWorkspace, DatabaseResponse, WorkspaceBootstrapOptions } from 'src/main/types'
 
 export interface IWorkspaceRepository {
     // Workspace Operations
     createWorkspace(
-        workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>
+        workspace: Omit<IWorkspace, 'id' | 'createdAt' | 'projects'>,
+        options?: WorkspaceBootstrapOptions
     ): Promise<HandlerResponse>
     updateWorkspace(id: string, updates: Partial<IWorkspace>): Promise<IWorkspace>
     deleteWorkspace(id: string): Promise<void>
@@ -93,9 +98,13 @@ export interface BaseEngine {
     createModel?(data: EnumConfig, basePath: string): Promise<void>
     createDto?(data: EnumConfig, basePath: string): Promise<void>
     createController?(data: EnumConfig, basePath: string): Promise<void>
+    createGraphqlSchema?(config: any, basePath: string): Promise<void>
 
     serializeElement?: (data: any, basePath: string) => Promise<void>
     createPermission?: (data: any, basePath: string) => Promise<void>
+    getPermissions?: (basePath: string) => Promise<any[]>
+    savePermission?: (data: any, basePath: string) => Promise<void>
+    deletePermission?: (id: string, basePath: string) => Promise<void>
 
     createPage?(pageConfig: PageConfig, basePath: string): Promise<void>
 
@@ -110,6 +119,8 @@ export interface BaseEngine {
     getCodeSnippets?(): CodeSnippetsRegistrationConfig
 
     registerComponent?(config: ComponentRegistrationConfig): void
+    resetComponents?(): void
+    buildComponentRegistry?(input: BuildComponentRegistryInput): ComponentRegisterConfig[]
 
     createProcess?: (process: ProcessConfig, basePath: string) => Promise<void>
     createProcessStep?: (step: ProcessStepConfig, basePath: string) => Promise<void>
@@ -147,6 +158,9 @@ export interface IBaseEngine {
     ) => Promise<HandlerResponse>
 
     createPermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    getPermissions: (engineType: string, basePath: string) => Promise<HandlerResponse>
+    savePermission: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
+    deletePermission: (id: string, engineType: string, basePath: string) => Promise<HandlerResponse>
     serializeElement: (data: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     delete: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     duplicate: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>
@@ -164,6 +178,11 @@ export interface IBaseEngine {
     registerComponent: (
         engineType: string,
         config: ComponentRegistrationConfig
+    ) => Promise<HandlerResponse>
+    resetComponents: (engineType: string) => Promise<HandlerResponse>
+    buildComponentRegistry: (
+        engineType: string,
+        input: BuildComponentRegistryInput
     ) => Promise<HandlerResponse>
 
     createProcess: (process: any, engineType: string, basePath: string) => Promise<HandlerResponse>

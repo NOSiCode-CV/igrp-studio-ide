@@ -8,6 +8,7 @@ import { ENV_TYPES } from '@renderer/constants/appConstants'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
 import type { StructuredLayout } from '@renderer/lib/dnd/types'
+import { sanitizeLayoutRules } from '@renderer/generators/ui/utils/permissionRules'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
@@ -33,9 +34,33 @@ interface PageSaveProps {
 }
 
 interface SaveError {
-    message: string
+    message: unknown
     code?: string
-    details?: string
+    details?: unknown
+}
+
+const getSaveErrorMessage = (error: unknown): string | undefined => {
+    if (error instanceof Error) return error.message
+    if (typeof error === 'string') return error
+
+    if (Array.isArray(error)) {
+        const messages = error
+            .map(getSaveErrorMessage)
+            .filter((message): message is string => Boolean(message))
+
+        return messages.join('\n\n') || undefined
+    }
+
+    if (typeof error === 'object' && error !== null) {
+        const { details, error: nestedError, message } = error as Record<string, unknown>
+
+        if (typeof message === 'string') return message
+        if (message !== undefined) return getSaveErrorMessage(message)
+        if (typeof details === 'string') return details
+        if (nestedError !== undefined) return getSaveErrorMessage(nestedError)
+    }
+
+    return undefined
 }
 
 /**
@@ -87,19 +112,28 @@ export const usePageSave = ({
 
             const isBpmnProcess = restData.type === 'processStep'
 
-            console.log('Saving configuration:', restData)
+            const components = restData.components
+                ? sanitizeLayoutRules(restData.components as StructuredLayout)
+                : restData.components
 
-            let error: string | undefined
+            const payload = {
+                ...restData,
+                components
+            }
+
+            console.log('Saving configuration:', payload)
+
+            let error: unknown
 
             if (isBpmnProcess) {
                 const result = await window.engine.createProcessStep(
-                    restData,
+                    payload,
                     ENV_TYPES.NEXTJS,
                     basePath
                 )
                 error = result.error
             } else {
-                const result = await window.engine.createPage(restData, ENV_TYPES.NEXTJS, basePath)
+                const result = await window.engine.createPage(payload, ENV_TYPES.NEXTJS, basePath)
                 error = result.error
             }
 
@@ -118,7 +152,7 @@ export const usePageSave = ({
             showSuccessToast('Components saved successfully')
             dispatch(onSetChangeStatus(true))
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+            const errorMessage = getSaveErrorMessage(error) || 'Unknown error occurred'
             showErrorToast(errorMessage)
             console.error('Save error:', error)
         }

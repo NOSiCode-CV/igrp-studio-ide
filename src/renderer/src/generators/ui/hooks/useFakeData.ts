@@ -228,9 +228,7 @@ export const useFakedata = (): {
         },
         [COMPONENT.Badge]: {
             properties: {
-                content: faker.lorem.words(1),
-                variant: 'outline',
-                color: 'primary'
+                content: faker.lorem.words(1)
             }
         }
     }

@@ -1,5 +1,7 @@
 // handlers/apiHandler.ts
 
+import type { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
+import { convertJsonSchemaToForm } from '@igrp/igrp-studio-nextjs-engine'
 import type {
     ComponentRegistrationConfig,
     PageConfig,
@@ -20,6 +22,13 @@ handleWithCustomErrors(
         await engine.createProject(project, basePath)
     }
 )
+
+handleWithCustomErrors(EVENTS.NEXT.CONVERT_JSON_SCHEMA, async (_event, schema: unknown) => {
+    // Engine ships fs-extra as a transitive dep, so importing it
+    // from the renderer breaks Vite. Keep the conversion main-side
+    // and return the structured component tree over IPC.
+    return convertJsonSchemaToForm(schema as never)
+})
 
 handleWithCustomErrors(
     EVENTS.SPRING.CREATE_ENUM,
@@ -58,6 +67,14 @@ handleWithCustomErrors(
     async (_event, dtoConfig: any, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType)
         await engine.createDto?.(dtoConfig, basePath)
+    }
+)
+
+handleWithCustomErrors(
+    EVENTS.SPRING.CREATE_GRAPHQL_SCHEMA,
+    async (_event, schemaConfig: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        await engine.createGraphqlSchema?.(schemaConfig, basePath)
     }
 )
 
@@ -154,6 +171,19 @@ handleWithCustomErrors(
     }
 )
 
+handleWithCustomErrors(EVENTS.NEXT.RESET_COMPONENT, async (_event, engineType: string) => {
+    const engine = EngineFactory.getEngine(engineType)
+    return engine.resetComponents?.()
+})
+
+handleWithCustomErrors(
+    EVENTS.NEXT.BUILD_COMPONENT_REGISTRY,
+    async (_event, engineType: string, input: BuildComponentRegistryInput) => {
+        const engine = EngineFactory.getEngine(engineType)
+        return engine.buildComponentRegistry?.(input)
+    }
+)
+
 handleWithCustomErrors(
     EVENTS.NEXT.CREATE_PROCESS,
     async (_event, process: ProcessConfig, engineType: string, basePath: string) => {
@@ -167,6 +197,38 @@ handleWithCustomErrors(
     async (_event, step: ProcessStepConfig, engineType: string, basePath: string) => {
         const engine = EngineFactory.getEngine(engineType)
         await engine.createProcessStep?.(step, basePath)
+    }
+)
+
+handleWithCustomErrors(
+    EVENTS.ENGINE.GET_PERMISSIONS,
+    async (_event, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        return (await engine.getPermissions?.(basePath)) ?? []
+    }
+)
+
+handleWithCustomErrors(
+    EVENTS.ENGINE.SAVE_PERMISSION,
+    async (_event, config: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        await engine.savePermission?.(config, basePath)
+    }
+)
+
+handleWithCustomErrors(
+    EVENTS.ENGINE.CREATE_PERMISSION,
+    async (_event, config: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        await engine.createPermission?.(config, basePath)
+    }
+)
+
+handleWithCustomErrors(
+    EVENTS.ENGINE.DELETE_PERMISSION,
+    async (_event, id: string, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        await engine.deletePermission?.(id, basePath)
     }
 )
 

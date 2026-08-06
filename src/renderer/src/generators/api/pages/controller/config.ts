@@ -72,6 +72,22 @@ export const getTablesColumns = (
         )?.REQUEST_PARAMS || []
     )
 
+    const pathVariableTypesData = formatMethods(
+        (
+            selectors.find((selector: any) => 'PATH_VARIABLE_TYPES' in selector) as
+                | { PATH_VARIABLE_TYPES: string[] }
+                | undefined
+        )?.PATH_VARIABLE_TYPES || []
+    )
+
+    const collectionTypesData = formatMethods(
+        (
+            selectors.find((selector: any) => 'REQUEST_PARAM_COLLECTION_TYPES' in selector) as
+                | { REQUEST_PARAM_COLLECTION_TYPES: string[] }
+                | undefined
+        )?.REQUEST_PARAM_COLLECTION_TYPES || []
+    )
+
     return {
         requestParams: [
             { key: 'name', name: t('name'), type: 'text' },
@@ -92,7 +108,7 @@ export const getTablesColumns = (
                         name: t('isRequired'),
                         type: 'checkbox'
                     },
-                    { key: 'advanced', name: '', type: 'popoverController' }
+                    { key: 'advanced', name: '', type: 'popoverController', options: { collectionTypes: collectionTypesData } }
                 ]
             },
             { key: 'description', name: t('description'), type: 'text' }
@@ -109,7 +125,7 @@ export const getTablesColumns = (
                         key: 'type',
                         name: t('type'),
                         type: 'select',
-                        options: paramsTypesData
+                        options: pathVariableTypesData
                     },
                     {
                         key: 'isRequired',

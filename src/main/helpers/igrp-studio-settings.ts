@@ -13,7 +13,9 @@ export const IGRPStudioSettings = {
                 bpmnConfigs: { configs: [], activeConfigId: undefined },
                 language: 'en',
                 connections: [],
-                updateChannel: 'stable'
+                updateChannel: 'stable',
+                /** After the welcome swipe + launch flow, skip `/welcome` on next launches when appropriate. */
+                welcomeOnboardingCompleted: false
             }
         })
     },
@@ -48,6 +50,15 @@ export const IGRPStudioSettings = {
 
     resetLanguage() {
         store?.set('language', 'en')
+    },
+
+    getWelcomeOnboardingCompleted(): boolean {
+        // Only explicit `true` counts — missing key, false, or corrupted values mean "not completed"
+        return store?.get('welcomeOnboardingCompleted') === true
+    },
+
+    setWelcomeOnboardingCompleted(completed: boolean) {
+        store?.set('welcomeOnboardingCompleted', completed)
     },
 
     // Update channel (stable | beta) for auto-updates

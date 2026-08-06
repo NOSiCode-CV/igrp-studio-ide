@@ -7,7 +7,16 @@ const config: Config = {
     rootDir: './',
     testRegex: '.*\\.test\\.ts$',
     transform: {
-        '^.+\\.ts$': 'ts-jest'
+        '^.+\\.ts$': [
+            'ts-jest',
+            {
+                tsconfig: {
+                    esModuleInterop: true,
+                    target: 'es2020',
+                    module: 'commonjs'
+                }
+            }
+        ]
     },
     moduleNameMapper: {
         '^electron$': '<rootDir>/__mocks__/electron.ts'

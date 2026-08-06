@@ -9,7 +9,7 @@ cache:
 build_packagedev_mac:
   rules:
     - when: never  # Mac build disabled; to re-enable: use - if: $CI_COMMIT_TAG
-  image: node
+  image: node:24
   stage: build
   tags:
     - arm64
@@ -39,7 +39,7 @@ build_packagedev_mac:
       - node_modules/
 
 build_packagedev_windows:
-  image: node
+  image: node:24
   stage: build
   only:
     - tags
@@ -78,8 +78,9 @@ build_packagedev_windows:
       - node_modules/
 
 build_packagedev_linux:
-  image: node
+  image: node:24
   stage: build
+  timeout: 2h
   only:
     - tags
   variables:

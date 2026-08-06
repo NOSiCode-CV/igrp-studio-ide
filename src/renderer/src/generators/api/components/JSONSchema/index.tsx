@@ -1,15 +1,11 @@
+import { Button } from '@renderer/components/ui/button'
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@renderer/components/ui/table'
 import {
-    IGRPButtonPrimitive,
-    IGRPTableBodyPrimitive,
-    IGRPTableHeaderPrimitive,
-    IGRPTableHeadPrimitive,
-    IGRPTablePrimitive,
-    IGRPTableRowPrimitive,
-    IGRPTooltipContentPrimitive,
-    IGRPTooltipPrimitive,
-    IGRPTooltipProviderPrimitive,
-    IGRPTooltipTriggerPrimitive
-} from '@igrp/igrp-framework-react-design-system'
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger
+} from '@renderer/components/ui/tooltip'
 import { Plus } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -342,18 +338,18 @@ export function JSONSchemaBuilder({
     }, [schema, newFields])
 
     return (
-        <IGRPTooltipProviderPrimitive>
-            <IGRPTablePrimitive>
-                <IGRPTableHeaderPrimitive>
-                    <IGRPTableRowPrimitive>
-                        <IGRPTableHeadPrimitive>{t('name')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('type')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive>{t('description')}</IGRPTableHeadPrimitive>
-                        <IGRPTableHeadPrimitive className="text-right flex flex-1 items-center">
+        <TooltipProvider>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{t('name')}</TableHead>
+                        <TableHead>{t('type')}</TableHead>
+                        <TableHead>{t('description')}</TableHead>
+                        <TableHead className="text-right flex flex-1 items-center">
                             {fieldOrder.length === 0 && Object.entries(newFields).length === 0 && (
-                                <IGRPTooltipPrimitive>
-                                    <IGRPTooltipTriggerPrimitive asChild>
-                                        <IGRPButtonPrimitive
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
                                             type="button"
                                             onClick={() => handleAddNewField()}
                                             variant="ghost"
@@ -362,19 +358,17 @@ export function JSONSchemaBuilder({
                                         >
                                             <Plus size={14} />
                                             <span className="sr-only">{t('addNewField')}</span>
-                                        </IGRPButtonPrimitive>
-                                    </IGRPTooltipTriggerPrimitive>
-                                    <IGRPTooltipContentPrimitive>
-                                        {t('addNewField')}
-                                    </IGRPTooltipContentPrimitive>
-                                </IGRPTooltipPrimitive>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>{t('addNewField')}</TooltipContent>
+                                </Tooltip>
                             )}
 
                             <JSONSchemaModal generateJSONSchema={generateJSONSchema} />
-                        </IGRPTableHeadPrimitive>
-                    </IGRPTableRowPrimitive>
-                </IGRPTableHeaderPrimitive>
-                <IGRPTableBodyPrimitive>
+                        </TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
                     {fieldOrder.map((id) => (
                         <SchemaFieldRow
                             key={id}
@@ -406,8 +400,8 @@ export function JSONSchemaBuilder({
                             enumTypes={enumTypes}
                         />
                     ))}
-                </IGRPTableBodyPrimitive>
-            </IGRPTablePrimitive>
-        </IGRPTooltipProviderPrimitive>
+                </TableBody>
+            </Table>
+        </TooltipProvider>
     )
 }
