@@ -133,6 +133,20 @@ export function DjangoConfig({
 
                     <div className="flex items-center space-x-2">
                         <Checkbox
+                            id="django-entity-revision"
+                            checked={data.enableEntityRevision}
+                            onCheckedChange={(checked) =>
+                                onChange({
+                                    ...data,
+                                    enableEntityRevision: checked as boolean
+                                })
+                            }
+                        />
+                        <Label htmlFor="django-entity-revision">{t('enableEntityRevision')}</Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
                             id="django-graphql"
                             checked={!!data.enableGraphQL}
                             onCheckedChange={(checked) =>
@@ -145,6 +159,25 @@ export function DjangoConfig({
                         <Label htmlFor="django-graphql">{t('enableGraphQL')}</Label>
                     </div>
                 </div>
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="django-auth">Authentication</Label>
+                <IGRPCombobox
+                    value={data.authMode ?? ''}
+                    onChange={(value) =>
+                        onChange({
+                            ...data,
+                            authMode: value === 'keycloak' || value === 'autentika' ? value : undefined
+                        })
+                    }
+                    options={[
+                        { value: '', label: 'Disabled' },
+                        { value: 'keycloak', label: 'Keycloak' },
+                        { value: 'autentika', label: 'Autentika' }
+                    ]}
+                    className="w-full"
+                />
             </div>
         </div>
     )

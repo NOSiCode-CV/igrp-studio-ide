@@ -31,6 +31,8 @@ export interface DjangoConfigData {
     enableEntityRevision: boolean
     /** Opt-in Strawberry GraphQL scaffolding (forwarded to @igrp/django-engine). */
     enableGraphQL?: boolean
+    /** Identity provider used by the generated Django JWT resource-server scaffold. */
+    authMode?: 'keycloak' | 'autentika'
 }
 
 export interface DotNetConfigData {

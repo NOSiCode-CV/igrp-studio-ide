@@ -91,6 +91,19 @@ describe('Studio ↔ django-engine integration', () => {
         expect(baseApi.igrpCoreVersion).toMatch(/^\d+\.\d+\.\d+(-[A-Za-z0-9.-]+)?$/)
     })
 
+    it('forwards the selected auth provider and emits the auth scaffold', async () => {
+        const engine = new DjangoEngine()
+        await engine.createProject(projectWith(outDir, { authMode: 'autentika' }), outDir)
+
+        expect(readBaseApi(outDir).authMode).toBe('autentika')
+        expect(
+            fs.existsSync(path.join(outDir, ARTIFACT, 'config', 'auth', 'authentication.py'))
+        ).toBe(true)
+        expect(
+            fs.readFileSync(path.join(outDir, ARTIFACT, 'config', 'auth', 'authentication.py'), 'utf-8')
+        ).toContain('autentika')
+    })
+
     it('routes createModel through the engine for a simple CRUD model (Department)', async () => {
         const engine = new DjangoEngine()
         await engine.createProject(baseProject(outDir), outDir)
@@ -149,6 +162,112 @@ describe('Studio ↔ django-engine integration', () => {
         const modelsPy = fs.readFileSync(path.join(outDir, 'department', 'models.py'), 'utf-8')
         expect(modelsPy).toContain('max_length=50')
         expect(modelsPy).toContain('unique=True')
+    })
+
+    it('normalizes the shared DTO form to Django fields and persists the reload manifest', async () => {
+        const engine = new DjangoEngine()
+        await engine.createProject(baseProject(outDir), outDir)
+
+        await engine.createDto(
+            {
+                type: 'dto',
+                name: 'DepartmentResponse',
+                module: 'Departments',
+                template: 'classic',
+                enableCustonValidation: false,
+                readOnly: false,
+                extends: { name: '', module: '' },
+                attributes: [
+                    { name: 'id', type: 'integer' },
+                    { name: 'name', type: 'string' }
+                ],
+                id: 'dto-id'
+            } as any,
+            outDir
+        )
+
+        const dtoSource = fs.readFileSync(path.join(outDir, 'departments', 'dtos.py'), 'utf-8')
+        expect(dtoSource).toContain(
+            'class DepartmentResponseSerializer(serializers.Serializer):'
+        )
+        expect(dtoSource).toContain('id = serializers.IntegerField()')
+        expect(dtoSource).toContain('name = serializers.CharField(')
+
+        const dtoManifest = JSON.parse(
+            fs.readFileSync(
+                path.join(outDir, '.igrpstudio', 'Departments', 'dto', 'DepartmentResponse.json'),
+                'utf-8'
+            )
+        )
+        expect(dtoManifest).toEqual({
+            type: 'dto',
+            name: 'DepartmentResponse',
+            module: 'Departments',
+            attributes: [
+                { name: 'id', type: 'integer' },
+                { name: 'name', type: 'string' }
+            ]
+        })
+    })
+
+    it('normalizes the shared response schema and persists a reloadable manifest', async () => {
+        const engine = new DjangoEngine()
+        await engine.createProject(baseProject(outDir), outDir)
+
+        await engine.createResponse(
+            {
+                type: 'response',
+                statusCode: '404',
+                name: 'DepartmentNotFound',
+                template: 'classic',
+                description: '',
+                module: 'Departments',
+                content: {
+                    'application/json': {
+                        schema: {
+                            type: 'object',
+                            required: ['message'],
+                            properties: {
+                                message: { type: 'string' },
+                                retryAfter: { type: 'integer', nullable: true }
+                            }
+                        }
+                    }
+                }
+            } as any,
+            outDir
+        )
+
+        const responseSource = fs.readFileSync(path.join(outDir, 'departments', 'responses.py'), 'utf-8')
+        expect(responseSource).toContain('class DepartmentNotFoundResponse(serializers.Serializer):')
+        expect(responseSource).toContain('status_code = 404')
+        expect(responseSource).toContain('message = serializers.CharField(')
+        expect(responseSource).toContain('retry_after = serializers.IntegerField(')
+
+        const responseManifest = JSON.parse(
+            fs.readFileSync(
+                path.join(outDir, '.igrpstudio', 'Departments', 'responses', 'DepartmentNotFound.json'),
+                'utf-8'
+            )
+        )
+        expect(responseManifest).toEqual(
+            expect.objectContaining({
+                type: 'response',
+                statusCode: '404',
+                module: 'Departments',
+                content: {
+                    'application/json': {
+                        schema: expect.objectContaining({
+                            required: ['message'],
+                            properties: expect.objectContaining({
+                                message: { type: 'string' },
+                                retryAfter: { type: 'integer', nullable: true }
+                            })
+                        })
+                    }
+                }
+            })
+        )
     })
 
     it('routes a ManyToOne relation model (Employee -> Department) through the engine', async () => {
@@ -518,16 +637,16 @@ describe('Studio ↔ django-engine integration', () => {
         }
     })
 
-    it('fails clearly for unsupported operations instead of silently no-opping', async () => {
-        // @igrp/django-engine backs only createProject + createModel. Every
-        // other API Designer op must throw (fail-clear) rather than silently
-        // succeed — the IPC layer invokes several via optional chaining, so an
-        // absent method would resolve as a no-op the user reads as success.
+    it('fails clearly for malformed forwarded operations instead of silently no-opping', async () => {
+        // The adapter forwards API Designer operations to the Django engine.
+        // Malformed payloads must still reject rather than resolve as a no-op;
+        // valid payloads are covered by the engine package's own operation
+        // tests.
         const engine = new DjangoEngine() as unknown as Record<
             string,
             (config: unknown, basePath: string) => Promise<void>
         >
-        const unsupported = [
+        const malformed = [
             'createModule',
             'createDto',
             'createEnum',
@@ -538,9 +657,9 @@ describe('Studio ↔ django-engine integration', () => {
             'delete',
             'duplicate'
         ]
-        for (const op of unsupported) {
-            await expect(engine[op]({}, '/tmp/django-unsupported')).rejects.toThrow(
-                /not supported for Django/
+        for (const op of malformed) {
+            await expect(engine[op]({}, '/tmp/django-malformed')).rejects.toThrow(
+                /Invalid|Unsupported|missing|required|JSON/i
             )
         }
     })
