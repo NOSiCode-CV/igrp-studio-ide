@@ -3,7 +3,9 @@ import type {
     ServiceWorkspace,
     WorkspaceService
 } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import { createSelector } from '@reduxjs/toolkit'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
+import { rememberLastOpenedProject } from '@renderer/hooks/use-project-resume'
 import useToast from '@renderer/hooks/useToast'
 import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
@@ -12,7 +14,6 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { type NavigateFunction, useNavigate } from 'react-router-dom'
-import { createSelector } from '@reduxjs/toolkit'
 import type {
     HandlerResponse,
     IWorkspace,
@@ -309,6 +310,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             dispatch(setBasePath(result.path))
 
             dispatch(setConfig(result))
+            rememberLastOpenedProject(result)
 
             // Detect git repo root (monorepo support) and persist on the project
             try {
@@ -353,6 +355,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             [ENV_TYPES.NEXTJS]: ROUTES.PATH_PAGE_BUILDER_UI,
             [ENV_TYPES.SPRING]: ROUTES.PATH_PAGE_BUILDER_API,
             [ENV_TYPES.DOTNET]: ROUTES.PATH_PAGE_BUILDER_API,
+            [ENV_TYPES.DJANGO]: ROUTES.PATH_PAGE_BUILDER_API,
             [ENV_TYPES.SPECIFICATION]: ROUTES.PATH_PAGE_BUILDER_SPECIFICATION
         }
         const path = navigationMap[appConfig.framework as keyof typeof navigationMap]

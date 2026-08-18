@@ -1,9 +1,11 @@
+import { createSelector } from '@reduxjs/toolkit'
+import Loader from '@renderer/components/loader'
 import { SidebarProvider } from '@renderer/components/ui/sidebar'
+import { useProjectResume } from '@renderer/hooks/use-project-resume'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { createSelector } from '@reduxjs/toolkit'
 import { IntegratedTerminal } from '../components/integrated-terminal'
 import { Footer } from './components/footer'
 import Header from './components/header'
@@ -29,12 +31,21 @@ const Layout = (props: LayoutProps): React.JSX.Element => {
     const navigate = useNavigate()
 
     const { config, basePath } = useSelector(selectStudioProperties)
+    const { resolved: projectResumeResolved } = useProjectResume()
 
     useEffect(() => {
-        if (!basePath) {
+        if (projectResumeResolved && !basePath) {
             navigate(ROUTES.IDE_INITIAL_SCREEN, { replace: true })
         }
-    }, [navigate, basePath])
+    }, [navigate, basePath, projectResumeResolved])
+
+    if (!projectResumeResolved || !basePath || !config) {
+        return (
+            <div className="flex h-screen w-full items-center justify-center bg-background">
+                <Loader />
+            </div>
+        )
+    }
 
     return (
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(20))] [--header-height-three:calc(--spacing(28))]">

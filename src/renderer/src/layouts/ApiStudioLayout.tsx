@@ -1,6 +1,7 @@
+import Loader from '@renderer/components/loader'
 import { SidebarInset, SidebarProvider } from '@renderer/components/ui/sidebar'
+import { useProjectResume } from '@renderer/hooks/use-project-resume'
 import useStudioAPI from '@renderer/hooks/use-studio-api'
-
 import {
     getFileThree as onGetFolderFiles,
     setChangeStatus as onSetChangeStatus
@@ -29,13 +30,15 @@ const Layout = (props: LayoutProps): React.ReactNode => {
     const navigate = useNavigate()
 
     const { currentItem, changeStatus, config, basePath, filesThree } = useStudioAPI()
+    const { resolved: projectResumeResolved } = useProjectResume()
 
     useEffect(() => {
+        if (!basePath) return
         dispatch(onGetFolderFiles(basePath))
     }, [basePath, dispatch])
 
     useEffect(() => {
-        if (changeStatus) {
+        if (changeStatus && basePath) {
             dispatch(onGetFolderFiles(basePath))
             dispatch(onSetChangeStatus(false))
         }
@@ -46,10 +49,18 @@ const Layout = (props: LayoutProps): React.ReactNode => {
     const { menuItems } = useNavdata(filesThree)
 
     useEffect(() => {
-        if (!basePath) {
-            navigate(ROUTES.HOME)
+        if (projectResumeResolved && !basePath) {
+            navigate(ROUTES.PATH_IDE_INITIAL_SCREEN, { replace: true })
         }
-    }, [basePath, navigate])
+    }, [basePath, navigate, projectResumeResolved])
+
+    if (!projectResumeResolved || !basePath || !config) {
+        return (
+            <div className="flex h-screen w-full items-center justify-center bg-background">
+                <Loader />
+            </div>
+        )
+    }
 
     return (
         <div className="[--header-height:calc(--spacing(10))] [--header-height-two:calc(--spacing(18))] [--header-height-three:calc(--spacing(30))]">
