@@ -819,6 +819,7 @@
     "tableView": "Vista tabela",
     "headerQuickSearch": "Pesquisar permissões",
     "backToProject": "Voltar ao Projeto",
+    "backToHome": "Voltar ao início",
     "permissionRuleSingular": "regra",
     "permissionRulePlural": "regras",
     "permissionsManagerDesc": "Catálogo de permissões do projeto. As chaves são reutilizadas nas regras das páginas.",

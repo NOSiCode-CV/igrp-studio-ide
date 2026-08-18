@@ -8,7 +8,9 @@ const githubConfig = {
     scopes: ['repo', 'read:user', 'read:org'],
     authUrl: 'https://github.com/login/oauth/authorize',
     tokenUrl: 'https://github.com/login/oauth/access_token',
-    provider: 'github' as const
+    provider: 'github' as const,
+    baseUrl: 'https://github.com',
+    configId: 'github'
 }
 
 export const githubAuth = new GitAuth(githubConfig, GitStore, GitHubService)

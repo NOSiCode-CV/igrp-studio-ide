@@ -1,5 +1,6 @@
 import { type BrowserWindow, app as electronApp, shell } from 'electron'
 import express from 'express'
+import { oauthErrorPage, oauthSuccessPage } from './oauth-callback-page'
 
 interface GitProviderConfig {
     clientId: string
@@ -10,13 +11,31 @@ interface GitProviderConfig {
     provider: 'github' | 'gitlab'
     /** Web host (e.g. https://github.example.com) — needed by GitHub Enterprise. */
     baseUrl?: string
+    /** Persisted config id (e.g. gitlab-nosi). Sent back on OAuth success. */
+    configId?: string
 }
 
 interface GitService {
     initialize: (token: string, baseUrl?: string) => void
 }
 
-const DEV_PORT = process.env.VITE_DEV_PORT || 4000
+/**
+ * Dev OAuth callback port. Must match a Callback URL registered on the
+ * GitHub/GitLab OAuth app. Do not reuse VITE_DEV_PORT (renderer) — that
+ * produced http://localhost:3000/oauth/callback which git.nosi.cv rejects.
+ */
+function getOAuthDevPort(): number {
+    const raw = process.env.VITE_GIT_OAUTH_DEV_PORT
+    const port = Number(raw)
+    return Number.isFinite(port) && port > 0 ? port : 4000
+}
+
+function getRedirectUri(isDev: boolean): string {
+    if (isDev) {
+        return `http://localhost:${getOAuthDevPort()}/oauth/callback`
+    }
+    return process.env.VITE_GIT_REDIRECT_URI || 'igrp-studio://oauth/callback'
+}
 
 export class GitAuth {
     private config: GitProviderConfig
@@ -31,9 +50,7 @@ export class GitAuth {
 
     getAuthUrl(isDev: boolean): string {
         const scopes = this.config.scopes.join(' ')
-        const redirectUri = isDev
-            ? `http://localhost:${DEV_PORT}/oauth/callback`
-            : process.env.VITE_GIT_REDIRECT_URI
+        const redirectUri = encodeURIComponent(getRedirectUri(isDev))
 
         return (
             `${this.config.authUrl}?client_id=${this.config.clientId}&redirect_uri=${redirectUri}` +
@@ -52,34 +69,53 @@ export class GitAuth {
     private async setupDevOAuth(mainWindow: BrowserWindow) {
         return new Promise((resolve, reject) => {
             const app = express()
-            const server = app.listen(DEV_PORT, () => {
+            const port = getOAuthDevPort()
+            const server = app.listen(port, () => {
                 const authUrl = this.getAuthUrl(true)
                 shell.openExternal(authUrl)
             })
 
+            server.on('error', (error: NodeJS.ErrnoException) => {
+                if (error.code === 'EADDRINUSE') {
+                    reject(
+                        new Error(
+                            `OAuth callback port ${port} is already in use. Close the other process or set VITE_GIT_OAUTH_DEV_PORT.`
+                        )
+                    )
+                    return
+                }
+                reject(error)
+            })
+
             app.get('/oauth/callback', async (req, res) => {
-                const { code } = req.query
+                const code = typeof req.query.code === 'string' ? req.query.code : ''
+                const oauthError =
+                    typeof req.query.error_description === 'string'
+                        ? req.query.error_description
+                        : typeof req.query.error === 'string'
+                          ? req.query.error
+                          : ''
 
-                if (code) {
-                    try {
-                        const token = await this.exchangeCodeForToken(code as string, true)
-                        this.handleAuthSuccess(token, mainWindow)
+                if (!code) {
+                    this.handleAuthError(
+                        new Error(oauthError || 'No authorization code found in callback URL'),
+                        mainWindow,
+                        res,
+                        reject
+                    )
+                    server.close()
+                    return
+                }
 
-                        res.send(`
-              <html>
-                <body style="background: #0d1117; color: #c9d1d9; font-family: -apple-system;">
-                  <h2>✅ ${this.config.provider.toUpperCase()} authentication successful!</h2>
-                  <p>You can close this window and return to the application.</p>
-                  <script>setTimeout(() => window.close(), 2000);</script>
-                </body>
-              </html>
-            `)
-
-                        server.close()
-                        resolve(token)
-                    } catch (error) {
-                        this.handleAuthError(error, mainWindow, res, reject)
-                    }
+                try {
+                    const token = await this.exchangeCodeForToken(code, true)
+                    this.handleAuthSuccess(token, mainWindow)
+                    res.type('html').send(oauthSuccessPage(this.config.provider))
+                    server.close()
+                    resolve(token)
+                } catch (error) {
+                    this.handleAuthError(error, mainWindow, res, reject)
+                    server.close()
                 }
             })
         })
@@ -117,9 +153,7 @@ export class GitAuth {
     }
 
     private async exchangeCodeForToken(code: string, isDev: boolean) {
-        const redirectUri = isDev
-            ? `http://localhost:${DEV_PORT}/oauth/callback`
-            : process.env.VITE_GIT_REDIRECT_URI
+        const redirectUri = getRedirectUri(isDev)
 
         const body: any = {
             client_id: this.config.clientId,
@@ -155,7 +189,8 @@ export class GitAuth {
             mainWindow.webContents.send(`${this.config.provider}-oauth-success`, {
                 access_token: data.access_token,
                 scope: data.scope,
-                baseUrl: this.config.baseUrl
+                baseUrl: this.config.baseUrl,
+                providerId: this.config.configId
             })
             mainWindow.show()
             mainWindow.focus()
@@ -196,14 +231,14 @@ export class GitAuth {
         })
 
         if (res) {
-            res.status(500).send(`
-        <html>
-          <body style="background: #0d1117; color: #c9d1d9; font-family: -apple-system;">
-            <h2>❌ Authentication Error</h2>
-            <p>Please try again.</p>
-          </body>
-        </html>
-      `)
+            res.status(500)
+                .type('html')
+                .send(
+                    oauthErrorPage(
+                        this.config.provider,
+                        error instanceof Error ? error.message : String(error)
+                    )
+                )
         }
         if (reject) reject(error)
     }

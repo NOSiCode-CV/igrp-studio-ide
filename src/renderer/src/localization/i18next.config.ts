@@ -28,8 +28,8 @@ const initializeI18n = async () => {
             interpolation: {
                 escapeValue: false
             },
-            saveMissing: true,
-            saveMissingTo: 'current',
+            // saveMissing + i18next-electron-fs-backend IPC is incompatible with
+            // contextIsolation (renderer crash: "c is not a function").
             lng: currentLanguage, // Use the language fetched from the main process
             supportedLngs: LNG.SUPPORTED_LANGUAGES
         })

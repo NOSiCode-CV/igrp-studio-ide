@@ -35,6 +35,9 @@ const useGitAuth = () => {
     const activeProviderId = useSelector(selectActiveProviderId)
     const activeProvider = useSelector(selectActiveProvider)
 
+    const activeProviderIdRef = useRef(activeProviderId)
+    activeProviderIdRef.current = activeProviderId
+
     const loadGithubData = useCallback(async (): Promise<void> => {
         setIsLoading(true)
 
@@ -57,13 +60,19 @@ const useGitAuth = () => {
         const processGitLabUserInfo = async (): Promise<void> => {
             try {
                 const userGitLab = await window.electron.ipcRenderer.invoke('gitlab-user-info')
-                if (userGitLab && activeProviderId && activeProviderId !== 'github') {
+                const gitlabProviderId =
+                    (activeProviderId && activeProviderId !== 'github' && activeProviderId) ||
+                    'gitlab-nosi'
+                if (userGitLab) {
                     dispatch(
                         setProviderUser({
-                            providerId: activeProviderId,
+                            providerId: gitlabProviderId,
                             user: userGitLab
                         })
                     )
+                    if (!activeProviderIdRef.current) {
+                        dispatch(setActiveProvider(gitlabProviderId))
+                    }
                 }
             } catch (error) {
                 console.error('Falha ao carregar informações do usuário GitLab:', error)
@@ -89,10 +98,13 @@ const useGitAuth = () => {
         const processGitLabRepositories = async (): Promise<void> => {
             try {
                 const repoGitlab = await window.electron.ipcRenderer.invoke('gitlab-repositories')
-                if (repoGitlab && activeProviderId && activeProviderId !== 'github') {
+                const gitlabProviderId =
+                    (activeProviderId && activeProviderId !== 'github' && activeProviderId) ||
+                    'gitlab-nosi'
+                if (repoGitlab) {
                     dispatch(
                         setProviderRepositories({
-                            providerId: activeProviderId,
+                            providerId: gitlabProviderId,
                             repositories: repoGitlab as Repository[]
                         })
                     )
@@ -116,8 +128,6 @@ const useGitAuth = () => {
 
     const loadGithubDataRef = useRef(loadGithubData)
     loadGithubDataRef.current = loadGithubData
-    const activeProviderIdRef = useRef(activeProviderId)
-    activeProviderIdRef.current = activeProviderId
 
     useEffect(() => {
         const onGitHubOAuthSuccess = async (_event: any, data: any): Promise<void> => {
@@ -131,12 +141,12 @@ const useGitAuth = () => {
         }
 
         const onGitLabOAuthSuccess = async (_event: any, data: any): Promise<void> => {
-            const providerId = data.providerId || activeProviderIdRef.current
+            const providerId = data.providerId || activeProviderIdRef.current || 'gitlab-nosi'
             if (providerId && providerId !== 'github') {
                 await window.electron.ipcRenderer.invoke(
                     'gitlab-initialize',
                     data.access_token,
-                    providerId
+                    data.baseUrl || providerId
                 )
                 dispatch(setActiveProvider(providerId))
                 await loadGithubDataRef.current()
@@ -240,9 +250,28 @@ const useGitAuth = () => {
             }
 
             // Merge saved configurations with default provider
-            const mergedProviders = [defaultProvider, ...config.filter((p: any) => !p.isDefault)]
+            const saved = Array.isArray(config) ? config : []
+            const mergedProviders = [
+                defaultProvider,
+                ...saved.filter((p: GitLabProvider) => !p.isDefault && p.id !== defaultProvider.id)
+            ].map((p: GitLabProvider) => {
+                const existing = gitLabProviders.find((e) => e.id === p.id)
+                return {
+                    ...p,
+                    user: existing?.user ?? p.user,
+                    repositories: existing?.repositories ?? p.repositories,
+                    active: existing?.active ?? p.active
+                }
+            })
 
             dispatch(setGitLabProviders(mergedProviders))
+
+            if (!activeProviderId) {
+                const active = mergedProviders.find((p) => p.active)
+                if (active) {
+                    dispatch(setActiveProvider(active.id))
+                }
+            }
 
             return mergedProviders
         } catch (error) {

@@ -120,7 +120,7 @@ export function AppIGRPSidebar({
                                     <a
                                         href={ROUTES.PATH_IDE_INITIAL_SCREEN}
                                         onClick={goHome}
-                                        title={t('backToHome', 'Voltar ao início')}
+                                        title={t('backToHome')}
                                     >
                                         <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                             <Home className="size-4" />

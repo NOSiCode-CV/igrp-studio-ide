@@ -23,6 +23,7 @@ import {
     KeyRound,
     Link2,
     ListFilter,
+    Loader2,
     Lock,
     Search,
     ShieldOff,
@@ -41,85 +42,6 @@ interface CloneProjectModalProps {
     open: boolean
     setOpen: (open: boolean) => void
 }
-
-// TEMP: Mock repositories used as a visual fallback while no GitHub/GitLab
-// account is connected (OAuth redirect URIs not yet valid in this env).
-// Remove once auth works locally.
-type MockRepo = Repository & { stargazers_count?: number }
-const MOCK_REPOS: MockRepo[] = [
-    {
-        id: 90001,
-        name: 'igrp-studio-horizon',
-        full_name: 'gov-cv/igrp-studio-horizon',
-        description:
-            'Electron-based low-code Studio for the IGRP platform — design APIs, pages and GraphQL visually.',
-        private: false,
-        html_url: 'https://github.com/gov-cv/igrp-studio-horizon',
-        clone_url: 'https://github.com/gov-cv/igrp-studio-horizon.git',
-        updated_at: '2026-05-20T10:15:00Z',
-        platform: 'github',
-        stargazers_count: 142
-    },
-    {
-        id: 90002,
-        name: 'social-api',
-        full_name: 'estagiarios-igrp/social-api',
-        description: 'Spring Boot service powering the social profile and notifications module.',
-        private: true,
-        html_url: 'https://github.com/estagiarios-igrp/social-api',
-        clone_url: 'https://github.com/estagiarios-igrp/social-api.git',
-        updated_at: '2026-05-12T08:42:00Z',
-        platform: 'github'
-    },
-    {
-        id: 90003,
-        name: 'eureka-server',
-        full_name: 'estagiarios-igrp/eureka-server',
-        description: null,
-        private: false,
-        html_url: 'https://github.com/estagiarios-igrp/eureka-server',
-        clone_url: 'https://github.com/estagiarios-igrp/eureka-server.git',
-        updated_at: '2026-04-28T17:05:00Z',
-        platform: 'github'
-    },
-    {
-        id: 90004,
-        name: 'igrp-design-system',
-        full_name: 'nosi/igrp-design-system',
-        description:
-            'Shared React + Tailwind design tokens, primitives and theme presets used across IGRP products.',
-        private: false,
-        html_url: 'https://git.nosi.cv/nosi/igrp-design-system',
-        clone_url: 'https://git.nosi.cv/nosi/igrp-design-system.git',
-        updated_at: '2026-05-25T11:30:00Z',
-        platform: 'gitlab',
-        stargazers_count: 38
-    },
-    {
-        id: 90005,
-        name: 'long-name-experimental-internal-tooling',
-        full_name: 'nosi/long-name-experimental-internal-tooling-for-ci-pipelines',
-        description: 'Internal pipeline glue. Subject to change without notice.',
-        private: true,
-        html_url:
-            'https://git.nosi.cv/nosi/long-name-experimental-internal-tooling-for-ci-pipelines',
-        clone_url:
-            'https://git.nosi.cv/nosi/long-name-experimental-internal-tooling-for-ci-pipelines.git',
-        updated_at: '2026-03-02T14:00:00Z',
-        platform: 'gitlab'
-    },
-    {
-        id: 90006,
-        name: 'cv-payments-gateway',
-        full_name: 'gov-cv/cv-payments-gateway',
-        description: 'Reference implementation for the national payments gateway integration.',
-        private: false,
-        html_url: 'https://github.com/gov-cv/cv-payments-gateway',
-        clone_url: 'https://github.com/gov-cv/cv-payments-gateway.git',
-        updated_at: '2026-02-14T09:20:00Z',
-        platform: 'github'
-    }
-]
 
 export function CloneProjectModal({
     workspace,
@@ -146,47 +68,74 @@ export function CloneProjectModal({
         actions: { saveOrOpenProject }
     } = useWorkspace()
 
-    const { repositoriesGitHub, repositoriesGitLab } = useGitAuth()
+    const {
+        repositoriesGitHub,
+        repositoriesGitLab,
+        userGitHub,
+        userGitLab,
+        loginGithub,
+        loginGitLab,
+        isLoading,
+        reloadData
+    } = useGitAuth()
     const { checkLocalProjects } = useGit()
+    const isGitConnected = Boolean(userGitHub || userGitLab)
 
-    // TEMP: seed one mock repo ID so the "Open Project" (dark slate) footer
-    // variant is visible during UI verification. Overwritten by the real
-    // `get-cloned-repos` IPC effect below as soon as it resolves.
-    const [clonedRepos, setClonedRepos] = useState<number[]>([90001])
+    const [clonedRepos, setClonedRepos] = useState<number[]>([])
+    const [projectPaths, setProjectPaths] = useState<Record<number, string>>({})
 
     const allRepos = useMemo(() => {
-        const real = [...(repositoriesGitHub || []), ...(repositoriesGitLab || [])]
-        // TEMP: fall back to mocks for visual UI verification while OAuth is unavailable.
-        if (real.length === 0) return MOCK_REPOS
-        return real
+        const merged = [...(repositoriesGitHub || []), ...(repositoriesGitLab || [])]
+        return merged.toSorted((a, b) => {
+            const da = a.updated_at ? Date.parse(a.updated_at) : 0
+            const db = b.updated_at ? Date.parse(b.updated_at) : 0
+            return db - da
+        })
     }, [repositoriesGitHub, repositoriesGitLab])
 
     useEffect(() => {
         const checkLocalProjectsExist = async () => {
-            if (!repositoriesGitHub && !repositoriesGitLab) return
-
             if (repositoriesGitHub?.length > 0) {
                 const githubResults = await checkLocalProjects(repositoriesGitHub)
                 setClonedRepos((prev) => [...prev, ...Object.keys(githubResults).map(Number)])
+                setProjectPaths((prev) => ({ ...prev, ...githubResults }))
             }
 
             if (repositoriesGitLab?.length > 0) {
                 const gitlabResults = await checkLocalProjects(repositoriesGitLab)
                 setClonedRepos((prev) => [...prev, ...Object.keys(gitlabResults).map(Number)])
+                setProjectPaths((prev) => ({ ...prev, ...gitlabResults }))
             }
         }
 
         checkLocalProjectsExist()
     }, [repositoriesGitHub, repositoriesGitLab, checkLocalProjects])
 
+    const gitlabReloadAttempted = useRef(false)
+    useEffect(() => {
+        if (!isOpen) {
+            gitlabReloadAttempted.current = false
+            return
+        }
+        if (tab !== 'search' || !userGitLab || isLoading) return
+        if ((repositoriesGitLab?.length ?? 0) > 0) return
+        if (gitlabReloadAttempted.current) return
+        gitlabReloadAttempted.current = true
+        void (async () => {
+            await window.electron.ipcRenderer.invoke('git-provider:invalidate-repo-cache', 'gitlab')
+            await reloadData()
+        })()
+    }, [isOpen, tab, userGitLab, repositoriesGitLab, isLoading, reloadData])
+
     useEffect(() => {
         const loadClonedReposData = async () => {
             try {
-                const cloned = await window.electron.ipcRenderer.invoke('get-cloned-repos')
-                // TEMP: merge instead of overwrite so the [90001] seed used to
-                // preview the dark "Open Project" footer state survives this
-                // fetch. Revert to `setClonedRepos(cloned)` once mocks go.
-                setClonedRepos((prev) => Array.from(new Set([...prev, ...cloned])))
+                const [cloned, paths] = await Promise.all([
+                    window.electron.ipcRenderer.invoke('get-cloned-repos'),
+                    window.electron.ipcRenderer.invoke('get-project-paths')
+                ])
+                setClonedRepos(cloned ?? [])
+                setProjectPaths(paths ?? {})
             } catch (error) {
                 console.error('Error loading cloned repos data', error)
             }
@@ -233,22 +182,52 @@ export function CloneProjectModal({
         setSelectedRepoId(null)
     }, [])
 
+    const handleOpenClonedProject = async (): Promise<void> => {
+        if (!selectedRepo) return
+
+        const projectPath =
+            projectPaths[selectedRepo.id] || `${workspace.path}/projects/${selectedRepo.name}`
+
+        try {
+            const { folderExists, config } = await window.electron.ipcRenderer.invoke(
+                'check-project-config',
+                projectPath
+            )
+
+            if (!folderExists || !config) {
+                showErrorToast('Project path not found. Clone the repository again.')
+                return
+            }
+
+            await saveOrOpenProject({
+                project: {
+                    ...config,
+                    path: projectPath,
+                    workspaceId: workspace.id
+                },
+                openProject: true
+            })
+            onClose(false)
+        } catch (error) {
+            console.error('Failed to open cloned project:', error)
+            showErrorToast('Failed to open project')
+        }
+    }
+
     const handleCloneProject = async (): Promise<void> => {
         if (tab === 'search' && selectedRepo) {
             if (isSelectedRepoCloned) {
-                onClose(false)
+                await handleOpenClonedProject()
                 return
             }
 
             setIsCloning(true)
             try {
                 const projectPath = `/projects/${selectedRepo.name}`
-                setClonedRepos((prev) => [...prev, selectedRepo.id])
                 await window.electron.ipcRenderer.invoke(
                     'clone-repository',
                     selectedRepo.clone_url,
-                    `${workspace.path}${projectPath}`,
-                    { type: 'none' }
+                    `${workspace.path}${projectPath}`
                 )
             } catch (error) {
                 console.error('Failed to clone repository:', error)
@@ -355,6 +334,10 @@ export function CloneProjectModal({
                                     path: data.path
                                 })
                                 setClonedRepos((prevRepos) => [...prevRepos, repoId])
+                                setProjectPaths((prev) => ({
+                                    ...prev,
+                                    [repoId]: data.path
+                                }))
                             }
                         }
                     })
@@ -383,23 +366,23 @@ export function CloneProjectModal({
         // biome-ignore lint/a11y/noStaticElementInteractions: backdrop click-to-close is a standard modal a11y exception (Escape is the keyboard close path)
         // biome-ignore lint/a11y/useKeyWithClickEvents: backdrop click-to-close is a standard modal a11y exception (Escape is the keyboard close path)
         <div
-            className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/25 backdrop-blur-[3px]"
+            className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/25 backdrop-blur-sm"
             onClick={handleBackdropClick}
         >
             <motion.div
                 initial={{ opacity: 0, scale: 0.98, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                className="w-full max-w-[460px] max-h-[85vh] bg-card rounded-sm border border-border shadow-[0_24px_60px_-15px_rgba(0,0,0,0.12),0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col font-sans"
+                className="w-full max-w-lg max-h-[80vh] bg-card rounded-sm border border-border shadow-lg overflow-hidden flex flex-col font-sans"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="pl-3 pr-2 py-1.5 bg-muted border-b border-border flex items-center justify-between select-none shrink-0">
                     <div className="flex items-center gap-2">
                         <div className="w-4 h-4 bg-primary rounded scale-90 flex items-center justify-center">
-                            <GitFork className="w-[10px] h-[10px] text-primary-foreground stroke-[3]" />
+                            <GitFork className="w-2.5 h-2.5 text-primary-foreground stroke-[3]" />
                         </div>
-                        <span className="text-[12px] font-medium text-foreground tracking-tight">
+                        <span className="text-xs font-medium text-foreground tracking-tight">
                             Clone Project
                         </span>
                     </div>
@@ -409,7 +392,7 @@ export function CloneProjectModal({
                         className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted group transition-colors"
                         disabled={isCloning}
                     >
-                        <X className="w-[14px] h-[14px]" />
+                        <X className="w-3.5 h-3.5" />
                     </button>
                 </div>
 
@@ -420,7 +403,7 @@ export function CloneProjectModal({
                         <button
                             type="button"
                             onClick={() => setTab('url')}
-                            className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-[11px] font-semibold rounded-sm transition-all ${
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-xs font-semibold rounded-sm transition-all ${
                                 tab === 'url'
                                     ? 'bg-card text-foreground shadow-sm border border-border/20 font-bold'
                                     : 'text-muted-foreground hover:text-foreground border border-transparent'
@@ -432,7 +415,7 @@ export function CloneProjectModal({
                         <button
                             type="button"
                             onClick={() => setTab('search')}
-                            className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-[11px] font-semibold rounded-sm transition-all ${
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-1 text-xs font-semibold rounded-sm transition-all ${
                                 tab === 'search'
                                     ? 'bg-card text-foreground shadow-sm border border-border/20 font-bold'
                                     : 'text-muted-foreground hover:text-foreground border border-transparent'
@@ -458,29 +441,29 @@ export function CloneProjectModal({
                                 <div className="space-y-1">
                                     <label
                                         htmlFor="clone-repo-url"
-                                        className="block text-[11px] font-medium text-muted-foreground pl-0.5"
+                                        className="block text-xs font-medium text-muted-foreground pl-0.5"
                                     >
                                         Repo URL
                                     </label>
                                     <div className="relative group/input">
-                                        <Globe className="w-[14px] h-[14px] absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
+                                        <Globe className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
                                         <input
                                             id="clone-repo-url"
                                             type="text"
                                             value={url}
                                             onChange={(e) => setUrl(e.target.value)}
                                             placeholder="https://github.com/username/repo.git"
-                                            className="w-full pl-7.5 pr-2 py-1 bg-card border border-input rounded-sm text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                            className="w-full pl-8 pr-2 py-1 bg-card border border-input rounded-sm text-xs text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                         />
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground mt-1 pl-0.5">
-                                        Supports GitHub, GitLab, Bitbucket, and custom Git URLs
+                                    <p className="text-xs text-muted-foreground mt-1 pl-0.5">
+                                        Supports GitHub and GitLab URLs
                                     </p>
                                 </div>
 
                                 {/* Auth Type block */}
                                 <div className="space-y-1">
-                                    <span className="block text-[11px] font-medium text-muted-foreground pl-0.5">
+                                    <span className="block text-xs font-medium text-muted-foreground pl-0.5">
                                         Auth Type
                                     </span>
                                     <div className="space-y-2.5">
@@ -499,14 +482,14 @@ export function CloneProjectModal({
                                                         onClick={() =>
                                                             setAuthMethod(method.id as any)
                                                         }
-                                                        className={`flex items-center justify-center gap-1.5 py-1.5 text-[11px] rounded-sm transition-all ${
+                                                        className={`flex items-center justify-center gap-1.5 py-1.5 text-xs rounded-sm transition-all ${
                                                             isActive
                                                                 ? 'bg-card text-foreground shadow-xs font-bold'
                                                                 : 'text-muted-foreground hover:text-foreground font-medium'
                                                         }`}
                                                     >
                                                         <Icon
-                                                            className={`w-[14px] h-[14px] ${
+                                                            className={`w-3.5 h-3.5 ${
                                                                 isActive
                                                                     ? 'text-primary'
                                                                     : 'text-muted-foreground'
@@ -531,7 +514,7 @@ export function CloneProjectModal({
                                                     <div className="space-y-1">
                                                         <label
                                                             htmlFor="clone-basic-username"
-                                                            className="block text-[10px] font-medium text-muted-foreground pl-0.5"
+                                                            className="block text-xs font-medium text-muted-foreground pl-0.5"
                                                         >
                                                             Username
                                                         </label>
@@ -545,14 +528,14 @@ export function CloneProjectModal({
                                                                     setUsername(e.target.value)
                                                                 }
                                                                 placeholder="Username"
-                                                                className="w-full pl-6.5 pr-2 py-1 bg-card border border-input rounded-sm text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                                className="w-full pl-7 pr-2 py-1 bg-card border border-input rounded-sm text-xs text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                                             />
                                                         </div>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <label
                                                             htmlFor="clone-basic-password"
-                                                            className="block text-[10px] font-medium text-muted-foreground pl-0.5"
+                                                            className="block text-xs font-medium text-muted-foreground pl-0.5"
                                                         >
                                                             Password / PAT
                                                         </label>
@@ -570,7 +553,7 @@ export function CloneProjectModal({
                                                                     setPassword(e.target.value)
                                                                 }
                                                                 placeholder="••••••••"
-                                                                className="w-full pl-6.5 pr-6 py-1 bg-card border border-input rounded-sm text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                                className="w-full pl-7 pr-6 py-1 bg-card border border-input rounded-sm text-xs text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                                             />
                                                             <button
                                                                 type="button"
@@ -628,7 +611,7 @@ export function CloneProjectModal({
                                                 >
                                                     <label
                                                         htmlFor="clone-token"
-                                                        className="block text-[10px] font-medium text-muted-foreground pl-0.5"
+                                                        className="block text-xs font-medium text-muted-foreground pl-0.5"
                                                     >
                                                         Personal Access Token
                                                     </label>
@@ -642,7 +625,7 @@ export function CloneProjectModal({
                                                                 setToken(e.target.value)
                                                             }
                                                             placeholder="ghp_xxxxxxxxxxxx"
-                                                            className="w-full pl-6.5 pr-6 py-1 bg-card border border-input rounded-sm text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                            className="w-full pl-7 pr-6 py-1 bg-card border border-input rounded-sm text-xs text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                                         />
                                                         <button
                                                             type="button"
@@ -696,26 +679,26 @@ export function CloneProjectModal({
                                 <div className="flex flex-col gap-1.5 shrink-0">
                                     <div className="flex gap-1.5">
                                         <div className="relative group/input flex-1">
-                                            <Search className="w-[14px] h-[14px] absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
+                                            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within/input:text-primary transition-colors" />
                                             <input
                                                 type="text"
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
                                                 placeholder="Search repositories..."
-                                                className="w-full pl-8 pr-2 py-1 bg-card border border-input rounded-sm text-[11px] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
+                                                className="w-full pl-8 pr-2 py-1 bg-card border border-input rounded-sm text-xs text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.03)]"
                                             />
                                         </div>
                                         <div className="relative" ref={filterRef}>
                                             <button
                                                 type="button"
                                                 onClick={() => setFilterMenuOpen(!filterMenuOpen)}
-                                                className={`h-full px-2.5 py-1.2 flex items-center gap-1.5 border rounded-sm text-[11px] font-bold transition-colors ${
+                                                className={`h-full px-2.5 py-1.5 flex items-center gap-1.5 border rounded-sm text-xs font-bold transition-colors ${
                                                     filterMenuOpen || platform !== 'all'
                                                         ? 'border-primary bg-primary/10 text-primary'
                                                         : 'border-input bg-card text-muted-foreground hover:bg-muted hover:text-foreground'
                                                 }`}
                                             >
-                                                <ListFilter className="w-[14px] h-[14px]" />
+                                                <ListFilter className="w-3.5 h-3.5" />
                                                 Filter
                                             </button>
 
@@ -726,7 +709,7 @@ export function CloneProjectModal({
                                                         animate={{ opacity: 1, scale: 1, y: 0 }}
                                                         exit={{ opacity: 0, scale: 0.95, y: 5 }}
                                                         transition={{ duration: 0.1 }}
-                                                        className="absolute right-0 top-full mt-1 w-32 bg-card border border-border rounded-sm shadow-[0_10px_25px_rgba(0,0,0,0.08)] z-[210] p-0.5 space-y-1"
+                                                        className="absolute right-0 top-full mt-1 w-32 bg-card border border-border rounded-sm shadow-md z-20 p-0.5 space-y-1"
                                                     >
                                                         {[
                                                             {
@@ -755,7 +738,7 @@ export function CloneProjectModal({
                                                                         setPlatform(p.id as any)
                                                                         setFilterMenuOpen(false)
                                                                     }}
-                                                                    className={`w-full flex items-center justify-between px-2 py-1.2 rounded-sm text-[11px] font-medium transition-colors ${
+                                                                    className={`w-full flex items-center justify-between px-2 py-1.5 rounded-sm text-xs font-medium transition-colors ${
                                                                         isSelected
                                                                             ? 'bg-primary/10 text-primary font-semibold'
                                                                             : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -766,7 +749,7 @@ export function CloneProjectModal({
                                                                         {p.label}
                                                                     </span>
                                                                     {isSelected && (
-                                                                        <Check className="w-[10px] h-[10px] text-primary stroke-[3]" />
+                                                                        <Check className="w-2.5 h-2.5 text-primary stroke-[3]" />
                                                                     )}
                                                                 </button>
                                                             )
@@ -785,12 +768,12 @@ export function CloneProjectModal({
                                                 exit={{ opacity: 0, height: 0 }}
                                                 className="overflow-hidden"
                                             >
-                                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-primary/10 text-primary rounded-sm border border-primary/30 text-[10px] font-bold uppercase tracking-wider w-fit">
+                                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-primary/10 text-primary rounded-sm border border-primary/30 text-xs font-bold uppercase tracking-wider w-fit">
                                                     <span className="opacity-60">Platform:</span>
                                                     {platform === 'github' ? (
-                                                        <Github className="w-[10px] h-[10px]" />
+                                                        <Github className="w-2.5 h-2.5" />
                                                     ) : (
-                                                        <Gitlab className="w-[10px] h-[10px]" />
+                                                        <Gitlab className="w-2.5 h-2.5" />
                                                     )}
                                                     {platform === 'github' ? 'GitHub' : 'GitLab'}
                                                     <button
@@ -798,7 +781,7 @@ export function CloneProjectModal({
                                                         onClick={() => setPlatform('all')}
                                                         className="ml-1 p-0.5 hover:bg-primary/10 rounded transition-colors"
                                                     >
-                                                        <X className="w-[10px] h-[10px]" />
+                                                        <X className="w-2.5 h-2.5" />
                                                     </button>
                                                 </div>
                                             </motion.div>
@@ -809,15 +792,16 @@ export function CloneProjectModal({
                                 {/* Results container */}
                                 <div className="bg-muted border border-input rounded-sm overflow-hidden flex flex-col">
                                     {filteredRepos.length > 0 ? (
-                                        <ScrollArea className="h-[50vh]">
+                                        <ScrollArea className="h-96">
                                             <div className="divide-y divide-border">
                                             {filteredRepos.map((repo) => {
                                                 const isSelected = selectedRepoId === repo.id
                                                 const isCloned = clonedRepos.includes(repo.id)
+                                                const repoKey = `${repo.platform}-${repo.id}`
                                                 return (
                                                     // biome-ignore lint/a11y/useSemanticElements: list item contains nested action buttons; the wrapper can't itself be a <button>
                                                     <div
-                                                        key={repo.id}
+                                                        key={repoKey}
                                                         role="button"
                                                         tabIndex={0}
                                                         onClick={() => setSelectedRepoId(repo.id)}
@@ -839,7 +823,7 @@ export function CloneProjectModal({
                                                         {isSelected && (
                                                             <motion.div
                                                                 layoutId="active-bar"
-                                                                className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary"
+                                                                className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary"
                                                                 initial={{ opacity: 0 }}
                                                                 animate={{ opacity: 1 }}
                                                                 exit={{ opacity: 0 }}
@@ -847,7 +831,7 @@ export function CloneProjectModal({
                                                         )}
 
                                                         <div
-                                                            className={`mt-0.5 w-[28px] h-[28px] rounded border flex items-center justify-center shrink-0 transition-all ${
+                                                            className={`mt-0.5 size-7 rounded border flex items-center justify-center shrink-0 transition-all ${
                                                                 isSelected
                                                                     ? 'bg-primary border-primary scale-105'
                                                                     : 'bg-card border-border group-hover:bg-muted'
@@ -855,7 +839,7 @@ export function CloneProjectModal({
                                                         >
                                                             {repo.platform === 'github' ? (
                                                                 <Github
-                                                                    className={`w-[14px] h-[14px] ${
+                                                                    className={`w-3.5 h-3.5 ${
                                                                         isSelected
                                                                             ? 'text-primary-foreground'
                                                                             : 'text-muted-foreground'
@@ -863,7 +847,7 @@ export function CloneProjectModal({
                                                                 />
                                                             ) : (
                                                                 <Gitlab
-                                                                    className={`w-[14px] h-[14px] ${
+                                                                    className={`w-3.5 h-3.5 ${
                                                                         isSelected
                                                                             ? 'text-primary-foreground'
                                                                             : 'text-orange-500'
@@ -875,7 +859,7 @@ export function CloneProjectModal({
                                                         <div className="flex-1 min-w-0 space-y-0.5">
                                                             <div className="flex items-center gap-1.5">
                                                                 <span
-                                                                    className={`text-[11px] font-bold truncate ${
+                                                                    className={`text-xs font-bold truncate ${
                                                                         isSelected
                                                                             ? 'text-primary'
                                                                             : 'text-foreground'
@@ -885,7 +869,7 @@ export function CloneProjectModal({
                                                                 </span>
                                                                 {repo.private && (
                                                                     <Lock
-                                                                        className={`w-[10px] h-[10px] shrink-0 ${
+                                                                        className={`w-2.5 h-2.5 shrink-0 ${
                                                                             isSelected
                                                                                 ? 'text-primary'
                                                                                 : 'text-muted-foreground'
@@ -905,7 +889,7 @@ export function CloneProjectModal({
                                                                             }}
                                                                             className="bg-primary rounded-full p-0.5 scale-75 shrink-0"
                                                                         >
-                                                                            <Check className="w-[10px] h-[10px] text-primary-foreground stroke-[4px]" />
+                                                                            <Check className="w-2.5 h-2.5 text-primary-foreground stroke-[4px]" />
                                                                         </motion.div>
                                                                     )}
                                                                 </AnimatePresence>
@@ -913,7 +897,7 @@ export function CloneProjectModal({
 
                                                             {repo.description ? (
                                                                 <p
-                                                                    className={`text-[10px] line-clamp-2 leading-tight ${
+                                                                    className={`text-xs line-clamp-2 leading-tight ${
                                                                         isSelected
                                                                             ? 'text-primary/80'
                                                                             : 'text-muted-foreground'
@@ -922,13 +906,13 @@ export function CloneProjectModal({
                                                                     {repo.description}
                                                                 </p>
                                                             ) : (
-                                                                <div className="flex items-center gap-1 text-[10px] italic text-muted-foreground">
-                                                                    <AlertCircle className="w-[10px] h-[10px]" />
+                                                                <div className="flex items-center gap-1 text-xs italic text-muted-foreground">
+                                                                    <AlertCircle className="w-2.5 h-2.5" />
                                                                     No description provided
                                                                 </div>
                                                             )}
 
-                                                            <div className="flex items-center gap-3 pt-0.5 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">
+                                                            <div className="flex items-center gap-3 pt-0.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                                                 {repo.updated_at && (
                                                                     <div className="flex items-center gap-1">
                                                                         <Calendar className="w-3 h-3 text-muted-foreground" />
@@ -970,23 +954,70 @@ export function CloneProjectModal({
                                                                         : 'text-muted-foreground hover:text-foreground'
                                                                 }`}
                                                             >
-                                                                <ExternalLink className="w-[14px] h-[14px]" />
+                                                                <ExternalLink className="w-3.5 h-3.5" />
                                                             </button>
                                                         </div>
                                                     </div>
                                                 )
                                             })}
+                                            {isLoading && userGitLab && (repositoriesGitLab?.length ?? 0) === 0 ? (
+                                                <div className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground bg-card">
+                                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                                    Loading GitLab repositories…
+                                                </div>
+                                            ) : null}
                                             </div>
                                         </ScrollArea>
+                                    ) : isLoading ? (
+                                        <div className="flex-1 min-h-56 flex flex-col items-center justify-center p-6 text-center select-none bg-card">
+                                            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground mb-3" />
+                                            <span className="text-xs font-bold text-foreground">
+                                                Loading repositories
+                                            </span>
+                                            <p className="text-xs text-muted-foreground max-w-48 mt-1 leading-tight">
+                                                Fetching GitHub and GitLab projects…
+                                            </p>
+                                        </div>
+                                    ) : !isGitConnected ? (
+                                        <div className="flex-1 min-h-56 flex flex-col items-center justify-center p-6 text-center select-none bg-card">
+                                            <div className="w-10 h-10 bg-muted border border-border rounded-lg flex items-center justify-center mb-3">
+                                                <Gitlab className="w-5 h-5 text-muted-foreground/60" />
+                                            </div>
+                                            <span className="text-xs font-bold text-foreground">
+                                                Connect an account
+                                            </span>
+                                            <p className="text-xs text-muted-foreground max-w-48 mt-1 leading-tight">
+                                                Sign in to GitHub or GitLab to search and clone your
+                                                repositories.
+                                            </p>
+                                            <div className="flex items-center gap-2 mt-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={loginGithub}
+                                                    className="px-3 py-1 text-xs font-bold rounded-sm border border-border bg-card hover:bg-muted flex items-center gap-1.5"
+                                                >
+                                                    <Github className="w-3 h-3" />
+                                                    GitHub
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => loginGitLab()}
+                                                    className="px-3 py-1 text-xs font-bold rounded-sm border border-border bg-card hover:bg-muted flex items-center gap-1.5"
+                                                >
+                                                    <Gitlab className="w-3 h-3" />
+                                                    GitLab
+                                                </button>
+                                            </div>
+                                        </div>
                                     ) : (
-                                        <div className="flex-1 min-h-[220px] flex flex-col items-center justify-center p-6 text-center select-none bg-card">
+                                        <div className="flex-1 min-h-56 flex flex-col items-center justify-center p-6 text-center select-none bg-card">
                                             <div className="w-10 h-10 bg-muted border border-border rounded-lg flex items-center justify-center mb-3">
                                                 <Search className="w-5 h-5 text-muted-foreground/60" />
                                             </div>
-                                            <span className="text-[11px] font-bold text-foreground">
+                                            <span className="text-xs font-bold text-foreground">
                                                 No repositories found
                                             </span>
-                                            <p className="text-[10px] text-muted-foreground max-w-[180px] mt-1 leading-tight">
+                                            <p className="text-xs text-muted-foreground max-w-44 mt-1 leading-tight">
                                                 Try adjusting your search or filters to find what
                                                 you're looking for.
                                             </p>
@@ -1003,7 +1034,7 @@ export function CloneProjectModal({
                     <button
                         type="button"
                         onClick={() => onClose(false)}
-                        className="px-4 py-1 text-[11px] font-bold text-muted-foreground bg-card border border-border rounded-sm hover:bg-muted min-w-[70px] transition-colors"
+                        className="px-4 py-1 text-xs font-bold text-muted-foreground bg-card border border-border rounded-sm hover:bg-muted min-w-16 transition-colors"
                         disabled={isCloning}
                     >
                         Cancel
@@ -1012,7 +1043,7 @@ export function CloneProjectModal({
                         type="button"
                         onClick={handleCloneProject}
                         disabled={isCloning || (tab === 'search' && !selectedRepoId)}
-                        className={`min-w-[110px] px-4 py-1 text-[11px] font-bold rounded-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 border ${
+                        className={`min-w-28 px-4 py-1 text-xs font-bold rounded-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 border ${
                             tab === 'search' && isSelectedRepoCloned && !isCloning
                                 ? 'bg-black border-black text-white'
                                 : 'bg-primary border-primary text-primary-foreground'
@@ -1030,7 +1061,7 @@ export function CloneProjectModal({
                                         exit={{ opacity: 0, y: -5 }}
                                         className="flex items-center gap-1.5 text-white"
                                     >
-                                        <FolderOpen className="w-[14px] h-[14px]" />
+                                        <FolderOpen className="w-3.5 h-3.5" />
                                         Open Project
                                     </motion.div>
                                 ) : (
@@ -1041,7 +1072,7 @@ export function CloneProjectModal({
                                         exit={{ opacity: 0, y: -5 }}
                                         className="flex items-center gap-1.5 text-primary-foreground"
                                     >
-                                        <GitFork className="w-[14px] h-[14px]" />
+                                        <GitFork className="w-3.5 h-3.5" />
                                         Clone Project
                                     </motion.div>
                                 )}
