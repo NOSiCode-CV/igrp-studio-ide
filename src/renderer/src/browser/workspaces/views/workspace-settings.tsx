@@ -21,14 +21,7 @@ import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
 import { setWorkspace } from '@renderer/redux/thunks'
 import { cn } from '@renderer/lib/utils'
-import {
-    AlertTriangle,
-    Check,
-    Copy,
-    Info,
-    SlidersHorizontal,
-    Trash2
-} from 'lucide-react'
+import { AlertTriangle, Check, Copy, Info, SlidersHorizontal, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -41,9 +34,9 @@ interface WorkspaceSettingsProps {
 }
 
 const SECTIONS = [
-    { id: 'general' as Section,  tKey: 'general',    icon: Info              },
-    { id: 'advanced' as Section, tKey: 'advanced',   icon: SlidersHorizontal },
-    { id: 'danger' as Section,   tKey: 'dangerZone', icon: AlertTriangle     }
+    { id: 'general' as Section, tKey: 'general', icon: Info },
+    { id: 'advanced' as Section, tKey: 'advanced', icon: SlidersHorizontal },
+    { id: 'danger' as Section, tKey: 'dangerZone', icon: AlertTriangle }
 ]
 
 export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
@@ -93,10 +86,8 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
 
     return (
         <div className="flex h-full">
-
             {/* Left nav panel */}
             <div className="w-[200px] shrink-0 flex flex-col gap-0.5 border-r p-3">
-
                 {SECTIONS.map(({ id, tKey, icon: Icon }) => (
                     <button
                         key={id}
@@ -115,14 +106,12 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                         {t(tKey)}
                     </button>
                 ))}
-
             </div>
 
             {/* Right content */}
             <main className="flex flex-col flex-1 min-h-0 h-full overflow-hidden">
                 <ScrollArea className="h-full">
                     <AnimatePresence mode="wait">
-
                         {/* General */}
                         {activeSection === 'general' && (
                             <motion.div
@@ -138,7 +127,9 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                         <Info className="h-4 w-4 text-muted-foreground shrink-0" />
                                         <h2 className="text-lg font-semibold">{t('general')}</h2>
                                     </div>
-                                    <p className="text-sm text-muted-foreground mt-0.5">{t('workspaceInfoDescription')}</p>
+                                    <p className="text-sm text-muted-foreground mt-0.5">
+                                        {t('workspaceInfoDescription')}
+                                    </p>
                                 </div>
                                 <div className="px-6">
                                     <Separator />
@@ -148,7 +139,9 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                         <div className="py-4 px-4 flex items-start gap-4">
                                             <div className="w-2/5 shrink-0">
                                                 <Label>{t('workspaceId')}</Label>
-                                                <p className="text-xs text-muted-foreground mt-1">{t('workspaceIdDescription')}</p>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    {t('workspaceIdDescription')}
+                                                </p>
                                             </div>
                                             <div className="flex items-start gap-1 flex-1 min-w-0">
                                                 <div className="font-mono text-xs bg-muted/50 border rounded-md px-2 py-1.5 flex-1 min-w-0 break-all leading-tight">
@@ -160,17 +153,22 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                                     className="shrink-0"
                                                     onClick={() => copyToClipboard(workspace.id)}
                                                 >
-                                                    {copied
-                                                        ? <Check className="h-3.5 w-3.5" />
-                                                        : <Copy className="h-3.5 w-3.5" />
-                                                    }
+                                                    {copied ? (
+                                                        <Check className="h-3.5 w-3.5" />
+                                                    ) : (
+                                                        <Copy className="h-3.5 w-3.5" />
+                                                    )}
                                                 </Button>
                                             </div>
                                         </div>
                                         <div className="py-4 px-4 flex items-start gap-4">
                                             <div className="w-2/5 shrink-0">
-                                                <Label htmlFor="workspace-name">{t('nameDescription')}</Label>
-                                                <p className="text-xs text-muted-foreground mt-1">{t('workspaceNameHint')}</p>
+                                                <Label htmlFor="workspace-name">
+                                                    {t('nameDescription')}
+                                                </Label>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    {t('workspaceNameHint')}
+                                                </p>
                                             </div>
                                             <Input
                                                 id="workspace-name"
@@ -181,13 +179,19 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                         </div>
                                         <div className="py-4 px-4 flex items-start gap-4">
                                             <div className="w-2/5 shrink-0">
-                                                <Label htmlFor="workspace-description">{t('description')}</Label>
-                                                <p className="text-xs text-muted-foreground mt-1">{t('workspaceDescriptionHint')}</p>
+                                                <Label htmlFor="workspace-description">
+                                                    {t('description')}
+                                                </Label>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    {t('workspaceDescriptionHint')}
+                                                </p>
                                             </div>
                                             <Textarea
                                                 id="workspace-description"
                                                 value={workspaceDescription}
-                                                onChange={(e) => setWorkspaceDescription(e.target.value)}
+                                                onChange={(e) =>
+                                                    setWorkspaceDescription(e.target.value)
+                                                }
                                                 className="h-20 text-sm resize-none flex-1"
                                             />
                                         </div>
@@ -224,7 +228,9 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                         <SlidersHorizontal className="h-4 w-4 text-muted-foreground shrink-0" />
                                         <h2 className="text-lg font-semibold">{t('advanced')}</h2>
                                     </div>
-                                    <p className="text-sm text-muted-foreground mt-0.5">{t('configureAdvancedOptions')}</p>
+                                    <p className="text-sm text-muted-foreground mt-0.5">
+                                        {t('configureAdvancedOptions')}
+                                    </p>
                                 </div>
                                 <div className="px-6">
                                     <Separator />
@@ -234,21 +240,27 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                         <div className="py-4 px-4 flex items-center justify-between gap-6">
                                             <div>
                                                 <Label>{t('autoSave')}</Label>
-                                                <p className="text-xs text-muted-foreground mt-1">{t('autoSaveChanges')}</p>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    {t('autoSaveChanges')}
+                                                </p>
                                             </div>
                                             <Switch name="auto-save" defaultChecked />
                                         </div>
                                         <div className="py-4 px-4 flex items-center justify-between gap-6">
                                             <div>
                                                 <Label>{t('enableVersioning')}</Label>
-                                                <p className="text-xs text-muted-foreground mt-1">{t('trackChanges')}</p>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    {t('trackChanges')}
+                                                </p>
                                             </div>
                                             <Switch name="enable-versioning" defaultChecked />
                                         </div>
                                         <div className="py-4 px-4 flex items-center justify-between gap-6">
                                             <div>
                                                 <Label>{t('experimentalFeatures')}</Label>
-                                                <p className="text-xs text-muted-foreground mt-1">{t('enableExperimentalFeatures')}</p>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    {t('enableExperimentalFeatures')}
+                                                </p>
                                             </div>
                                             <Switch name="experimental-features" />
                                         </div>
@@ -270,9 +282,13 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 <div className="px-6 pt-6 pb-3">
                                     <div className="flex items-center gap-2">
                                         <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
-                                        <h2 className="text-lg font-semibold text-destructive">{t('dangerZone')}</h2>
+                                        <h2 className="text-lg font-semibold text-destructive">
+                                            {t('dangerZone')}
+                                        </h2>
                                     </div>
-                                    <p className="text-sm text-muted-foreground mt-0.5">{t('irreversibleActions')}</p>
+                                    <p className="text-sm text-muted-foreground mt-0.5">
+                                        {t('irreversibleActions')}
+                                    </p>
                                 </div>
                                 <div className="px-6">
                                     <Separator />
@@ -280,12 +296,20 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 <div className="mx-6 mt-4 border rounded-md border-destructive/30 p-4">
                                     <div className="flex items-start justify-between gap-6">
                                         <div>
-                                            <p className="text-sm font-medium">{t('deleteWorkspace')}</p>
-                                            <p className="text-xs text-muted-foreground mt-1">{t('deleteWarning')}</p>
+                                            <p className="text-sm font-medium">
+                                                {t('deleteWorkspace')}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                                {t('deleteWarning')}
+                                            </p>
                                         </div>
                                         <IGRPModalDialog>
                                             <IGRPModalDialogTrigger asChild>
-                                                <Button variant="destructive" size="sm" className="shrink-0">
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    className="shrink-0"
+                                                >
                                                     <Trash2 className="h-3.5 w-3.5 mr-1" />
                                                     <span>{t('delete')}</span>
                                                 </Button>
@@ -298,7 +322,10 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                                     </IGRPModalDialogTitle>
                                                     <IGRPModalDialogDescription className="text-xs">
                                                         {t('cannotUndoAction')}
-                                                        <span className="font-medium"> {workspace.name} </span>
+                                                        <span className="font-medium">
+                                                            {' '}
+                                                            {workspace.name}{' '}
+                                                        </span>
                                                         {t('workspaceAndProjects')}
                                                     </IGRPModalDialogDescription>
                                                 </IGRPModalDialogHeader>
@@ -314,7 +341,9 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                                             <span className="text-muted-foreground">
                                                                 {t('id')}{' '}
                                                             </span>
-                                                            <span className="font-mono">{workspace.id}</span>
+                                                            <span className="font-mono">
+                                                                {workspace.id}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -327,7 +356,9 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                                         className="bg-destructive hover:bg-destructive/90"
                                                         onClick={handleDeleteWorkspace}
                                                     >
-                                                        {isDeleting ? t('deleting') : t('deleteWorkspace')}
+                                                        {isDeleting
+                                                            ? t('deleting')
+                                                            : t('deleteWorkspace')}
                                                     </Button>
                                                 </IGRPModalDialogFooter>
                                             </IGRPModalDialogContent>
@@ -336,11 +367,9 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 </div>
                             </motion.div>
                         )}
-
                     </AnimatePresence>
                 </ScrollArea>
             </main>
-
         </div>
     )
 }

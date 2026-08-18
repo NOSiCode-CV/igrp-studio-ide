@@ -225,7 +225,10 @@ export function ProjectList({ projects, services }: ProjectListProps) {
                                                 )}
                                             </div>
                                         </HoverCardTrigger>
-                                        <HoverCardContent align="start" className="w-auto max-w-[260px] p-2">
+                                        <HoverCardContent
+                                            align="start"
+                                            className="w-auto max-w-[260px] p-2"
+                                        >
                                             <div className="flex flex-wrap gap-1">
                                                 {dependencyNames.map((name, i) => (
                                                     <span

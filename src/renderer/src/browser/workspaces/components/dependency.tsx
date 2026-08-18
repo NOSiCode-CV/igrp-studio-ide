@@ -68,7 +68,8 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
         }
 
         const rect = root.getBoundingClientRect()
-        const overflowRight = rect.left + DEPENDENCY_POPOVER_WIDTH > window.innerWidth - VIEWPORT_SAFE_MARGIN
+        const overflowRight =
+            rect.left + DEPENDENCY_POPOVER_WIDTH > window.innerWidth - VIEWPORT_SAFE_MARGIN
         setPopoverAlign(overflowRight ? 'right' : 'left')
     }, [])
 
@@ -100,7 +101,8 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
         const handleWheel = (event: WheelEvent): void => {
             event.preventDefault()
             event.stopPropagation()
-            const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
+            const delta =
+                Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
             popover.scrollLeft += delta
         }
 
@@ -111,8 +113,7 @@ export const DependencySummary = ({ dependsOn, className = '' }: DependencySumma
     const handlePopoverWheel = (event: ReactWheelEvent<HTMLDivElement>): void => {
         event.preventDefault()
         event.stopPropagation()
-        const delta =
-            Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
+        const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
         event.currentTarget.scrollLeft += delta
     }
 

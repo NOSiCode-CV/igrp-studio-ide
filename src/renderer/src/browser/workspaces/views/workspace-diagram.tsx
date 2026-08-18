@@ -165,11 +165,20 @@ const resolveDiagramServiceType = (service: ServiceInfo): DiagramServiceType => 
         return explicitType
     }
 
-    const fingerprint = `${service.name || ''} ${service.container_name || ''} ${service.image || ''}`.toLowerCase()
-    if (fingerprint.includes('db') || fingerprint.includes('postgres') || fingerprint.includes('mysql')) {
+    const fingerprint =
+        `${service.name || ''} ${service.container_name || ''} ${service.image || ''}`.toLowerCase()
+    if (
+        fingerprint.includes('db') ||
+        fingerprint.includes('postgres') ||
+        fingerprint.includes('mysql')
+    ) {
         return 'database'
     }
-    if (fingerprint.includes('proxy') || fingerprint.includes('gateway') || fingerprint.includes('nginx')) {
+    if (
+        fingerprint.includes('proxy') ||
+        fingerprint.includes('gateway') ||
+        fingerprint.includes('nginx')
+    ) {
         return 'proxy'
     }
     if (fingerprint.includes('keycloak') || fingerprint.includes('auth')) {
@@ -194,7 +203,11 @@ const resolveDiagramServiceType = (service: ServiceInfo): DiagramServiceType => 
     ) {
         return 'observability'
     }
-    if (fingerprint.includes('web') || fingerprint.includes('frontend') || fingerprint.includes('api')) {
+    if (
+        fingerprint.includes('web') ||
+        fingerprint.includes('frontend') ||
+        fingerprint.includes('api')
+    ) {
         return 'web'
     }
     return 'other'
@@ -280,7 +293,12 @@ const ServiceNode: React.FC<{
                 )}
             >
                 <div className="flex min-w-0 items-center gap-2">
-                    <span className={cn('flex h-5 w-5 items-center justify-center rounded text-white', typeBg)}>
+                    <span
+                        className={cn(
+                            'flex h-5 w-5 items-center justify-center rounded text-white',
+                            typeBg
+                        )}
+                    >
                         <ServiceTypeIcon className="h-3 w-3" />
                     </span>
                     <span className="truncate text-[11px] font-semibold text-slate-800">
@@ -300,7 +318,9 @@ const ServiceNode: React.FC<{
                 <div className="truncate text-[8px] font-semibold uppercase tracking-[0.14em] text-slate-400">
                     {serviceTypeLabel}
                 </div>
-                <div className="truncate text-[10px] font-semibold text-slate-500">{portsLabel}</div>
+                <div className="truncate text-[10px] font-semibold text-slate-500">
+                    {portsLabel}
+                </div>
             </div>
 
             <div className="truncate px-3 pb-2 pt-1 text-[10px] text-slate-500">
@@ -708,10 +728,8 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
                         data: {
                             service,
                             serviceUrl: getServiceUrl(service),
-                            isRelated:
-                                selectedNode !== null && relatedToSelected.has(service.name),
-                            isMuted:
-                                selectedNode !== null && !relatedToSelected.has(service.name),
+                            isRelated: selectedNode !== null && relatedToSelected.has(service.name),
+                            isMuted: selectedNode !== null && !relatedToSelected.has(service.name),
                             onAction: (action: string, serviceName: string) =>
                                 handleServiceActionRef.current?.(action, serviceName),
                             services,
@@ -829,7 +847,9 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
         if (!(target instanceof HTMLElement)) return false
         if (target.closest('[data-diagram-ui="true"]')) return false
         if (target.closest('.react-flow__node')) return false
-        return Boolean(target.closest('.react-flow__pane') || target.closest('.react-flow__background'))
+        return Boolean(
+            target.closest('.react-flow__pane') || target.closest('.react-flow__background')
+        )
     }, [])
 
     const handleCanvasMouseDown = useCallback(

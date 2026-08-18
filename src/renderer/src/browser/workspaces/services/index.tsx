@@ -71,11 +71,7 @@ export const resolveServiceVisualType = (
     const explicitType = (serviceOrType.labels?.type || '').toLowerCase().trim()
     if (explicitType) return explicitType
 
-    const fingerprint = [
-        serviceOrType.name,
-        serviceOrType.container_name,
-        serviceOrType.image
-    ]
+    const fingerprint = [serviceOrType.name, serviceOrType.container_name, serviceOrType.image]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()

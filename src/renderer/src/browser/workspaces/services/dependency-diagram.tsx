@@ -90,7 +90,8 @@ const TYPE_META: Record<
     observability: { bg: 'bg-fuchsia-500', Icon: Stethoscope }
 }
 
-const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value))
+const clamp = (value: number, min: number, max: number): number =>
+    Math.max(min, Math.min(max, value))
 
 const KNOWN_TYPES = new Set<ServiceType>([
     'database',
@@ -112,7 +113,11 @@ const toStatus = (service: ServiceInfo): Status => {
         return 'running'
     }
 
-    if (status === 'error' || statusMessage.includes('error') || statusMessage.includes('unhealthy')) {
+    if (
+        status === 'error' ||
+        statusMessage.includes('error') ||
+        statusMessage.includes('unhealthy')
+    ) {
         return 'error'
     }
 
@@ -125,15 +130,25 @@ const toServiceType = (service: ServiceInfo): ServiceType => {
         return explicitType as ServiceType
     }
 
-    const fingerprint = `${service.name || ''} ${service.container_name || ''} ${service.image || ''}`.toLowerCase()
-    if (fingerprint.includes('postgres') || fingerprint.includes('mysql') || fingerprint.includes('db')) {
+    const fingerprint =
+        `${service.name || ''} ${service.container_name || ''} ${service.image || ''}`.toLowerCase()
+    if (
+        fingerprint.includes('postgres') ||
+        fingerprint.includes('mysql') ||
+        fingerprint.includes('db')
+    ) {
         return 'database'
     }
-    if (fingerprint.includes('gateway') || fingerprint.includes('proxy') || fingerprint.includes('nginx')) {
+    if (
+        fingerprint.includes('gateway') ||
+        fingerprint.includes('proxy') ||
+        fingerprint.includes('nginx')
+    ) {
         return 'proxy'
     }
     if (fingerprint.includes('keycloak') || fingerprint.includes('auth')) return 'auth'
-    if (fingerprint.includes('eureka') || fingerprint.includes('discovery')) return 'service-discovery'
+    if (fingerprint.includes('eureka') || fingerprint.includes('discovery'))
+        return 'service-discovery'
     if (fingerprint.includes('redis') || fingerprint.includes('cache')) return 'cache'
     if (fingerprint.includes('minio') || fingerprint.includes('storage')) return 'storage'
     if (
@@ -411,7 +426,11 @@ export function DependencyDiagram({
                         transformOrigin: '0 0'
                     }}
                 >
-                    <svg className="pointer-events-none absolute inset-0" width={canvasWidth} height={canvasHeight}>
+                    <svg
+                        className="pointer-events-none absolute inset-0"
+                        width={canvasWidth}
+                        height={canvasHeight}
+                    >
                         <defs>
                             <marker
                                 id="arrow-default"
@@ -457,11 +476,19 @@ export function DependencyDiagram({
                                         stroke={isRelated ? '#0ea5e9' : defaultEdgeColor}
                                         strokeWidth={isRelated ? 2 : 1.5}
                                         strokeDasharray={edge.sourceRunning ? undefined : '4 4'}
-                                        markerEnd={isRelated ? 'url(#arrow-related)' : 'url(#arrow-default)'}
+                                        markerEnd={
+                                            isRelated
+                                                ? 'url(#arrow-related)'
+                                                : 'url(#arrow-default)'
+                                        }
                                     />
                                     {isRelated ? (
                                         <circle r="2.6" fill="#0ea5e9">
-                                            <animateMotion dur="1.6s" repeatCount="indefinite" path={path} />
+                                            <animateMotion
+                                                dur="1.6s"
+                                                repeatCount="indefinite"
+                                                path={path}
+                                            />
                                         </circle>
                                     ) : null}
                                 </g>
@@ -482,7 +509,9 @@ export function DependencyDiagram({
                         const isDimmed = selection !== null && !relatedNodes.has(node.service.name)
 
                         const ledColor = isRunning ? '#4DB33D' : isError ? '#EC1111' : '#999999'
-                        const portsLabel = node.service.ports.length ? node.service.ports.join(', ') : 'none'
+                        const portsLabel = node.service.ports.length
+                            ? node.service.ports.join(', ')
+                            : 'none'
 
                         return (
                             <div
@@ -495,7 +524,11 @@ export function DependencyDiagram({
                                 } ${isHovered ? 'z-20 scale-[1.05]' : 'scale-100'} ${isDimmed ? 'opacity-[0.35]' : 'opacity-100'}`}
                                 style={{ width: NODE_WIDTH, left: node.x, top: node.y }}
                                 onMouseEnter={() => setHoveredNode(node.service.name)}
-                                onMouseLeave={() => setHoveredNode((prev) => (prev === node.service.name ? null : prev))}
+                                onMouseLeave={() =>
+                                    setHoveredNode((prev) =>
+                                        prev === node.service.name ? null : prev
+                                    )
+                                }
                                 onClick={(event) => {
                                     event.stopPropagation()
                                     if (didPanRef.current) {
@@ -507,7 +540,9 @@ export function DependencyDiagram({
                             >
                                 <div className="flex h-8 items-center justify-between border-b border-slate-200 px-2 dark:border-slate-700">
                                     <div className="flex min-w-0 items-center gap-1.5">
-                                        <span className={`flex h-4 w-4 items-center justify-center rounded-sm text-white ${visual.bg}`}>
+                                        <span
+                                            className={`flex h-4 w-4 items-center justify-center rounded-sm text-white ${visual.bg}`}
+                                        >
                                             <TypeIcon className="h-2.5 w-2.5" />
                                         </span>
                                         <span className="truncate text-[11px] font-semibold text-slate-800 dark:text-slate-100">
@@ -524,9 +559,13 @@ export function DependencyDiagram({
                                     <div className="text-[8px] uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500">
                                         {serviceType}
                                     </div>
-                                    <div className="truncate text-[9px] text-slate-500 dark:text-slate-400">{portsLabel}</div>
                                     <div className="truncate text-[9px] text-slate-500 dark:text-slate-400">
-                                        <span className="text-slate-400 dark:text-slate-500">image:</span>{' '}
+                                        {portsLabel}
+                                    </div>
+                                    <div className="truncate text-[9px] text-slate-500 dark:text-slate-400">
+                                        <span className="text-slate-400 dark:text-slate-500">
+                                            image:
+                                        </span>{' '}
                                         {node.service.image || 'none'}
                                     </div>
                                 </div>
@@ -591,7 +630,9 @@ export function DependencyDiagram({
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                         <Network className="h-4 w-4 text-sky-600" />
-                        <span className="text-sm font-medium text-slate-900 dark:text-slate-100">Workspace Diagram</span>
+                        <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                            Workspace Diagram
+                        </span>
                     </div>
                     <Button
                         size="sm"
