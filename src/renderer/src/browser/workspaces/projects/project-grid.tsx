@@ -8,7 +8,14 @@ import { formatDistanceToNow } from 'date-fns'
 import { Clock } from 'lucide-react'
 import path from 'path'
 import type { ProjectData, ServiceInfo } from 'src/main/types'
+import { resolveServiceVisualType } from '../services'
 import { ProjectActions } from './project-actions'
+
+const stripWorkspacePrefix = (name: string, workspaceSlug?: string): string => {
+    if (!name || !workspaceSlug) return name
+    const prefix = `${workspaceSlug}-`
+    return name.startsWith(prefix) ? name.slice(prefix.length) : name
+}
 
 interface ProjectProps {
     projects: ProjectData[]
@@ -39,6 +46,8 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
         workspace,
         actions: { saveOrOpenProject }
     } = useWorkspace()
+
+    const serviceByName = new Map(services.map((s) => [s.name, s]))
 
     const handleOpenProject = (project: ProjectData): void => {
         saveOrOpenProject({ project, openProject: true })
@@ -88,7 +97,17 @@ const ProjectGrid = ({ projects, projectOrder, services }: ProjectProps) => {
         <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>
             {sortProjects(projects).map((project, index) => {
                 const service = findServiceByProjectName(project)
-                const dependencyNames = getDependencyNames(service?.dependsOn ?? [])
+                const dependencyNames = getDependencyNames(service?.dependsOn ?? []).map((rawName) => {
+                    const depService = serviceByName.get(rawName)
+                    if (resolveServiceVisualType(depService ?? rawName) === 'database') {
+                        const cfg = project.config as any
+                        const slug = (cfg?.name || cfg?.artifact || project.name || '')
+                            .toLowerCase()
+                            .replace(/[^a-z0-9]/g, '')
+                        if (slug) return `${slug}_db`
+                    }
+                    return stripWorkspacePrefix(rawName, workspace?.slug)
+                })
                 const ports = service?.ports ?? []
                 const description = project.config?.description
                 const firstDep = dependencyNames[0] ?? ''
