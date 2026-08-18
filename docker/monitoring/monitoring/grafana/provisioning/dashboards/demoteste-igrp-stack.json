@@ -1,253 +1,341 @@
 {
-  "uid": "demoteste-igrp-stack",
-  "title": "Demoteste - IGRP Stack",
-  "tags": ["demoteste", "igrp", "stack"],
-  "timezone": "browser",
-  "schemaVersion": 39,
-  "version": 3,
-  "refresh": "15s",
-  "time": {
-    "from": "now-1h",
-    "to": "now"
-  },
-  "panels": [
-    {
-      "id": 1,
-      "type": "text",
-      "title": "Arquitetura do workspace",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
-      "options": {
-        "mode": "markdown",
-        "content": "### Fluxo principal\n\n`Browser` -> `Nginx :2575` -> `Application Center`, `Keycloak`, `Grafana`, `PgAdmin`, `MinIO`, `Frontends /apps/*` e `Gateway API`.\n\n`Gateway API` resolve os backends atraves do `Eureka` e encaminha chamadas para `access-management`, `process-management-api`, `process-studio-api` e backends criados em `projects/`.\n\n### Observabilidade\n\n`Spring APIs / Apps` -> `OpenTelemetry Collector` -> `Tempo`, `Loki` e `Prometheus`.\n\n`Tempo metrics_generator` -> `Prometheus` -> `Grafana Service Graph`.\n\n> Nota: estado Docker ON/OFF de todos os containers requer `cAdvisor`. Sem `cAdvisor`, o dashboard mostra apenas estados realmente observaveis por Prometheus/Tempo, evitando falsos OFF."
-      }
+    "uid": "demoteste-igrp-stack",
+    "title": "Demoteste - IGRP Stack",
+    "tags": ["demoteste", "igrp", "stack"],
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 3,
+    "refresh": "15s",
+    "time": {
+        "from": "now-1h",
+        "to": "now"
     },
-    {
-      "id": 2,
-      "type": "stat",
-      "title": "Core containers ativos",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
-      "targets": [
+    "panels": [
         {
-          "refId": "A",
-          "expr": "count(container_last_seen{name!=\"\", container_label_com_docker_compose_project=\"demoteste-igrp\"})"
-        }
-      ],
-      "options": {
-        "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "" },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto"
-      },
-      "fieldConfig": {
-        "defaults": { "unit": "short", "thresholds": { "mode": "absolute", "steps": [{ "color": "orange", "value": null }, { "color": "green", "value": 1 }] } },
-        "overrides": []
-      }
-    },
-    {
-      "id": 3,
-      "type": "stat",
-      "title": "Processos containers ativos",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "count(container_last_seen{name!=\"\", container_label_com_docker_compose_project=\"demoteste-process-igrp\"})"
-        }
-      ],
-      "options": {
-        "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "" },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto"
-      },
-      "fieldConfig": {
-        "defaults": { "unit": "short", "thresholds": { "mode": "absolute", "steps": [{ "color": "orange", "value": null }, { "color": "green", "value": 1 }] } },
-        "overrides": []
-      }
-    },
-    {
-      "id": 4,
-      "type": "stat",
-      "title": "Monitoring containers ativos",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "count(container_last_seen{name!=\"\", container_label_com_docker_compose_project=\"demoteste-monitoring-infra\"})"
-        }
-      ],
-      "options": {
-        "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "" },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto"
-      },
-      "fieldConfig": {
-        "defaults": { "unit": "short", "thresholds": { "mode": "absolute", "steps": [{ "color": "orange", "value": null }, { "color": "green", "value": 1 }] } },
-        "overrides": []
-      }
-    },
-    {
-      "id": 5,
-      "type": "stat",
-      "title": "cAdvisor",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 8 },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "up{job=\"cadvisor\"} or vector(0)"
-        }
-      ],
-      "options": {
-        "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "" },
-        "orientation": "auto",
-        "textMode": "value_and_name",
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "mappings": [
-            { "type": "value", "options": { "0": { "text": "cAdvisor OFF" }, "1": { "text": "cAdvisor ON" } } }
-          ],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "orange", "value": null }, { "color": "green", "value": 1 }] }
+            "id": 1,
+            "type": "text",
+            "title": "Arquitetura do workspace",
+            "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+            "options": {
+                "mode": "markdown",
+                "content": "### Fluxo principal\n\n`Browser` -> `Nginx :2575` -> `Application Center`, `Keycloak`, `Grafana`, `PgAdmin`, `MinIO`, `Frontends /apps/*` e `Gateway API`.\n\n`Gateway API` resolve os backends atraves do `Eureka` e encaminha chamadas para `access-management`, `process-management-api`, `process-studio-api` e backends criados em `projects/`.\n\n### Observabilidade\n\n`Spring APIs / Apps` -> `OpenTelemetry Collector` -> `Tempo`, `Loki` e `Prometheus`.\n\n`Tempo metrics_generator` -> `Prometheus` -> `Grafana Service Graph`.\n\n> Nota: estado Docker ON/OFF de todos os containers requer `cAdvisor`. Sem `cAdvisor`, o dashboard mostra apenas estados realmente observaveis por Prometheus/Tempo, evitando falsos OFF."
+            }
         },
-        "overrides": []
-      }
-    },
-    {
-      "id": 6,
-      "type": "table",
-      "title": "Inventario Docker por stack",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 12 },
-      "targets": [
         {
-          "refId": "A",
-          "expr": "container_last_seen{name!=\"\", container_label_com_docker_compose_project=~\"demoteste-igrp|demoteste-process-igrp|demoteste-monitoring-infra\"}",
-          "format": "table",
-          "instant": true
-        }
-      ],
-      "options": { "showHeader": true, "cellHeight": "sm" },
-      "fieldConfig": {
-        "defaults": {
-          "custom": { "align": "auto", "inspect": false },
-          "mappings": [
-            { "type": "value", "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } } }
-          ],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+            "id": 2,
+            "type": "stat",
+            "title": "Core containers ativos",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "count(container_last_seen{name!=\"\", container_label_com_docker_compose_project=\"demoteste-igrp\"})"
+                }
+            ],
+            "options": {
+                "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "" },
+                "orientation": "auto",
+                "textMode": "auto",
+                "colorMode": "background",
+                "graphMode": "area",
+                "justifyMode": "auto"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "short",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            { "color": "orange", "value": null },
+                            { "color": "green", "value": 1 }
+                        ]
+                    }
+                },
+                "overrides": []
+            }
         },
-        "overrides": []
-      }
-    },
-    {
-      "id": 7,
-      "type": "table",
-      "title": "Spring APIs observadas por tracing",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 12 },
-      "targets": [
         {
-          "refId": "A",
-          "expr": "sum by (service) (increase(traces_spanmetrics_calls_total[30m]))",
-          "format": "table",
-          "instant": true
-        }
-      ],
-      "options": { "showHeader": true, "cellHeight": "sm" },
-      "fieldConfig": { "defaults": { "custom": { "align": "auto", "inspect": false } }, "overrides": [] }
-    },
-    {
-      "id": 8,
-      "type": "text",
-      "title": "Stack esperado",
-      "gridPos": { "h": 10, "w": 8, "x": 0, "y": 19 },
-      "options": {
-        "mode": "markdown",
-        "content": "### Core IGRP\n\n- `demoteste-nginx`\n- `demoteste-database-postgres`\n- `demoteste-eureka`\n- `demoteste-gateway`\n- `demoteste-iam-keycloak`\n- `demoteste-access-management`\n- `demoteste-application-center`\n- `demoteste-minio`\n- `demoteste-redis`\n- `demoteste-pgadmin`"
-      }
-    },
-    {
-      "id": 9,
-      "type": "text",
-      "title": "Processos esperado",
-      "gridPos": { "h": 10, "w": 8, "x": 8, "y": 19 },
-      "options": {
-        "mode": "markdown",
-        "content": "### Processos\n\n- `demoteste-process-management-api`\n- `demoteste-process-studio-api`\n- `igrp-process-management`\n- `igrp-process-studio`\n\n### Tarefas transitorias\n\n- `demoteste-process-management-db-prepare`\n- `demoteste-process-studio-db-prepare`\n- `*-ui-warmup`"
-      }
-    },
-    {
-      "id": 10,
-      "type": "text",
-      "title": "Monitoring esperado",
-      "gridPos": { "h": 10, "w": 8, "x": 16, "y": 19 },
-      "options": {
-        "mode": "markdown",
-        "content": "### Monitoring\n\n- `demoteste-otel-collector`\n- `demoteste-prometheus`\n- `demoteste-loki`\n- `demoteste-tempo`\n- `demoteste-grafana`\n- `demoteste-cadvisor` *(opcional, para inventario Docker)*"
-      }
-    },
-    {
-      "id": 11,
-      "type": "timeseries",
-      "title": "Requests por servico observado",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 29 },
-      "targets": [
+            "id": 3,
+            "type": "stat",
+            "title": "Processos containers ativos",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "count(container_last_seen{name!=\"\", container_label_com_docker_compose_project=\"demoteste-process-igrp\"})"
+                }
+            ],
+            "options": {
+                "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "" },
+                "orientation": "auto",
+                "textMode": "auto",
+                "colorMode": "background",
+                "graphMode": "area",
+                "justifyMode": "auto"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "short",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            { "color": "orange", "value": null },
+                            { "color": "green", "value": 1 }
+                        ]
+                    }
+                },
+                "overrides": []
+            }
+        },
         {
-          "refId": "A",
-          "expr": "sum by (service) (rate(traces_spanmetrics_calls_total[5m]))",
-          "legendFormat": "{{service}}"
-        }
-      ],
-      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 15 } }, "overrides": [] },
-      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
-    },
-    {
-      "id": 12,
-      "type": "timeseries",
-      "title": "Service Graph - requests por ligacao",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 29 },
-      "targets": [
+            "id": 4,
+            "type": "stat",
+            "title": "Monitoring containers ativos",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "count(container_last_seen{name!=\"\", container_label_com_docker_compose_project=\"demoteste-monitoring-infra\"})"
+                }
+            ],
+            "options": {
+                "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "" },
+                "orientation": "auto",
+                "textMode": "auto",
+                "colorMode": "background",
+                "graphMode": "area",
+                "justifyMode": "auto"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "short",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            { "color": "orange", "value": null },
+                            { "color": "green", "value": 1 }
+                        ]
+                    }
+                },
+                "overrides": []
+            }
+        },
         {
-          "refId": "A",
-          "expr": "sum by (client, server, connection_type) (rate(traces_service_graph_request_total[5m]))",
-          "legendFormat": "{{client}} -> {{server}} ({{connection_type}})"
-        }
-      ],
-      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 15 } }, "overrides": [] },
-      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
-    },
-    {
-      "id": 13,
-      "type": "table",
-      "title": "Ligacoes reais observadas",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 37 },
-      "targets": [
+            "id": 5,
+            "type": "stat",
+            "title": "cAdvisor",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 4, "w": 6, "x": 18, "y": 8 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "up{job=\"cadvisor\"} or vector(0)"
+                }
+            ],
+            "options": {
+                "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "" },
+                "orientation": "auto",
+                "textMode": "value_and_name",
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "short",
+                    "mappings": [
+                        {
+                            "type": "value",
+                            "options": {
+                                "0": { "text": "cAdvisor OFF" },
+                                "1": { "text": "cAdvisor ON" }
+                            }
+                        }
+                    ],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            { "color": "orange", "value": null },
+                            { "color": "green", "value": 1 }
+                        ]
+                    }
+                },
+                "overrides": []
+            }
+        },
         {
-          "refId": "A",
-          "expr": "sum by (client, server, connection_type) (increase(traces_service_graph_request_total[1h]))",
-          "format": "table",
-          "instant": true
+            "id": 6,
+            "type": "table",
+            "title": "Inventario Docker por stack",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 7, "w": 12, "x": 0, "y": 12 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "container_last_seen{name!=\"\", container_label_com_docker_compose_project=~\"demoteste-igrp|demoteste-process-igrp|demoteste-monitoring-infra\"}",
+                    "format": "table",
+                    "instant": true
+                }
+            ],
+            "options": { "showHeader": true, "cellHeight": "sm" },
+            "fieldConfig": {
+                "defaults": {
+                    "custom": { "align": "auto", "inspect": false },
+                    "mappings": [
+                        {
+                            "type": "value",
+                            "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } }
+                        }
+                    ],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            { "color": "red", "value": null },
+                            { "color": "green", "value": 1 }
+                        ]
+                    }
+                },
+                "overrides": []
+            }
+        },
+        {
+            "id": 7,
+            "type": "table",
+            "title": "Spring APIs observadas por tracing",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 7, "w": 12, "x": 12, "y": 12 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (service) (increase(traces_spanmetrics_calls_total[30m]))",
+                    "format": "table",
+                    "instant": true
+                }
+            ],
+            "options": { "showHeader": true, "cellHeight": "sm" },
+            "fieldConfig": {
+                "defaults": { "custom": { "align": "auto", "inspect": false } },
+                "overrides": []
+            }
+        },
+        {
+            "id": 8,
+            "type": "text",
+            "title": "Stack esperado",
+            "gridPos": { "h": 10, "w": 8, "x": 0, "y": 19 },
+            "options": {
+                "mode": "markdown",
+                "content": "### Core IGRP\n\n- `demoteste-nginx`\n- `demoteste-database-postgres`\n- `demoteste-eureka`\n- `demoteste-gateway`\n- `demoteste-iam-keycloak`\n- `demoteste-access-management`\n- `demoteste-application-center`\n- `demoteste-minio`\n- `demoteste-redis`\n- `demoteste-pgadmin`"
+            }
+        },
+        {
+            "id": 9,
+            "type": "text",
+            "title": "Processos esperado",
+            "gridPos": { "h": 10, "w": 8, "x": 8, "y": 19 },
+            "options": {
+                "mode": "markdown",
+                "content": "### Processos\n\n- `demoteste-process-management-api`\n- `demoteste-process-studio-api`\n- `igrp-process-management`\n- `igrp-process-studio`\n\n### Tarefas transitorias\n\n- `demoteste-process-management-db-prepare`\n- `demoteste-process-studio-db-prepare`\n- `*-ui-warmup`"
+            }
+        },
+        {
+            "id": 10,
+            "type": "text",
+            "title": "Monitoring esperado",
+            "gridPos": { "h": 10, "w": 8, "x": 16, "y": 19 },
+            "options": {
+                "mode": "markdown",
+                "content": "### Monitoring\n\n- `demoteste-otel-collector`\n- `demoteste-prometheus`\n- `demoteste-loki`\n- `demoteste-tempo`\n- `demoteste-grafana`\n- `demoteste-cadvisor` *(opcional, para inventario Docker)*"
+            }
+        },
+        {
+            "id": 11,
+            "type": "timeseries",
+            "title": "Requests por servico observado",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 8, "w": 12, "x": 0, "y": 29 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (service) (rate(traces_spanmetrics_calls_total[5m]))",
+                    "legendFormat": "{{service}}"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "reqps",
+                    "custom": {
+                        "drawStyle": "line",
+                        "lineInterpolation": "smooth",
+                        "fillOpacity": 15
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "bottom",
+                    "calcs": ["lastNotNull", "max"]
+                },
+                "tooltip": { "mode": "multi", "sort": "desc" }
+            }
+        },
+        {
+            "id": 12,
+            "type": "timeseries",
+            "title": "Service Graph - requests por ligacao",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 8, "w": 12, "x": 12, "y": 29 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (client, server, connection_type) (rate(traces_service_graph_request_total[5m]))",
+                    "legendFormat": "{{client}} -> {{server}} ({{connection_type}})"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "reqps",
+                    "custom": {
+                        "drawStyle": "line",
+                        "lineInterpolation": "smooth",
+                        "fillOpacity": 15
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "bottom",
+                    "calcs": ["lastNotNull", "max"]
+                },
+                "tooltip": { "mode": "multi", "sort": "desc" }
+            }
+        },
+        {
+            "id": 13,
+            "type": "table",
+            "title": "Ligacoes reais observadas",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 8, "w": 24, "x": 0, "y": 37 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (client, server, connection_type) (increase(traces_service_graph_request_total[1h]))",
+                    "format": "table",
+                    "instant": true
+                }
+            ],
+            "options": { "showHeader": true, "cellHeight": "sm" },
+            "fieldConfig": {
+                "defaults": { "custom": { "align": "auto", "inspect": false } },
+                "overrides": []
+            }
         }
-      ],
-      "options": { "showHeader": true, "cellHeight": "sm" },
-      "fieldConfig": { "defaults": { "custom": { "align": "auto", "inspect": false } }, "overrides": [] }
-    }
-  ]
+    ]
 }

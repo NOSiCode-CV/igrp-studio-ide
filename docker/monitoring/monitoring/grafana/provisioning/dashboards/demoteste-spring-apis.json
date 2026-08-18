@@ -1,139 +1,244 @@
 {
-  "uid": "demoteste-spring-apis",
-  "title": "Demoteste - Spring APIs",
-  "tags": ["demoteste", "spring", "apis"],
-  "timezone": "browser",
-  "schemaVersion": 39,
-  "version": 1,
-  "refresh": "15s",
-  "time": { "from": "now-1h", "to": "now" },
-  "templating": {
-    "list": [
-      {
-        "name": "api",
-        "type": "query",
-        "datasource": { "type": "prometheus", "uid": "prometheus" },
-        "query": "label_values(http_server_request_duration_count, exported_job)",
-        "refresh": 1,
-        "includeAll": true,
-        "multi": true,
-        "current": { "selected": true, "text": "All", "value": "$__all" }
-      }
+    "uid": "demoteste-spring-apis",
+    "title": "Demoteste - Spring APIs",
+    "tags": ["demoteste", "spring", "apis"],
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 1,
+    "refresh": "15s",
+    "time": { "from": "now-1h", "to": "now" },
+    "templating": {
+        "list": [
+            {
+                "name": "api",
+                "type": "query",
+                "datasource": { "type": "prometheus", "uid": "prometheus" },
+                "query": "label_values(http_server_request_duration_count, exported_job)",
+                "refresh": 1,
+                "includeAll": true,
+                "multi": true,
+                "current": { "selected": true, "text": "All", "value": "$__all" }
+            }
+        ]
+    },
+    "panels": [
+        {
+            "id": 1,
+            "type": "timeseries",
+            "title": "HTTP requests por API",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (exported_job) (rate(http_server_request_duration_count{exported_job=~\"$api\"}[5m]))",
+                    "legendFormat": "{{exported_job}}"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "reqps",
+                    "custom": {
+                        "drawStyle": "line",
+                        "lineInterpolation": "smooth",
+                        "fillOpacity": 12
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "bottom",
+                    "calcs": ["lastNotNull"]
+                },
+                "tooltip": { "mode": "multi", "sort": "desc" }
+            }
+        },
+        {
+            "id": 2,
+            "type": "timeseries",
+            "title": "HTTP status por API",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (exported_job, http_response_status_code) (rate(http_server_request_duration_count{exported_job=~\"$api\"}[5m]))",
+                    "legendFormat": "{{exported_job}} {{http_response_status_code}}"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "reqps",
+                    "custom": {
+                        "drawStyle": "line",
+                        "lineInterpolation": "smooth",
+                        "fillOpacity": 12
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "bottom",
+                    "calcs": ["lastNotNull"]
+                },
+                "tooltip": { "mode": "multi", "sort": "desc" }
+            }
+        },
+        {
+            "id": 3,
+            "type": "timeseries",
+            "title": "Latencia HTTP p95 por API",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "histogram_quantile(0.95, sum by (exported_job, le) (rate(http_server_request_duration_bucket{exported_job=~\"$api\"}[5m])))",
+                    "legendFormat": "{{exported_job}}"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "s",
+                    "custom": {
+                        "drawStyle": "line",
+                        "lineInterpolation": "smooth",
+                        "fillOpacity": 12
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "bottom",
+                    "calcs": ["lastNotNull", "max"]
+                },
+                "tooltip": { "mode": "multi", "sort": "desc" }
+            }
+        },
+        {
+            "id": 4,
+            "type": "timeseries",
+            "title": "JVM memory usado",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (exported_job) (jvm_memory_used{exported_job=~\"$api\"})",
+                    "legendFormat": "{{exported_job}}"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "bytes",
+                    "custom": {
+                        "drawStyle": "line",
+                        "lineInterpolation": "smooth",
+                        "fillOpacity": 15
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "bottom",
+                    "calcs": ["lastNotNull", "max"]
+                },
+                "tooltip": { "mode": "multi", "sort": "desc" }
+            }
+        },
+        {
+            "id": 5,
+            "type": "timeseries",
+            "title": "JVM threads",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 7, "w": 8, "x": 0, "y": 16 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (exported_job) (jvm_thread_count{exported_job=~\"$api\"})",
+                    "legendFormat": "{{exported_job}}"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "short",
+                    "custom": {
+                        "drawStyle": "line",
+                        "lineInterpolation": "smooth",
+                        "fillOpacity": 8
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "bottom",
+                    "calcs": ["lastNotNull"]
+                },
+                "tooltip": { "mode": "multi", "sort": "desc" }
+            }
+        },
+        {
+            "id": 6,
+            "type": "timeseries",
+            "title": "JVM CPU recente",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 7, "w": 8, "x": 8, "y": 16 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "avg by (exported_job) (jvm_cpu_recent_utilization{exported_job=~\"$api\"})",
+                    "legendFormat": "{{exported_job}}"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "percentunit",
+                    "custom": {
+                        "drawStyle": "line",
+                        "lineInterpolation": "smooth",
+                        "fillOpacity": 8
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "bottom",
+                    "calcs": ["lastNotNull", "max"]
+                },
+                "tooltip": { "mode": "multi", "sort": "desc" }
+            }
+        },
+        {
+            "id": 7,
+            "type": "table",
+            "title": "Rotas mais chamadas",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 7, "w": 8, "x": 16, "y": 16 },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "topk(15, sum by (exported_job, http_route, http_request_method) (increase(http_server_request_duration_count{exported_job=~\"$api\"}[30m])))",
+                    "format": "table",
+                    "instant": true
+                }
+            ],
+            "options": { "showHeader": true, "cellHeight": "sm" },
+            "fieldConfig": {
+                "defaults": { "custom": { "align": "auto", "inspect": false } },
+                "overrides": []
+            }
+        }
     ]
-  },
-  "panels": [
-    {
-      "id": 1,
-      "type": "timeseries",
-      "title": "HTTP requests por API",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "sum by (exported_job) (rate(http_server_request_duration_count{exported_job=~\"$api\"}[5m]))",
-          "legendFormat": "{{exported_job}}"
-        }
-      ],
-      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 12 } }, "overrides": [] },
-      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
-    },
-    {
-      "id": 2,
-      "type": "timeseries",
-      "title": "HTTP status por API",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "sum by (exported_job, http_response_status_code) (rate(http_server_request_duration_count{exported_job=~\"$api\"}[5m]))",
-          "legendFormat": "{{exported_job}} {{http_response_status_code}}"
-        }
-      ],
-      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 12 } }, "overrides": [] },
-      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
-    },
-    {
-      "id": 3,
-      "type": "timeseries",
-      "title": "Latencia HTTP p95 por API",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "histogram_quantile(0.95, sum by (exported_job, le) (rate(http_server_request_duration_bucket{exported_job=~\"$api\"}[5m])))",
-          "legendFormat": "{{exported_job}}"
-        }
-      ],
-      "fieldConfig": { "defaults": { "unit": "s", "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 12 } }, "overrides": [] },
-      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
-    },
-    {
-      "id": 4,
-      "type": "timeseries",
-      "title": "JVM memory usado",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "sum by (exported_job) (jvm_memory_used{exported_job=~\"$api\"})",
-          "legendFormat": "{{exported_job}}"
-        }
-      ],
-      "fieldConfig": { "defaults": { "unit": "bytes", "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 15 } }, "overrides": [] },
-      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
-    },
-    {
-      "id": 5,
-      "type": "timeseries",
-      "title": "JVM threads",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 16 },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "sum by (exported_job) (jvm_thread_count{exported_job=~\"$api\"})",
-          "legendFormat": "{{exported_job}}"
-        }
-      ],
-      "fieldConfig": { "defaults": { "unit": "short", "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 8 } }, "overrides": [] },
-      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
-    },
-    {
-      "id": 6,
-      "type": "timeseries",
-      "title": "JVM CPU recente",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 16 },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "avg by (exported_job) (jvm_cpu_recent_utilization{exported_job=~\"$api\"})",
-          "legendFormat": "{{exported_job}}"
-        }
-      ],
-      "fieldConfig": { "defaults": { "unit": "percentunit", "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 8 } }, "overrides": [] },
-      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
-    },
-    {
-      "id": 7,
-      "type": "table",
-      "title": "Rotas mais chamadas",
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 16 },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "topk(15, sum by (exported_job, http_route, http_request_method) (increase(http_server_request_duration_count{exported_job=~\"$api\"}[30m])))",
-          "format": "table",
-          "instant": true
-        }
-      ],
-      "options": { "showHeader": true, "cellHeight": "sm" },
-      "fieldConfig": { "defaults": { "custom": { "align": "auto", "inspect": false } }, "overrides": [] }
-    }
-  ]
 }
