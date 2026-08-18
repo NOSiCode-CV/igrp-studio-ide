@@ -92,9 +92,9 @@ export class DotNetEngine implements BaseEngine {
     async createProject(project: ProjectData, basePath: string): Promise<void> {
         ensureProductionMode()
 
-        const config = project.config as DotNetConfigData
+        const config = project.config as DotNetConfigData & { enableGraphQL?: boolean }
 
-        const baseConfig: BaseApiConfig = {
+        const baseConfig = {
             type: 'dotnet',
             apiName: deriveApiName(config.artifact, config.name),
             artifact: config.artifact,
@@ -109,6 +109,7 @@ export class DotNetEngine implements BaseEngine {
             // contain spaces; passing it through breaks template rendering.
             enableObservability: !!config.enableObservability,
             enableEntityRevision: !!config.enableEntityRevision,
+            enableGraphQL: !!config.enableGraphQL,
             igrpCoreVersion: IGRP_CORE_VERSION,
             // iGRP workspace identity + Studio manifest version (Spring parity —
             // see SpringEngine.createProject). `workspaceSlug`, when present,
@@ -124,7 +125,7 @@ export class DotNetEngine implements BaseEngine {
         }
 
         await ensureDirectoryExists(basePath)
-        await newApi(baseConfig, basePath)
+        await newApi(baseConfig as BaseApiConfig, basePath)
     }
 
     async createModule(config: ModuleConfig, basePath: string): Promise<void> {

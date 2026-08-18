@@ -49,7 +49,7 @@ describe('DotNetConfig defaults', () => {
     it('renders engine defaults when data is undefined (default parameter)', () => {
         render(<DotNetConfig data={undefined as never} onChange={jest.fn()} />)
 
-        expect(screen.getByTestId('igrp-combobox')).toHaveTextContent('Postgresql')
+        expect(screen.getAllByTestId('igrp-combobox')[0]).toHaveTextContent('Postgresql')
         expect(screen.getByRole('radio', { name: 'technical' })).toBeChecked()
     })
 

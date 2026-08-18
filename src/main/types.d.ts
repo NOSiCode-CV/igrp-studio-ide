@@ -41,12 +41,10 @@ export interface DotNetConfigData {
     projectStructureStyle: ProjectStructureStyle
     name?: string
     enableObservability: boolean
-    /**
-     * Whether the generated project enables IGRP entity revision/audit history.
-     * Required by `@igrp/dotnet-engine` BaseApiConfig; not surfaced in the
-     * Studio UI yet — safe-defaults to `false` in `DEFAULT_DOTNET_CONFIG`.
-     */
+    /** Whether the generated project enables IGRP entity revision/audit history. */
     enableEntityRevision: boolean
+    /** Opt-in HotChocolate GraphQL generation for .NET projects. */
+    enableGraphQL?: boolean
     /**
      * iGRP workspace slug (workspace metadata, not a UUID). When present,
      * `@igrp/dotnet-engine` additionally emits the workspace deployment files

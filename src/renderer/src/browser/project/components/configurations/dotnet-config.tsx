@@ -30,9 +30,9 @@ export const DEFAULT_DOTNET_CONFIG: DotNetConfigData = {
     database: 'Postgresql',
     projectStructureStyle: 'technical',
     enableObservability: false,
+    enableGraphQL: false,
     // Default to false; entity-revision tracking adds a non-trivial audit
-    // schema and is opt-in. Kept off the form UI per "safe defaults instead
-    // of unnecessary UI fields" until a product decision surfaces it.
+    // schema and is opt-in.
     enableEntityRevision: false
 }
 
@@ -140,6 +140,51 @@ export function DotNetConfig({
                     />
                     <Label htmlFor="observability">{t('enableObservability')}</Label>
                 </div>
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="dotnet-entity-revision"
+                        checked={data.enableEntityRevision}
+                        onCheckedChange={(checked) =>
+                            onChange({
+                                ...data,
+                                enableEntityRevision: checked as boolean
+                            })
+                        }
+                    />
+                    <Label htmlFor="dotnet-entity-revision">{t('enableEntityRevision')}</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="dotnet-graphql"
+                        checked={!!data.enableGraphQL}
+                        onCheckedChange={(checked) =>
+                            onChange({
+                                ...data,
+                                enableGraphQL: checked as boolean
+                            })
+                        }
+                    />
+                    <Label htmlFor="dotnet-graphql">{t('enableGraphQL')}</Label>
+                </div>
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="dotnet-auth">Authentication</Label>
+                <IGRPCombobox
+                    value={data.authMode ?? ''}
+                    onChange={(value) =>
+                        onChange({
+                            ...data,
+                            authMode: value === 'keycloak' || value === 'autentika' ? value : undefined
+                        })
+                    }
+                    options={[
+                        { value: '', label: 'Disabled' },
+                        { value: 'keycloak', label: 'Keycloak' },
+                        { value: 'autentika', label: 'Autentika' }
+                    ]}
+                    className="w-full"
+                />
             </div>
         </div>
     )
