@@ -109,6 +109,7 @@ export const useModel = ({
 
         const {
             revision,
+            audit,
             name,
             tableName,
             attributes,
@@ -138,6 +139,12 @@ export const useModel = ({
         const indexesTable = indexes?.length > 0 ? indexes : [defaultValues.indexes]
 
         formik.setFieldValue('revision', revision || false)
+        // `audit` was previously omitted here: reopening an existing schema
+        // left the form on its brand-new-model default (`audit: true` from
+        // `getInitialValues`) instead of the persisted value, so saving any
+        // unrelated edit (e.g. toggling Revision) silently flipped a
+        // persisted `audit: false` model back to `audit: true`.
+        formik.setFieldValue('audit', audit || false)
         formik.setFieldValue('name', name || '')
         formik.setFieldValue('tableName', tableName || '')
         formik.setFieldValue('crud', crud || false)
