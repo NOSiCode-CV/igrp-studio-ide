@@ -21,6 +21,11 @@ type ComposeHostPortBinding = {
     port: number
     variableName?: string
 }
+type DockerDaemonCheck = {
+    isRunning: boolean
+    error?: string
+    details?: string
+}
 
 type WorkspaceRegistry = {
     workspaces?: Array<{
@@ -40,6 +45,9 @@ export class DockerService {
     private readonly composeRetryAttempts = 3
     private readonly composeRetryDelayMs = 2500
     private readonly logDedupWindowMs = 2000
+    private readonly dockerDaemonCacheTtlMs = 15000
+    private dockerDaemonCache: { expiresAt: number; result: DockerDaemonCheck } | null = null
+    private dockerDaemonCheckInFlight: Promise<DockerDaemonCheck> | null = null
     private lastLogKey: string | null = null
     private lastLogAt = 0
 
@@ -436,7 +444,8 @@ export class DockerService {
     private ensureProjectComposeIntegration(
         workspacePath: string,
         composePath: string,
-        serviceName: string
+        serviceName: string,
+        projectPath?: string
     ): void {
         if (!fs.existsSync(composePath)) return
 
@@ -539,6 +548,18 @@ export class DockerService {
         envMap.set('POSTGRES_HOST', dbHost)
         envMap.set('DB_HOST', dbHost)
         envMap.set('DATABASE_HOST', dbHost)
+        // .NET appsettings.json connection string uses ${POSTGRES_DATABASE}, ${POSTGRES_USER},
+        // ${POSTGRES_PASSWORD}, and ${POSTGRES_EXTERNAL_PORT} — none of which the workspace
+        // .env exposes (it uses IGRP_DATABASE_NAME / IGRP_DATABASE_USER etc.). Derive the
+        // project-specific DB name from the project's .env or baseApi.json; fall back to the
+        // workspace shared DB only if neither source is available.
+        const projectDbName = this.resolveProjectDatabaseName(projectPath, dbName)
+        envMap.set('POSTGRES_DATABASE', projectDbName)
+        envMap.set('POSTGRES_DB', projectDbName)
+        envMap.set('POSTGRES_USER', dbUser)
+        envMap.set('POSTGRES_PASSWORD', dbPassword)
+        envMap.set('POSTGRES_EXTERNAL_PORT', '5432')
+        envMap.set('POSTGRES_INTERNAL_PORT', '5432')
         // Use internal Eureka service URL for container-to-container communication.
         // Public nginx URL can refuse connections from inside project containers.
         envMap.set('EUREKA_SERVICE_URL', eurekaUrl)
@@ -878,6 +899,28 @@ export class DockerService {
 
     private async wait(ms: number): Promise<void> {
         await new Promise((resolve) => setTimeout(resolve, ms))
+    }
+
+    private resolveProjectDatabaseName(projectPath: string | undefined, fallback: string): string {
+        if (!projectPath) return fallback
+        // Prefer the value already written in the project .env (e.g. mytest_db)
+        const envVars = this.parseEnvFile(path.join(projectPath, '.env'))
+        if (envVars.POSTGRES_DATABASE && envVars.POSTGRES_DATABASE !== '_db') {
+            return envVars.POSTGRES_DATABASE
+        }
+        // Fall back to deriving from apiName in .igrpstudio/baseApi.json
+        try {
+            const baseApiPath = path.join(projectPath, '.igrpstudio', 'baseApi.json')
+            if (fs.existsSync(baseApiPath)) {
+                const baseApi = JSON.parse(fs.readFileSync(baseApiPath, 'utf8'))
+                if (typeof baseApi.apiName === 'string' && baseApi.apiName) {
+                    return `${baseApi.apiName.toLowerCase()}_db`
+                }
+            }
+        } catch {
+            // ignore — non-critical
+        }
+        return fallback
     }
 
     private parseEnvFile(envFilePath?: string): Record<string, string> {
@@ -1330,18 +1373,39 @@ export class DockerService {
      * Check if Docker daemon is running and accessible
      * @returns Promise<{isRunning: boolean, error?: string, details?: string}>
      */
-    async checkDockerDaemon(): Promise<{
-        isRunning: boolean
-        error?: string
-        details?: string
-    }> {
+    async checkDockerDaemon(signal?: AbortSignal): Promise<DockerDaemonCheck> {
+        if (!signal) {
+            if (this.dockerDaemonCache && this.dockerDaemonCache.expiresAt > Date.now()) {
+                return this.dockerDaemonCache.result
+            }
+            if (this.dockerDaemonCheckInFlight) return this.dockerDaemonCheckInFlight
+        }
+
+        const request = this.checkDockerDaemonUncached(signal)
+        if (signal) return request
+
+        this.dockerDaemonCheckInFlight = request
+        try {
+            const result = await request
+            this.dockerDaemonCache = {
+                expiresAt: Date.now() + this.dockerDaemonCacheTtlMs,
+                result
+            }
+            return result
+        } finally {
+            this.dockerDaemonCheckInFlight = null
+        }
+    }
+
+    private async checkDockerDaemonUncached(signal?: AbortSignal): Promise<DockerDaemonCheck> {
         this.logInfo('Checking Docker daemon status...')
 
         try {
             // Try to get Docker info
             const { stdout } = await execAsync('docker info', {
                 timeout: 10000, // 10 second timeout
-                maxBuffer: 1024 * 1024 // 1MB buffer
+                maxBuffer: 1024 * 1024, // 1MB buffer
+                signal
             })
 
             this.logSuccess('Docker daemon is running and accessible')
@@ -1350,8 +1414,9 @@ export class DockerService {
             // If we get here, Docker daemon is running
             return { isRunning: true, details: stdout }
         } catch (error: unknown) {
-            const errorMessage =
-                (error as any).stderr || (error as any).stdout || (error as any).message
+            const errorMessage = String(
+                (error as any).stderr || (error as any).stdout || (error as any).message || error
+            )
             this.logError(`Docker daemon check failed: ${errorMessage}`)
 
             // Check for specific Docker daemon connection errors
@@ -1404,9 +1469,9 @@ export class DockerService {
      * Check if Docker is available and running before executing commands
      * @throws Error if Docker daemon is not running
      */
-    private async ensureDockerRunning(): Promise<void> {
+    private async ensureDockerRunning(signal?: AbortSignal): Promise<void> {
         this.logDebug('Ensuring Docker daemon is running...')
-        const check = await this.checkDockerDaemon()
+        const check = await this.checkDockerDaemon(signal)
         if (!check.isRunning) {
             this.logError(`Docker daemon is not running: ${check.error}. ${check.details}`)
             throw new Error(`Docker daemon is not running: ${check.error}. ${check.details}`)
@@ -1502,14 +1567,14 @@ export class DockerService {
         command: string,
         service?: string,
         composeFilePath?: string,
-        options?: { envFilePath?: string }
+        options?: { envFilePath?: string; signal?: AbortSignal }
     ): Promise<string> {
         this.logInfo(
             `Executing Docker Compose command: ${command}${service ? ` for service: ${service}` : ''}`
         )
 
         // Check if Docker daemon is running first
-        await this.ensureDockerRunning()
+        await this.ensureDockerRunning(options?.signal)
 
         const composeFile = composeFilePath || path.join(projectPath, 'igrp-compose.yaml')
         const escapedComposeFile = escapePath(composeFile)
@@ -1566,7 +1631,8 @@ export class DockerService {
             for (let attempt = 1; attempt <= attempts; attempt++) {
                 try {
                     const result = await execAsync(fullCommand, {
-                        maxBuffer: 1024 * 1024 * 10
+                        maxBuffer: 1024 * 1024 * 10,
+                        signal: options?.signal
                     })
                     stdout = result.stdout
                     lastError = undefined
@@ -1720,7 +1786,7 @@ export class DockerService {
         }
     }
 
-    async upMainStack(projectPath: string): Promise<void> {
+    async upMainStack(projectPath: string, signal?: AbortSignal): Promise<void> {
         this.logInfo('Starting main stack from igrp-compose.yaml...')
         const composePath = path.join(projectPath, 'igrp-compose.yaml')
         const envPath = path.join(projectPath, '.env')
@@ -1729,7 +1795,8 @@ export class DockerService {
         }
 
         await this.executeComposeCommand(projectPath, 'up -d', undefined, composePath, {
-            envFilePath: envPath
+            envFilePath: envPath,
+            signal
         })
         await this.status(projectPath)
     }
@@ -1805,7 +1872,8 @@ export class DockerService {
                     this.ensureProjectComposeIntegration(
                         workspaceProject.workspacePath,
                         workspaceProjectComposePath,
-                        projectComposeService
+                        projectComposeService,
+                        projectPath
                     )
                     const workspaceEnv = this.parseEnvFile(workspaceEnvPath)
                     const workspaceSlug =
@@ -1917,13 +1985,25 @@ export class DockerService {
     async status(projectPath: string): Promise<ServiceInfo[]> {
         this.logInfo('Checking Docker Compose service status...')
         try {
+            const dockerCheck = await this.checkDockerDaemon()
+            if (!dockerCheck.isRunning) {
+                // When Docker is offline, scanning every compose file and
+                // emitting one warning per service on every 5-second refresh
+                // can overwhelm the renderer. The UI already has the daemon
+                // error; returning no live services is enough until Docker
+                // becomes reachable again.
+                this.logWarn(
+                    `Docker daemon unavailable; skipping compose status: ${dockerCheck.error}`
+                )
+                return []
+            }
+
             const composeFiles = this.getComposeDescriptors(projectPath)
             if (composeFiles.length === 0) {
                 this.logWarn('No compose file found in workspace.')
                 return []
             }
 
-            const dockerCheck = await this.checkDockerDaemon()
             const mergedServices = new Map<string, ServiceInfo>()
 
             for (const composeDescriptor of composeFiles) {
@@ -1959,12 +2039,7 @@ export class DockerService {
                             `Error parsing container info for ${composeDescriptor.key}: ${parseError}`
                         )
                     }
-                } else {
-                    this.logWarn(
-                        `Docker daemon not running, returning error status for ${composeDescriptor.key}`
-                    )
                 }
-
                 for (const serviceName of serviceNames) {
                     const serviceDef = allServices[serviceName]
                     const containerInfo = runningServicesMap.get(serviceName)
@@ -1992,15 +2067,6 @@ export class DockerService {
                         volumes: processedVolumes,
                         composeFile: composeDescriptor.path,
                         stack: composeDescriptor.key
-                    }
-
-                    if (!dockerCheck.isRunning) {
-                        mergedServices.set(serviceName, {
-                            ...baseInfo,
-                            status: 'error',
-                            statusMessage: `Docker daemon not running: ${dockerCheck.error}`
-                        })
-                        continue
                     }
 
                     if (containerInfo) {

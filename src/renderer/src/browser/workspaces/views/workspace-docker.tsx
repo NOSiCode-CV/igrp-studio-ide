@@ -300,7 +300,9 @@ export function WorkspaceDocker({ workspace, onStacksChanged }: WorkspaceConfigP
                 <IGRPCardHeader className="compact-card-header gap-2">
                     <div className="flex items-center justify-between gap-3">
                         <div>
-                            <IGRPCardTitle className="text-sm">{t('dockerComposeConfiguration')}</IGRPCardTitle>
+                            <IGRPCardTitle className="text-sm">
+                                {t('dockerComposeConfiguration')}
+                            </IGRPCardTitle>
                             <IGRPCardDescription className="text-[11px] text-slate-500 dark:text-slate-400">
                                 {t('manageComposeFile')}
                             </IGRPCardDescription>
@@ -327,7 +329,11 @@ export function WorkspaceDocker({ workspace, onStacksChanged }: WorkspaceConfigP
                                         <motion.span
                                             layoutId="compose-active-underline"
                                             className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-teal-500"
-                                            transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                                            transition={{
+                                                type: 'spring',
+                                                stiffness: 420,
+                                                damping: 32
+                                            }}
                                         />
                                     ) : null}
                                 </button>
@@ -404,7 +410,8 @@ export function WorkspaceDocker({ workspace, onStacksChanged }: WorkspaceConfigP
 
                 <IGRPCardFooter className="compact-card-footer flex items-center justify-between border-t border-slate-200 pt-3 dark:border-slate-700">
                     <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                        {services.filter((s) => s.status === 'running').length} {t('servicesEnabled')}
+                        {services.filter((s) => s.status === 'running').length}{' '}
+                        {t('servicesEnabled')}
                     </div>
                     <div className="flex gap-2">
                         <Button

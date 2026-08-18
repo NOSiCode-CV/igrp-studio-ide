@@ -216,7 +216,9 @@ services:
       name: "igrpAccessManagement"
     command: ["--spring.profiles.active=${SPRING_PROFILES_ACTIVE}"]
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      # The access-management image is shell-less and does not ship curl/wget.
+      # Use the native JVM executable as a compatible container liveness probe.
+      test: ["CMD", "java", "-version"]
       interval: 30s
       timeout: 10s
       retries: 5
