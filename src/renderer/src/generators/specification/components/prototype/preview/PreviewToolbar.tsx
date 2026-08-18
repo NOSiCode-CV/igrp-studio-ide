@@ -13,10 +13,7 @@ import {
     Tablet
 } from 'lucide-react'
 import type { JSX } from 'react'
-import {
-    MAX_CUSTOM_VIEWPORT,
-    MIN_CUSTOM_VIEWPORT
-} from '../persistence/custom-viewport'
+import { MAX_CUSTOM_VIEWPORT, MIN_CUSTOM_VIEWPORT } from '../persistence/custom-viewport'
 import { DeviceButton } from './DeviceButton'
 import { PagesDropdown } from './PagesDropdown'
 import { PreviewModeButton } from './PreviewModeButton'

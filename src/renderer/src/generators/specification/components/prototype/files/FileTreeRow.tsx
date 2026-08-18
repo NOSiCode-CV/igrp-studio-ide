@@ -1,8 +1,5 @@
 import { cn } from '@renderer/lib/utils'
-import type {
-    FileChangeKind,
-    PrototypeFile
-} from '@renderer/redux/specPrototype/reducer'
+import type { FileChangeKind, PrototypeFile } from '@renderer/redux/specPrototype/reducer'
 import { FileCode, FolderOpen } from 'lucide-react'
 import { useState, type JSX } from 'react'
 import type { TreeNode } from './file-tree'

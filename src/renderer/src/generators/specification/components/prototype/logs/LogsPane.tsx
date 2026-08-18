@@ -2,14 +2,7 @@ import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import type { RootState } from '@renderer/redux'
 import { Copy, Search, Terminal, Trash2 } from 'lucide-react'
-import {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-    type JSX
-} from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type JSX } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { LogFilterButton } from './LogFilterButton'
 import { LogLine } from './LogLine'

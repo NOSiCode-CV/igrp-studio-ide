@@ -1,7 +1,4 @@
-import {
-    pickSkillHints,
-    type InstalledSkillSummary
-} from '../../../hooks/usePrototypeSkills'
+import { pickSkillHints, type InstalledSkillSummary } from '../../../hooks/usePrototypeSkills'
 import { ALWAYS_INJECT_SKILL_SECTIONS, SKILL_BLOCK_MAX_BYTES } from './skill-sections'
 
 /**

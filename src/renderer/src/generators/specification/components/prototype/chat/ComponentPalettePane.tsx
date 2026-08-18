@@ -1,8 +1,5 @@
 import { Input } from '@renderer/components/ui/input'
-import {
-    PaletteComponentCard,
-    useEnginePalette
-} from '@renderer/features/component-palette'
+import { PaletteComponentCard, useEnginePalette } from '@renderer/features/component-palette'
 import { useEngineCatalog } from '@renderer/features/engine-catalog'
 import { Search } from 'lucide-react'
 import { useEffect, useMemo, useState, type JSX } from 'react'

@@ -1,8 +1,5 @@
 import type { RootState } from '@renderer/redux'
-import {
-    loadPrototypeFiles,
-    openPrototypeFile
-} from '@renderer/redux/specPrototype/thunks'
+import { loadPrototypeFiles, openPrototypeFile } from '@renderer/redux/specPrototype/thunks'
 import { RefreshCw } from 'lucide-react'
 import { useMemo, type JSX } from 'react'
 import { useDispatch, useSelector } from 'react-redux'

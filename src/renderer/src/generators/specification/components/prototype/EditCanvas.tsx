@@ -20,11 +20,7 @@
  * pointing its own callbacks at its EditorContext.
  */
 
-import {
-    TreeView,
-    PropsPanel,
-    type TreeCallbacks
-} from '@renderer/features/manifest-tree'
+import { TreeView, PropsPanel, type TreeCallbacks } from '@renderer/features/manifest-tree'
 import { Button } from '@renderer/components/ui/button'
 import { useEngineCatalog } from '@renderer/features/engine-catalog'
 import type { RootState } from '@renderer/redux'
@@ -65,9 +61,7 @@ export const EditCanvas = ({ basePath }: EditCanvasProps): JSX.Element => {
     const saving = useSelector(selectManifestSaving)
     const lastSavedAt = useSelector(selectManifestLastSavedAt)
     const selectedId = useSelector(selectSelectedNodeId)
-    const loadedBasePath = useSelector(
-        (s: RootState) => s.specPrototypeManifest.basePath
-    )
+    const loadedBasePath = useSelector((s: RootState) => s.specPrototypeManifest.basePath)
     const { componentsRegistered } = useEngineCatalog()
 
     // Load the manifest from disk when entering Edit mode (or when basePath
@@ -109,18 +103,14 @@ export const EditCanvas = ({ basePath }: EditCanvasProps): JSX.Element => {
         return () => window.removeEventListener('keydown', onKey)
     }, [dispatch, manifest, selectedId])
 
-    const root =
-        manifest && isStructuredComponent(manifest.components)
-            ? manifest.components
-            : null
+    const root = manifest && isStructuredComponent(manifest.components) ? manifest.components : null
 
     // Bridge the feature-level callbacks to Redux. Each callback is a
     // single dispatch — no async work, no derived state. The slice's
     // reducers handle Immer-style mutations + dirty flag.
     const callbacks = useMemo<TreeCallbacks>(
         () => ({
-            onAdd: (parentId, node, position) =>
-                dispatch(nodeAdded({ parentId, node, position })),
+            onAdd: (parentId, node, position) => dispatch(nodeAdded({ parentId, node, position })),
             onMove: (id, newParentId, position) =>
                 dispatch(nodeMoved({ id, newParentId, position })),
             onRemove: (id) => dispatch(nodeRemoved({ id })),
@@ -183,9 +173,7 @@ export const EditCanvas = ({ basePath }: EditCanvasProps): JSX.Element => {
                             }
                             onUpdate={callbacks.onUpdate}
                             onRemove={callbacks.onRemove}
-                            canDelete={Boolean(
-                                selectedNode && root.id !== selectedNode.id
-                            )}
+                            canDelete={Boolean(selectedNode && root.id !== selectedNode.id)}
                         />
                     </>
                 )}
@@ -261,7 +249,9 @@ const CanvasHeader = ({
                 title="Force save now (overrides the 500ms debounce)"
                 className={cn(
                     'h-7 gap-1 text-[10.5px]',
-                    dirty && !saving && 'border-primary/30 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary'
+                    dirty &&
+                        !saving &&
+                        'border-primary/30 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary'
                 )}
             >
                 <Save size={11} />
@@ -281,9 +271,8 @@ const EmptyState = (): JSX.Element => (
         <div className="max-w-xs space-y-1">
             <p className="text-sm font-medium text-foreground">No page yet</p>
             <p className="text-[11px]">
-                Generate one from the chat first — attach a spec, ask the AI to
-                build a page. The manifest will land here, ready for visual
-                editing.
+                Generate one from the chat first — attach a spec, ask the AI to build a page. The
+                manifest will land here, ready for visual editing.
             </p>
         </div>
     </div>
@@ -295,10 +284,7 @@ function isStructuredComponent(node: unknown): node is StructuredComponent {
     return Boolean(node) && typeof node === 'object' && 'id' in (node as object)
 }
 
-function findNodeById(
-    root: StructuredComponent,
-    id: string
-): StructuredComponent | null {
+function findNodeById(root: StructuredComponent, id: string): StructuredComponent | null {
     if (root.id === id) return root
     if (Array.isArray(root.children)) {
         for (const child of root.children) {

@@ -22,10 +22,7 @@ export const readPersistedAttachedIds = (basePath?: string): string[] => {
     }
 }
 
-export const writePersistedAttachedIds = (
-    basePath: string | undefined,
-    ids: string[]
-): void => {
+export const writePersistedAttachedIds = (basePath: string | undefined, ids: string[]): void => {
     if (!basePath || typeof window === 'undefined') return
     try {
         window.localStorage?.setItem(attachedIdsKey(basePath), JSON.stringify(ids))

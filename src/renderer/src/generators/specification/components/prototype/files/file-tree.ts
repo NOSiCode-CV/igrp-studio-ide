@@ -1,7 +1,4 @@
-import type {
-    FileChangeKind,
-    PrototypeFile
-} from '@renderer/redux/specPrototype/reducer'
+import type { FileChangeKind, PrototypeFile } from '@renderer/redux/specPrototype/reducer'
 
 /**
  * Visual tree node for the Files pane.

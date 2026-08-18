@@ -47,14 +47,7 @@ import {
 } from '@renderer/redux/specPrototype/thunks'
 import { loadManifest } from '@renderer/redux/specPrototypeManifest/thunks'
 import { selectDocNodes, selectSelectedDocId } from '@renderer/redux/specDocs/reducer'
-import {
-    type JSX,
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState
-} from 'react'
+import { type JSX, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector, useStore } from 'react-redux'
 import { Group, Panel, Separator } from 'react-resizable-panels'
 import { AIAssistant, type ChatAttachment } from './shared/AIAssistant'

@@ -797,171 +797,178 @@ export function CloneProjectModal({
                                     {filteredRepos.length > 0 ? (
                                         <ScrollArea className="h-[50vh]">
                                             <div className="divide-y divide-border">
-                                            {filteredRepos.map((repo) => {
-                                                const isSelected = selectedRepoId === repo.id
-                                                const isCloned = clonedRepos.includes(repo.id)
-                                                return (
-                                                    // biome-ignore lint/a11y/useSemanticElements: list item contains nested action buttons; the wrapper can't itself be a <button>
-                                                    <div
-                                                        key={repo.id}
-                                                        role="button"
-                                                        tabIndex={0}
-                                                        onClick={() => setSelectedRepoId(repo.id)}
-                                                        onKeyDown={(e) => {
-                                                            if (
-                                                                e.key === 'Enter' ||
-                                                                e.key === ' '
-                                                            ) {
-                                                                e.preventDefault()
+                                                {filteredRepos.map((repo) => {
+                                                    const isSelected = selectedRepoId === repo.id
+                                                    const isCloned = clonedRepos.includes(repo.id)
+                                                    return (
+                                                        // biome-ignore lint/a11y/useSemanticElements: list item contains nested action buttons; the wrapper can't itself be a <button>
+                                                        <div
+                                                            key={repo.id}
+                                                            role="button"
+                                                            tabIndex={0}
+                                                            onClick={() =>
                                                                 setSelectedRepoId(repo.id)
                                                             }
-                                                        }}
-                                                        className={`w-full group flex items-start gap-3 p-2.5 outline-none transition-colors relative ${
-                                                            isSelected
-                                                                ? 'bg-primary/5 shadow-[inset_0_0_0_1px_rgba(13,148,136,0.1)] z-10'
-                                                                : 'bg-card hover:bg-muted/75'
-                                                        }`}
-                                                    >
-                                                        {isSelected && (
-                                                            <motion.div
-                                                                layoutId="active-bar"
-                                                                className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary"
-                                                                initial={{ opacity: 0 }}
-                                                                animate={{ opacity: 1 }}
-                                                                exit={{ opacity: 0 }}
-                                                            />
-                                                        )}
-
-                                                        <div
-                                                            className={`mt-0.5 w-[28px] h-[28px] rounded border flex items-center justify-center shrink-0 transition-all ${
+                                                            onKeyDown={(e) => {
+                                                                if (
+                                                                    e.key === 'Enter' ||
+                                                                    e.key === ' '
+                                                                ) {
+                                                                    e.preventDefault()
+                                                                    setSelectedRepoId(repo.id)
+                                                                }
+                                                            }}
+                                                            className={`w-full group flex items-start gap-3 p-2.5 outline-none transition-colors relative ${
                                                                 isSelected
-                                                                    ? 'bg-primary border-primary scale-105'
-                                                                    : 'bg-card border-border group-hover:bg-muted'
+                                                                    ? 'bg-primary/5 shadow-[inset_0_0_0_1px_rgba(13,148,136,0.1)] z-10'
+                                                                    : 'bg-card hover:bg-muted/75'
                                                             }`}
                                                         >
-                                                            {repo.platform === 'github' ? (
-                                                                <Github
-                                                                    className={`w-[14px] h-[14px] ${
-                                                                        isSelected
-                                                                            ? 'text-primary-foreground'
-                                                                            : 'text-muted-foreground'
-                                                                    }`}
-                                                                />
-                                                            ) : (
-                                                                <Gitlab
-                                                                    className={`w-[14px] h-[14px] ${
-                                                                        isSelected
-                                                                            ? 'text-primary-foreground'
-                                                                            : 'text-orange-500'
-                                                                    }`}
+                                                            {isSelected && (
+                                                                <motion.div
+                                                                    layoutId="active-bar"
+                                                                    className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary"
+                                                                    initial={{ opacity: 0 }}
+                                                                    animate={{ opacity: 1 }}
+                                                                    exit={{ opacity: 0 }}
                                                                 />
                                                             )}
-                                                        </div>
 
-                                                        <div className="flex-1 min-w-0 space-y-0.5">
-                                                            <div className="flex items-center gap-1.5">
-                                                                <span
-                                                                    className={`text-[11px] font-bold truncate ${
-                                                                        isSelected
-                                                                            ? 'text-primary'
-                                                                            : 'text-foreground'
-                                                                    }`}
-                                                                >
-                                                                    {repo.full_name}
-                                                                </span>
-                                                                {repo.private && (
-                                                                    <Lock
-                                                                        className={`w-[10px] h-[10px] shrink-0 ${
+                                                            <div
+                                                                className={`mt-0.5 w-[28px] h-[28px] rounded border flex items-center justify-center shrink-0 transition-all ${
+                                                                    isSelected
+                                                                        ? 'bg-primary border-primary scale-105'
+                                                                        : 'bg-card border-border group-hover:bg-muted'
+                                                                }`}
+                                                            >
+                                                                {repo.platform === 'github' ? (
+                                                                    <Github
+                                                                        className={`w-[14px] h-[14px] ${
                                                                             isSelected
-                                                                                ? 'text-primary'
+                                                                                ? 'text-primary-foreground'
                                                                                 : 'text-muted-foreground'
                                                                         }`}
                                                                     />
+                                                                ) : (
+                                                                    <Gitlab
+                                                                        className={`w-[14px] h-[14px] ${
+                                                                            isSelected
+                                                                                ? 'text-primary-foreground'
+                                                                                : 'text-orange-500'
+                                                                        }`}
+                                                                    />
                                                                 )}
-                                                                <AnimatePresence>
-                                                                    {isCloned && (
-                                                                        <motion.div
-                                                                            initial={{
-                                                                                scale: 0,
-                                                                                opacity: 0
-                                                                            }}
-                                                                            animate={{
-                                                                                scale: 1,
-                                                                                opacity: 1
-                                                                            }}
-                                                                            className="bg-primary rounded-full p-0.5 scale-75 shrink-0"
-                                                                        >
-                                                                            <Check className="w-[10px] h-[10px] text-primary-foreground stroke-[4px]" />
-                                                                        </motion.div>
-                                                                    )}
-                                                                </AnimatePresence>
                                                             </div>
 
-                                                            {repo.description ? (
-                                                                <p
-                                                                    className={`text-[10px] line-clamp-2 leading-tight ${
+                                                            <div className="flex-1 min-w-0 space-y-0.5">
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <span
+                                                                        className={`text-[11px] font-bold truncate ${
+                                                                            isSelected
+                                                                                ? 'text-primary'
+                                                                                : 'text-foreground'
+                                                                        }`}
+                                                                    >
+                                                                        {repo.full_name}
+                                                                    </span>
+                                                                    {repo.private && (
+                                                                        <Lock
+                                                                            className={`w-[10px] h-[10px] shrink-0 ${
+                                                                                isSelected
+                                                                                    ? 'text-primary'
+                                                                                    : 'text-muted-foreground'
+                                                                            }`}
+                                                                        />
+                                                                    )}
+                                                                    <AnimatePresence>
+                                                                        {isCloned && (
+                                                                            <motion.div
+                                                                                initial={{
+                                                                                    scale: 0,
+                                                                                    opacity: 0
+                                                                                }}
+                                                                                animate={{
+                                                                                    scale: 1,
+                                                                                    opacity: 1
+                                                                                }}
+                                                                                className="bg-primary rounded-full p-0.5 scale-75 shrink-0"
+                                                                            >
+                                                                                <Check className="w-[10px] h-[10px] text-primary-foreground stroke-[4px]" />
+                                                                            </motion.div>
+                                                                        )}
+                                                                    </AnimatePresence>
+                                                                </div>
+
+                                                                {repo.description ? (
+                                                                    <p
+                                                                        className={`text-[10px] line-clamp-2 leading-tight ${
+                                                                            isSelected
+                                                                                ? 'text-primary/80'
+                                                                                : 'text-muted-foreground'
+                                                                        }`}
+                                                                    >
+                                                                        {repo.description}
+                                                                    </p>
+                                                                ) : (
+                                                                    <div className="flex items-center gap-1 text-[10px] italic text-muted-foreground">
+                                                                        <AlertCircle className="w-[10px] h-[10px]" />
+                                                                        No description provided
+                                                                    </div>
+                                                                )}
+
+                                                                <div className="flex items-center gap-3 pt-0.5 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">
+                                                                    {repo.updated_at && (
+                                                                        <div className="flex items-center gap-1">
+                                                                            <Calendar className="w-3 h-3 text-muted-foreground" />
+                                                                            {new Date(
+                                                                                repo.updated_at
+                                                                            ).toLocaleDateString(
+                                                                                undefined,
+                                                                                {
+                                                                                    month: 'short',
+                                                                                    day: 'numeric',
+                                                                                    year: 'numeric'
+                                                                                }
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+                                                                    {(repo as any)
+                                                                        .stargazers_count !==
+                                                                        undefined && (
+                                                                        <div className="flex items-center gap-1">
+                                                                            <Star className="w-3 h-3 text-amber-500 fill-amber-400" />
+                                                                            {
+                                                                                (repo as any)
+                                                                                    .stargazers_count
+                                                                            }
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex items-center gap-1 shrink-0 ml-1.5 self-start pt-0.5">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        window.open(
+                                                                            repo.html_url ||
+                                                                                repo.clone_url,
+                                                                            '_blank'
+                                                                        )
+                                                                    }}
+                                                                    className={`p-1 rounded hover:bg-muted transition-colors ${
                                                                         isSelected
-                                                                            ? 'text-primary/80'
-                                                                            : 'text-muted-foreground'
+                                                                            ? 'text-primary'
+                                                                            : 'text-muted-foreground hover:text-foreground'
                                                                     }`}
                                                                 >
-                                                                    {repo.description}
-                                                                </p>
-                                                            ) : (
-                                                                <div className="flex items-center gap-1 text-[10px] italic text-muted-foreground">
-                                                                    <AlertCircle className="w-[10px] h-[10px]" />
-                                                                    No description provided
-                                                                </div>
-                                                            )}
-
-                                                            <div className="flex items-center gap-3 pt-0.5 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">
-                                                                {repo.updated_at && (
-                                                                    <div className="flex items-center gap-1">
-                                                                        <Calendar className="w-3 h-3 text-muted-foreground" />
-                                                                        {new Date(
-                                                                            repo.updated_at
-                                                                        ).toLocaleDateString(
-                                                                            undefined,
-                                                                            {
-                                                                                month: 'short',
-                                                                                day: 'numeric',
-                                                                                year: 'numeric'
-                                                                            }
-                                                                        )}
-                                                                    </div>
-                                                                )}
-                                                                {(repo as any).stargazers_count !== undefined && (
-                                                                    <div className="flex items-center gap-1">
-                                                                        <Star className="w-3 h-3 text-amber-500 fill-amber-400" />
-                                                                        {(repo as any).stargazers_count}
-                                                                    </div>
-                                                                )}
+                                                                    <ExternalLink className="w-[14px] h-[14px]" />
+                                                                </button>
                                                             </div>
                                                         </div>
-
-                                                        <div className="flex items-center gap-1 shrink-0 ml-1.5 self-start pt-0.5">
-                                                            <button
-                                                                type="button"
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation()
-                                                                    window.open(
-                                                                        repo.html_url ||
-                                                                            repo.clone_url,
-                                                                        '_blank'
-                                                                    )
-                                                                }}
-                                                                className={`p-1 rounded hover:bg-muted transition-colors ${
-                                                                    isSelected
-                                                                        ? 'text-primary'
-                                                                        : 'text-muted-foreground hover:text-foreground'
-                                                                }`}
-                                                            >
-                                                                <ExternalLink className="w-[14px] h-[14px]" />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            })}
+                                                    )
+                                                })}
                                             </div>
                                         </ScrollArea>
                                     ) : (
