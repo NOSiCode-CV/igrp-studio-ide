@@ -114,6 +114,11 @@ const DEFAULT_MAIN_COMPOSE = 'igrp-compose.yaml'
 const DEFAULT_NGINX_CONF = 'nginx.conf'
 const DEFAULT_MONITORING_COMPOSE = path.join('monitoring', 'igrp-monitoring-compose.yaml')
 const DEFAULT_PROCESS_COMPOSE = path.join('process', 'igrp-process-compose.yaml')
+// Workspace creation must remain usable when Docker is unavailable or when the
+// first image pull takes longer than the UI flow should block. Stack startup is
+// best-effort bootstrap work; the workspace itself is still valid and can be
+// started later from the workspace controls.
+const WORKSPACE_BOOTSTRAP_TIMEOUT_MS = 15_000
 const DEFAULT_MONITORING_SOURCE_COMPOSE = path.join(
     DEFAULT_STACK_TEMPLATE_DIR,
     'monitoring',
@@ -124,6 +129,48 @@ const DEFAULT_PROCESS_SOURCE_COMPOSE = path.join(
     'process',
     'igrp-process-compose.yaml'
 )
+
+/**
+ * Resolve a project entry persisted by the workspace engine.
+ *
+ * The engine's managed-project contract stores a relative `basePath` and the
+ * Studio historically resolved that to `<workspace>/projects/<name>`. A
+ * linked import needs one additional, explicit field so reopening a workspace
+ * can find the existing project without copying it. `projectPath` is the
+ * extension used for that purpose; `path` and `config.projectPath` are
+ * accepted as compatibility aliases for older/importer-produced metadata.
+ */
+function resolveWorkspaceProjectPath(workspacePath: string, projectConfig: any): {
+    projectPath: string
+    linked: boolean
+} {
+    const linkedCandidate =
+        projectConfig?.projectPath ?? projectConfig?.path ?? projectConfig?.config?.projectPath
+
+    if (typeof linkedCandidate === 'string' && linkedCandidate.trim()) {
+        const normalizedCandidate = linkedCandidate.trim()
+        return {
+            projectPath: path.isAbsolute(normalizedCandidate)
+                ? path.normalize(normalizedCandidate)
+                : path.resolve(workspacePath, normalizedCandidate),
+            linked: true
+        }
+    }
+
+    const projectName = projectConfig?.config?.name || projectConfig?.basePath || 'Unnamed Project'
+    return {
+        projectPath: path.join(workspacePath, 'projects', projectName),
+        linked: false
+    }
+}
+
+function descriptorPathForProject(projectPath: string): string | undefined {
+    const candidates = [
+        path.join(projectPath, '.igrpstudio', 'baseApi.json'),
+        path.join(projectPath, '.igrpstudio', 'baseApp.json')
+    ]
+    return candidates.find((candidate) => fs.existsSync(candidate))
+}
 
 export class WorkspaceRepository {
     private readonly defaultNginxHostPort = 2575
@@ -554,6 +601,48 @@ export class WorkspaceRepository {
         }
     }
 
+    private async normalizeAccessManagementHealthcheck(
+        composePath: string,
+        workspaceSlug: string
+    ): Promise<void> {
+        if (!fs.existsSync(composePath)) return
+
+        const lines = (await readFile(composePath, 'utf8')).split('\n')
+        const accessServiceName = `${workspaceSlug}-access-management`
+        let inAccessManagementService = false
+        let changed = false
+
+        for (let index = 0; index < lines.length; index += 1) {
+            const serviceMatch = lines[index].match(/^\s{2}([a-zA-Z0-9_-]+):\s*$/)
+            if (serviceMatch) {
+                inAccessManagementService = serviceMatch[1] === accessServiceName
+            }
+
+            if (!inAccessManagementService) continue
+
+            if (
+                lines[index].includes(
+                    'test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]'
+                )
+            ) {
+                lines[index] = lines[index].replace(
+                    'test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]',
+                    'test: ["CMD", "java", "-version"]'
+                )
+                changed = true
+            }
+
+            if (lines[index].trim() === 'start_period: 120s') {
+                lines[index] = lines[index].replace('start_period: 120s', 'start_period: 30s')
+                changed = true
+            }
+        }
+
+        if (changed) {
+            await writeFile(composePath, lines.join('\n'), 'utf8')
+        }
+    }
+
     private async ensureMainStackFromTemplate(
         workspace: IWorkspace,
         bootstrapResult: WorkspaceBootstrapResult
@@ -583,6 +672,7 @@ export class WorkspaceRepository {
             ])
         }
         await this.ensureHostGatewayAliasesForSlug(targetCompose, workspace.slug)
+        await this.normalizeAccessManagementHealthcheck(targetCompose, workspace.slug)
 
         const sourceEnv = path.join(templateRootPath, '.env')
         const targetEnv = path.join(workspace.path, '.env')
@@ -758,8 +848,25 @@ export class WorkspaceRepository {
         }
 
         if (normalizedOptions.autoStartStack) {
+            const bootstrapAbortController = new AbortController()
+            let bootstrapTimer: ReturnType<typeof setTimeout> | undefined
             try {
-                await dockerService.upMainStack(newWorkspace.path)
+                await Promise.race([
+                    dockerService.upMainStack(
+                        newWorkspace.path,
+                        bootstrapAbortController.signal
+                    ),
+                    new Promise<never>((_, reject) => {
+                        bootstrapTimer = setTimeout(() => {
+                            bootstrapAbortController.abort()
+                            reject(
+                                new Error(
+                                    `Docker stack startup exceeded ${WORKSPACE_BOOTSTRAP_TIMEOUT_MS / 1000}s; the workspace was created and startup can be retried later.`
+                                )
+                            )
+                        }, WORKSPACE_BOOTSTRAP_TIMEOUT_MS)
+                    })
+                ])
                 bootstrapResult.stackStarted = true
             } catch (error) {
                 bootstrapResult.errors.push(
@@ -767,13 +874,16 @@ export class WorkspaceRepository {
                         ? error.message
                         : 'Failed to start igrp stack automatically.'
                 )
+            } finally {
+                if (bootstrapTimer) clearTimeout(bootstrapTimer)
+                if (!bootstrapResult.stackStarted) bootstrapAbortController.abort()
             }
         }
 
         await this.saveData(data)
 
         return {
-            ...newWorkspace,
+            ...this.withDatabaseName(newWorkspace),
             bootstrap: bootstrapResult
         }
     }
@@ -802,11 +912,7 @@ export class WorkspaceRepository {
             throw new Error(`Workspace ${workspaceId} not found`)
         }
 
-        await this.copyOptionalStacksFromTemplate(
-            workspace,
-            normalizedOptions,
-            bootstrapResult
-        )
+        await this.copyOptionalStacksFromTemplate(workspace, normalizedOptions, bootstrapResult)
 
         if (
             normalizedOptions.installMonitoringStack &&
@@ -890,7 +996,7 @@ export class WorkspaceRepository {
         data.workspaces[index] = updatedWorkspace
 
         await this.saveData(data)
-        return updatedWorkspace
+        return this.withDatabaseName(updatedWorkspace)
     }
 
     async deleteWorkspace(id: string): Promise<void> {
@@ -967,8 +1073,6 @@ export class WorkspaceRepository {
             updatedAt: new Date().toISOString()
         }
 
-        await this.addProjectToStudioWorkspace(workspace, newProject, false)
-
         // .NET Wave 10: `@igrp/dotnet-engine` emits the workspace deployment
         // files (`igrp-compose-<name>.yaml` + `.igrp.<name>.env`) and wires the
         // CI `REGISTRY_PROJECT` only when it receives the workspace slug. The
@@ -979,14 +1083,57 @@ export class WorkspaceRepository {
             newProject.config = { ...(newProject.config ?? {}), workspaceSlug: workspace.slug }
         }
 
+        // Generate the project FIRST, register it in the workspace only after
+        // generation succeeded. The previous order (workspace entry → engine)
+        // left a ghost project behind whenever the engine rejected the config:
+        // the sidebar showed a clickable project with no `.igrpstudio/
+        // baseApi.json`, so every artifact operation (addModule/addModel/…)
+        // failed on getBaseApiConfig with ENOENT.
         const engine = EngineFactory.getEngine(project.framework)
         await engine.createProject(newProject, project.path)
 
-        workspace.projects = workspace.projects || []
-        workspace.projects.push(newProject)
-        workspace.updatedAt = new Date().toISOString()
+        // Backend engines gate every subsequent operation on this file. If an
+        // engine ever "succeeds" without writing it, fail here — before any
+        // workspace state exists — instead of creating a project that breaks
+        // on first use.
+        if (project.framework === 'springboot' || project.framework === 'dotnet') {
+            const baseApiPath = path.join(project.path, '.igrpstudio', 'baseApi.json')
+            if (!fs.existsSync(baseApiPath)) {
+                throw new Error(
+                    `Project generation finished but "${baseApiPath}" was not written by the ${project.framework} engine. ` +
+                        `The project was NOT added to the workspace. Check the engine output and try again.`
+                )
+            }
+        }
 
-        await this.saveData(data)
+        try {
+            await this.addProjectToStudioWorkspace(workspace, newProject, false)
+
+            workspace.projects = workspace.projects || []
+            workspace.projects.push(newProject)
+            workspace.updatedAt = new Date().toISOString()
+
+            await this.saveData(data)
+        } catch (registrationError) {
+            // Roll back the generated files so a retry doesn't trip the
+            // "directory already exists and is not empty" guard above. Safe to
+            // remove recursively: that same guard proved the target was absent
+            // or empty before generation, so everything under it is engine
+            // output from this call.
+            try {
+                if (nextProjectPath && fs.existsSync(nextProjectPath)) {
+                    fs.rmSync(nextProjectPath, { recursive: true, force: true })
+                }
+            } catch (cleanupError) {
+                console.warn(
+                    `[workspace] Rollback of generated project at ${nextProjectPath} failed: ${
+                        cleanupError instanceof Error ? cleanupError.message : cleanupError
+                    }`
+                )
+            }
+            throw registrationError
+        }
+
         return newProject
     }
 
@@ -1031,6 +1178,10 @@ export class WorkspaceRepository {
                 await addProjectToWorkspace(workspaceConfig, workspacePath)
             }
 
+            if (newProject.storageMode === 'linked') {
+                await this.persistLinkedProjectPathInWorkspaceJson(workspace, newProject)
+            }
+
             // WORKAROUND: `@igrp/igrp-studio-nextjs-engine`'s
             // `addProjectToWorkspace` has no `'dotnet'` branch and silently
             // skips .NET projects, so the workspace's `igrp-compose.yaml`
@@ -1058,14 +1209,13 @@ export class WorkspaceRepository {
                 // source-of-truth) with `dependsOn: []`. Mirror what Spring
                 // gets so the Studio UI shows the dependency and any future
                 // compose regeneration carries it across.
-                await this.setDotnetProjectDependsOnInWorkspaceJson(
-                    newProject,
-                    workspace
-                ).catch((err) => {
-                    console.warn(
-                        `[workspace] Failed to set dependsOn on .NET project in workspace.json: ${err?.message ?? err}`
-                    )
-                })
+                await this.setDotnetProjectDependsOnInWorkspaceJson(newProject, workspace).catch(
+                    (err) => {
+                        console.warn(
+                            `[workspace] Failed to set dependsOn on .NET project in workspace.json: ${err?.message ?? err}`
+                        )
+                    }
+                )
             }
         } else {
             console.log(`Project "${config.name}" already exists in workspace. Skipping addition.`)
@@ -1079,6 +1229,52 @@ export class WorkspaceRepository {
                 )
             }
         }
+    }
+
+    /**
+     * Persist the source path of an imported project in the workspace
+     * descriptor. The path is metadata only: the importer never copies or
+     * regenerates the linked project. This makes a linked project survive a
+     * fresh Studio process, where the local workspace registry is not yet
+     * populated.
+     */
+    private async persistLinkedProjectPathInWorkspaceJson(
+        workspace: IWorkspace,
+        project: ProjectData
+    ): Promise<void> {
+        const jsonPath = path.join(workspace.path, '.igrpstudio', 'workspace.json')
+        const raw = await readFile(jsonPath, 'utf8')
+        const workspaceConfig = JSON.parse(raw)
+
+        if (!Array.isArray(workspaceConfig.projects)) {
+            workspaceConfig.projects = []
+        }
+
+        let projectEntry = workspaceConfig.projects.find(
+            (entry: any) =>
+                entry?.config?.id === project.id || entry?.config?.name === project.config?.name
+        )
+
+        if (!projectEntry) {
+            projectEntry = {
+                id: workspace.id,
+                config: {
+                    ...project.config,
+                    id: project.id,
+                    name: project.name,
+                    type: project.framework
+                },
+                basePath: path.basename(project.path),
+                environments: [],
+                ports: { internal: 0, external: 0 },
+                dependsOn: []
+            }
+            workspaceConfig.projects.push(projectEntry)
+        }
+
+        projectEntry.projectPath = path.resolve(project.path)
+        projectEntry.storageMode = 'linked'
+        await writeFile(jsonPath, JSON.stringify(workspaceConfig, null, 2), 'utf8')
     }
 
     /**
@@ -1272,23 +1468,60 @@ export class WorkspaceRepository {
                 config: project || {}
             }
 
-            workspace.projects?.push(updatedProject as ProjectData)
-
-            workspace.updatedAt = new Date().toISOString()
-
             const storageMode = updates.storageMode ?? 'managed'
             updatedProject.storageMode = storageMode
 
+            // Register the source in the descriptor before adding it to the
+            // local registry. `addProjectToStudioWorkspace` uses the local
+            // list to detect duplicates; pushing first made every linked
+            // import look like an existing project and skipped persistence.
             await this.addProjectToStudioWorkspace(
                 workspace,
                 updatedProject,
                 storageMode === 'managed'
             )
 
+            workspace.projects?.push(updatedProject as ProjectData)
+            workspace.updatedAt = new Date().toISOString()
+
             foundProject = updatedProject
         }
 
         await this.saveData(data)
+
+        // Project Settings are edited through the same updateProject path as
+        // workspace metadata. Persist generator-owned fields back to the
+        // linked engine descriptor as well; otherwise the renderer can show a
+        // new option while generators still read the stale baseApi.json.
+        if (updates.config && foundProject?.path) {
+            const descriptorPath = descriptorPathForProject(foundProject.path)
+            if (descriptorPath) {
+                const descriptor = JSON.parse(await readFile(descriptorPath, 'utf8')) as Record<
+                    string,
+                    unknown
+                >
+                const config = updates.config as Record<string, unknown>
+                const workspaceOnlyKeys = new Set([
+                    'id',
+                    'name',
+                    'path',
+                    'projectPath',
+                    'workspaceId',
+                    'framework',
+                    'type'
+                ])
+                const generatorConfig = Object.fromEntries(
+                    Object.entries(config).filter(([key, value]) => {
+                        return !workspaceOnlyKeys.has(key) && value !== undefined
+                    })
+                )
+                await writeFile(
+                    descriptorPath,
+                    JSON.stringify({ ...descriptor, ...generatorConfig }, null, 2),
+                    'utf8'
+                )
+            }
+        }
 
         return foundProject
     }
@@ -1473,7 +1706,8 @@ export class WorkspaceRepository {
     // Query Methods
     async getWorkspace(id: string): Promise<IWorkspace | undefined> {
         const data = await this.loadData()
-        return data.workspaces.find((w) => w.id === id)
+        const ws = data.workspaces.find((w) => w.id === id)
+        return ws ? this.withDatabaseName(ws) : undefined
     }
 
     async getProject(id: string): Promise<ProjectData | undefined> {
@@ -1487,7 +1721,29 @@ export class WorkspaceRepository {
 
     async listWorkspaces(): Promise<IWorkspace[]> {
         const { workspaces } = await this.loadData()
-        return workspaces
+        return workspaces.map((ws) => this.withDatabaseName(ws))
+    }
+
+    private withDatabaseName(ws: IWorkspace): IWorkspace {
+        return { ...ws, databaseName: this.readWorkspaceDatabaseName(ws.path) }
+    }
+
+    private readWorkspaceDatabaseName(workspacePath: string): string | undefined {
+        if (!workspacePath) return undefined
+        const envPath = path.join(workspacePath, '.env')
+        if (!fs.existsSync(envPath)) return undefined
+        try {
+            const lines = fs.readFileSync(envPath, 'utf8').split('\n')
+            for (const line of lines) {
+                const trimmed = line.trim()
+                if (trimmed.startsWith('IGRP_DATABASE_NAME=')) {
+                    return trimmed.slice('IGRP_DATABASE_NAME='.length).trim() || undefined
+                }
+            }
+        } catch {
+            // ignore — non-critical, workspace card just shows nothing
+        }
+        return undefined
     }
 
     async listProjects(workspaceId: string): Promise<ProjectData[]> {
@@ -1569,23 +1825,66 @@ export class WorkspaceRepository {
             if (workspaceConfig.projects && Array.isArray(workspaceConfig.projects)) {
                 for (const projectConfig of workspaceConfig.projects) {
                     try {
+                        const { projectPath, linked } = resolveWorkspaceProjectPath(
+                            workspacePath,
+                            projectConfig
+                        )
+                        const descriptorPath = descriptorPathForProject(projectPath)
+
+                        if (linked) {
+                            if (!fs.existsSync(projectPath)) {
+                                throw new Error(
+                                    `Linked project path does not exist: ${projectPath}`
+                                )
+                            }
+                            if (!descriptorPath) {
+                                throw new Error(
+                                    `Linked project is missing .igrpstudio/baseApi.json or baseApp.json: ${projectPath}`
+                                )
+                            }
+                        }
+
+                        const descriptor = descriptorPath
+                            ? JSON.parse(await readFile(descriptorPath, 'utf8'))
+                            : {}
+                        const projectDataConfig = projectConfig.config || descriptor
+                        const framework =
+                            projectDataConfig.type || descriptor.type || 'nextjs'
+                        const isFrontend =
+                            projectDataConfig.type === 'frontend' ||
+                            descriptorPath?.endsWith('baseApp.json')
+
                         const updatedProject: ProjectData = {
-                            id: uuidv4(),
-                            name: projectConfig?.config?.name || 'Unnamed Project',
-                            path: `${workspacePath}/projects/${projectConfig?.config?.name}`,
-                            type:
-                                projectConfig.config?.type === 'frontend' ? 'frontend' : 'backend',
-                            framework: projectConfig.config?.type || 'nextjs',
+                            id: projectDataConfig.id || projectConfig.id || uuidv4(),
+                            name:
+                                projectDataConfig.name ||
+                                descriptor.name ||
+                                descriptor.apiName ||
+                                descriptor.appName ||
+                                path.basename(projectPath),
+                            path: projectPath,
+                            type: isFrontend ? 'frontend' : 'backend',
+                            framework,
                             workspaceId: newWorkspace.id,
-                            config: projectConfig.config || {},
-                            themeColor: projectConfig.config?.themeColor || '#000000',
-                            icon: projectConfig.config?.icon || '',
+                            config: projectDataConfig,
+                            service: projectConfig.service,
+                            storageMode: projectConfig.storageMode || (linked ? 'linked' : 'managed'),
+                            dependsOn: projectConfig.dependsOn,
+                            themeColor: projectDataConfig.themeColor || '#000000',
+                            icon: projectDataConfig.icon || '',
                             createdAt: projectConfig.createdAt || new Date().toISOString(),
                             updatedAt: new Date().toISOString()
                         }
                         // Push project to workspace
                         newWorkspace.projects?.push(updatedProject as ProjectData)
                     } catch (error) {
+                        const hasLinkedPath =
+                            typeof projectConfig?.projectPath === 'string' ||
+                            typeof projectConfig?.path === 'string' ||
+                            typeof projectConfig?.config?.projectPath === 'string'
+                        if (hasLinkedPath) {
+                            throw error
+                        }
                         console.warn(`Failed to load project ${projectConfig.name}:`, error)
                     }
                 }
@@ -1596,10 +1895,11 @@ export class WorkspaceRepository {
             data.workspaces.push(newWorkspace)
             await this.saveData(data)
 
-            return newWorkspace
+            return this.withDatabaseName(newWorkspace)
         } catch (error) {
             console.error('Failed to parse workspace configuration:', error)
-            throw new Error('Invalid workspace configuration file')
+            const detail = error instanceof Error ? `: ${error.message}` : ''
+            throw new Error(`Invalid workspace configuration file${detail}`)
         }
     }
 
