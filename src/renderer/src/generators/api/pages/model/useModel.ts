@@ -92,7 +92,7 @@ export const useModel = ({
             t
         })
         setTableColumns(res)
-    }, [selectors, formik.values])
+    }, [selectors, formik.values, models])
 
     useEffect(() => {
         const load = async () => {
@@ -162,6 +162,14 @@ export const useModel = ({
                 return
             }
 
+            // A newly-created schema has no metadata file yet, so getJsonData
+            // returns null. Relation cleanup is still valid for that first save
+            // (there are no previous relations), but must receive an empty
+            // model-shaped value instead of dereferencing null.
+            await removeStaleRelationReferences(
+                currentData ?? ({ attributes: [] } as unknown as ModelConfig),
+                values
+            )
             await createRelationReference(values)
             dispatch(onSetChangeStatus(true))
             showSuccessToast(t('createdSuccess', { name: t('model'), value: values.name }))
@@ -176,19 +184,136 @@ export const useModel = ({
         handleSave()
     }, [KeyboardKey.save])
 
+    const removeStaleRelationReferences = async (
+        previousValues: ModelConfig,
+        values: ModelConfig
+    ) => {
+        const previousRelations = (previousValues.attributes ?? []).filter(
+            (attribute: any) =>
+                attribute.type === 'relation' &&
+                attribute.relation?.cardinality === 'twoWay' &&
+                attribute.relation?.mappedBy
+        )
+
+        for (const attribute of previousRelations) {
+            const relation = attribute.relation as {
+                entity: string
+                mappedBy: string
+            }
+            const stillExists = (values.attributes ?? []).some(
+                (currentAttribute: any) =>
+                    currentAttribute.type === 'relation' &&
+                    currentAttribute.name === attribute.name &&
+                    currentAttribute.relation?.entity === relation.entity &&
+                    currentAttribute.relation?.mappedBy === relation.mappedBy
+            )
+
+            if (stillExists) continue
+
+            const schemaRef = findModelsByName(relation.entity)
+            if (!schemaRef) continue
+
+            try {
+                const modelData = await window.api.getJsonContent(schemaRef.path || '')
+                const existingRefs = Array.isArray(modelData.relationReference)
+                    ? modelData.relationReference
+                    : []
+                const updatedReferences = existingRefs.filter(
+                    (existingRef: any) =>
+                        !(
+                            existingRef.entity === previousValues.name &&
+                            existingRef.fieldName === relation.mappedBy &&
+                            existingRef.mappedBy === attribute.name
+                        )
+                )
+
+                if (updatedReferences.length === existingRefs.length) continue
+
+                const { error } = await window.engine.createModel(
+                    { ...modelData, relationReference: updatedReferences },
+                    framework,
+                    basePath
+                )
+
+                if (error) showErrorToast(error)
+            } catch (error) {
+                console.error('Failed to remove stale relation reference:', error)
+            }
+        }
+
+        // A relation can already have been removed in an earlier save. Sweep
+        // the module's generated inverse references as well so a stale
+        // reference cannot survive in the project metadata and be regenerated
+        // as a phantom navigation.
+        for (const schema of models) {
+            const schemaPath = (schema as any).path
+            if (!schemaPath) continue
+
+            try {
+                const modelData = await window.api.getJsonContent(schemaPath)
+                const existingRefs = Array.isArray(modelData.relationReference)
+                    ? modelData.relationReference
+                    : []
+                const updatedReferences = existingRefs.filter((existingRef: any) => {
+                    if (existingRef.entity !== values.name) return true
+
+                    return (values.attributes ?? []).some(
+                        (attribute: any) =>
+                            attribute.type === 'relation' &&
+                            attribute.name === existingRef.mappedBy &&
+                            attribute.relation?.entity === modelData.name &&
+                            attribute.relation?.mappedBy === existingRef.fieldName
+                    )
+                })
+
+                if (updatedReferences.length === existingRefs.length) continue
+
+                const { error } = await window.engine.createModel(
+                    { ...modelData, relationReference: updatedReferences },
+                    framework,
+                    basePath
+                )
+
+                if (error) showErrorToast(error)
+            } catch (error) {
+                console.error('Failed to sweep stale relation references:', error)
+            }
+        }
+    }
+
     const createRelationReference = async (values: ModelConfig) => {
         const { attributes, name: entityFrom } = values
 
-        await Promise.all(
-            attributes.map(async (attribute) => {
+        // Each createModel call regenerates shared project artefacts. Running
+        // relation-reference updates concurrently lets those writes race on
+        // the same temporary/output files (especially on synced folders).
+        // Keep the updates ordered so one generated project is written at a
+        // time.
+        for (const attribute of attributes) {
                 const { relation, type, name } = attribute
-                if (type !== 'relation' || !relation) return
+                if (type !== 'relation' || !relation) continue
 
                 const { mappedBy, fetchType, type: relationType, entity, cardinality } = relation
-                if (cardinality !== 'twoWay') return
+                // A relation reference is only needed when the target model
+                // owns the inverse navigation. An owning-side relation with
+                // no mappedBy has no inverse field to synthesize.
+                if (cardinality !== 'twoWay' || !mappedBy) continue
+
+                // A generated relation reference represents the inverse side of
+                // the relation declared on the current model.  In particular,
+                // a ManyToOne owner must expose a OneToMany collection on the
+                // target model (and vice versa).  Reusing relationType here
+                // makes the target navigation scalar and produces the wrong
+                // EF relationship shape.
+                const inverseRelationType =
+                    relationType === 'OneToMany'
+                        ? 'ManyToOne'
+                        : relationType === 'ManyToOne'
+                          ? 'OneToMany'
+                          : relationType
 
                 const relationReference: RelationReference = {
-                    type: relationType,
+                    type: inverseRelationType,
                     entity: entityFrom,
                     fetchType,
                     fieldName: mappedBy,
@@ -197,7 +322,7 @@ export const useModel = ({
                 }
 
                 const schemaRef = findModelsByName(entity)
-                if (!schemaRef) return
+                if (!schemaRef) continue
 
                 try {
                     const modelData = await window.api.getJsonContent(schemaRef?.path || '')
@@ -210,6 +335,39 @@ export const useModel = ({
                             existingRef.fieldName === relationReference.fieldName &&
                             existingRef.mappedBy === relationReference.mappedBy
                     )
+
+                    // When both sides are explicitly modeled, the target's
+                    // relation attribute already emits the navigation and EF
+                    // mapping. Keeping a generated relationReference as well
+                    // would emit the same FK property/navigation twice. Drop
+                    // a stale reference if one exists, but do not add a new
+                    // duplicate reference.
+                    const targetHasExplicitRelation = (modelData.attributes ?? []).some(
+                        (targetAttribute: any) =>
+                            targetAttribute.type === 'relation' &&
+                            targetAttribute.name === relationReference.fieldName &&
+                            targetAttribute.relation?.entity === entityFrom
+                    )
+
+                    if (targetHasExplicitRelation) {
+                        if (existingIndex < 0) continue
+
+                        const updatedModel = {
+                            ...modelData,
+                            relationReference: existingRefs.filter(
+                                (_: any, index: number) => index !== existingIndex
+                            )
+                        }
+
+                        const { error } = await window.engine.createModel(
+                            updatedModel,
+                            framework,
+                            basePath
+                        )
+
+                        if (error) showErrorToast(error)
+                        continue
+                    }
 
                     let updatedReferences
                     if (existingIndex >= 0) {
@@ -237,8 +395,7 @@ export const useModel = ({
                 } catch (error) {
                     console.error('Failed to fetch JSON content:', error)
                 }
-            })
-        )
+        }
     }
 
     const deleteModel = async (): Promise<void> => {
