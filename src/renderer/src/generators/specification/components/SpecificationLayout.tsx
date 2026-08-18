@@ -1,3 +1,4 @@
+import { TabProvider } from '@renderer/components/navigation/TabContext'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@renderer/components/ui/sidebar'
 import {
     Tooltip,
@@ -5,14 +6,13 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@renderer/components/ui/tooltip'
-import { TabProvider } from '@renderer/components/navigation/TabContext'
 import { DataModelsPanel } from '@renderer/features/data-models'
 import { cn } from '@renderer/lib/utils'
 import { loadDocs } from '@renderer/redux/specDocs/thunks'
 import { loadKB } from '@renderer/redux/specKB/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
 import { Database, FileText, Home, Library, Sparkles, Workflow } from 'lucide-react'
-import { useEffect, type JSX } from 'react'
+import { type JSX, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { ProcessesSelectionProvider } from '../../../features/bpmn/components/ProcessesSelection'
@@ -196,7 +196,7 @@ const SpecificationLayout = ({ basePath, currentItem }: SpecificationLayoutProps
                                         href={ROUTES.HOME}
                                         onClick={(e) => {
                                             e.preventDefault()
-                                            navigate(ROUTES.HOME)
+                                            navigate(ROUTES.PATH_IDE_INITIAL_SCREEN)
                                         }}
                                     >
                                         <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">

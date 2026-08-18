@@ -44,7 +44,7 @@ const othersRoutes = [
         component: <IDEInitialScreen />
     },
     {
-        path: ROUTES.HOME,
+        path: ROUTES.PATH_HOME,
         component: <IDEInitialScreen />
     },
     {
