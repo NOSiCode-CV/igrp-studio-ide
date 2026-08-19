@@ -2,7 +2,18 @@ import { ENV_TYPES } from '@renderer/constants/appConstants'
 import { toGraphQLOperationPayload } from './mapper'
 import type { GraphQLOperationFormValues, GraphQLPersistedOperation } from './types'
 
-const PRIMITIVES = new Set(['Boolean', 'String', 'Int', 'Float', 'ID', 'boolean', 'string', 'int', 'float', 'id'])
+const PRIMITIVES = new Set([
+    'Boolean',
+    'String',
+    'Int',
+    'Float',
+    'ID',
+    'boolean',
+    'string',
+    'int',
+    'float',
+    'id'
+])
 
 const GQL_TO_ENGINE_TYPE: Record<string, string> = {
     Int: 'integer',
@@ -19,6 +30,28 @@ const GQL_TO_ENGINE_TYPE: Record<string, string> = {
 
 const primitiveObjectType = (engineType: ENV_TYPES) =>
     engineType === ENV_TYPES.DOTNET ? ('dotnet' as const) : ('java' as const)
+
+const describeEngineError = (error: unknown): string => {
+    if (error instanceof Error) return error.message
+    if (typeof error === 'string') return error
+    if (error && typeof error === 'object' && 'message' in error) {
+        return String((error as { message?: unknown }).message)
+    }
+    try {
+        return JSON.stringify(error)
+    } catch {
+        return String(error)
+    }
+}
+
+const assertEngineGenerationSucceeded = (response: unknown): void => {
+    if (!response || typeof response !== 'object' || !('error' in response)) return
+
+    const error = (response as { error?: unknown }).error
+    if (error) {
+        throw new Error(`GraphQL generation failed: ${describeEngineError(error)}`)
+    }
+}
 
 function buildSchemaConfig(
     moduleName: string,
@@ -116,7 +149,10 @@ export const GraphQLService = {
             operationId,
             payload
         )
-        if (payload.operationType !== 'subscription') {
+        // Engine-backed operations are imported read-only for schema fields;
+        // their comment/enabled metadata is persisted in Horizon's manifest
+        // overlay without regenerating the canonical engine descriptor.
+        if (payload.operationType !== 'subscription' && !operationId.startsWith('engine:')) {
             await GraphQLService.generateSchemas(basePath, moduleName, engineType)
         }
         return result
@@ -136,19 +172,44 @@ export const GraphQLService = {
         }
     },
 
-    async generateSchemas(basePath: string, moduleName: string, engineType: ENV_TYPES): Promise<void> {
+    async generateSchemas(
+        basePath: string,
+        moduleName: string,
+        engineType: ENV_TYPES
+    ): Promise<void> {
         const allOps = await window.graphql.listGraphQLOperations(basePath, moduleName)
-        const uniqueReturnTypes = new Set(
-            allOps
-                .filter(
-                    (op) => op.operationType !== 'subscription' && !PRIMITIVES.has(op.returnType)
-                )
-                .map((op) => op.returnType)
-        )
+        const nonSubOps = allOps.filter((op) => op.operationType !== 'subscription')
+
+        // Scalar-return ops (e.g. `deleteAuthor(id): Boolean`, `count: Int`) have
+        // no object return type to key a schema on. The engine generators require
+        // a schema `typeRef` that resolves to a real graphqlType, so a synthetic
+        // scalar schema is rejected at generation ("typeRef not found" — verified
+        // against @igrp/dotnet-engine). Rather than silently DROPPING such ops
+        // (they would never be generated, with no signal) or emitting a schema the
+        // engine rejects, fail CLEARLY so the user can attach an object return
+        // type or remove the operation.
+        const scalarOps = nonSubOps.filter((op) => PRIMITIVES.has(op.returnType))
+        if (scalarOps.length > 0) {
+            const names = scalarOps
+                .map((op) => `${op.operationType} "${op.name}" → ${op.returnType}`)
+                .join(', ')
+            throw new Error(
+                `Cannot generate a GraphQL schema for scalar-return operation(s): ${names}. ` +
+                    `A schema must reference an object return type; give the operation an ` +
+                    `object return type or remove it, then regenerate.`
+            )
+        }
+
+        const uniqueReturnTypes = new Set(nonSubOps.map((op) => op.returnType))
         for (const schemaName of uniqueReturnTypes) {
             const schemaOps = allOps.filter((op) => op.returnType === schemaName)
             const config = buildSchemaConfig(moduleName, schemaName, schemaOps, engineType)
-            await window.engine.createGraphqlSchema(config, engineType, basePath)
+            const response = await window.engine.createGraphqlSchema(config, engineType, basePath)
+            // IPC handlers return structured `{ error }` responses instead of throwing across
+            // the preload boundary. Do not show a false "saved successfully" toast when the
+            // engine rejected the schema (for example, a model was selected without a
+            // graphqlType manifest).
+            assertEngineGenerationSucceeded(response)
         }
     },
 

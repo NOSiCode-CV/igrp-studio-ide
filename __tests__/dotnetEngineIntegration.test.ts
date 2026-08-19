@@ -84,7 +84,7 @@ describe('Studio ↔ dotnet-engine integration', () => {
         await engine.createProject(project, outDir)
 
         // Baseline files emitted by `newApi`
-        expect(fs.existsSync(path.join(outDir, 'Program.cs'))).toBe(true)
+        expect(fs.existsSync(path.join(outDir, 'src', 'Program.cs'))).toBe(true)
         expect(fs.existsSync(path.join(outDir, '.igrpstudio', 'baseApi.json'))).toBe(true)
 
         // BaseApiConfig persisted with the derived apiName + pinned IGRP core
@@ -186,28 +186,26 @@ describe('Studio ↔ dotnet-engine integration', () => {
 
         await engine.createController(customController, outDir)
 
-        // CRUD runtime emitted for Department (technical style: Controllers/Department/...)
-        expect(
-            fs.existsSync(path.join(outDir, 'Controllers', 'Department', 'DepartmentController.cs'))
-        ).toBe(true)
-        expect(fs.existsSync(path.join(outDir, 'Services', 'DepartmentService.cs'))).toBe(true)
-        expect(fs.existsSync(path.join(outDir, 'Models', 'Department', 'Department.cs'))).toBe(true)
+        // CRUD runtime emitted for Department (technical style: src/Controllers/Department/...)
         expect(
             fs.existsSync(
-                path.join(
-                    outDir,
-                    'Data',
-                    'Repositories',
-                    'Department',
-                    'DepartmentCrudRepository.cs'
-                )
+                path.join(outDir, 'src', 'Controllers', 'Department', 'DepartmentController.cs')
+            )
+        ).toBe(true)
+        expect(fs.existsSync(path.join(outDir, 'src', 'Services', 'DepartmentCrud.cs'))).toBe(true)
+        expect(
+            fs.existsSync(path.join(outDir, 'src', 'Models', 'Department', 'Department.cs'))
+        ).toBe(true)
+        expect(
+            fs.existsSync(
+                path.join(outDir, 'src', 'Data', 'Configurations', 'DepartmentConfiguration.cs')
             )
         ).toBe(true)
 
         // Custom controller emitted for HealthCheck
         expect(
             fs.existsSync(
-                path.join(outDir, 'Controllers', 'HealthCheck', 'HealthCheckController.cs')
+                path.join(outDir, 'src', 'Controllers', 'HealthCheck', 'HealthCheckController.cs')
             )
         ).toBe(true)
     })
@@ -339,10 +337,14 @@ describe('Studio ↔ dotnet-engine integration', () => {
         expect(fs.existsSync(path.join(modelsDir, 'Department.json'))).toBe(true)
         expect(fs.existsSync(path.join(modelsDir, 'Employee.json'))).toBe(true)
         expect(
-            fs.existsSync(path.join(outDir, 'Controllers', 'Department', 'DepartmentController.cs'))
+            fs.existsSync(
+                path.join(outDir, 'src', 'Controllers', 'Department', 'DepartmentController.cs')
+            )
         ).toBe(true)
         expect(
-            fs.existsSync(path.join(outDir, 'Controllers', 'Employee', 'EmployeeController.cs'))
+            fs.existsSync(
+                path.join(outDir, 'src', 'Controllers', 'Employee', 'EmployeeController.cs')
+            )
         ).toBe(true)
 
         // Same id + different name stays a RENAME: Employee's artifacts are
@@ -352,10 +354,14 @@ describe('Studio ↔ dotnet-engine integration', () => {
         expect(fs.existsSync(path.join(modelsDir, 'Employee.json'))).toBe(false)
         expect(fs.existsSync(path.join(modelsDir, 'Customer.json'))).toBe(true)
         expect(
-            fs.existsSync(path.join(outDir, 'Controllers', 'Employee', 'EmployeeController.cs'))
+            fs.existsSync(
+                path.join(outDir, 'src', 'Controllers', 'Employee', 'EmployeeController.cs')
+            )
         ).toBe(false)
         expect(
-            fs.existsSync(path.join(outDir, 'Controllers', 'Customer', 'CustomerController.cs'))
+            fs.existsSync(
+                path.join(outDir, 'src', 'Controllers', 'Customer', 'CustomerController.cs')
+            )
         ).toBe(true)
         // Department untouched throughout.
         expect(fs.existsSync(path.join(modelsDir, 'Department.json'))).toBe(true)
@@ -421,7 +427,13 @@ describe('Studio ↔ dotnet-engine integration', () => {
         // headers. It also applies the Spring springdoc.swagger-ui defaults
         // (operationsSorter consumed, try-it-out on, docs collapsed).
         const bootstrap = fs.readFileSync(
-            path.join(outDir, 'Infrastructure', 'Pipeline', 'IgrpApplicationBuilderExtensions.cs'),
+            path.join(
+                outDir,
+                'src',
+                'Infrastructure',
+                'Pipeline',
+                'IgrpApplicationBuilderExtensions.cs'
+            ),
             'utf-8'
         )
         expect(bootstrap).toContain('IGRP_GATEWAY_PATH')

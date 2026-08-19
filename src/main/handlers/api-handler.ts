@@ -21,6 +21,14 @@ handleWithCustomErrors(
     }
 )
 
+handleWithCustomErrors(
+    EVENTS.ENGINE.CREATE_PERMISSION,
+    async (_event, data: any, engineType: string, basePath: string) => {
+        const engine = EngineFactory.getEngine(engineType)
+        await engine.createPermission?.(data, basePath)
+    }
+)
+
 handleWithCustomErrors(EVENTS.NEXT.CONVERT_JSON_SCHEMA, async (_event, schema: unknown) => {
     // Engine ships fs-extra as a transitive dep, so importing it
     // from the renderer breaks Vite. Keep the conversion main-side

@@ -65,6 +65,33 @@ export const getInitialValues = (framework: ENV_TYPES): DTOConfig => ({
  */
 export const initialValues: DTOConfig = getInitialValues(ENV_TYPES.SPRING)
 
+/**
+ * Translate the shared DTO editor state to the selected engine's payload.
+ * Django's native schema uses `fields` and rejects the renderer-only
+ * `attributes`, template, validation, and editor identity fields.
+ */
+export const buildDtoEngineConfig = (
+    values: DTOConfig,
+    framework: ENV_TYPES,
+    module: string,
+    id?: string
+): Record<string, any> => {
+    if (framework === ENV_TYPES.DJANGO) {
+        return {
+            type: 'dto',
+            name: values.name,
+            module: module || 'shared',
+            fields: values.attributes || []
+        }
+    }
+
+    return {
+        ...values,
+        module: module || 'shared',
+        id
+    }
+}
+
 export const TabList = [{ label: 'Fields', value: 'attributes' }]
 
 export const TemplateOptions = [

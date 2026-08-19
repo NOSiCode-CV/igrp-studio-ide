@@ -5,7 +5,12 @@ import type {
     ResponseConfig
 } from '@igrp/igrp-studio-springboot-engine/types'
 import { OPTION_TYPE } from '@renderer/constants/appConstants'
-import { extractByType, getMergedFiles, getModulesArray } from '@renderer/generators/api/helpers'
+import {
+    extractByType,
+    getAllModels,
+    getMergedFiles,
+    getModulesArray
+} from '@renderer/generators/api/helpers'
 import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { createSelector } from '@reduxjs/toolkit'
@@ -31,7 +36,7 @@ const makeSelectProperties = (module?: string) =>
         return {
             basePath: studio.basePath,
             config: studio.config,
-            models: extractByType(moduleData, OPTION_TYPE.MODELS),
+            models: getAllModels(studio.filesThree),
             dto: extractByType(moduleData, OPTION_TYPE.DATA_OBJECTS),
             controllers: extractByType(moduleData, OPTION_TYPE.CONTROLLERS),
             responses: extractByType(moduleData, OPTION_TYPE.RESPONSES),

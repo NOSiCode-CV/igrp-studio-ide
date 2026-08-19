@@ -1,4 +1,4 @@
-import { access, mkdtemp, readFile, rm } from 'fs/promises'
+import { access, mkdtemp, readFile, rm, writeFile } from 'fs/promises'
 import * as os from 'os'
 import * as path from 'path'
 import type { GraphQLManifest, GraphQLOperation } from '../src/main/types/graphql-manifest.types'
@@ -382,6 +382,82 @@ describe('graphql manifest service', () => {
 
             expect(operations).toHaveLength(2)
             expect(operations.map((operation) => operation.id)).toEqual([first.id, second.id])
+        })
+
+        it('exposes existing engine operations when the Studio manifest is empty', async () => {
+            await saveManifest(projectPath, 'catalogo', createManifest())
+            const graphqlDir = path.join(projectPath, '.igrpstudio', 'catalogo', 'graphql')
+            await writeFile(
+                path.join(graphqlDir, 'Cars.json'),
+                JSON.stringify({
+                    type: 'graphql',
+                    module: 'catalogo',
+                    queries: [
+                        {
+                            name: 'listCars',
+                            returnTypeRef: 'Carro',
+                            collectionType: 'list'
+                        }
+                    ],
+                    mutations: [
+                        {
+                            name: 'createCar',
+                            inputRef: 'CreateCarInput',
+                            returnTypeRef: 'Carro'
+                        }
+                    ]
+                })
+            )
+
+            const operations = await listOperations(projectPath, 'catalogo')
+
+            expect(operations.map((operation) => operation.name)).toEqual([
+                'listCars',
+                'createCar'
+            ])
+            expect(operations[0]).toMatchObject({
+                operationType: 'query',
+                returnType: 'Carro',
+                returnMode: 'list'
+            })
+            expect(operations[1]).toMatchObject({
+                operationType: 'mutation',
+                inputType: 'CreateCarInput',
+                returnType: 'Carro'
+            })
+        })
+
+        it('persists metadata for an existing engine operation in the Studio overlay', async () => {
+            await saveManifest(projectPath, 'catalogo', createManifest())
+            const graphqlDir = path.join(projectPath, '.igrpstudio', 'catalogo', 'graphql')
+            await writeFile(
+                path.join(graphqlDir, 'Cars.json'),
+                JSON.stringify({
+                    type: 'graphql',
+                    module: 'catalogo',
+                    queries: [
+                        {
+                            name: 'listCars',
+                            returnTypeRef: 'Carro',
+                            collectionType: 'list'
+                        }
+                    ]
+                })
+            )
+
+            const updated = await updateOperation(
+                projectPath,
+                'catalogo',
+                'engine:catalogo:Cars.json:query:listCars',
+                { comment: 'NhaFlow showcase query' }
+            )
+
+            expect(updated).toMatchObject({
+                id: 'engine:catalogo:Cars.json:query:listCars',
+                name: 'listCars',
+                comment: 'NhaFlow showcase query'
+            })
+            await expect(listOperations(projectPath, 'catalogo')).resolves.toEqual([updated])
         })
     })
 })

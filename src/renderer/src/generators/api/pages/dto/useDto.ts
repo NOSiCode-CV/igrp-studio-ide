@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import type { IColumnsTabelProps } from '../../types/Interfaces'
-import { getInitialValues, getTablesColumns } from './config'
+import { buildDtoEngineConfig, getInitialValues, getTablesColumns } from './config'
 import { useDtoValidation } from './validation'
 
 export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; currentItem: any }) => {
@@ -108,11 +108,12 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
 
     const handleSave = async (newValues: DTOConfig): Promise<void> => {
         try {
-            const config: any = {
-                ...newValues,
-                module: currentItem?.module || 'shared',
-                id: id || currentItem.id
-            }
+            const config = buildDtoEngineConfig(
+                newValues,
+                framework,
+                currentItem?.module || 'shared',
+                id || currentItem.id
+            )
 
             // `extends` (Java/Spring class inheritance) and `readOnly` are
             // Spring-only fields on DTOConfig. The dotnet-engine schema is

@@ -5,7 +5,7 @@ import type {
     GraphQLOperationType,
     GraphQLReturnMode
 } from '../../types/graphql-manifest.types'
-import { mkdir, readFile, rename, writeFile } from 'fs/promises'
+import { mkdir, readFile, readdir, rename, writeFile } from 'fs/promises'
 import * as path from 'path'
 import { randomUUID } from 'crypto'
 
@@ -23,6 +23,92 @@ function resolveManifestPath(basePath: string, moduleName: string) {
         manifestDir,
         manifestPath
     }
+}
+
+/**
+ * Read operations emitted by a backend engine descriptor when the Studio
+ * manifest predates the project import. Engine descriptors are the source of
+ * truth for generated projects; the Horizon manifest is the source of truth
+ * for operations created in the Studio UI. Showing both keeps an existing
+ * project navigable without rewriting or flattening its generated metadata.
+ */
+async function loadEngineDescriptorOperations(
+    basePath: string,
+    moduleName: string
+): Promise<GraphQLOperation[]> {
+    const graphqlDir = path.join(basePath, '.igrpstudio', moduleName, 'graphql')
+    let entries: string[]
+    try {
+        entries = await readdir(graphqlDir)
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') return []
+        throw error
+    }
+
+    const operations: GraphQLOperation[] = []
+    const operationGroups: Array<{
+        key: GraphQLOperationType
+        field: 'queries' | 'mutations' | 'subscriptions'
+    }> = [
+        { key: 'query', field: 'queries' },
+        { key: 'mutation', field: 'mutations' },
+        { key: 'subscription', field: 'subscriptions' }
+    ]
+
+    for (const entry of entries) {
+        if (entry === 'graphql.json' || !entry.endsWith('.json')) continue
+
+        let descriptor: any
+        try {
+            descriptor = JSON.parse(
+                await readFile(path.join(graphqlDir, entry), 'utf8')
+            )
+        } catch {
+            continue
+        }
+
+        for (const group of operationGroups) {
+            const definitions = Array.isArray(descriptor?.[group.field])
+                ? descriptor[group.field]
+                : []
+
+            for (const definition of definitions) {
+                if (!definition?.name) continue
+
+                const argumentsSource = definition.args ?? definition.params ?? []
+                const args = Array.isArray(argumentsSource)
+                    ? argumentsSource
+                          .filter((argument: any) => argument?.name && argument?.type)
+                          .map((argument: any) => ({
+                              name: argument.name,
+                              type: argument.type,
+                              required:
+                                  typeof argument.required === 'boolean'
+                                      ? argument.required
+                                      : argument.nullable !== true
+                          }))
+                    : []
+                const returnType = definition.returnTypeRef || definition.return?.type
+                if (!returnType) continue
+
+                operations.push({
+                    id: `engine:${moduleName}:${entry}:${group.key}:${definition.name}`,
+                    operationType: group.key,
+                    name: definition.name,
+                    args,
+                    inputType: definition.inputRef,
+                    returnType,
+                    returnMode:
+                        definition.collectionType === 'list' || definition.returnMode === 'list'
+                            ? 'list'
+                            : 'single',
+                    enabled: true
+                })
+            }
+        }
+    }
+
+    return operations
 }
 
 export function validateManifest(manifest: unknown): GraphQLManifestValidationError[] {
@@ -352,6 +438,39 @@ export async function updateOperation(
     )
 
     if (operationIndex === -1) {
+        // Existing engine descriptors are surfaced with a stable `engine:` id.
+        // Allow the Studio to persist presentation metadata for those imported
+        // operations in its manifest overlay while keeping the generated engine
+        // descriptor authoritative for schema/role changes.
+        if (operationId.startsWith('engine:')) {
+            const discovered = await loadEngineDescriptorOperations(basePath, moduleName)
+            const sourceOperation = discovered.find((operation) => operation.id === operationId)
+
+            if (!sourceOperation) {
+                throw new Error(`GraphQL operation "${operationId}" not found`)
+            }
+
+            const metadataOperation: GraphQLOperation = {
+                ...sourceOperation,
+                ...(typeof updates.comment === 'string' ? { comment: updates.comment } : {}),
+                ...(typeof updates.enabled === 'boolean' ? { enabled: updates.enabled } : {})
+            }
+            const manifestNames = new Set(manifest.operations.map((operation) => operation.name))
+            const importedOperations = discovered.filter(
+                (operation) => !manifestNames.has(operation.name)
+            )
+            const overlayOperations = importedOperations.map((operation) =>
+                operation.id === operationId ? metadataOperation : operation
+            )
+            const updatedManifest: GraphQLManifest = {
+                ...manifest,
+                operations: [...manifest.operations, ...overlayOperations]
+            }
+
+            await saveManifest(basePath, moduleName, updatedManifest)
+            return metadataOperation
+        }
+
         throw new Error(`GraphQL operation "${operationId}" not found`)
     }
 
@@ -363,6 +482,12 @@ export async function updateOperation(
 
     const operations = [...manifest.operations]
     operations[operationIndex] = updatedOperation
+
+    if (operationId.startsWith('engine:')) {
+        const discovered = await loadEngineDescriptorOperations(basePath, moduleName)
+        const manifestNames = new Set(operations.map((operation) => operation.name))
+        operations.push(...discovered.filter((operation) => !manifestNames.has(operation.name)))
+    }
 
     const updatedManifest: GraphQLManifest = {
         ...manifest,
@@ -399,5 +524,11 @@ export async function listOperations(
     moduleName: string
 ): Promise<GraphQLOperation[]> {
     const manifest = await loadManifest(basePath, moduleName)
-    return manifest.operations
+    const discovered = await loadEngineDescriptorOperations(basePath, moduleName)
+    const manifestNames = new Set(manifest.operations.map((operation) => operation.name))
+
+    return [
+        ...manifest.operations,
+        ...discovered.filter((operation) => !manifestNames.has(operation.name))
+    ]
 }

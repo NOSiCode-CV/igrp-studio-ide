@@ -122,8 +122,19 @@ export const extractByType = (moduleData: any, type: string) => {
     // Retorna os arquivos do tipo ou um array vazio
     return typeFiles ? typeFiles.children : []
 }
+
+/**
+ * Relation editors need to resolve targets outside the source module. Keep
+ * the module-local merge for ordinary module views, but expose every persisted
+ * model when building cross-module relation choices.
+ */
+export const getAllModels = (filesThree: FileTree[] = []) =>
+    filesThree.flatMap((moduleData) => extractByType(moduleData, 'models'))
+
 const mergeFilesByType = (files: FileTree[]): FileTree[] => {
     const mergedFilesMap: Record<string, FileTree> = {}
+    const childKey = (child: FileTree): string =>
+        `${child.name}-${child.content?.module ?? ''}`
 
     // Helper function to recursively merge children
     const mergeChildren = (existingChildren: FileTree[], newChildren: FileTree[]): FileTree[] => {
@@ -131,12 +142,12 @@ const mergeFilesByType = (files: FileTree[]): FileTree[] => {
 
         // Add existing children to the map
         existingChildren.forEach((child: any) => {
-            childrenMap[`${child.name}-${child.content.module}`] = child
+            childrenMap[childKey(child)] = child
         })
 
         // Merge new children into the map
         newChildren.forEach((child: any) => {
-            const name = `${child.name}-${child.content.module}`
+            const name = childKey(child)
             if (childrenMap[name]) {
                 // If the child already exists, merge their children recursively
                 if (child.children && childrenMap[name].children) {
