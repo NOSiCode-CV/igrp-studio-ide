@@ -1313,15 +1313,16 @@
     handlebars "^4.7.8"
     uuid "^9.0.0"
 
-"@igrp/dotnet-engine@file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-alpha.1-local.tgz":
-  version "0.1.0-alpha.1"
-  resolved "file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-alpha.1-local.tgz#0874b7b084c1f622d76b03fd5fc55abd3dafea6f"
+"@igrp/dotnet-engine@file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-rc.9-final-20260819.tgz":
+  version "0.1.0-rc.9"
+  resolved "file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-rc.9-final-20260819.tgz#3e4f949429dd8a14bf5a9f76631318b97a20a3c3"
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
     ajv-formats "^3.0.1"
     fast-xml-parser "^4.3.2"
     fs-extra "^11.2.0"
+    handlebars "^4.7.8"
     sass "^1.77.8"
     source-map-loader "^5.0.0"
     ts-loader "^9.5.1"
