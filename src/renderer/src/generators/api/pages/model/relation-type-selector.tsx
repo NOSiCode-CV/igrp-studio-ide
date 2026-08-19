@@ -84,6 +84,7 @@ export function RelationTypeSelector({ value, onChange }: RelationTypeSelectorPr
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
+                                        type="button"
                                         size="icon"
                                         onClick={() => onChange(type)}
                                         className={cn(

@@ -54,6 +54,11 @@ export function RelationPopover({ field, options, changeValue }: RelationPopover
     const fetchTypes = formatMethods(['lazy', 'eager'])
     const cascadeTypes = formatMethods(['ALL', 'PERSIST', 'MERGE', 'REMOVE', 'REFRESH', 'DETACH'])
 
+    const relationTargetLabel =
+        field.relation?.referencedColumnName ||
+        (field.relation?.mappedBy ? `mappedBy ${field.relation.mappedBy}` : '') ||
+        (field.relation?.joinTable ? `join ${field.relation.joinTable}` : '')
+
     useEffect(() => {
         if (localRelation.entity) {
             const model = models.find((t: any) => t.content.name === localRelation.entity)
@@ -104,7 +109,7 @@ export function RelationPopover({ field, options, changeValue }: RelationPopover
             <PopoverTrigger asChild>
                 <Button variant="link">
                     {field.relation && field.relation.entity
-                        ? `${field.relation.type} ${t('with')} ${field.relation.entity}.${field.relation.referencedColumnName}`
+                        ? `${field.relation.type} ${t('with')} ${field.relation.entity}${relationTargetLabel ? `.${relationTargetLabel}` : ''}`
                         : t('setRelation')}
                     <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
@@ -147,7 +152,7 @@ export function RelationPopover({ field, options, changeValue }: RelationPopover
                                                         joinTable: e.target.value
                                                     })
                                                 }
-                                                placeholder={t(t('entityNamePlaceholder'))}
+                                                placeholder={t('entityNamePlaceholder')}
                                             />
                                             <p className="text-xs text-muted-foreground ">
                                                 {t('entityNameDescription')}
@@ -186,16 +191,27 @@ export function RelationPopover({ field, options, changeValue }: RelationPopover
                                     <Label htmlFor="referencedColumnName">
                                         {t('referenceColumnName')}
                                     </Label>
-                                    <IGRPCombobox
-                                        value={localRelation.referencedColumnName}
-                                        options={availableColumns}
-                                        onChange={(value) =>
+                                    <select
+                                        id="referencedColumnName"
+                                        value={localRelation.referencedColumnName || ''}
+                                        onChange={(event) =>
                                             setLocalRelation({
                                                 ...localRelation,
-                                                referencedColumnName: value as string
+                                                referencedColumnName: event.target.value
                                             })
                                         }
-                                    />
+                                        disabled={availableColumns.length === 0}
+                                        className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30"
+                                    >
+                                        <option value="" disabled>
+                                            {t('selectType')}
+                                        </option>
+                                        {availableColumns.map((column) => (
+                                            <option key={column.value} value={column.value}>
+                                                {column.label}
+                                            </option>
+                                        ))}
+                                    </select>
                                     {errors.referencedColumnName && (
                                         <p className="text-xs text-red-500">
                                             {errors.referencedColumnName}
@@ -219,7 +235,7 @@ export function RelationPopover({ field, options, changeValue }: RelationPopover
                                                     inverseJoinColumn: e.target.value
                                                 })
                                             }
-                                            placeholder={t(t('fieldNamePlaceholder'))}
+                                            placeholder={t('fieldNamePlaceholder')}
                                         />
                                     </div>
                                 )}
@@ -240,7 +256,7 @@ export function RelationPopover({ field, options, changeValue }: RelationPopover
                                                     mappedBy: e.target.value
                                                 })
                                             }
-                                            placeholder={t(t('fieldNamePlaceholder'))}
+                                            placeholder={t('fieldNamePlaceholder')}
                                         />
                                     </div>
                                 )}
