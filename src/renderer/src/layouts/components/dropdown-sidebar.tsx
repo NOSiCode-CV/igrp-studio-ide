@@ -12,6 +12,7 @@ import { useFramework } from '@renderer/hooks/use-framework'
 import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
+import { getId } from '@renderer/utils'
 import { Ellipsis, Plus } from 'lucide-react'
 import React, { lazy, Suspense, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -315,7 +316,15 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                                 <DropdownMenuItem
                                     onClick={(e) => {
                                         e.stopPropagation()
-                                        const actionId = `new-action-${menuItem.id || menuItem.label}`
+                                        // The id must be unique PER CLICK, not per tree node.
+                                        // It becomes the tab id AND the artifact id the editor
+                                        // sends to the engine on save (`currentItem.id`). With
+                                        // the old deterministic `new-action-<node>` form, two
+                                        // schemas created from the same module node shared an
+                                        // id, and the engine — which treats "same id, new
+                                        // name" as a rename — deleted the first model (and its
+                                        // CRUD surface) when the second was saved.
+                                        const actionId = `new-action-${menuItem.id || menuItem.label}-${getId()}`
                                         handleDropdownClick({
                                             ...menuItem,
                                             ...menu,

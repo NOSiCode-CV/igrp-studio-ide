@@ -267,7 +267,15 @@ const useNavdata = (filesThree: FileTree[]) => {
 
                 if (folder.children) {
                     folder.children.forEach((child: any) => {
-                        if (!Object.values(OPTION_TYPE).includes(child.name as OptionType)) {
+                        const isRootSecurityDescriptor =
+                            (folder.name === 'authorization' || folder.name === 'permissions') &&
+                            !child.isDirectory &&
+                            child.name.endsWith('.json')
+
+                        if (
+                            !Object.values(OPTION_TYPE).includes(child.name as OptionType) &&
+                            !isRootSecurityDescriptor
+                        ) {
                             return
                         }
 
@@ -313,20 +321,22 @@ const useNavdata = (filesThree: FileTree[]) => {
 
                             folderMenuItem.subItems?.push(subFolderMenuItem)
                         } else {
-                            const dropdownMenus = getDropdownSubMenus(folder.content?.type)
+                            const dropdownMenus = getDropdownSubMenus(child.content?.type)
 
                             const fileMenuItem: MenuItem = {
-                                id: folder.content?.id || folder.name,
-                                label: folder.name,
-                                path: folder.path,
+                                id: child.content?.id || child.name,
+                                label: child.content?.name || child.name,
+                                path: child.path,
                                 module: folder.name,
-                                type: folder.content?.type,
+                                type: isRootSecurityDescriptor
+                                    ? OPTION_TYPE.FILE_THREE
+                                    : child.content?.type,
                                 link: ROUTES.PATH_PAGE_BUILDER_API,
-                                subItems: getSubItems(folder, folder.name),
+                                subItems: getSubItems(child, folder.name),
                                 click: onClickItem,
                                 dropdownclick: onClickItem,
                                 dropdownMenus,
-                                content: folder.content
+                                content: child.content
                             }
                             folderMenuItem.subItems?.push(fileMenuItem)
                         }
