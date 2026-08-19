@@ -186,9 +186,17 @@ export const useModel = ({
         }
     }
 
-    // Keyboard shortcut for save (Ctrl/Cmd + S)
+    // Keyboard shortcut for save (Ctrl/Cmd + S). Routed through
+    // `formik.handleSubmit` — the SAME RHF/Zod-validated path the form's
+    // native submit (Save button) uses — rather than calling `handleSave`
+    // directly. Calling `handleSave` here used to skip validation entirely
+    // (including the uniqueConstraints duplicate-name check), since RHF's
+    // resolver only runs inside `form.handleSubmit(...)`. `handleSubmit`
+    // accepts no event outside a DOM submit and still validates + calls
+    // `handleSave` only when the form is valid, so a valid Ctrl+S save is
+    // unaffected.
     useKeyPress(() => {
-        handleSave()
+        formik.handleSubmit()
     }, [KeyboardKey.save])
 
     const removeStaleRelationReferences = async (
