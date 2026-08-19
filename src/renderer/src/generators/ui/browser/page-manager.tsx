@@ -478,12 +478,12 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                                         <SelectTrigger className="w-[200px]" size="sm">
                                             <FolderKanban className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
                                             <SelectValue
-                                                placeholder={t('filterByGroup', 'Grupo')}
+                                                placeholder={t('filterByGroup')}
                                             />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">
-                                                {t('allGroups', 'Todos os grupos')}
+                                                {t('allGroups')}
                                             </SelectItem>
                                             {availableGroups.map((group) => (
                                                 <SelectItem key={group} value={group}>
@@ -492,7 +492,7 @@ const PageManager = ({ onPageClick }: PageBuilderContentProps): React.JSX.Elemen
                                             ))}
                                             {hasUngrouped && (
                                                 <SelectItem value={UNGROUPED_ROUTE_GROUP}>
-                                                    {t('ungrouped', 'Sem grupo')}
+                                                    {t('ungrouped')}
                                                 </SelectItem>
                                             )}
                                         </SelectContent>

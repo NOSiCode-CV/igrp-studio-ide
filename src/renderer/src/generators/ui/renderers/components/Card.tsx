@@ -6,6 +6,7 @@ import type React from 'react'
 import { useCallback } from 'react'
 import { generateAllClasses } from '../../components/settings/style/utils'
 import { useDroppedComponents } from '../../contexts/EditorContext'
+import { omitInternalProperties } from '../../utils/omitInternalProperties'
 import CardComponent, { type CardComponentProps } from '../CardComponent'
 import BoxWrapper from '../tools/BoxWrapper'
 import TableTool from '../tools/tableTool'
@@ -63,7 +64,7 @@ const IGRPStudioCard: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
         <div className="w-full flex flex-col py-3 space-y-3">
             {components.map((child, index) => {
                 const { properties, style, childProperties } = child
-                const { className, ...args } = properties || {}
+                const { className, ...args } = omitInternalProperties(properties)
 
                 const { className: childClassName } = childProperties || {}
 

@@ -190,7 +190,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                 const { componentName: compName, id } = tableComp
 
                 return (
-                    <>
+                    <Fragment key={tableComp.id}>
                         <TableTool
                             parentComp={comp}
                             comp={tableComp}
@@ -201,7 +201,6 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                             index={index}
                         />
                         <Droppable
-                            key={index}
                             className="bg-card rounded-lg border border-dashed border-gray-400 group/table"
                             component={tableComp}
                             onDrop={onDragEnd}
@@ -209,7 +208,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                         >
                             {renderTableFilters(compName, id)}
                         </Droppable>
-                    </>
+                    </Fragment>
                 )
             })}
 
@@ -217,7 +216,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
             {tableColumns.map((tableComp, index) => {
                 const { componentName: compName, id } = tableComp
                 return (
-                    <>
+                    <Fragment key={tableComp.id}>
                         <TableTool
                             parentComp={comp}
                             comp={tableComp}
@@ -227,7 +226,6 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                             index={index}
                         />
                         <Droppable
-                            key={index}
                             className="group/table min-w-0 max-w-full rounded-lg border border-dashed border-gray-400 bg-card"
                             component={tableComp}
                             onDrop={onDragEnd}
@@ -246,7 +244,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                                 </div>
                             )}
                         </Droppable>
-                    </>
+                    </Fragment>
                 )
             })}
 

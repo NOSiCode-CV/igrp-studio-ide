@@ -44,9 +44,9 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps): JSX.Elem
                 .object({
                     name: z
                         .string()
-                        .min(1, t('fieldRequired', { name: t('State name') }))
+                        .min(1, t('fieldRequired', { name: t('stateName') }))
                         .regex(PATTERNS.SPECIAL_CHARACTERS, t('msgSpecialCharactersRegex')),
-                    type: z.string().min(1, t('fieldRequired', { name: t('State type') })),
+                    type: z.string().min(1, t('fieldRequired', { name: t('stateType') })),
                     defaultValue: z.string().optional()
                 })
                 .passthrough(),
@@ -122,7 +122,7 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps): JSX.Elem
                 </DialogHeader>
                 <form onSubmit={formik.handleSubmit} className="space-y-4">
                     <TextInput
-                        label={t('Name')}
+                        label={t('name')}
                         id="name"
                         placeholder="myState"
                         value={formik.values.name}
@@ -134,7 +134,7 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps): JSX.Elem
                     />
 
                     <SelectInput
-                        label={t('Type')}
+                        label={t('type')}
                         id="type"
                         value={formik.values.type}
                         onChange={(value) => handleTypeChange(value as string)}
@@ -169,7 +169,7 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps): JSX.Elem
                                 id={`isOptional`}
                                 value={formik.values.isOptional}
                                 onChange={(value) => formik.setFieldValue('isOptional', value)}
-                                label="isOptional"
+                                label={t('isOptional')}
                             />
                         </div>
                     </div>
@@ -180,10 +180,10 @@ const StateComponent = ({ open, setOpen, state }: StateComponentProps): JSX.Elem
                     />
 
                     <DialogFooter className="space-x-2">
-                        <DialogClose>Close</DialogClose>
+                        <DialogClose>{t('close')}</DialogClose>
                         <Button type="submit" disabled={formik.isSubmitting}>
                             {formik.isSubmitting && <Loader2 className="animate-spin" />}
-                            Save changes
+                            {t('saveChanges')}
                         </Button>
                     </DialogFooter>
                 </form>

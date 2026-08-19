@@ -17,6 +17,32 @@
 */
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Canvas toolbars: only the deepest hovered BoxWrapper is visible.
+ * Nested Containers used to share `group/row-container`, so one hover
+ * matched every ancestor `group-hover/row-container` via the descendant
+ * combinator. Visibility is CSS `:has()`, not Tailwind groups.
+ *
+ * The hit area sits above the component (`-top-8`) and extends back down
+ * into it (`padding-bottom`) so moving the pointer to Move/Clone/Settings
+ * does not leave `:hover` and hide the toolbar.
+ */
+.igrp-canvas-item > .igrp-canvas-toolbar-hit {
+    opacity: 0;
+    pointer-events: none;
+    padding-bottom: 2rem;
+}
+
+.igrp-canvas-item:hover > .igrp-canvas-toolbar-hit {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.igrp-canvas-item:hover:has(.igrp-canvas-item:hover) > .igrp-canvas-toolbar-hit {
+    opacity: 0;
+    pointer-events: none;
+}
+
 @layer utilities {
     header {
         -webkit-app-region: drag;

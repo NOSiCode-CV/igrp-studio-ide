@@ -9,6 +9,7 @@ import CompTools from './CompTools'
 interface BoxContainerProps {
     group?: string
     className?: string
+    wrapperClassName?: string
     comp: StructuredComponent
     parentComp?: StructuredComponent
     onEdit: () => void
@@ -20,8 +21,8 @@ const BoxWrapper = ({
     comp,
     parentComp,
     children,
-    group,
     className,
+    wrapperClassName,
     onEdit,
     path
 }: BoxContainerProps) => {
@@ -123,23 +124,32 @@ const BoxWrapper = ({
         }
     }
 
+    const toolbarClassName = className
+        ?.split(/\s+/)
+        .filter(
+            (token) => token && !token.startsWith('opacity-') && !token.includes('group-hover')
+        )
+        .join(' ')
+
     return (
-        <div className={cn('relative', group)} id={id}>
+        <div className={cn('igrp-canvas-item relative', wrapperClassName)} id={id}>
             <div
                 className={cn(
-                    `absolute -top-8 right-0 px-2 bg-gray-600 text-white rounded transition-opacity duration-200 shadow-lg z-50`,
-                    className
+                    'igrp-canvas-toolbar-hit absolute -top-8 right-0 z-50',
+                    toolbarClassName
                 )}
             >
-                <CompTools
-                    path={path}
-                    comp={comp}
-                    parentComp={parentComp}
-                    handleClickDeleteComp={onClickDeleteComp}
-                    handleClickBtnEdition={onClickBtnEdition}
-                    handleClickStructComp={onClickStructure}
-                    handleClickCloneComp={onClickCloneComp}
-                />
+                <div className="igrp-canvas-toolbar px-2 bg-gray-600 text-white rounded shadow-lg">
+                    <CompTools
+                        path={path}
+                        comp={comp}
+                        parentComp={parentComp}
+                        handleClickDeleteComp={onClickDeleteComp}
+                        handleClickBtnEdition={onClickBtnEdition}
+                        handleClickStructComp={onClickStructure}
+                        handleClickCloneComp={onClickCloneComp}
+                    />
+                </div>
             </div>
             {children}
         </div>

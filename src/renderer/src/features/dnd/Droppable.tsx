@@ -1,4 +1,4 @@
-import { type DragEvent, type ReactNode, useEffect, useState } from 'react'
+import { type CSSProperties, type DragEvent, type ReactNode, useEffect, useState } from 'react'
 import { cn } from '@renderer/lib/utils'
 import { useDragDrop } from './drag-drop-context'
 import type { DraggableItem, DragEndResult, LayoutMode } from './types'
@@ -19,6 +19,7 @@ export interface DroppableProps<T extends DroppableContainer = DroppableContaine
     layout?: string
     children: ReactNode
     className?: string
+    style?: CSSProperties
     accept?: string[]
     path?: string
     /**
@@ -35,6 +36,7 @@ function Droppable<T extends DroppableContainer = DroppableContainer>({
     component,
     children,
     className,
+    style,
     path,
     emptyState
 }: DroppableProps<T>) {
@@ -113,6 +115,7 @@ function Droppable<T extends DroppableContainer = DroppableContainer>({
             onDragLeave={onDragLeave}
             onDragOverCapture={onDragOverCapture}
             id={componentId}
+            style={style}
             className={cn(
                 'space-y-3 min-h-12 rounded-lg bg-card',
                 Boolean(draggingItem) &&

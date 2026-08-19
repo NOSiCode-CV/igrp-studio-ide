@@ -1,4 +1,4 @@
-import type { DragEvent, ReactNode } from 'react'
+import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import { cn } from '@renderer/lib/utils'
 import { DropZone } from './DropZone'
 import { useDragDrop } from './drag-drop-context'
@@ -8,6 +8,7 @@ export interface DraggableProps<T extends DraggableItem = DraggableItem> {
     index?: number
     dropTargetId?: string
     className?: string
+    style?: CSSProperties
     item: T
     layout?: LayoutMode
     dropZone?: boolean
@@ -27,6 +28,7 @@ function Draggable<T extends DraggableItem = DraggableItem>({
     item,
     dropTargetId,
     className,
+    style,
     index = 0,
     dropZone = true,
     layout = 'vertical',
@@ -86,6 +88,7 @@ function Draggable<T extends DraggableItem = DraggableItem>({
                     : 'border-border',
                 className
             )}
+            style={style}
             id={`drag-${componentId}`}
         >
             {dropZone && (

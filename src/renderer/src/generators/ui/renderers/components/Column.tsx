@@ -5,6 +5,7 @@ import { cn } from '@renderer/lib/utils'
 import type React from 'react'
 import { EmptySlotComponent } from '../../components/EmptySlotComponent'
 import { useDroppedComponents } from '../../contexts/EditorContext'
+import { getCanvasItemSizing } from '../../utils/canvas-item-sizing'
 import { useResponsiveClasses } from '../../utils/layout-mapping'
 import CardComponent, { type CardComponentProps } from '../CardComponent'
 import BoxWrapper from '../tools/BoxWrapper'
@@ -30,6 +31,7 @@ const IGRPStudioColumn: React.FC<CardComponentProps> = ({
         if (children.length === 0) return <EmptySlotComponent />
 
         return children.map((child: StructuredComponent, index: number) => {
+            const sizing = getCanvasItemSizing(child)
             return (
                 <Draggable
                     key={child.id}
@@ -37,6 +39,8 @@ const IGRPStudioColumn: React.FC<CardComponentProps> = ({
                     index={index}
                     dropTargetId={componentId}
                     mode="MOVE"
+                    className={sizing.className}
+                    style={sizing.style}
                 >
                     <BoxWrapper
                         parentComp={comp}
@@ -54,9 +58,15 @@ const IGRPStudioColumn: React.FC<CardComponentProps> = ({
 
     // Gera as classes responsivas usando o hook personalizado
     const { classes: finalClasses } = useResponsiveClasses(variant, 'span', className)
+    const selfSizing = getCanvasItemSizing(comp)
 
     return (
-        <Droppable component={comp} onDrop={onDragEnd} className={cn(finalClasses)}>
+        <Droppable
+            component={comp}
+            onDrop={onDragEnd}
+            className={cn(finalClasses, selfSizing.className)}
+            style={selfSizing.style}
+        >
             {renderComponents()}
         </Droppable>
     )

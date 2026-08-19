@@ -1,5 +1,10 @@
-// utils/tailwindGroups.ts
-
+/**
+ * Named Tailwind groups for canvas hover.
+ *
+ * Do not use `String.includes(componentName)`: `group/row-container` contains
+ * the substring `container`, so nested Containers reused one tag group and
+ * `group-hover/row-container` lit every ancestor toolbar at once.
+ */
 export const getHoverClasses = ({
     group,
     hoverClass,
@@ -9,9 +14,12 @@ export const getHoverClasses = ({
     hoverClass?: string
     componentName: string
 }) => {
-    //RESET Hover if parent is diff current component
-    const _group = group?.includes(componentName) ? group : undefined
-    const _hoverClass = hoverClass?.includes(componentName) ? hoverClass : undefined
+    const suffix = group?.split('/').pop()?.replace(/-child$/, '')
+    const matches = suffix === componentName
 
-    return { group: _group, hoverClass: _hoverClass }
+    return {
+        group: matches ? group : undefined,
+        hoverClass: matches ? hoverClass : undefined
+    }
 }
+

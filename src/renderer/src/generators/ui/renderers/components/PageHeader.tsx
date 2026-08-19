@@ -4,6 +4,7 @@ import Droppable from '@renderer/lib/dnd/Droppable'
 import type { DragEndResult, StructuredComponent } from '@renderer/lib/dnd/types'
 import { cn } from '@renderer/lib/utils'
 import { useDroppedComponents } from '../../contexts/EditorContext'
+import { omitInternalProperties } from '../../utils/omitInternalProperties'
 import CardComponent from '../CardComponent'
 import BoxField from '../tools/BoxFields'
 
@@ -15,7 +16,7 @@ export interface PageHeaderProps {
 
 const IGRPStudioPageHeader: React.FC<PageHeaderProps> = ({ comp, onDragEnd }: PageHeaderProps) => {
     const { id: componentId, children: buttonComponents, componentName, label, properties } = comp
-    const { title } = properties
+    const { title, ...headerProps } = omitInternalProperties(properties)
 
     const { setEditingComponent } = useDroppedComponents()
 
@@ -54,9 +55,9 @@ const IGRPStudioPageHeader: React.FC<PageHeaderProps> = ({ comp, onDragEnd }: Pa
     return (
         <IGRPPageHeader
             title={title || label || componentName}
-            {...properties}
+            {...headerProps}
             showBackButton={false}
-            className='flex-row'
+            className="flex-row"
         >
             <Droppable
                 component={comp}

@@ -6,11 +6,13 @@ import { cn } from '@renderer/lib/utils'
 import { COMPONENT } from '../../ComponentTypes'
 import { useDroppedComponents } from '../../contexts/EditorContext'
 import { getHoverClasses } from '../../utils/tailwindGroups'
+import { omitInternalProperties } from '../../utils/omitInternalProperties'
 import CardComponent, { type CardComponentProps } from '../CardComponent'
 import BoxContainer from '../tools/BoxWrapper'
 
 const IGRPStudioAlert = ({ comp, group, hoverClass, className, onDragEnd }: CardComponentProps) => {
     const { children: components, id: componentId, properties } = comp || {}
+    const alertProps = omitInternalProperties(properties)
 
     const { setEditingComponent } = useDroppedComponents()
 
@@ -34,7 +36,7 @@ const IGRPStudioAlert = ({ comp, group, hoverClass, className, onDragEnd }: Card
 
     return (
         <Droppable onDrop={handleDrop} component={comp} className={cn(className)}>
-            <IGRPAlert {...properties}>
+            <IGRPAlert {...alertProps}>
                 {components &&
                     components.length > 0 &&
                     components.map((comp: StructuredComponent, index: number) => {

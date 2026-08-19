@@ -44,7 +44,6 @@ const IGRPStudioCardDetails: React.FC<CardComponentProps> = ({
                 'overflow-hidden gap-3 animate-fade-in motion-reduce:animate-none',
                 'transition-all duration-200 hover:shadow-lg hover:border-primary/20'
             )}
-            {...properties}
         >
             {(title || description) && (
                 <CardHeader className="pb-4">

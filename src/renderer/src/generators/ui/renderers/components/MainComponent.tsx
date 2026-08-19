@@ -4,6 +4,7 @@ import type { DragEndResult, StructuredComponent, StructuredLayout } from '@rend
 import { cn } from '@renderer/lib/utils'
 import { COMPONENT } from '../../ComponentTypes'
 import { useDroppedComponents } from '../../contexts/EditorContext'
+import { getCanvasItemSizing } from '../../utils/canvas-item-sizing'
 import CardComponent from '../CardComponent'
 import BoxWrapper from '../tools/BoxWrapper'
 import PageTools from '../tools/PageTools'
@@ -34,6 +35,7 @@ const IGRPStudioMainComponent = ({ onDragEnd, component }: PageProps) => {
                 <Droppable onDrop={onDragEnd} component={component}>
                     <div className="overflow-y-auto flex flex-col space-y-6 py-6">
                         {components.map((row, index) => {
+                            const sizing = getCanvasItemSizing(row)
                             return (
                                 <Draggable
                                     key={row.id}
@@ -41,6 +43,8 @@ const IGRPStudioMainComponent = ({ onDragEnd, component }: PageProps) => {
                                     index={index}
                                     dropTargetId={componentId}
                                     mode="MOVE"
+                                    className={sizing.className}
+                                    style={sizing.style}
                                 >
                                     <BoxWrapper
                                         parentComp={component}

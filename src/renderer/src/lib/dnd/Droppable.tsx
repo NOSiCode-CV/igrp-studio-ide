@@ -5,7 +5,7 @@
  * tree-shaped item and any empty-state renderer.
  */
 
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { GenNoInfoComp } from '@renderer/generators/ui/components/GenNoInfoComp'
 import GenericDroppable from '@renderer/features/dnd/Droppable'
 import type { DragEndResult, StructuredComponent } from './types'
@@ -16,6 +16,7 @@ interface DroppableProps {
     layout?: string
     children: ReactNode
     className?: string
+    style?: CSSProperties
     accept?: string[]
     path?: string
 }
@@ -25,6 +26,7 @@ const Droppable = ({
     component,
     children,
     className,
+    style,
     path,
     accept,
     layout
@@ -36,6 +38,7 @@ const Droppable = ({
         accept={accept}
         path={path}
         className={className}
+        style={style}
         emptyState={({ isHovered }) => <GenNoInfoComp isActive={isHovered} />}
     >
         {children}
