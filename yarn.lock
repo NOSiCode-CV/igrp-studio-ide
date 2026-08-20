@@ -1313,9 +1313,9 @@
     handlebars "^4.7.8"
     uuid "^9.0.0"
 
-"@igrp/dotnet-engine@file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-rc.9-final-20260819.tgz":
+"@igrp/dotnet-engine@file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-rc.9-final-20260820.tgz":
   version "0.1.0-rc.9"
-  resolved "file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-rc.9-final-20260819.tgz#3e4f949429dd8a14bf5a9f76631318b97a20a3c3"
+  resolved "file:../../dotnet-engine/igrp-dotnet-engine-0.1.0-rc.9-final-20260820.tgz#8a96817ac1daa6bb0d461eb4446fb1a404d0ce46"
   dependencies:
     ajv "^8.17.1"
     ajv-errors "^3.0.0"
