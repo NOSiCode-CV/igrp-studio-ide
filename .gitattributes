@@ -1,0 +1,14 @@
+# Workspace container assets must keep LF endings.
+#
+# These shell scripts are bind-mounted into Linux containers by the generated
+# workspace compose files (db-init for PostgreSQL/Keycloak, the MinIO
+# entrypoint). The repository stores them with LF, but with core.autocrlf=true
+# a Windows checkout rewrites them to CRLF and the container fails to execute
+# them:
+#
+#   /scripts/init-database.sh: line 2: : not found
+#   /scripts/init-database.sh: set: line 3: illegal option -
+#
+# which makes the *-db-prepare services exit 2 and leaves Keycloak unable to
+# start. Pinning the eol here keeps the checked-out copy executable.
+docker/**/*.sh text eol=lf
