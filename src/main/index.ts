@@ -14,7 +14,6 @@ import {
 } from 'electron'
 import fs from 'fs'
 import * as os from 'os'
-import dns from 'node:dns'
 import path, { join } from 'path'
 import * as pty from 'node-pty'
 import icon from '../../resources/icon.png?asset'
@@ -417,27 +416,13 @@ ipcMain.on('open-external-url', (_event, url) => {
         return
     }
 
-    try {
-        const parsed = new URL(url)
-        const host = parsed.hostname
-        if (host === 'localhost' || host === '127.0.0.1') {
-            shell.openExternal(url)
-            return
-        }
-
-        dns.lookup(host, (err) => {
-            if (!err) {
-                shell.openExternal(url)
-                return
-            }
-
-            const fallback = new URL(url)
-            fallback.hostname = 'localhost'
-            shell.openExternal(fallback.toString())
-        })
-    } catch {
-        shell.openExternal(url)
-    }
+    // Hand the URL straight to the OS. If DNS fails or the host is
+    // unreachable the browser will render its own error page — that's
+    // the right outcome. A previous version rewrote the hostname to
+    // 'localhost' on DNS failure, which silently redirected external
+    // links (e.g. "Get latest version" -> docs3.igrp.cv) to a local
+    // server that usually doesn't exist.
+    shell.openExternal(url)
 })
 
 // In this file you can include the rest of your app"s specific main process
