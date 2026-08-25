@@ -146,7 +146,7 @@ export const GenerateNewStepForm: React.FC<GenerateNewStepFormProps> = ({
                 <div className="space-y-6 py-4">
                     <TextInput
                         id="description"
-                        label={t('Component Description')}
+                        label={t('componentDescription')}
                         onChange={(e) => setDescription(e.target.value)}
                         value={description || ''}
                         placeholder="Enter component description..."
@@ -154,7 +154,7 @@ export const GenerateNewStepForm: React.FC<GenerateNewStepFormProps> = ({
                     />
                     <TextInput
                         id="name"
-                        label={t('Component Name')}
+                        label={t('componentName')}
                         className="col-span-3"
                         onChange={(e) => setComponentName(e.target.value)}
                         value={componentName || ''}

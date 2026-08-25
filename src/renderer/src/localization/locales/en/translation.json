@@ -427,6 +427,7 @@
     "ungrouped": "No group",
     "deprecatedComponent": "Deprecated component",
     "componentName": "Component Name",
+    "componentDescription": "Component Description",
     "terminal": "Terminal",
     "debug": "Debug",
     "navigator": "Navigator",

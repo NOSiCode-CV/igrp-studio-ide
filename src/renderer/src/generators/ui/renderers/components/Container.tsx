@@ -15,7 +15,7 @@ const IGRPStudioContainer = ({
     onDragEnd,
     className
 }: CardComponentProps) => {
-    const { children: components, id: componentId } = comp || {}
+    const { children: components = [], id: componentId } = comp || {}
 
     const { setEditingComponent } = useDroppedComponents()
 

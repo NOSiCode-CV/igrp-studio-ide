@@ -427,6 +427,7 @@
     "ungrouped": "Sem grupo",
     "deprecatedComponent": "Componente obsoleto",
     "componentName": "Nome do Componente",
+    "componentDescription": "Descrição do Componente",
     "terminal": "Terminal",
     "debug": "Depurar",
     "navigator": "Navegador",
