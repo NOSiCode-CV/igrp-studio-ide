@@ -245,7 +245,9 @@ export const useComponents = (): {
                         }
                     }
 
-                    child.children.forEach(tempProcess)
+                    if (Array.isArray(child.children)) {
+                        child.children.forEach(tempProcess)
+                    }
 
                     // Only add the repeater field if it hasn't been added yet
                     fields.push({
@@ -290,7 +292,9 @@ export const useComponents = (): {
                 }
             }
 
-            components.forEach((component) => processComponent(component))
+            if (Array.isArray(components)) {
+                components.forEach((component) => processComponent(component))
+            }
 
             return { fields, componentMap }
         },
