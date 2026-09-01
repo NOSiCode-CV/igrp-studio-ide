@@ -20,7 +20,7 @@ export const AddComponentPopover = ({
 }) => {
     const { t } = useTranslation()
 
-    const { componentName, id: componentId, children } = comp
+    const { componentName, id: componentId, children = [] } = comp
     const {
         handleAddChildToComponent,
         handleReorderChildInComponent,
