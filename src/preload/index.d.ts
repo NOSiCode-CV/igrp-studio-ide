@@ -12,7 +12,7 @@ import {
 } from '../main/types'
 import { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
 import { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
-import { ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import { UpdateServiceRequest } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
 
 type UpdateChannel = 'stable' | 'beta'
@@ -124,7 +124,6 @@ declare const engine: {
         engineType: string,
         input: BuildComponentRegistryInput
     ) => Promise<HandlerResponse>
-    getService: (engineType: string) => Promise<HandlerResponse>
     getDependencies: (engineType: string) => Promise<HandlerResponse>
     getAppMetadata: (engineType: string, basePath: string) => Promise<HandlerResponse>
     getCodeSnippets: (engineType: string) => Promise<HandlerResponse>
@@ -145,8 +144,6 @@ declare const repo: {
             project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>
         ) => Promise<any>
         updateProject: (projectId: string, updates: Partial<ProjectData>) => Promise<any>
-        saveCustomWorkspaceComposeFile: (yaml: object, basePath: string) => Promise<any>
-        configureService: (config: ProjectWorkspace, basePath: string) => Promise<any>
         deleteProject: (projectId: string, basePath: string) => Promise<any>
         getProject: (projectId: string) => Promise<any>
         findAllProjects: (workspaceId?: string) => Promise<any>
@@ -170,9 +167,7 @@ declare const repo: {
             workspaceId: string,
             project: ProjectData
         ) => Promise<HandlerResponse>
-        createService: (service: ServiceWorkspace, basePath: string) => Promise<any>
-        updateService: (service: ServiceWorkspace, basePath: string) => Promise<any>
-        deleteService: (serviceId: string, basePath: string) => Promise<any>
+        updateService: (request: UpdateServiceRequest, basePath: string) => Promise<any>
         findAllServices: (workspaceId: string) => Promise<any>
         createBackup: (backupPath?: string) => Promise<any>
         restoreBackup: (backupPath: string) => Promise<any>
