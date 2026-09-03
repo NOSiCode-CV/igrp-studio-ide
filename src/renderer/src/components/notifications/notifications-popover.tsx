@@ -75,30 +75,37 @@ const NotificationsPopover = ({
 
     const dismissNotification = (notification: AppNotification): void => {
         if (notification.id === CLI_UPDATE_NOTIFICATION_ID && notification.meta?.latest) {
-            dismissCliUpdate(notification.meta.latest)
+            dismissCliUpdate(notification.meta.latest, notification.meta.missing ?? false)
         }
         dispatch(removeNotification(notification.id))
     }
 
     const handleUpdateCli = async (notification: AppNotification): Promise<void> => {
+        const missing = notification.meta?.missing ?? false
         setUpdatingId(notification.id)
         dispatch(markNotificationRead(notification.id))
         try {
-            // Reuses the same install path as onboarding (`installIgrpCli` IPC).
+            // Reuses the same install path as onboarding (`installIgrpCli` IPC) —
+            // it installs the given version when the CLI is absent and upgrades
+            // to it otherwise, so the same call covers both flavors.
             const result = await installIgrpCli(notification.meta?.latest)
             if (!result.success) {
-                showErrorToast(result.error || t('cliUpdateFailed'))
+                showErrorToast(result.error || t(missing ? 'cliInstallFailed' : 'cliUpdateFailed'))
                 return
             }
             clearCliUpdateDismiss()
             dispatch(removeNotification(notification.id))
             showSuccessToast(
-                t('cliUpdateSuccess', {
+                t(missing ? 'cliInstallSuccess' : 'cliUpdateSuccess', {
                     version: notification.meta?.latest ?? ''
                 })
             )
         } catch (error) {
-            showErrorToast(error instanceof Error ? error.message : t('cliUpdateFailed'))
+            showErrorToast(
+                error instanceof Error
+                    ? error.message
+                    : t(missing ? 'cliInstallFailed' : 'cliUpdateFailed')
+            )
         } finally {
             setUpdatingId(null)
         }
@@ -202,7 +209,12 @@ const NotificationsPopover = ({
                                                                         <Download className="w-3 h-3 mr-1" />
                                                                     )}
                                                                     {isUpdating
-                                                                        ? t('cliUpdating')
+                                                                        ? t(
+                                                                              notification.meta
+                                                                                  ?.missing
+                                                                                  ? 'cliInstalling'
+                                                                                  : 'cliUpdating'
+                                                                          )
                                                                         : t(
                                                                               notification.action
                                                                                   .labelKey ||

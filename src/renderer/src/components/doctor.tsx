@@ -1,4 +1,5 @@
 import { Badge } from '@renderer/components/ui/badge'
+import { Button } from '@renderer/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import {
     Dialog,
@@ -22,17 +23,25 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@renderer/components/ui/tooltip'
+import { clearCliUpdateDismiss } from '@renderer/hooks/useIgrpCliUpdateCheck'
+import useToast from '@renderer/hooks/useToast'
+import { installIgrpCli } from '@renderer/services/igrp-cli'
 import {
     AlertTriangle,
     CheckCircle,
     Download,
     Globe,
+    Loader2,
     Settings,
     Stethoscope,
     Wrench,
     XCircle
 } from 'lucide-react'
 import { type JSX, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { removeNotification } from '@renderer/redux/notifications/reducer'
+import { CLI_UPDATE_NOTIFICATION_ID } from '@renderer/hooks/useIgrpCliUpdateCheck'
 import type { ToolCheck } from 'src/main/types'
 
 interface CategorySummary {
@@ -54,20 +63,44 @@ export default function Doctor({
     open: boolean
     setOpen: (prompt: boolean) => void
 }): JSX.Element {
+    const { t } = useTranslation()
+    const { showSuccessToast, showErrorToast } = useToast()
+    const dispatch = useDispatch()
     const [results, setResults] = useState<ToolCheck[] | null>(null)
     const [loading, setLoading] = useState(false)
+    const [installingCli, setInstallingCli] = useState(false)
+
+    const runChecks = (): void => {
+        setLoading(true)
+        setResults(null)
+        window.api.runDoctorChecks().then((res: ToolCheck[]) => {
+            setResults(res)
+            setLoading(false)
+        })
+    }
 
     useEffect(() => {
-        if (open) {
-            setLoading(true)
-            setResults(null)
-            window.api.runDoctorChecks().then((res: ToolCheck[]) => {
-                console.log('doctor results', res)
-                setResults(res)
-                setLoading(false)
-            })
-        }
+        if (open) runChecks()
     }, [open])
+
+    const handleInstallCli = async (): Promise<void> => {
+        setInstallingCli(true)
+        try {
+            const result = await installIgrpCli()
+            if (!result.success) {
+                showErrorToast(result.error || t('cliInstallFailed'))
+                return
+            }
+            clearCliUpdateDismiss()
+            dispatch(removeNotification(CLI_UPDATE_NOTIFICATION_ID))
+            showSuccessToast(t('cliInstallSuccess', { version: '' }))
+            runChecks()
+        } catch (error) {
+            showErrorToast(error instanceof Error ? error.message : t('cliInstallFailed'))
+        } finally {
+            setInstallingCli(false)
+        }
+    }
 
     const allGood = results && results.every((tool) => tool.success)
 
@@ -294,17 +327,42 @@ export default function Doctor({
                                                                 )}
                                                             </TableCell>
                                                             <TableCell className="py-3">
-                                                                {!tool.success && tool.link && (
-                                                                    <a
-                                                                        href={tool.link}
-                                                                        target="_blank"
-                                                                        rel="noreferrer"
-                                                                        className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
-                                                                    >
-                                                                        <Download className="h-3 w-3" />
-                                                                        Download
-                                                                    </a>
-                                                                )}
+                                                                {!tool.success &&
+                                                                    tool.command === 'igrp' && (
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            className="h-7 text-xs"
+                                                                            disabled={installingCli}
+                                                                            onClick={() =>
+                                                                                void handleInstallCli()
+                                                                            }
+                                                                        >
+                                                                            {installingCli ? (
+                                                                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                                                            ) : (
+                                                                                <Download className="w-3 h-3 mr-1" />
+                                                                            )}
+                                                                            {installingCli
+                                                                                ? t('cliInstalling')
+                                                                                : t(
+                                                                                      'cliInstallAction'
+                                                                                  )}
+                                                                        </Button>
+                                                                    )}
+                                                                {!tool.success &&
+                                                                    tool.command !== 'igrp' &&
+                                                                    tool.link && (
+                                                                        <a
+                                                                            href={tool.link}
+                                                                            target="_blank"
+                                                                            rel="noreferrer"
+                                                                            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                                                                        >
+                                                                            <Download className="h-3 w-3" />
+                                                                            Download
+                                                                        </a>
+                                                                    )}
                                                             </TableCell>
                                                         </TableRow>
                                                     ))}

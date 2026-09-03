@@ -17,8 +17,10 @@ export interface AppNotification {
         labelKey?: string
     }
     meta?: {
-        installed?: string
+        installed?: string | null
         latest?: string
+        /** True when the CLI is not installed at all (install prompt, not update). */
+        missing?: boolean
     }
 }
 
