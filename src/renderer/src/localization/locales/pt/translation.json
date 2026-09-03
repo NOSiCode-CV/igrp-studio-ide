@@ -1,6 +1,7 @@
 {
     "welcome": "Bem-vindo ao IGRP Studio",
     "selectProject": "Selecionar Projeto",
+    "selectServiceType": "Selecionar tipo de serviço",
     "start": "Iniciar",
     "startGroup": "Iniciar todos os serviços deste grupo",
     "stopGroup": "Parar todos os serviços deste grupo",
