@@ -1,5 +1,4 @@
 import {
-    Component,
     ModuleConfig,
     ModelConfig,
     DTOConfig,
@@ -20,13 +19,13 @@ import {
     ComponentRegisterConfig,
     ComponentRegistrationConfig
 } from '@igrp/igrp-studio-nextjs-engine/types'
+import type { UpdateServiceRequest } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import {
-    DockerServiceRegistrationConfig,
-    ProjectWorkspace,
-    ServiceWorkspace,
+    IWorkspace,
+    DatabaseResponse,
+    WorkspaceBootstrapOptions,
     WorkspaceService
-} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
-import { IWorkspace, DatabaseResponse, WorkspaceBootstrapOptions } from 'src/main/types'
+} from 'src/main/types'
 
 export interface IWorkspaceRepository {
     // Workspace Operations
@@ -40,15 +39,13 @@ export interface IWorkspaceRepository {
     findAllWorkspaces(): Promise<IWorkspace[]>
     findRecentWorkspaces(limit?: number): Promise<IWorkspace[]>
     openWorkspace(workspacePath: string): Promise<HandlerResponse>
-    saveCustomWorkspaceComposeFile(yaml: object, basePath: string): Promise<void>
 
     // Project Operations
     createProject(
         workspaceId: string,
         project: Omit<ProjectData, 'id' | 'createdAt' | 'workspaceId'>
     ): Promise<HandlerResponse>
-    updateProject(projectId: string, updates: Partial<ProjectWorkspace>): Promise<HandlerResponse>
-    configureService(config: ProjectWorkspace, basePath: string): Promise<HandlerResponse>
+    updateProject(projectId: string, updates: Partial<ProjectData>): Promise<HandlerResponse>
     deleteProject(projectId: string, basePath: string): Promise<void>
     getProject(id: string): Promise<ProjectData | undefined>
     findAllProjects(workspaceId?: string): Promise<ProjectData[]>
@@ -56,9 +53,10 @@ export interface IWorkspaceRepository {
     addProjectToWorkspace(workspaceId: string, project: ProjectData): Promise<HandlerResponse>
 
     //Service Operations
-    createService(service: ServiceWorkspace, basePath: string): Promise<HandlerResponse>
-    updateService(service: ServiceWorkspace, basePath: string): Promise<HandlerResponse>
-    deleteService(serviceId: string, basePath: string): Promise<HandlerResponse>
+    // Full-replace of one existing compose service block. Adding and removing
+    // services was dropped when the workspace engine's surface shrank to
+    // `newWorkspace` + `updateService`.
+    updateService(request: UpdateServiceRequest, basePath: string): Promise<HandlerResponse>
     findAllServices(workspaceId: string): Promise<WorkspaceService[]>
 
     // Utility Methods
@@ -110,7 +108,6 @@ export interface BaseEngine {
 
     registry?(): Promise<void>
     getComponents?(): ComponentRegistrationConfig
-    getServices?(): Promise<DockerServiceRegistrationConfig>
 
     getDependencies?(): Promise<Dependency[]>
 
@@ -168,7 +165,6 @@ export interface IBaseEngine {
     createPage: (config: any, engineType: string, basePath: string) => Promise<HandlerResponse>
     registry: (engineType: string) => Promise<HandlerResponse>
     getComponent: (engineType: string) => Promise<HandlerResponse>
-    getService: (engineType: string) => Promise<Record<string, Component>>
     getDependencies: (engineType: string) => Promise<HandlerResponse>
 
     getAppMetadata: (engineType: string, basePath: string) => Promise<HandlerResponse>
