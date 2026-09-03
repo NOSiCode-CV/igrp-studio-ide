@@ -25,8 +25,12 @@ import CardComponent, { type CardComponentProps } from '../CardComponent'
 import BoxField from '../tools/BoxFields'
 import TableTool from '../tools/tableTool'
 
+// Stable reference — an inline `[]` default would be a new array every
+// render, tripping the `useEffect([components])` below into an infinite loop.
+const EMPTY_CHILDREN: StructuredComponent[] = []
+
 const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
-    const { children: components, componentName } = comp
+    const { children: components = EMPTY_CHILDREN, componentName } = comp
     const [columns, setColumns] = useState<StructuredComponent[]>([])
     const [filters, setFilters] = useState<StructuredComponent[]>([])
     const [manageColumnsOpen, setManageColumnsOpen] = useState(false)
@@ -195,7 +199,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                             parentComp={comp}
                             comp={tableComp}
                             onEdit={() => handleEdit(tableComp, componentName)}
-                            tableColumns={tableColumns[0].children}
+                            tableColumns={tableColumns[0]?.children}
                             group="group/table-filter"
                             className="opacity-0 group-hover/table-filter:opacity-100"
                             index={index}

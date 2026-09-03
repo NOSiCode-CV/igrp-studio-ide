@@ -21,7 +21,30 @@ import '@igrp/framework-process-studio-bpmn-editor/dist/styles.css'
 // tokens import). v0.1.0-beta.141 removed the precompiled `/styles` export.
 import { Toaster } from '@renderer/components/ui/sonner'
 // Configure Redux store
-const store = configureStore({ reducer: rootReducer, devTools: true })
+// serializableCheck/immutableCheck deep-scan the *whole* tree on every
+// dispatch. A few slices are known-large, already-plain (strings/JSON) data
+// that don't need the safety net but do pay its traversal cost on every
+// single dispatch, project-wide:
+// - specDocs.byDoc: full editor buffers, dispatched on every keystroke.
+// - specPrototypeManifest.manifest: full generated-page component tree,
+//   mutated on every canvas edit.
+// - PageBuilder.filesThree: recursive `.igrpstudio/` file tree, reloaded via
+//   getFileThree() whenever Page Builder opens/refreshes.
+// Everything else stays checked.
+const IGNORED_STATE_PATHS = [
+    /^specDocs\.byDoc/,
+    /^specPrototypeManifest\.manifest/,
+    /^PageBuilder\.filesThree/
+]
+const store = configureStore({
+    reducer: rootReducer,
+    devTools: true,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: { ignoredPaths: IGNORED_STATE_PATHS },
+            immutableCheck: { ignoredPaths: IGNORED_STATE_PATHS }
+        })
+})
 
 // TanStack Query client — scoped usage (BPMN module). Defaults from §4.5 of the
 // process-integration plan: read queries are reasonably fresh.
