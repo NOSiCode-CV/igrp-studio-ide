@@ -1,4 +1,7 @@
-import type { UpdateServiceRequest } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import type {
+    ResetWorkspaceOptions,
+    UpdateServiceRequest
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import useToast from '@renderer/hooks/useToast'
 import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks'
@@ -63,6 +66,13 @@ interface UseWorkspaceReturn {
          * `properties` is the FULL desired service.
          */
         updateService: (request: UpdateServiceRequest) => Promise<HandlerResponse>
+        /**
+         * Regenerate the current workspace from the latest published template.
+         * Preserves `projects/`, root `.env*`, and `.git`; overwrites the IGRP
+         * stack files back to the template defaults. Studio's own service
+         * registry is cleared so the next read reflects what's on disk.
+         */
+        resetWorkspace: (options?: ResetWorkspaceOptions) => Promise<HandlerResponse>
         removeProject: (project: ProjectData) => Promise<void>
         updateProject: (
             projectId: string,
@@ -397,6 +407,29 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         }
     }
 
+    const resetWorkspace = async (options?: ResetWorkspaceOptions): Promise<HandlerResponse> => {
+        dispatch(setChangeStatus(false))
+        try {
+            const result: HandlerResponse = await window.igrpStudio.workspace.resetWorkspace(
+                workspace.path,
+                options
+            )
+
+            if (result?.error) {
+                showErrorToast(result.error)
+            } else {
+                showSuccessToast(t('resetWorkspaceSuccess', { name: workspace.name }))
+                window.dispatchEvent(new Event('igrp:workspace:refresh'))
+            }
+
+            dispatch(setChangeStatus(true))
+            return result
+        } catch (err) {
+            showErrorToast(err)
+            return { error: err as string }
+        }
+    }
+
     const openWorkspace = async (workspacePath: string): Promise<IWorkspace | null> => {
         try {
             // Check if the workspace path exists and contains workspace files
@@ -452,6 +485,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             findAllProjects,
             getRecentWorkspaces,
             updateService,
+            resetWorkspace,
             removeProject,
             updateProject,
             openWorkspace

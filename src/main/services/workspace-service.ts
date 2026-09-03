@@ -1,8 +1,12 @@
 import {
     newWorkspace as engineNewWorkspace,
+    resetWorkspace as engineResetWorkspace,
     updateService as engineUpdateService
 } from '@igrp/igrp-studio-workspace-engine'
-import type { UpdateServiceRequest } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import type {
+    ResetWorkspaceOptions,
+    UpdateServiceRequest
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { app } from 'electron'
 import fs from 'fs'
 import { mkdir, readFile, writeFile } from 'fs/promises'
@@ -1190,6 +1194,29 @@ export class WorkspaceRepository {
         await this.saveData(data)
 
         return foundService
+    }
+
+    /**
+     * Regenerate a workspace from the latest published template while
+     * preserving the user's `projects/`, root `.env*`, and `.git`. The
+     * engine keys off `.igrpstudio/workspace.json` for identity, so a valid
+     * workspace must already live at `basePath`.
+     *
+     * Studio's own service registry is cleared here: after a reset, the
+     * services on disk are the template's defaults, not whatever Studio
+     * had cached, so the next read repopulates from truth.
+     */
+    async resetWorkspace(basePath: string, options?: ResetWorkspaceOptions): Promise<void> {
+        await engineResetWorkspace(basePath, options)
+
+        const data = await this.loadData()
+        for (const workspace of data.workspaces) {
+            if (workspace.path !== basePath) continue
+            workspace.services = []
+            workspace.updatedAt = new Date().toISOString()
+            break
+        }
+        await this.saveData(data)
     }
 
     async listServices(workspaceId: string): Promise<WorkspaceService[]> {

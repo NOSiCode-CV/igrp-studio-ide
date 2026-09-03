@@ -19,7 +19,10 @@ import {
     ComponentRegisterConfig,
     ComponentRegistrationConfig
 } from '@igrp/igrp-studio-nextjs-engine/types'
-import type { UpdateServiceRequest } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import type {
+    ResetWorkspaceOptions,
+    UpdateServiceRequest
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import {
     IWorkspace,
     DatabaseResponse,
@@ -39,6 +42,7 @@ export interface IWorkspaceRepository {
     findAllWorkspaces(): Promise<IWorkspace[]>
     findRecentWorkspaces(limit?: number): Promise<IWorkspace[]>
     openWorkspace(workspacePath: string): Promise<HandlerResponse>
+    resetWorkspace(basePath: string, options?: ResetWorkspaceOptions): Promise<void>
 
     // Project Operations
     createProject(

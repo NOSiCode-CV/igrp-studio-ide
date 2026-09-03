@@ -12,7 +12,10 @@ import {
 } from '../main/types'
 import { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
 import { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
-import { UpdateServiceRequest } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import {
+    ResetWorkspaceOptions,
+    UpdateServiceRequest
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { WatchEvent } from '../main/helpers/watch-folder'
 
 type UpdateChannel = 'stable' | 'beta'
@@ -163,6 +166,10 @@ declare const repo: {
         getWorkspace: (workspaceId: string) => Promise<any>
         getLastAccessedWorkspace: () => Promise<any>
         openWorkspace: (workspacePath: string) => Promise<HandlerResponse>
+        resetWorkspace: (
+            basePath: string,
+            options?: ResetWorkspaceOptions
+        ) => Promise<HandlerResponse>
         addProjectToWorkspace: (
             workspaceId: string,
             project: ProjectData

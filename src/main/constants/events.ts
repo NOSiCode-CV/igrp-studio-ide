@@ -52,7 +52,8 @@ export const EVENTS = {
             FIND_RECENT: 'repository:workspace:find-recent',
             OPEN: 'repository:workspace:open',
             INSTALL_OPTIONAL_STACKS: 'repository:workspace:install-optional-stacks',
-            GET_OPTIONAL_STACKS_STATUS: 'repository:workspace:get-optional-stacks-status'
+            GET_OPTIONAL_STACKS_STATUS: 'repository:workspace:get-optional-stacks-status',
+            RESET: 'repository:workspace:reset'
         },
         PROJECT: {
             CREATE: 'repository:project:create',

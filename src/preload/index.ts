@@ -1,7 +1,10 @@
 import { electronAPI } from '@electron-toolkit/preload'
 import type { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
 import type { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
-import type { UpdateServiceRequest } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import type {
+    ResetWorkspaceOptions,
+    UpdateServiceRequest
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { preloadBindings } from 'i18next-electron-fs-backend'
 import { EVENTS } from '../main/constants/events'
@@ -559,6 +562,20 @@ const repo = {
         openWorkspace: async (workspacePath: string): Promise<HandlerResponse> => {
             try {
                 return await ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.OPEN, workspacePath)
+            } catch (error) {
+                return handleError(error)
+            }
+        },
+        resetWorkspace: async (
+            basePath: string,
+            options?: ResetWorkspaceOptions
+        ): Promise<HandlerResponse> => {
+            try {
+                return await ipcRenderer.invoke(
+                    EVENTS.REPOSITORY.WORKSPACE.RESET,
+                    basePath,
+                    options
+                )
             } catch (error) {
                 return handleError(error)
             }

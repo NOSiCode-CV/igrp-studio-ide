@@ -1,4 +1,7 @@
-import type { UpdateServiceRequest } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import type {
+    ResetWorkspaceOptions,
+    UpdateServiceRequest
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { ipcMain } from 'electron'
 import { ERROR_CODES, EVENTS } from '../constants/events'
 import { handleWithCustomErrors } from '../helpers'
@@ -132,6 +135,20 @@ handleWithCustomErrors(EVENTS.REPOSITORY.WORKSPACE.OPEN, async (_, workspacePath
         }
     }
 })
+
+handleWithCustomErrors(
+    EVENTS.REPOSITORY.WORKSPACE.RESET,
+    async (_, basePath: string, options?: ResetWorkspaceOptions) => {
+        try {
+            await repo.resetWorkspace(basePath, options)
+            return { result: true }
+        } catch (error) {
+            return {
+                error: error instanceof Error ? error.message : 'Failed to reset workspace'
+            }
+        }
+    }
+)
 
 // Project Handlers
 handleWithCustomErrors(

@@ -1358,10 +1358,10 @@
     tailwindcss "4.3.1"
     vaul "1.1.2"
 
-"@igrp/igrp-studio-nextjs-engine@0.2.0-beta.31":
-  version "0.2.0-beta.31"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.2.0-beta.31.tgz#305bf13c594b3ee13b275c1c57401f0cbc7a0661"
-  integrity sha512-MCmnlWT8OE8sOMcrwhCAeUb8Jfs2+d4B/Cx80cwFKoQBUYzVyp35K9cfQxNhbkpe0WozDSEZHPlLFxyEwQfvPw==
+"@igrp/igrp-studio-nextjs-engine@0.2.0-beta.32":
+  version "0.2.0-beta.32"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-nextjs-engine/-/igrp-studio-nextjs-engine-0.2.0-beta.32.tgz#e9a7f534f1af2db83efa74d0beeee86e46d3d49c"
+  integrity sha512-Z7AqMKj9IIOGOz3fMPPK8/8RH7fdi+dBF7lJz8stNl9KrcqD6w6O5HSdc1SUMbhE5VcskSXteOq5loRSej4NTw==
   dependencies:
     "@prettier/sync" "^0.5.2"
     "@types/adm-zip" "^0.5.7"
@@ -1404,10 +1404,10 @@
     source-map-loader "^5.0.0"
     ts-loader "^9.5.4"
 
-"@igrp/igrp-studio-workspace-engine@0.2.0-beta.7":
-  version "0.2.0-beta.7"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-workspace-engine/-/igrp-studio-workspace-engine-0.2.0-beta.7.tgz#6dffbd24058957bf7beb1301b427ad9f5e765a90"
-  integrity sha512-QbMJTdEhzKtMf64T1xHVr+D7GoLj72FeYNcWYLh38ot1t33qSGCgy7mQMJw5xGAiYAsVZXGJ2FqmwmtGRB8vBQ==
+"@igrp/igrp-studio-workspace-engine@0.2.0-beta.8":
+  version "0.2.0-beta.8"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-workspace-engine/-/igrp-studio-workspace-engine-0.2.0-beta.8.tgz#de05581da70b90ed88d9500f845d968172707703"
+  integrity sha512-WQEtLiDu4LGdr33KBP4k9yOFoNYCe3NhKZzDR3bryN7cNcnjrjE7cV1CNcY8SMBip5/+YnWNL5HIuLlYStKB2w==
   dependencies:
     ajv "^8.18.0"
     ajv-errors "^3.0.0"

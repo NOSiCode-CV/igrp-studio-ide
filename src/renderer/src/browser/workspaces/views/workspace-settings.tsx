@@ -26,6 +26,7 @@ import {
     Check,
     Copy,
     Info,
+    RotateCcw,
     SlidersHorizontal,
     Trash2
 } from 'lucide-react'
@@ -51,6 +52,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
     const [workspaceDescription, setWorkspaceDescription] = useState(workspace.description)
     const [isSaving, setIsSaving] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
+    const [isResetting, setIsResetting] = useState(false)
     const [copied, setCopied] = useState(false)
     const [activeSection, setActiveSection] = useState<Section>('general')
 
@@ -59,7 +61,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
     const { t } = useTranslation()
 
     const {
-        actions: { updateWorkspace, deleteWorkspace }
+        actions: { updateWorkspace, deleteWorkspace, resetWorkspace }
     } = useWorkspace()
 
     const handleSaveWorkspace = () => {
@@ -83,6 +85,15 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
             deleteWorkspace(workspace.id)
             setIsDeleting(false)
         }, 800)
+    }
+
+    const handleResetWorkspace = async () => {
+        setIsResetting(true)
+        try {
+            await resetWorkspace()
+        } finally {
+            setIsResetting(false)
+        }
     }
 
     const copyToClipboard = (text: string) => {
@@ -280,6 +291,51 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                 <div className="mx-6 mt-4 border rounded-md border-destructive/30 p-4">
                                     <div className="flex items-start justify-between gap-6">
                                         <div>
+                                            <p className="text-sm font-medium">{t('resetWorkspace')}</p>
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                                {t('resetWorkspaceDescription', { name: workspace.name })}
+                                            </p>
+                                        </div>
+                                        <IGRPModalDialog>
+                                            <IGRPModalDialogTrigger asChild>
+                                                <Button variant="outline" size="sm" className="shrink-0">
+                                                    <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                                                    <span>{t('resetWorkspace')}</span>
+                                                </Button>
+                                            </IGRPModalDialogTrigger>
+                                            <IGRPModalDialogContent className="compact-dialog">
+                                                <IGRPModalDialogHeader className="compact-dialog-header">
+                                                    <IGRPModalDialogTitle className="text-base flex items-center gap-2">
+                                                        <RotateCcw className="h-4 w-4 text-destructive" />
+                                                        {t('resetWorkspaceTitle')}
+                                                    </IGRPModalDialogTitle>
+                                                    <IGRPModalDialogDescription className="text-xs">
+                                                        {t('resetWorkspaceDescription', { name: workspace.name })}
+                                                    </IGRPModalDialogDescription>
+                                                </IGRPModalDialogHeader>
+                                                <IGRPModalDialogFooter className="compact-dialog-footer flex flex-row items-center justify-end gap-2 sm:flex-row sm:justify-end sm:space-x-0">
+                                                    <Button variant="outline" size="sm">
+                                                        {t('cancel')}
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        disabled={isResetting}
+                                                        onClick={handleResetWorkspace}
+                                                    >
+                                                        {isResetting
+                                                            ? t('resetWorkspaceResetting')
+                                                            : t('resetWorkspaceConfirm')}
+                                                    </Button>
+                                                </IGRPModalDialogFooter>
+                                            </IGRPModalDialogContent>
+                                        </IGRPModalDialog>
+                                    </div>
+                                </div>
+
+                                <div className="mx-6 mt-4 border rounded-md border-destructive/30 p-4">
+                                    <div className="flex items-start justify-between gap-6">
+                                        <div>
                                             <p className="text-sm font-medium">{t('deleteWorkspace')}</p>
                                             <p className="text-xs text-muted-foreground mt-1">{t('deleteWarning')}</p>
                                         </div>
@@ -318,7 +374,7 @@ export function WorkspaceSettings({ workspace }: WorkspaceSettingsProps) {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <IGRPModalDialogFooter className="compact-dialog-footer flex flex-1 items-center">
+                                                <IGRPModalDialogFooter className="compact-dialog-footer flex flex-row items-center justify-end gap-2 sm:flex-row sm:justify-end sm:space-x-0">
                                                     <Button variant="outline" size="sm">
                                                         {t('cancel')}
                                                     </Button>
