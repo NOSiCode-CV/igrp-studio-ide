@@ -1404,19 +1404,18 @@
     source-map-loader "^5.0.0"
     ts-loader "^9.5.4"
 
-"@igrp/igrp-studio-workspace-engine@0.2.0-beta.6":
-  version "0.2.0-beta.6"
-  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-workspace-engine/-/igrp-studio-workspace-engine-0.2.0-beta.6.tgz#5ea05d1234d3a242f071c41d363d735ed5db133d"
-  integrity sha512-OD9g1y0iyykxIMcg4M/7ClqxQcSaabu91UQUmb7cj3/qsQxXMxdircZ4R3HbUlIiTUPpLQ/McJOxR1fVqQBcYw==
+"@igrp/igrp-studio-workspace-engine@0.2.0-beta.7":
+  version "0.2.0-beta.7"
+  resolved "https://sonatype.nosi.cv/repository/igrp/@igrp/igrp-studio-workspace-engine/-/igrp-studio-workspace-engine-0.2.0-beta.7.tgz#6dffbd24058957bf7beb1301b427ad9f5e765a90"
+  integrity sha512-QbMJTdEhzKtMf64T1xHVr+D7GoLj72FeYNcWYLh38ot1t33qSGCgy7mQMJw5xGAiYAsVZXGJ2FqmwmtGRB8vBQ==
   dependencies:
     ajv "^8.18.0"
     ajv-errors "^3.0.0"
     ajv-formats "^3.0.1"
     axios "^1.15.2"
     fs-extra "^11.3.4"
-    handlebars "^4.7.9"
-    js-yaml "^4.1.1"
     jszip "^3.10.1"
+    yaml "^2.6.1"
 
 "@isaacs/cliui@^8.0.2":
   version "8.0.2"
@@ -11450,6 +11449,11 @@ yaml@^1.10.0:
   version "1.10.3"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.3.tgz#76e407ed95c42684fb8e14641e5de62fe65bbcb3"
   integrity sha512-vIYeF1u3CjlhAFekPPAk2h/Kv4T3mAkMox5OymRiJQB0spDP10LHvt+K7G9Ny6NuuMAb25/6n1qyUjAcGNf/AA==
+
+yaml@^2.6.1:
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.9.0.tgz#78274afd93598a1dfdd6130df6a566defcbf9aa4"
+  integrity sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==
 
 yargs-parser@^21.1.1:
   version "21.1.1"
