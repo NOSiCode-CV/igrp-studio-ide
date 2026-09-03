@@ -1,13 +1,8 @@
-import type {
-    ProjectWorkspace,
-    ServiceWorkspace,
-    WorkspaceService
-} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import type { UpdateServiceRequest } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { ENV_TYPES } from '@renderer/constants/appConstants'
 import useToast from '@renderer/hooks/useToast'
 import { setBasePath, setChangeStatus, setConfig, setWorkspace } from '@renderer/redux/thunks'
 import { ROUTES } from '@renderer/routes/routeConstants'
-import yaml from 'js-yaml'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -62,14 +57,12 @@ interface UseWorkspaceReturn {
         saveOrOpenProject: (props: openProjectProps) => Promise<void>
         findAllProjects: () => Promise<ProjectData[]>
         getRecentWorkspaces: () => Promise<IWorkspace[]>
-        getTemplatesService: () => Promise<HandlerResponse>
-        saveCustomWorkspaceComposeFile: (content: string) => Promise<void>
-        createOrUpdateService: (service: WorkspaceService) => Promise<HandlerResponse>
-        removeService: (serviceId: string) => Promise<void>
-        configureService: (props: {
-            config: object
-            service: WorkspaceService
-        }) => Promise<HandlerResponse>
+        /**
+         * Full-replace a single service block inside an existing stack
+         * compose file. Studio owns which file/serviceKey a UI edit maps to;
+         * `properties` is the FULL desired service.
+         */
+        updateService: (request: UpdateServiceRequest) => Promise<HandlerResponse>
         removeProject: (project: ProjectData) => Promise<void>
         updateProject: (
             projectId: string,
@@ -118,26 +111,6 @@ export const useWorkspace = (): UseWorkspaceReturn => {
 
     const findAllServices = async (): Promise<ServiceInfo[]> => {
         return await window.igrpStudio.docker.status(workspace.path)
-    }
-
-    const getTemplatesService = async (): Promise<HandlerResponse> => {
-        return await window.engine.getService(ENV_TYPES.NEXTJS).then((data) => {
-            return data
-        })
-    }
-
-    const saveCustomWorkspaceComposeFile = async (content: string): Promise<void> => {
-        try {
-            const composeYmal = yaml.load(content)
-            await window.igrpStudio.workspace.saveCustomWorkspaceComposeFile(
-                composeYmal as object,
-                workspace.path
-            )
-            showSuccessToast('Update successful')
-        } catch (err) {
-            console.error(err)
-            showErrorToast('Failed to load workspaces')
-        }
     }
 
     const refreshWorkspaces = async (): Promise<void> => {
@@ -366,75 +339,11 @@ export const useWorkspace = (): UseWorkspaceReturn => {
         if (path) navigate(path)
     }
 
-    const createOrUpdateService = async (service: WorkspaceService): Promise<HandlerResponse> => {
-        let result: HandlerResponse = {}
+    const updateService = async (request: UpdateServiceRequest): Promise<HandlerResponse> => {
         dispatch(setChangeStatus(false))
         try {
-            const { id: serviceId } = service
-
-            const data: ServiceWorkspace = {
-                id: workspace.id,
-                service
-            }
-
-            if (serviceId)
-                result = await window.igrpStudio.workspace.updateService(data, workspace.path)
-            else result = await window.igrpStudio.workspace.createService(data, workspace.path)
-
-            if (result?.error) {
-                console.error(result.error)
-                showErrorToast(result.error)
-            } else showSuccessToast(t('savedSuccessfully', { name: 'Service' }))
-
-            dispatch(setChangeStatus(true))
-
-            return result
-        } catch (err) {
-            showErrorToast(err)
-            return { error: err as string }
-        }
-    }
-
-    const configureService = async ({
-        config,
-        service
-    }: {
-        config: object
-        service: WorkspaceService
-    }): Promise<HandlerResponse> => {
-        let result: HandlerResponse = {}
-        try {
-            const data: ProjectWorkspace = {
-                id: workspace.id,
-                service,
-                config: {
-                    ...config,
-                    id: service.id
-                }
-            }
-
-            result = await window.igrpStudio.workspace.configureService(data, workspace.path)
-
-            if (result?.error) {
-                console.error(result.error)
-                showErrorToast(result.error)
-            } else showSuccessToast(t('savedSuccessfully', { name: 'Service' }))
-
-            dispatch(setChangeStatus(true))
-
-            return result
-        } catch (err) {
-            showErrorToast(err)
-            return { error: err as string }
-        }
-    }
-
-    const removeService = async (serviceId: string): Promise<void> => {
-        try {
-            dispatch(setChangeStatus(false))
-
-            const result: HandlerResponse = await window.igrpStudio.workspace.deleteService(
-                serviceId,
+            const result: HandlerResponse = await window.igrpStudio.workspace.updateService(
+                request,
                 workspace.path
             )
 
@@ -442,11 +351,15 @@ export const useWorkspace = (): UseWorkspaceReturn => {
                 console.error(result.error)
                 showErrorToast(result.error)
             } else {
-                showSuccessToast(t('deletedSuccess', { name: 'Service' }))
-                dispatch(setChangeStatus(true))
+                showSuccessToast(t('savedSuccessfully', { name: request.serviceKey || 'Service' }))
             }
+
+            dispatch(setChangeStatus(true))
+
+            return result
         } catch (err) {
             showErrorToast(err)
+            return { error: err as string }
         }
     }
 
@@ -538,11 +451,7 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             saveOrOpenProject,
             findAllProjects,
             getRecentWorkspaces,
-            getTemplatesService,
-            saveCustomWorkspaceComposeFile,
-            createOrUpdateService,
-            removeService,
-            configureService,
+            updateService,
             removeProject,
             updateProject,
             openWorkspace
