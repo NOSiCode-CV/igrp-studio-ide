@@ -32,7 +32,6 @@ export const EVENTS = {
         DELETE_PAGE: 'next-engine:delete-page',
         REGISTRY_COMPONENT: 'engine:registry-component',
         GET_COMPONENT: 'engine:get-component',
-        GET_SERVICE: 'engine:get-service',
         GET_CODE_SNIPPET: 'engine:get-code-snippet',
         LOAD_METADATA: 'engine:load-metadata',
         REGISTER_COMPONENT: 'engine:register-component',
@@ -53,8 +52,7 @@ export const EVENTS = {
             FIND_RECENT: 'repository:workspace:find-recent',
             OPEN: 'repository:workspace:open',
             INSTALL_OPTIONAL_STACKS: 'repository:workspace:install-optional-stacks',
-            GET_OPTIONAL_STACKS_STATUS: 'repository:workspace:get-optional-stacks-status',
-            SAVE_CUSTOM_YAML: 'engine:save-custom-ymal'
+            GET_OPTIONAL_STACKS_STATUS: 'repository:workspace:get-optional-stacks-status'
         },
         PROJECT: {
             CREATE: 'repository:project:create',
@@ -63,13 +61,12 @@ export const EVENTS = {
             GET: 'repository:project:get',
             FIND_ALL: 'repository:project:find-all',
             FIND_RECENT: 'repository:project:find-recent',
-            CONFIGURE_SERVICE: 'repository:configure-service',
             ADD_TO_WORKSPACE: 'repository:project:add-to-workspace'
         },
         SERVICE: {
-            CREATE: 'repository:service:create',
+            // Only full-replace of an existing compose service block is
+            // supported by the workspace engine now; add/delete were dropped.
             UPDATE: 'repository:service:update',
-            DELETE: 'repository:service:delete',
             FIND_ALL: 'repository:service:find-all'
         },
         BACKUP: {

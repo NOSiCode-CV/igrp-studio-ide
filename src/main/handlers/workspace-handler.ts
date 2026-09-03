@@ -1,7 +1,4 @@
-import type {
-    ProjectWorkspace,
-    ServiceWorkspace
-} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import type { UpdateServiceRequest } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { ipcMain } from 'electron'
 import { ERROR_CODES, EVENTS } from '../constants/events'
 import { handleWithCustomErrors } from '../helpers'
@@ -113,13 +110,6 @@ ipcMain.handle(EVENTS.REPOSITORY.WORKSPACE.FIND_RECENT, async (_, limit = 5) => 
 })
 
 ipcMain.handle(
-    EVENTS.REPOSITORY.WORKSPACE.SAVE_CUSTOM_YAML,
-    async (_, yaml: object, basePath: string) => {
-        return await repo.saveCustomCompose(yaml, basePath)
-    }
-)
-
-ipcMain.handle(
     EVENTS.REPOSITORY.WORKSPACE.GET_OPTIONAL_STACKS_STATUS,
     async (_, workspacePath: string) => {
         return await repo.getOptionalStacksStatus(workspacePath)
@@ -158,13 +148,6 @@ handleWithCustomErrors(
     }
 )
 
-ipcMain.handle(
-    EVENTS.REPOSITORY.PROJECT.CONFIGURE_SERVICE,
-    async (_, config: ProjectWorkspace, basePath: string) => {
-        await repo.configureService(config, basePath)
-    }
-)
-
 handleWithCustomErrors(
     EVENTS.REPOSITORY.PROJECT.ADD_TO_WORKSPACE,
     async (_, workspaceId: string, project: ProjectData) => {
@@ -193,24 +176,15 @@ ipcMain.handle(EVENTS.REPOSITORY.PROJECT.FIND_RECENT, async (_, limit = 5) => {
     return await repo.getRecentProjects(limit)
 })
 
-// Service Handlers
-handleWithCustomErrors(
-    EVENTS.REPOSITORY.SERVICE.CREATE,
-    async (_event, service: ServiceWorkspace, basePath: string) => {
-        return await repo.addService(service, basePath)
-    }
-)
-
+// Service Handlers — the workspace engine only supports full-replace of an
+// existing service block. Add-service and delete-service were dropped from
+// its API, so the corresponding IPC endpoints are gone too.
 handleWithCustomErrors(
     EVENTS.REPOSITORY.SERVICE.UPDATE,
-    async (_, update: ServiceWorkspace, basePath: string) => {
-        return await repo.updateService(update, basePath)
+    async (_, request: UpdateServiceRequest, basePath: string) => {
+        return await repo.updateService(request, basePath)
     }
 )
-
-ipcMain.handle(EVENTS.REPOSITORY.SERVICE.DELETE, async (_, serviceId: string, basePath: string) => {
-    await repo.deleteService(serviceId, basePath)
-})
 
 ipcMain.handle(EVENTS.REPOSITORY.SERVICE.FIND_ALL, async (_, workspaceId: string) => {
     return await repo.listServices(workspaceId)
