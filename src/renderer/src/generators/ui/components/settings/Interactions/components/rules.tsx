@@ -82,7 +82,13 @@ function buildPermissionKeyContext(
 
 type EditorMode =
     | { kind: 'visibility'; index: number | null; draft: VisibilityRuleDefinition }
-    | { kind: 'permission'; index: number | null; draft: PermissionRuleDefinition }
+    | {
+          kind: 'permission'
+          index: number | null
+          draft: PermissionRuleDefinition
+          /** Keys in `draft.permission` that are external — not registered in the project catalog. */
+          externalKeys: string[]
+      }
 
 const Rules = ({
     rules = [],
@@ -93,7 +99,7 @@ const Rules = ({
 }: RulesProps) => {
     const { t } = useTranslation()
     const { config } = useStudio()
-    const { ensureKeys, touchRecent } = usePermissionCatalog()
+    const { catalog, ensureKeys, touchRecent } = usePermissionCatalog()
     const permissionKeyContext = useMemo(
         () => buildPermissionKeyContext(ruleContext, pageName, config?.name),
         [ruleContext, pageName, config?.name]
@@ -127,7 +133,12 @@ const Rules = ({
 
     const openNewPermission = () => {
         setFormErrors([])
-        setEditor({ kind: 'permission', index: null, draft: createEmptyPermissionRule() })
+        setEditor({
+            kind: 'permission',
+            index: null,
+            draft: createEmptyPermissionRule(),
+            externalKeys: []
+        })
     }
 
     const openEdit = (index: number) => {
@@ -136,14 +147,21 @@ const Rules = ({
         if (isVisibilityRule(rule)) {
             setEditor({ kind: 'visibility', index, draft: { ...rule } })
         } else if (isPermissionRule(rule)) {
+            const permission = [...(rule.permission ?? [])]
+            // Presumed external: not in the catalog, so a re-save shouldn't
+            // silently register it — the user brought it in from outside Studio.
+            const externalKeys = permission.filter(
+                (key) => !catalog.some((entry) => entry.key === key)
+            )
             setEditor({
                 kind: 'permission',
                 index,
                 draft: {
                     ...rule,
-                    permission: [...(rule.permission ?? [])],
+                    permission,
                     action: rule.action ?? 'hide'
-                }
+                },
+                externalKeys
             })
         }
     }
@@ -181,7 +199,9 @@ const Rules = ({
             return
         }
         const source = `${pageName ?? 'page'} / ${ruleContext.tag}`
-        void ensureKeys(result.rule.permission ?? [], source)
+        const externalSet = new Set(editor.externalKeys)
+        const keysToCatalog = (result.rule.permission ?? []).filter((key) => !externalSet.has(key))
+        void ensureKeys(keysToCatalog, source)
         touchRecent(result.rule.permission ?? [])
         const next = [...allRules]
         if (editor.index === null) next.push(result.rule)
@@ -300,6 +320,8 @@ const Rules = ({
                     errors={formErrors}
                     isRootComponent={isRootComponent}
                     suggestionContext={permissionKeyContext}
+                    externalKeys={editor.externalKeys}
+                    onExternalKeysChange={(externalKeys) => setEditor({ ...editor, externalKeys })}
                     onChange={(draft) => {
                         setFormErrors([])
                         setEditor({ ...editor, draft })
@@ -405,6 +427,8 @@ const PermissionRuleEditor = ({
     errors,
     isRootComponent,
     suggestionContext,
+    externalKeys,
+    onExternalKeysChange,
     onChange,
     onSave,
     onClose
@@ -414,6 +438,8 @@ const PermissionRuleEditor = ({
     errors: string[]
     isRootComponent: boolean
     suggestionContext?: PermissionKeySuggestionContext
+    externalKeys: string[]
+    onExternalKeysChange: (keys: string[]) => void
     onChange: (draft: PermissionRuleDefinition) => void
     onSave: () => void
     onClose: () => void
@@ -495,7 +521,18 @@ const PermissionRuleEditor = ({
                                 <PermissionPicker
                                     value={permissions}
                                     suggestionContext={suggestionContext}
-                                    onChange={(keys) => onChange({ ...draft, permission: keys })}
+                                    externalKeys={externalKeys}
+                                    onChange={(keys) => {
+                                        // Keep externalKeys in sync when a chip is removed.
+                                        onExternalKeysChange(
+                                            externalKeys.filter((k) => keys.includes(k))
+                                        )
+                                        onChange({ ...draft, permission: keys })
+                                    }}
+                                    onAddExternal={(key) => {
+                                        onExternalKeysChange([...externalKeys, key])
+                                        onChange({ ...draft, permission: [...permissions, key] })
+                                    }}
                                 />
                                 <p className="text-xs text-muted-foreground">
                                     {t(

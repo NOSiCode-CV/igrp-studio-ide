@@ -1,17 +1,11 @@
 import {
-    addProjectToWorkspace,
-    addServiceToWorkspace,
     newWorkspace as engineNewWorkspace,
-    removeProjectFromWorkspace,
-    removeServiceFromWorkspace,
-    saveCustomWorkspaceComposeFile,
-    updateProjectToWorkspace,
-    updateServiceToWorkspace
+    resetWorkspace as engineResetWorkspace,
+    updateService as engineUpdateService
 } from '@igrp/igrp-studio-workspace-engine'
 import type {
-    ProjectWorkspace,
-    ServiceWorkspace,
-    WorkspaceService
+    ResetWorkspaceOptions,
+    UpdateServiceRequest
 } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { app } from 'electron'
 import fs from 'fs'
@@ -28,7 +22,8 @@ import type {
     OptionalStacksStatus,
     ProjectData,
     WorkspaceBootstrapOptions,
-    WorkspaceBootstrapResult
+    WorkspaceBootstrapResult,
+    WorkspaceService
 } from '../types'
 
 const WORKSPACE_FILE = path.join(app.getPath('userData'), 'igrpstudio.workspaces.json')
@@ -978,42 +973,20 @@ export class WorkspaceRepository {
         newProject: ProjectData,
         move: boolean
     ): Promise<void> {
-        const { config, id: projectId, framework } = newProject
-
+        // The workspace engine no longer manages projects — spring-engine owns
+        // `projects/**` compose files. This method now only performs Studio's
+        // own bookkeeping: import (copy/move) the sources into the workspace
+        // when `move` is set.
+        const { config } = newProject
         const { path: workspacePath, id: workspaceId } = workspace
 
-        // Check if project already exists in workspace
+        // Check if project already exists in workspace (registry-side).
         const existingProjects = await this.listProjects(workspaceId)
         const existingProject = existingProjects.find(
             (project) => project.config.name === config.name
         )
 
-        const workspaceConfig: ProjectWorkspace = {
-            // Defensive default for `database`: the external
-            // `@igrp/igrp-studio-workspace-engine`'s `addProjectToWorkspace`
-            // unconditionally calls a `jt(e.config.database)` normalizer
-            // whose default branch does `e.toLowerCase()`. Frameworks that
-            // don't have a database field (Next.js, frontend in general)
-            // crash there with "Cannot read properties of undefined
-            // (reading 'toLowerCase')". Passing an empty string makes `jt`
-            // return "" without throwing; the downstream database service
-            // push is gated by `type === 'springboot'`, so this doesn't
-            // create a phantom DB container for Next.js projects.
-            config: { database: '', ...config, id: projectId, type: framework },
-            id: workspaceId
-        }
-
-        if (!existingProject) {
-            // Specification projects manage their own folder structure via
-            // SpecificationEngine (docs/, kb/, vectors/, chats/, prototype/).
-            // The third-party workspace engine doesn't know the 'specification'
-            // type and would crash on a lookup. Skip its registration here —
-            // metadata is still persisted via this.saveData below.
-            if (framework !== 'specification') {
-                //call engine
-                await addProjectToWorkspace(workspaceConfig, workspacePath)
-            }
-        } else {
+        if (existingProject) {
             console.log(`Project "${config.name}" already exists in workspace. Skipping addition.`)
         }
 
@@ -1121,40 +1094,6 @@ export class WorkspaceRepository {
         return foundProject
     }
 
-    async configureService(config: ProjectWorkspace, basePath: string): Promise<void> {
-        const { id: workspaceId, service, config: projectData } = config
-
-        const { config: projectDataConfig, id: projectId, framework } = projectData
-
-        const data = await this.loadData()
-
-        const workspace = data.workspaces.find((w) => w.id === workspaceId)
-
-        if (!workspace) {
-            throw new Error(`Workspace ${workspaceId} not found`)
-        }
-
-        const projectConfig: ProjectWorkspace = {
-            config: { ...projectDataConfig, id: projectId, type: framework },
-            service,
-            id: workspaceId
-        }
-
-        await updateProjectToWorkspace(projectConfig, basePath)
-
-        const projectIndex = workspace.projects?.findIndex((p) => p.id === projectId) ?? -1
-        workspace.projects = workspace.projects ?? []
-        workspace.projects[projectIndex] = {
-            ...workspace.projects[projectIndex],
-            id: projectId,
-            config: projectDataConfig,
-            service,
-            updatedAt: new Date().toISOString()
-        }
-
-        await this.updateWorkspace(workspaceId, workspace)
-    }
-
     async deleteProject(projectId: string, basePath: string): Promise<void> {
         const data = await this.loadData()
         let deleted = false
@@ -1173,23 +1112,9 @@ export class WorkspaceRepository {
             }
         }
 
-        // Engine-side cleanup: removes the entry from the workspace folder's
-        // own metadata (.igrpstudio/workspace.json) and regenerates composes.
-        // Deletion must be idempotent: if that file no longer knows the
-        // project (registry/workspace desync — e.g. a recovered registry or a
-        // failed write when the project was added), the engine half is
-        // already in the desired state, so don't let its "not found" abort
-        // the registry-side delete and leave the project undeletable.
-        try {
-            await removeProjectFromWorkspace(projectId, basePath)
-        } catch (error) {
-            const message = error instanceof Error ? error.message : String(error)
-            if (/not found in workspace/i.test(message)) {
-                console.warn(`deleteProject: ${message} — continuing with registry removal`)
-            } else {
-                throw error
-            }
-        }
+        // Projects live under `projects/**`, which is owned by spring-engine
+        // now; the workspace engine no longer maintains a workspace-side
+        // registration to remove here.
 
         // Clean up project icon files
         if (projectToDelete && projectToDelete.icon) {
@@ -1224,88 +1149,74 @@ export class WorkspaceRepository {
         await this.saveData(data)
     }
 
-    async saveCustomCompose(yaml: object, basePath: string) {
-        await saveCustomWorkspaceComposeFile(yaml, basePath)
-    }
+    /**
+     * Full-replace a single service block inside an existing stack compose
+     * file. This is the only compose-editing surface the workspace engine
+     * still exposes; adding, removing, and saving a whole custom compose file
+     * were dropped when the engine's public API shrank.
+     *
+     * The renderer supplies the stack-relative compose file path, the
+     * `serviceKey` under `services:` to replace, and the FULL desired service
+     * as `ServiceProperties`. Studio's local `workspace.services[]`
+     * bookkeeping is refreshed by matching on `serviceKey` so the registry
+     * stays in step with what was actually written to disk.
+     */
+    async updateService(
+        request: UpdateServiceRequest,
+        basePath: string
+    ): Promise<WorkspaceService | undefined> {
+        await engineUpdateService(request, basePath)
 
-    async addService(serviceWorkspace: ServiceWorkspace, basePath: string) {
-        const data = await this.loadData()
-        const workspace = data.workspaces.find((w) => w.id === serviceWorkspace.id)
-
-        if (!workspace) {
-            throw new Error(`Workspace ${serviceWorkspace.id} not found`)
-        }
-
-        const serviceId = uuidv4()
-        const newService = {
-            ...serviceWorkspace.service,
-            id: serviceId,
-            properties: {
-                ...serviceWorkspace.service.properties,
-                labels:
-                    serviceWorkspace.service.properties?.labels?.map((label) =>
-                        label.key === 'uuid' ? { ...label, value: serviceId } : label
-                    ) || []
-            }
-        }
-        workspace.services = workspace?.services || []
-        workspace.services.push(newService)
-
-        await addServiceToWorkspace({ ...serviceWorkspace, service: newService }, basePath)
-
-        await this.saveData(data)
-    }
-
-    async deleteService(serviceId: string, basePath: string) {
-        const data = await this.loadData()
-        let deleted = false
-
-        for (const workspace of data.workspaces) {
-            if (workspace.services) {
-                const initialLength = workspace.services.length
-                workspace.services = workspace.services.filter((p) => p.id !== serviceId)
-                if (workspace.services.length !== initialLength) {
-                    workspace.updatedAt = new Date().toISOString()
-                    deleted = true
-                    break
-                }
-            }
-        }
-
-        await removeServiceFromWorkspace(serviceId, basePath)
-
-        if (!deleted) {
-            throw new Error(`Project ${serviceId} not found`)
-        }
-
-        await this.saveData(data)
-    }
-
-    async updateService(config: ServiceWorkspace, basePath: string) {
         const data = await this.loadData()
         let foundService: WorkspaceService | undefined
-        const { service } = config
 
         for (const workspace of data.workspaces) {
-            const serviceIndex = workspace.services?.findIndex((p) => p.id === service.id) ?? -1
-            if (serviceIndex !== -1 && workspace.services) {
-                const updatedService = {
-                    ...workspace.services[serviceIndex],
-                    ...service,
-                    updatedAt: new Date().toISOString()
-                }
-                workspace.services[serviceIndex] = updatedService
-                workspace.updatedAt = new Date().toISOString()
-                foundService = updatedService
-                break
+            if (workspace.path !== basePath) continue
+            workspace.services = workspace.services ?? []
+            const index = workspace.services.findIndex((s) => s.name === request.serviceKey)
+            const nowIso = new Date().toISOString()
+            const entry: WorkspaceService = {
+                ...(index !== -1 ? workspace.services[index] : {}),
+                name: request.serviceKey,
+                properties: request.properties as unknown as Record<string, unknown>,
+                updatedAt: nowIso
             }
+            if (index === -1) {
+                workspace.services.push(entry)
+            } else {
+                workspace.services[index] = entry
+            }
+            workspace.updatedAt = nowIso
+            foundService = entry
+            break
         }
-
-        await updateServiceToWorkspace(config, basePath)
 
         await this.saveData(data)
 
         return foundService
+    }
+
+    /**
+     * Regenerate a workspace from the latest published template while
+     * preserving the user's `projects/`, root `.env*`, and `.git`. The
+     * engine keys off `.igrpstudio/workspace.json` for identity, so a valid
+     * workspace must already live at `basePath`.
+     *
+     * Studio's own service registry is cleared here: after a reset, the
+     * services on disk are the template's defaults, not whatever Studio
+     * had cached, so the next read repopulates from truth.
+     */
+    async resetWorkspace(basePath: string, options?: ResetWorkspaceOptions): Promise<void> {
+        await engineResetWorkspace(basePath, options)
+
+        const data = await this.loadData()
+        for (const workspace of data.workspaces) {
+            if (workspace.path !== basePath) continue
+            workspace.services = []
+            workspace.updatedAt = new Date().toISOString()
+            break
+        }
+        await this.saveData(data)
     }
 
     async listServices(workspaceId: string): Promise<WorkspaceService[]> {

@@ -24,8 +24,6 @@ import { Button } from '@renderer/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import AlertDialogDelete from '@renderer/components/alert-dialog-delete'
 import { useDocker } from '@renderer/hooks/use-docker'
-import { useWorkspace } from '@renderer/hooks/use-workspace'
-import useToast from '@renderer/hooks/useToast'
 import { cn } from '@renderer/lib/utils'
 import {
     AlertCircle,
@@ -494,10 +492,6 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
     const handleEditServiceRef = useRef<(service: ServiceInfo) => void>(() => {})
     const handleDeleteServiceRef = useRef<(service: ServiceInfo) => void>(() => {})
     const handleOpenInBrowserRef = useRef<(service: ServiceInfo) => void>(() => {})
-    const { showErrorToast } = useToast()
-    const {
-        actions: { removeService }
-    } = useWorkspace()
 
     // Memoize defaultViewport to prevent ReactFlow warnings
     const defaultViewport = useMemo(
@@ -569,16 +563,14 @@ const WorkspaceDiagramContent: React.FC<WorkspaceDiagramProps> = ({
     }, [])
 
     const handleConfirmDelete = useCallback(async () => {
+        // Delete-service is out of scope for the workspace engine now — the
+        // dialog is left in place as a no-op guard, and the confirm just
+        // dismisses. If Studio grows its own remove flow later, it hooks in
+        // here.
         if (!serviceToDelete) return
-
         setIsDialogOpen(false)
-        try {
-            await removeService(serviceToDelete.labels.uuid)
-            setServiceToDelete(null)
-        } catch (error: unknown) {
-            showErrorToast(error)
-        }
-    }, [serviceToDelete, removeService, showErrorToast])
+        setServiceToDelete(null)
+    }, [serviceToDelete])
 
     const handleOpenInBrowser = useCallback(
         (service: ServiceInfo) => {

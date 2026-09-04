@@ -110,6 +110,8 @@ export const gitSlice = createSlice({
                     ...state.gitLabProviders[providerIndex],
                     ...updates
                 }
+            } else {
+                state.gitLabProviders.push({ id, ...updates } as GitLabProvider)
             }
         },
         removeGitLabProvider: (state, action: PayloadAction<string>) => {
@@ -133,6 +135,7 @@ export const gitSlice = createSlice({
             if (providerId === 'github') {
                 state.userGitHub = user
             } else {
+                state.userGitLab = user
                 const provider = state.gitLabProviders.find((p) => p.id === providerId)
                 if (provider) {
                     provider.user = user
@@ -149,7 +152,10 @@ export const gitSlice = createSlice({
             const { providerId, repositories } = action.payload
             if (providerId === 'github') {
                 state.repositoriesGitHub = repositories
+                state.isInitialized = true
             } else {
+                state.repositoriesGitLab = repositories
+                state.isInitialized = true
                 const provider = state.gitLabProviders.find((p) => p.id === providerId)
                 if (provider) {
                     provider.repositories = repositories

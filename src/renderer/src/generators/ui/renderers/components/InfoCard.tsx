@@ -77,7 +77,7 @@ const IGRPStudioInfoCard = ({ comp, group, hoverClass, onDragEnd }: CardComponen
     }
 
     return (
-        <div {...properties} className={cn('space-y-3 relative  p-3')}>
+        <div className={cn('space-y-3 relative p-3', properties?.className)}>
             <IGRPHeadline title={title}></IGRPHeadline>
             {components &&
                 components.length > 0 &&

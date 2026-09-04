@@ -46,11 +46,35 @@ export function buildGitAuth(config: GitProviderConfig): GitAuth {
             authUrl,
             tokenUrl,
             provider: type,
-            baseUrl: trimTrailingSlash(config.baseUrl || desc.defaultHost)
+            baseUrl: trimTrailingSlash(config.baseUrl || desc.defaultHost),
+            configId: config.id
         },
         GitStore,
         service
     )
+}
+
+const NOSI_GITLAB_ID = 'gitlab-nosi'
+
+function envGitlabDefault(): GitProviderConfig | null {
+    const clientId = process.env.VITE_GITLAB_CLIENT_ID || ''
+    const clientSecret = process.env.VITE_GITLAB_CLIENT_SECRET || ''
+    if (!clientId || !clientSecret) return null
+    const baseUrl = (
+        process.env.VITE_GITLAB_BASE_URL ||
+        process.env.VITE_GITLAB_HOST ||
+        'https://git.nosi.cv'
+    ).replace(/\/+$/, '')
+    return {
+        id: NOSI_GITLAB_ID,
+        type: 'gitlab',
+        name: 'GitLab NOSi',
+        baseUrl,
+        clientId,
+        clientSecret,
+        active: true,
+        isDefault: true
+    }
 }
 
 export function getActiveProviderConfig(type: GitProviderType): GitProviderConfig | null {
@@ -60,5 +84,8 @@ export function getActiveProviderConfig(type: GitProviderType): GitProviderConfi
 
 export function getProviderConfigById(id: string): GitProviderConfig | null {
     const configs = GitStore.getProviderConfigs()
-    return configs.find((c) => c.id === id) ?? null
+    const found = configs.find((c) => c.id === id)
+    if (found) return found
+    if (id === NOSI_GITLAB_ID) return envGitlabDefault()
+    return null
 }

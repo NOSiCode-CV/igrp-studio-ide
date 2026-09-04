@@ -56,7 +56,7 @@ export function ServiceGrid({ services, showFilter = true, onActionComplete }: S
             ) : null}
 
             {/* Services Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
                 {filteredServices.map((service, index) => {
                     const visualType = resolveServiceVisualType(service)
                     const serviceTypeLabel =
@@ -67,8 +67,8 @@ export function ServiceGrid({ services, showFilter = true, onActionComplete }: S
                             key={index}
                             className="group relative overflow-visible rounded-lg border bg-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-black/25"
                         >
-                            <div className="relative z-10 flex items-start justify-between gap-2 border-b px-3 py-3">
-                                <div className="flex min-w-0 items-center gap-2">
+                            <div className="relative z-10 flex flex-wrap items-start justify-between gap-2 border-b px-3 py-3">
+                                <div className="flex min-w-0 flex-1 items-center gap-2">
                                     <span
                                         className={`h-1.5 w-1.5 rounded-full ${getStatusDotColor(
                                             service.status

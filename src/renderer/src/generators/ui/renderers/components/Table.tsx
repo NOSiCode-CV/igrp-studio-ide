@@ -25,8 +25,12 @@ import CardComponent, { type CardComponentProps } from '../CardComponent'
 import BoxField from '../tools/BoxFields'
 import TableTool from '../tools/tableTool'
 
+// Stable reference — an inline `[]` default would be a new array every
+// render, tripping the `useEffect([components])` below into an infinite loop.
+const EMPTY_CHILDREN: StructuredComponent[] = []
+
 const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
-    const { children: components, componentName } = comp
+    const { children: components = EMPTY_CHILDREN, componentName } = comp
     const [columns, setColumns] = useState<StructuredComponent[]>([])
     const [filters, setFilters] = useState<StructuredComponent[]>([])
     const [manageColumnsOpen, setManageColumnsOpen] = useState(false)
@@ -190,18 +194,17 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                 const { componentName: compName, id } = tableComp
 
                 return (
-                    <>
+                    <Fragment key={tableComp.id}>
                         <TableTool
                             parentComp={comp}
                             comp={tableComp}
                             onEdit={() => handleEdit(tableComp, componentName)}
-                            tableColumns={tableColumns[0].children}
+                            tableColumns={tableColumns[0]?.children}
                             group="group/table-filter"
                             className="opacity-0 group-hover/table-filter:opacity-100"
                             index={index}
                         />
                         <Droppable
-                            key={index}
                             className="bg-card rounded-lg border border-dashed border-gray-400 group/table"
                             component={tableComp}
                             onDrop={onDragEnd}
@@ -209,7 +212,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                         >
                             {renderTableFilters(compName, id)}
                         </Droppable>
-                    </>
+                    </Fragment>
                 )
             })}
 
@@ -217,7 +220,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
             {tableColumns.map((tableComp, index) => {
                 const { componentName: compName, id } = tableComp
                 return (
-                    <>
+                    <Fragment key={tableComp.id}>
                         <TableTool
                             parentComp={comp}
                             comp={tableComp}
@@ -227,7 +230,6 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                             index={index}
                         />
                         <Droppable
-                            key={index}
                             className="group/table min-w-0 max-w-full rounded-lg border border-dashed border-gray-400 bg-card"
                             component={tableComp}
                             onDrop={onDragEnd}
@@ -246,7 +248,7 @@ const IGRPStudioTable: React.FC<CardComponentProps> = ({ comp, onDragEnd }) => {
                                 </div>
                             )}
                         </Droppable>
-                    </>
+                    </Fragment>
                 )
             })}
 

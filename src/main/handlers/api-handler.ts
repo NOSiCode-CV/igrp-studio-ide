@@ -137,12 +137,6 @@ handleWithCustomErrors(EVENTS.NEXT.GET_COMPONENT, async (_event, engineType: str
     return data
 })
 
-handleWithCustomErrors(EVENTS.NEXT.GET_SERVICE, async (_event, engineType: string) => {
-    const engine = EngineFactory.getEngine(engineType)
-    const data = engine.getServices?.()
-    return data
-})
-
 handleWithCustomErrors(EVENTS.ENGINE.GET_DEPENDENCIES, async (_event, engineType: string) => {
     const engine = EngineFactory.getEngine(engineType)
     const data = engine.getDependencies?.()

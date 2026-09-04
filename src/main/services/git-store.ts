@@ -102,10 +102,25 @@ export const GitStore = {
 
     logoutGithub() {
         store?.delete('github_token')
+        store?.delete('github_base_url')
     },
 
     logoutGitlab() {
         store?.delete('gitlab_token')
+        store?.delete('gitlab_base_url')
+    },
+
+    setProviderHost(service: 'github' | 'gitlab', host: string | null | undefined) {
+        if (!host) {
+            store?.delete(`${service}_base_url`)
+            return
+        }
+        store?.set(`${service}_base_url`, host.replace(/\/+$/, ''))
+    },
+
+    getProviderHost(service: 'github' | 'gitlab'): string | null {
+        const raw = store?.get(`${service}_base_url`)
+        return typeof raw === 'string' && raw.length > 0 ? raw : null
     },
 
     setProjectPath(repoId: number, path: string) {

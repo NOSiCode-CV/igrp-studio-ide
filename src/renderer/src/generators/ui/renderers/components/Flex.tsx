@@ -3,9 +3,9 @@ import Droppable from '@renderer/lib/dnd/Droppable'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { cn } from '@renderer/lib/utils'
 import type React from 'react'
-import { COMPONENT } from '../../ComponentTypes'
 import { EmptySlotComponent } from '../../components/EmptySlotComponent'
 import { useDroppedComponents } from '../../contexts/EditorContext'
+import { getCanvasItemSizing } from '../../utils/canvas-item-sizing'
 import { flexVariants } from '../../utils/layout-mapping'
 import { getHoverClasses } from '../../utils/tailwindGroups'
 import CardComponent, { type CardComponentProps } from '../CardComponent'
@@ -35,13 +35,16 @@ const IGRPStudioFlex: React.FC<CardComponentProps> = ({
     const { group: _group, hoverClass: _hoverClass } = getHoverClasses({
         group,
         hoverClass,
-        componentName: COMPONENT.Flex
+        componentName: 'flex'
     })
+
+    const selfSizing = getCanvasItemSizing(comp)
 
     const renderColumns = () => {
         const fields =
             children.length > 0 ? (
                 children.map((comp: StructuredComponent, index: number) => {
+                    const sizing = getCanvasItemSizing(comp)
                     return (
                         <Draggable
                             key={comp.id}
@@ -50,7 +53,8 @@ const IGRPStudioFlex: React.FC<CardComponentProps> = ({
                             index={index}
                             dropTargetId={componentId}
                             mode="MOVE"
-                            className="p-1 text-center"
+                            className={cn('p-1', sizing.className)}
+                            style={sizing.style}
                         >
                             <BoxWrapper
                                 comp={comp}
@@ -60,6 +64,7 @@ const IGRPStudioFlex: React.FC<CardComponentProps> = ({
                                     'opacity-0',
                                     _hoverClass ?? 'group-hover/comp-flex:opacity-100'
                                 )}
+                                wrapperClassName="w-full"
                             >
                                 <CardComponent
                                     comp={comp}
@@ -83,7 +88,8 @@ const IGRPStudioFlex: React.FC<CardComponentProps> = ({
             component={comp}
             onDrop={onDragEnd}
             layout="horizontal"
-            className={cn(flexVariants({ variant, className }))}
+            className={cn(flexVariants({ variant, className }), selfSizing.className)}
+            style={selfSizing.style}
         >
             {renderColumns()}
         </Droppable>

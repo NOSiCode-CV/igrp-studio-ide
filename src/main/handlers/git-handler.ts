@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import { GitAuthExpiredError } from '../helpers/git-auth/git-auth-errors'
+import { getProviderConfigById } from '../helpers/git-auth/git-auth-factory'
 import { clearRepoCache } from '../helpers/git-auth/repo-cache'
 import { GitService } from '../services/git-service'
 import { GitStore } from '../services/git-store'
@@ -63,12 +64,12 @@ ipcMain.handle('gitauth-initialize', async (_event, token: string, baseUrl?: str
     }
 })
 ipcMain.handle('logout-github', async () => {
-    clearRepoCache('github')
-    return GitStore.logoutGithub()
+    GitHubService.logout()
+    return true
 })
 ipcMain.handle('logout-gitlab', async () => {
-    clearRepoCache('gitlab')
-    return GitStore.logoutGitlab()
+    GitLabService.logout()
+    return true
 })
 
 ipcMain.handle(
@@ -78,16 +79,28 @@ ipcMain.handle(
         return true
     }
 )
-ipcMain.handle('gitlab-initialize', async (_event, token) => {
-    try {
-        await GitLabService.initialize(token)
-        GitStore.setToken('gitlab', token)
-        return true
-    } catch (error) {
-        console.error('GitLab initialization failed:', error)
-        throw error
+ipcMain.handle(
+    'gitlab-initialize',
+    async (_event, token: string, baseUrlOrProviderId?: string) => {
+        try {
+            let baseUrl: string | undefined
+            if (typeof baseUrlOrProviderId === 'string' && baseUrlOrProviderId.length > 0) {
+                if (/^https?:\/\//i.test(baseUrlOrProviderId)) {
+                    baseUrl = baseUrlOrProviderId
+                } else {
+                    const cfg = getProviderConfigById(baseUrlOrProviderId)
+                    baseUrl = cfg?.baseUrl
+                }
+            }
+            await GitLabService.initialize(token, baseUrl)
+            GitStore.setToken('gitlab', token)
+            return true
+        } catch (error) {
+            console.error('GitLab initialization failed:', error)
+            throw error
+        }
     }
-})
+)
 ipcMain.handle('add-cloned-repo', (_event, repoId: number) => {
     GitStore.addClonedRepo(repoId)
 })

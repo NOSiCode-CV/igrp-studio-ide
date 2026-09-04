@@ -35,8 +35,6 @@ import type {
     ProcessConfig,
     ProcessStepConfig
 } from '@igrp/igrp-studio-nextjs-engine/types'
-import { initServices, loadServiceRegistry } from '@igrp/igrp-studio-workspace-engine'
-import type { DockerServiceRegistrationConfig } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { app } from 'electron'
 import { ensureDirectoryExists } from '../helpers'
 import type { BaseEngine } from '../interfaces'
@@ -45,7 +43,6 @@ import type { NextConfigData, ProjectData } from '../types'
 export class NextjsEngine implements BaseEngine {
     async registry(): Promise<void> {
         await initComponents()
-        await initServices()
         await initCodeSnippets()
 
         setEngineConfiguration({
@@ -53,11 +50,6 @@ export class NextjsEngine implements BaseEngine {
         })
 
         loadEngineConfiguration()
-    }
-
-    async getServices(): Promise<DockerServiceRegistrationConfig> {
-        const result = loadServiceRegistry()
-        return result
     }
 
     async getAppMetadata(basePath: string): Promise<AppExportsConfig> {

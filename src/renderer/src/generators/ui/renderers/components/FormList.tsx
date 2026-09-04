@@ -130,7 +130,7 @@ const IGRPStudioFormList: React.FC<CardComponentProps> = ({ comp, onDragEnd }) =
                         </IGRPBadge>
                     </div>
                     <Droppable component={component} onDrop={onDragEnd} className="border">
-                        {childComponents.map((child, index) => {
+                        {(childComponents ?? []).map((child, index) => {
                             return (
                                 <Draggable
                                     key={child.id}

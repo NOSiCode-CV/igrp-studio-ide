@@ -125,7 +125,7 @@ const IGRPStudioTextList = ({ comp, group, hoverClass, onDragEnd }: CardComponen
     }
 
     return (
-        <div {...properties} className={cn('space-y-3 relative  p-3')}>
+        <div className={cn('space-y-3 relative p-3', properties?.className)}>
             {components && components.length > 0 ? (
                 components.map((child: StructuredComponent, index: number) => {
                     return (

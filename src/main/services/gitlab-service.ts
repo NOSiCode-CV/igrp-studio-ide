@@ -13,13 +13,35 @@ import { GitStore } from './git-store'
 
 let gitlab: any = null
 
+function asProjectList(repos: unknown): any[] {
+    return Array.isArray(repos) ? repos : []
+}
+
+function mapGitlabProject(repo: any) {
+    const namespace = repo.namespace
+    return {
+        id: repo.id,
+        name: repo.name,
+        full_name: repo.path_with_namespace,
+        description: repo.description ?? null,
+        private: repo.visibility !== 'public',
+        html_url: repo.web_url,
+        clone_url: repo.http_url_to_repo,
+        updated_at: repo.last_activity_at ?? null,
+        owner: namespace?.path ?? namespace?.full_path ?? namespace?.name ?? '',
+        default_branch: repo.default_branch || 'main',
+        platform: 'gitlab' as const
+    }
+}
+
 export const GitLabService = {
     async initializeServices() {
         try {
             const token = GitStore.getToken('gitlab')
 
             if (token) {
-                await this.initialize(token)
+                const host = GitStore.getProviderHost('gitlab')
+                await this.initialize(token, host || undefined)
                 return true
             }
         } catch (error) {
@@ -31,19 +53,25 @@ export const GitLabService = {
     /**
      * @param token   OAuth access token
      * @param baseUrl Optional GitLab host (e.g. https://git.nosi.cv).
-     *                When omitted falls back to VITE_GITLAB_HOST env var
-     *                (kept for backwards compatibility with the singleton).
+     *                When omitted: last persisted host, then VITE_GITLAB_BASE_URL,
+     *                then VITE_GITLAB_HOST (legacy).
      */
     async initialize(token: string, baseUrl?: string) {
         try {
-            const host = baseUrl || process.env.VITE_GITLAB_HOST
+            const host = (
+                baseUrl ||
+                GitStore.getProviderHost('gitlab') ||
+                process.env.VITE_GITLAB_BASE_URL ||
+                process.env.VITE_GITLAB_HOST ||
+                'https://git.nosi.cv'
+            ).replace(/\/+$/, '')
             gitlab = new Gitlab({
                 oauthToken: token,
                 host
             })
 
             GitStore.setToken('gitlab', token)
-            // New session — drop any cache from a previous account.
+            GitStore.setProviderHost('gitlab', host)
             clearRepoCache('gitlab')
 
             return true
@@ -56,6 +84,12 @@ export const GitLabService = {
         }
     },
 
+    logout() {
+        gitlab = null
+        GitStore.logoutGitlab()
+        clearRepoCache('gitlab')
+    },
+
     async getUserInfo() {
         if (!gitlab) throw new Error('GitLab client not initialized')
 
@@ -63,7 +97,8 @@ export const GitLabService = {
         if (!online) throw new Error('ERR_INTERNET_DISCONNECTED')
 
         try {
-            return await gitlab.Users.current()
+            const user = await gitlab.Users.showCurrentUser()
+            return JSON.parse(JSON.stringify(user))
         } catch (error) {
             const auth = isAuthError(error)
             if (auth.match) throw new GitAuthExpiredError('gitlab', auth.status)
@@ -81,96 +116,18 @@ export const GitLabService = {
             const online = await isOnline()
             if (!online) throw new Error('ERR_INTERNET_DISCONNECTED')
 
-            const igrpRepos: any = []
-            const batchSize = 10
-
-            // Gitbeaker's .all() walks pagination internally and returns
-            // every project the user has access to.
-            const repos = await gitlab.Projects.all({
-                membership: true,
-                orderBy: 'last_activity_at',
-                sort: 'desc',
-                perPage: 100
-            })
-
-            for (let i = 0; i < repos.length; i += batchSize) {
-                const batch = repos.slice(i, i + batchSize)
-
-                const promises = batch.map(async (repo) => {
-                    try {
-                        const branches = await gitlab.Branches.all(repo.id, {
-                            perPage: 5
-                        }).catch((err) => {
-                            console.log(
-                                `Error fetching branches for ${repo.name}:`,
-                                err.description || err.message
-                            )
-                            return []
-                        })
-
-                        if (branches.length === 0) {
-                            console.log(`Repository ${repo.name} has no branches or is empty.`)
-                            return null
-                        }
-
-                        const defaultBranch = repo.default_branch || 'main'
-
-                        const tree = await gitlab.Repositories.tree(repo.id, {
-                            path: '/',
-                            ref: defaultBranch
-                        }).catch(async (err) => {
-                            if (defaultBranch !== 'master') {
-                                return gitlab.Repositories.tree(repo.id, {
-                                    path: '/',
-                                    ref: 'master'
-                                }).catch(() => {
-                                    console.log(
-                                        `Error fetching repository tree for ${repo.name}:`,
-                                        err.description || err.message
-                                    )
-                                    return []
-                                })
-                            }
-                            return []
-                        })
-
-                        // Check if .igrpstudio directory exists in the tree
-                        const hasIgrpStudioDir = tree.some(
-                            (item) => item.name === '.igrpstudio' && item.type === 'tree'
-                        )
-
-                        if (hasIgrpStudioDir) {
-                            return {
-                                id: repo.id,
-                                name: repo.name,
-                                full_name: repo.path_with_namespace,
-                                description: repo.description,
-                                private: repo.visibility === 'private',
-                                html_url: repo.web_url,
-                                clone_url: repo.http_url_to_repo,
-                                updated_at: repo.last_activity_at,
-                                owner: repo.namespace.path,
-                                default_branch: defaultBranch,
-                                platform: 'gitlab'
-                            }
-                        }
-
-                        return null
-                    } catch (error: any) {
-                        console.log(
-                            `Error checking repo gitlab ${repo.name}:`,
-                            error.description || error.message
-                        )
-                        return null
-                    }
+            const repos = asProjectList(
+                await gitlab.Projects.all({
+                    membership: true,
+                    orderBy: 'last_activity_at',
+                    sort: 'desc',
+                    perPage: 100
                 })
+            )
 
-                const results = await Promise.all(promises)
-                igrpRepos.push(...results.filter((r) => r !== null))
-            }
-
-            writeRepoCache('gitlab', igrpRepos)
-            return igrpRepos
+            const mapped = repos.map(mapGitlabProject)
+            if (mapped.length > 0) writeRepoCache('gitlab', mapped)
+            return mapped
         } catch (error) {
             console.error('Error listing GitLab repositories:', error)
             const auth = isAuthError(error)

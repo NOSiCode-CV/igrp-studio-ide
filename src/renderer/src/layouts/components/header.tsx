@@ -186,7 +186,7 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                     <Link
                         to={homePath}
                         onClick={goHome}
-                        title={t('backToHome', 'Voltar ao início')}
+                        title={t('backToHome')}
                         className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-1.5 py-1 text-xs font-semibold tracking-wide text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                     >
                         <img
@@ -204,13 +204,13 @@ const Header = ({ config, basePath }: HeaderProps): JSX.Element => {
                                     <Link
                                         to={homePath}
                                         onClick={goHome}
-                                        title={t('backToHome', 'Voltar ao início')}
+                                        title={t('backToHome')}
                                         className="rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                                     >
                                         <ArrowLeft className="h-4 w-4" />
                                     </Link>
                                 </TooltipTrigger>
-                                <TooltipContent>{t('backToHome', 'Voltar ao início')}</TooltipContent>
+                                <TooltipContent>{t('backToHome')}</TooltipContent>
                             </Tooltip>
 
                             <div className="hidden min-w-0 items-center gap-1.5 text-xs font-medium text-muted-foreground md:flex">

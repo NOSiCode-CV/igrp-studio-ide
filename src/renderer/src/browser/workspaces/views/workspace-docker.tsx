@@ -14,7 +14,7 @@ import { useDocker } from '@renderer/hooks/use-docker'
 import { useWorkspace } from '@renderer/hooks/use-workspace'
 import useToast from '@renderer/hooks/useToast'
 import { AnimatePresence, motion } from 'motion/react'
-import { Check, Copy, FileText, Loader2, Plus, RefreshCw, Save } from 'lucide-react'
+import { Check, Copy, FileText, Loader2, Plus, RefreshCw } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import { type JSX, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -83,19 +83,22 @@ export function WorkspaceDocker({ workspace, onStacksChanged }: WorkspaceConfigP
     const { services } = useDocker({ workspace })
 
     const {
-        actions: { saveCustomWorkspaceComposeFile, installOptionalStacks, getOptionalStacksStatus }
+        actions: { installOptionalStacks, getOptionalStacksStatus }
     } = useWorkspace()
     const { showErrorToast } = useToast()
 
     const { t } = useTranslation()
 
     const composeTabs = useMemo<ComposeTabConfig[]>(() => {
+        // Whole-file compose editing was removed from the workspace engine's
+        // API — every stack file is now read-only from the UI. Per-service
+        // edits go through `updateService(request)` instead.
         const tabs: ComposeTabConfig[] = [
             {
                 id: 'main',
                 label: 'Main Compose',
                 fileName: 'igrp-compose.yaml',
-                readOnly: false
+                readOnly: true
             }
         ]
 
@@ -167,12 +170,6 @@ export function WorkspaceDocker({ workspace, onStacksChanged }: WorkspaceConfigP
         navigator.clipboard.writeText(composeContent)
         setCopied(true)
         setTimeout(() => setCopied(false), 1800)
-    }
-
-    const handleSaveService = (): void => {
-        if (!isReadOnly && composeContent) {
-            saveCustomWorkspaceComposeFile(composeContent)
-        }
     }
 
     const handleInstallOptionalStack = async (stack: OptionalStackId): Promise<void> => {
@@ -433,15 +430,6 @@ export function WorkspaceDocker({ workspace, onStacksChanged }: WorkspaceConfigP
                                     {t('copy')}
                                 </>
                             )}
-                        </Button>
-                        <Button
-                            size="sm"
-                            className="h-7 rounded-lg bg-teal-600 px-2.5 text-[11px] text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500 dark:disabled:bg-slate-700 dark:disabled:text-slate-400"
-                            onClick={handleSaveService}
-                            disabled={isReadOnly || !composeContent}
-                        >
-                            <Save className="mr-1 h-3.5 w-3.5" />
-                            {t('save')}
                         </Button>
                     </div>
                 </IGRPCardFooter>

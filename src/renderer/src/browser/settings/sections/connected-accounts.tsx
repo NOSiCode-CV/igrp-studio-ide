@@ -188,6 +188,7 @@ function Account({
     isConfigured
 }: AccountProps): React.ReactNode {
     const { t } = useTranslation()
+    const label = name === 'github' || name === 'gitlab' ? t(name) : name
 
     const handleClick = (): void => {
         if (action) action()
@@ -198,7 +199,7 @@ function Account({
             <div className="flex items-center space-x-3">
                 {icon}
                 <div>
-                    <span className="font-medium">{t(name)}</span>
+                    <span className="font-medium">{label}</span>
                     {isDefault && (
                         <span className="ml-2 text-xs text-muted-foreground">({t('default')})</span>
                     )}
@@ -253,12 +254,14 @@ export function ConnectedAccountsSettings(): React.ReactNode {
         gitLabProviders,
         activeProviderId,
         activeProvider,
+        userGitHub,
         loginGithub,
         loginGitLab,
         logoutGithub,
         logoutGitLab,
         saveGitlabConfig,
         setActiveProvider,
+        setActiveGitlabConfig,
         handleRemoveGitLabProvider
     } = useGithubAuth()
 
@@ -291,6 +294,7 @@ export function ConnectedAccountsSettings(): React.ReactNode {
                 const response = await saveGitlabConfig(config as unknown as GitLabProvider)
                 if (response.success) {
                     showSuccessToast(t('configSaved'))
+                    await getGitlabConfig()
                     closeForm()
                 } else {
                     showErrorToast(t('configSaveError'))
@@ -335,9 +339,19 @@ export function ConnectedAccountsSettings(): React.ReactNode {
         }
     }
 
-    const handleActivateProvider = (providerId: string): void => {
-        setActiveProvider(providerId)
-        showSuccessToast(t('providerActivated'))
+    const handleActivateProvider = async (providerId: string): Promise<void> => {
+        try {
+            if (providerId === 'github' || githubConfigs.some((c) => c.id === providerId)) {
+                await window.electron.ipcRenderer.invoke('git-provider:set-active', providerId)
+                setActiveProvider(providerId)
+            } else {
+                await setActiveGitlabConfig(providerId)
+            }
+            showSuccessToast(t('providerActivated'))
+        } catch (error) {
+            console.error('Failed to activate provider:', error)
+            showErrorToast(t('configSaveError'))
+        }
     }
 
     const handleEditProvider = (
@@ -378,7 +392,7 @@ export function ConnectedAccountsSettings(): React.ReactNode {
         isDefault: false
     })
 
-    const isGithubConnected = activeProviderId === 'github' && !!activeProvider?.user
+    const isGithubConnected = !!userGitHub
 
     return (
         <div>
@@ -422,12 +436,12 @@ export function ConnectedAccountsSettings(): React.ReactNode {
                         key={provider.id}
                         name={provider.name}
                         icon={<Gitlab size={20} />}
-                        connected={activeProviderId === provider.id && !!provider.user}
+                        connected={!!provider.user}
                         isActive={activeProviderId === provider.id}
                         isDefault={provider.isDefault}
                         isConfigured={provider.isConfigured}
                         action={
-                            activeProviderId === provider.id && provider.user
+                            provider.user
                                 ? () => logoutGitLab(provider.id)
                                 : () => loginGitLab(provider.id)
                         }

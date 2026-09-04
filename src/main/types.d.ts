@@ -1,4 +1,17 @@
-import { WorkspaceService } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+/**
+ * Local Studio-owned bookkeeping shape for a workspace-level service entry
+ * persisted in `.igrpstudio.workspaces.json`. The workspace engine no longer
+ * exports a `WorkspaceService` type — Studio owns this now. The shape is
+ * intentionally loose: existing on-disk registries were populated by earlier
+ * engine versions with arbitrary compose-service fields nested under
+ * `properties`, so we accept any of them without asserting a schema.
+ */
+export interface WorkspaceService {
+    id?: string
+    name?: string
+    properties?: Record<string, unknown>
+    [key: string]: unknown
+}
 
 type Handler = (event: IpcMainInvokeEvent, ...args: any[]) => any
 

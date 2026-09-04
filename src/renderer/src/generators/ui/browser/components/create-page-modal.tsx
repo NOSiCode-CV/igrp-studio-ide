@@ -347,9 +347,9 @@ export function CreatePageModal({
                         {!isSubPage && (
                             <div className="space-y-2">
                                 <Label htmlFor="route-group">
-                                    {t('routeGroup', 'Grupo')}{' '}
+                                    {t('routeGroup')}{' '}
                                     <span className="font-normal text-muted-foreground">
-                                        ({t('optional', 'opcional')})
+                                        ({t('optional')})
                                     </span>
                                 </Label>
                                 <Select
@@ -362,12 +362,12 @@ export function CreatePageModal({
                                 >
                                     <SelectTrigger id="route-group" className="w-full">
                                         <SelectValue
-                                            placeholder={t('selectGroup', 'Selecionar grupo')}
+                                            placeholder={t('selectGroup')}
                                         />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value={NO_GROUP}>
-                                            {t('noGroup', 'Sem grupo')}
+                                            {t('noGroup')}
                                         </SelectItem>
                                         {availableGroups.map((group) => (
                                             <SelectItem key={group} value={group}>
@@ -382,7 +382,7 @@ export function CreatePageModal({
                                                 </SelectItem>
                                             )}
                                         <SelectItem value={NEW_GROUP}>
-                                            {t('newGroup', 'Novo grupo…')}
+                                            {t('newGroup')}
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -390,18 +390,12 @@ export function CreatePageModal({
                                     <Input
                                         value={newGroupName}
                                         onChange={(e) => setNewGroupName(e.target.value)}
-                                        placeholder={t(
-                                            'newGroupPlaceholder',
-                                            'ex.: contribuicoes'
-                                        )}
+                                        placeholder={t('newGroupPlaceholder')}
                                         className="font-mono text-sm"
                                     />
                                 )}
                                 <p className="text-xs text-muted-foreground">
-                                    {t(
-                                        'routeGroupHint',
-                                        'Usa route groups do Next.js: (nome)/path — não aparece no URL.'
-                                    )}
+                                    {t('routeGroupHint')}
                                 </p>
                             </div>
                         )}

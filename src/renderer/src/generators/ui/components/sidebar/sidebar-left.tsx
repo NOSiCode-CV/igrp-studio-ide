@@ -260,7 +260,7 @@ export function AppSidebar({
                                                                             <TooltipContent>
                                                                                 <p>
                                                                                     {t(
-                                                                                        'Deprecated component'
+                                                                                        'deprecatedComponent'
                                                                                     )}
                                                                                 </p>
                                                                             </TooltipContent>

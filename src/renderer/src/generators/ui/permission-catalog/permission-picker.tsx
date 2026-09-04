@@ -12,7 +12,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@renderer/components/ui/popover'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { cn } from '@renderer/lib/utils'
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Check, ChevronsUpDown, Plus, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CreatePermissionDialog } from './create-permission-dialog'
@@ -20,9 +20,15 @@ import { usePermissionCatalog } from './PermissionCatalogContext'
 import type { PermissionKeySuggestionContext } from './suggestPermissionKey'
 import type { PermissionCatalogEntry } from './types'
 
+const PERMISSION_KEY_PATTERN = /^[a-z][a-z0-9_.]*$/
+
 interface PermissionPickerProps {
     value: string[]
     onChange: (keys: string[]) => void
+    /** Keys in `value` that are external (already exist in the backend/token) — not tracked in the project catalog. */
+    externalKeys?: string[]
+    /** Called when the user submits a raw key via the "use existing permission" input. */
+    onAddExternal?: (key: string) => void
     suggestedKeys?: string[]
     suggestionContext?: PermissionKeySuggestionContext
     className?: string
@@ -58,6 +64,8 @@ function CatalogItem({
 export function PermissionPicker({
     value,
     onChange,
+    externalKeys = [],
+    onAddExternal,
     suggestedKeys = [],
     suggestionContext,
     className
@@ -66,6 +74,8 @@ export function PermissionPicker({
     const { catalog, recentKeys, addPermission } = usePermissionCatalog()
     const [open, setOpen] = useState(false)
     const [createOpen, setCreateOpen] = useState(false)
+    const [externalInput, setExternalInput] = useState('')
+    const [externalError, setExternalError] = useState('')
 
     const recentEntries = useMemo(
         () =>
@@ -99,10 +109,33 @@ export function PermissionPicker({
         onChange(value.includes(key) ? value.filter((k) => k !== key) : [...value, key])
     }
 
+    const remove = (key: string) => {
+        onChange(value.filter((k) => k !== key))
+    }
+
     const handleCreated = (key: string) => {
         if (!value.includes(key)) onChange([...value, key])
         setCreateOpen(false)
         setOpen(false)
+    }
+
+    const submitExternal = () => {
+        const key = externalInput.trim()
+        if (!key) return
+        if (!PERMISSION_KEY_PATTERN.test(key)) {
+            setExternalError(
+                t(
+                    'permissionKeyInvalid',
+                    'Use lowercase letters, numbers, dots and underscores (e.g. app.page.action).'
+                )
+            )
+            return
+        }
+        setExternalError('')
+        if (!value.includes(key)) {
+            onAddExternal ? onAddExternal(key) : onChange([...value, key])
+        }
+        setExternalInput('')
     }
 
     return (
@@ -115,12 +148,33 @@ export function PermissionPicker({
                 ) : (
                     value.map((key) => {
                         const entry = catalog.find((e) => e.key === key)
+                        const isExternal = externalKeys.includes(key)
                         return (
-                            <Badge key={key} variant="secondary" className="text-xs">
+                            <Badge
+                                key={key}
+                                variant={isExternal ? 'outline' : 'secondary'}
+                                className="text-xs gap-1"
+                            >
                                 <span className="font-mono">{key}</span>
-                                {entry?.label && (
-                                    <span className="text-muted-foreground ml-1">· {entry.label}</span>
+                                {isExternal ? (
+                                    <span className="text-muted-foreground ml-1">
+                                        · {t('externalPermission', 'external')}
+                                    </span>
+                                ) : (
+                                    entry?.label && (
+                                        <span className="text-muted-foreground ml-1">
+                                            · {entry.label}
+                                        </span>
+                                    )
                                 )}
+                                <button
+                                    type="button"
+                                    onClick={() => remove(key)}
+                                    className="ml-1 rounded-sm opacity-60 hover:opacity-100"
+                                    aria-label={t('removePermission', 'Remove permission')}
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
                             </Badge>
                         )
                     })
@@ -145,7 +199,7 @@ export function PermissionPicker({
                 >
                     <Command>
                         <CommandInput placeholder={t('searchPermissions', 'Search catalog…')} />
-                        <ScrollArea className="h-72">
+                        <ScrollArea className="max-h-72">
                             <CommandList className="max-h-none overflow-visible">
                                 <CommandEmpty>{t('noItemFound', 'No items found')}</CommandEmpty>
                                 {suggestedEntries.length > 0 && (
@@ -199,7 +253,7 @@ export function PermissionPicker({
                                 )}
                             </CommandList>
                         </ScrollArea>
-                        <div className="border-t p-2">
+                        <div className="border-t p-2 space-y-2">
                             <Button
                                 type="button"
                                 variant="ghost"
@@ -210,6 +264,53 @@ export function PermissionPicker({
                                 <Plus className="h-4 w-4 mr-2" />
                                 {t('createNewPermission', 'Create new permission…')}
                             </Button>
+                            <p className="px-1 text-[11px] text-muted-foreground">
+                                {t(
+                                    'createPermissionSyncHint',
+                                    'Registered in the project catalog and synced with Access Management.'
+                                )}
+                            </p>
+                            <div className="space-y-1 px-1">
+                                <div className="flex gap-1.5">
+                                    <input
+                                        value={externalInput}
+                                        onChange={(e) => {
+                                            setExternalInput(e.target.value)
+                                            if (externalError) setExternalError('')
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault()
+                                                submitExternal()
+                                            }
+                                        }}
+                                        placeholder={t(
+                                            'useExistingPermissionPlaceholder',
+                                            'e.g. delete_invoice'
+                                        )}
+                                        className="h-8 flex-1 rounded-md border bg-transparent px-2 text-xs font-mono outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={submitExternal}
+                                        disabled={!externalInput.trim()}
+                                    >
+                                        {t('use', 'Use')}
+                                    </Button>
+                                </div>
+                                {externalError ? (
+                                    <p className="text-[11px] text-destructive">{externalError}</p>
+                                ) : (
+                                    <p className="text-[11px] text-muted-foreground">
+                                        {t(
+                                            'useExistingPermissionHint',
+                                            'Already granted by the backend (in the access token) — reuse it here without registering it in the project catalog.'
+                                        )}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </Command>
                 </PopoverContent>

@@ -4,8 +4,149 @@ import { promisify } from 'util'
 import { checkAndReadBaseApi } from '../helpers'
 import { escapePath } from '../helpers/utils'
 import type { Commit, Repository } from '../types'
+import { GitStore } from './git-store'
 
-const execAsync = promisify(exec)
+const execAsyncRaw = promisify(exec)
+
+/** TOFU: accept unknown hosts once; never skip verification of known hosts. */
+const GIT_SSH_TOFU = 'ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new'
+
+function gitEnv(extra?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+    return {
+        ...process.env,
+        GIT_TERMINAL_PROMPT: '0',
+        GIT_SSH_COMMAND: GIT_SSH_TOFU,
+        ...extra
+    }
+}
+
+function execAsync(
+    command: string,
+    options: { cwd?: string; maxBuffer?: number; env?: NodeJS.ProcessEnv } = {}
+) {
+    return execAsyncRaw(command, {
+        ...options,
+        env: gitEnv(options.env)
+    })
+}
+
+function gitErrorMessage(error: unknown): string {
+    const err = error as { stderr?: string; stdout?: string; message?: string }
+    return [err.stderr, err.stdout, err.message].filter(Boolean).join('\n')
+}
+
+function describeCloneFailure(error: unknown): string {
+    const message = gitErrorMessage(error)
+    if (/Host key verification failed/i.test(message)) {
+        return (
+            'SSH host key is not trusted. Clone via HTTPS (recommended) or accept the host key once from a terminal, then retry.'
+        )
+    }
+    if (/Permission denied \(publickey\)/i.test(message) || /Could not read from remote repository/i.test(message)) {
+        return 'SSH authentication failed. Connect a GitHub or GitLab account and clone via HTTPS, or configure an SSH key.'
+    }
+    if (/Authentication failed|could not read Username|terminal prompts disabled/i.test(message)) {
+        return 'Git asked for credentials with no session. Sign in to GitHub or GitLab in Studio, or provide a token.'
+    }
+    return message || 'Failed to clone repository'
+}
+
+function hostnameOf(urlOrHost: string): string | null {
+    try {
+        const withScheme = /^https?:\/\//i.test(urlOrHost) ? urlOrHost : `https://${urlOrHost}`
+        return new URL(withScheme).hostname.toLowerCase()
+    } catch {
+        return null
+    }
+}
+
+function parseGitHostAndPath(repoUrl: string): { host: string; httpsUrl: string } | null {
+    const trimmed = repoUrl.trim()
+    const sshScp = trimmed.match(/^git@([^:]+):(.+)$/)
+    if (sshScp) {
+        const host = sshScp[1].toLowerCase()
+        const repoPath = sshScp[2].replace(/^\/+/, '')
+        return { host, httpsUrl: `https://${host}/${repoPath}` }
+    }
+    const sshUri = trimmed.match(/^ssh:\/\/(?:git@)?([^/]+)\/(.+)$/)
+    if (sshUri) {
+        const host = sshUri[1].toLowerCase()
+        return { host, httpsUrl: `https://${host}/${sshUri[2]}` }
+    }
+    try {
+        const parsed = new URL(trimmed)
+        return { host: parsed.hostname.toLowerCase(), httpsUrl: trimmed }
+    } catch {
+        return null
+    }
+}
+
+function normalizeGitUrl(url: string): string {
+    const parsed = parseGitHostAndPath(url)
+    let candidate = parsed?.httpsUrl ?? url.trim()
+    try {
+        const u = new URL(candidate)
+        u.username = ''
+        u.password = ''
+        candidate = u.toString()
+    } catch {
+        // keep as-is
+    }
+    return candidate.replace(/\.git\/?$/i, '').replace(/\/+$/, '').toLowerCase()
+}
+
+function tokenForHost(host: string): { token: string; kind: 'github' | 'gitlab' } | null {
+    const githubHost =
+        hostnameOf(GitStore.getProviderHost('github') || 'https://github.com') || 'github.com'
+    const gitlabHost =
+        hostnameOf(
+            GitStore.getProviderHost('gitlab') ||
+                process.env.VITE_GITLAB_BASE_URL ||
+                process.env.VITE_GITLAB_HOST ||
+                'https://git.nosi.cv'
+        ) || 'git.nosi.cv'
+
+    const isGithub = host === githubHost || host === 'github.com' || host.endsWith('.github.com')
+    if (isGithub) {
+        const token = GitStore.getToken('github')
+        return token ? { token, kind: 'github' } : null
+    }
+
+    const isGitlab =
+        host === gitlabHost ||
+        host === 'gitlab.com' ||
+        host === 'git.nosi.cv' ||
+        host.includes('gitlab')
+    if (isGitlab) {
+        const token = GitStore.getToken('gitlab')
+        return token ? { token, kind: 'gitlab' } : null
+    }
+
+    return null
+}
+
+function withEmbeddedToken(httpsUrl: string, kind: 'github' | 'gitlab', token: string): string {
+    const url = new URL(httpsUrl)
+    if (kind === 'github') {
+        url.username = token
+        url.password = ''
+    } else {
+        url.username = 'oauth2'
+        url.password = token
+    }
+    return url.toString()
+}
+
+function stripCredentials(httpsUrl: string): string {
+    try {
+        const url = new URL(httpsUrl)
+        url.username = ''
+        url.password = ''
+        return url.toString()
+    } catch {
+        return httpsUrl
+    }
+}
 
 export const GitService = {
     async isGitInitialized(projectPath: string) {
@@ -157,49 +298,60 @@ export const GitService = {
             })
 
             // Prepare git clone command with authentication
-            let cloneCommand = `git clone ${repoUrl} ${encapeBasePath}`
+            let cloneTarget = repoUrl
+            let cleanRemote: string | null = null
+            const parsed = parseGitHostAndPath(repoUrl)
+            const wantsExplicitAuth = Boolean(auth && auth.type && auth.type !== 'none')
 
-            // Add authentication if provided
-            if (auth && auth.type !== 'none') {
-                if (auth.type === 'basic' && auth.username && auth.password) {
-                    // For basic auth, we need to encode credentials in the URL
-                    const url = new URL(repoUrl)
-                    url.username = auth.username
-                    url.password = auth.password
-                    cloneCommand = `git clone ${url.toString()} ${encapeBasePath}`
-                } else if (auth.type === 'token' && auth.token) {
-                    // For token auth, we can use the token in the URL or set it as credential
-                    if (repoUrl.includes('github.com')) {
-                        // GitHub token authentication
-                        const url = new URL(repoUrl)
-                        url.username = auth.token
-                        url.password = ''
-                        cloneCommand = `git clone ${url.toString()} ${encapeBasePath}`
-                    } else if (repoUrl.includes('gitlab.com')) {
-                        // GitLab token authentication
-                        const url = new URL(repoUrl)
-                        url.username = 'oauth2'
-                        url.password = auth.token
-                        cloneCommand = `git clone ${url.toString()} ${encapeBasePath}`
-                    } else {
-                        // Generic token authentication
-                        const url = new URL(repoUrl)
-                        url.username = auth.token
-                        url.password = ''
-                        cloneCommand = `git clone ${url.toString()} ${encapeBasePath}`
+            try {
+                if (wantsExplicitAuth && parsed) {
+                    if (auth!.type === 'basic' && auth!.username && auth!.password) {
+                        const url = new URL(parsed.httpsUrl)
+                        url.username = auth!.username
+                        url.password = auth!.password
+                        cloneTarget = url.toString()
+                        cleanRemote = stripCredentials(parsed.httpsUrl)
+                    } else if (auth!.type === 'token' && auth!.token) {
+                        const kind =
+                            parsed.host === 'github.com' || parsed.host.endsWith('.github.com')
+                                ? 'github'
+                                : 'gitlab'
+                        cloneTarget = withEmbeddedToken(parsed.httpsUrl, kind, auth!.token)
+                        cleanRemote = stripCredentials(parsed.httpsUrl)
+                    }
+                } else if (parsed) {
+                    const stored = tokenForHost(parsed.host)
+                    if (stored) {
+                        cloneTarget = withEmbeddedToken(parsed.httpsUrl, stored.kind, stored.token)
+                        cleanRemote = stripCredentials(parsed.httpsUrl)
                     }
                 }
+            } catch (urlError) {
+                console.error('Failed to apply clone credentials:', urlError)
             }
 
+            const cloneCommand = `git clone ${escapePath(cloneTarget)} ${encapeBasePath}`
+
             return new Promise((resolve, reject) => {
-                exec(cloneCommand, async (error) => {
+                exec(cloneCommand, { env: gitEnv() }, async (error) => {
                     if (error) {
+                        const message = describeCloneFailure(error)
                         window.webContents.send('clone-progress', {
                             status: 'error',
-                            message: `Failed to clone: ${error.message}`
+                            message
                         })
-                        reject(error)
+                        reject(new Error(message))
                         return
+                    }
+
+                    if (cleanRemote) {
+                        try {
+                            await execAsync(`git remote set-url origin ${escapePath(cleanRemote)}`, {
+                                cwd: basePath
+                            })
+                        } catch (remoteError) {
+                            console.error('Failed to strip clone credentials from origin:', remoteError)
+                        }
                     }
 
                     try {
@@ -285,10 +437,7 @@ export const GitService = {
             })
             return stdout
         } catch (error: any) {
-            await execAsync(`git push -u origin ${branch}`, {
-                cwd: projectPath
-            })
-            return 'Branch pushed successfully after pull failure'
+            throw new Error(gitErrorMessage(error) || 'Failed to pull changes')
         }
     },
 
@@ -508,22 +657,33 @@ export const GitService = {
     },
 
     async checkGitRemotes(
-        projects: { data: any[] },
+        projects: { data?: any[] } | any[],
         githubRepos: Repository[]
     ): Promise<Record<number, string>> {
         try {
-            const results = {}
+            const list = Array.isArray(projects) ? projects : (projects?.data ?? [])
+            const results: Record<number, string> = {}
 
-            for (const project of projects?.data) {
-                const remoteUrl = await this.getRemoteUrl(project.path)
-                if (remoteUrl) {
-                    const matchingRepo = githubRepos.find(
-                        (repo) => repo.clone_url === remoteUrl || repo.html_url === remoteUrl
+            for (const project of list) {
+                const projectPath = project?.path
+                if (!projectPath) continue
+
+                const remoteUrl = await this.getRemoteUrl(projectPath)
+                if (!remoteUrl) continue
+
+                const remoteNorm = normalizeGitUrl(remoteUrl)
+                const matchingRepo = githubRepos.find((repo) => {
+                    const candidates = [repo.clone_url, repo.html_url, (repo as any).ssh_url]
+                    return candidates.some(
+                        (candidate) =>
+                            typeof candidate === 'string' &&
+                            candidate.length > 0 &&
+                            normalizeGitUrl(candidate) === remoteNorm
                     )
+                })
 
-                    if (matchingRepo) {
-                        results[matchingRepo.id] = project.path
-                    }
+                if (matchingRepo) {
+                    results[matchingRepo.id] = projectPath
                 }
             }
 

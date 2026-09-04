@@ -23,7 +23,8 @@ export const GitHubService = {
             const token = GitStore.getToken('github')
 
             if (token) {
-                await this.initialize(token)
+                const host = GitStore.getProviderHost('github')
+                await this.initialize(token, host || undefined)
                 return true
             }
         } catch (error) {
@@ -45,7 +46,7 @@ export const GitHubService = {
             const apiUrl = deriveApiUrl(baseUrl)
             octokit = new Octokit(apiUrl ? { auth: token, baseUrl: apiUrl } : { auth: token })
             await octokit.users.getAuthenticated()
-            // New session — drop any cache from a previous account.
+            GitStore.setProviderHost('github', baseUrl || 'https://github.com')
             clearRepoCache('github')
             return true
         } catch (error) {
@@ -55,6 +56,12 @@ export const GitHubService = {
             if (auth.match) throw new GitAuthExpiredError('github', auth.status)
             throw error
         }
+    },
+
+    logout() {
+        octokit = null
+        GitStore.logoutGithub()
+        clearRepoCache('github')
     },
 
     async getUserInfo() {

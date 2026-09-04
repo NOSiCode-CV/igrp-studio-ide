@@ -102,6 +102,14 @@ export const toolConfig: ToolConfig[] = [
         category: 'development',
         description: 'Microsoft MarkItDown module (pip install "markitdown[all]")',
         extraCheck: 'markitdownModule'
+    },
+    {
+        name: '@igrp/cli',
+        command: 'igrp',
+        link: 'https://www.npmjs.com/package/@igrp/cli',
+        required: true,
+        category: 'development',
+        description: 'IGRP CLI to bootstrap projects and open workspaces from the terminal'
     }
 ]
 

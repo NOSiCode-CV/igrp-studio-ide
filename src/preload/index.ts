@@ -1,7 +1,10 @@
 import { electronAPI } from '@electron-toolkit/preload'
 import type { BuildComponentRegistryInput } from '@igrp/igrp-studio-nextjs-engine'
 import type { ComponentRegistrationConfig } from '@igrp/igrp-studio-nextjs-engine/types'
-import type { ServiceWorkspace } from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
+import type {
+    ResetWorkspaceOptions,
+    UpdateServiceRequest
+} from '@igrp/igrp-studio-workspace-engine/dist/interfaces/types'
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { preloadBindings } from 'i18next-electron-fs-backend'
 import { EVENTS } from '../main/constants/events'
@@ -412,14 +415,6 @@ const engine = {
         }
     },
 
-    getService: async (engineType: string): Promise<HandlerResponse> => {
-        try {
-            return await ipcRenderer.invoke(EVENTS.NEXT.GET_SERVICE, engineType)
-        } catch (error) {
-            return handleError(error)
-        }
-    },
-
     getDependencies: async (engineType: string): Promise<HandlerResponse> => {
         try {
             return await ipcRenderer.invoke(EVENTS.ENGINE.GET_DEPENDENCIES, engineType)
@@ -512,10 +507,6 @@ const repo = {
                 return handleError(error)
             }
         },
-        saveCustomWorkspaceComposeFile: (yaml: object, basePath: string) =>
-            ipcRenderer.invoke(EVENTS.REPOSITORY.WORKSPACE.SAVE_CUSTOM_YAML, yaml, basePath),
-        configureService: (config: ServiceWorkspace, basePath: string) =>
-            ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.CONFIGURE_SERVICE, config, basePath),
         deleteProject: (projectId: string, basePath: string) =>
             ipcRenderer.invoke(EVENTS.REPOSITORY.PROJECT.DELETE, projectId, basePath),
         getProject: (projectId: string) =>
@@ -575,6 +566,20 @@ const repo = {
                 return handleError(error)
             }
         },
+        resetWorkspace: async (
+            basePath: string,
+            options?: ResetWorkspaceOptions
+        ): Promise<HandlerResponse> => {
+            try {
+                return await ipcRenderer.invoke(
+                    EVENTS.REPOSITORY.WORKSPACE.RESET,
+                    basePath,
+                    options
+                )
+            } catch (error) {
+                return handleError(error)
+            }
+        },
         addProjectToWorkspace: async (
             workspaceId: string,
             project: ProjectData
@@ -590,13 +595,10 @@ const repo = {
             }
         },
 
-        // Service methods
-        createService: (service: ServiceWorkspace, basePath: string) =>
-            ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.CREATE, service, basePath),
-        updateService: (service: ServiceWorkspace, basePath: string) =>
-            ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.UPDATE, service, basePath),
-        deleteService: (serviceId: string, basePath: string) =>
-            ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.DELETE, serviceId, basePath),
+        // Service methods — only full-replace of an existing compose service
+        // block remains after the workspace engine's surface shrank.
+        updateService: (request: UpdateServiceRequest, basePath: string) =>
+            ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.UPDATE, request, basePath),
         findAllServices: (workspaceId: string) =>
             ipcRenderer.invoke(EVENTS.REPOSITORY.SERVICE.FIND_ALL, workspaceId),
 

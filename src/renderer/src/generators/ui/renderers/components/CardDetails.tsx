@@ -11,7 +11,9 @@ import Draggable from '@renderer/lib/dnd/Draggable'
 import Droppable from '@renderer/lib/dnd/Droppable'
 import type { StructuredComponent } from '@renderer/lib/dnd/types'
 import { cn } from '@renderer/lib/utils'
+import { getLabel } from '@renderer/utils'
 import type React from 'react'
+import { GenNoInfoComp } from '../../components/GenNoInfoComp'
 import { useDroppedComponents } from '../../contexts/EditorContext'
 import type { CardComponentProps } from '../CardComponent'
 import FieldTools from '../tools/FieldTools'
@@ -22,7 +24,7 @@ const IGRPStudioCardDetails: React.FC<CardComponentProps> = ({
 }: CardComponentProps) => {
     const {
         id: parentComponentId,
-        children: components,
+        children: components = [],
         componentName: parentComponentName,
         properties
     } = comp
@@ -44,7 +46,6 @@ const IGRPStudioCardDetails: React.FC<CardComponentProps> = ({
                 'overflow-hidden gap-3 animate-fade-in motion-reduce:animate-none',
                 'transition-all duration-200 hover:shadow-lg hover:border-primary/20'
             )}
-            {...properties}
         >
             {(title || description) && (
                 <CardHeader className="pb-4">
@@ -61,50 +62,62 @@ const IGRPStudioCardDetails: React.FC<CardComponentProps> = ({
                     path="cardDetails"
                 >
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm relative group/card-details-trigger">
-                        {components.map((child: StructuredComponent, key: number) => {
-                            const { label, value, showCopyTo } = child.properties || {}
+                        {components.length === 0 ? (
+                            <div className="col-span-full">
+                                <GenNoInfoComp type={getLabel(parentComponentName).toUpperCase()} />
+                            </div>
+                        ) : (
+                            components.map((child: StructuredComponent, key: number) => {
+                                const { label, value, content, showCopyTo } =
+                                    child.properties || {}
+                                const displayValue = content ?? value
 
-                            return (
-                                <Draggable
-                                    key={child.id}
-                                    item={child}
-                                    index={key}
-                                    dropTargetId={parentComponentId}
-                                    dropZone={true}
-                                    className={cn('bg-muted/0', className)}
-                                    mode="MOVE"
-                                >
-                                    <div
-                                        className={cn(
-                                            'absolute top-0 mt-1 bg-gray-600 text-white rounded opacity-0 group-hover/card-details-trigger:opacity-100 transition-opacity duration-200 shadow-lg left-0 right-auto'
-                                        )}
+                                return (
+                                    <Draggable
+                                        key={child.id}
+                                        item={child}
+                                        index={key}
+                                        dropTargetId={parentComponentId}
+                                        dropZone={true}
+                                        className={cn('bg-muted/0', className)}
+                                        mode="MOVE"
                                     >
-                                        <FieldTools
-                                            comp={child}
-                                            parentComp={comp}
-                                            path={undefined}
-                                            index={key}
-                                            onEdit={() =>
-                                                handleEditClick(child, parentComponentName)
-                                            }
-                                        />
-                                    </div>
-                                    <div key={key} className="flex items-center gap-4">
-                                        <div>
-                                            <h3 className="font-normal text-muted-foreground">
-                                                {label}
-                                            </h3>
-                                            {typeof value === 'string' ? (
-                                                <span className="font-medium">{value}</span>
-                                            ) : (
-                                                value
+                                        <div
+                                            className={cn(
+                                                'absolute top-0 mt-1 bg-gray-600 text-white rounded opacity-0 group-hover/card-details-trigger:opacity-100 transition-opacity duration-200 shadow-lg left-0 right-auto'
+                                            )}
+                                        >
+                                            <FieldTools
+                                                comp={child}
+                                                parentComp={comp}
+                                                path={undefined}
+                                                index={key}
+                                                onEdit={() =>
+                                                    handleEditClick(child, parentComponentName)
+                                                }
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <div>
+                                                <h3 className="font-normal text-muted-foreground">
+                                                    {label}
+                                                </h3>
+                                                {typeof displayValue === 'string' ? (
+                                                    <span className="font-medium">
+                                                        {displayValue}
+                                                    </span>
+                                                ) : (
+                                                    displayValue
+                                                )}
+                                            </div>
+                                            {showCopyTo && (
+                                                <IGRPCopyTo value={displayValue as string} />
                                             )}
                                         </div>
-                                        {showCopyTo && <IGRPCopyTo value={value as string} />}
-                                    </div>
-                                </Draggable>
-                            )
-                        })}
+                                    </Draggable>
+                                )
+                            })
+                        )}
                     </div>
                 </Droppable>
             </CardContent>
