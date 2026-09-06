@@ -42,12 +42,26 @@ export const dialog = {
 }
 
 export const net = {
-    request: (..._args: any[]) => ({
-        on: (_evt: string, _cb: (...a: any[]) => void) => undefined,
-        end: () => undefined,
-        write: (_chunk: any) => undefined,
-        abort: () => undefined
-    }),
+    request: (..._args: any[]) => {
+        const listeners = new Map<string, (...a: any[]) => void>()
+        const request = {
+            on: (event: string, callback: (...a: any[]) => void) => {
+                listeners.set(event, callback)
+                return request
+            },
+            end: () => {
+                // Keep network checks deterministic and local in Jest. The
+                // production Electron implementation performs the real HEAD
+                // request; the test double reports a successful response on
+                // the next microtask so callers never hang on an unhandled
+                // request object.
+                queueMicrotask(() => listeners.get('response')?.({ statusCode: 204 }))
+            },
+            write: (_chunk: any) => undefined,
+            abort: () => listeners.get('abort')?.()
+        }
+        return request
+    },
     isOnline: () => true
 }
 

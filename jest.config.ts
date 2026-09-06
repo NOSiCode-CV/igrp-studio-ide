@@ -32,6 +32,7 @@ const config: Config = {
     },
     moduleNameMapper: {
         '^electron$': '<rootDir>/__mocks__/electron.ts',
+        '^electron/main$': '<rootDir>/__mocks__/electron-main.ts',
         // Mirror electron-vite's `@renderer` alias so renderer modules
         // (validation schemas, config components) are unit-testable.
         '^@renderer/(.*)$': '<rootDir>/src/renderer/src/$1',
