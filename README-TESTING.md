@@ -4,33 +4,35 @@ This guide is for a tester who receives a packaged IGRP Studio Horizon candidate
 
 The tester must have access to `git.nosi.cv`. Download candidates from the GitLab job artifacts, not from an unverified copy sent by email or chat.
 
-> **Current acceptance warning (2026-09-04):** the Windows job `108769` is
-> marked **Passed** by GitLab, but the exact candidate is **not accepted**.
-> Its extracted payload contains Linux-only native variants for required
-> packages (`@lancedb/lancedb`, `@parcel/watcher`, `@tailwindcss/oxide` and
-> `lightningcss`); direct Windows probes failed. Do not present this `.exe` as
-> a working Windows release. Use it only to reproduce the recorded finding, or
-> wait for a new candidate produced after the packaging correction.
+### Current candidate proof (2026-09-06)
 
-### Pipeline correction prepared (not yet CI-validated)
+The corrected acceptance candidate is published and was verified directly in
+GitLab. This is a test candidate, not a signed production release: the
+Windows installer intentionally skips code signing when the candidate tag is
+used, so Windows SmartScreen may display a warning.
 
-The working tree now contains a Windows packaging gate that installs the
-Windows x64 native packages explicitly, adds the required `apache-arrow` peer,
-uses `electron-builder.yml`, disables the builder's native rebuild, and checks
-the unpacked payload before release. The Windows build does not publish by
-itself; the `release` job receives the artifact only after the build job passes.
-The CI jobs now resolve `@igrp/django-engine` and `@igrp/dotnet-engine` from
-the authenticated NOSi registry instead of `file:../../...` sibling paths,
-write the registry configuration before installation, and use an explicit
-`electron-builder.yml` with `--publish never` for candidate builds. This is
-source-level preparation only. A new tag pipeline must still run and produce
-a new artifact before the Windows row above can change to accepted.
+| CI item | Result |
+|---|---|
+| Candidate tag | `v0.2.0-beta.13-candidate.7` |
+| Pipeline | **Passed** — [#40922](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/pipelines/40922) |
+| Windows build | **Passed** — [job #109089](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/jobs/109089) |
+| Linux build | **Passed** — [job #109090](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/jobs/109090) |
+| Release upload | **Passed** — [job #109091](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/jobs/109091) |
+| Windows installer | `igrp-studio-0.2.0-beta.13-setup.exe` — 268 MiB |
+| Linux packages | AppImage 351 MiB; DEB 242 MiB; Snap 310 MiB |
+| Windows native payload gate | **Passed** — CI log reports native dependency verification passed |
+| macOS artifact | **NOT VERIFIED** — no macOS runner is enabled |
 
-### Current source verification (2026-09-06)
+The Windows and Linux artifact browsers are linked below. Download the
+artifact from the matching job, calculate its SHA-256 hash, and record the
+manual UI result separately. The candidate is suitable for external testing,
+but it must not be described as signed production software.
 
-The canonical checkout contains the enum/type-payload hardening and the CI
-packaging correction, but these changes are not yet represented by a new
-GitLab candidate:
+### Source and runtime verification (2026-09-06)
+
+The canonical checkout also contains the enum/type-payload hardening, the
+cross-module fixture, the target-native packaging gate, and the public runtime
+verifier:
 
 | Check | Result |
 |---|---|
@@ -47,15 +49,17 @@ GitLab candidate:
 | EF migration and PostgreSQL schema | **PASS** — migration applied; domain tables, foreign keys and `customer_tag` join table present |
 | Cross-module REST/GraphQL runtime verifier | **PASS** — health/OpenAPI, CRUD, relation persistence, validation and cleanup |
 | Generated custom controller business logic | **NOT IMPLEMENTED** — generated scaffold routes correctly return `501` until a developer supplies the handler |
-| Local NSIS installer creation | **BLOCKED** — Windows `winCodeSign` extraction needs symlink privilege; local signing certificate is not available |
-| New GitLab Windows artifact | **NOT VERIFIED** — requires push/tag pipeline |
+| Local NSIS installer creation | **BLOCKED** — local signing certificate/symlink privilege is unavailable; CI candidate packaging passed |
+| New GitLab Windows artifact | **PASS WITH LIMITATIONS** — pipeline #40922/job #109089 passed; candidate is unsigned and still needs an external install/use record |
 | macOS artifact | **BLOCKED** — no macOS runner is enabled |
 | PostgreSQL runtime E2E | **PASS (isolated follow-up)** — generated API passed REST + GraphQL CRUD after explicit EF schema preparation |
 | Docker-specific runtime path | **BLOCKED** — Docker Desktop/service is unavailable to the current account |
 
 The exact command outputs and decision record are kept in
 `C:\Users\ipp21\NosiEngine\evidence\horizon-windows-installed-artifact-full-e2e-20260904\CORRECTION_SOURCE_VERIFICATION_20260905.md`.
-These source checks do not replace testing the new downloaded installer.
+These source checks do not replace installing and using the downloaded
+candidate. The historical Windows defect is retained below as a rejected
+candidate record, not as the current candidate status.
 
 ### Follow-up runtime E2E (2026-09-05)
 
@@ -129,16 +133,17 @@ their normal success/error statuses and finish with `CROSS_MODULE_RUNTIME_PASS`.
 
 | Component | CI evidence | Candidate / limitation | Manual acceptance |
 |---|---|---|---|
-| Horizon — Linux x64 | Pipeline **40620**, job **108539**, Passed | `IGRP-Studio-0.2.0-beta.20-x86_64.AppImage` (321 MiB) or `IGRP-Studio-0.2.0-beta.20-amd64.deb` (228 MiB) | Not yet verified by an external tester |
-| Horizon — Windows | Job **108769**, Passed | `igrp-studio-0.2.0-beta.20-setup.exe` (273 MiB); exact payload has a confirmed native dependency defect and pipeline **40762** also contains manual actions | **Blocked / not accepted** until a corrected candidate is produced and tested |
+| Horizon — Linux x64 | Pipeline **40922**, job **109090**, Passed | `igrp-studio-0.2.0-beta.13.AppImage` (351 MiB), `.deb` (242 MiB) and `.snap` (310 MiB) | CI artifact verified; external manual test still to be recorded |
+| Horizon — Windows | Pipeline **40922**, job **109089**, Passed | `igrp-studio-0.2.0-beta.13-setup.exe` (268 MiB); unsigned acceptance candidate | CI native-payload gate passed; external install/use still to be recorded |
 | Horizon — macOS | No passed macOS candidate | Job is blocked because no macOS runner is available | **Blocked / not verified** |
 | .NET engine package | Pipeline **40739**, job **108722**, Passed | `igrp-dotnet-engine-0.1.0-rc.10.tgz` (932 KiB) | Requires a package-level test in a sample project |
 
 CI Passed means that the recorded CI job completed successfully and produced an artifact. It does not, by itself, prove that a person installed and used the application successfully.
 
-### Internal Windows evidence record
+### Historical Windows evidence record — rejected candidate
 
-This is an internal isolated test record, not an external acceptance claim.
+This is an internal isolated test record for the old rejected candidate, not the
+current candidate and not an external acceptance claim.
 
 ```text
 Tester: Codex background isolated UI run
@@ -158,7 +163,7 @@ The final check logs are retained with the evidence package:
 `dotnet-test-final-20260905.txt`, `dotnet-ef-migrations-final-20260905.txt`
 and `generated-host-probe-final-20260905.txt`.
 
-## Internal background UI check (2026-09-04 to 2026-09-05)
+## Historical internal background UI check (2026-09-04 to 2026-09-05)
 
 An isolated run against the installed Windows candidate (`40762` / job
 `108769`) exercised the public UI without overlapping the user's normal Horizon
@@ -179,17 +184,19 @@ excludes `Shared` from the endpoint module list. This is not evidence that an
 endpoint can exist without a module: create a domain module first and repeat
 the endpoint step. A separate follow-up then proved the generated API runtime
 with an isolated PostgreSQL database and explicit schema preparation; see
-`E2E_RESULTS.md`. The Windows native-payload defect remains release-blocking.
-Keep these historical UI, runtime, and installer states separate.
+`E2E_RESULTS.md`. The Windows native-payload defect described there belongs to
+the old candidate only. Keep these historical UI, runtime, and installer
+states separate from candidate.7.
 
 ## 1. Download the candidate
 
 Use the matching job while logged in:
 
-- [Horizon Linux job 108539](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/jobs/108539)
-- [Horizon Linux artifacts](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/jobs/108539/artifacts/browse/dist/)
-- [Horizon Windows candidate job 108769](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/jobs/108769)
-- [Horizon Windows artifacts](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/jobs/108769/artifacts/browse/dist/)
+- [Horizon candidate pipeline 40922](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/pipelines/40922)
+- [Horizon Linux job 109090](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/jobs/109090)
+- [Horizon Linux artifacts](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/jobs/109090/artifacts/browse/dist/)
+- [Horizon Windows candidate job 109089](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/jobs/109089)
+- [Horizon Windows artifacts](https://git.nosi.cv/igrp-3_0/igrp-studio/igrp-studio-horizon/-/jobs/109089/artifacts/browse/dist/)
 - [Dotnet engine job 108722](https://git.nosi.cv/igrp-3_0/igrp-studio/dotnet-engine/-/jobs/108722)
 - [Dotnet engine artifacts](https://git.nosi.cv/igrp-3_0/igrp-studio/dotnet-engine/-/jobs/108722/artifacts/browse/package-artifact/)
 
@@ -207,13 +214,13 @@ Record the exact filename and calculate its SHA-256 hash before running it.
 Windows PowerShell:
 
 ```powershell
-Get-FileHash .\igrp-studio-0.2.0-beta.20-setup.exe -Algorithm SHA256
+Get-FileHash .\igrp-studio-0.2.0-beta.13-setup.exe -Algorithm SHA256
 ```
 
 Linux:
 
 ```bash
-sha256sum ./IGRP-Studio-0.2.0-beta.20-x86_64.AppImage
+sha256sum ./igrp-studio-0.2.0-beta.13.AppImage
 ```
 
 macOS/Linux alternative:
@@ -231,28 +238,29 @@ If the filename, version, source job, or hash is unexpected, stop and record **B
 Portable AppImage:
 
 ```bash
-chmod +x ./IGRP-Studio-0.2.0-beta.20-x86_64.AppImage
-./IGRP-Studio-0.2.0-beta.20-x86_64.AppImage
+chmod +x ./igrp-studio-0.2.0-beta.13.AppImage
+./igrp-studio-0.2.0-beta.13.AppImage
 ```
 
 Debian/Ubuntu package:
 
 ```bash
-sudo apt install ./IGRP-Studio-0.2.0-beta.20-amd64.deb
+sudo apt install ./igrp-studio_0.2.0-beta.13_amd64.deb
 ```
 
 Launch the application and confirm that the main window opens without an immediate crash.
 
 ### Windows x64
 
-1. Download the Windows setup artifact from job **108769**.
+1. Download `igrp-studio-0.2.0-beta.13-setup.exe` from job **109089**.
 2. Confirm that the job is **Passed** and that the artifact is the expected `.exe` candidate.
 3. Calculate the SHA-256 hash.
-4. For the current `beta.20` candidate, stop after recording the hash unless
-   the purpose is explicitly to reproduce the packaging defect. A corrected
-   candidate must be available before claiming Windows acceptance.
-5. Run the corrected installer and launch IGRP Studio Horizon from the Start menu.
-6. If SmartScreen appears, verify the source, filename, and hash first; follow the organization's software policy and do not blindly bypass security warnings.
+4. Run the installer and launch IGRP Studio Horizon from the Start menu.
+5. This is an unsigned acceptance candidate; if SmartScreen appears, verify
+   the GitLab source, filename and hash before following the organization's
+   software policy for allowing the test.
+6. Complete the model/relation and generated-backend checks below and record
+   the result as a separate manual acceptance record.
 
 ### macOS
 
@@ -294,12 +302,12 @@ record.
 6. Toggle revision OFF→ON→OFF, save after each transition, close the app and
    reopen the workspace. Confirm the final OFF state and all three models are
    still present.
-7. Open the enum editor. On a corrected candidate, create an enum and use it
+7. Open the enum editor. On candidate.7, create an enum and use it
    as a model field. The corrected source normalizes the selector payload to
    `type` + `objectType: "enum"` + `module`; record the generated manifest and
    the save result. If the candidate still rejects the field, record the exact
    validation/error and mark the enum gate `BLOCKED` or `FAIL`; do not silently
-   leave the project in a broken state. The old job `108769` remains blocked.
+   leave the project in a broken state.
 8. Create a domain module first (for example `HumanResources`; `Shared` is not
    offered as an endpoint module), then open the endpoint action editor and
    select that module. If the selector is still empty after a domain module
@@ -394,6 +402,8 @@ After manual testing:
 1. Update the platform/support table in `README.md` with the tested version and platform.
 2. Link to the GitLab pipeline/job rather than committing large binaries to the repository.
 3. Add the artifact filename, commit, hash, test date, tester, and manual result to the release/testing notes.
-4. Keep known limitations visible: Linux evidence is not Windows/macOS evidence, the overall Windows candidate pipeline may still be Blocked by manual actions, and macOS needs a runner.
+4. Keep known limitations visible: candidate.7 is unsigned, Linux evidence is
+   not Windows/macOS evidence, custom controller business logic remains a
+   developer responsibility, and macOS needs a runner.
 5. Make documentation-only changes in a separate reviewable commit or merge request.
 6. Never add tokens, passwords, registry credentials, or raw credential-bearing CI output to the README or report.
