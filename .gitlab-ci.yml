@@ -15,7 +15,6 @@ build_packagedev_mac:
     - arm64
   variables:
     ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
-    CERTIFICATE_PASSWORD: '${CERTIFICATE_PASSWORD}'
   before_script:
     - apt-get update
     - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
@@ -23,11 +22,19 @@ build_packagedev_mac:
     - apt-get update
     - apt-get install -y wine64
     - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
+    - test -s certificate.pfx
+    - |
+      printf '%s\n' \
+        'registry=https://sonatype.nosi.cv/repository/npm-group/' \
+        '@igrp:registry=https://sonatype.nosi.cv/repository/igrp/' \
+        "//sonatype.nosi.cv/repository/npm-group/:username=${SONATYPE_USERNAME}" \
+        "//sonatype.nosi.cv/repository/npm-group/:_password=${SONATYPE_PASSWORD}" \
+        "//sonatype.nosi.cv/repository/igrp/:username=${SONATYPE_USERNAME}" \
+        "//sonatype.nosi.cv/repository/igrp/:_password=${SONATYPE_PASSWORD}" \
+        > .npmrc
 
   script:
-    - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
-    - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
-    - yarn install --frozen-lockfile --ignore-engines
+    - yarn install --frozen-lockfile --ignore-engines --ignore-scripts
     - yarn release:mac
   artifacts:
     paths:
@@ -45,7 +52,7 @@ build_packagedev_windows:
     - tags
   variables:
     ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
-    CERTIFICATE_PASSWORD: '${CERTIFICATE_PASSWORD}'
+    NODE_OPTIONS: '--max-old-space-size=4096'
   before_script:
     - apt-get update
     - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
@@ -62,12 +69,33 @@ build_packagedev_windows:
     #"https://git.nosi.cv/api/v4/projects/${CI_PROJECT_ID}/repository/files/certificate%2Fcertificate.pfx/raw?ref=master"
 
     - echo "$CERTIFICATE_BASE64" | base64 -d > certificate.pfx
+    - test -s certificate.pfx
+    - |
+      printf '%s\n' \
+        'registry=https://sonatype.nosi.cv/repository/npm-group/' \
+        '@igrp:registry=https://sonatype.nosi.cv/repository/igrp/' \
+        "//sonatype.nosi.cv/repository/npm-group/:username=${SONATYPE_USERNAME}" \
+        "//sonatype.nosi.cv/repository/npm-group/:_password=${SONATYPE_PASSWORD}" \
+        "//sonatype.nosi.cv/repository/igrp/:username=${SONATYPE_USERNAME}" \
+        "//sonatype.nosi.cv/repository/igrp/:_password=${SONATYPE_PASSWORD}" \
+        > .npmrc
 
   script:
-    - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
-    - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
-    - yarn install --frozen-lockfile --ignore-engines
-    - yarn release:win
+    - yarn install --frozen-lockfile --ignore-engines --ignore-scripts
+    # Build the renderer with the Linux host dependencies first. The target
+    # native packages are installed only after the build so Vite can still run
+    # on Linux while the packaged app receives Windows x64 bindings.
+    - yarn typecheck
+    - yarn test --runInBand
+    # Fail the candidate before packaging if the public engine contract cannot
+    # generate two domain modules, cross-module relations, DTO inheritance,
+    # enums and endpoint controllers.
+    - node scripts/stress-cross-module.mjs technical Sqlite "$CI_PROJECT_DIR/.e2e/cross-module"
+    - yarn electron-vite build
+    - node scripts/prepare-target-native-deps.mjs win32 x64
+    # Publish only from the gated release job after this verification passes.
+    - yarn electron-builder --win --config electron-builder.yml --publish never
+    - node scripts/verify-win-artifact.mjs
   artifacts:
     paths:
       - dist/
@@ -84,14 +112,21 @@ build_packagedev_linux:
     - tags
   variables:
     ELECTRON_BUILDER_CACHE: '${CI_PROJECT_DIR}/.cache/electron-builder'
-    CERTIFICATE_PASSWORD: '${CERTIFICATE_PASSWORD}'
   before_script:
     - apt-get update
     - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
+    - |
+      printf '%s\n' \
+        'registry=https://sonatype.nosi.cv/repository/npm-group/' \
+        '@igrp:registry=https://sonatype.nosi.cv/repository/igrp/' \
+        "//sonatype.nosi.cv/repository/npm-group/:username=${SONATYPE_USERNAME}" \
+        "//sonatype.nosi.cv/repository/npm-group/:_password=${SONATYPE_PASSWORD}" \
+        "//sonatype.nosi.cv/repository/igrp/:username=${SONATYPE_USERNAME}" \
+        "//sonatype.nosi.cv/repository/igrp/:_password=${SONATYPE_PASSWORD}" \
+        > .npmrc
   script:
-    - export CERTIFICATE_PASSWORD=${CERTIFICATE_PASSWORD}
-    - sed -i "s/__CERT_PASS__/${CERTIFICATE_PASSWORD}/g" package.json
-    - yarn install --frozen-lockfile --ignore-engines
+    - yarn install --frozen-lockfile --ignore-engines --ignore-scripts
+    - node scripts/stress-cross-module.mjs technical Sqlite "$CI_PROJECT_DIR/.e2e/cross-module"
     - yarn release:linux
   artifacts:
     paths:
