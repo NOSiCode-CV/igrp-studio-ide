@@ -56,6 +56,10 @@ build_packagedev_windows:
   before_script:
     - apt-get update
     - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
+    # The current node image does not expose Yarn on PATH. Install the
+    # repository's Yarn 1 tool explicitly before any yarn command is used.
+    - npm install --global yarn@1.22.22
+    - yarn --version
     - dpkg --add-architecture i386
     - apt-get update
     - apt-get install -y wine64 wine32
@@ -115,6 +119,10 @@ build_packagedev_linux:
   before_script:
     - apt-get update
     - apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
+    # Keep the Linux candidate job independent of the base image's package
+    # manager shims; the project lockfile is a Yarn 1 lockfile.
+    - npm install --global yarn@1.22.22
+    - yarn --version
     - |
       printf '%s\n' \
         'registry=https://sonatype.nosi.cv/repository/npm-group/' \
