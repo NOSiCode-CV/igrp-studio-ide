@@ -113,8 +113,11 @@ function findGeneratedFile(root, suffix) {
 
 function assertManifestContracts() {
     const manifestRoot = path.join(OUT, '.igrpstudio')
-    const peopleModels = path.join(manifestRoot, 'people', 'models')
-    const salesModels = path.join(manifestRoot, 'sales', 'models')
+    // Generated module folders preserve the module display casing. Keep these
+    // paths case-sensitive so the acceptance gate behaves the same on the
+    // Linux runners used for the Windows/Wine packaging job and on Windows.
+    const peopleModels = path.join(manifestRoot, 'People', 'models')
+    const salesModels = path.join(manifestRoot, 'Sales', 'models')
     const sharedDtos = path.join(manifestRoot, 'Shared', 'dto')
 
     const people = jsonFiles(peopleModels).map(readJson)
