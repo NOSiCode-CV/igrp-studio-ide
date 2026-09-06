@@ -155,7 +155,13 @@ build_packagedev_linux:
     - yarn release:linux
   artifacts:
     paths:
-      - dist/
+      # Publish only distributable Linux files; dist/linux-unpacked contains
+      # tens of thousands of runtime files and exceeds the GitLab limit.
+      - dist/*.AppImage
+      - dist/*.deb
+      - dist/*.snap
+      - dist/*.blockmap
+      - dist/*.yml
     expire_in: 4 weeks
   cache:
     paths:
