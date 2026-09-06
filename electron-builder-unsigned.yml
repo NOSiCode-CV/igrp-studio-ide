@@ -1,0 +1,11 @@
+extends: electron-builder.yml
+
+# Acceptance candidates must remain testable even when the CI signing secret
+# is unavailable or stale. Production/release tags continue to use the signed
+# electron-builder.yml configuration.
+win:
+  signtoolOptions: null
+  forceCodeSigning: false
+  signAndEditExecutable: false
+  signExts:
+    - '!.exe'
