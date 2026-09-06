@@ -38,7 +38,14 @@ build_packagedev_mac:
     - yarn release:mac
   artifacts:
     paths:
-      - dist/
+      # Keep the unpacked app available for the in-job verifier, but publish
+      # only distributable files. Uploading dist/ also archives tens of
+      # thousands of unpacked dependency files and exceeds the GitLab limit.
+      - dist/*.dmg
+      - dist/*.zip
+      - dist/*.pkg
+      - dist/*.blockmap
+      - dist/*.yml
     expire_in: 4 weeks
   cache:
     paths:
@@ -102,7 +109,12 @@ build_packagedev_windows:
     - node scripts/verify-win-artifact.mjs
   artifacts:
     paths:
-      - dist/
+      - dist/*.exe
+      - dist/*.AppImage
+      - dist/*.deb
+      - dist/*.snap
+      - dist/*.blockmap
+      - dist/*.yml
     expire_in: 4 weeks
   cache:
     paths:

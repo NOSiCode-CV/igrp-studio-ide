@@ -23,6 +23,7 @@ if (!packages) {
 }
 
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
+const crossPlatformInstall = process.platform !== targetPlatform
 const installArgs = [
     'install',
     '--no-save',
@@ -32,11 +33,15 @@ const installArgs = [
     '--include=optional',
     `--os=${targetPlatform}`,
     `--cpu=${targetArch}`,
+    ...(crossPlatformInstall ? ['--force'] : []),
     ...packages.map(([name, version]) => `${name}@${version}`)
 ]
 
 console.log(`Installing target-native dependencies for ${targetPlatform}/${targetArch}`)
 console.log(`Packages: ${packages.map(([name, version]) => `${name}@${version}`).join(', ')}`)
+if (crossPlatformInstall) {
+    console.log(`Host platform is ${process.platform}; forcing target-only package installation for ${targetPlatform}`)
+}
 
 const result = spawnSync(npmCommand, installArgs, {
     cwd: process.cwd(),
