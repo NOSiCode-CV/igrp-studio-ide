@@ -97,7 +97,10 @@ export default function WelcomeSwipe() {
     const [cliInstallError, setCliInstallError] = useState<string | null>(null)
     const [cliInstallOutput, setCliInstallOutput] = useState<string | null>(null)
     const aiCodeLineWidths = [92, 78, 86, 70]
-    const isSetupSlide = slides[currentSlide].title === 'Prepare your environment'
+    // Keep the rendered slide total even if a rapid click sequence queues more
+    // than one functional state update before React commits a render.
+    const currentSlideData = slides[Math.min(Math.max(currentSlide, 0), slides.length - 1)] ?? slides[0]
+    const isSetupSlide = currentSlideData.title === 'Prepare your environment'
 
     const goToApplicationsHome = useCallback(() => {
         navigate(ROUTES.PATH_IDE_INITIAL_SCREEN, { replace: true })
@@ -141,17 +144,13 @@ export default function WelcomeSwipe() {
     }, [getWorkspaces, workspace, goToApplicationsHome])
 
     const nextSlide = () => {
-        if (currentSlide < slides.length - 1) {
-            setDirection(1)
-            setCurrentSlide((prev) => prev + 1)
-        }
+        setDirection(1)
+        setCurrentSlide((prev) => Math.min(prev + 1, slides.length - 1))
     }
 
     const prevSlide = () => {
-        if (currentSlide > 0) {
-            setDirection(-1)
-            setCurrentSlide((prev) => prev - 1)
-        }
+        setDirection(-1)
+        setCurrentSlide((prev) => Math.max(prev - 1, 0))
     }
 
     const handleInstallCli = useCallback(async () => {
@@ -234,7 +233,13 @@ export default function WelcomeSwipe() {
                     </div>
 
                     <div className="flex-1 relative">
-                        <AnimatePresence initial={false} custom={direction} mode="wait">
+                        {/*
+                         * Keep the next slide mounted while the previous slide exits. The
+                         * wait mode can leave the previous slide's action button mounted
+                         * after a direct pagination click, hiding "Enter Studio Workspace"
+                         * on the setup slide.
+                         */}
+                        <AnimatePresence initial={false} custom={direction} mode="sync">
                             <motion.div
                                 key={currentSlide}
                                 custom={direction}
@@ -264,7 +269,7 @@ export default function WelcomeSwipe() {
                                     transition={{ delay: 0.1 }}
                                     className="text-4xl lg:text-5xl font-extrabold text-foreground leading-[1.1] tracking-tight mb-6"
                                 >
-                                    {slides[currentSlide].title}
+                                    {currentSlideData.title}
                                 </motion.h1>
 
                                 <motion.p
@@ -273,7 +278,7 @@ export default function WelcomeSwipe() {
                                     transition={{ delay: 0.2 }}
                                     className="text-lg text-muted-foreground leading-relaxed mb-8"
                                 >
-                                    {slides[currentSlide].description}
+                                    {currentSlideData.description}
                                 </motion.p>
 
                                 <div className="flex items-center gap-4">
@@ -433,7 +438,7 @@ export default function WelcomeSwipe() {
                                             </span>
                                         </div>
                                     </div>
-                                ) : slides[currentSlide].title === 'AI-Powered Code Generation' ? (
+                                ) : currentSlideData.title === 'AI-Powered Code Generation' ? (
                                     <div className="flex flex-col gap-2 p-4 w-full">
                                         {aiCodeLineWidths.map((width, i) => (
                                             <motion.div
@@ -468,12 +473,12 @@ export default function WelcomeSwipe() {
                                         className="flex flex-col items-center gap-3"
                                     >
                                         <div
-                                            className={`p-4 rounded-2xl bg-linear-to-br ${slides[currentSlide].color} shadow-lg shadow-primary/20`}
+                                            className={`p-4 rounded-2xl bg-linear-to-br ${currentSlideData.color} shadow-lg shadow-primary/20`}
                                         >
-                                            {slides[currentSlide].icon}
+                                            {currentSlideData.icon}
                                         </div>
                                         <span className="text-[12px] text-foreground font-bold uppercase tracking-widest">
-                                            {slides[currentSlide].title.split(' ')[0]}
+                                            {currentSlideData.title.split(' ')[0]}
                                         </span>
                                     </motion.div>
                                 )}

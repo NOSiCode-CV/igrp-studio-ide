@@ -53,6 +53,39 @@ export function getOptionsByObject(objects: any, module: string, currentItem: st
         : []
 }
 
+/**
+ * Convert a type-selector value back to the engine schema shape.
+ *
+ * The dropdown emits `{ type, value, module }` for enum/model/DTO choices,
+ * while persisted manifests and engine schemas use `type` for the selected
+ * name and `objectType` for its namespace. Keep this normalization at the
+ * submission boundary so both fresh and previously saved form state are safe.
+ */
+type SchemaTypeSelection = {
+    type?: string
+    value?: string
+    module?: string
+}
+
+export const normalizeSchemaTypeSelection = <T>(field: T): T => {
+    const candidate = field as T & { type?: unknown }
+    if (!field || typeof candidate.type !== 'object' || Array.isArray(candidate.type)) return field
+
+    const selection = candidate.type as SchemaTypeSelection
+    if (typeof selection.value !== 'string') return field
+
+    return {
+        ...candidate,
+        type: selection.value,
+        ...(typeof selection.type === 'string' && selection.type
+            ? { objectType: selection.type }
+            : {}),
+        ...(typeof selection.module === 'string' && selection.module
+            ? { module: selection.module }
+            : {})
+    } as T
+}
+
 export const addNewRow = (formik: RowFormController, field: string, defaultValue: any): void => {
     formik.setFieldValue(field, [...formik.values[field], defaultValue])
 }
@@ -136,13 +169,21 @@ const mergeFilesByType = (files: FileTree[]): FileTree[] => {
     const childKey = (child: FileTree): string =>
         `${child.name}-${child.content?.module ?? ''}`
 
+    // `filesThree` is derived from Redux state and may contain frozen tree
+    // nodes. Build fresh nodes at every level so merging a module with the
+    // Shared bucket never mutates read-only state.
+    const cloneTree = (node: FileTree): FileTree => ({
+        ...node,
+        ...(node.children ? { children: node.children.map(cloneTree) } : {})
+    })
+
     // Helper function to recursively merge children
     const mergeChildren = (existingChildren: FileTree[], newChildren: FileTree[]): FileTree[] => {
         const childrenMap: Record<string, FileTree> = {}
 
         // Add existing children to the map
         existingChildren.forEach((child: any) => {
-            childrenMap[childKey(child)] = child
+            childrenMap[childKey(child)] = cloneTree(child)
         })
 
         // Merge new children into the map
@@ -151,14 +192,14 @@ const mergeFilesByType = (files: FileTree[]): FileTree[] => {
             if (childrenMap[name]) {
                 // If the child already exists, merge their children recursively
                 if (child.children && childrenMap[name].children) {
-                    childrenMap[name].children = mergeChildren(
-                        childrenMap[name].children!,
-                        child.children
-                    )
+                    childrenMap[name] = {
+                        ...childrenMap[name],
+                        children: mergeChildren(childrenMap[name].children!, child.children)
+                    }
                 }
             } else {
                 // If the child doesn't exist, add it to the map
-                childrenMap[name] = child
+                childrenMap[name] = cloneTree(child)
             }
         })
 
@@ -171,14 +212,14 @@ const mergeFilesByType = (files: FileTree[]): FileTree[] => {
         if (mergedFilesMap[file.name]) {
             // If the file/directory already exists, merge their children
             if (file.children && mergedFilesMap[file.name].children) {
-                mergedFilesMap[file.name].children = mergeChildren(
-                    mergedFilesMap[file.name].children!,
-                    file.children
-                )
+                mergedFilesMap[file.name] = {
+                    ...mergedFilesMap[file.name],
+                    children: mergeChildren(mergedFilesMap[file.name].children!, file.children)
+                }
             }
         } else {
             // If the file/directory doesn't exist, add it to the map
-            mergedFilesMap[file.name] = { ...file }
+            mergedFilesMap[file.name] = cloneTree(file)
         }
     })
 

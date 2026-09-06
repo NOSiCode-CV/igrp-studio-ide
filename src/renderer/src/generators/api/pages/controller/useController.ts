@@ -116,7 +116,7 @@ export const useController = ({
         load()
     }, [currentItem])
 
-    const getValuesToSubmit = async () => {
+    const getValuesToSubmit = async (controllerOverride = controller) => {
         const values = { ...formik.values }
         const data = await getJsonData(currentItem?.path)
         const actionName = oldActionName || values.actionName
@@ -151,7 +151,7 @@ export const useController = ({
             ? mergedActions
             : [...existingActions, newAction]
 
-        const { name, description, path, module } = controller
+        const { name, description, path, module } = controllerOverride
 
         return {
             type: 'controller',
@@ -160,7 +160,11 @@ export const useController = ({
             description,
             basePath: path,
             actions: finalActions,
-            id
+            // `currentItem.id` identifies the action tab. The engine's
+            // controller upsert/rename contract needs the controller id from
+            // the manifest, otherwise adding a second action is treated as a
+            // new controller and can overwrite the existing action list.
+            id: data?.id ?? id
         } as ControllerConfig
     }
 
@@ -169,20 +173,22 @@ export const useController = ({
         formik.handleSubmit()
     }, [KeyboardKey.save])
 
-    const handleSave = async (): Promise<void> => {
+    const handleSave = async (controllerOverride?: typeof controller): Promise<void> => {
         try {
-            if (!controller.name || !controller.module || !controller.description) {
+            const activeController = controllerOverride ?? controller
+
+            if (
+                !activeController.name ||
+                !activeController.module ||
+                !activeController.description
+            ) {
                 setIsModalOpen(true)
                 return
             }
 
-            const values = await getValuesToSubmit()
+            const values = await getValuesToSubmit(activeController)
 
-            const { error } = await window.engine.createController(
-                values,
-                framework,
-                basePath
-            )
+            const { error } = await window.engine.createController(values, framework, basePath)
 
             console.log(values, error)
 

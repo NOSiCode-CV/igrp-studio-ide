@@ -407,3 +407,25 @@ After manual testing:
    developer responsibility, and macOS needs a runner.
 5. Make documentation-only changes in a separate reviewable commit or merge request.
 6. Never add tokens, passwords, registry credentials, or raw credential-bearing CI output to the README or report.
+
+## 9. Latest local verification record (2026-09-06)
+
+The latest isolated Windows UI run covered onboarding, workspace creation,
+`People`/`Sales` modules, shared models, cross-module OneToOne and ManyToOne
+relations, a ManyToMany join table, and a controller with two actions. The
+generated project restored, compiled and passed **5/5** tests. The detailed
+record is kept outside this repository at:
+
+`C:\Users\ipp21\NosiEngine\evidence\horizon-cross-module-acceptance-20260906\MANUAL_UI_RUN_20260906.md`
+
+The run also created an `InitialCreate` EF migration in the disposable
+workspace. Docker was unavailable, so the database proof used an isolated
+PostgreSQL 18 cluster on a bounded local port; the migration was applied and
+the generated CRUD/relation smoke test passed. The generated custom endpoint
+routes were reached successfully, but returned the expected **501 Not
+Implemented** until their application-specific query/command handlers are
+implemented.
+
+This record was produced from a local working-tree build. It is not evidence
+that candidate.7 contains the latest local fixes; publish and pass a new CI
+candidate before asking an external tester to use those changes.
