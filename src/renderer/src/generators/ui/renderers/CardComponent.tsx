@@ -44,6 +44,11 @@ const CardComponent = ({ comp, group, hoverClass, onDragEnd }: CardComponentProp
     const { iconProperties, className, content, label, ...rest } = properties || {}
     const args = omitInternalProperties(rest)
 
+    // Leaf buttons render text; Radix Slot needs a single React element child.
+    if (componentName === 'button' && !comp.children?.length) {
+        delete args.asChild
+    }
+
     const Component = COMPONENT_MAP[componentName]
 
     const FAKE_COMPONENT_DATA = getFakeComponentData(componentName)

@@ -9,6 +9,7 @@ import { useGit } from '@renderer/hooks/use-git'
 import useToast from '@renderer/hooks/useToast'
 import type { StructuredLayout } from '@renderer/lib/dnd/types'
 import { sanitizeLayoutRules } from '@renderer/generators/ui/utils/permissionRules'
+import { sanitizeLeafButtonAsChild } from '@renderer/generators/ui/utils/sanitizeLeafButtonAsChild'
 import { setChangeStatus as onSetChangeStatus } from '@renderer/redux/thunks'
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
@@ -113,7 +114,9 @@ export const usePageSave = ({
             const isBpmnProcess = restData.type === 'processStep'
 
             const components = restData.components
-                ? sanitizeLayoutRules(restData.components as StructuredLayout)
+                ? sanitizeLeafButtonAsChild(
+                      sanitizeLayoutRules(restData.components as StructuredLayout)!
+                  )
                 : restData.components
 
             const payload = {
