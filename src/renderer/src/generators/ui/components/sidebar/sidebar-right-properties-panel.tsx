@@ -38,6 +38,12 @@ const PropertiesPanel = memo(function PropertiesPanel({
 }: PropertiesPanelProps) {
     const { t } = useTranslation()
     const tag = tempEditingComponent.tag || ''
+    const editableProperties =
+        tempEditingComponent.componentName === 'button' && !tempEditingComponent.children?.length
+            ? Object.fromEntries(
+                  Object.entries(propsComponent).filter(([key]) => key !== 'asChild')
+              )
+            : propsComponent
 
     return (
         <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
@@ -48,7 +54,7 @@ const PropertiesPanel = memo(function PropertiesPanel({
                 <AccordionContent className="space-y-2">
                     {propsComponent && (
                         <RenderPropsConfig
-                            propsComp={propsComponent}
+                            propsComp={editableProperties}
                             formValues={tempEditingComponent.properties}
                             pageOptions={pageOptions}
                             dataProperties={tempEditingComponent.data}
