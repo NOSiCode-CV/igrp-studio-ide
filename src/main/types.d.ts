@@ -136,6 +136,8 @@ export interface WorkspaceBootstrapResult {
         process: boolean
     }
     errors: string[]
+    /** Non-fatal notices, e.g. Docker not running — the stack just didn't auto-start. */
+    warnings: string[]
 }
 
 export interface OptionalStacksStatus {

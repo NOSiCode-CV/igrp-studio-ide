@@ -216,9 +216,9 @@ export const WorkspaceSwitcher = ({
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     className="gap-2 p-2"
-                                    onSelect={(e) => {
-                                        e.preventDefault()
-                                        setShowWorkspaceDialog(true)
+                                    onSelect={() => {
+                                        // Let the menu close first so focus isn't left inside an aria-hidden popper
+                                        setTimeout(() => setShowWorkspaceDialog(true), 0)
                                     }}
                                 >
                                     <div className="flex size-6 items-center justify-center rounded-md border bg-background">

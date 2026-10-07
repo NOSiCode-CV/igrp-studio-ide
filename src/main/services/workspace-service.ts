@@ -711,7 +711,8 @@ export class WorkspaceRepository {
                 monitoring: false,
                 process: false
             },
-            errors: []
+            errors: [],
+            warnings: []
         }
 
         const data = await this.loadData()
@@ -722,7 +723,18 @@ export class WorkspaceRepository {
             projects: []
         }
 
-        const { path: _workspacePath, createdAt, ...baseConfigWorkspace } = newWorkspace
+        // Engine's WorkspaceConfig schema is additionalProperties:false — only
+        // {id, name, slug, description, version} are allowed through.
+        const {
+            path: _workspacePath,
+            createdAt,
+            updatedAt,
+            lastOpenedAt,
+            projects,
+            services,
+            pinned,
+            ...baseConfigWorkspace
+        } = newWorkspace
 
         data.workspaces.push(newWorkspace)
 
@@ -750,15 +762,24 @@ export class WorkspaceRepository {
         }
 
         if (normalizedOptions.autoStartStack) {
-            try {
-                await dockerService.upMainStack(newWorkspace.path)
-                bootstrapResult.stackStarted = true
-            } catch (error) {
-                bootstrapResult.errors.push(
-                    error instanceof Error
-                        ? error.message
-                        : 'Failed to start igrp stack automatically.'
+            const daemonCheck = await dockerService.checkDockerDaemon()
+            if (!daemonCheck.isRunning) {
+                // Workspace creation must not depend on Docker being installed/running —
+                // the stack simply stays stopped until the user starts Docker themselves.
+                bootstrapResult.warnings.push(
+                    'Docker is not running, so the local platform stack was not started automatically. Start Docker and launch the stack from the workspace when ready.'
                 )
+            } else {
+                try {
+                    await dockerService.upMainStack(newWorkspace.path)
+                    bootstrapResult.stackStarted = true
+                } catch (error) {
+                    bootstrapResult.errors.push(
+                        error instanceof Error
+                            ? error.message
+                            : 'Failed to start igrp stack automatically.'
+                    )
+                }
             }
         }
 
@@ -785,7 +806,8 @@ export class WorkspaceRepository {
                 monitoring: false,
                 process: false
             },
-            errors: []
+            errors: [],
+            warnings: []
         }
 
         const data = await this.loadData()

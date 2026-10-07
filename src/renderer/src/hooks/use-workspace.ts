@@ -88,7 +88,7 @@ interface UseWorkspaceReturn {
 
 export const useWorkspace = (): UseWorkspaceReturn => {
     const { t } = useTranslation()
-    const { showSuccessToast, showErrorToast } = useToast()
+    const { showSuccessToast, showErrorToast, showWarningToast } = useToast()
     const [workspaces, setWorkspaces] = useState<IWorkspace[]>([])
     const [loading, setLoading] = useState(true)
     // Only the first workspaces load drives the full-screen loader; later
@@ -168,6 +168,11 @@ export const useWorkspace = (): UseWorkspaceReturn => {
             const bootstrapErrors = (result as any)?.bootstrap?.errors
             if (Array.isArray(bootstrapErrors) && bootstrapErrors.length > 0) {
                 showErrorToast(bootstrapErrors.join('\n'))
+            }
+
+            const bootstrapWarnings = (result as any)?.bootstrap?.warnings
+            if (Array.isArray(bootstrapWarnings) && bootstrapWarnings.length > 0) {
+                showWarningToast(bootstrapWarnings.join('\n'))
             }
 
             dispatch(setWorkspace(result))
