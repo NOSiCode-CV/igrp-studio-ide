@@ -426,6 +426,12 @@ export function ProjectWizard({ children }: { children?: React.ReactNode }) {
         if (!current.group) updates.group = 'cv.igrp'
         if (!current.database) updates.database = 'Postgresql'
         if (!current.projectStructureStyle) updates.projectStructureStyle = 'technical'
+        // Feature toggles are off by default — the backend's Zod schema requires
+        // valid booleans, so a user who never clicks them submits `undefined`
+        // and the create fails ("must be boolean"). Backfill them to false.
+        if (current.enableObservability === undefined) updates.enableObservability = false
+        if (current.enableEntityRevision === undefined) updates.enableEntityRevision = false
+        if (current.enableGraalVm === undefined) updates.enableGraalVm = false
         const expectedConfigName = slugifyConfigName(values.name || '')
         if (current.name !== expectedConfigName) updates.name = expectedConfigName
         if (!current.artifact && values.name) updates.artifact = slugifyArtifact(values.name)
