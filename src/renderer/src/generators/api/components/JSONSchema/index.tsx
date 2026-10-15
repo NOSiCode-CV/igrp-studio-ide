@@ -298,9 +298,15 @@ export function JSONSchemaBuilder({
                     properties: deleteFromProperties(prev.properties)
                 }
             })
+            // Drop the id from the ordered list in the same tick as the
+            // schema update. Previously this read `schema.properties` off
+            // the stale closure (the callback has no deps), so the ordered
+            // list never shrank — leaving `fieldOrder.length > 0` after
+            // deleting the only root field, which in turn hid the "+ Add
+            // field" button and stranded the DTO without any way to add
+            // new fields.
+            setFieldOrder((prev) => prev.filter((key) => key !== id))
         }
-
-        setFieldOrder(Object.keys(schema.properties))
     }, [])
 
     const generateJSONSchema = useCallback(() => {
