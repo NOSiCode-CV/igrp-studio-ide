@@ -228,6 +228,23 @@ ipcMain.handle('git-provider:set-active', async (_event, id: string): Promise<vo
 ipcMain.handle('get-gitlab-config', async () => {
     return GitLabService.getGitlabConfigs()
 })
+
+/**
+ * Public shape of the bundled "GitLab NOSi" provider — baseUrl and
+ * clientId are safe to show in the renderer, but the client secret
+ * never leaves the main process. The renderer uses `isConfigured`
+ * alone to decide whether to offer the one-click login.
+ */
+ipcMain.handle('get-default-gitlab-provider-info', async () => {
+    const baseUrl = (
+        process.env.VITE_GITLAB_BASE_URL ||
+        process.env.VITE_GITLAB_HOST ||
+        'https://git.nosi.cv'
+    ).replace(/\/+$/, '')
+    const clientId = process.env.VITE_GITLAB_CLIENT_ID || ''
+    const isConfigured = !!clientId && !!process.env.GITLAB_CLIENT_SECRET
+    return { baseUrl, clientId, isConfigured }
+})
 ipcMain.handle('set-active-gitlab-config', async (_event, id: string): Promise<void> => {
     return GitLabService.setActiveGitlabConfig(id)
 })

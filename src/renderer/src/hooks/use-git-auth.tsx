@@ -233,20 +233,23 @@ const useGitAuth = () => {
         try {
             const config = await window.electron.ipcRenderer.invoke('get-gitlab-config')
 
-            // Create default provider if environment variables are available
-            const baseUrl = import.meta.env.VITE_GITLAB_BASE_URL
-            const clientId = import.meta.env.VITE_GITLAB_CLIENT_ID
-            const clientSecret = import.meta.env.VITE_GITLAB_CLIENT_SECRET
+            // Ask the main process for the default provider's public info.
+            // The client secret stays main-process-only — the renderer only
+            // ever learns whether the provider is wired up (isConfigured)
+            // and the public baseUrl/clientId used by the OAuth redirect.
+            const defaultInfo = await window.electron.ipcRenderer.invoke(
+                'get-default-gitlab-provider-info'
+            )
 
             const defaultProvider = {
                 id: 'gitlab-nosi',
                 name: 'GitLab NOSi',
-                baseUrl: baseUrl || 'https://git.nosi.cv',
-                clientId: clientId || '',
-                clientSecret: clientSecret || '',
+                baseUrl: defaultInfo?.baseUrl || 'https://git.nosi.cv',
+                clientId: defaultInfo?.clientId || '',
+                clientSecret: '',
                 active: false,
                 isDefault: true,
-                isConfigured: !!(baseUrl && clientId && clientSecret)
+                isConfigured: !!defaultInfo?.isConfigured
             }
 
             // Merge saved configurations with default provider

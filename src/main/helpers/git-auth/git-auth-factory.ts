@@ -58,7 +58,9 @@ const NOSI_GITLAB_ID = 'gitlab-nosi'
 
 function envGitlabDefault(): GitProviderConfig | null {
     const clientId = process.env.VITE_GITLAB_CLIENT_ID || ''
-    const clientSecret = process.env.VITE_GITLAB_CLIENT_SECRET || ''
+    // Main-process-only; see gitlab-auth.ts for the rationale behind
+    // dropping the VITE_ prefix on the secret.
+    const clientSecret = process.env.GITLAB_CLIENT_SECRET || ''
     if (!clientId || !clientSecret) return null
     const baseUrl = (
         process.env.VITE_GITLAB_BASE_URL ||

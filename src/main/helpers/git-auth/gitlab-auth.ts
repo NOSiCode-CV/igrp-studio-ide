@@ -10,7 +10,9 @@ const gitlabDefaultHost = (
 
 const gitlabConfig = {
     clientId: process.env.VITE_GITLAB_CLIENT_ID || '',
-    clientSecret: process.env.VITE_GITLAB_CLIENT_SECRET || '',
+    // Main-process-only — the VITE_ prefix would inline this into the
+    // renderer bundle; strip it so Vite can never see the secret.
+    clientSecret: process.env.GITLAB_CLIENT_SECRET || '',
     scopes: ['api', 'read_user', 'read_repository'],
     authUrl: `${gitlabDefaultHost}/oauth/authorize`,
     tokenUrl: `${gitlabDefaultHost}/oauth/token`,

@@ -28,27 +28,21 @@ export interface GitState {
     activeProviderId: string | null
 }
 
-// Helper function to create default GitLab NOSi provider
-const createDefaultGitLabProvider = (): GitLabProvider => {
-    const baseUrl = process.env.VITE_GITLAB_BASE_URL
-    const clientId = process.env.VITE_GITLAB_CLIENT_ID
-    const clientSecret = process.env.VITE_GITLAB_CLIENT_SECRET
-
-    // Always create the default provider, but mark it as unconfigured if env vars are missing
-    return {
-        id: 'gitlab-nosi',
-        name: 'GitLab NOSi',
-        baseUrl: baseUrl || 'https://git.nosi.cv',
-        clientId: clientId || '',
-        clientSecret: clientSecret || '',
-        active: false,
-        isDefault: true,
-        isConfigured: !!(baseUrl && clientId && clientSecret)
-    }
+// Default GitLab NOSi placeholder — the renderer intentionally does
+// NOT know the client secret; the Redux store boots with a shell that
+// use-git-auth later tops up with isConfigured + the public baseUrl/
+// clientId via the main process. Vite would otherwise inline any
+// VITE_-prefixed secret into the shipped bundle.
+const defaultProvider: GitLabProvider = {
+    id: 'gitlab-nosi',
+    name: 'GitLab NOSi',
+    baseUrl: 'https://git.nosi.cv',
+    clientId: '',
+    clientSecret: '',
+    active: false,
+    isDefault: true,
+    isConfigured: false
 }
-
-// Create the default provider once
-const defaultProvider = createDefaultGitLabProvider()
 
 const initialState: GitState = {
     repositoriesGitHub: [],

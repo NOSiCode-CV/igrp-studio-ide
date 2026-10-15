@@ -12,7 +12,6 @@ interface ImportMetaEnv {
     readonly VITE_GIT_REDIRECT_URI: string
 
     readonly VITE_GITHUB_CLIENT_ID: string
-    readonly VITE_GITHUB_CLIENT_SECRET: string
     /** Optional: Personal Access Token for GitHub API (e.g. release notes in private repo). Not the OAuth client secret. */
     readonly VITE_GITHUB_TOKEN?: string
 
@@ -22,7 +21,9 @@ interface ImportMetaEnv {
     readonly VITE_SENTRY_TEST: string
     readonly VITE_GITLAB_BASE_URL: string
     readonly VITE_GITLAB_CLIENT_ID: string
-    readonly VITE_GITLAB_CLIENT_SECRET: string
+    // Intentionally no VITE_*_CLIENT_SECRET here — OAuth client secrets
+    // live only in the main process so Vite can never inline them into
+    // the renderer bundle. See `get-default-gitlab-provider-info` IPC.
 }
 
 interface ImportMeta {

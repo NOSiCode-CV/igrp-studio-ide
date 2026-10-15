@@ -4,7 +4,9 @@ import { GitAuth } from './git-auth'
 
 const githubConfig = {
     clientId: process.env.VITE_GITHUB_CLIENT_ID || '',
-    clientSecret: process.env.VITE_GITHUB_CLIENT_SECRET || '',
+    // Main-process-only — see gitlab-auth.ts for why the VITE_ prefix
+    // is intentionally dropped here.
+    clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
     scopes: ['repo', 'read:user', 'read:org'],
     authUrl: 'https://github.com/login/oauth/authorize',
     tokenUrl: 'https://github.com/login/oauth/access_token',
