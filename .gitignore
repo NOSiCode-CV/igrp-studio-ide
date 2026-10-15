@@ -5,6 +5,8 @@ out
 *.log*
 package-lock.json
 
+.env
+.env.production
 .env.signing
 .env.local
 /tsconfig.web.tsbuildinfo
