@@ -50,10 +50,24 @@ export const useDto = ({ selectors, currentItem }: { selectors: Array<any>; curr
 
     useEffect(() => {
         if (!data) {
+            // Fresh DTO (no file loaded yet). Every entry point into the
+            // creator — three-dots on the module, "+" next to Contract,
+            // "+" next to Components, three-dots on Contract — reuses the
+            // same menu item, which carries a static id of 'new-dto'. If
+            // handleSave then persists with that id, each entry point can
+            // only ever hold one DTO on disk — the next one overwrites
+            // the previous. Mint a fresh id on mount so the first save
+            // of a new DTO always lands on its own file.
+            setId(getId())
             formik.resetForm()
             return
         }
         const { attributes, type } = data
+
+        // Loading an existing artifact — reuse the id persisted in the
+        // file so handleSave writes back to that same file instead of
+        // whatever fresh id lingered from a previous "new" session.
+        if (data.id) setId(data.id)
 
         formik.setValues(data)
         formik.setFieldValue('attributes', attributes || initialValues.attributes)
