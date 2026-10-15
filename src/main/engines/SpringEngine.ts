@@ -27,6 +27,7 @@ import type {
     ResponseConfig
 } from '@igrp/igrp-studio-springboot-engine/types'
 import { app } from 'electron'
+import { randomUUID } from 'node:crypto'
 import { ensureDirectoryExists } from '../helpers'
 import type { BaseEngine } from '../interfaces'
 import type { ProjectData } from '../types'
@@ -60,14 +61,20 @@ export class SpringEngine implements BaseEngine {
     }
 
     async duplicate(config: any, basePath: string): Promise<void> {
-        // For Spring engine, we'll create a copy with a modified name
+        // Each duplicate needs a unique name AND a unique id — a fixed
+        // `${name}Copy` / `${id}_copy` suffix meant every subsequent
+        // duplication of the same artifact resolved to the same filename
+        // and id, so the engine kept overwriting the previous copy instead
+        // of adding a new one. Mint a fresh UUID for the id and append a
+        // short random suffix to the display name so the created artifact
+        // never collides with earlier copies.
         const { name, type, module, content } = config
-        const duplicateName = `${name}Copy`
+        const uniqueSuffix = randomUUID().slice(0, 6)
+        const duplicateName = `${name}Copy${uniqueSuffix}`
 
-        // Create a deep copy of the content and update the name
         const duplicateContent = JSON.parse(JSON.stringify(content))
         duplicateContent.name = duplicateName
-        duplicateContent.id = `${duplicateContent.id}_copy`
+        duplicateContent.id = randomUUID()
 
         // Create the duplicate based on type
         switch (type) {

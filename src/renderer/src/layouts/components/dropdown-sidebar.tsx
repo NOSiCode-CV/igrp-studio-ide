@@ -158,9 +158,14 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                     dispatch(onSetChangeStatus(true))
                 }
             } else {
-                // Standard duplication for other types
+                // Standard duplication for other types.
+                // The engine resolves artifacts by their persisted name
+                // (what the file on disk is actually called); `item.label`
+                // can be a formatted/translated display string, which the
+                // engine rejects with "<X> file not found". Prefer the
+                // name on the loaded content.
                 const config = {
-                    name: item.label,
+                    name: item.content?.name ?? item.label,
                     type: item.type,
                     module: item.module,
                     content: item.content
@@ -258,9 +263,14 @@ export const DropdownSidebarMenuButton: React.FC<DropdownSidebarMenuButtonProps>
                 createGitCommit(basePath, `Delete GraphQL operation ${item.label}`)
                 dispatch(onSetChangeStatus(true))
             } else {
-                // Standard deletion for other types
+                // Standard deletion for other types.
+                // Same reasoning as the duplicate path above: resolve the
+                // real name from the loaded content before asking the
+                // engine, so the dropdown "Delete" matches what the
+                // in-page trash button does and no longer trips the
+                // "<X> file not found" error from the engine.
                 const config = {
-                    name: item.label,
+                    name: item.content?.name ?? item.label,
                     type: item.type,
                     module: item.module
                 }
