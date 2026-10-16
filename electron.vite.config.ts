@@ -20,6 +20,22 @@ export default defineConfig({
                 }
             }
         },
+        // Bake the OAuth client secrets into the compiled main bundle
+        // at build time. In dev `dotenv.config()` reads them from local
+        // `.env`; in production the packaged app has no `.env`, so CI
+        // (GitLab CI/CD → Variables) must set GITHUB_CLIENT_SECRET and
+        // GITLAB_CLIENT_SECRET in the build environment, and these
+        // defines freeze them into out/main/*.js. Safe for main (Node
+        // runtime, not shipped as public JS) — never add equivalent
+        // defines for the renderer.
+        define: {
+            'process.env.GITHUB_CLIENT_SECRET': JSON.stringify(
+                process.env.GITHUB_CLIENT_SECRET || ''
+            ),
+            'process.env.GITLAB_CLIENT_SECRET': JSON.stringify(
+                process.env.GITLAB_CLIENT_SECRET || ''
+            )
+        },
         envPrefix: 'VITE_'
     },
     preload: {
